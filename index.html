@@ -28,6 +28,10 @@ const REGLAGES = {
   degatsEnnemi: 8,
   delaiPerteEtoile: 12,      // secondes sans être vu par la police pour perdre une étoile
   nombrePietons: 12,
+  nombreVoitures: 6,         // voitures qui circulent toutes seules
+  vitesseCirculation: 4,
+  vitessePolice: 7,          // voitures de police
+  etoilesVoituresPolice: 2,  // à partir de combien d'étoiles la police arrive en voiture
   champDeVision: 0.66,       // plus grand = vue plus large
 };
 
@@ -134,6 +138,19 @@ const ART = {
     ".kkk........kkk.",
     ".kkk........kkk.",
   ],
+  voiturePolice: [
+    "......rrbb......",
+    "....cccccccc....",
+    "...cwwwwwwwwc...",
+    "..cwwwwwwwwwwc..",
+    ".cccccccccccccc.",
+    "cyyccccccccccyyc",
+    "gggggggggggggggg",
+    "cccccccccccccccc",
+    "kkkkkkkkkkkkkkkk",
+    ".kkk........kkk.",
+    ".kkk........kkk.",
+  ],
   arbre: [
     "...VVVV...",
     "..VvvvvV..",
@@ -210,7 +227,7 @@ const ART = {
 };
 const ART_DE = { soldat: 'humain', boss: 'humain', flic: 'humain', pieton: 'humain' };
 // hauteur dans le monde (1 = hauteur d'un mur)
-const TAILLE = { soldat: 0.75, boss: 0.95, flic: 0.75, pieton: 0.7, voiture: 0.55, arbre: 1.4,
+const TAILLE = { soldat: 0.75, boss: 0.95, flic: 0.75, pieton: 0.7, voiture: 0.55, voiturePolice: 0.6, arbre: 1.4,
                  soin: 0.25, munitions: 0.25, fleche: 0.35, fumee: 0.6 };
 const PALETTES = {
   soldat:    { h: '#4a5a2a', f: '#f0c090', e: '#222', c: '#6b7a3a', p: '#4a5a2a', k: '#222', a: '#333' },
@@ -218,6 +235,8 @@ const PALETTES = {
   flic:      { h: '#123', f: '#f0c090', e: '#222', c: '#2856c8', p: '#123', k: '#111', a: '#333' },
   pieton:    { h: '#6a3a1a', e: '#222', p: '#35a', k: '#333' },
   voiture:   { w: '#9cf', y: '#ff6', k: '#111', g: '#ccc' },
+  policeA:   { c: '#fff', w: '#9cf', y: '#ff6', k: '#111', g: '#26c', r: '#f22', b: '#224' },
+  policeB:   { c: '#fff', w: '#9cf', y: '#ff6', k: '#111', g: '#26c', r: '#622', b: '#44f' },
   arbre:     { v: '#2a8a2a', V: '#1a6a1a', b: '#7a4a1a' },
   soin:      { w: '#fff', r: '#e22' },
   munitions: { b: '#8a5a2a', y: '#fc3', k: '#442' },
@@ -290,7 +309,7 @@ for (let y = 0; y < H_CARTE; y++) {
     grille[y].push(sol);
   }
 }
-for (const v of entites.filter(e => e.type === 'voiture')) { // chaque voiture regarde vers là où il y a le plus de route
+function orienter(v) { // la voiture regarde vers là où il y a le plus de route
   let meilleur = -1;
   for (const a of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
     let n = 0;
@@ -298,6 +317,7 @@ for (const v of entites.filter(e => e.type === 'voiture')) { // chaque voiture r
     if (n > meilleur) { meilleur = n; v.angle = a; }
   }
 }
+entites.filter(e => e.type === 'voiture').forEach(orienter);
 MISSIONS.forEach(m => m.etapes.forEach(e => {
   if (e.lieu && !lieux[e.lieu]) alert(`Mission "${m.nom}" : le lieu "${e.lieu}" n'est pas sur la carte !`);
 }));
@@ -335,7 +355,7 @@ function voit(a, b) { // est-ce qu'il y a un mur entre a et b ?
 // =====================================================================
 const J = { x: depart.x, y: depart.y, angle: 0, vie: REGLAGES.viesJoueur, munitions: REGLAGES.munitionsDepart,
             argent: 0, voiture: null, cooldownTir: 0, flashTir: 0, degat: 0, bob: 0 };
-let etoiles = 0, tempsCalme = 0, tempsRenfort = 0, tempsPietons = 0, tempsChamp = 0, temps = 0;
+let etoiles = 0, tempsCalme = 0, tempsRenfort = 0, tempsVoituresPolice = 0, tempsVoitures = 0, tempsPietons = 0, tempsChamp = 0, temps = 0;
 let missionIndex = 0, etapeIndex = 0;
 let messageTexte = '', messageTemps = 0;
 function message(t, duree = 2.5) { messageTexte = t; messageTemps = duree; }
@@ -416,9 +436,14 @@ function conduire(dt) {
   const virage = Math.min(1, Math.abs(v.vitesse) / 2) * Math.sign(v.vitesse) * 2.2 * dt;
   if (touches.KeyA || touches.ArrowLeft) v.angle -= virage;
   if (touches.KeyD || touches.ArrowRight) v.angle += virage;
+  const ax = v.x, ay = v.y;
   if (!deplacer(v, Math.cos(v.angle) * v.vitesse * dt, Math.sin(v.angle) * v.vitesse * dt, 0.35)) {
     if (Math.abs(v.vitesse) > 3) son('choc');
     v.vitesse *= 0.5;
+  }
+  if (entites.some(e => e.type === 'voiture' && e !== v && dist(e, v) < 0.9)) { // on percute une autre voiture
+    if (Math.abs(v.vitesse) > 3) son('choc');
+    v.x = ax; v.y = ay; v.vitesse *= -0.3;
   }
   J.x = v.x; J.y = v.y; J.angle = v.angle;
   // on renverse ceux qu'on percute (façon dessin animé : pouf !)
@@ -444,6 +469,12 @@ function porteVoiture() {
   const v = entites.find(e => e.type === 'voiture' && dist(e, J) < 1.5);
   if (!v) return;
   J.voiture = v;
+  if (v.conducteur) { // on sort le conducteur de sa voiture !
+    v.conducteur = false;
+    const c = ajouterEntite(v.police ? 'flic' : 'pieton', v.x + Math.cos(v.angle + 1.57), v.y + Math.sin(v.angle + 1.57));
+    if (!libre(c.x, c.y, 0.2)) { c.x = v.x - Math.cos(v.angle + 1.57); c.y = v.y - Math.sin(v.angle + 1.57); }
+    c.peur = 5;
+  }
   if (!v.volee) { v.volee = true; crime(1); message('Voiture volée !'); }
 }
 
@@ -541,7 +572,62 @@ function poursuivre(e, vitesse, dt) {
   deplacer(e, Math.cos(a) * vitesse * dt, Math.sin(a) * vitesse * dt, 0.2);
 }
 
+// Les voitures roulent de case en case. À chaque carrefour, elles choisissent une route au hasard
+// (la police, elle, prend le chemin le plus court vers le joueur).
+// ponytail: pas de files de circulation, les voitures s'arrêtent et font demi-tour si elles se bloquent
+const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+function prochaineCase(v) {
+  const cx = Math.floor(v.x), cy = Math.floor(v.y);
+  const dir = Math.round(v.angle / (Math.PI / 2)) & 3;
+  let choix = -1;
+  if (v.police) {
+    let meilleur = 1e9;
+    DIRECTIONS.forEach(([ax, ay], i) => {
+      const d = champ[(cy + ay) * L_CARTE + cx + ax];
+      if (d >= 0 && d < meilleur) { meilleur = d; choix = i; }
+    });
+  } else {
+    const possibles = [0, 1, 2, 3].filter(i => i !== ((dir + 2) & 3) && solEn(cx + DIRECTIONS[i][0], cy + DIRECTIONS[i][1]) === '.'
+                                               && !murEn(cx + DIRECTIONS[i][0], cy + DIRECTIONS[i][1]));
+    if (possibles.includes(dir) && Math.random() < 0.7) choix = dir;
+    else if (possibles.length) choix = hasard(possibles);
+  }
+  if (choix < 0) choix = (dir + 2) & 3; // cul-de-sac : demi-tour
+  v.angle = choix * Math.PI / 2;
+  return { x: cx + DIRECTIONS[choix][0] + 0.5, y: cy + DIRECTIONS[choix][1] + 0.5 };
+}
+
+function majVoiture(v, dt) {
+  if (v.police) v.pal = Math.sin(temps * 12) > 0 ? PAL_POLICE_A : PAL_POLICE_B; // gyrophare
+  if (!v.conducteur || v === J.voiture) return;
+  if (v.police && dist(v, J) < 5 && voit(v, J)) { // arrivés : les policiers sortent de la voiture
+    v.conducteur = false; v.vitesse = 0;
+    for (const cote of [-1, 1]) {
+      const x = v.x + Math.cos(v.angle + cote * 1.57) * 0.8, y = v.y + Math.sin(v.angle + cote * 1.57) * 0.8;
+      if (libre(x, y, 0.2)) { const f = ajouterEntite('flic', x, y); f.renfort = true; f.alerte = true; }
+    }
+    return;
+  }
+  // quelqu'un devant ? on attend (et on fait demi-tour si ça dure)
+  const devant = { x: v.x + Math.cos(v.angle), y: v.y + Math.sin(v.angle) };
+  const bloque = (!J.voiture && !v.police && dist(devant, J) < 0.8) ||
+    entites.some(e => e !== v && (e.type === 'voiture' || e.type === 'pieton') && dist(e, devant) < 0.8);
+  if (bloque) {
+    v.vitesse = 0;
+    v.attente = (v.attente || 0) + dt;
+    if (v.attente > 2) { v.attente = 0; v.angle += Math.PI; v.cible = prochaineCase(v); }
+    return;
+  }
+  v.attente = 0;
+  v.vitesse = v.police ? REGLAGES.vitessePolice : REGLAGES.vitesseCirculation;
+  if (!v.cible) v.cible = prochaineCase(v);
+  const d = dist(v, v.cible), pas = v.vitesse * dt;
+  if (d <= pas) { v.x = v.cible.x; v.y = v.cible.y; v.cible = prochaineCase(v); }
+  else { v.x += (v.cible.x - v.x) / d * pas; v.y += (v.cible.y - v.y) / d * pas; }
+}
+
 function majEntite(e, dt) {
+  if (e.type === 'voiture') { majVoiture(e, dt); return; }
   if (e.type === 'fumee') { e.timer -= dt; if (e.timer <= 0) e.supprimer = true; return; }
   if (!PERSONNES.includes(e.type) || e.supprimer) return;
   e.cooldown -= dt; e.timer -= dt; e.peur -= dt;
@@ -601,6 +687,17 @@ function police(dt) {
     const f = apparaitre('flic', 8, 16);
     if (f) f.renfort = true;
   }
+  if (etoiles >= REGLAGES.etoilesVoituresPolice) {
+    tempsVoituresPolice -= dt;
+    const enRoute = entites.filter(e => e.police && e.conducteur).length;
+    if (tempsVoituresPolice <= 0 && enRoute < etoiles - 1) {
+      tempsVoituresPolice = 5;
+      const v = apparaitre('voiture', 10, 22);
+      if (v) { v.police = true; v.conducteur = true; v.renfort = true; v.art = 'voiturePolice'; orienter(v); }
+    }
+  }
+  // les voitures de police garées loin disparaissent
+  for (const e of entites) if (e.police && !e.conducteur && e.renfort && e !== J.voiture && dist(e, J) > 18) e.supprimer = true;
 }
 
 // =====================================================================
@@ -649,6 +746,12 @@ function mettreAJour(dt) {
   if (tempsPietons <= 0 && entites.filter(e => e.type === 'pieton').length < REGLAGES.nombrePietons) {
     tempsPietons = 2;
     apparaitre('pieton', 6, 30);
+  }
+  tempsVoitures -= dt;
+  if (tempsVoitures <= 0 && entites.filter(e => e.conducteur && !e.police).length < REGLAGES.nombreVoitures) {
+    tempsVoitures = 2;
+    const v = apparaitre('voiture', 8, 30);
+    if (v) { v.conducteur = true; orienter(v); }
   }
   ramasser();
   missions();
@@ -733,8 +836,8 @@ function projeter(x, y) { // position à l'écran d'un objet du monde
 function dessinerSprite(s) {
   const p = projeter(s.x, s.y);
   if (!p) return;
-  const art = ART[ART_DE[s.type] || s.type], ah = art.length, aw = art[0].length;
-  const hPix = (H / p.tz) * TAILLE[s.type], wPix = hPix * aw / ah;
+  const nom = s.art || ART_DE[s.type] || s.type, art = ART[nom], ah = art.length, aw = art[0].length;
+  const hPix = (H / p.tz) * TAILLE[s.art || s.type], wPix = hPix * aw / ah;
   const sol = H / 2 + H / (2 * p.tz) - (s.flotte || 0) * H / p.tz;
   const haut = sol - hPix, gauche = p.ecranX - wPix / 2;
   const x0 = Math.max(0, Math.floor(gauche)), x1 = Math.min(W, Math.ceil(gauche + wPix));
@@ -754,6 +857,7 @@ function dessinerSprite(s) {
 }
 
 const PAL_FLECHE = convertirPalette(PALETTES.fleche);
+const PAL_POLICE_A = convertirPalette(PALETTES.policeA), PAL_POLICE_B = convertirPalette(PALETTES.policeB);
 
 function rendreMonde() {
   const c = Math.cos(J.angle), s = Math.sin(J.angle), fov = REGLAGES.champDeVision;
@@ -874,7 +978,7 @@ function dessiner() {
   const points = { soldat: '#f33', boss: '#f0f', flic: '#39f', voiture: '#ccc' };
   for (const e of entites) {
     if (!points[e.type]) continue;
-    ctx.fillStyle = points[e.type];
+    ctx.fillStyle = e.police ? (Math.sin(temps * 12) > 0 ? '#f22' : '#39f') : points[e.type];
     ctx.fillRect(mx0 + e.x * t - 2, my0 + e.y * t - 2, 4, 4);
   }
   const cible = cibleMission();

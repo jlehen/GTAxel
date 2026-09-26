@@ -20,6 +20,8 @@ Ou ouvre `index.html` dans un navigateur (double-clic). Rien à installer.
 
 - **Missions** : suis la flèche jaune et le point clignotant sur la mini-carte.
 - **Police** : faire des bêtises donne des étoiles (jusqu'à 5). Plus il y en a, plus les policiers sont nombreux. Reste 12 secondes hors de leur vue pour perdre une étoile.
+- **Voitures** : des voitures circulent en ville. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler.
+- **Police en voiture** : à partir de 2 étoiles, des voitures de police arrivent toutes sirènes hurlantes et les policiers en descendent. Tu peux aussi voler leur voiture !
 - **Bunker** : gardé par des soldats. Les ennemis mis K.O. laissent des munitions.
 - **Trousses de soin** : +30 de vie.
 
