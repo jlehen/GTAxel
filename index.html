@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Axel's Game</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  canvas { display: block; margin: auto; width: min(100vw, 160vh); height: auto; cursor: crosshair; }
+</style>
+</head>
+<body>
+<canvas id="ecran" width="960" height="600"></canvas>
+<script>
+// =====================================================================
+//  RÉGLAGES : change ces nombres pour modifier le jeu !
+// =====================================================================
+const REGLAGES = {
+  titre: "AXEL'S GAME",
+  vitesseMarche: 3.5,        // cases par seconde à pied
+  vitesseRotation: 2.5,      // tourner avec les flèches
+  sensibiliteSouris: 0.0025,
+  vitesseMaxVoiture: 9,
+  accelerationVoiture: 6,
+  viesJoueur: 100,
+  munitionsDepart: 30,
+  degatsArme: 34,            // 3 balles pour mettre K.O. un soldat
+  cadenceTir: 0.3,           // secondes entre deux tirs
+  degatsEnnemi: 8,
+  delaiPerteEtoile: 12,      // secondes sans être vu par la police pour perdre une étoile
+  nombrePietons: 12,
+  champDeVision: 0.66,       // plus grand = vue plus large
+};
+
+// =====================================================================
+//  LA CARTE : dessine ta ville ! (toutes les lignes doivent avoir la même longueur)
+//  Murs : 1 béton   2 briques   3 tour en verre   4 immeuble   5 magasin   B bunker
+//  Sols : . route   , herbe   _ sol du bunker
+//  X départ du joueur   S soldat   K Kommandant (le chef)   P piéton   F policier
+//  C voiture   H trousse de soin   M munitions   T arbre   a b c ... lieux de mission
+// =====================================================================
+const CARTE = [
+  "11111111111111111111111111111111",
+  "1..............F...............1",
+  "1.X............................1",
+  "1..22222..33333..,,,,,..44444..1",
+  "1..22222..33333..,,,,,..44444..1",
+  "1..22222..33333..,,T,,..44444..1",
+  "1..22222..33333..,,,,,..44444..1",
+  "1..22222..33333..,,,,,..44444..1",
+  "1....C.........P..........C....1",
+  "1..a...........................1",
+  "1..55555..22222..33333..55555..1",
+  "1..55555.P22222..33333..55555..1",
+  "1..55555..22222..33333..55555.C1",
+  "1..55555..22222.M33333..55555..1",
+  "1..55555..22222..33333..55555..1",
+  "1.......P.................H....1",
+  "1....................C.........1",
+  "1..44444..22222..BBBBBBBBBBBB..1",
+  "1..44444..22222..B____S_____B..1",
+  "1..44444..22222..B_BBB__BBB_B..1",
+  "1..44444..22222..B_B______B_B..1",
+  "1..44444..22222..B_B_S__S_B_B..1",
+  "1....b..........._____K_____B..1",
+  "1....C...........B_B______B_B..1",
+  "1..33333..22222..B_B_S____B_B..1",
+  "1..33333..22222..B_BBB__BBB_B..1",
+  "1..33333..22222..B____S_____B..1",
+  "1..33333..22222..B__M___H___B..1",
+  "1..33333..22222..BBBBBBBBBBBB..1",
+  "1...........c..................1",
+  "1.......P.................C....1",
+  "11111111111111111111111111111111",
+];
+
+// =====================================================================
+//  LES MISSIONS : invente les tiennes !
+//  Types d'étapes :
+//    aller    : va au lieu (une lettre a, b, c... de la carte)
+//    voiture  : arrive au lieu EN VOITURE
+//    eliminer : mets K.O. tous les ennemis d'un type ('boss' ou 'soldat')
+//    etoiles  : fais monter la police à ce nombre d'étoiles
+//    semer    : perds toutes tes étoiles
+// =====================================================================
+const MISSIONS = [
+  { nom: 'Le colis', recompense: 500, etapes: [
+    { type: 'aller', lieu: 'a', texte: 'Récupère le colis au point A' },
+    { type: 'aller', lieu: 'b', texte: 'Livre le colis au point B' },
+  ]},
+  { nom: 'Voleur de voitures', recompense: 1000, etapes: [
+    { type: 'voiture', lieu: 'c', texte: 'Vole une voiture (touche E) et amène-la au garage C' },
+  ]},
+  { nom: 'Course-poursuite', recompense: 1500, etapes: [
+    { type: 'etoiles', nombre: 3, texte: 'Fais monter la police à 3 étoiles' },
+    { type: 'semer', texte: 'Sème la police !' },
+  ]},
+  { nom: 'Opération bunker', recompense: 5000, etapes: [
+    { type: 'aller', lieu: 'b', texte: "Va au point B, près de l'entrée du bunker" },
+    { type: 'eliminer', cible: 'boss', texte: 'Mets K.O. le Kommandant caché dans le bunker' },
+  ]},
+];
+
+// =====================================================================
+//  LES DESSINS (pixel art) : chaque lettre est une couleur, '.' = transparent
+// =====================================================================
+const ART = {
+  humain: [
+    "...hhhh...",
+    "..hhhhhh..",
+    "..ffffff..",
+    "..feffef..",
+    "..ffffff..",
+    "...ffff...",
+    "..cccccc..",
+    ".cccccccc.",
+    ".cccccccc.",
+    ".fccccccfa",
+    ".fccccccfa",
+    "..pppppp..",
+    "..pp..pp..",
+    "..pp..pp..",
+    "..pp..pp..",
+    ".kkk..kkk.",
+  ],
+  voiture: [
+    "....cccccccc....",
+    "...cwwwwwwwwc...",
+    "..cwwwwwwwwwwc..",
+    ".cccccccccccccc.",
+    "cyyccccccccccyyc",
+    "cccccggggggccccc",
+    "cccccccccccccccc",
+    "kkkkkkkkkkkkkkkk",
+    ".kkk........kkk.",
+    ".kkk........kkk.",
+  ],
+  arbre: [
+    "...VVVV...",
+    "..VvvvvV..",
+    ".VvvvvvvV.",
+    "VvvvVvvvvV",
+    "VvvvvvvVvV",
+    "VvVvvvvvvV",
+    ".VvvvvVvV.",
+    "..VvvvvV..",
+    "...VVVV...",
+    "....bb....",
+    "....bb....",
+    "....bb....",
+    "....bb....",
+    "....bb....",
+    "...bbbb...",
+    "..bbbbbb..",
+  ],
+  soin: [
+    "wwwwwwww",
+    "wwwrrwww",
+    "wwrrrrww",
+    "wwrrrrww",
+    "wwwrrwww",
+    "wwwwwwww",
+  ],
+  munitions: [
+    ".y.y.y..",
+    ".y.y.y..",
+    "bbbbbbbb",
+    "bkkkkkkb",
+    "bbbbbbbb",
+    "bbbbbbbb",
+  ],
+  fleche: [
+    "..yyyy..",
+    "..yyyy..",
+    "..yyyy..",
+    "yyyyyyyy",
+    ".yyyyyy.",
+    "..yyyy..",
+    "...yy...",
+  ],
+  fumee: [
+    "..w..g..",
+    ".wwwggg.",
+    "wwwwwwgg",
+    "gwwywwwg",
+    "gwwwwwwg",
+    ".gwwwyg.",
+    "..gggg..",
+  ],
+  pistolet: [
+    ".....kk.....",
+    "....kggk....",
+    "....kggk....",
+    "....kggk....",
+    "...kkggkk...",
+    "...kggggk...",
+    "..fkggggkf..",
+    ".fffkkkkfff.",
+    ".ffffffffff.",
+    "ffffffffffff",
+    "ffffffffffff",
+    "ffffffffffff",
+  ],
+  flash: [
+    "..y..y..",
+    "...yy...",
+    ".yyooyy.",
+    "...yy...",
+    "..y..y..",
+  ],
+};
+const ART_DE = { soldat: 'humain', boss: 'humain', flic: 'humain', pieton: 'humain' };
+// hauteur dans le monde (1 = hauteur d'un mur)
+const TAILLE = { soldat: 0.75, boss: 0.95, flic: 0.75, pieton: 0.7, voiture: 0.55, arbre: 1.4,
+                 soin: 0.25, munitions: 0.25, fleche: 0.35, fumee: 0.6 };
+const PALETTES = {
+  soldat:    { h: '#4a5a2a', f: '#f0c090', e: '#222', c: '#6b7a3a', p: '#4a5a2a', k: '#222', a: '#333' },
+  boss:      { h: '#111', f: '#f0c090', e: '#222', c: '#555', p: '#333', k: '#111', a: '#333' },
+  flic:      { h: '#123', f: '#f0c090', e: '#222', c: '#2856c8', p: '#123', k: '#111', a: '#333' },
+  pieton:    { h: '#6a3a1a', e: '#222', p: '#35a', k: '#333' },
+  voiture:   { w: '#9cf', y: '#ff6', k: '#111', g: '#ccc' },
+  arbre:     { v: '#2a8a2a', V: '#1a6a1a', b: '#7a4a1a' },
+  soin:      { w: '#fff', r: '#e22' },
+  munitions: { b: '#8a5a2a', y: '#fc3', k: '#442' },
+  fleche:    { y: '#ff0' },
+  fumee:     { w: '#eee', g: '#bbb', y: '#ff0' },
+  pistolet:  { k: '#222', g: '#777', f: '#f0c090' },
+  flash:     { y: '#ff0', o: '#f80' },
+};
+const COULEURS = ['#e33', '#3a3', '#fc3', '#c3c', '#3cc', '#f80', '#eee', '#48f'];
+const PEAUX = ['#f0c090', '#d8a070', '#a86a40', '#6a4020', '#f8d8b8'];
+const LEGENDE = { S: 'soldat', K: 'boss', P: 'pieton', F: 'flic', C: 'voiture', H: 'soin', M: 'munitions', T: 'arbre' };
+const PERSONNES = ['soldat', 'boss', 'pieton', 'flic'];
+const MURS = '12345B';
+
+// =====================================================================
+//  Petits outils
+// =====================================================================
+function rgb(r, g, b) { return 255 << 24 | b << 16 | g << 8 | r; }
+function entier(css) {
+  let h = css.slice(1);
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16);
+  return rgb(n >> 16, (n >> 8) & 255, n & 255);
+}
+function assombrir(c, f) { return rgb((c & 255) * f, ((c >> 8) & 255) * f, ((c >> 16) & 255) * f); }
+function bruit(a, b) { // un nombre "au hasard" mais toujours le même pour (a, b)
+  let h = Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+function hasard(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
+function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+function convertirPalette(p) { const r = {}; for (const k in p) r[k] = entier(p[k]); return r; }
+
+// =====================================================================
+//  Lecture de la carte
+// =====================================================================
+CARTE.forEach((ligne, i) => {
+  if (ligne.length !== CARTE[0].length) alert(`Carte : la ligne ${i} n'a pas la bonne longueur !`);
+});
+const L_CARTE = CARTE[0].length, H_CARTE = CARTE.length;
+const grille = [];
+let entites = [];
+const lieux = {};
+let depart = { x: 2.5, y: 2.5 };
+
+function ajouterEntite(type, x, y) {
+  const e = { type, x, y, vie: type === 'boss' ? 300 : 100, angle: Math.random() * 6.28,
+              couleur: hasard(COULEURS), cooldown: 0, timer: 0, peur: 0, vitesse: 0 };
+  e.pal = convertirPalette(PALETTES[type]);
+  if (type === 'pieton' || type === 'voiture') e.pal.c = entier(e.couleur);
+  if (type === 'pieton') e.pal.f = entier(hasard(PEAUX));
+  entites.push(e);
+  return e;
+}
+
+for (let y = 0; y < H_CARTE; y++) {
+  grille.push([]);
+  for (let x = 0; x < L_CARTE; x++) {
+    const c = CARTE[y][x];
+    let sol = c;
+    if (!MURS.includes(c) && !'.,_'.includes(c)) {
+      // un personnage ou un objet : le sol est celui de la case à gauche
+      const g = grille[y][x - 1];
+      sol = g && '.,_'.includes(g) ? g : '.';
+      if (c === 'X') depart = { x: x + 0.5, y: y + 0.5 };
+      else if (LEGENDE[c]) ajouterEntite(LEGENDE[c], x + 0.5, y + 0.5);
+      else lieux[c] = { x: x + 0.5, y: y + 0.5 };
+    }
+    grille[y].push(sol);
+  }
+}
+for (const v of entites.filter(e => e.type === 'voiture')) { // chaque voiture regarde vers là où il y a le plus de route
+  let meilleur = -1;
+  for (const a of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
+    let n = 0;
+    while (n < 10 && !murEn(Math.floor(v.x + Math.cos(a) * (n + 1)), Math.floor(v.y + Math.sin(a) * (n + 1)))) n++;
+    if (n > meilleur) { meilleur = n; v.angle = a; }
+  }
+}
+MISSIONS.forEach(m => m.etapes.forEach(e => {
+  if (e.lieu && !lieux[e.lieu]) alert(`Mission "${m.nom}" : le lieu "${e.lieu}" n'est pas sur la carte !`);
+}));
+
+function murEn(x, y) {
+  if (x < 0 || y < 0 || x >= L_CARTE || y >= H_CARTE) return '1';
+  const c = grille[y][x];
+  return MURS.includes(c) ? c : null;
+}
+function solEn(x, y) {
+  if (x < 0 || y < 0 || x >= L_CARTE || y >= H_CARTE) return '.';
+  return grille[y][x];
+}
+function libre(x, y, r) {
+  return !murEn(Math.floor(x - r), Math.floor(y - r)) && !murEn(Math.floor(x + r), Math.floor(y - r)) &&
+         !murEn(Math.floor(x - r), Math.floor(y + r)) && !murEn(Math.floor(x + r), Math.floor(y + r));
+}
+function deplacer(o, mx, my, r) { // renvoie false si on a tapé un mur
+  let ok = true;
+  if (libre(o.x + mx, o.y, r)) o.x += mx; else ok = false;
+  if (libre(o.x, o.y + my, r)) o.y += my; else ok = false;
+  return ok;
+}
+function voit(a, b) { // est-ce qu'il y a un mur entre a et b ?
+  const n = Math.ceil(dist(a, b) / 0.2);
+  for (let i = 1; i < n; i++) {
+    const t = i / n;
+    if (murEn(Math.floor(a.x + (b.x - a.x) * t), Math.floor(a.y + (b.y - a.y) * t))) return false;
+  }
+  return true;
+}
+
+// =====================================================================
+//  État du jeu
+// =====================================================================
+const J = { x: depart.x, y: depart.y, angle: 0, vie: REGLAGES.viesJoueur, munitions: REGLAGES.munitionsDepart,
+            argent: 0, voiture: null, cooldownTir: 0, flashTir: 0, degat: 0, bob: 0 };
+let etoiles = 0, tempsCalme = 0, tempsRenfort = 0, tempsPietons = 0, tempsChamp = 0, temps = 0;
+let missionIndex = 0, etapeIndex = 0;
+let messageTexte = '', messageTemps = 0;
+function message(t, duree = 2.5) { messageTexte = t; messageTemps = duree; }
+message(MISSIONS[0].etapes[0].texte, 4);
+
+// =====================================================================
+//  Sons (bips rétro)
+// =====================================================================
+let audio = null;
+const SONS = {
+  tir:     [400, 60, 0.15, 'square', 0.25],
+  ennemi:  [300, 80, 0.12, 'sawtooth', 0.12],
+  aie:     [200, 90, 0.2, 'triangle', 0.4],
+  bonus:   [600, 1200, 0.15, 'sine', 0.3],
+  mission: [500, 1500, 0.5, 'triangle', 0.3],
+  ko:      [800, 100, 0.4, 'sine', 0.25],
+  choc:    [120, 40, 0.2, 'square', 0.25],
+  vide:    [1000, 900, 0.05, 'square', 0.1],
+};
+function son(nom) {
+  if (!audio) return;
+  const [f1, f2, duree, forme, vol] = SONS[nom], t = audio.currentTime;
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.type = forme;
+  o.frequency.setValueAtTime(f1, t);
+  o.frequency.exponentialRampToValueAtTime(f2, t + duree);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + duree);
+  o.connect(g).connect(audio.destination);
+  o.start(t); o.stop(t + duree);
+}
+
+// =====================================================================
+//  Clavier et souris
+// =====================================================================
+const ecran = document.getElementById('ecran');
+const ctx = ecran.getContext('2d');
+const touches = {};
+let sourisAppuyee = false, enJeu = false;
+addEventListener('keydown', e => {
+  touches[e.code] = true;
+  if (e.code === 'KeyE' && enJeu && !e.repeat) porteVoiture();
+  if (e.code === 'Space') e.preventDefault();
+});
+addEventListener('keyup', e => touches[e.code] = false);
+ecran.addEventListener('mousedown', () => {
+  if (!enJeu) { enJeu = true; audio = audio || new AudioContext(); ecran.requestPointerLock?.(); }
+  else sourisAppuyee = true;
+});
+addEventListener('mouseup', () => sourisAppuyee = false);
+addEventListener('mousemove', e => {
+  if (enJeu && document.pointerLockElement === ecran && !J.voiture) J.angle += e.movementX * REGLAGES.sensibiliteSouris;
+});
+document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) enJeu = false; });
+
+// =====================================================================
+//  Le joueur
+// =====================================================================
+function marcher(dt) {
+  let av = 0, lat = 0;
+  if (touches.KeyW || touches.ArrowUp) av += 1;     // Z sur un clavier français
+  if (touches.KeyS || touches.ArrowDown) av -= 1;
+  if (touches.KeyA) lat -= 1;                       // Q sur un clavier français
+  if (touches.KeyD) lat += 1;
+  if (touches.ArrowLeft) J.angle -= REGLAGES.vitesseRotation * dt;
+  if (touches.ArrowRight) J.angle += REGLAGES.vitesseRotation * dt;
+  const v = REGLAGES.vitesseMarche * dt, c = Math.cos(J.angle), s = Math.sin(J.angle);
+  deplacer(J, (c * av - s * lat) * v, (s * av + c * lat) * v, 0.25);
+  if (av || lat) J.bob += dt * 10;
+}
+
+function conduire(dt) {
+  const v = J.voiture, R = REGLAGES;
+  if (touches.KeyW || touches.ArrowUp) v.vitesse += R.accelerationVoiture * dt;
+  else if (touches.KeyS || touches.ArrowDown) v.vitesse -= R.accelerationVoiture * 1.5 * dt;
+  else v.vitesse *= Math.pow(0.4, dt); // la voiture ralentit toute seule
+  v.vitesse = Math.max(-R.vitesseMaxVoiture / 3, Math.min(R.vitesseMaxVoiture, v.vitesse));
+  const virage = Math.min(1, Math.abs(v.vitesse) / 2) * Math.sign(v.vitesse) * 2.2 * dt;
+  if (touches.KeyA || touches.ArrowLeft) v.angle -= virage;
+  if (touches.KeyD || touches.ArrowRight) v.angle += virage;
+  if (!deplacer(v, Math.cos(v.angle) * v.vitesse * dt, Math.sin(v.angle) * v.vitesse * dt, 0.35)) {
+    if (Math.abs(v.vitesse) > 3) son('choc');
+    v.vitesse *= 0.5;
+  }
+  J.x = v.x; J.y = v.y; J.angle = v.angle;
+  // on renverse ceux qu'on percute (façon dessin animé : pouf !)
+  if (Math.abs(v.vitesse) > 2) {
+    for (const e of entites) {
+      if (PERSONNES.includes(e.type) && !e.supprimer && dist(e, v) < 0.6) { toucher(e, 100); v.vitesse *= 0.7; }
+    }
+  }
+}
+
+function porteVoiture() {
+  if (J.voiture) { // sortir par la gauche ou la droite
+    const v = J.voiture;
+    v.vitesse = 0;
+    J.voiture = null;
+    for (const cote of [-1, 1]) {
+      const x = v.x + Math.cos(v.angle + cote * Math.PI / 2) * 0.8;
+      const y = v.y + Math.sin(v.angle + cote * Math.PI / 2) * 0.8;
+      if (libre(x, y, 0.25)) { J.x = x; J.y = y; return; }
+    }
+    return;
+  }
+  const v = entites.find(e => e.type === 'voiture' && dist(e, J) < 1.5);
+  if (!v) return;
+  J.voiture = v;
+  if (!v.volee) { v.volee = true; crime(1); message('Voiture volée !'); }
+}
+
+function tirer() {
+  if (J.munitions <= 0) { message('Plus de balles !', 1); son('vide'); J.cooldownTir = 0.5; return; }
+  J.munitions--;
+  J.cooldownTir = REGLAGES.cadenceTir;
+  J.flashTir = 0.08;
+  son('tir');
+  // qui est au milieu de l'écran, devant le mur ?
+  let cible = null, plusProche = Infinity;
+  for (const e of entites) {
+    if (!PERSONNES.includes(e.type)) continue;
+    const p = projeter(e.x, e.y);
+    if (!p) continue;
+    const largeur = (H / p.tz) * 0.5;
+    if (Math.abs(p.ecranX - W / 2) < largeur * 0.4 && p.tz < zbuffer[W / 2] && p.tz < plusProche) { cible = e; plusProche = p.tz; }
+  }
+  if (cible) toucher(cible, REGLAGES.degatsArme);
+  // le bruit fait fuir les piétons et alerte les soldats
+  for (const e of entites) {
+    if (dist(e, J) > 10) continue;
+    if (e.type === 'pieton' || (e.type === 'flic' && etoiles === 0)) { e.peur = 5; e.timer = 0; }
+    if (e.type === 'soldat' || e.type === 'boss') e.alerte = true;
+  }
+}
+
+function toucher(e, degats) {
+  e.vie -= degats;
+  e.alerte = true;
+  if (e.type === 'flic' && etoiles === 0) crime(1);
+  if (e.vie > 0) return;
+  // K.O. : il disparaît dans un nuage de fumée
+  e.supprimer = true;
+  son('ko');
+  ajouterEntite('fumee', e.x, e.y).timer = 0.6;
+  if (e.type !== 'pieton') ajouterEntite('munitions', e.x, e.y);
+  if (e.type === 'soldat') J.argent += 50;
+  if (e.type === 'boss') J.argent += 1000;
+  if (e.type === 'pieton' || e.type === 'flic') crime(1);
+}
+
+function crime(n) { etoiles = Math.min(5, etoiles + n); tempsCalme = 0; }
+
+function ramasser() {
+  for (const e of entites) {
+    if (e.supprimer || dist(e, J) > 0.6) continue;
+    if (e.type === 'soin' && J.vie < REGLAGES.viesJoueur) {
+      J.vie = Math.min(REGLAGES.viesJoueur, J.vie + 30);
+      e.supprimer = true; message('+30 vie', 1); son('bonus');
+    }
+    if (e.type === 'munitions') { J.munitions += 10; e.supprimer = true; message('+10 balles', 1); son('bonus'); }
+  }
+}
+
+function mourir() {
+  message("K.O. ! Tu te réveilles à l'hôpital (-100 $)", 4);
+  J.vie = REGLAGES.viesJoueur;
+  J.argent = Math.max(0, J.argent - 100);
+  J.munitions = Math.max(J.munitions, 10);
+  if (J.voiture) { J.voiture.vitesse = 0; J.voiture = null; }
+  J.x = depart.x; J.y = depart.y;
+  etoiles = 0;
+  for (const e of entites) { e.alerte = false; if (e.renfort) e.supprimer = true; }
+}
+
+// =====================================================================
+//  Les personnages (ennemis, police, piétons)
+// =====================================================================
+// "champ" = distance (en cases) de chaque case jusqu'au joueur : sert aux poursuivants à contourner les murs
+const champ = new Int16Array(L_CARTE * H_CARTE);
+function calculerChamp() {
+  champ.fill(-1);
+  const file = [Math.floor(J.y) * L_CARTE + Math.floor(J.x)];
+  champ[file[0]] = 0;
+  for (let i = 0; i < file.length; i++) {
+    const c = file[i], x = c % L_CARTE, y = (c / L_CARTE) | 0;
+    for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const n = (y + ay) * L_CARTE + x + ax;
+      if (murEn(x + ax, y + ay) || champ[n] !== -1) continue;
+      champ[n] = champ[c] + 1;
+      file.push(n);
+    }
+  }
+}
+function poursuivre(e, vitesse, dt) {
+  const cx = Math.floor(e.x), cy = Math.floor(e.y);
+  let meilleur = champ[cy * L_CARTE + cx], bx = cx, by = cy;
+  if (meilleur < 0) meilleur = 1e9;
+  for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+    const d = champ[(cy + ay) * L_CARTE + cx + ax];
+    if (d >= 0 && d < meilleur) { meilleur = d; bx = cx + ax; by = cy + ay; }
+  }
+  const a = Math.atan2(by + 0.5 - e.y, bx + 0.5 - e.x);
+  deplacer(e, Math.cos(a) * vitesse * dt, Math.sin(a) * vitesse * dt, 0.2);
+}
+
+function majEntite(e, dt) {
+  if (e.type === 'fumee') { e.timer -= dt; if (e.timer <= 0) e.supprimer = true; return; }
+  if (!PERSONNES.includes(e.type) || e.supprimer) return;
+  e.cooldown -= dt; e.timer -= dt; e.peur -= dt;
+  const d = dist(e, J);
+  const hostile = e.type === 'soldat' || e.type === 'boss' || (e.type === 'flic' && etoiles > 0);
+  const vitesse = e.type === 'flic' ? 2.5 + etoiles * 0.3 : e.type === 'pieton' ? (e.peur > 0 ? 3 : 0.8) : 2;
+
+  if (hostile) {
+    if (d < 14 && voit(e, J)) {
+      if (!e.alerte) { e.alerte = true; e.cooldown = 0.7; } // petit temps de réaction
+      const a = Math.atan2(J.y - e.y, J.x - e.x);
+      if (d > 3) deplacer(e, Math.cos(a) * vitesse * dt, Math.sin(a) * vitesse * dt, 0.2);
+      if (e.cooldown <= 0) {
+        e.cooldown = 0.8 + Math.random() * 1.2;
+        son('ennemi');
+        if (Math.random() < Math.max(0.2, 0.8 - d * 0.05)) {
+          J.vie -= REGLAGES.degatsEnnemi * (e.type === 'boss' ? 2 : 1);
+          J.degat = 0.4; son('aie');
+        }
+      }
+      return;
+    }
+    if (e.type === 'flic' || e.alerte) { poursuivre(e, vitesse, dt); return; }
+    return; // soldat de garde : il ne bouge pas
+  }
+  // se promener, ou fuir le joueur quand on a peur
+  if (e.timer <= 0) {
+    e.timer = 1.5 + Math.random() * 3;
+    e.angle = e.peur > 0 ? Math.atan2(e.y - J.y, e.x - J.x) + Math.random() - 0.5 : Math.random() * Math.PI * 2;
+  }
+  if (!deplacer(e, Math.cos(e.angle) * vitesse * dt, Math.sin(e.angle) * vitesse * dt, 0.2)) e.timer = 0;
+}
+
+function apparaitre(type, dMin, dMax) { // fait apparaître quelqu'un sur une route, hors de vue
+  for (let essai = 0; essai < 40; essai++) {
+    const x = Math.floor(Math.random() * L_CARTE) + 0.5, y = Math.floor(Math.random() * H_CARTE) + 0.5;
+    const d = Math.hypot(x - J.x, y - J.y);
+    if (grille[y | 0][x | 0] !== '.' || d < dMin || d > dMax || voit({ x, y }, J)) continue;
+    return ajouterEntite(type, x, y);
+  }
+}
+
+function police(dt) {
+  if (etoiles === 0) return;
+  const vu = entites.some(e => e.type === 'flic' && dist(e, J) < 14 && voit(e, J));
+  tempsCalme = vu ? 0 : tempsCalme + dt;
+  if (tempsCalme > REGLAGES.delaiPerteEtoile) {
+    etoiles--; tempsCalme = 0;
+    if (etoiles === 0) {
+      message('Tu as semé la police !');
+      for (const e of entites) if (e.renfort && dist(e, J) > 6) e.supprimer = true;
+    }
+  }
+  tempsRenfort -= dt;
+  if (tempsRenfort <= 0 && entites.filter(e => e.type === 'flic').length < etoiles * 2) {
+    tempsRenfort = 3;
+    const f = apparaitre('flic', 8, 16);
+    if (f) f.renfort = true;
+  }
+}
+
+// =====================================================================
+//  Missions
+// =====================================================================
+function etapeFinie(et) {
+  switch (et.type) {
+    case 'aller': return dist(J, lieux[et.lieu]) < 1;
+    case 'voiture': return J.voiture && dist(J, lieux[et.lieu]) < 1.5;
+    case 'eliminer': return !entites.some(e => e.type === et.cible && !e.supprimer);
+    case 'etoiles': return etoiles >= et.nombre;
+    case 'semer': return etoiles === 0;
+  }
+}
+function missions() {
+  const m = MISSIONS[missionIndex];
+  if (!m || !etapeFinie(m.etapes[etapeIndex])) return;
+  son('mission');
+  etapeIndex++;
+  if (etapeIndex < m.etapes.length) { message(m.etapes[etapeIndex].texte, 3); return; }
+  J.argent += m.recompense;
+  missionIndex++; etapeIndex = 0;
+  message(missionIndex < MISSIONS.length ? `Mission "${m.nom}" réussie ! +${m.recompense} $`
+                                         : 'BRAVO ! Toutes les missions sont finies !', 4);
+}
+function cibleMission() {
+  const m = MISSIONS[missionIndex];
+  if (!m) return null;
+  const et = m.etapes[etapeIndex];
+  if (et.lieu) return lieux[et.lieu];
+  if (et.type === 'eliminer') return entites.find(e => e.type === et.cible && !e.supprimer);
+  return null;
+}
+
+function mettreAJour(dt) {
+  temps += dt;
+  messageTemps -= dt;
+  J.cooldownTir -= dt; J.flashTir -= dt; J.degat -= dt;
+  if (J.voiture) conduire(dt); else marcher(dt);
+  if ((touches.Space || sourisAppuyee) && !J.voiture && J.cooldownTir <= 0) tirer();
+  tempsChamp -= dt;
+  if (tempsChamp <= 0) { calculerChamp(); tempsChamp = 0.5; }
+  for (const e of entites) majEntite(e, dt);
+  police(dt);
+  tempsPietons -= dt;
+  if (tempsPietons <= 0 && entites.filter(e => e.type === 'pieton').length < REGLAGES.nombrePietons) {
+    tempsPietons = 2;
+    apparaitre('pieton', 6, 30);
+  }
+  ramasser();
+  missions();
+  entites = entites.filter(e => !e.supprimer);
+  if (J.vie <= 0) mourir();
+}
+
+// =====================================================================
+//  Dessin du monde en 3D (raycasting, comme Wolfenstein 3D)
+// =====================================================================
+const W = 320, H = 200;
+const tampon = document.createElement('canvas');
+tampon.width = W; tampon.height = H;
+const tctx = tampon.getContext('2d');
+const image = tctx.createImageData(W, H);
+const pixels = new Uint32Array(image.data.buffer);
+const zbuffer = new Float32Array(W);
+const ciel = [];
+for (let y = 0; y < H / 2; y++) { const t = y / (H / 2); ciel.push(rgb(70 + 110 * t, 120 + 90 * t, 200 + 40 * t)); }
+
+const C = convertirPalette({
+  beton: '#8a8a8a', betonJoint: '#6a6a6a',
+  brique1: '#a0452e', brique2: '#8a3a26', joint: '#c8c0b0',
+  vitre: '#3a6a9a', vitreClair: '#8ac0e8', cadre: '#2a3440',
+  beige: '#d8c8a0', fenetre: '#2a3a5a', fenetreAllumee: '#f8e070',
+  vert: '#3a8a6a', rouge: '#d83030', blanc: '#f0f0f0', vitrine: '#6ab0d0',
+  pierre1: '#5a6a8a', pierre2: '#4a5a7a', pierre3: '#6a7a9a', jointBunker: '#2a3040',
+  route: '#505050', routeJoint: '#404040', herbe1: '#3a8a3a', herbe2: '#358035',
+  dalle1: '#6a6050', dalle2: '#5a5040',
+});
+
+// u = position horizontale sur le mur (0 à 1), v = verticale (0 en haut, 1 en bas)
+function texMur(m, u, v, mx, my) {
+  switch (m) {
+    case '2': { // briques
+      const rang = Math.floor(v * 12), dec = (rang % 2) * 0.5;
+      if ((v * 12) % 1 < 0.15 || (u * 3 + dec) % 1 < 0.05) return C.joint;
+      return bruit(mx * 7 + rang, my * 13 + Math.floor(u * 3 + dec)) > 0.5 ? C.brique1 : C.brique2;
+    }
+    case '3': { // tour en verre
+      const fu = (u * 3) % 1, fv = (v * 6) % 1;
+      if (fu > 0.1 && fu < 0.9 && fv > 0.12 && fv < 0.88) return fu + fv * 0.5 > 0.9 ? C.vitreClair : C.vitre;
+      return C.cadre;
+    }
+    case '4': { // immeuble avec des fenêtres allumées
+      const fu = (u * 2) % 1, fv = (v * 4) % 1;
+      if (fu > 0.2 && fu < 0.8 && fv > 0.2 && fv < 0.75)
+        return bruit(mx * 4 + Math.floor(u * 2), my * 4 + Math.floor(v * 4)) > 0.6 ? C.fenetreAllumee : C.fenetre;
+      return C.beige;
+    }
+    case '5': { // magasin avec store rayé
+      if (v < 0.45) { const fu = (u * 2) % 1, fv = (v * 4) % 1; return fu > 0.25 && fu < 0.75 && fv > 0.25 && fv < 0.8 ? C.fenetre : C.vert; }
+      if (v < 0.55) return (u * 6) % 1 < 0.5 ? C.rouge : C.blanc;
+      return u > 0.1 && u < 0.9 && v < 0.95 ? C.vitrine : C.vert;
+    }
+    case 'B': { // pierres bleues du bunker
+      const rang = Math.floor(v * 8), dec = (rang % 2) * 0.5;
+      if ((v * 8) % 1 < 0.1 || (u * 2 + dec) % 1 < 0.05) return C.jointBunker;
+      const n = bruit(mx * 5 + rang, my * 9 + Math.floor(u * 2 + dec));
+      return n < 0.33 ? C.pierre1 : n < 0.66 ? C.pierre2 : C.pierre3;
+    }
+    default: // béton
+      return (v * 4) % 1 < 0.05 || (u * 2) % 1 < 0.03 ? C.betonJoint : C.beton;
+  }
+}
+function texSol(s, u, v) {
+  if (s === ',') return ((u * 6 | 0) + (v * 6 | 0)) % 2 ? C.herbe1 : C.herbe2;
+  if (s === '_') return ((u * 2 | 0) + (v * 2 | 0)) % 2 ? C.dalle1 : C.dalle2;
+  return u < 0.03 || v < 0.03 ? C.routeJoint : C.route;
+}
+function brume(d) { return Math.max(0.3, 1 - d / 24); }
+
+let cam = {};
+function projeter(x, y) { // position à l'écran d'un objet du monde
+  const { dx, dy, px, py } = cam, rx = x - J.x, ry = y - J.y;
+  const inv = 1 / (px * dy - dx * py);
+  const tx = inv * (dy * rx - dx * ry), tz = inv * (-py * rx + px * ry);
+  if (tz < 0.2) return null;
+  return { ecranX: (W / 2) * (1 + tx / tz), tz };
+}
+
+function dessinerSprite(s) {
+  const p = projeter(s.x, s.y);
+  if (!p) return;
+  const art = ART[ART_DE[s.type] || s.type], ah = art.length, aw = art[0].length;
+  const hPix = (H / p.tz) * TAILLE[s.type], wPix = hPix * aw / ah;
+  const sol = H / 2 + H / (2 * p.tz) - (s.flotte || 0) * H / p.tz;
+  const haut = sol - hPix, gauche = p.ecranX - wPix / 2;
+  const x0 = Math.max(0, Math.floor(gauche)), x1 = Math.min(W, Math.ceil(gauche + wPix));
+  const y0 = Math.max(0, Math.floor(haut)), y1 = Math.min(H, Math.ceil(sol));
+  const f = brume(p.tz);
+  for (let x = x0; x < x1; x++) {
+    if (p.tz >= zbuffer[x]) continue; // caché derrière un mur
+    const ax = Math.floor((x - gauche) / wPix * aw);
+    if (ax < 0 || ax >= aw) continue;
+    for (let y = y0; y < y1; y++) {
+      const ay = Math.floor((y - haut) / hPix * ah);
+      if (ay < 0 || ay >= ah) continue;
+      const col = s.pal[art[ay][ax]];
+      if (col !== undefined) pixels[y * W + x] = assombrir(col, f);
+    }
+  }
+}
+
+const PAL_FLECHE = convertirPalette(PALETTES.fleche);
+
+function rendreMonde() {
+  const c = Math.cos(J.angle), s = Math.sin(J.angle), fov = REGLAGES.champDeVision;
+  cam = { dx: c, dy: s, px: -s * fov, py: c * fov };
+  const { dx, dy, px, py } = cam;
+
+  // ciel
+  for (let y = 0; y < H / 2; y++) pixels.fill(ciel[y], y * W, (y + 1) * W);
+  // sol
+  for (let y = H / 2; y < H; y++) {
+    const dLigne = (H / 2) / (y + 0.5 - H / 2);
+    const pasX = dLigne * 2 * px / W, pasY = dLigne * 2 * py / W;
+    let fx = J.x + dLigne * (dx - px), fy = J.y + dLigne * (dy - py);
+    const f = brume(dLigne);
+    for (let x = 0; x < W; x++) {
+      const cx = Math.floor(fx), cy = Math.floor(fy);
+      pixels[y * W + x] = assombrir(texSol(solEn(cx, cy), fx - cx, fy - cy), f);
+      fx += pasX; fy += pasY;
+    }
+  }
+  // murs : un rayon par colonne de l'écran
+  for (let x = 0; x < W; x++) {
+    const camX = 2 * x / W - 1, rdx = dx + px * camX, rdy = dy + py * camX;
+    let mx = Math.floor(J.x), my = Math.floor(J.y);
+    const ddx = Math.abs(1 / rdx), ddy = Math.abs(1 / rdy);
+    const sx = rdx < 0 ? -1 : 1, sy = rdy < 0 ? -1 : 1;
+    let sdx = (rdx < 0 ? J.x - mx : mx + 1 - J.x) * ddx;
+    let sdy = (rdy < 0 ? J.y - my : my + 1 - J.y) * ddy;
+    let cote = 0, mur = null;
+    for (let i = 0; i < 64 && !mur; i++) {
+      if (sdx < sdy) { sdx += ddx; mx += sx; cote = 0; } else { sdy += ddy; my += sy; cote = 1; }
+      mur = murEn(mx, my);
+    }
+    const d = Math.max(0.01, cote === 0 ? sdx - ddx : sdy - ddy);
+    zbuffer[x] = d;
+    let u = cote === 0 ? J.y + d * rdy : J.x + d * rdx;
+    u -= Math.floor(u);
+    const hauteur = H / d, haut = (H - hauteur) / 2;
+    const f = brume(d) * (cote ? 0.75 : 1);
+    const y0 = Math.max(0, Math.floor(haut)), y1 = Math.min(H, Math.ceil(haut + hauteur));
+    for (let y = y0; y < y1; y++) pixels[y * W + x] = assombrir(texMur(mur || '1', u, (y - haut) / hauteur, mx, my), f);
+  }
+  // personnages et objets, du plus loin au plus proche
+  const liste = entites.filter(e => e !== J.voiture);
+  const cible = cibleMission();
+  if (cible) liste.push({ x: cible.x, y: cible.y, type: 'fleche', pal: PAL_FLECHE,
+                          flotte: (cible.type === 'boss' ? 1 : 0.3) + Math.sin(temps * 4) * 0.08 });
+  liste.sort((a, b) => dist(b, J) - dist(a, J));
+  for (const e of liste) dessinerSprite(e);
+}
+
+// =====================================================================
+//  Affichage : arme, volant, infos, mini-carte
+// =====================================================================
+const miniCarte = document.createElement('canvas');
+miniCarte.width = L_CARTE; miniCarte.height = H_CARTE;
+{
+  const m = miniCarte.getContext('2d');
+  const couleurs = { '.': '#333', ',': '#264', '_': '#553', B: '#46a' };
+  for (let y = 0; y < H_CARTE; y++) for (let x = 0; x < L_CARTE; x++) {
+    m.fillStyle = couleurs[grille[y][x]] || '#888';
+    m.fillRect(x, y, 1, 1);
+  }
+}
+const PAL_CSS = { pistolet: PALETTES.pistolet, flash: PALETTES.flash };
+function dessinerArt(art, pal, x, y, t) {
+  for (let j = 0; j < art.length; j++) for (let i = 0; i < art[j].length; i++) {
+    const c = pal[art[j][i]];
+    if (c) { ctx.fillStyle = c; ctx.fillRect(x + i * t, y + j * t, t, t); }
+  }
+}
+function texte(t, x, y, couleur = '#fff', taille = 22, align = 'left') {
+  ctx.font = `bold ${taille}px monospace`;
+  ctx.textAlign = align;
+  ctx.fillStyle = '#000'; ctx.fillText(t, x + 2, y + 2);
+  ctx.fillStyle = couleur; ctx.fillText(t, x, y);
+}
+
+function dessiner() {
+  const w = ecran.width, h = ecran.height;
+  rendreMonde();
+  tctx.putImageData(image, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tampon, 0, 0, w, h);
+
+  if (J.voiture) { // volant
+    ctx.fillStyle = '#222'; ctx.fillRect(0, h - 70, w, 70);
+    const tourne = (touches.KeyA || touches.ArrowLeft ? -0.5 : 0) + (touches.KeyD || touches.ArrowRight ? 0.5 : 0);
+    ctx.save(); ctx.translate(w / 2, h + 30); ctx.rotate(tourne);
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 24;
+    ctx.beginPath(); ctx.arc(0, 0, 160, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.fillRect(-12, -160, 24, 160);
+    ctx.restore();
+    texte(`${Math.round(Math.abs(J.voiture.vitesse) * 12)} km/h`, w - 20, h - 25, '#6f6', 28, 'right');
+  } else { // pistolet + viseur
+    const t = 12, bx = Math.sin(J.bob) * 8, by = Math.abs(Math.cos(J.bob)) * 8 + (J.flashTir > 0 ? -10 : 0);
+    const x = w / 2 - 6 * t + bx, y = h - 12 * t + 10 + by;
+    if (J.flashTir > 0) dessinerArt(ART.flash, PAL_CSS.flash, x + 2 * t, y - 5 * t, t);
+    dessinerArt(ART.pistolet, PAL_CSS.pistolet, x, y, t);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(w / 2 - 10, h / 2 - 1, 20, 2); ctx.fillRect(w / 2 - 1, h / 2 - 10, 2, 20);
+  }
+  if (J.degat > 0) { ctx.fillStyle = `rgba(255,0,0,${J.degat})`; ctx.fillRect(0, 0, w, h); }
+
+  // vie, balles, argent
+  texte(`VIE ${Math.max(0, J.vie)}`, 20, h - 60, J.vie < 30 ? '#f44' : '#fff', 26);
+  texte(`BALLES ${J.munitions}`, 20, h - 25, '#fc3', 26);
+  texte(`${J.argent} $`, w - 20, 36, '#6f6', 28, 'right');
+
+  // étoiles de police
+  for (let i = 0; i < 5; i++) texte('★', w - 40 - i * 30, 72, i < etoiles ? '#fd0' : '#555', 28);
+
+  // mini-carte
+  const t = 4, mx0 = w - L_CARTE * t - 16, my0 = 90;
+  ctx.globalAlpha = 0.85;
+  ctx.drawImage(miniCarte, mx0, my0, L_CARTE * t, H_CARTE * t);
+  ctx.globalAlpha = 1;
+  const points = { soldat: '#f33', boss: '#f0f', flic: '#39f', voiture: '#ccc' };
+  for (const e of entites) {
+    if (!points[e.type]) continue;
+    ctx.fillStyle = points[e.type];
+    ctx.fillRect(mx0 + e.x * t - 2, my0 + e.y * t - 2, 4, 4);
+  }
+  const cible = cibleMission();
+  if (cible && Math.sin(temps * 8) > 0) { ctx.fillStyle = '#ff0'; ctx.fillRect(mx0 + cible.x * t - 4, my0 + cible.y * t - 4, 8, 8); }
+  ctx.save(); ctx.translate(mx0 + J.x * t, my0 + J.y * t); ctx.rotate(J.angle);
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(-4, -4); ctx.lineTo(-4, 4); ctx.fill();
+  ctx.restore();
+
+  // mission en cours + flèche vers l'objectif
+  const m = MISSIONS[missionIndex];
+  if (m) {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(10, 10, 560, 60);
+    texte(`Mission ${missionIndex + 1}/${MISSIONS.length} : ${m.nom}`, 20, 34, '#fd0', 20);
+    texte(m.etapes[etapeIndex].texte, 20, 60, '#fff', 17);
+  }
+  if (cible) {
+    ctx.save(); ctx.translate(w / 2, 110);
+    ctx.rotate(Math.atan2(cible.y - J.y, cible.x - J.x) - J.angle);
+    ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(12, 12); ctx.lineTo(-12, 12); ctx.fill();
+    ctx.restore();
+    texte(`${Math.round(dist(J, cible))} m`, w / 2, 150, '#ff0', 16, 'center');
+  }
+
+  if (messageTemps > 0) texte(messageTexte, w / 2, h / 2 - 60, '#fff', 28, 'center');
+
+  if (!enJeu) { // écran titre / pause
+    ctx.fillStyle = 'rgba(0,0,0,0.75)'; ctx.fillRect(0, 0, w, h);
+    texte(REGLAGES.titre, w / 2, 170, '#fd0', 64, 'center');
+    texte('Clique pour jouer', w / 2, 250, '#fff', 30, 'center');
+    const aide = ['Z Q S D ou flèches : se déplacer', 'Souris : viser', 'Clic ou Espace : tirer',
+                  'E : monter / descendre de voiture', 'Échap : pause'];
+    aide.forEach((l, i) => texte(l, w / 2, 330 + i * 34, '#ccc', 20, 'center'));
+  }
+}
+
+let dernier = performance.now();
+function boucle(t) {
+  const dt = Math.min(0.05, (t - dernier) / 1000);
+  dernier = t;
+  if (enJeu) mettreAJour(dt);
+  dessiner();
+  requestAnimationFrame(boucle);
+}
+requestAnimationFrame(boucle);
+</script>
+</body>
+</html>
