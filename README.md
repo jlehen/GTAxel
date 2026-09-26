@@ -1,46 +1,59 @@
 # GTAxel
 
-Un jeu de tir à la première personne dans une ville, entre **Wolfenstein 3D** et **GTA** : on vole des voitures, on échappe à la police et on attaque le bunker du Kommandant.
+Un jeu d'action en 3D dans une ville, inspiré de **GTA** et **Wolfenstein** : on vole des voitures, on échappe à la police, on achète des armes et on attaque le bunker du Kommandant.
 
 ## Jouer
 
 **En ligne : https://jlehen.github.io/GTAxel/**
 
-Ou ouvre `index.html` dans un navigateur (double-clic). Rien à installer.
+Ou ouvre `index.html` dans un navigateur (double-clic). Il faut une connexion Internet : le moteur 3D ([Three.js](https://threejs.org)) est chargé en ligne.
 
 | Touche | Action |
 |---|---|
 | Z Q S D ou flèches | Se déplacer / conduire |
-| Souris | Viser |
-| Clic ou Espace | Tirer |
-| E | Monter / descendre de voiture |
+| Souris | Regarder |
+| Clic gauche | Tirer / frapper |
+| Clic droit | Viser (zoom) |
+| Maj | Courir |
+| Espace | Sauter (frein à main en voiture) |
+| Ctrl ou C | S'accroupir (on se fait moins toucher) |
+| E | Monter / descendre de voiture, acheter à l'armurerie |
+| V | Vue à la 1re / 3e personne |
+| 1 à 6 ou molette | Changer d'arme |
 | Échap | Pause |
+
+Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'onglet avec Ctrl+W.
 
 ## Le jeu
 
-- **Missions** : suis la flèche jaune et le point clignotant sur la mini-carte.
-- **Police** : faire des bêtises donne des étoiles (jusqu'à 5). Plus il y en a, plus les policiers sont nombreux. Reste 12 secondes hors de leur vue pour perdre une étoile.
-- **Voitures** : des voitures circulent en ville. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler.
-- **Police en voiture** : à partir de 2 étoiles, des voitures de police arrivent toutes sirènes hurlantes et les policiers en descendent. Tu peux aussi voler leur voiture !
-- **Bunker** : gardé par des soldats. Les ennemis mis K.O. laissent des munitions.
-- **Trousses de soin** : +30 de vie.
+- **Armes** : on commence avec les poings et un couteau. Les autres s'achètent à l'**armurerie** (A orange sur la mini-carte) ou se ramassent sur les ennemis : pistolet, mitraillette, fusil à pompe, fusil d'assaut. Un tir à la tête fait beaucoup plus de dégâts.
+- **Vie** : elle remonte toute seule si on n'est pas touché pendant 5 secondes. Les trousses de soin rendent 50 points. En voiture, on prend beaucoup moins de dégâts.
+- **Police** : faire des bêtises donne des étoiles (jusqu'à 5). À partir de 2 étoiles, la police arrive en voiture. Reste 12 secondes hors de sa vue pour perdre une étoile.
+- **Voitures** : elles circulent en ville. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler.
+- **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse.
+- **WASTED** : si tu meurs, tu te réveilles à l'hôpital (+ rouge sur la mini-carte) et tu perds 100 $.
 
 ## Modifier le jeu
 
-Tout est dans `index.html`, avec trois zones faciles à changer en haut du fichier :
+Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier :
 
-1. **`REGLAGES`** : vitesses, vie, balles, dégâts, titre du jeu…
-2. **`CARTE`** : la ville est dessinée avec des lettres. Toutes les lignes doivent avoir la même longueur.
+1. **`REGLAGES`** : vitesses, vie, dégâts des ennemis, nombre de voitures et de piétons… Si le jeu rame, mets `ombres: false`.
+2. **`ARMES`** : dégâts, cadence de tir, prix, munitions de chaque arme.
+3. **`CARTE`** : chaque lettre est un pâté de maisons, les routes sont ajoutées toutes seules. Toutes les lignes doivent avoir la même longueur.
 
-   | Lettre | Signification |
+   | Lettre | Pâté de maisons |
    |---|---|
-   | `1` `2` `3` `4` `5` `B` | Murs : béton, briques, verre, immeuble, magasin, bunker |
-   | `.` `,` `_` | Sols : route, herbe, sol du bunker |
+   | `T` | Tours en verre |
+   | `I` | Immeubles |
+   | `M` | Maisons |
+   | `P` | Parc |
+   | `A` | Armurerie |
+   | `H` | Hôpital |
+   | `B` | Bunker militaire (soldats + Kommandant) |
+   | `.` | Place |
    | `X` | Départ du joueur |
-   | `S` `K` `F` `P` | Soldat, Kommandant, policier, piéton |
-   | `C` `H` `M` `T` | Voiture, soin, munitions, arbre |
    | `a` `b` `c`… | Lieux de mission |
 
-3. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture`, `eliminer`, `etoiles`, `semer`.
+4. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture`, `eliminer`, `etoiles`, `semer`, `arme`.
 
 Recharge la page (F5) pour voir tes changements.
