@@ -2,702 +2,1257 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>Axel's Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTAxel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
-  canvas { display: block; margin: auto; width: min(100vw, 160vh); height: auto; cursor: crosshair; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Roboto Condensed', Arial, sans-serif; }
+  canvas { display: block; }
+  #hud { position: fixed; inset: 0; pointer-events: none; color: #fff; text-shadow: 0 0 4px #000, 1px 1px 2px #000; }
+  #minicarte { position: absolute; left: 24px; bottom: 44px; width: 220px; height: 220px; border-radius: 50%; border: 3px solid rgba(0,0,0,.6); }
+  #barre-vie { position: absolute; left: 30px; bottom: 24px; width: 214px; height: 10px; background: rgba(0,0,0,.55); }
+  #barre-vie > div { height: 100%; width: 100%; background: #56b24c; transition: width .15s; }
+  #haut-droite { position: absolute; right: 28px; top: 18px; text-align: right; }
+  #argent { font: 38px 'Anton', Impact, sans-serif; color: #7fcf6f; }
+  #etoiles { font-size: 32px; letter-spacing: 3px; }
+  #etoiles span { color: rgba(255,255,255,.2); }
+  #etoiles span.on { color: #fff; }
+  #etoiles.vu span.on { animation: clignote .5s steps(1) infinite; }
+  @keyframes clignote { 50% { color: #58a8ff; } }
+  #arme { font: 26px 'Anton', Impact, sans-serif; margin-top: 6px; }
+  #munitions { font-size: 20px; }
+  #aide { position: absolute; left: 20px; top: 20px; max-width: 380px; background: rgba(0,0,0,.78); padding: 12px 16px; font-size: 17px; display: none; }
+  #objectif { position: absolute; bottom: 70px; left: 0; right: 0; text-align: center; font-size: 23px; padding: 0 280px; }
+  #annonce { position: absolute; top: 26%; left: 0; right: 0; text-align: center; font: 58px 'Anton', Impact, sans-serif; color: #f0c850; opacity: 0; transition: opacity .3s; }
+  #annonce small { display: block; font: 26px 'Roboto Condensed', Arial, sans-serif; color: #fff; }
+  #viseur { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #fff; box-shadow: 0 0 3px #000; }
+  #rouge { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 45%, rgba(190,0,0,.75)); opacity: 0; }
+  #wasted { position: absolute; top: 38%; left: 0; right: 0; text-align: center; font: 100px 'Anton', Impact, sans-serif; color: #c0392b; letter-spacing: 8px; display: none; }
+  #vitesse { position: absolute; right: 32px; bottom: 28px; font: 44px 'Anton', Impact, sans-serif; display: none; }
+  #menu { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          background: rgba(0,0,0,.72); color: #fff; cursor: pointer; text-align: center; }
+  #menu h1 { font: 120px 'Anton', Impact, sans-serif; margin: 0; letter-spacing: 4px;
+             background: linear-gradient(#fff 40%, #f0c850); -webkit-background-clip: text; background-clip: text; color: transparent;
+             filter: drop-shadow(5px 5px 0 #000); }
+  #etat { font-size: 28px; margin: 10px 0 26px; color: #f0c850; }
+  #menu table { border-collapse: collapse; font-size: 18px; }
+  #menu td { padding: 3px 14px; }
+  #menu td:first-child { text-align: right; color: #f0c850; font-weight: 700; }
 </style>
 </head>
 <body>
-<canvas id="ecran" width="960" height="600"></canvas>
-<script>
+<div id="hud">
+  <canvas id="minicarte" width="220" height="220"></canvas>
+  <div id="barre-vie"><div></div></div>
+  <div id="haut-droite">
+    <div id="argent">0 $</div>
+    <div id="etoiles"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+    <div id="arme"></div>
+    <div id="munitions"></div>
+  </div>
+  <div id="aide"></div>
+  <div id="objectif"></div>
+  <div id="annonce"></div>
+  <div id="viseur"></div>
+  <div id="rouge"></div>
+  <div id="wasted">WASTED</div>
+  <div id="vitesse"></div>
+</div>
+<div id="menu">
+  <h1>GTAxel</h1>
+  <div id="etat">Chargement… (il faut une connexion Internet)</div>
+  <table>
+    <tr><td>Z Q S D</td><td>se déplacer / conduire</td></tr>
+    <tr><td>Souris</td><td>regarder</td></tr>
+    <tr><td>Clic gauche</td><td>tirer / frapper</td></tr>
+    <tr><td>Clic droit</td><td>viser</td></tr>
+    <tr><td>Maj</td><td>courir</td></tr>
+    <tr><td>Espace</td><td>sauter (frein à main en voiture)</td></tr>
+    <tr><td>Ctrl ou C</td><td>s'accroupir</td></tr>
+    <tr><td>E</td><td>monter / descendre de voiture, acheter</td></tr>
+    <tr><td>V</td><td>vue 1re / 3e personne</td></tr>
+    <tr><td>1 à 6 ou molette</td><td>changer d'arme</td></tr>
+    <tr><td>Échap</td><td>pause</td></tr>
+  </table>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
 // =====================================================================
 //  RÉGLAGES : change ces nombres pour modifier le jeu !
 // =====================================================================
 const REGLAGES = {
-  titre: "AXEL'S GAME",
-  vitesseMarche: 3.5,        // cases par seconde à pied
-  vitesseRotation: 2.5,      // tourner avec les flèches
-  sensibiliteSouris: 0.0025,
-  vitesseMaxVoiture: 9,
-  accelerationVoiture: 6,
+  vitesseMarche: 4,          // mètres par seconde
+  vitesseCourse: 8,          // avec Maj
+  vitesseAccroupi: 2,
+  forceSaut: 6,
+  gravite: 18,
+  sensibiliteSouris: 0.0022,
   viesJoueur: 100,
-  munitionsDepart: 30,
-  degatsArme: 34,            // 3 balles pour mettre K.O. un soldat
-  cadenceTir: 0.3,           // secondes entre deux tirs
-  degatsEnnemi: 8,
-  delaiPerteEtoile: 12,      // secondes sans être vu par la police pour perdre une étoile
-  nombrePietons: 12,
-  nombreVoitures: 6,         // voitures qui circulent toutes seules
-  vitesseCirculation: 4,
-  vitessePolice: 7,          // voitures de police
+  regeneration: 8,           // points de vie regagnés par seconde...
+  delaiRegeneration: 5,      // ...quand on n'a pas été touché depuis ce nombre de secondes
+  protectionVoiture: 0.4,    // en voiture on ne prend que 40 % des dégâts
+  vitesseMaxVoiture: 32,     // m/s (32 m/s = 115 km/h)
+  accelerationVoiture: 14,
+  nombrePietons: 30,
+  nombreVoitures: 16,        // voitures qui circulent autour de toi
+  vitesseCirculation: 11,
+  vitessePolice: 18,
   etoilesVoituresPolice: 2,  // à partir de combien d'étoiles la police arrive en voiture
-  champDeVision: 0.66,       // plus grand = vue plus large
+  delaiPerteEtoile: 12,      // secondes sans être vu par la police pour perdre une étoile
+  maxPoliciers: 8,
+  degatsPolicier: 5,
+  degatsSoldat: 7,
+  degatsBoss: 12,
+  precisionEnnemis: 0.35,    // 1 = ils ne ratent jamais
+  argentDepart: 0,
+  vueDepart: 3,              // 1 = première personne, 3 = troisième personne
+  ombres: true,              // mets false si le jeu rame
 };
 
 // =====================================================================
-//  LA CARTE : dessine ta ville ! (toutes les lignes doivent avoir la même longueur)
-//  Murs : 1 béton   2 briques   3 tour en verre   4 immeuble   5 magasin   B bunker
-//  Sols : . route   , herbe   _ sol du bunker
-//  X départ du joueur   S soldat   K Kommandant (le chef)   P piéton   F policier
-//  C voiture   H trousse de soin   M munitions   T arbre   a b c ... lieux de mission
+//  LES ARMES : on commence avec les deux premières
+// =====================================================================
+const ARMES = [
+  { nom: 'Poings',         modele: null,           degats: 15, cadence: 0.45, portee: 2,   corps: true },
+  { nom: 'Couteau',        modele: 'couteau',      degats: 50, cadence: 0.5,  portee: 2.3, corps: true },
+  { nom: 'Pistolet',       modele: 'pistolet',     degats: 40, cadence: 0.3,  portee: 90,  prix: 200,  munitions: 36 },
+  { nom: 'Mitraillette',   modele: 'mitraillette', degats: 22, cadence: 0.08, portee: 60,  prix: 800,  munitions: 150, auto: true, dispersion: 0.03 },
+  { nom: 'Fusil à pompe',  modele: 'pompe',        degats: 20, cadence: 0.9,  portee: 30,  prix: 1200, munitions: 30, plombs: 8, dispersion: 0.07 },
+  { nom: "Fusil d'assaut", modele: 'fusil',        degats: 34, cadence: 0.12, portee: 130, prix: 2000, munitions: 120, auto: true, dispersion: 0.012 },
+];
+
+// =====================================================================
+//  LA CARTE : chaque lettre est un pâté de maisons (les routes sont ajoutées toutes seules)
+//  T tours   I immeubles   M maisons   P parc   A armurerie   H hôpital   B bunker
+//  . place   X départ du joueur   a b c d ... lieux de mission (des places)
 // =====================================================================
 const CARTE = [
-  "11111111111111111111111111111111",
-  "1..............F...............1",
-  "1.X............................1",
-  "1..22222..33333..,,,,,..44444..1",
-  "1..22222..33333..,,,,,..44444..1",
-  "1..22222..33333..,,T,,..44444..1",
-  "1..22222..33333..,,,,,..44444..1",
-  "1..22222..33333..,,,,,..44444..1",
-  "1....C.........P..........C....1",
-  "1..a...........................1",
-  "1..55555..22222..33333..55555..1",
-  "1..55555.P22222..33333..55555..1",
-  "1..55555..22222..33333..55555.C1",
-  "1..55555..22222.M33333..55555..1",
-  "1..55555..22222..33333..55555..1",
-  "1.......P.................H....1",
-  "1....................C.........1",
-  "1..44444..22222..BBBBBBBBBBBB..1",
-  "1..44444..22222..B____S_____B..1",
-  "1..44444..22222..B_BBB__BBB_B..1",
-  "1..44444..22222..B_B______B_B..1",
-  "1..44444..22222..B_B_S__S_B_B..1",
-  "1....b..........._____K_____B..1",
-  "1....C...........B_B______B_B..1",
-  "1..33333..22222..B_B_S____B_B..1",
-  "1..33333..22222..B_BBB__BBB_B..1",
-  "1..33333..22222..B____S_____B..1",
-  "1..33333..22222..B__M___H___B..1",
-  "1..33333..22222..BBBBBBBBBBBB..1",
-  "1...........c..................1",
-  "1.......P.................C....1",
-  "11111111111111111111111111111111",
+  "MMMMPPIIIMMM",
+  "MXMMPPIaTIMM",
+  "MMHIIITTTIIM",
+  "PPIIATTTTIIP",
+  "PPIIITTbTIIP",
+  "MIIcIITTIIMM",
+  "MMIIIIIIIPPM",
+  "MMPPIIIdBIMM",
+  "MMPPIIIIIPMM",
+  "MMMMMMPPPMMM",
 ];
 
 // =====================================================================
 //  LES MISSIONS : invente les tiennes !
-//  Types d'étapes :
-//    aller    : va au lieu (une lettre a, b, c... de la carte)
-//    voiture  : arrive au lieu EN VOITURE
-//    eliminer : mets K.O. tous les ennemis d'un type ('boss' ou 'soldat')
-//    etoiles  : fais monter la police à ce nombre d'étoiles
-//    semer    : perds toutes tes étoiles
+//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'boss' ou 'soldat')
+//  etoiles (nombre) · semer · arme (le nom d'une arme à posséder)
 // =====================================================================
 const MISSIONS = [
   { nom: 'Le colis', recompense: 500, etapes: [
-    { type: 'aller', lieu: 'a', texte: 'Récupère le colis au point A' },
-    { type: 'aller', lieu: 'b', texte: 'Livre le colis au point B' },
+    { type: 'aller', lieu: 'a', texte: 'Récupère le colis au point jaune' },
+    { type: 'aller', lieu: 'b', texte: 'Livre le colis en centre-ville' },
+  ]},
+  { nom: 'Armé jusqu\'aux dents', recompense: 200, etapes: [
+    { type: 'arme', arme: 'Pistolet', texte: 'Achète un pistolet à l\'armurerie (A sur la carte)' },
   ]},
   { nom: 'Voleur de voitures', recompense: 1000, etapes: [
-    { type: 'voiture', lieu: 'c', texte: 'Vole une voiture (touche E) et amène-la au garage C' },
+    { type: 'voiture', lieu: 'c', texte: 'Vole une voiture (touche E) et amène-la au garage' },
   ]},
   { nom: 'Course-poursuite', recompense: 1500, etapes: [
     { type: 'etoiles', nombre: 3, texte: 'Fais monter la police à 3 étoiles' },
     { type: 'semer', texte: 'Sème la police !' },
   ]},
   { nom: 'Opération bunker', recompense: 5000, etapes: [
-    { type: 'aller', lieu: 'b', texte: "Va au point B, près de l'entrée du bunker" },
-    { type: 'eliminer', cible: 'boss', texte: 'Mets K.O. le Kommandant caché dans le bunker' },
+    { type: 'aller', lieu: 'd', texte: 'Va près du bunker militaire' },
+    { type: 'eliminer', cible: 'boss', texte: 'Élimine le Kommandant dans le bunker' },
   ]},
 ];
 
 // =====================================================================
-//  LES DESSINS (pixel art) : chaque lettre est une couleur, '.' = transparent
+//  Outils
 // =====================================================================
-const ART = {
-  humain: [
-    "...hhhh...",
-    "..hhhhhh..",
-    "..ffffff..",
-    "..feffef..",
-    "..ffffff..",
-    "...ffff...",
-    "..cccccc..",
-    ".cccccccc.",
-    ".cccccccc.",
-    ".fccccccfa",
-    ".fccccccfa",
-    "..pppppp..",
-    "..pp..pp..",
-    "..pp..pp..",
-    "..pp..pp..",
-    ".kkk..kkk.",
-  ],
-  voiture: [
-    "....cccccccc....",
-    "...cwwwwwwwwc...",
-    "..cwwwwwwwwwwc..",
-    ".cccccccccccccc.",
-    "cyyccccccccccyyc",
-    "cccccggggggccccc",
-    "cccccccccccccccc",
-    "kkkkkkkkkkkkkkkk",
-    ".kkk........kkk.",
-    ".kkk........kkk.",
-  ],
-  voiturePolice: [
-    "......rrbb......",
-    "....cccccccc....",
-    "...cwwwwwwwwc...",
-    "..cwwwwwwwwwwc..",
-    ".cccccccccccccc.",
-    "cyyccccccccccyyc",
-    "gggggggggggggggg",
-    "cccccccccccccccc",
-    "kkkkkkkkkkkkkkkk",
-    ".kkk........kkk.",
-    ".kkk........kkk.",
-  ],
-  arbre: [
-    "...VVVV...",
-    "..VvvvvV..",
-    ".VvvvvvvV.",
-    "VvvvVvvvvV",
-    "VvvvvvvVvV",
-    "VvVvvvvvvV",
-    ".VvvvvVvV.",
-    "..VvvvvV..",
-    "...VVVV...",
-    "....bb....",
-    "....bb....",
-    "....bb....",
-    "....bb....",
-    "....bb....",
-    "...bbbb...",
-    "..bbbbbb..",
-  ],
-  soin: [
-    "wwwwwwww",
-    "wwwrrwww",
-    "wwrrrrww",
-    "wwrrrrww",
-    "wwwrrwww",
-    "wwwwwwww",
-  ],
-  munitions: [
-    ".y.y.y..",
-    ".y.y.y..",
-    "bbbbbbbb",
-    "bkkkkkkb",
-    "bbbbbbbb",
-    "bbbbbbbb",
-  ],
-  fleche: [
-    "..yyyy..",
-    "..yyyy..",
-    "..yyyy..",
-    "yyyyyyyy",
-    ".yyyyyy.",
-    "..yyyy..",
-    "...yy...",
-  ],
-  fumee: [
-    "..w..g..",
-    ".wwwggg.",
-    "wwwwwwgg",
-    "gwwywwwg",
-    "gwwwwwwg",
-    ".gwwwyg.",
-    "..gggg..",
-  ],
-  pistolet: [
-    ".....kk.....",
-    "....kggk....",
-    "....kggk....",
-    "....kggk....",
-    "...kkggkk...",
-    "...kggggk...",
-    "..fkggggkf..",
-    ".fffkkkkfff.",
-    ".ffffffffff.",
-    "ffffffffffff",
-    "ffffffffffff",
-    "ffffffffffff",
-  ],
-  flash: [
-    "..y..y..",
-    "...yy...",
-    ".yyooyy.",
-    "...yy...",
-    "..y..y..",
-  ],
-};
-const ART_DE = { soldat: 'humain', boss: 'humain', flic: 'humain', pieton: 'humain' };
-// hauteur dans le monde (1 = hauteur d'un mur)
-const TAILLE = { soldat: 0.75, boss: 0.95, flic: 0.75, pieton: 0.7, voiture: 0.55, voiturePolice: 0.6, arbre: 1.4,
-                 soin: 0.25, munitions: 0.25, fleche: 0.35, fumee: 0.6 };
-const PALETTES = {
-  soldat:    { h: '#4a5a2a', f: '#f0c090', e: '#222', c: '#6b7a3a', p: '#4a5a2a', k: '#222', a: '#333' },
-  boss:      { h: '#111', f: '#f0c090', e: '#222', c: '#555', p: '#333', k: '#111', a: '#333' },
-  flic:      { h: '#123', f: '#f0c090', e: '#222', c: '#2856c8', p: '#123', k: '#111', a: '#333' },
-  pieton:    { h: '#6a3a1a', e: '#222', p: '#35a', k: '#333' },
-  voiture:   { w: '#9cf', y: '#ff6', k: '#111', g: '#ccc' },
-  policeA:   { c: '#fff', w: '#9cf', y: '#ff6', k: '#111', g: '#26c', r: '#f22', b: '#224' },
-  policeB:   { c: '#fff', w: '#9cf', y: '#ff6', k: '#111', g: '#26c', r: '#622', b: '#44f' },
-  arbre:     { v: '#2a8a2a', V: '#1a6a1a', b: '#7a4a1a' },
-  soin:      { w: '#fff', r: '#e22' },
-  munitions: { b: '#8a5a2a', y: '#fc3', k: '#442' },
-  fleche:    { y: '#ff0' },
-  fumee:     { w: '#eee', g: '#bbb', y: '#ff0' },
-  pistolet:  { k: '#222', g: '#777', f: '#f0c090' },
-  flash:     { y: '#ff0', o: '#f80' },
-};
-const COULEURS = ['#e33', '#3a3', '#fc3', '#c3c', '#3cc', '#f80', '#eee', '#48f'];
-const PEAUX = ['#f0c090', '#d8a070', '#a86a40', '#6a4020', '#f8d8b8'];
-const LEGENDE = { S: 'soldat', K: 'boss', P: 'pieton', F: 'flic', C: 'voiture', H: 'soin', M: 'munitions', T: 'arbre' };
-const PERSONNES = ['soldat', 'boss', 'pieton', 'flic'];
-const MURS = '12345B';
+const R_ = REGLAGES;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const hasard = l => l[Math.floor(Math.random() * l.length)];
+const entre = (a, b) => a + Math.random() * (b - a);
+const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+const angleVers = (a, b) => Math.atan2(b.x - a.x, b.z - a.z);     // 0 = vers +Z
+function diffAngle(a, b) { let d = (b - a) % (2 * Math.PI); if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; return d; }
+const lerpAngle = (a, b, k) => a + diffAngle(a, b) * Math.min(1, k);
+function graine(n) { return () => { n = (n + 0x6D2B79F5) | 0; let t = Math.imul(n ^ (n >>> 15), 1 | n); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const hasardR = (l, rnd) => l[Math.floor(rnd() * l.length)];
+const indexArme = nom => ARMES.findIndex(a => a.nom === nom);
 
 // =====================================================================
-//  Petits outils
+//  Géographie : pâtés de S mètres, routes de R mètres
 // =====================================================================
-function rgb(r, g, b) { return 255 << 24 | b << 16 | g << 8 | r; }
-function entier(css) {
-  let h = css.slice(1);
-  if (h.length === 3) h = h.split('').map(c => c + c).join('');
-  const n = parseInt(h, 16);
-  return rgb(n >> 16, (n >> 8) & 255, n & 255);
+const S = 60, R = 14, PAS = S + R, VOIE = 3.2;
+const NBX = CARTE[0].length, NBZ = CARTE.length;
+const TAILLE_X = NBX * PAS + R, TAILLE_Z = NBZ * PAS + R;
+CARTE.forEach((l, i) => { if (l.length !== NBX) alert(`Carte : la ligne ${i} n'a pas la bonne longueur !`); });
+const origine = (i, j) => ({ x: i * PAS + R, z: j * PAS + R });            // coin d'un pâté
+const centre = (i, j) => ({ x: i * PAS + R + S / 2, z: j * PAS + R + S / 2 });
+const noeud = (i, j) => ({ x: i * PAS + R / 2, z: j * PAS + R / 2 });        // carrefour
+const blocEn = (x, z) => [clamp(Math.floor((x - R / 2) / PAS), 0, NBX - 1), clamp(Math.floor((z - R / 2) / PAS), 0, NBZ - 1)];
+const typeBloc = (i, j) => (i >= 0 && j >= 0 && i < NBX && j < NBZ) ? CARTE[j][i] : null;
+function hauteurSol(x, z) { // 0 sur la route, 0.2 sur les trottoirs
+  const i = Math.floor((x - R) / PAS), j = Math.floor((z - R) / PAS);
+  return typeBloc(i, j) && x - R - i * PAS <= S && z - R - j * PAS <= S ? 0.2 : 0;
 }
-function assombrir(c, f) { return rgb((c & 255) * f, ((c >> 8) & 255) * f, ((c >> 16) & 255) * f); }
-function bruit(a, b) { // un nombre "au hasard" mais toujours le même pour (a, b)
-  let h = Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263) | 0;
-  h = Math.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
-function hasard(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
-function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-function convertirPalette(p) { const r = {}; for (const k in p) r[k] = entier(p[k]); return r; }
 
-// =====================================================================
-//  Lecture de la carte
-// =====================================================================
-CARTE.forEach((ligne, i) => {
-  if (ligne.length !== CARTE[0].length) alert(`Carte : la ligne ${i} n'a pas la bonne longueur !`);
-});
-const L_CARTE = CARTE[0].length, H_CARTE = CARTE.length;
-const grille = [];
-let entites = [];
 const lieux = {};
-let depart = { x: 2.5, y: 2.5 };
-
-function ajouterEntite(type, x, y) {
-  const e = { type, x, y, vie: type === 'boss' ? 300 : 100, angle: Math.random() * 6.28,
-              couleur: hasard(COULEURS), cooldown: 0, timer: 0, peur: 0, vitesse: 0 };
-  e.pal = convertirPalette(PALETTES[type]);
-  if (type === 'pieton' || type === 'voiture') e.pal.c = entier(e.couleur);
-  if (type === 'pieton') e.pal.f = entier(hasard(PEAUX));
-  entites.push(e);
-  return e;
+let depart = centre(0, 0), hopital = null, armurerie = null;
+for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
+  const c = CARTE[j][i];
+  if (c === 'X') depart = centre(i, j);
+  if (/[a-z]/.test(c)) lieux[c] = centre(i, j);
 }
-
-for (let y = 0; y < H_CARTE; y++) {
-  grille.push([]);
-  for (let x = 0; x < L_CARTE; x++) {
-    const c = CARTE[y][x];
-    let sol = c;
-    if (!MURS.includes(c) && !'.,_'.includes(c)) {
-      // un personnage ou un objet : le sol est celui de la case à gauche
-      const g = grille[y][x - 1];
-      sol = g && '.,_'.includes(g) ? g : '.';
-      if (c === 'X') depart = { x: x + 0.5, y: y + 0.5 };
-      else if (LEGENDE[c]) ajouterEntite(LEGENDE[c], x + 0.5, y + 0.5);
-      else lieux[c] = { x: x + 0.5, y: y + 0.5 };
-    }
-    grille[y].push(sol);
-  }
-}
-function orienter(v) { // la voiture regarde vers là où il y a le plus de route
-  let meilleur = -1;
-  for (const a of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
-    let n = 0;
-    while (n < 10 && !murEn(Math.floor(v.x + Math.cos(a) * (n + 1)), Math.floor(v.y + Math.sin(a) * (n + 1)))) n++;
-    if (n > meilleur) { meilleur = n; v.angle = a; }
-  }
-}
-entites.filter(e => e.type === 'voiture').forEach(orienter);
 MISSIONS.forEach(m => m.etapes.forEach(e => {
   if (e.lieu && !lieux[e.lieu]) alert(`Mission "${m.nom}" : le lieu "${e.lieu}" n'est pas sur la carte !`);
 }));
 
-function murEn(x, y) {
-  if (x < 0 || y < 0 || x >= L_CARTE || y >= H_CARTE) return '1';
-  const c = grille[y][x];
-  return MURS.includes(c) ? c : null;
+// =====================================================================
+//  Moteur 3D
+// =====================================================================
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.85;
+renderer.shadowMap.enabled = R_.ombres;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.autoClear = false;
+document.body.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xbfd0e0, 120, 650);
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 1500);
+camera.rotation.order = 'YXZ';
+scene.add(camera);
+
+// ciel réaliste + reflets sur les vitres et les voitures
+const soleilDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(50), THREE.MathUtils.degToRad(140));
+const ciel = new Sky();
+ciel.scale.setScalar(1000);
+ciel.material.uniforms.turbidity.value = 5;
+ciel.material.uniforms.rayleigh.value = 1.2;
+ciel.material.uniforms.mieCoefficient.value = 0.004;
+ciel.material.uniforms.mieDirectionalG.value = 0.8;
+ciel.material.uniforms.sunPosition.value.copy(soleilDir);
+{
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const s = new THREE.Scene(); s.add(ciel);
+  scene.environment = pmrem.fromScene(s).texture;
+  scene.add(ciel);
 }
-function solEn(x, y) {
-  if (x < 0 || y < 0 || x >= L_CARTE || y >= H_CARTE) return '.';
-  return grille[y][x];
+scene.add(new THREE.HemisphereLight(0xcfe4ff, 0x5a5040, 0.35));
+const soleil = new THREE.DirectionalLight(0xfff1dd, 2.4);
+soleil.castShadow = true;
+soleil.shadow.mapSize.set(2048, 2048);
+Object.assign(soleil.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 1, far: 500 });
+soleil.shadow.bias = -0.0004;
+soleil.shadow.normalBias = 0.03;
+scene.add(soleil, soleil.target);
+
+// =====================================================================
+//  Textures dessinées par le programme
+// =====================================================================
+function toile(l, h, dessin) {
+  const c = document.createElement('canvas'); c.width = l; c.height = h;
+  dessin(c.getContext('2d'), l, h);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return t;
 }
-function libre(x, y, r) {
-  return !murEn(Math.floor(x - r), Math.floor(y - r)) && !murEn(Math.floor(x + r), Math.floor(y - r)) &&
-         !murEn(Math.floor(x - r), Math.floor(y + r)) && !murEn(Math.floor(x + r), Math.floor(y + r));
+function grain(g, l, h, n, a, t = 2) {
+  for (let i = 0; i < n; i++) { const v = Math.random() * 255 | 0; g.fillStyle = `rgba(${v},${v},${v},${a})`; g.fillRect(Math.random() * l, Math.random() * h, t, t); }
 }
-function deplacer(o, mx, my, r) { // renvoie false si on a tapé un mur
-  let ok = true;
-  if (libre(o.x + mx, o.y, r)) o.x += mx; else ok = false;
-  if (libre(o.x, o.y + my, r)) o.y += my; else ok = false;
-  return ok;
+function vitre(g, x, y, w, h, [r, v, b] = [60, 90, 120]) {
+  const gr = g.createLinearGradient(x, y, x + w * 0.4, y + h);
+  gr.addColorStop(0, `rgb(${r + 100},${v + 105},${b + 110})`);
+  gr.addColorStop(0.45, `rgb(${r},${v},${b})`);
+  gr.addColorStop(1, `rgb(${r >> 1},${v >> 1},${b >> 1})`);
+  g.fillStyle = gr; g.fillRect(x, y, w, h);
+  if (Math.random() < 0.25) { g.fillStyle = 'rgba(235,225,200,.55)'; g.fillRect(x, y, w, h * entre(0.3, 0.7)); }
 }
-function voit(a, b) { // est-ce qu'il y a un mur entre a et b ?
-  const n = Math.ceil(dist(a, b) / 0.2);
-  for (let i = 1; i < n; i++) {
-    const t = i / n;
-    if (murEn(Math.floor(a.x + (b.x - a.x) * t), Math.floor(a.y + (b.y - a.y) * t))) return false;
+function facade(fond, cols, rangs, fenetre, avant, hauteur = 256) {
+  return toile(256, hauteur, (g, l, h) => {
+    g.fillStyle = fond; g.fillRect(0, 0, l, h); grain(g, l, h, 3000, 0.06);
+    if (avant) avant(g, l, h);
+    for (let r = 0; r < rangs; r++) for (let c = 0; c < cols; c++) fenetre(g, c * l / cols, r * h / rangs, l / cols, h / rangs);
+  });
+}
+const TEX = {
+  route: toile(256, 256, (g, l, h) => { g.fillStyle = '#3a3a3c'; g.fillRect(0, 0, l, h); grain(g, l, h, 8000, 0.07); }),
+  lignes: toile(64, 256, (g) => { g.fillStyle = '#eee'; g.fillRect(30, 0, 4, 80); g.fillRect(3, 0, 3, 256); g.fillRect(58, 0, 3, 256); }),
+  zebra: toile(128, 32, (g) => { g.fillStyle = '#eee'; for (let k = 0; k < 8; k++) g.fillRect(k * 16 + 3, 0, 10, 32); }),
+  trottoir: toile(256, 256, (g, l, h) => { g.fillStyle = '#aaa79f'; g.fillRect(0, 0, l, h); grain(g, l, h, 4000, 0.08); g.fillStyle = 'rgba(0,0,0,.25)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 64, 0, 2, h); g.fillRect(0, k * 64, l, 2); } }),
+  herbe: toile(256, 256, (g, l, h) => { g.fillStyle = '#4a7a35'; g.fillRect(0, 0, l, h); for (let i = 0; i < 6000; i++) { g.fillStyle = `hsl(${entre(80, 110)},${entre(30, 50)}%,${entre(22, 38)}%)`; g.fillRect(Math.random() * l, Math.random() * h, 2, 3); } }),
+  paves: toile(256, 256, (g, l, h) => { g.fillStyle = '#8a7a6a'; g.fillRect(0, 0, l, h); for (let y = 0; y < 16; y++) for (let x = 0; x < 9; x++) { g.fillStyle = `hsl(25,${entre(10, 25)}%,${entre(45, 60)}%)`; g.fillRect(x * 32 + (y % 2) * 16 - 16 + 1, y * 16 + 1, 30, 14); } }),
+  toit: toile(256, 256, (g, l, h) => { g.fillStyle = '#6d6d6a'; g.fillRect(0, 0, l, h); grain(g, l, h, 12000, 0.15); }),
+  tuiles: toile(256, 256, (g, l, h) => { g.fillStyle = '#7a2e1e'; g.fillRect(0, 0, l, h); for (let y = 0; y < 16; y++) { for (let x = 0; x < 17; x++) { g.fillStyle = `rgba(255,${entre(80, 140) | 0},60,${entre(0, 0.15)})`; g.fillRect(x * 16 + (y % 2) * 8 - 8, y * 16, 15, 13); } g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, y * 16 + 13, l, 3); } }),
+  brique: facade('#8c3b2a', 4, 4, (g, x, y, w, h) => { g.fillStyle = '#d8d0c0'; g.fillRect(x + w * .2 - 4, y + h * .2 - 4, w * .6 + 8, h * .55 + 8); vitre(g, x + w * .2, y + h * .2, w * .6, h * .55); },
+    (g, l, h) => { g.fillStyle = 'rgba(0,0,0,.22)'; for (let y = 0; y < h; y += 4) { g.fillRect(0, y, l, 1); for (let x = (y / 4 % 2) * 6; x < l; x += 12) g.fillRect(x, y, 1, 4); } }),
+  beton: facade('#cbbf9f', 4, 4, (g, x, y, w, h) => vitre(g, x + w * .15, y + h * .2, w * .7, h * .6, [50, 70, 90]),
+    (g, l, h) => { g.fillStyle = 'rgba(0,0,0,.15)'; for (let y = 0; y < h; y += h / 4) g.fillRect(0, y + h / 4 - 7, l, 7); }),
+  moderne: facade('#8d949b', 1, 4, (g, x, y, w, h) => { vitre(g, 0, y + h * .25, w, h * .55, [40, 60, 80]); g.fillStyle = '#6d747b'; for (let k = 0; k < 6; k++) g.fillRect(k * w / 6, y + h * .25, 3, h * .55); }),
+  verre: facade('#1d2c3a', 6, 4, (g, x, y, w, h) => vitre(g, x + 1.5, y + 1.5, w - 3, h - 3, [40, 90, 125])),
+  verre2: facade('#3a3320', 6, 4, (g, x, y, w, h) => vitre(g, x + 1.5, y + 1.5, w - 3, h - 3, [115, 98, 60])),
+  maison: facade('#e8dcc0', 2, 2, (g, x, y, w, h) => { g.fillStyle = '#fff'; g.fillRect(x + w * .3 - 4, y + h * .25 - 4, w * .4 + 8, h * .45 + 8); vitre(g, x + w * .3, y + h * .25, w * .4, h * .45); g.fillStyle = '#3b5b3b'; g.fillRect(x + w * .3 - 18, y + h * .25 - 4, 12, h * .45 + 8); g.fillRect(x + w * .7 + 6, y + h * .25 - 4, 12, h * .45 + 8); }),
+  hopital: facade('#f2f2ee', 1, 4, (g, x, y, w, h) => vitre(g, 0, y + h * .3, w, h * .45, [50, 90, 140])),
+  magasin: facade('#4a2a22', 4, 2, (g, x, y, w, h) => { if (y > 0) { g.fillStyle = '#222'; g.fillRect(x, y + 8, w, h - 8); vitre(g, x + 4, y + 14, w - 8, h - 20, [70, 60, 50]); } else vitre(g, x + w * .2, y + h * .25, w * .6, h * .5); }, null, 128),
+  bunker: toile(256, 256, (g, l, h) => { g.fillStyle = '#6e6e66'; g.fillRect(0, 0, l, h); grain(g, l, h, 6000, 0.1); g.fillStyle = 'rgba(0,0,0,.3)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 64, 0, 2, h); g.fillRect(0, k * 64, l, 2); } for (let i = 0; i < 12; i++) { g.fillStyle = 'rgba(40,35,20,.15)'; g.fillRect(Math.random() * l, Math.random() * h, 6, entre(20, 80)); } }),
+  croix: toile(128, 128, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#d42020'; g.fillRect(44, 14, 40, 100); g.fillRect(14, 44, 100, 40); }),
+  enseigne: toile(512, 96, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 512, 96); g.fillStyle = '#ff7a1a'; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText('ARMURERIE', 256, 72); }),
+  flash: toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,230,1)'); r.addColorStop(0.3, 'rgba(255,200,80,.8)'); r.addColorStop(1, 'rgba(255,120,0,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }),
+};
+TEX.route.repeat.set(TAILLE_X / 8, TAILLE_Z / 8);
+TEX.lignes.repeat.set(1, S / 12);
+
+const std = (map, o = {}) => new THREE.MeshStandardMaterial({ map, roughness: 0.85, ...o });
+const MAT = {
+  route: std(TEX.route, { roughness: 0.95 }),
+  lignes: std(TEX.lignes, { transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
+  zebra: std(TEX.zebra, { transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
+  trottoir: std(TEX.trottoir), herbe: std(TEX.herbe, { roughness: 1 }), paves: std(TEX.paves),
+  toit: std(TEX.toit, { roughness: 1 }), tuiles: std(TEX.tuiles), ardoise: std(TEX.tuiles, { color: '#667' }),
+  brique: std(TEX.brique), beton: std(TEX.beton), moderne: std(TEX.moderne, { metalness: 0.3, roughness: 0.4 }),
+  verre: std(TEX.verre, { metalness: 0.8, roughness: 0.12 }), verre2: std(TEX.verre2, { metalness: 0.8, roughness: 0.15 }),
+  maison1: std(TEX.maison), maison2: std(TEX.maison, { color: '#cfe0ff' }), maison3: std(TEX.maison, { color: '#ffc8b0' }),
+  hopital: std(TEX.hopital, { roughness: 0.5 }), magasin: std(TEX.magasin), bunker: std(TEX.bunker, { roughness: 1 }),
+  metal: std(null, { color: '#8a8d90', metalness: 0.6, roughness: 0.4 }), sacs: std(null, { color: '#8a7a5a', roughness: 1 }),
+  pierre: std(null, { color: '#b8b2a6' }), eau: std(null, { color: '#2a5a7a', metalness: 0.3, roughness: 0.05 }),
+  porte: std(null, { color: '#222', roughness: 0.6 }),
+  croix: std(TEX.croix, { emissive: '#fff', emissiveMap: TEX.croix, emissiveIntensity: 0.3 }),
+  enseigne: std(TEX.enseigne, { emissive: '#fff', emissiveMap: TEX.enseigne, emissiveIntensity: 0.8 }),
+};
+// taille (en mètres) couverte par une répétition de chaque texture
+const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [12, 12], verre2: [12, 12], hopital: [12, 12],
+  maison1: [6, 6], maison2: [6, 6], maison3: [6, 6], magasin: [12, 6], bunker: [8, 8], toit: [8, 8], trottoir: [4, 4],
+  herbe: [6, 6], paves: [4, 4] };
+
+// =====================================================================
+//  Construction de la ville
+// =====================================================================
+const geos = {};               // matériau -> liste de géométries (fusionnées à la fin)
+const empreintes = [];         // bâtiments pour la mini-carte
+const arbres = [], lampadaires = [];
+const CELL = 25, cellules = new Map();
+function ajouterCollision(x1, z1, x2, z2, h) {
+  const b = { x1, z1, x2, z2, h };
+  for (let cx = Math.floor(x1 / CELL); cx <= Math.floor(x2 / CELL); cx++)
+    for (let cz = Math.floor(z1 / CELL); cz <= Math.floor(z2 / CELL); cz++) {
+      const k = cx * 1000 + cz;
+      if (!cellules.has(k)) cellules.set(k, []);
+      cellules.get(k).push(b);
+    }
+}
+function pourBoites(x1, z1, x2, z2, f) {
+  for (let cx = Math.floor(x1 / CELL); cx <= Math.floor(x2 / CELL); cx++)
+    for (let cz = Math.floor(z1 / CELL); cz <= Math.floor(z2 / CELL); cz++) {
+      const l = cellules.get(cx * 1000 + cz);
+      if (l) for (const b of l) f(b);
+    }
+}
+function ajusterUV(g, faces, [tl, th]) {
+  const uv = g.attributes.uv;
+  faces.forEach(([fl, fh], f) => { for (let k = 0; k < 4; k++) { const i = f * 4 + k; uv.setXY(i, uv.getX(i) * fl / tl, uv.getY(i) * fh / th); } });
+}
+function ajouterGeo(mat, g) { (geos[mat] ||= []).push(g); }
+// une boîte posée : (x, z) = centre, y = bas
+function boite(mat, x, y, z, l, h, p, collision = false) {
+  const g = new THREE.BoxGeometry(l, h, p);
+  if (DIM_TEX[mat]) ajusterUV(g, [[p, h], [p, h], [l, p], [l, p], [l, h], [l, h]], DIM_TEX[mat]);
+  g.translate(x, y + h / 2, z);
+  ajouterGeo(mat, g);
+  if (collision) { ajouterCollision(x - l / 2, z - p / 2, x + l / 2, z + p / 2, y + h); if (h > 2) empreintes.push([x - l / 2, z - p / 2, l, p]); }
+}
+function sol(mat, x, y, z, l, p) {
+  const g = new THREE.PlaneGeometry(l, p).rotateX(-Math.PI / 2);
+  if (DIM_TEX[mat]) ajusterUV(g, [[l, p]], DIM_TEX[mat]);
+  g.translate(x, y, z);
+  ajouterGeo(mat, g);
+}
+function immeuble(mat, x, z, l, p, etages, rnd) {
+  const h = etages * 3;
+  boite(mat, x, 0.2, z, l, h, p, true);
+  boite('toit', x, 0.2 + h, z, l + 0.5, 0.6, p + 0.5);
+  if (rnd() < 0.8) boite('metal', x + (rnd() - 0.5) * l * 0.5, 0.8 + h, z + (rnd() - 0.5) * p * 0.5, 3, 1.6, 2);
+  if (rnd() < 0.5) boite('metal', x + (rnd() - 0.5) * l * 0.5, 0.8 + h, z + (rnd() - 0.5) * p * 0.5, 1.5, 3, 1.5);
+}
+function maison(mat, toitMat, x, z) {
+  const l = 12, p = 9, h = 6;
+  boite(mat, x, 0.2, z, l, h, p, true);
+  const r = (p + 1) / Math.sqrt(3);
+  const t = new THREE.CylinderGeometry(r, r, l + 0.8, 3).rotateX(-Math.PI / 2).rotateY(Math.PI / 2).scale(1, 0.55, 1);
+  const uv = t.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 4, uv.getY(i) * 3);
+  t.translate(x, 0.2 + h + r * 0.5 * 0.55, z);
+  ajouterGeo(toitMat, t);
+  boite('porte', x, 0.2, z + p / 2, 1.2, 2.2, 0.1);
+}
+function arbre(x, z, s = 1) { arbres.push({ x, z, s }); ajouterCollision(x - 0.3, z - 0.3, x + 0.3, z + 0.3, 3); }
+
+const stands = [], soins = [], pnjDepart = [], voituresGarees = [], pickupsDepart = [];
+function genererBloc(i, j) {
+  const c = CARTE[j][i], o = origine(i, j), rnd = graine(i * 7919 + j * 104729);
+  const X = v => o.x + v, Z = v => o.z + v;
+  boite('trottoir', X(S / 2), 0, Z(S / 2), S, 0.2, S);
+  for (const k of [12, 30, 48]) { // lampadaires sur les 4 côtés
+    lampadaires.push({ x: X(k), z: Z(0.8), a: Math.PI }, { x: X(k), z: Z(S - 0.8), a: 0 },
+                     { x: X(0.8), z: Z(k), a: -Math.PI / 2 }, { x: X(S - 0.8), z: Z(k), a: Math.PI / 2 });
   }
+  if (c === 'T') {
+    const mats = ['verre', 'verre2', 'moderne'];
+    if (rnd() < 0.5) {
+      const e = 20 + Math.floor(rnd() * 20), m = hasardR(mats, rnd);
+      immeuble(m, X(30), Z(30), 33, 33, e, rnd);
+      immeuble(m, X(30), Z(30), 24, 24, e + 3 + Math.floor(rnd() * 4), rnd);
+    } else for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) immeuble(hasardR(mats, rnd), X(a), Z(b), 21, 21, 12 + Math.floor(rnd() * 18), rnd);
+  } else if (c === 'I') {
+    const mats = ['brique', 'beton', 'moderne'];
+    if (rnd() < 0.6) for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) immeuble(hasardR(mats, rnd), X(a), Z(b), 21, 21, 4 + Math.floor(rnd() * 7), rnd);
+    else { immeuble(hasardR(mats, rnd), X(30), Z(17), 45, 21, 5 + Math.floor(rnd() * 6), rnd); immeuble(hasardR(mats, rnd), X(30), Z(43), 45, 21, 3 + Math.floor(rnd() * 6), rnd); }
+  } else if (c === 'M') {
+    sol('herbe', X(S / 2), 0.21, Z(S / 2), S - 8, S - 8);
+    const t = hasardR(['tuiles', 'ardoise'], rnd);
+    for (const [a, b] of [[16, 15], [44, 15], [16, 43], [44, 43]]) { maison(hasardR(['maison1', 'maison2', 'maison3'], rnd), t, X(a), Z(b)); arbre(X(a + (rnd() - 0.5) * 8), Z(b + 9), 0.8 + rnd() * 0.5); }
+    voituresGarees.push({ x: X(30), z: Z(29), a: Math.PI / 2 });
+  } else if (c === 'P') {
+    sol('herbe', X(S / 2), 0.21, Z(S / 2), S - 8, S - 8);
+    sol('paves', X(S / 2), 0.22, Z(S / 2), 4, S - 8); sol('paves', X(S / 2), 0.225, Z(S / 2), S - 8, 4);
+    boite('pierre', X(30), 0.2, Z(30), 8, 0.7, 8, true); boite('eau', X(30), 0.2, Z(30), 7, 0.75, 7);
+    for (let k = 0; k < 14; k++) { const a = 8 + rnd() * 44, b = 8 + rnd() * 44; if (Math.abs(a - 30) > 5 && Math.abs(b - 30) > 5) arbre(X(a), Z(b), 0.8 + rnd() * 0.7); }
+    soins.push({ x: X(34), z: Z(26) });
+  } else if (c === 'H') {
+    hopital = { x: X(30), z: Z(S - 2) };
+    immeuble('hopital', X(30), Z(22), 36, 24, 5, rnd);
+    const cr = new THREE.PlaneGeometry(5, 5); cr.translate(X(30), 11, Z(34.06)); ajouterGeo('croix', cr);
+    boite('porte', X(30), 0.2, Z(34), 4, 3, 0.2);
+    sol('paves', X(30), 0.21, Z(46), 40, 16);
+    soins.push({ x: X(26), z: Z(40) }, { x: X(34), z: Z(40) });
+    voituresGarees.push({ x: X(14), z: Z(46), a: 0 });
+  } else if (c === 'A') {
+    armurerie = { x: X(30), z: Z(32) };
+    immeuble('magasin', X(30), Z(16), 30, 14, 2, rnd);
+    const en = new THREE.PlaneGeometry(12, 2.25); en.translate(X(30), 4.6, Z(23.06)); ajouterGeo('enseigne', en);
+    boite('porte', X(30), 0.2, Z(23), 2, 2.4, 0.2);
+    sol('paves', X(30), 0.21, Z(36), 44, 20);
+    [2, 3, 4, 5].forEach((a, k) => stands.push({ arme: a, x: X(15 + k * 10), z: Z(33) }));
+  } else if (c === 'B') {
+    sol('paves', X(30), 0.21, Z(30), 52, 52);
+    boite('bunker', X(30), 0.2, Z(4.5), 52, 4, 1, true);            // murs d'enceinte
+    boite('bunker', X(30), 0.2, Z(55.5), 52, 4, 1, true);
+    boite('bunker', X(55.5), 0.2, Z(30), 1, 4, 52, true);
+    boite('bunker', X(4.5), 0.2, Z(14.75), 1, 4, 21.5, true);       // mur ouest avec l'entrée
+    boite('bunker', X(4.5), 0.2, Z(45.25), 1, 4, 21.5, true);
+    boite('bunker', X(40), 0.2, Z(30), 20, 5, 24, true);             // le bunker
+    boite('toit', X(40), 5.2, Z(30), 21, 0.5, 25);
+    boite('porte', X(30), 0.2, Z(30), 0.2, 2.6, 3);
+    for (const [a, b, l, p] of [[18, 22, 1, 6], [18, 38, 1, 6], [12, 12, 5, 1], [12, 48, 5, 1], [26, 10, 1, 5], [26, 50, 1, 5]])
+      boite('sacs', X(a), 0.2, Z(b), l, 1.1, p, true);                // sacs de sable
+    pnjDepart.push({ type: 'boss', x: X(28), z: Z(30) });
+    for (const [a, b] of [[10, 22], [10, 38], [22, 14], [22, 46], [34, 12], [34, 48], [50, 10], [50, 50]]) pnjDepart.push({ type: 'soldat', x: X(a), z: Z(b) });
+    soins.push({ x: X(48), z: Z(8) }, { x: X(48), z: Z(52) });
+    pickupsDepart.push({ type: 'arme', arme: 5, x: X(52), z: Z(30) });
+  } else { // places : '.', 'X', et les lieux de mission
+    sol('paves', X(30), 0.21, Z(30), S - 8, S - 8);
+    for (const [a, b] of [[10, 10], [50, 10], [10, 50], [50, 50]]) { boite('pierre', X(a), 0.2, Z(b), 2.4, 0.6, 2.4); arbre(X(a), Z(b), 1); }
+    voituresGarees.push({ x: X(20), z: Z(14), a: Math.PI / 2 }, { x: X(40), z: Z(46), a: -Math.PI / 2 });
+  }
+}
+for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) genererBloc(i, j);
+if (!hopital) hopital = depart;
+
+// routes : un grand sol + marquages par tronçon
+{
+  const g = new THREE.PlaneGeometry(TAILLE_X, TAILLE_Z).rotateX(-Math.PI / 2);
+  g.translate(TAILLE_X / 2, 0, TAILLE_Z / 2);
+  const m = new THREE.Mesh(g, MAT.route); m.receiveShadow = true; scene.add(m);
+  const herbe = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000).rotateX(-Math.PI / 2), std(TEX.herbe.clone(), { roughness: 1 }));
+  herbe.material.map.repeat.set(600, 600); herbe.position.set(TAILLE_X / 2, -0.05, TAILLE_Z / 2); herbe.receiveShadow = true; scene.add(herbe);
+  for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
+    const n = noeud(i, j);
+    if (j < NBZ) { // tronçon nord-sud
+      const l = new THREE.PlaneGeometry(R, S).rotateX(-Math.PI / 2); l.translate(n.x, 0.02, n.z + R / 2 + S / 2); ajouterGeo('lignes', l);
+      for (const dz of [R / 2 + 2, R / 2 + S - 2]) { const z = new THREE.PlaneGeometry(R - 2, 3).rotateX(-Math.PI / 2); z.translate(n.x, 0.025, n.z + dz); ajouterGeo('zebra', z); }
+    }
+    if (i < NBX) { // tronçon est-ouest
+      const l = new THREE.PlaneGeometry(R, S).rotateX(-Math.PI / 2).rotateY(Math.PI / 2); l.translate(n.x + R / 2 + S / 2, 0.02, n.z); ajouterGeo('lignes', l);
+      for (const dx of [R / 2 + 2, R / 2 + S - 2]) { const z = new THREE.PlaneGeometry(R - 2, 3).rotateX(-Math.PI / 2).rotateY(Math.PI / 2); z.translate(n.x + dx, 0.025, n.z); ajouterGeo('zebra', z); }
+    }
+  }
+}
+// fusion : quelques gros objets au lieu de milliers de petits (beaucoup plus rapide)
+const batiments = [];
+for (const [nom, liste] of Object.entries(geos)) {
+  const m = new THREE.Mesh(mergeGeometries(liste), MAT[nom]);
+  m.castShadow = !['lignes', 'zebra', 'herbe', 'paves', 'croix', 'enseigne'].includes(nom);
+  m.receiveShadow = true;
+  scene.add(m);
+  if (!['lignes', 'zebra', 'herbe', 'paves', 'trottoir'].includes(nom)) batiments.push(m);
+  liste.forEach(g => g.dispose());
+}
+// arbres et lampadaires "instanciés" (un seul objet pour tous)
+function instances(geo, mat, liste, placer) {
+  const m = new THREE.InstancedMesh(geo, mat, liste.length);
+  const o = new THREE.Object3D();
+  liste.forEach((e, k) => { placer(o, e); o.updateMatrix(); m.setMatrixAt(k, o.matrix); });
+  m.castShadow = true; m.receiveShadow = true; scene.add(m);
+}
+instances(new THREE.CylinderGeometry(0.15, 0.25, 3, 7).translate(0, 1.5, 0), std(null, { color: '#5a3d24' }), arbres,
+  (o, e) => { o.position.set(e.x, 0.2, e.z); o.scale.setScalar(e.s); });
+instances(new THREE.IcosahedronGeometry(1.9, 1).translate(0, 4.4, 0), std(null, { color: '#3d6e2a', flatShading: true }), arbres,
+  (o, e) => { o.position.set(e.x, 0.2, e.z); o.scale.setScalar(e.s); o.rotation.y = e.x; });
+{
+  const poteau = mergeGeometries([new THREE.CylinderGeometry(0.07, 0.11, 7, 6).translate(0, 3.5, 0), new THREE.BoxGeometry(0.1, 0.1, 1.8).translate(0, 7, 0.85)]);
+  instances(poteau, std(null, { color: '#333', metalness: 0.6, roughness: 0.5 }), lampadaires, (o, e) => { o.position.set(e.x, 0.2, e.z); o.rotation.y = e.a; });
+  instances(new THREE.BoxGeometry(0.35, 0.12, 0.7).translate(0, 6.92, 1.6), std(null, { color: '#ffe', emissive: '#ffe8b0', emissiveIntensity: 0.4 }), lampadaires,
+    (o, e) => { o.position.set(e.x, 0.2, e.z); o.rotation.y = e.a; });
+  lampadaires.forEach(e => ajouterCollision(e.x - 0.15, e.z - 0.15, e.x + 0.15, e.z + 0.15, 7));
+}
+
+// =====================================================================
+//  Collisions et ligne de vue
+// =====================================================================
+function resoudre(o, r) { // pousse un cercle (o.x, o.z, rayon r) hors des bâtiments ; renvoie true si choc
+  let choc = false;
+  pourBoites(o.x - r, o.z - r, o.x + r, o.z + r, b => {
+    if ((o.y || 0) > b.h) return;
+    const px = clamp(o.x, b.x1, b.x2), pz = clamp(o.z, b.z1, b.z2);
+    const dx = o.x - px, dz = o.z - pz, d2 = dx * dx + dz * dz;
+    if (d2 >= r * r) return;
+    choc = true;
+    if (d2 > 1e-8) { const d = Math.sqrt(d2); o.x = px + dx / d * r; o.z = pz + dz / d * r; }
+    else {
+      const m = Math.min(o.x - b.x1, b.x2 - o.x, o.z - b.z1, b.z2 - o.z);
+      if (m === o.x - b.x1) o.x = b.x1 - r; else if (m === b.x2 - o.x) o.x = b.x2 + r; else if (m === o.z - b.z1) o.z = b.z1 - r; else o.z = b.z2 + r;
+    }
+  });
+  o.x = clamp(o.x, -30, TAILLE_X + 30); o.z = clamp(o.z, -30, TAILLE_Z + 30);
+  return choc;
+}
+function dansBatiment(x, y, z) {
+  let r = false;
+  pourBoites(x, z, x, z, b => { if (x > b.x1 && x < b.x2 && z > b.z1 && z < b.z2 && y < b.h) r = true; });
+  return r;
+}
+function voit(a, b) {
+  const n = Math.ceil(dist(a, b) / 1.5);
+  for (let i = 1; i < n; i++) { const t = i / n; if (dansBatiment(a.x + (b.x - a.x) * t, 1.5, a.z + (b.z - a.z) * t)) return false; }
   return true;
 }
 
 // =====================================================================
-//  État du jeu
+//  Personnages (faits de formes simples, animés)
 // =====================================================================
-const J = { x: depart.x, y: depart.y, angle: 0, vie: REGLAGES.viesJoueur, munitions: REGLAGES.munitionsDepart,
-            argent: 0, voiture: null, cooldownTir: 0, flashTir: 0, degat: 0, bob: 0 };
-let etoiles = 0, tempsCalme = 0, tempsRenfort = 0, tempsVoituresPolice = 0, tempsVoitures = 0, tempsPietons = 0, tempsChamp = 0, temps = 0;
-let missionIndex = 0, etapeIndex = 0;
-let messageTexte = '', messageTemps = 0;
-function message(t, duree = 2.5) { messageTexte = t; messageTemps = duree; }
-message(MISSIONS[0].etapes[0].texte, 4);
-
-// =====================================================================
-//  Sons (bips rétro)
-// =====================================================================
-let audio = null;
-const SONS = {
-  tir:     [400, 60, 0.15, 'square', 0.25],
-  ennemi:  [300, 80, 0.12, 'sawtooth', 0.12],
-  aie:     [200, 90, 0.2, 'triangle', 0.4],
-  bonus:   [600, 1200, 0.15, 'sine', 0.3],
-  mission: [500, 1500, 0.5, 'triangle', 0.3],
-  ko:      [800, 100, 0.4, 'sine', 0.25],
-  choc:    [120, 40, 0.2, 'square', 0.25],
-  vide:    [1000, 900, 0.05, 'square', 0.1],
+const cacheMat = {};
+const mat = (c, o = {}) => cacheMat[c + JSON.stringify(o)] ||= new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, ...o });
+const GEO = {
+  torse: new THREE.BoxGeometry(0.44, 0.6, 0.24), bassin: new THREE.BoxGeometry(0.4, 0.18, 0.22),
+  tete: new THREE.SphereGeometry(0.125, 16, 12), cou: new THREE.CylinderGeometry(0.05, 0.06, 0.12, 8),
+  bras: new THREE.CapsuleGeometry(0.065, 0.48, 4, 8), jambe: new THREE.CapsuleGeometry(0.085, 0.72, 4, 8),
+  main: new THREE.SphereGeometry(0.055, 8, 6), chaussure: new THREE.BoxGeometry(0.13, 0.08, 0.27),
+  cheveux: new THREE.SphereGeometry(0.135, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.55),
+  casque: new THREE.SphereGeometry(0.16, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5),
+  casquette: new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16), visiere: new THREE.BoxGeometry(0.2, 0.02, 0.12),
+  oeil: new THREE.SphereGeometry(0.018, 6, 4),
 };
-function son(nom) {
-  if (!audio) return;
-  const [f1, f2, duree, forme, vol] = SONS[nom], t = audio.currentTime;
-  const o = audio.createOscillator(), g = audio.createGain();
-  o.type = forme;
-  o.frequency.setValueAtTime(f1, t);
-  o.frequency.exponentialRampToValueAtTime(f2, t + duree);
-  g.gain.setValueAtTime(vol, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + duree);
-  o.connect(g).connect(audio.destination);
-  o.start(t); o.stop(t + duree);
+function piece(geo, couleur, parent, x, y, z) {
+  const m = new THREE.Mesh(geo, mat(couleur));
+  m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m;
+}
+function creerHumain(s) {
+  const g = new THREE.Group(), haut = new THREE.Group();
+  haut.position.y = 0.95; g.add(haut);
+  piece(GEO.bassin, s.bas, haut, 0, 0, 0);
+  piece(GEO.torse, s.haut, haut, 0, 0.38, 0);
+  piece(GEO.cou, s.peau, haut, 0, 0.72, 0);
+  const tete = piece(GEO.tete, s.peau, haut, 0, 0.86, 0);
+  if (s.casque) piece(GEO.casque, s.casque, tete, 0, 0.02, 0);
+  else if (s.casquette) { piece(GEO.casquette, s.casquette, tete, 0, 0.09, 0); piece(GEO.visiere, s.casquette, tete, 0, 0.06, 0.13); }
+  else piece(GEO.cheveux, s.cheveux, tete, 0, 0.012, -0.01);
+  piece(GEO.oeil, '#111', tete, 0.045, 0.02, 0.113); piece(GEO.oeil, '#111', tete, -0.045, 0.02, 0.113);
+  // le personnage regarde vers +Z : son bras droit est du côté -X
+  const [brasD, brasG] = [-1, 1].map(c => { const b = new THREE.Group(); b.position.set(0.29 * c, 0.62, 0); haut.add(b);
+    piece(GEO.bras, s.haut, b, 0, -0.26, 0); piece(GEO.main, s.peau, b, 0, -0.57, 0); return b; });
+  const [jambeD, jambeG] = [-1, 1].map(c => { const j = new THREE.Group(); j.position.set(0.11 * c, 0.95, 0); g.add(j);
+    piece(GEO.jambe, s.bas, j, 0, -0.45, 0); piece(GEO.chaussure, s.chaussures, j, 0, -0.9, 0.04); return j; });
+  return { g, haut, tete, brasD, brasG, jambeD, jambeG, phase: Math.random() * 6, arme: null };
+}
+function animerHumain(h, vitesse, dt, o = {}) {
+  h.phase += dt * (vitesse > 0.2 ? 2.5 + vitesse * 1.3 : 0);
+  const amp = vitesse > 0.2 ? Math.min(0.95, 0.35 + vitesse * 0.08) : 0, s = Math.sin(h.phase) * amp;
+  h.jambeG.rotation.x = s; h.jambeD.rotation.x = -s;
+  h.brasG.rotation.set(-s * 0.8, 0, 0.08); h.brasD.rotation.set(s * 0.8, 0, -0.08);
+  if (o.arme) { h.brasD.rotation.set(-1.45, 0, 0); h.brasG.rotation.set(-1.3, 0, -0.55); }
+  if (o.frappe > 0) h.brasD.rotation.x = -1.7 * Math.sin(o.frappe * Math.PI);
+  if (o.enAir) { h.jambeG.rotation.x = 0.6; h.jambeD.rotation.x = -0.2; }
+  const hy = o.accroupi ? 0.6 : 0.95;
+  h.haut.position.y = hy; h.jambeG.position.y = h.jambeD.position.y = hy;
+  h.jambeG.scale.y = h.jambeD.scale.y = hy / 0.95;
+  h.haut.rotation.x = o.accroupi ? 0.25 : 0;
+  h.g.rotation.x = -(o.mort || 0) * Math.PI / 2;
+}
+
+// armes en 3D (le canon pointe vers +Z)
+const M_METAL = mat('#2b2b2b', { metalness: 0.8, roughness: 0.35 }), M_LAME = mat('#d0d0d0', { metalness: 1, roughness: 0.2 }), M_BOIS = mat('#6b4423');
+function creerArme(i) {
+  const modele = ARMES[i].modele;
+  if (!modele) return null;
+  const g = new THREE.Group();
+  const b = (l, h, p, m, x, y, z) => { const e = new THREE.Mesh(new THREE.BoxGeometry(l, h, p), m); e.position.set(x, y, z); e.castShadow = true; g.add(e); };
+  if (modele === 'couteau') { b(0.025, 0.03, 0.1, M_BOIS, 0, 0, 0); b(0.008, 0.03, 0.2, M_LAME, 0, 0.005, 0.15); g.userData.bout = 0.25; }
+  if (modele === 'pistolet') { b(0.035, 0.05, 0.2, M_METAL, 0, 0.03, 0.05); b(0.03, 0.1, 0.045, M_METAL, 0, -0.03, -0.02); g.userData.bout = 0.16; }
+  if (modele === 'mitraillette') { b(0.05, 0.08, 0.28, M_METAL, 0, 0.03, 0.08); b(0.03, 0.16, 0.035, M_METAL, 0, -0.07, 0.05); b(0.03, 0.08, 0.04, M_METAL, 0, -0.03, -0.03); g.userData.bout = 0.23; }
+  if (modele === 'pompe') { b(0.045, 0.045, 0.7, M_METAL, 0, 0.03, 0.3); b(0.05, 0.08, 0.25, M_METAL, 0, 0, 0.02); b(0.045, 0.1, 0.3, M_BOIS, 0, -0.03, -0.22); b(0.055, 0.055, 0.18, M_BOIS, 0, -0.01, 0.38); g.userData.bout = 0.65; }
+  if (modele === 'fusil') { b(0.05, 0.09, 0.5, M_METAL, 0, 0.02, 0.12); b(0.025, 0.025, 0.3, M_METAL, 0, 0.04, 0.5); b(0.035, 0.17, 0.06, M_METAL, 0, -0.09, 0.16); b(0.04, 0.11, 0.26, M_METAL, 0, -0.01, -0.24); g.userData.bout = 0.64; }
+  return g;
+}
+function donnerArme(h, i) {
+  if (h.arme) h.brasD.remove(h.arme);
+  h.arme = creerArme(i);
+  if (h.arme) { h.arme.position.set(0, -0.6, 0.03); h.arme.rotation.x = Math.PI / 2; h.brasD.add(h.arme); }
+}
+function boutDuCanon(h, v) {
+  if (!h.arme) return h.brasD.localToWorld(v.set(0, -0.6, 0));
+  return h.arme.localToWorld(v.set(0, 0.03, h.arme.userData.bout));
 }
 
 // =====================================================================
-//  Clavier et souris
+//  Voitures
 // =====================================================================
-const ecran = document.getElementById('ecran');
-const ctx = ecran.getContext('2d');
-const touches = {};
-let sourisAppuyee = false, enJeu = false;
-addEventListener('keydown', e => {
-  touches[e.code] = true;
-  if (e.code === 'KeyE' && enJeu && !e.repeat) porteVoiture();
-  if (e.code === 'Space') e.preventDefault();
-});
-addEventListener('keyup', e => touches[e.code] = false);
-ecran.addEventListener('mousedown', () => {
-  if (!enJeu) { enJeu = true; audio = audio || new AudioContext(); ecran.requestPointerLock?.(); }
-  else sourisAppuyee = true;
-});
-addEventListener('mouseup', () => sourisAppuyee = false);
-addEventListener('mousemove', e => {
-  if (enJeu && document.pointerLockElement === ecran && !J.voiture) J.angle += e.movementX * REGLAGES.sensibiliteSouris;
-});
-document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) enJeu = false; });
+const PEINTURES = ['#9e1010', '#111', '#e8e8e8', '#1a3a8a', '#b8b8b8', '#0e5a2e', '#d8a010', '#5a1a6a', '#2a6ad8', '#e06010'];
+const GEO_V = {
+  caisse: new THREE.BoxGeometry(1.9, 0.55, 4.4), bas: new THREE.BoxGeometry(1.94, 0.22, 4.3),
+  cabine: new THREE.BoxGeometry(1.72, 0.52, 2.3), toit: new THREE.BoxGeometry(1.66, 0.06, 1.9),
+  phare: new THREE.BoxGeometry(0.42, 0.14, 0.05), calandre: new THREE.BoxGeometry(0.9, 0.16, 0.04),
+  pneu: new THREE.CylinderGeometry(0.36, 0.36, 0.26, 16).rotateZ(Math.PI / 2), jante: new THREE.CylinderGeometry(0.22, 0.22, 0.28, 10).rotateZ(Math.PI / 2),
+  gyro: new THREE.BoxGeometry(0.55, 0.13, 0.26), bande: new THREE.BoxGeometry(1.96, 0.14, 3.2),
+};
+const M_VITRE = new THREE.MeshPhysicalMaterial({ color: '#0d141b', metalness: 0.9, roughness: 0.05 });
+const M_PNEU = mat('#151515', { roughness: 0.9 }), M_JANTE = mat('#bbb', { metalness: 1, roughness: 0.3 });
+const M_PHARE = mat('#fff', { emissive: '#fff8e0', emissiveIntensity: 1.5 }), M_FEU = mat('#a00', { emissive: '#f00', emissiveIntensity: 1 });
+const cachePeinture = {};
+const peinture = c => cachePeinture[c] ||= new THREE.MeshPhysicalMaterial({ color: c, metalness: 0.55, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08 });
+function modeleVoiture(couleur, police) {
+  const g = new THREE.Group();
+  const add = (geo, m, x, y, z) => { const e = new THREE.Mesh(geo, m); e.position.set(x, y, z); e.castShadow = true; g.add(e); return e; };
+  add(GEO_V.caisse, peinture(couleur), 0, 0.64, 0);
+  add(GEO_V.bas, mat('#1a1a1a'), 0, 0.4, 0);
+  add(GEO_V.cabine, M_VITRE, 0, 1.17, -0.25);
+  add(GEO_V.toit, peinture(couleur), 0, 1.45, -0.3);
+  add(GEO_V.calandre, mat('#222'), 0, 0.58, 2.21);
+  for (const x of [-0.62, 0.62]) { add(GEO_V.phare, M_PHARE, x, 0.72, 2.2); add(GEO_V.phare, M_FEU, x, 0.72, -2.2); }
+  const roues = [];
+  for (const [x, z] of [[-0.88, 1.35], [0.88, 1.35], [-0.88, -1.35], [0.88, -1.35]]) {
+    const r = new THREE.Group(); r.position.set(x, 0.36, z); g.add(r);
+    const p = new THREE.Mesh(GEO_V.pneu, M_PNEU); p.castShadow = true; r.add(p); r.add(new THREE.Mesh(GEO_V.jante, M_JANTE));
+    roues.push(r);
+  }
+  let gyro = null;
+  if (police) {
+    add(GEO_V.bande, mat('#1a3a9a'), 0, 0.72, 0);
+    gyro = [add(GEO_V.gyro, new THREE.MeshStandardMaterial({ color: '#f22', emissive: '#f00' }), 0.3, 1.54, -0.3),
+            add(GEO_V.gyro, new THREE.MeshStandardMaterial({ color: '#22f', emissive: '#00f' }), -0.3, 1.54, -0.3)];
+  }
+  return { g, roues, gyro };
+}
+const voitures = [];
+function creerVoiture(x, z, angle, police = false) {
+  const { g, roues, gyro } = modeleVoiture(police ? '#f2f2f2' : hasard(PEINTURES), police);
+  const v = { m: g, roues, gyro, x, z, angle, vitesse: 0, conducteur: null, police, attente: 0, choc: false };
+  g.traverse(o => o.userData.voiture = v);
+  scene.add(g); voitures.push(v);
+  return v;
+}
+// passer du repère de la voiture (lx vers sa gauche, lz vers l'avant) au monde
+const local = (v, lx, lz) => ({ x: v.x + lx * Math.cos(v.angle) + lz * Math.sin(v.angle), z: v.z - lx * Math.sin(v.angle) + lz * Math.cos(v.angle) });
+
+// =====================================================================
+//  Sons (fabriqués par le programme)
+// =====================================================================
+let audio = null, bruitBuf, moteur, moteurGain, sirene, sireneGain;
+function initAudio() {
+  if (audio) return;
+  audio = new AudioContext();
+  bruitBuf = audio.createBuffer(1, audio.sampleRate, audio.sampleRate);
+  const d = bruitBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  moteur = audio.createOscillator(); moteur.type = 'sawtooth';
+  const f = audio.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 500;
+  moteurGain = audio.createGain(); moteurGain.gain.value = 0;
+  moteur.connect(f).connect(moteurGain).connect(audio.destination); moteur.start();
+  sirene = audio.createOscillator(); sirene.type = 'square';
+  sireneGain = audio.createGain(); sireneGain.gain.value = 0;
+  sirene.connect(sireneGain).connect(audio.destination); sirene.start();
+}
+function bruit(vol, freq, duree) {
+  if (!audio || vol <= 0.01) return;
+  const t = audio.currentTime, s = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+  s.buffer = bruitBuf; f.type = 'lowpass'; f.frequency.value = freq;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + duree);
+  s.connect(f).connect(g).connect(audio.destination); s.start(t, Math.random() * 0.5); s.stop(t + duree);
+}
+function bip(f1, f2, duree, forme, vol) {
+  if (!audio) return;
+  const t = audio.currentTime, o = audio.createOscillator(), g = audio.createGain();
+  o.type = forme; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + duree);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + duree);
+  o.connect(g).connect(audio.destination); o.start(t); o.stop(t + duree);
+}
+const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12], pompe: [0.8, 1200, 0.45], fusil: [0.5, 2000, 0.22] };
 
 // =====================================================================
 //  Le joueur
 // =====================================================================
-function marcher(dt) {
-  let av = 0, lat = 0;
-  if (touches.KeyW || touches.ArrowUp) av += 1;     // Z sur un clavier français
-  if (touches.KeyS || touches.ArrowDown) av -= 1;
-  if (touches.KeyA) lat -= 1;                       // Q sur un clavier français
-  if (touches.KeyD) lat += 1;
-  if (touches.ArrowLeft) J.angle -= REGLAGES.vitesseRotation * dt;
-  if (touches.ArrowRight) J.angle += REGLAGES.vitesseRotation * dt;
-  const v = REGLAGES.vitesseMarche * dt, c = Math.cos(J.angle), s = Math.sin(J.angle);
-  deplacer(J, (c * av - s * lat) * v, (s * av + c * lat) * v, 0.25);
-  if (av || lat) J.bob += dt * 10;
+const J = { x: depart.x, z: depart.z, y: 0.2, vy: 0, sol: true, lacet: Math.PI, lacetCam: Math.PI, tangage: -0.1, decalage: 0, angleCorps: Math.PI,
+  vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
+  balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
+  dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0 };
+const joueurH = creerHumain({ peau: '#e0b090', haut: '#f4f4f4', bas: '#3a4a6a', chaussures: '#222', cheveux: '#3a2a1a' });
+scene.add(joueurH.g);
+
+// arme vue en première personne (dessinée par-dessus le reste)
+const vmScene = new THREE.Scene(), vmCamera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.01, 10);
+vmScene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.2));
+{ const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(1, 2, 1); vmScene.add(l); }
+vmScene.environment = scene.environment;
+const vm = new THREE.Group(); vmScene.add(vm);
+function construireVM() {
+  vm.clear();
+  const bras = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.085, 0.5), mat('#e0b090')); bras.position.set(0, -0.02, 0.25); vm.add(bras);
+  vm.add(new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), mat('#e0b090')));
+  const a = creerArme(J.arme);
+  if (a) { a.rotation.y = Math.PI; a.position.set(0, 0.03, -0.02); vm.add(a); }
+}
+function changerArme(i) {
+  if (!J.possede[i] || J.arme === i) return;
+  J.arme = i; donnerArme(joueurH, i); construireVM();
+}
+construireVM();
+
+addEventListener('resize', () => {
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = vmCamera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix(); vmCamera.updateProjectionMatrix();
+});
+
+// =====================================================================
+//  Personnages non joueurs
+// =====================================================================
+const PEAUX = ['#f0c8a0', '#e0b090', '#c89060', '#8a5a34', '#5a3a20'];
+const TENUES = {
+  pieton: () => ({ peau: hasard(PEAUX), haut: hasard(['#c33', '#36a', '#eee', '#222', '#3a3', '#e90', '#a3a', '#678']),
+    bas: hasard(['#2a3a5a', '#222', '#6a5a40', '#444', '#8a8a8a']), chaussures: hasard(['#222', '#eee', '#6b4423']), cheveux: hasard(['#1a1208', '#3a2a1a', '#8a6a3a', '#d8c080', '#555']) }),
+  flic: () => ({ peau: hasard(PEAUX), haut: '#1d2f5a', bas: '#141e36', chaussures: '#111', casquette: '#141e36' }),
+  soldat: () => ({ peau: hasard(PEAUX), haut: '#4b5320', bas: '#3b4218', chaussures: '#2a2a1a', casque: '#3b4218' }),
+  boss: () => ({ peau: '#e0b090', haut: '#222', bas: '#111', chaussures: '#000', casquette: '#111' }),
+};
+const VIE_PNJ = { pieton: 50, flic: 70, soldat: 90, boss: 450 };
+const ARME_PNJ = { flic: 2, soldat: 5, boss: 4 };
+const personnes = [];
+function creerPersonne(type, x, z) {
+  const h = creerHumain(TENUES[type]());
+  if (type === 'boss') h.g.scale.setScalar(1.15);
+  const p = { type, h, x, z, angle: Math.random() * 6.28, vie: VIE_PNJ[type], cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
+  if (ARME_PNJ[type] !== undefined) donnerArme(h, ARME_PNJ[type]);
+  h.g.traverse(o => o.userData.personne = p);
+  h.g.position.set(x, hauteurSol(x, z), z);
+  scene.add(h.g); personnes.push(p);
+  if (type === 'soldat' || type === 'boss') { const [i, j] = blocEn(x, z), o = origine(i, j); p.zone = [o.x + 6, o.z + 6, o.x + S - 6, o.z + S - 6]; }
+  else initChemin(p);
+  return p;
+}
+// les piétons marchent sur les trottoirs, d'un coin à l'autre, et traversent aux passages piétons
+function coin(i, j, k) { const o = origine(i, j); return { x: o.x + (k === 1 || k === 2 ? S - 2 : 2), z: o.z + (k >= 2 ? S - 2 : 2) }; }
+function initChemin(p) {
+  const [i, j] = blocEn(p.x, p.z);
+  p.bloc = [i, j]; p.sens = Math.random() < 0.5 ? 1 : 3;
+  p.coin = [0, 1, 2, 3].reduce((m, k) => dist(coin(i, j, k), p) < dist(coin(i, j, m), p) ? k : m, 0);
+}
+function coinSuivant(p) {
+  const [i, j] = p.bloc, k = p.coin;
+  if (Math.random() < 0.3) {
+    const options = [];
+    if (k === 1 || k === 2) options.push([i + 1, j, k === 1 ? 0 : 3]); else options.push([i - 1, j, k === 0 ? 1 : 2]);
+    if (k === 0 || k === 1) options.push([i, j - 1, k === 0 ? 3 : 2]); else options.push([i, j + 1, k === 2 ? 1 : 0]);
+    const ok = options.filter(([a, b]) => typeBloc(a, b));
+    if (ok.length) { const [a, b, c] = hasard(ok); p.bloc = [a, b]; p.coin = c; return; }
+  }
+  p.coin = (k + p.sens) % 4;
 }
 
-function conduire(dt) {
-  const v = J.voiture, R = REGLAGES;
-  if (touches.KeyW || touches.ArrowUp) v.vitesse += R.accelerationVoiture * dt;
-  else if (touches.KeyS || touches.ArrowDown) v.vitesse -= R.accelerationVoiture * 1.5 * dt;
-  else v.vitesse *= Math.pow(0.4, dt); // la voiture ralentit toute seule
-  v.vitesse = Math.max(-R.vitesseMaxVoiture / 3, Math.min(R.vitesseMaxVoiture, v.vitesse));
-  const virage = Math.min(1, Math.abs(v.vitesse) / 2) * Math.sign(v.vitesse) * 2.2 * dt;
-  if (touches.KeyA || touches.ArrowLeft) v.angle -= virage;
-  if (touches.KeyD || touches.ArrowRight) v.angle += virage;
-  const ax = v.x, ay = v.y;
-  if (!deplacer(v, Math.cos(v.angle) * v.vitesse * dt, Math.sin(v.angle) * v.vitesse * dt, 0.35)) {
-    if (Math.abs(v.vitesse) > 3) son('choc');
-    v.vitesse *= 0.5;
+// =====================================================================
+//  Objets à ramasser, effets
+// =====================================================================
+const objets = [];
+const M_BILLET = mat('#3a8a3a', { emissive: '#1a4a1a' }), M_SOIN = std(TEX.croix, { emissive: '#fff', emissiveMap: TEX.croix, emissiveIntensity: 0.4 });
+function creerObjet(o) {
+  const g = new THREE.Group();
+  if (o.type === 'soin') g.add(new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), M_SOIN));
+  if (o.type === 'argent') for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.15), M_BILLET); b.position.y = k * 0.05; b.rotation.y = k; g.add(b); }
+  if (o.type === 'arme' || o.type === 'stand') { const a = creerArme(o.arme); a.scale.setScalar(2.2); g.add(a); }
+  const anneau = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.6, 24).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: o.type === 'soin' ? '#f44' : o.type === 'argent' ? '#6f6' : '#fc4', transparent: true, opacity: 0.6, side: THREE.DoubleSide }));
+  anneau.position.y = -0.8;
+  g.add(anneau);
+  if (o.type === 'stand') {
+    const piedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal); piedestal.position.y = -0.6; piedestal.castShadow = true; g.add(piedestal);
+    anneau.position.y = -1.08;
+    const prix = new THREE.Sprite(new THREE.SpriteMaterial({ map: toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(`${ARMES[o.arme].nom} ${ARMES[o.arme].prix} $`, 128, 42); }) }));
+    prix.scale.set(2.4, 0.6, 1); prix.position.y = 1; g.add(prix);
   }
-  if (entites.some(e => e.type === 'voiture' && e !== v && dist(e, v) < 0.9)) { // on percute une autre voiture
-    if (Math.abs(v.vitesse) > 3) son('choc');
-    v.x = ax; v.y = ay; v.vitesse *= -0.3;
-  }
-  J.x = v.x; J.y = v.y; J.angle = v.angle;
-  // on renverse ceux qu'on percute (façon dessin animé : pouf !)
-  if (Math.abs(v.vitesse) > 2) {
-    for (const e of entites) {
-      if (PERSONNES.includes(e.type) && !e.supprimer && dist(e, v) < 0.6) { toucher(e, 100); v.vitesse *= 0.7; }
-    }
-  }
+  o.m = g; o.base = (o.type === 'stand' ? 1.1 : 0.85) + hauteurSol(o.x, o.z);
+  g.position.set(o.x, o.base, o.z);
+  scene.add(g); objets.push(o);
+  return o;
 }
+soins.forEach(s => creerObjet({ type: 'soin', x: s.x, z: s.z, reapparait: true }));
+stands.forEach(s => creerObjet({ type: 'stand', arme: s.arme, x: s.x, z: s.z }));
+pickupsDepart.forEach(creerObjet);
 
-function porteVoiture() {
-  if (J.voiture) { // sortir par la gauche ou la droite
-    const v = J.voiture;
-    v.vitesse = 0;
-    J.voiture = null;
-    for (const cote of [-1, 1]) {
-      const x = v.x + Math.cos(v.angle + cote * Math.PI / 2) * 0.8;
-      const y = v.y + Math.sin(v.angle + cote * Math.PI / 2) * 0.8;
-      if (libre(x, y, 0.25)) { J.x = x; J.y = y; return; }
-    }
-    return;
-  }
-  const v = entites.find(e => e.type === 'voiture' && dist(e, J) < 1.5);
-  if (!v) return;
-  J.voiture = v;
-  if (v.conducteur) { // on sort le conducteur de sa voiture !
-    v.conducteur = false;
-    const c = ajouterEntite(v.police ? 'flic' : 'pieton', v.x + Math.cos(v.angle + 1.57), v.y + Math.sin(v.angle + 1.57));
-    if (!libre(c.x, c.y, 0.2)) { c.x = v.x - Math.cos(v.angle + 1.57); c.y = v.y - Math.sin(v.angle + 1.57); }
-    c.peur = 5;
-  }
-  if (!v.volee) { v.volee = true; crime(1); message('Voiture volée !'); }
+const effets = [];
+const M_TRACEUR = new THREE.LineBasicMaterial({ color: '#ffe9a0', transparent: true, opacity: 0.85 });
+function traceur(a, b) {
+  const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([a, b]), M_TRACEUR);
+  scene.add(l); effets.push({ o: l, vie: 0.05 });
 }
-
-function tirer() {
-  if (J.munitions <= 0) { message('Plus de balles !', 1); son('vide'); J.cooldownTir = 0.5; return; }
-  J.munitions--;
-  J.cooldownTir = REGLAGES.cadenceTir;
-  J.flashTir = 0.08;
-  son('tir');
-  // qui est au milieu de l'écran, devant le mur ?
-  let cible = null, plusProche = Infinity;
-  for (const e of entites) {
-    if (!PERSONNES.includes(e.type)) continue;
-    const p = projeter(e.x, e.y);
-    if (!p) continue;
-    const largeur = (H / p.tz) * 0.5;
-    if (Math.abs(p.ecranX - W / 2) < largeur * 0.4 && p.tz < zbuffer[W / 2] && p.tz < plusProche) { cible = e; plusProche = p.tz; }
-  }
-  if (cible) toucher(cible, REGLAGES.degatsArme);
-  // le bruit fait fuir les piétons et alerte les soldats
-  for (const e of entites) {
-    if (dist(e, J) > 10) continue;
-    if (e.type === 'pieton' || (e.type === 'flic' && etoiles === 0)) { e.peur = 5; e.timer = 0; }
-    if (e.type === 'soldat' || e.type === 'boss') e.alerte = true;
-  }
+const M_FLASH = new THREE.SpriteMaterial({ map: TEX.flash, blending: THREE.AdditiveBlending, depthWrite: false });
+function flash(pos, taille = 0.6, dans = scene) {
+  const s = new THREE.Sprite(M_FLASH); s.position.copy(pos); s.scale.setScalar(taille);
+  dans.add(s); effets.push({ o: s, vie: 0.05, dans });
 }
+const lumiereTir = new THREE.PointLight('#ffb050', 0, 12); scene.add(lumiereTir);
 
-function toucher(e, degats) {
-  e.vie -= degats;
-  e.alerte = true;
-  if (e.type === 'flic' && etoiles === 0) crime(1);
-  if (e.vie > 0) return;
-  // K.O. : il disparaît dans un nuage de fumée
-  e.supprimer = true;
-  son('ko');
-  ajouterEntite('fumee', e.x, e.y).timer = 0.6;
-  if (e.type !== 'pieton') ajouterEntite('munitions', e.x, e.y);
-  if (e.type === 'soldat') J.argent += 50;
-  if (e.type === 'boss') J.argent += 1000;
-  if (e.type === 'pieton' || e.type === 'flic') crime(1);
-}
+// repère de mission : colonne lumineuse (ou flèche au-dessus de la cible)
+const repere = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 5, 24, 1, true),
+  new THREE.MeshBasicMaterial({ color: '#ffd23a', transparent: true, opacity: 0.35, side: THREE.DoubleSide, depthWrite: false, fog: false }));
+scene.add(repere);
+const fleche = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.7, 4).rotateX(Math.PI), new THREE.MeshBasicMaterial({ color: '#ffd23a', fog: false }));
+scene.add(fleche);
 
+// =====================================================================
+//  État du jeu
+// =====================================================================
+let etoiles = 0, tempsCalme = 0, vuParPolice = false, tVu = 0, tRenfort = 0, tVoiturePolice = 0, tPeupler = 0, temps = 0;
+let missionIndex = 0, etapeIndex = 0, enJeu = false, visee = false, sourisG = false, dejaTire = false, tempsAnnonce = 0;
+const touches = {};
+pnjDepart.forEach(p => creerPersonne(p.type, p.x, p.z));
+voituresGarees.forEach(v => creerVoiture(v.x, v.z, v.a));
+
+const $ = id => document.getElementById(id);
+function annonce(titre, sous = '', duree = 3) { $('annonce').innerHTML = `${titre}${sous ? `<small>${sous}</small>` : ''}`; $('annonce').style.opacity = 1; tempsAnnonce = duree; }
 function crime(n) { etoiles = Math.min(5, etoiles + n); tempsCalme = 0; }
+const policeVoit = () => personnes.some(p => p.type === 'flic' && p.vie > 0 && dist(p, J) < 50 && voit(p, J)) || voitures.some(v => v.police && v.conducteur && dist(v, J) < 50);
 
-function ramasser() {
-  for (const e of entites) {
-    if (e.supprimer || dist(e, J) > 0.6) continue;
-    if (e.type === 'soin' && J.vie < REGLAGES.viesJoueur) {
-      J.vie = Math.min(REGLAGES.viesJoueur, J.vie + 30);
-      e.supprimer = true; message('+30 vie', 1); son('bonus');
-    }
-    if (e.type === 'munitions') { J.munitions += 10; e.supprimer = true; message('+10 balles', 1); son('bonus'); }
+// =====================================================================
+//  Clavier et souris
+// =====================================================================
+addEventListener('keydown', e => {
+  if (!enJeu) return;
+  if (!['F5', 'F11', 'F12', 'Escape'].includes(e.code)) e.preventDefault();
+  touches[e.code] = true;
+  if (e.repeat) return;
+  if (e.code === 'KeyE' || e.code === 'KeyF') action();
+  if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
+  if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture) J.accroupi = !J.accroupi;
+  if (e.code.startsWith('Digit')) changerArme(+e.code.slice(5) - 1);
+});
+addEventListener('keyup', e => touches[e.code] = false);
+const touche = (...codes) => codes.some(c => touches[c]) ? 1 : 0;
+addEventListener('mousedown', e => { if (!enJeu) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
+addEventListener('mouseup', e => { if (e.button === 0) { sourisG = false; dejaTire = false; } if (e.button === 2) visee = false; });
+addEventListener('contextmenu', e => e.preventDefault());
+addEventListener('wheel', e => {
+  if (!enJeu || J.voiture) return;
+  for (let k = 1; k <= ARMES.length; k++) { const i = (J.arme + (e.deltaY > 0 ? k : -k) + ARMES.length * 2) % ARMES.length; if (J.possede[i]) { changerArme(i); break; } }
+});
+addEventListener('mousemove', e => {
+  if (!enJeu || document.pointerLockElement !== renderer.domElement) return;
+  if (J.voiture) J.decalage -= e.movementX * R_.sensibiliteSouris; else J.lacet -= e.movementX * R_.sensibiliteSouris;
+  J.tangage = clamp(J.tangage - e.movementY * R_.sensibiliteSouris, -1.3, 1.2);
+  J.dernierMouvement = temps;
+});
+$('menu').addEventListener('click', () => {
+  enJeu = true; $('menu').style.display = 'none';
+  initAudio(); audio.resume();
+  renderer.domElement.requestPointerLock?.();
+});
+document.addEventListener('pointerlockchange', () => {
+  if (document.pointerLockElement) return;
+  enJeu = false; $('menu').style.display = 'flex'; $('etat').textContent = 'Pause — clique pour continuer';
+  for (const k in touches) touches[k] = false;
+  sourisG = visee = false;
+});
+
+// =====================================================================
+//  Actions du joueur
+// =====================================================================
+function standProche() { return objets.find(o => o.type === 'stand' && dist(o, J) < 2.2); }
+function action() {
+  if (J.mort) return;
+  if (J.voiture) { sortirVoiture(); return; }
+  const s = standProche();
+  if (s) { acheter(s); return; }
+  let v = null, best = 3.5;
+  for (const o of voitures) { const d = dist(o, J); if (d < best) { best = d; v = o; } }
+  if (v) entrerVoiture(v);
+}
+function acheter(s) {
+  const a = ARMES[s.arme], possede = J.possede[s.arme], prix = possede ? Math.round(a.prix / 2) : a.prix;
+  if (J.argent < prix) { annonce('Pas assez d\'argent', `Il te faut ${prix} $`, 2); bip(300, 200, 0.2, 'square', 0.2); return; }
+  J.argent -= prix; J.possede[s.arme] = true; J.balles[s.arme] += a.munitions;
+  bip(700, 1400, 0.2, 'sine', 0.3);
+  annonce(possede ? 'Munitions achetées' : `${a.nom} acheté !`, '', 2);
+  changerArme(s.arme);
+}
+function entrerVoiture(v) {
+  if (v.conducteur) { // on sort le conducteur !
+    const p = local(v, 1.8, 0.3), c = creerPersonne(v.police ? 'flic' : 'pieton', p.x, p.z);
+    resoudre(c, 0.35);
+    if (v.police) c.alerte = true; else c.peur = 8;
+    v.conducteur = null;
   }
+  if (!v.volee) { v.volee = true; if (v.police || policeVoit()) crime(1); }
+  J.voiture = v; J.accroupi = false; J.decalage = 0; J.tangage = -0.12;
+}
+function sortirVoiture() {
+  const v = J.voiture;
+  for (const lx of [1.9, -1.9]) {
+    const p = local(v, lx, 0);
+    if (!dansBatiment(p.x, 1, p.z)) { J.x = p.x; J.z = p.z; break; }
+  }
+  J.voiture = null; J.lacet = v.angle + J.decalage; J.y = hauteurSol(J.x, J.z); J.vy = 0;
 }
 
-function mourir() {
-  message("K.O. ! Tu te réveilles à l'hôpital (-100 $)", 4);
-  J.vie = REGLAGES.viesJoueur;
-  J.argent = Math.max(0, J.argent - 100);
-  J.munitions = Math.max(J.munitions, 10);
-  if (J.voiture) { J.voiture.vitesse = 0; J.voiture = null; }
-  J.x = depart.x; J.y = depart.y;
+const raycaster = new THREE.Raycaster(), vTmp = new THREE.Vector3(), vTmp2 = new THREE.Vector3();
+function positionTir() {
+  if (J.vue === 1) return camera.localToWorld(vTmp.set(0.2, -0.18, -0.7));
+  joueurH.g.updateMatrixWorld(true);
+  return boutDuCanon(joueurH, vTmp);
+}
+function tirer() {
+  const a = ARMES[J.arme];
+  J.cooldown = a.cadence; J.angleCorps = J.lacet;
+  if (a.corps) { frapper(a); return; }
+  if (J.balles[J.arme] <= 0) { bip(1000, 900, 0.05, 'square', 0.15); annonce('', 'Plus de munitions', 1); J.cooldown = 0.3; return; }
+  J.balles[J.arme]--; J.recul = 1;
+  bruit(...SON_ARME[a.modele]);
+  const depart = positionTir().clone();
+  if (J.vue === 1) flash(vTmp2.set(0, 0.03, -0.75).applyMatrix4(vm.matrixWorld), 0.25, vmScene); else flash(depart);
+  lumiereTir.position.copy(depart); lumiereTir.intensity = 40;
+  const cibles = [...batiments, ...personnes.filter(p => p.vie > 0 && dist(p, J) < a.portee + 5).map(p => p.h.g), ...voitures.map(v => v.m)];
+  raycaster.far = a.portee;
+  raycaster.near = J.vue === 3 ? camera.position.distanceTo(vTmp2.set(J.x, J.y + 1.5, J.z)) : 0;
+  for (let k = 0; k < (a.plombs || 1); k++) {
+    const d = (a.dispersion || 0.004) * (visee ? 0.5 : 1) * (J.vitesse > 5 ? 2 : 1);
+    raycaster.setFromCamera(new THREE.Vector2(entre(-d, d), entre(-d, d)), camera);
+    const hit = raycaster.intersectObjects(cibles, true)[0];
+    const point = hit ? hit.point : raycaster.ray.at(a.portee, new THREE.Vector3());
+    if (hit) {
+      const p = hit.object.userData.personne;
+      if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
+      flash(point, 0.3);
+    }
+    traceur(depart, point);
+  }
+  // le bruit fait fuir les piétons et alerte soldats et policiers
+  for (const p of personnes) {
+    if (p.vie <= 0) continue;
+    const d = dist(p, J);
+    if (p.type === 'pieton' && d < 40) p.peur = 8;
+    if ((p.type === 'soldat' || p.type === 'boss') && d < 50) p.alerte = true;
+    if (p.type === 'flic' && d < 30 && etoiles === 0) crime(1);
+  }
+}
+function frapper(a) {
+  J.frappe = 1;
+  bruit(0.15, a.modele ? 6000 : 800, 0.1);
+  let cible = null, best = a.portee + 0.5;
+  for (const p of personnes) {
+    if (p.vie <= 0) continue;
+    const d = dist(p, J);
+    if (d < best && Math.abs(diffAngle(J.lacet, angleVers(J, p))) < 0.9) { best = d; cible = p; }
+  }
+  if (cible) {
+    blesser(cible, a.degats); bip(160, 60, 0.12, 'sine', 0.5);
+    cible.x += Math.sin(J.lacet) * 0.5; cible.z += Math.cos(J.lacet) * 0.5;
+  }
+}
+function blesser(p, degats) {
+  if (p.vie <= 0) return;
+  p.vie -= degats; p.alerte = true;
+  if (p.type === 'pieton') p.peur = 8;
+  if (p.type === 'flic' && etoiles === 0) crime(1);
+  if (p.vie > 0) return;
+  // il tombe et lâche quelque chose
+  p.mort = 0.001;
+  if (p.type === 'pieton') { crime(1); if (Math.random() < 0.6) creerObjet({ type: 'argent', montant: 10 + Math.floor(Math.random() * 60), x: p.x, z: p.z }); }
+  if (p.type === 'flic') { crime(1); creerObjet({ type: 'arme', arme: 2, x: p.x, z: p.z }); }
+  if (p.type === 'soldat') creerObjet({ type: 'arme', arme: Math.random() < 0.5 ? 3 : 5, x: p.x, z: p.z });
+  if (p.type === 'boss') { creerObjet({ type: 'arme', arme: 4, x: p.x + 1, z: p.z }); creerObjet({ type: 'argent', montant: 1000, x: p.x - 1, z: p.z }); }
+}
+function blesserJoueur(degats) {
+  if (J.mort) return;
+  J.vie -= degats * (J.voiture ? R_.protectionVoiture : 1);
+  J.dernierDegat = temps;
+  $('rouge').style.opacity = 0.9;
+  bip(180, 90, 0.15, 'triangle', 0.3);
+  if (J.vie <= 0) { J.vie = 0; J.mort = 0.001; $('wasted').style.display = 'block'; renderer.domElement.style.filter = 'grayscale(1) brightness(.7)'; bip(200, 50, 1.5, 'sine', 0.4); }
+}
+function reapparaitre() {
+  J.mort = 0; J.vie = R_.viesJoueur; J.argent = Math.max(0, J.argent - 100);
+  if (J.voiture) sortirVoiture();
+  J.x = hopital.x; J.z = hopital.z; J.y = hauteurSol(J.x, J.z); J.lacet = 0; J.accroupi = false;
   etoiles = 0;
-  for (const e of entites) { e.alerte = false; if (e.renfort) e.supprimer = true; }
+  for (const p of personnes) { p.alerte = false; if (p.renfort) p.supprimer = true; }
+  for (const v of voitures) if (v.police && v.renfort) v.supprimer = true;
+  $('wasted').style.display = 'none'; renderer.domElement.style.filter = '';
+  annonce('', 'Tu te réveilles à l\'hôpital (-100 $)', 3);
 }
 
 // =====================================================================
-//  Les personnages (ennemis, police, piétons)
+//  Mise à jour du joueur
 // =====================================================================
-// "champ" = distance (en cases) de chaque case jusqu'au joueur : sert aux poursuivants à contourner les murs
-const champ = new Int16Array(L_CARTE * H_CARTE);
-function calculerChamp() {
-  champ.fill(-1);
-  const file = [Math.floor(J.y) * L_CARTE + Math.floor(J.x)];
-  champ[file[0]] = 0;
-  for (let i = 0; i < file.length; i++) {
-    const c = file[i], x = c % L_CARTE, y = (c / L_CARTE) | 0;
-    for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const n = (y + ay) * L_CARTE + x + ax;
-      if (murEn(x + ax, y + ay) || champ[n] !== -1) continue;
-      champ[n] = champ[c] + 1;
-      file.push(n);
-    }
+function majJoueur(dt) {
+  const av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
+  const court = touche('ShiftLeft', 'ShiftRight') && !visee;
+  if (court && J.accroupi) J.accroupi = false;
+  const v = J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche;
+  let mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat;
+  const n = Math.hypot(mx, mz);
+  if (n > 0) { mx /= n; mz /= n; J.x += mx * v * dt; J.z += mz * v * dt; }
+  J.vitesse = n > 0 ? v : 0;
+  const hs = hauteurSol(J.x, J.z);
+  if (J.sol && touches.Space) { J.vy = R_.forceSaut; J.sol = false; J.accroupi = false; }
+  J.vy -= R_.gravite * dt; J.y += J.vy * dt;
+  if (J.y <= hs) { J.y = hs; J.vy = 0; J.sol = true; }
+  resoudre(J, 0.35);
+  for (const o of voitures) for (const lz of [1.3, -1.3]) { // on ne traverse pas les voitures
+    const c = local(o, 0, lz), d = dist(c, J);
+    if (d < 1.4 && d > 0) { J.x = c.x + (J.x - c.x) / d * 1.4; J.z = c.z + (J.z - c.z) / d * 1.4; }
   }
+  // orientation du corps : vers la caméra avec une arme à feu, sinon vers où on marche
+  if (!ARMES[J.arme].corps || visee || J.vue === 1) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
+  else if (n > 0) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(mx, mz), 10 * dt);
+  joueurH.g.position.set(J.x, J.y, J.z); joueurH.g.rotation.y = J.angleCorps;
+  animerHumain(joueurH, J.vitesse, dt, { arme: !ARMES[J.arme].corps, accroupi: J.accroupi, frappe: J.frappe, enAir: !J.sol });
 }
-function poursuivre(e, vitesse, dt) {
-  const cx = Math.floor(e.x), cy = Math.floor(e.y);
-  let meilleur = champ[cy * L_CARTE + cx], bx = cx, by = cy;
-  if (meilleur < 0) meilleur = 1e9;
-  for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-    const d = champ[(cy + ay) * L_CARTE + cx + ax];
-    if (d >= 0 && d < meilleur) { meilleur = d; bx = cx + ax; by = cy + ay; }
+function conduire(v, dt) {
+  const gaz = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), volant = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
+  if (gaz > 0) v.vitesse += R_.accelerationVoiture * dt * (v.vitesse < 0 ? 2.5 : 1);
+  else if (gaz < 0) v.vitesse -= R_.accelerationVoiture * dt * (v.vitesse > 0 ? 2.5 : 0.6);
+  else v.vitesse *= Math.pow(0.6, dt);
+  if (touches.Space) v.vitesse *= Math.pow(0.05, dt); // frein à main
+  v.vitesse = clamp(v.vitesse, -10, R_.vitesseMaxVoiture);
+  const braquage = clamp(Math.abs(v.vitesse) / 6, 0, 1) * (1 - Math.abs(v.vitesse) / R_.vitesseMaxVoiture * 0.5) * Math.sign(v.vitesse);
+  v.angle -= volant * 1.9 * braquage * dt * (touches.Space ? 1.6 : 1);
+  bougerVoiture(v, dt, true);
+  J.x = v.x; J.z = v.z; J.vitesse = Math.abs(v.vitesse);
+  if (temps - J.dernierMouvement > 1.5) { J.decalage *= Math.pow(0.1, dt); J.tangage += (-0.12 - J.tangage) * Math.min(1, dt * 2); }
+}
+function bougerVoiture(v, dt, parJoueur) {
+  v.x += Math.sin(v.angle) * v.vitesse * dt; v.z += Math.cos(v.angle) * v.vitesse * dt;
+  let choc = false;
+  for (const lz of [1.3, -1.3]) {
+    const c = local(v, 0, lz), avant = { ...c };
+    if (resoudre(c, 1.05)) { v.x += c.x - avant.x; v.z += c.z - avant.z; choc = true; }
   }
-  const a = Math.atan2(by + 0.5 - e.y, bx + 0.5 - e.x);
-  deplacer(e, Math.cos(a) * vitesse * dt, Math.sin(a) * vitesse * dt, 0.2);
+  for (const o of voitures) {
+    if (o === v) continue;
+    const d = dist(o, v);
+    if (d < 2.6 && d > 0) { v.x = o.x + (v.x - o.x) / d * 2.6; v.z = o.z + (v.z - o.z) / d * 2.6; choc = true; }
+  }
+  if (choc) {
+    if (!v.choc && Math.abs(v.vitesse) > 6) { bruit(Math.min(0.8, Math.abs(v.vitesse) / 30), 500, 0.35); v.vitesse *= 0.35; }
+    v.vitesse *= Math.pow(0.2, dt);
+  }
+  v.choc = choc;
+  if (parJoueur && Math.abs(v.vitesse) > 4) { // on renverse les piétons
+    const avant = local(v, 0, Math.sign(v.vitesse) * 1.6);
+    for (const p of personnes) if (p.vie > 0 && (dist(p, avant) < 1.3 || dist(p, v) < 1.4)) blesser(p, 200);
+  }
 }
 
-// Les voitures roulent de case en case. À chaque carrefour, elles choisissent une route au hasard
-// (la police, elle, prend le chemin le plus court vers le joueur).
-// ponytail: pas de files de circulation, les voitures s'arrêtent et font demi-tour si elles se bloquent
-const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-function prochaineCase(v) {
-  const cx = Math.floor(v.x), cy = Math.floor(v.y);
-  const dir = Math.round(v.angle / (Math.PI / 2)) & 3;
-  let choix = -1;
-  if (v.police) {
-    let meilleur = 1e9;
-    DIRECTIONS.forEach(([ax, ay], i) => {
-      const d = champ[(cy + ay) * L_CARTE + cx + ax];
-      if (d >= 0 && d < meilleur) { meilleur = d; choix = i; }
-    });
-  } else {
-    const possibles = [0, 1, 2, 3].filter(i => i !== ((dir + 2) & 3) && solEn(cx + DIRECTIONS[i][0], cy + DIRECTIONS[i][1]) === '.'
-                                               && !murEn(cx + DIRECTIONS[i][0], cy + DIRECTIONS[i][1]));
-    if (possibles.includes(dir) && Math.random() < 0.7) choix = dir;
-    else if (possibles.length) choix = hasard(possibles);
-  }
-  if (choix < 0) choix = (dir + 2) & 3; // cul-de-sac : demi-tour
-  v.angle = choix * Math.PI / 2;
-  return { x: cx + DIRECTIONS[choix][0] + 0.5, y: cy + DIRECTIONS[choix][1] + 0.5 };
-}
-
-function majVoiture(v, dt) {
-  if (v.police) v.pal = Math.sin(temps * 12) > 0 ? PAL_POLICE_A : PAL_POLICE_B; // gyrophare
-  if (!v.conducteur || v === J.voiture) return;
-  if (v.police && dist(v, J) < 5 && voit(v, J)) { // arrivés : les policiers sortent de la voiture
-    v.conducteur = false; v.vitesse = 0;
-    for (const cote of [-1, 1]) {
-      const x = v.x + Math.cos(v.angle + cote * 1.57) * 0.8, y = v.y + Math.sin(v.angle + cote * 1.57) * 0.8;
-      if (libre(x, y, 0.2)) { const f = ajouterEntite('flic', x, y); f.renfort = true; f.alerte = true; }
-    }
+// =====================================================================
+//  Intelligence des personnages
+// =====================================================================
+function majPersonne(p, dt) {
+  const d = dist(p, J);
+  p.h.g.visible = d < 220;
+  if (p.vie <= 0) {
+    p.mort = Math.min(1, p.mort + dt * 3);
+    animerHumain(p.h, 0, dt, { mort: p.mort });
+    p.h.g.position.y = hauteurSol(p.x, p.z) + p.mort * 0.12;
+    p.tempsMort = (p.tempsMort || 0) + dt;
+    if (p.tempsMort > 15) p.supprimer = true;
     return;
   }
-  // quelqu'un devant ? on attend (et on fait demi-tour si ça dure)
-  const devant = { x: v.x + Math.cos(v.angle), y: v.y + Math.sin(v.angle) };
-  const bloque = (!J.voiture && !v.police && dist(devant, J) < 0.8) ||
-    entites.some(e => e !== v && (e.type === 'voiture' || e.type === 'pieton') && dist(e, devant) < 0.8);
-  if (bloque) {
-    v.vitesse = 0;
-    v.attente = (v.attente || 0) + dt;
-    if (v.attente > 2) { v.attente = 0; v.angle += Math.PI; v.cible = prochaineCase(v); }
-    return;
-  }
-  v.attente = 0;
-  v.vitesse = v.police ? REGLAGES.vitessePolice : REGLAGES.vitesseCirculation;
-  if (!v.cible) v.cible = prochaineCase(v);
-  const d = dist(v, v.cible), pas = v.vitesse * dt;
-  if (d <= pas) { v.x = v.cible.x; v.y = v.cible.y; v.cible = prochaineCase(v); }
-  else { v.x += (v.cible.x - v.x) / d * pas; v.y += (v.cible.y - v.y) / d * pas; }
-}
-
-function majEntite(e, dt) {
-  if (e.type === 'voiture') { majVoiture(e, dt); return; }
-  if (e.type === 'fumee') { e.timer -= dt; if (e.timer <= 0) e.supprimer = true; return; }
-  if (!PERSONNES.includes(e.type) || e.supprimer) return;
-  e.cooldown -= dt; e.timer -= dt; e.peur -= dt;
-  const d = dist(e, J);
-  const hostile = e.type === 'soldat' || e.type === 'boss' || (e.type === 'flic' && etoiles > 0);
-  const vitesse = e.type === 'flic' ? 2.5 + etoiles * 0.3 : e.type === 'pieton' ? (e.peur > 0 ? 3 : 0.8) : 2;
-
-  if (hostile) {
-    if (d < 14 && voit(e, J)) {
-      if (!e.alerte) { e.alerte = true; e.cooldown = 0.7; } // petit temps de réaction
-      const a = Math.atan2(J.y - e.y, J.x - e.x);
-      if (d > 3) deplacer(e, Math.cos(a) * vitesse * dt, Math.sin(a) * vitesse * dt, 0.2);
-      if (e.cooldown <= 0) {
-        e.cooldown = 0.8 + Math.random() * 1.2;
-        son('ennemi');
-        if (Math.random() < Math.max(0.2, 0.8 - d * 0.05)) {
-          J.vie -= REGLAGES.degatsEnnemi * (e.type === 'boss' ? 2 : 1);
-          J.degat = 0.4; son('aie');
-        }
+  p.cooldown -= dt; p.peur -= dt;
+  let vitesse = 0, arme = false;
+  const hostile = p.type === 'soldat' || p.type === 'boss' || (p.type === 'flic' && etoiles > 0);
+  if (hostile && !J.mort) {
+    p.vuTimer -= dt;
+    if (p.vuTimer <= 0) { p.vuTimer = 0.3; p.voitJ = d < (p.type === 'flic' ? 70 : 45) && voit(p, J); if (p.voitJ) p.alerte = true; }
+    if (p.type === 'flic') p.alerte = true;
+    if (p.alerte) {
+      arme = true;
+      const vise = angleVers(p, J);
+      p.angle = lerpAngle(p.angle, vise, 8 * dt);
+      if (!p.voitJ || d > 22) vitesse = 4.5; else if (d < 6) vitesse = -2;
+      if (p.voitJ && p.cooldown <= 0 && Math.abs(diffAngle(p.angle, vise)) < 0.3) {
+        p.cooldown = entre(1, 2) * (p.type === 'boss' ? 0.6 : 1);
+        tirEnnemi(p, d);
       }
-      return;
     }
-    if (e.type === 'flic' || e.alerte) { poursuivre(e, vitesse, dt); return; }
-    return; // soldat de garde : il ne bouge pas
+  } else if (p.peur > 0) {
+    if (Math.random() < dt * 2) p.angle = angleVers(J, p) + entre(-0.6, 0.6);
+    vitesse = 5;
+    if (p.peur - dt <= 0) initChemin(p);
+  } else if (p.bloc) {
+    let c = coin(p.bloc[0], p.bloc[1], p.coin);
+    if (dist(p, c) < 0.8) { coinSuivant(p); c = coin(p.bloc[0], p.bloc[1], p.coin); }
+    p.angle = lerpAngle(p.angle, angleVers(p, c), 6 * dt);
+    vitesse = 1.4;
   }
-  // se promener, ou fuir le joueur quand on a peur
-  if (e.timer <= 0) {
-    e.timer = 1.5 + Math.random() * 3;
-    e.angle = e.peur > 0 ? Math.atan2(e.y - J.y, e.x - J.x) + Math.random() - 0.5 : Math.random() * Math.PI * 2;
+  if (vitesse) {
+    p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt;
+    resoudre(p, 0.35);
+    if (p.zone) { p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]); }
   }
-  if (!deplacer(e, Math.cos(e.angle) * vitesse * dt, Math.sin(e.angle) * vitesse * dt, 0.2)) e.timer = 0;
+  if (p.h.g.visible) {
+    p.h.g.position.set(p.x, hauteurSol(p.x, p.z), p.z); p.h.g.rotation.y = p.angle;
+    animerHumain(p.h, Math.abs(vitesse), dt, { arme });
+  }
+}
+function tirEnnemi(p, d) {
+  const degats = { flic: R_.degatsPolicier, soldat: R_.degatsSoldat, boss: R_.degatsBoss }[p.type];
+  let chance = R_.precisionEnnemis * clamp(1.2 - d / 50, 0.2, 1);
+  if (J.accroupi) chance *= 0.5;
+  if (J.vitesse > 6) chance *= 0.6;
+  if (J.voiture) chance *= 0.7;
+  const reussi = Math.random() < chance;
+  p.h.g.updateMatrixWorld(true);
+  const depart = boutDuCanon(p.h, new THREE.Vector3());
+  const arrivee = new THREE.Vector3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
+  if (!reussi) arrivee.add(new THREE.Vector3(entre(-2, 2), entre(-1, 1.5), entre(-2, 2)));
+  traceur(depart, arrivee); flash(depart, 0.4);
+  bruit(0.4 * clamp(1 - d / 120, 0, 1), 1800, 0.18);
+  if (reussi) blesserJoueur(degats);
 }
 
-function apparaitre(type, dMin, dMax) { // fait apparaître quelqu'un sur une route, hors de vue
-  for (let essai = 0; essai < 40; essai++) {
-    const x = Math.floor(Math.random() * L_CARTE) + 0.5, y = Math.floor(Math.random() * H_CARTE) + 0.5;
-    const d = Math.hypot(x - J.x, y - J.y);
-    if (grille[y | 0][x | 0] !== '.' || d < dMin || d > dMax || voit({ x, y }, J)) continue;
-    return ajouterEntite(type, x, y);
+// voitures qui roulent toutes seules : elles suivent une "carotte" qui avance sur la voie de droite
+const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+const noeudExiste = (i, j) => i >= 0 && j >= 0 && i <= NBX && j <= NBZ;
+function pointRoute(r, t) { const a = noeud(r.i, r.j), [dx, dz] = DIRS[r.d]; return { x: a.x + dx * t - dz * VOIE, z: a.z + dz * t + dx * VOIE }; }
+function choisirDirection(v, i, j, d) {
+  const options = [0, 1, 2, 3].filter(k => k !== (d + 2) % 4 && noeudExiste(i + DIRS[k][0], j + DIRS[k][1]));
+  if (!options.length) return (d + 2) % 4;
+  if (v.police) return options.reduce((m, k) => dist(noeud(i + DIRS[k][0], j + DIRS[k][1]), J) < dist(noeud(i + DIRS[m][0], j + DIRS[m][1]), J) ? k : m);
+  return options.includes(d) && Math.random() < 0.6 ? d : hasard(options);
+}
+function majVoitureIA(v, dt) {
+  const r = v.route;
+  if (v.police && dist(v, J) < 30) { // arrivés : les policiers descendent
+    v.conducteur = null;
+    for (const lx of [1.9, -1.9]) { const p = local(v, lx, 0), f = creerPersonne('flic', p.x, p.z); f.renfort = true; resoudre(f, 0.35); }
+    return;
   }
+  const fx = Math.sin(v.angle), fz = Math.cos(v.angle);
+  const devant = (o, portee, largeur) => { const dx = o.x - v.x, dz = o.z - v.z, a = dx * fx + dz * fz; return a > 0 && a < portee && Math.abs(dx * fz - dz * fx) < largeur; };
+  let bloque = voitures.some(o => o !== v && devant(o, 9, 2));
+  if (!v.police) bloque ||= (!J.voiture && devant(J, 7, 1.6)) || personnes.some(p => p.vie > 0 && devant(p, 7, 1.6));
+  v.attente = bloque ? v.attente + dt : 0;
+  if (v.attente > 5) { // bloquée trop longtemps : demi-tour
+    v.attente = 0;
+    const [dx, dz] = DIRS[r.d];
+    v.route = { i: r.i + dx, j: r.j + dz, d: (r.d + 2) % 4, t: PAS - r.t };
+    return;
+  }
+  const cible = bloque ? 0 : v.police ? R_.vitessePolice : R_.vitesseCirculation;
+  v.vitesse += clamp(cible - v.vitesse, -25 * dt, 8 * dt);
+  for (let k = 0; k < 40 && dist(v, pointRoute(r, r.t)) < 6; k++) {
+    r.t += 0.5;
+    if (r.t >= PAS) { r.i += DIRS[r.d][0]; r.j += DIRS[r.d][1]; r.t -= PAS; r.d = choisirDirection(v, r.i, r.j, r.d); }
+  }
+  const c = pointRoute(r, r.t);
+  v.angle += clamp(diffAngle(v.angle, angleVers(v, c)), -0.3 * v.vitesse * dt, 0.3 * v.vitesse * dt);
+  v.x += Math.sin(v.angle) * v.vitesse * dt; v.z += Math.cos(v.angle) * v.vitesse * dt;
+}
+function majVoiture(v, dt) {
+  const d = dist(v, J);
+  v.m.visible = d < 350;
+  if (v.gyro) { const on = Math.sin(temps * 14) > 0; v.gyro[0].material.emissiveIntensity = on ? 4 : 0.1; v.gyro[1].material.emissiveIntensity = on ? 0.1 : 4; }
+  if (v === J.voiture) {}
+  else if (v.conducteur) majVoitureIA(v, dt);
+  else if (Math.abs(v.vitesse) > 0.05) { v.vitesse *= Math.pow(0.3, dt); bougerVoiture(v, dt, false); }
+  for (const r of v.roues) r.children[0].rotation.x = r.children[1].rotation.x += v.vitesse * dt / 0.36;
+  v.m.position.set(v.x, hauteurSol(v.x, v.z), v.z); v.m.rotation.y = v.angle;
+  if (v.conducteur === 'civil' && d > 280) v.supprimer = true;
+  if (v.police && v.renfort && !v.conducteur && v !== J.voiture && d > 150) v.supprimer = true;
 }
 
+// faire apparaître piétons et voitures autour du joueur (hors de sa vue)
+function apparaitreVoiture(police) {
+  const [bi, bj] = blocEn(J.x, J.z);
+  for (let essai = 0; essai < 20; essai++) {
+    const i = bi + Math.floor(entre(-3, 5)), j = bj + Math.floor(entre(-3, 5)), d = Math.floor(Math.random() * 4);
+    if (!noeudExiste(i, j) || !noeudExiste(i + DIRS[d][0], j + DIRS[d][1])) continue;
+    const r = { i, j, d, t: entre(8, PAS - 8) }, p = pointRoute(r, r.t), dd = dist(p, J);
+    if (dd < (police ? 90 : 60) || dd > 230 || voitures.some(o => dist(o, p) < 12) || (dd < 130 && voit(p, J))) continue;
+    const v = creerVoiture(p.x, p.z, Math.atan2(DIRS[d][0], DIRS[d][1]), police);
+    v.conducteur = police ? 'police' : 'civil'; v.route = r; v.renfort = police; v.vitesse = police ? 10 : 5;
+    return v;
+  }
+}
+function apparaitrePersonne(type) {
+  const [bi, bj] = blocEn(J.x, J.z);
+  for (let essai = 0; essai < 20; essai++) {
+    const i = bi + Math.floor(entre(-2, 3)), j = bj + Math.floor(entre(-2, 3));
+    if (!typeBloc(i, j)) continue;
+    const p = coin(i, j, Math.floor(Math.random() * 4)), d = dist(p, J);
+    if (d < 45 || d > 170 || (d < 110 && voit(p, J))) continue;
+    return creerPersonne(type, p.x, p.z);
+  }
+}
+function peupler(dt) {
+  tPeupler -= dt;
+  if (tPeupler > 0) return;
+  tPeupler = 0.5;
+  for (const p of personnes) if (p.type === 'pieton' && dist(p, J) > 200) p.supprimer = true;
+  if (personnes.filter(p => p.type === 'pieton').length < R_.nombrePietons) apparaitrePersonne('pieton');
+  if (voitures.filter(v => v.conducteur === 'civil').length < R_.nombreVoitures) apparaitreVoiture(false);
+}
 function police(dt) {
   if (etoiles === 0) return;
-  const vu = entites.some(e => e.type === 'flic' && dist(e, J) < 14 && voit(e, J));
-  tempsCalme = vu ? 0 : tempsCalme + dt;
-  if (tempsCalme > REGLAGES.delaiPerteEtoile) {
+  tVu -= dt;
+  if (tVu <= 0) { tVu = 0.3; vuParPolice = policeVoit(); }
+  tempsCalme = vuParPolice ? 0 : tempsCalme + dt;
+  if (tempsCalme > R_.delaiPerteEtoile) {
     etoiles--; tempsCalme = 0;
     if (etoiles === 0) {
-      message('Tu as semé la police !');
-      for (const e of entites) if (e.renfort && dist(e, J) > 6) e.supprimer = true;
+      annonce('', 'Tu as semé la police !', 2.5);
+      for (const p of personnes) if (p.renfort && dist(p, J) > 50) p.supprimer = true;
+      for (const v of voitures) if (v.police && v.renfort && v !== J.voiture && dist(v, J) > 50) v.supprimer = true;
     }
   }
-  tempsRenfort -= dt;
-  if (tempsRenfort <= 0 && entites.filter(e => e.type === 'flic').length < etoiles * 2) {
-    tempsRenfort = 3;
-    const f = apparaitre('flic', 8, 16);
-    if (f) f.renfort = true;
+  const flics = personnes.filter(p => p.type === 'flic' && p.vie > 0).length;
+  tRenfort -= dt;
+  if (tRenfort <= 0 && flics < Math.min(R_.maxPoliciers, etoiles * 2)) { tRenfort = 4; const f = apparaitrePersonne('flic'); if (f) f.renfort = true; }
+  if (etoiles >= R_.etoilesVoituresPolice) {
+    tVoiturePolice -= dt;
+    const n = voitures.filter(v => v.police && v.conducteur).length;
+    if (tVoiturePolice <= 0 && n < Math.min(3, etoiles - 1) && flics < R_.maxPoliciers) { tVoiturePolice = 6; apparaitreVoiture(true); }
   }
-  if (etoiles >= REGLAGES.etoilesVoituresPolice) {
-    tempsVoituresPolice -= dt;
-    const enRoute = entites.filter(e => e.police && e.conducteur).length;
-    if (tempsVoituresPolice <= 0 && enRoute < etoiles - 1) {
-      tempsVoituresPolice = 5;
-      const v = apparaitre('voiture', 10, 22);
-      if (v) { v.police = true; v.conducteur = true; v.renfort = true; v.art = 'voiturePolice'; orienter(v); }
-    }
-  }
-  // les voitures de police garées loin disparaissent
-  for (const e of entites) if (e.police && !e.conducteur && e.renfort && e !== J.voiture && dist(e, J) > 18) e.supprimer = true;
 }
 
 // =====================================================================
@@ -705,313 +1260,178 @@ function police(dt) {
 // =====================================================================
 function etapeFinie(et) {
   switch (et.type) {
-    case 'aller': return dist(J, lieux[et.lieu]) < 1;
-    case 'voiture': return J.voiture && dist(J, lieux[et.lieu]) < 1.5;
-    case 'eliminer': return !entites.some(e => e.type === et.cible && !e.supprimer);
+    case 'aller': return dist(J, lieux[et.lieu]) < 4;
+    case 'voiture': return J.voiture && dist(J, lieux[et.lieu]) < 7;
+    case 'eliminer': return !personnes.some(p => p.type === et.cible && p.vie > 0);
     case 'etoiles': return etoiles >= et.nombre;
     case 'semer': return etoiles === 0;
+    case 'arme': return J.possede[indexArme(et.arme)];
   }
-}
-function missions() {
-  const m = MISSIONS[missionIndex];
-  if (!m || !etapeFinie(m.etapes[etapeIndex])) return;
-  son('mission');
-  etapeIndex++;
-  if (etapeIndex < m.etapes.length) { message(m.etapes[etapeIndex].texte, 3); return; }
-  J.argent += m.recompense;
-  missionIndex++; etapeIndex = 0;
-  message(missionIndex < MISSIONS.length ? `Mission "${m.nom}" réussie ! +${m.recompense} $`
-                                         : 'BRAVO ! Toutes les missions sont finies !', 4);
 }
 function cibleMission() {
   const m = MISSIONS[missionIndex];
   if (!m) return null;
   const et = m.etapes[etapeIndex];
   if (et.lieu) return lieux[et.lieu];
-  if (et.type === 'eliminer') return entites.find(e => e.type === et.cible && !e.supprimer);
+  if (et.type === 'eliminer') return personnes.find(p => p.type === et.cible && p.vie > 0) || null;
+  if (et.type === 'arme') return objets.find(o => o.type === 'stand' && o.arme === indexArme(et.arme)) || armurerie;
   return null;
 }
+function missions() {
+  const m = MISSIONS[missionIndex];
+  if (!m || !etapeFinie(m.etapes[etapeIndex])) return;
+  bip(500, 1500, 0.5, 'triangle', 0.3);
+  if (++etapeIndex < m.etapes.length) return;
+  J.argent += m.recompense;
+  missionIndex++; etapeIndex = 0;
+  annonce(missionIndex < MISSIONS.length ? 'MISSION RÉUSSIE' : 'BRAVO !', missionIndex < MISSIONS.length ? `${m.nom} : +${m.recompense} $` : 'Toutes les missions sont finies !', 4);
+}
 
+// =====================================================================
+//  Caméra
+// =====================================================================
+function placerCamera(pivot, direction, distance, epaule) {
+  const droite = new THREE.Vector3(-Math.cos(J.lacetCam), 0, Math.sin(J.lacetCam));
+  const voulu = pivot.clone().addScaledVector(direction, -distance).addScaledVector(droite, epaule);
+  let t = 1;
+  for (let s = 0.05; s <= 1; s += 0.05) { // la caméra ne passe pas dans les murs
+    const p = vTmp.lerpVectors(pivot, voulu, s);
+    if (dansBatiment(p.x, p.y, p.z)) { t = Math.max(0.05, s - 0.08); break; }
+  }
+  camera.position.lerpVectors(pivot, voulu, t);
+  camera.position.y = Math.max(0.3, camera.position.y);
+}
+function majCamera(dt) {
+  const v = J.voiture;
+  J.lacetCam = v ? v.angle + J.decalage : J.lacet;
+  const dir = new THREE.Vector3(Math.sin(J.lacetCam) * Math.cos(J.tangage), Math.sin(J.tangage), Math.cos(J.lacetCam) * Math.cos(J.tangage));
+  joueurH.g.visible = !v && J.vue !== 1;
+  if (J.mort) {
+    joueurH.g.visible = !v;
+    placerCamera(new THREE.Vector3(J.x, J.y + 0.5, J.z), new THREE.Vector3(0.3, -0.9, 0.3).normalize(), 5, 0);
+    camera.lookAt(J.x, J.y, J.z);
+    return;
+  }
+  if (v) {
+    if (J.vue === 1) { const p = local(v, 0.4, 0.1); camera.position.set(p.x, 1.25, p.z); }
+    else placerCamera(new THREE.Vector3(v.x, 1.8, v.z), dir, 8 + Math.abs(v.vitesse) * 0.08, 0);
+  } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
+  else placerCamera(new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z), dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
+  camera.rotation.set(J.tangage + J.recul * 0.03, J.lacetCam + Math.PI, 0);
+  const fov = visee && !v ? 45 : 70;
+  if (Math.abs(camera.fov - fov) > 0.1) { camera.fov += (fov - camera.fov) * Math.min(1, dt * 10); camera.updateProjectionMatrix(); }
+}
+
+// =====================================================================
+//  Affichage (mini-carte, infos)
+// =====================================================================
+const carteImg = document.createElement('canvas');
+carteImg.width = Math.ceil(TAILLE_X); carteImg.height = Math.ceil(TAILLE_Z);
+{
+  const g = carteImg.getContext('2d');
+  g.fillStyle = '#8c9196'; g.fillRect(0, 0, carteImg.width, carteImg.height);
+  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070' };
+  for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) { const o = origine(i, j); g.fillStyle = couleurs[CARTE[j][i]] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
+  g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
+  const icone = (p, fond, lettre) => { if (!p) return; g.fillStyle = fond; g.beginPath(); g.arc(p.x, p.z, 9, 0, 7); g.fill(); g.fillStyle = '#fff'; g.font = 'bold 13px Arial'; g.textAlign = 'center'; g.fillText(lettre, p.x, p.z + 5); };
+  icone(armurerie, '#d86a10', 'A'); icone(hopital, '#c02020', '+');
+}
+const mctx = $('minicarte').getContext('2d');
+function dessinerMinicarte() {
+  const zoom = J.voiture ? 0.8 : 1.3, th = -Math.PI / 2 - Math.atan2(Math.cos(J.lacetCam), Math.sin(J.lacetCam)), c = Math.cos(th), s = Math.sin(th);
+  const ecran = (x, z) => { const dx = (x - J.x) * zoom, dz = (z - J.z) * zoom; return [110 + dx * c - dz * s, 110 + dx * s + dz * c]; };
+  mctx.save(); mctx.clearRect(0, 0, 220, 220);
+  mctx.beginPath(); mctx.arc(110, 110, 110, 0, 7); mctx.clip();
+  mctx.fillStyle = '#3a5a3a'; mctx.fillRect(0, 0, 220, 220);
+  mctx.save(); mctx.translate(110, 110); mctx.rotate(th); mctx.scale(zoom, zoom); mctx.translate(-J.x, -J.z); mctx.drawImage(carteImg, 0, 0); mctx.restore();
+  const point = (x, z, couleur, r = 3) => { const [a, b] = ecran(x, z); mctx.fillStyle = couleur; mctx.beginPath(); mctx.arc(a, b, r, 0, 7); mctx.fill(); };
+  const gyro = Math.sin(temps * 12) > 0 ? '#f33' : '#39f';
+  for (const p of personnes) if (p.vie > 0 && p.alerte && (p.type !== 'flic' || etoiles > 0)) point(p.x, p.z, p.type === 'flic' ? gyro : '#e33');
+  for (const v of voitures) if (v.police && v.conducteur) point(v.x, v.z, gyro, 4);
+  const cible = cibleMission();
+  if (cible) { // le point jaune reste au bord si l'objectif est loin
+    let [a, b] = ecran(cible.x, cible.z); const dx = a - 110, dz = b - 110, l = Math.hypot(dx, dz);
+    if (l > 100) { a = 110 + dx / l * 100; b = 110 + dz / l * 100; }
+    mctx.fillStyle = '#ffd23a'; mctx.strokeStyle = '#000'; mctx.beginPath(); mctx.arc(a, b, 6, 0, 7); mctx.fill(); mctx.stroke();
+  }
+  mctx.fillStyle = '#fff'; mctx.strokeStyle = '#000';
+  mctx.beginPath(); mctx.moveTo(110, 101); mctx.lineTo(117, 117); mctx.lineTo(110, 113); mctx.lineTo(103, 117); mctx.closePath(); mctx.fill(); mctx.stroke();
+  mctx.restore();
+}
+function majHUD(dt) {
+  $('barre-vie').firstChild.style.width = `${J.vie / R_.viesJoueur * 100}%`;
+  $('barre-vie').firstChild.style.background = J.vie < 30 ? '#c0392b' : '#56b24c';
+  $('argent').textContent = `${J.argent} $`;
+  [...$('etoiles').children].forEach((e, i) => e.classList.toggle('on', i < etoiles));
+  $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
+  const a = ARMES[J.arme];
+  $('arme').textContent = a.nom;
+  $('munitions').textContent = a.corps ? '' : `${J.balles[J.arme]} balles`;
+  const m = MISSIONS[missionIndex];
+  $('objectif').textContent = m ? m.etapes[etapeIndex].texte : 'Ville libre : fais ce que tu veux !';
+  $('viseur').style.display = !J.voiture && !J.mort && (J.vue === 1 || visee || !a.corps) ? 'block' : 'none';
+  $('vitesse').style.display = J.voiture ? 'block' : 'none';
+  if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h`;
+  const s = standProche(), v = !J.voiture && voitures.some(o => dist(o, J) < 3.5);
+  const aide = J.voiture ? '' : s ? `Appuie sur <b>E</b> pour acheter : ${ARMES[s.arme].nom} (${J.possede[s.arme] ? `munitions ${Math.round(ARMES[s.arme].prix / 2)}` : ARMES[s.arme].prix} $)` : v ? 'Appuie sur <b>E</b> pour monter dans la voiture' : '';
+  $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
+  $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
+  tempsAnnonce -= dt;
+  if (tempsAnnonce <= 0) $('annonce').style.opacity = 0;
+  dessinerMinicarte();
+}
+
+// =====================================================================
+//  Boucle principale
+// =====================================================================
 function mettreAJour(dt) {
   temps += dt;
-  messageTemps -= dt;
-  J.cooldownTir -= dt; J.flashTir -= dt; J.degat -= dt;
-  if (J.voiture) conduire(dt); else marcher(dt);
-  if ((touches.Space || sourisAppuyee) && !J.voiture && J.cooldownTir <= 0) tirer();
-  tempsChamp -= dt;
-  if (tempsChamp <= 0) { calculerChamp(); tempsChamp = 0.5; }
-  for (const e of entites) majEntite(e, dt);
-  police(dt);
-  tempsPietons -= dt;
-  if (tempsPietons <= 0 && entites.filter(e => e.type === 'pieton').length < REGLAGES.nombrePietons) {
-    tempsPietons = 2;
-    apparaitre('pieton', 6, 30);
+  if (J.mort) { J.mort += dt; animerHumain(joueurH, 0, dt, { mort: Math.min(1, J.mort * 3) }); if (J.mort > 3.5) reapparaitre(); }
+  else {
+    if (J.voiture) conduire(J.voiture, dt); else majJoueur(dt);
+    J.cooldown -= dt; J.frappe = Math.max(0, J.frappe - dt * 3.3); J.recul = Math.max(0, J.recul - dt * 8);
+    if (sourisG && !J.voiture && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
+    if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
-  tempsVoitures -= dt;
-  if (tempsVoitures <= 0 && entites.filter(e => e.conducteur && !e.police).length < REGLAGES.nombreVoitures) {
-    tempsVoitures = 2;
-    const v = apparaitre('voiture', 8, 30);
-    if (v) { v.conducteur = true; orienter(v); }
-  }
-  ramasser();
-  missions();
-  entites = entites.filter(e => !e.supprimer);
-  if (J.vie <= 0) mourir();
-}
-
-// =====================================================================
-//  Dessin du monde en 3D (raycasting, comme Wolfenstein 3D)
-// =====================================================================
-const W = 320, H = 200;
-const tampon = document.createElement('canvas');
-tampon.width = W; tampon.height = H;
-const tctx = tampon.getContext('2d');
-const image = tctx.createImageData(W, H);
-const pixels = new Uint32Array(image.data.buffer);
-const zbuffer = new Float32Array(W);
-const ciel = [];
-for (let y = 0; y < H / 2; y++) { const t = y / (H / 2); ciel.push(rgb(70 + 110 * t, 120 + 90 * t, 200 + 40 * t)); }
-
-const C = convertirPalette({
-  beton: '#8a8a8a', betonJoint: '#6a6a6a',
-  brique1: '#a0452e', brique2: '#8a3a26', joint: '#c8c0b0',
-  vitre: '#3a6a9a', vitreClair: '#8ac0e8', cadre: '#2a3440',
-  beige: '#d8c8a0', fenetre: '#2a3a5a', fenetreAllumee: '#f8e070',
-  vert: '#3a8a6a', rouge: '#d83030', blanc: '#f0f0f0', vitrine: '#6ab0d0',
-  pierre1: '#5a6a8a', pierre2: '#4a5a7a', pierre3: '#6a7a9a', jointBunker: '#2a3040',
-  route: '#505050', routeJoint: '#404040', herbe1: '#3a8a3a', herbe2: '#358035',
-  dalle1: '#6a6050', dalle2: '#5a5040',
-});
-
-// u = position horizontale sur le mur (0 à 1), v = verticale (0 en haut, 1 en bas)
-function texMur(m, u, v, mx, my) {
-  switch (m) {
-    case '2': { // briques
-      const rang = Math.floor(v * 12), dec = (rang % 2) * 0.5;
-      if ((v * 12) % 1 < 0.15 || (u * 3 + dec) % 1 < 0.05) return C.joint;
-      return bruit(mx * 7 + rang, my * 13 + Math.floor(u * 3 + dec)) > 0.5 ? C.brique1 : C.brique2;
+  for (const p of personnes) majPersonne(p, dt);
+  for (const v of voitures) majVoiture(v, dt);
+  for (const o of objets) {
+    if (o.cache) { o.cache -= dt; if (o.cache <= 0) { o.cache = 0; o.m.visible = true; } continue; }
+    o.m.rotation.y += dt * 1.5; o.m.position.y = o.base + Math.sin(temps * 2 + o.x) * 0.1;
+    if (o.type === 'stand' || J.mort || dist(o, J) > 1.6) continue;
+    if (o.type === 'soin') { if (J.vie >= R_.viesJoueur) continue; J.vie = Math.min(R_.viesJoueur, J.vie + 50); annonce('', '+50 vie', 1.5); }
+    if (o.type === 'argent') { J.argent += o.montant; annonce('', `+${o.montant} $`, 1.5); }
+    if (o.type === 'arme') {
+      const a = ARMES[o.arme], nouveau = !J.possede[o.arme];
+      J.possede[o.arme] = true; J.balles[o.arme] += nouveau ? a.munitions / 2 : Math.ceil(a.munitions / 4);
+      annonce('', nouveau ? `${a.nom} ramassé !` : `+ munitions (${a.nom})`, 2);
+      if (nouveau && ARMES[J.arme].corps) changerArme(o.arme);
     }
-    case '3': { // tour en verre
-      const fu = (u * 3) % 1, fv = (v * 6) % 1;
-      if (fu > 0.1 && fu < 0.9 && fv > 0.12 && fv < 0.88) return fu + fv * 0.5 > 0.9 ? C.vitreClair : C.vitre;
-      return C.cadre;
-    }
-    case '4': { // immeuble avec des fenêtres allumées
-      const fu = (u * 2) % 1, fv = (v * 4) % 1;
-      if (fu > 0.2 && fu < 0.8 && fv > 0.2 && fv < 0.75)
-        return bruit(mx * 4 + Math.floor(u * 2), my * 4 + Math.floor(v * 4)) > 0.6 ? C.fenetreAllumee : C.fenetre;
-      return C.beige;
-    }
-    case '5': { // magasin avec store rayé
-      if (v < 0.45) { const fu = (u * 2) % 1, fv = (v * 4) % 1; return fu > 0.25 && fu < 0.75 && fv > 0.25 && fv < 0.8 ? C.fenetre : C.vert; }
-      if (v < 0.55) return (u * 6) % 1 < 0.5 ? C.rouge : C.blanc;
-      return u > 0.1 && u < 0.9 && v < 0.95 ? C.vitrine : C.vert;
-    }
-    case 'B': { // pierres bleues du bunker
-      const rang = Math.floor(v * 8), dec = (rang % 2) * 0.5;
-      if ((v * 8) % 1 < 0.1 || (u * 2 + dec) % 1 < 0.05) return C.jointBunker;
-      const n = bruit(mx * 5 + rang, my * 9 + Math.floor(u * 2 + dec));
-      return n < 0.33 ? C.pierre1 : n < 0.66 ? C.pierre2 : C.pierre3;
-    }
-    default: // béton
-      return (v * 4) % 1 < 0.05 || (u * 2) % 1 < 0.03 ? C.betonJoint : C.beton;
+    bip(600, 1200, 0.15, 'sine', 0.3);
+    if (o.reapparait) { o.cache = 60; o.m.visible = false; } else o.supprimer = true;
+  }
+  for (const e of effets) { e.vie -= dt; if (e.vie <= 0) { (e.dans || scene).remove(e.o); if (e.o.isLine) e.o.geometry.dispose(); } }
+  lumiereTir.intensity = Math.max(0, lumiereTir.intensity - dt * 800);
+  police(dt); peupler(dt); missions();
+  // ménage
+  for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); personnes.splice(k, 1); }
+  for (let k = voitures.length - 1; k >= 0; k--) if (voitures[k].supprimer && voitures[k] !== J.voiture) { scene.remove(voitures[k].m); voitures.splice(k, 1); }
+  for (let k = objets.length - 1; k >= 0; k--) if (objets[k].supprimer) { scene.remove(objets[k].m); objets.splice(k, 1); }
+  for (let k = effets.length - 1; k >= 0; k--) if (effets[k].vie <= 0) effets.splice(k, 1);
+  // sons de moteur et de sirène
+  if (audio) {
+    moteurGain.gain.value = J.voiture ? 0.06 : 0;
+    if (J.voiture) moteur.frequency.value = 45 + Math.abs(J.voiture.vitesse) * 4;
+    let dp = Infinity; for (const v of voitures) if (v.police && v.conducteur) dp = Math.min(dp, dist(v, J));
+    sireneGain.gain.value = dp < 180 ? 0.035 * (1 - dp / 180) : 0;
+    sirene.frequency.value = Math.sin(temps * 5) > 0 ? 700 : 950;
   }
 }
-function texSol(s, u, v) {
-  if (s === ',') return ((u * 6 | 0) + (v * 6 | 0)) % 2 ? C.herbe1 : C.herbe2;
-  if (s === '_') return ((u * 2 | 0) + (v * 2 | 0)) % 2 ? C.dalle1 : C.dalle2;
-  return u < 0.03 || v < 0.03 ? C.routeJoint : C.route;
-}
-function brume(d) { return Math.max(0.3, 1 - d / 24); }
-
-let cam = {};
-function projeter(x, y) { // position à l'écran d'un objet du monde
-  const { dx, dy, px, py } = cam, rx = x - J.x, ry = y - J.y;
-  const inv = 1 / (px * dy - dx * py);
-  const tx = inv * (dy * rx - dx * ry), tz = inv * (-py * rx + px * ry);
-  if (tz < 0.2) return null;
-  return { ecranX: (W / 2) * (1 + tx / tz), tz };
-}
-
-function dessinerSprite(s) {
-  const p = projeter(s.x, s.y);
-  if (!p) return;
-  const nom = s.art || ART_DE[s.type] || s.type, art = ART[nom], ah = art.length, aw = art[0].length;
-  const hPix = (H / p.tz) * TAILLE[s.art || s.type], wPix = hPix * aw / ah;
-  const sol = H / 2 + H / (2 * p.tz) - (s.flotte || 0) * H / p.tz;
-  const haut = sol - hPix, gauche = p.ecranX - wPix / 2;
-  const x0 = Math.max(0, Math.floor(gauche)), x1 = Math.min(W, Math.ceil(gauche + wPix));
-  const y0 = Math.max(0, Math.floor(haut)), y1 = Math.min(H, Math.ceil(sol));
-  const f = brume(p.tz);
-  for (let x = x0; x < x1; x++) {
-    if (p.tz >= zbuffer[x]) continue; // caché derrière un mur
-    const ax = Math.floor((x - gauche) / wPix * aw);
-    if (ax < 0 || ax >= aw) continue;
-    for (let y = y0; y < y1; y++) {
-      const ay = Math.floor((y - haut) / hPix * ah);
-      if (ay < 0 || ay >= ah) continue;
-      const col = s.pal[art[ay][ax]];
-      if (col !== undefined) pixels[y * W + x] = assombrir(col, f);
-    }
-  }
-}
-
-const PAL_FLECHE = convertirPalette(PALETTES.fleche);
-const PAL_POLICE_A = convertirPalette(PALETTES.policeA), PAL_POLICE_B = convertirPalette(PALETTES.policeB);
-
-function rendreMonde() {
-  const c = Math.cos(J.angle), s = Math.sin(J.angle), fov = REGLAGES.champDeVision;
-  cam = { dx: c, dy: s, px: -s * fov, py: c * fov };
-  const { dx, dy, px, py } = cam;
-
-  // ciel
-  for (let y = 0; y < H / 2; y++) pixels.fill(ciel[y], y * W, (y + 1) * W);
-  // sol
-  for (let y = H / 2; y < H; y++) {
-    const dLigne = (H / 2) / (y + 0.5 - H / 2);
-    const pasX = dLigne * 2 * px / W, pasY = dLigne * 2 * py / W;
-    let fx = J.x + dLigne * (dx - px), fy = J.y + dLigne * (dy - py);
-    const f = brume(dLigne);
-    for (let x = 0; x < W; x++) {
-      const cx = Math.floor(fx), cy = Math.floor(fy);
-      pixels[y * W + x] = assombrir(texSol(solEn(cx, cy), fx - cx, fy - cy), f);
-      fx += pasX; fy += pasY;
-    }
-  }
-  // murs : un rayon par colonne de l'écran
-  for (let x = 0; x < W; x++) {
-    const camX = 2 * x / W - 1, rdx = dx + px * camX, rdy = dy + py * camX;
-    let mx = Math.floor(J.x), my = Math.floor(J.y);
-    const ddx = Math.abs(1 / rdx), ddy = Math.abs(1 / rdy);
-    const sx = rdx < 0 ? -1 : 1, sy = rdy < 0 ? -1 : 1;
-    let sdx = (rdx < 0 ? J.x - mx : mx + 1 - J.x) * ddx;
-    let sdy = (rdy < 0 ? J.y - my : my + 1 - J.y) * ddy;
-    let cote = 0, mur = null;
-    for (let i = 0; i < 64 && !mur; i++) {
-      if (sdx < sdy) { sdx += ddx; mx += sx; cote = 0; } else { sdy += ddy; my += sy; cote = 1; }
-      mur = murEn(mx, my);
-    }
-    const d = Math.max(0.01, cote === 0 ? sdx - ddx : sdy - ddy);
-    zbuffer[x] = d;
-    let u = cote === 0 ? J.y + d * rdy : J.x + d * rdx;
-    u -= Math.floor(u);
-    const hauteur = H / d, haut = (H - hauteur) / 2;
-    const f = brume(d) * (cote ? 0.75 : 1);
-    const y0 = Math.max(0, Math.floor(haut)), y1 = Math.min(H, Math.ceil(haut + hauteur));
-    for (let y = y0; y < y1; y++) pixels[y * W + x] = assombrir(texMur(mur || '1', u, (y - haut) / hauteur, mx, my), f);
-  }
-  // personnages et objets, du plus loin au plus proche
-  const liste = entites.filter(e => e !== J.voiture);
-  const cible = cibleMission();
-  if (cible) liste.push({ x: cible.x, y: cible.y, type: 'fleche', pal: PAL_FLECHE,
-                          flotte: (cible.type === 'boss' ? 1 : 0.3) + Math.sin(temps * 4) * 0.08 });
-  liste.sort((a, b) => dist(b, J) - dist(a, J));
-  for (const e of liste) dessinerSprite(e);
-}
-
-// =====================================================================
-//  Affichage : arme, volant, infos, mini-carte
-// =====================================================================
-const miniCarte = document.createElement('canvas');
-miniCarte.width = L_CARTE; miniCarte.height = H_CARTE;
-{
-  const m = miniCarte.getContext('2d');
-  const couleurs = { '.': '#333', ',': '#264', '_': '#553', B: '#46a' };
-  for (let y = 0; y < H_CARTE; y++) for (let x = 0; x < L_CARTE; x++) {
-    m.fillStyle = couleurs[grille[y][x]] || '#888';
-    m.fillRect(x, y, 1, 1);
-  }
-}
-const PAL_CSS = { pistolet: PALETTES.pistolet, flash: PALETTES.flash };
-function dessinerArt(art, pal, x, y, t) {
-  for (let j = 0; j < art.length; j++) for (let i = 0; i < art[j].length; i++) {
-    const c = pal[art[j][i]];
-    if (c) { ctx.fillStyle = c; ctx.fillRect(x + i * t, y + j * t, t, t); }
-  }
-}
-function texte(t, x, y, couleur = '#fff', taille = 22, align = 'left') {
-  ctx.font = `bold ${taille}px monospace`;
-  ctx.textAlign = align;
-  ctx.fillStyle = '#000'; ctx.fillText(t, x + 2, y + 2);
-  ctx.fillStyle = couleur; ctx.fillText(t, x, y);
-}
-
-function dessiner() {
-  const w = ecran.width, h = ecran.height;
-  rendreMonde();
-  tctx.putImageData(image, 0, 0);
-  ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(tampon, 0, 0, w, h);
-
-  if (J.voiture) { // volant
-    ctx.fillStyle = '#222'; ctx.fillRect(0, h - 70, w, 70);
-    const tourne = (touches.KeyA || touches.ArrowLeft ? -0.5 : 0) + (touches.KeyD || touches.ArrowRight ? 0.5 : 0);
-    ctx.save(); ctx.translate(w / 2, h + 30); ctx.rotate(tourne);
-    ctx.strokeStyle = '#111'; ctx.lineWidth = 24;
-    ctx.beginPath(); ctx.arc(0, 0, 160, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = '#111'; ctx.fillRect(-12, -160, 24, 160);
-    ctx.restore();
-    texte(`${Math.round(Math.abs(J.voiture.vitesse) * 12)} km/h`, w - 20, h - 25, '#6f6', 28, 'right');
-  } else { // pistolet + viseur
-    const t = 12, bx = Math.sin(J.bob) * 8, by = Math.abs(Math.cos(J.bob)) * 8 + (J.flashTir > 0 ? -10 : 0);
-    const x = w / 2 - 6 * t + bx, y = h - 12 * t + 10 + by;
-    if (J.flashTir > 0) dessinerArt(ART.flash, PAL_CSS.flash, x + 2 * t, y - 5 * t, t);
-    dessinerArt(ART.pistolet, PAL_CSS.pistolet, x, y, t);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(w / 2 - 10, h / 2 - 1, 20, 2); ctx.fillRect(w / 2 - 1, h / 2 - 10, 2, 20);
-  }
-  if (J.degat > 0) { ctx.fillStyle = `rgba(255,0,0,${J.degat})`; ctx.fillRect(0, 0, w, h); }
-
-  // vie, balles, argent
-  texte(`VIE ${Math.max(0, J.vie)}`, 20, h - 60, J.vie < 30 ? '#f44' : '#fff', 26);
-  texte(`BALLES ${J.munitions}`, 20, h - 25, '#fc3', 26);
-  texte(`${J.argent} $`, w - 20, 36, '#6f6', 28, 'right');
-
-  // étoiles de police
-  for (let i = 0; i < 5; i++) texte('★', w - 40 - i * 30, 72, i < etoiles ? '#fd0' : '#555', 28);
-
-  // mini-carte
-  const t = 4, mx0 = w - L_CARTE * t - 16, my0 = 90;
-  ctx.globalAlpha = 0.85;
-  ctx.drawImage(miniCarte, mx0, my0, L_CARTE * t, H_CARTE * t);
-  ctx.globalAlpha = 1;
-  const points = { soldat: '#f33', boss: '#f0f', flic: '#39f', voiture: '#ccc' };
-  for (const e of entites) {
-    if (!points[e.type]) continue;
-    ctx.fillStyle = e.police ? (Math.sin(temps * 12) > 0 ? '#f22' : '#39f') : points[e.type];
-    ctx.fillRect(mx0 + e.x * t - 2, my0 + e.y * t - 2, 4, 4);
-  }
-  const cible = cibleMission();
-  if (cible && Math.sin(temps * 8) > 0) { ctx.fillStyle = '#ff0'; ctx.fillRect(mx0 + cible.x * t - 4, my0 + cible.y * t - 4, 8, 8); }
-  ctx.save(); ctx.translate(mx0 + J.x * t, my0 + J.y * t); ctx.rotate(J.angle);
-  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(-4, -4); ctx.lineTo(-4, 4); ctx.fill();
-  ctx.restore();
-
-  // mission en cours + flèche vers l'objectif
-  const m = MISSIONS[missionIndex];
-  if (m) {
-    ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(10, 10, 560, 60);
-    texte(`Mission ${missionIndex + 1}/${MISSIONS.length} : ${m.nom}`, 20, 34, '#fd0', 20);
-    texte(m.etapes[etapeIndex].texte, 20, 60, '#fff', 17);
-  }
-  if (cible) {
-    ctx.save(); ctx.translate(w / 2, 110);
-    ctx.rotate(Math.atan2(cible.y - J.y, cible.x - J.x) - J.angle);
-    ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(12, 12); ctx.lineTo(-12, 12); ctx.fill();
-    ctx.restore();
-    texte(`${Math.round(dist(J, cible))} m`, w / 2, 150, '#ff0', 16, 'center');
-  }
-
-  if (messageTemps > 0) texte(messageTexte, w / 2, h / 2 - 60, '#fff', 28, 'center');
-
-  if (!enJeu) { // écran titre / pause
-    ctx.fillStyle = 'rgba(0,0,0,0.75)'; ctx.fillRect(0, 0, w, h);
-    texte(REGLAGES.titre, w / 2, 170, '#fd0', 64, 'center');
-    texte('Clique pour jouer', w / 2, 250, '#fff', 30, 'center');
-    const aide = ['Z Q S D ou flèches : se déplacer', 'Souris : viser', 'Clic ou Espace : tirer',
-                  'E : monter / descendre de voiture', 'Échap : pause'];
-    aide.forEach((l, i) => texte(l, w / 2, 330 + i * 34, '#ccc', 20, 'center'));
-  }
+function majRepere(dt) {
+  const cible = cibleMission(), et = MISSIONS[missionIndex]?.etapes[etapeIndex];
+  repere.visible = !!cible && et.type !== 'eliminer';
+  fleche.visible = !!cible && et.type === 'eliminer';
+  if (cible) { repere.position.set(cible.x, 2.5, cible.z); fleche.position.set(cible.x, 2.9 + Math.sin(temps * 4) * 0.15, cible.z); fleche.rotation.y += dt * 2; }
 }
 
 let dernier = performance.now();
@@ -1019,10 +1439,25 @@ function boucle(t) {
   const dt = Math.min(0.05, (t - dernier) / 1000);
   dernier = t;
   if (enJeu) mettreAJour(dt);
-  dessiner();
+  majCamera(dt); majRepere(dt); majHUD(dt);
+  soleil.position.set(J.x + soleilDir.x * 200, soleilDir.y * 200, J.z + soleilDir.z * 200);
+  soleil.target.position.set(J.x, 0, J.z);
+  ciel.position.copy(camera.position);
+  // arme en première personne : balancement en marchant, recul au tir
+  vm.position.set(0.2 + Math.sin(joueurH.phase) * 0.01, -0.2 - Math.abs(Math.cos(joueurH.phase)) * 0.01, -0.5 + J.recul * 0.05);
+  vm.rotation.set(J.recul * 0.15 - J.frappe * 0.8, 0, 0);
+  renderer.clear();
+  renderer.render(scene, camera);
+  if (J.vue === 1 && !J.voiture && !J.mort) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
   requestAnimationFrame(boucle);
 }
+// premier placement du joueur
+majJoueur(0);
 requestAnimationFrame(boucle);
+$('etat').textContent = 'Clique pour jouer';
+// pour les tests automatiques
+window.jeu = { J, creerPersonne, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
+  get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; } };
 </script>
 </body>
 </html>
