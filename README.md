@@ -4,7 +4,9 @@ Un jeu de tir à la première personne dans une ville, entre **Wolfenstein 3D** 
 
 ## Jouer
 
-Ouvre `index.html` dans un navigateur (double-clic). Rien à installer.
+**En ligne : https://jlehen.github.io/GTAxel/**
+
+Ou ouvre `index.html` dans un navigateur (double-clic). Rien à installer.
 
 | Touche | Action |
 |---|---|
