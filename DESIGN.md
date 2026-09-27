@@ -1,0 +1,378 @@
+# GTAxel — Document de design
+
+Mis à jour le 27 septembre 2026.
+
+## Vision
+
+GTAxel est un jeu d'action en 3D, en monde ouvert, qui se joue dans le navigateur. Il mélange GTA (ville libre, voitures, police) et Wolfenstein (le bunker et son Kommandant). Il a été imaginé par un garçon de 10 à 13 ans, qui doit pouvoir le modifier lui-même.
+
+**Piliers de design**
+
+- **Liberté** : dès le départ, on va où on veut, à pied ou en voiture volée. Les missions sont un fil conducteur, pas un couloir.
+- **Pardonnant** : les ennemis visent mal, la vie remonte toute seule et la mort ne coûte que 100 $. On doit pouvoir faire des bêtises sans être puni trop vite.
+- **Bidouillable** : tout tient dans un seul fichier `index.html`. Les réglages, les armes, la carte et les missions sont des tableaux commentés en français, en haut du fichier. On voit une modification en appuyant sur F5.
+- **Zéro installation** : un double-clic ou un lien suffit, pourvu qu'on ait Internet. En ligne : [jlehen.github.io/GTAxel](https://jlehen.github.io/GTAxel/).
+
+Pas de sang ni de gore : les personnages touchés tombent au sol.
+
+## Boucle de jeu et contrôles
+
+Le joueur alterne entre deux boucles. Les missions rapportent l'argent qui achète des armes ; les bêtises attirent la police jusqu'à ce qu'on la sème ou qu'on meure.
+
+```mermaid
+flowchart LR
+  E[Explorer la ville<br>à pied ou en voiture]
+  E --> M[Faire une mission<br>suivre le point jaune] --> G[Gagner de l'argent<br>200 à 5 000 $] --> A[Acheter des armes<br>à l'armurerie]
+  A -- armes plus fortes : on peut viser le bunker --> E
+  E --> B[Faire des bêtises<br>voler, frapper, tirer] --> P[La police arrive<br>1 à 5 étoiles]
+  P --> S[Semer la police<br>12 s caché = -1 étoile] --> E
+  P --> W[WASTED<br>la vie tombe à 0] --> H[Réveil à l'hôpital<br>-100 $, plus d'étoiles] --> E
+```
+
+Une partie commence à pied, sans argent, avec les poings et un couteau. Il n'y a pas de fin : après la 5e mission, la ville reste libre.
+
+### Contrôles
+
+| Touche | À pied | En voiture |
+| --- | --- | --- |
+| Z Q S D ou flèches | Se déplacer | Accélérer, freiner, tourner |
+| Souris | Regarder | Tourner la caméra autour de la voiture |
+| Clic gauche | Tirer ou frapper | Rien |
+| Clic droit | Viser (zoom, tir plus précis) | Rien |
+| Maj | Courir | Rien |
+| Espace | Sauter (environ 1 m) | Frein à main, virage plus serré |
+| Ctrl ou C | S'accroupir (bascule) | Rien |
+| E ou F | Monter en voiture, acheter une arme | Descendre |
+| V | 1re ou 3e personne | Vue intérieure ou extérieure |
+| 1 à 6, molette | Changer d'arme | Rien |
+| Échap | Pause | Pause |
+
+Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W A S D sur un QWERTY.
+
+### Déplacements
+
+| Allure | Vitesse |
+| --- | --- |
+| Course (Maj) | 8 m/s |
+| Marche | 4 m/s |
+| En visant | 2,4 m/s |
+| Accroupi | 2 m/s |
+
+### Caméras
+
+- **3e personne (par défaut)** : caméra 3,8 m derrière l'épaule droite. En visant, elle se rapproche à 1,8 m et le champ de vision passe de 70° à 45°. Elle avance quand un mur la gêne.
+- **1re personne (V)** : l'arme est dessinée par-dessus la scène, avec balancement et recul.
+- **En voiture** : caméra 8 m derrière, qui recule avec la vitesse et se recale seule après 1,5 s sans bouger la souris.
+- **Mort** : vue plongeante sur le corps pendant 3,5 s.
+
+## Le monde
+
+La ville mesure environ 900 m × 750 m : 120 pâtés de 60 m de côté, séparés par des rues de 14 m à double sens. Elle est construite au chargement à partir du tableau `CARTE`, et chaque pâté est identique d'une partie à l'autre.
+
+La carte actuelle (tableau `CARTE` de `index.html`, 12 colonnes × 10 lignes) :
+
+```
+MMMMPPIIIMMM
+MXMMPPIaTIMM
+MMHIIITTTIIM
+PPIIATTTTIIP
+PPIIITTbTIIP
+MIIcIITTIIMM
+MMIIIIIIIPPM
+MMPPIIIdBIMM
+MMPPIIIIIPMM
+MMMMMMPPPMMM
+```
+
+On y compte 13 pâtés de tours, 41 d'immeubles, 38 de maisons et 20 parcs. Les tours occupent le centre, les maisons et les parcs la bordure. Le bunker est en bas à droite de la carte, loin du départ en haut à gauche.
+
+### Types de pâtés
+
+| Lettre | Contenu |
+| --- | --- |
+| `T` | Une grande tour de 20 à 45 étages, ou 4 tours de 12 à 29 étages, en verre ou modernes |
+| `I` | 2 ou 4 immeubles de 3 à 10 étages, en brique, béton ou modernes |
+| `M` | 4 maisons avec pelouse et arbres, 1 voiture garée |
+| `P` | Pelouse, allées pavées, fontaine, jusqu'à 14 arbres, 1 trousse de soin |
+| `H` | Hôpital : point de réveil, 2 trousses de soin, 1 voiture garée |
+| `A` | Armurerie : 4 stands d'armes devant la boutique |
+| `B` | Bunker : enceinte avec une seule entrée à l'ouest, sacs de sable, 8 soldats, le Kommandant, 2 trousses, 1 fusil d'assaut |
+| `.` `X` `a`–`d` | Place pavée avec 4 arbres et 2 voitures garées |
+
+Un étage fait 3 m. Les trousses de soin réapparaissent 60 s après avoir été ramassées.
+
+### La rue
+
+- Trottoirs de 20 cm, lampadaires tous les 18 m, passages piétons à chaque carrefour.
+- Ciel réaliste avec un soleil fixe et des ombres. Le brouillard commence à 120 m et cache tout au-delà de 650 m.
+- Autour de la ville, une plaine d'herbe sans limite ni obstacle.
+
+### La population
+
+Seuls les environs du joueur sont vivants. Piétons et voitures apparaissent hors de sa vue et disparaissent quand il s'éloigne.
+
+| | Piétons | Voitures en circulation |
+| --- | --- | --- |
+| Nombre | 30 | 16 |
+| Apparaissent entre | 45 et 170 m | 60 et 230 m |
+| Disparaissent au-delà de | 200 m | 280 m |
+| Vitesse | 1,4 m/s | 11 m/s (40 km/h) |
+
+- **Piétons** : ils vont de coin en coin sur les trottoirs et traversent aux passages piétons (30 % de chances à chaque coin). Ils s'enfuient pendant 8 s si on tire à moins de 40 m ou si on les frappe.
+- **Voitures** : elles roulent sur la voie de droite et choisissent leur direction à chaque carrefour (60 % tout droit). Elles s'arrêtent devant un obstacle, et font demi-tour après 5 s bloquées.
+- **Voitures garées** : 49 au départ, prêtes à être volées.
+
+## Combat et armes
+
+Il y a 6 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'achètent à l'armurerie ou se ramassent sur les ennemis. Un tir à la tête fait 2,5 fois plus de dégâts.
+
+### Les armes
+
+| Arme | Dégâts par coup | Coups par seconde | Portée | Prix | Munitions achetées | Particularité |
+| --- | --- | --- | --- | --- | --- | --- |
+| Poings | 15 | 2,2 | 2 m | départ | illimitées | Repousse la cible de 50 cm |
+| Couteau | 50 | 2 | 2,3 m | départ | illimitées | Repousse la cible de 50 cm |
+| Pistolet | 40 | 3,3 | 90 m | 200 $ | 36 | Un clic par tir |
+| Mitraillette | 22 | 12,5 | 60 m | 800 $ | 150 | Automatique, peu précise |
+| Fusil à pompe | 8 plombs × 20 | 1,1 | 30 m | 1 200 $ | 30 | Très dispersé |
+| Fusil d'assaut | 34 | 8,3 | 130 m | 2 000 $ | 120 | Automatique, précis |
+
+- Racheter une arme déjà possédée coûte moitié prix et ne donne que des munitions.
+- Une arme ramassée donne la moitié des munitions ; si on l'a déjà, le quart.
+- Les coups de poing et de couteau touchent l'ennemi le plus proche devant soi, jusqu'à 50° de côté.
+- La dispersion est divisée par 2 en visant et doublée en courant.
+- Renverser quelqu'un avec une voiture à plus de 14 km/h fait 200 dégâts.
+
+### Les personnages
+
+| Type | Vie | Arme | Coups de pistolet pour tuer | Ce qu'il lâche |
+| --- | --- | --- | --- | --- |
+| Piéton | 50 | aucune | 2 | 10 à 69 $ (6 fois sur 10) |
+| Policier | 70 | pistolet | 2 | Un pistolet |
+| Soldat | 90 | fusil d'assaut | 3 | Une mitraillette ou un fusil d'assaut |
+| Kommandant | 450 | fusil à pompe | 12 (5 à la tête) | Un fusil à pompe et 1 000 $ |
+
+Les corps disparaissent au bout de 15 s.
+
+### Le joueur
+
+- **Vie** : 100 points. Elle remonte de 8 points par seconde après 5 s sans être touché, soit de 0 à 100 en 12,5 s. Une trousse de soin rend 50 points.
+- **Quand il est touché** : l'écran rougit sur les bords et un son grave retentit.
+
+### Les ennemis
+
+Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat. Il tire toutes les 1 à 2 s, ou 0,6 à 1,2 s pour le Kommandant. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
+
+| Ennemi | Dégâts par balle |
+| --- | --- |
+| Policier | 5 |
+| Soldat | 7 |
+| Kommandant | 12 |
+
+La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts.
+
+**Temps de survie estimé, sans bouger ni se soigner** :
+
+| Situation | Temps moyen avant de mourir |
+| --- | --- |
+| 1 policier à 10 m | environ 85 s |
+| Le Kommandant à 10 m | environ 20 s |
+| Les 8 soldats à 20 m qui voient le joueur | environ 10 s |
+
+Ce sont des calculs à partir des réglages, pas des mesures en jeu.
+
+Les soldats ne quittent jamais l'enceinte du bunker. Ils attaquent quand ils voient le joueur, ou quand il tire à moins de 50 m.
+
+## Police et recherche
+
+Le niveau de recherche va de 0 à 5 étoiles. Chaque bêtise ajoute une étoile ; 12 s sans être vu par la police en retirent une. À 0 étoile, les policiers sont pacifiques.
+
+### Ce qui donne une étoile
+
+- Tuer un piéton, à l'arme ou en l'écrasant.
+- Tuer un policier.
+- Frapper un policier, ou tirer à moins de 30 m de lui, quand on n'a encore aucune étoile.
+- Voler une voiture de police, ou n'importe quelle voiture sous les yeux de la police.
+
+### La réponse de la police
+
+| Étoiles | Policiers à pied, au plus | Voitures de police en route, au plus | Temps minimum pour tout perdre |
+| --- | --- | --- | --- |
+| 1 | 2 | 0 | 12 s |
+| 2 | 4 | 1 | 24 s |
+| 3 | 6 | 2 | 36 s |
+| 4 | 8 | 3 | 48 s |
+| 5 | 8 | 3 | 60 s |
+
+- **À pied** : un renfort apparaît toutes les 4 s, hors de vue, entre 45 et 170 m.
+- **En voiture** : dès 2 étoiles, une voiture de police apparaît toutes les 6 s entre 90 et 230 m. Elle roule à 65 km/h et prend à chaque carrefour la rue qui la rapproche du joueur. À moins de 30 m, elle s'arrête et 2 policiers en descendent.
+- **Être vu** : un policier vivant à moins de 50 m avec une ligne de vue dégagée, ou une voiture de police conduite à moins de 50 m. Les étoiles clignotent en bleu tant que la police voit le joueur.
+- **Fin de poursuite** : à 0 étoile, les renforts à plus de 50 m disparaissent. Mourir remet aussi les étoiles à 0.
+
+La sirène s'entend à moins de 180 m d'une voiture de police en route, et les policiers apparaissent en points rouges et bleus sur la mini-carte.
+
+## Véhicules
+
+Toutes les voitures se volent, garées ou en circulation, police comprise. Il suffit d'appuyer sur E à moins de 3,5 m. Si quelqu'un conduit, il est éjecté : un civil s'enfuit, un policier attaque.
+
+### Conduite
+
+| Caractéristique | Valeur |
+| --- | --- |
+| Vitesse maximale | 115 km/h (32 m/s) |
+| Marche arrière | 36 km/h |
+| 0 à 100 km/h | environ 2 s |
+| Freinage | 2,5 fois plus fort que l'accélération |
+
+- La direction ne répond pas à l'arrêt. Elle est la plus vive vers 20 km/h, puis deux fois moins à pleine vitesse.
+- Le frein à main (Espace) freine fort et serre le virage.
+- Contre un mur ou une autre voiture, au-dessus de 22 km/h, il y a un bruit de choc et la voiture perd 65 % de sa vitesse.
+- En descendant, le joueur sort du côté qui n'est pas contre un mur. La voiture continue sur son élan puis s'arrête.
+
+### Protection
+
+En voiture, le joueur ne prend que 40 % des dégâts, et les ennemis le touchent 30 % moins souvent. En contrepartie, on ne peut pas tirer depuis une voiture.
+
+### Ce que les voitures ne font pas (encore)
+
+Elles ne s'abîment pas et n'explosent pas. Il n'y a qu'un seul modèle, en plusieurs couleurs, plus la version police avec gyrophares.
+
+## Missions et progression
+
+Les 5 missions s'enchaînent dans l'ordre et rapportent 8 200 $ au total. Elles emmènent le joueur de la livraison d'un colis à l'attaque du bunker. L'argent gagné avant le bunker suffit pour s'offrir le fusil d'assaut.
+
+| # | Mission | Étapes | Récompense |
+| --- | --- | --- | --- |
+| 1 | Le colis | Aller au point `a`, puis au point `b` en centre-ville | 500 $ |
+| 2 | Armé jusqu'aux dents | Acheter un pistolet à l'armurerie | 200 $ |
+| 3 | Voleur de voitures | Amener une voiture au garage `c` | 1 000 $ |
+| 4 | Course-poursuite | Monter à 3 étoiles, puis semer la police | 1 500 $ |
+| 5 | Opération bunker | Aller au point `d`, puis éliminer le Kommandant | 5 000 $ |
+
+Après la dernière mission, l'objectif affiche « Ville libre : fais ce que tu veux ! ».
+
+### Types d'étapes
+
+Une mission est une liste d'étapes. Chaque étape est validée dès que sa condition est vraie :
+
+| Type | Condition |
+| --- | --- |
+| `aller` | Être à moins de 4 m du lieu |
+| `voiture` | Être en voiture à moins de 7 m du lieu |
+| `eliminer` | Plus aucun personnage de ce type en vie (`boss` ou `soldat`) |
+| `etoiles` | Avoir au moins ce nombre d'étoiles |
+| `semer` | Revenir à 0 étoile |
+| `arme` | Posséder l'arme nommée |
+
+### Guidage
+
+- Un point jaune sur la mini-carte montre l'objectif. Il reste collé au bord quand l'objectif est loin.
+- Dans le monde, une colonne jaune lumineuse de 5 m marque le lieu, ou une flèche jaune flotte au-dessus de la cible à éliminer.
+- Le texte de l'étape s'affiche en bas de l'écran. À la fin, un bandeau annonce « MISSION RÉUSSIE » et la récompense.
+
+### Argent
+
+| Source | Montant |
+| --- | --- |
+| Missions | 200 à 5 000 $ |
+| Le Kommandant | 1 000 $ |
+| Piétons tués | 10 à 69 $, 6 fois sur 10 |
+| Mort | -100 $ |
+
+### Mort
+
+Quand la vie tombe à 0, l'écran passe en noir et blanc avec « WASTED » pendant 3,5 s. Le joueur se réveille devant l'hôpital avec toute sa vie, 100 $ de moins et 0 étoile. Il garde ses armes, ses munitions et sa progression dans les missions.
+
+## Interface et son
+
+L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, argent et étoiles en haut à droite. Tous les sons sont fabriqués par le programme ; il n'y a aucun fichier audio.
+
+### Éléments à l'écran
+
+| Emplacement | Élément | Détail |
+| --- | --- | --- |
+| Bas gauche | Mini-carte | Ronde, elle tourne avec la caméra. Elle dézoome en voiture. |
+| Bas gauche | Barre de vie | Verte, rouge sous 30 points |
+| Haut droite | Argent | En gros chiffres verts |
+| Haut droite | Étoiles | 5 étoiles, qui clignotent en bleu quand la police voit le joueur |
+| Haut droite | Arme et munitions | Nom de l'arme, nombre de balles |
+| Haut gauche | Aide | « Appuie sur E pour… » près d'une voiture ou d'un stand |
+| Bas centre | Objectif | Texte de l'étape de mission en cours |
+| Centre | Viseur | Un point blanc, avec une arme à feu, en visant ou en 1re personne |
+| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Tu as semé la police ! » |
+| Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
+| Plein écran | Bords rouges | Quand le joueur est touché |
+| Plein écran | WASTED | Noir et blanc à la mort |
+
+**La mini-carte** montre les bâtiments et les parcs, l'armurerie (A orange) et l'hôpital (+ rouge). Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
+
+**Le menu** affiche le titre, la liste des touches et « Clique pour jouer ». Échap libère la souris et ramène ce menu en mode pause.
+
+### Sons
+
+- **Armes** : chaque arme à feu a son propre coup de feu. Les tirs ennemis s'entendent moins fort de loin.
+- **Voiture** : moteur dont le son monte avec la vitesse, bruit de choc.
+- **Police** : sirène à deux tons, plus forte quand la voiture approche.
+- **Signaux** : bips pour un achat, un objet ramassé, une étape réussie, une blessure, la mort.
+
+Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed pour le texte (Google Fonts).
+
+## Architecture technique
+
+Tout le jeu tient dans `index.html`, environ 1 460 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+
+### Plan du fichier
+
+| Lignes | Partie | Rôle |
+| --- | --- | --- |
+| 1–89 | HTML et CSS | Interface et menu |
+| 92–176 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS` |
+| 180–265 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
+| 266–344 | Textures | Façades, vitres et routes dessinées par le programme |
+| 345–555 | Ville et collisions | Construction des pâtés, routes, murs invisibles |
+| 556–714 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
+| 715–1086 | Joueur | Clavier et souris, tir, achat, conduite |
+| 1087–1258 | Intelligence | Piétons, ennemis, circulation, police |
+| 1259–1384 | Missions, caméra, écran | Enchaînement des étapes, vues, mini-carte |
+| 1385–1463 | Boucle principale | Mise à jour et affichage de chaque image |
+
+### À chaque image
+
+1. Déplacer le joueur, à pied ou en voiture, et tirer si le bouton est enfoncé.
+2. Faire réfléchir et bouger chaque personnage, puis chaque voiture.
+3. Ramasser les objets touchés par le joueur.
+4. Gérer la police, repeupler autour du joueur, vérifier la mission.
+5. Placer la caméra, mettre à jour l'écran, dessiner la scène.
+
+Le pas de temps est limité à 50 ms, pour qu'un ralentissement ne fasse pas traverser les murs.
+
+### Choix techniques
+
+- **Rendu** : ciel physique, tone mapping ACES, ombres douces, reflets sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui.
+- **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : environ 122 appels de dessin et 120 000 triangles par image. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
+- **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
+- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture.
+- **Ville reproductible** : chaque pâté tire ses nombres au hasard à partir de sa position. La ville est donc la même à chaque partie.
+- **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, ou si une mission vise un lieu absent de la carte.
+- **Tests** : `window.jeu` donne accès à l'état du jeu. Un script hors dépôt pilote Chromium sans écran pour vérifier circulation, tirs, police, missions et mort.
+
+## Limites connues et pistes
+
+Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique et le son n'ont pas encore été vérifiés : les tests ont tourné en rendu logiciel.
+
+### Limites actuelles
+
+- Il n'y a pas de sauvegarde : recharger la page fait tout recommencer.
+- On ne peut entrer dans aucun bâtiment, et rien n'empêche de sortir de la ville dans la plaine.
+- Le soleil est fixe : il n'y a ni nuit ni météo.
+- Les voitures ne s'abîment pas, on ne peut pas tirer depuis une voiture, et la police (65 km/h) ne rattrape pas une voiture lancée à fond (115 km/h).
+- Les missions sont linéaires : une seule à la fois, dans l'ordre.
+- Il faut Internet, même pour jouer depuis le fichier.
+- Ctrl+W ferme l'onglet dans certains navigateurs : C est plus sûr pour s'accroupir.
+
+### Pistes pour la suite
+
+- Dégâts et explosions des voitures, tir par la fenêtre.
+- Sauvegarde de l'argent, des armes et des missions dans le navigateur.
+- Cycle jour et nuit, avec les lampadaires allumés.
+- Missions au choix, avec des marqueurs sur la carte.
