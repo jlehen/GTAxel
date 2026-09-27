@@ -928,12 +928,12 @@ stands.forEach(s => creerObjet({ type: 'stand', arme: s.arme, x: s.x, z: s.z }))
 pickupsDepart.forEach(creerObjet);
 
 const effets = [];
-const M_TRACEUR = new THREE.LineBasicMaterial({ color: '#ffe9a0', transparent: true, opacity: 0.85 });
+const M_TRACEUR = new THREE.LineBasicMaterial({ color: '#ffe9a0', transparent: true, opacity: 0.85, toneMapped: false }); // toneMapped: false = toujours à pleine lumière
 function traceur(a, b) {
   const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([a, b]), M_TRACEUR);
   scene.add(l); effets.push({ o: l, vie: 0.05 });
 }
-const M_FLASH = new THREE.SpriteMaterial({ map: TEX.flash, blending: THREE.AdditiveBlending, depthWrite: false });
+const M_FLASH = new THREE.SpriteMaterial({ map: TEX.flash, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
 function flash(pos, taille = 0.6, dans = scene) {
   const s = new THREE.Sprite(M_FLASH); s.position.copy(pos); s.scale.setScalar(taille);
   dans.add(s); effets.push({ o: s, vie: 0.05, dans });
@@ -945,7 +945,7 @@ const lumiereBoum = new THREE.PointLight('#ff8030', 0, 40); scene.add(lumiereBou
 function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null) {
   const s = new THREE.Sprite(M_FLASH.clone()); s.position.copy(pos); scene.add(s);
   effets.push({ o: s, vie: 0.6, boule: rayon });
-  lumiereBoum.position.copy(pos); lumiereBoum.intensity = 3000;
+  lumiereBoum.position.copy(pos); lumiereBoum.intensity = 5000;
   bruit(clamp(1.2 - dist(pos, J) / 150, 0, 1), 350, 1.4);
   if (degatsPNJ) for (const p of personnes) { const d = dist(p, pos); if (p.vie > 0 && p !== tireur && d < rayon) blesser(p, degatsPNJ * (1 - d / rayon), !tireur); }
   const d = Math.hypot(J.x - pos.x, J.y + 1 - pos.y, J.z - pos.z);
@@ -1144,7 +1144,7 @@ function tirer() {
   bruit(...SON_ARME[a.modele]);
   const depart = positionTir().clone();
   if (J.vue === 1) flash(vTmp2.set(0, 0.03, -0.75).applyMatrix4(vm.matrixWorld), 0.25, vmScene); else flash(depart);
-  lumiereTir.position.copy(depart); lumiereTir.intensity = 40;
+  lumiereTir.position.copy(depart); lumiereTir.intensity = 70;
   const cibles = [...batiments, ...personnes.filter(p => p.vie > 0 && dist(p, J) < a.portee + 5).map(p => p.h.g), ...voitures.map(v => v.m)];
   raycaster.far = a.portee;
   raycaster.near = J.vue === 3 ? camera.position.distanceTo(vTmp2.set(J.x, J.y + 1.5, J.z)) : 0;
@@ -1698,8 +1698,8 @@ function mettreAJour(dt) {
     if (e.fumee) { const t = 1 - e.vie / e.fumee; e.o.scale.setScalar(0.4 + t * 1.6); e.o.material.opacity = 0.6 * (1 - t); } // bouffée de fumée
     if (e.vie <= 0) { (e.dans || scene).remove(e.o); if (e.o.isLine) e.o.geometry.dispose(); if (e.boule || e.fumee) e.o.material.dispose(); }
   }
-  lumiereTir.intensity = Math.max(0, lumiereTir.intensity - dt * 800);
-  lumiereBoum.intensity = Math.max(0, lumiereBoum.intensity - dt * 6000);
+  lumiereTir.intensity = Math.max(0, lumiereTir.intensity - dt * 1400);
+  lumiereBoum.intensity = Math.max(0, lumiereBoum.intensity - dt * 10000);
   police(dt); peupler(dt); missions();
   // ménage
   for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); personnes.splice(k, 1); }
