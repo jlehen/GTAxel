@@ -20,6 +20,7 @@ Ou ouvre `index.html` dans un navigateur (double-clic). Il faut une connexion In
 | E | Monter / descendre de voiture, acheter à l'armurerie |
 | V | Vue à la 1re / 3e personne |
 | 1 à 6 ou molette | Changer d'arme |
+| M | Carte de toute la ville (molette : zoom, souris ou flèches : se déplacer) |
 | Échap | Pause |
 
 Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'onglet avec Ctrl+W.
@@ -31,6 +32,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 - **Police** : faire des bêtises donne des étoiles (jusqu'à 5). À partir de 2 étoiles, la police arrive en voiture. Reste 12 secondes hors de sa vue pour perdre une étoile.
 - **Voitures** : elles circulent en ville. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler.
 - **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse. La dernière mission t'envoie au château Wolfenstein (W rouge sur la mini-carte) pour éliminer Hitler.
+- **Carte** : la touche M affiche toute la ville en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), l'armurerie, l'hôpital, le bunker et le château.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital (+ rouge sur la mini-carte) et tu perds 100 $.
 
 ## Modifier le jeu

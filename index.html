@@ -29,6 +29,7 @@
   #viseur { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #fff; box-shadow: 0 0 3px #000; }
   #rouge { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 45%, rgba(190,0,0,.75)); opacity: 0; }
   #wasted { position: absolute; top: 38%; left: 0; right: 0; text-align: center; font: 100px 'Anton', Impact, sans-serif; color: #c0392b; letter-spacing: 8px; display: none; }
+  #grande-carte { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
   #vitesse { position: absolute; right: 32px; bottom: 28px; font: 44px 'Anton', Impact, sans-serif; display: none; }
   #menu { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
           background: rgba(0,0,0,.72); color: #fff; cursor: pointer; text-align: center; }
@@ -59,6 +60,7 @@
   <div id="rouge"></div>
   <div id="wasted">WASTED</div>
   <div id="vitesse"></div>
+  <canvas id="grande-carte"></canvas>
 </div>
 <div id="menu">
   <h1>GTAxel</h1>
@@ -75,6 +77,7 @@
     <tr><td>E</td><td>monter / descendre de voiture, acheter</td></tr>
     <tr><td>V</td><td>vue 1re / 3e personne</td></tr>
     <tr><td>1 à 6 ou molette</td><td>changer d'arme</td></tr>
+    <tr><td>M</td><td>carte de la ville (molette : zoom)</td></tr>
     <tr><td>Échap</td><td>pause</td></tr>
   </table>
 </div>
@@ -216,7 +219,7 @@ function hauteurSol(x, z) { // 0 sur la route, 0.2 sur les trottoirs
 }
 
 const lieux = {};
-let depart = centre(0, 0), hopital = null, armurerie = null, chateau = null;
+let depart = centre(0, 0), hopital = null, armurerie = null, chateau = null, bunker = null;
 for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
   const c = CARTE[j][i];
   if (c === 'X') depart = centre(i, j);
@@ -459,6 +462,7 @@ function genererBloc(i, j) {
     sol('paves', X(30), 0.21, Z(36), 44, 20);
     [2, 3, 4, 5].forEach((a, k) => stands.push({ arme: a, x: X(15 + k * 10), z: Z(33) }));
   } else if (c === 'B') {
+    bunker = { x: X(30), z: Z(30) };
     sol('paves', X(30), 0.21, Z(30), 52, 52);
     boite('bunker', X(30), 0.2, Z(4.5), 52, 4, 1, true);            // murs d'enceinte
     boite('bunker', X(30), 0.2, Z(55.5), 52, 4, 1, true);
@@ -902,6 +906,8 @@ addEventListener('keydown', e => {
   if (!['F5', 'F11', 'F12', 'Escape'].includes(e.code)) e.preventDefault();
   touches[e.code] = true;
   if (e.repeat) return;
+  if (e.key.toLowerCase() === 'm') { ouvrirCarte(!carte.ouverte); return; } // la lettre M, quel que soit le clavier
+  if (carte.ouverte) return;
   if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture) J.accroupi = !J.accroupi;
@@ -909,15 +915,18 @@ addEventListener('keydown', e => {
 });
 addEventListener('keyup', e => touches[e.code] = false);
 const touche = (...codes) => codes.some(c => touches[c]) ? 1 : 0;
-addEventListener('mousedown', e => { if (!enJeu) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
+addEventListener('mousedown', e => { if (!enJeu || carte.ouverte) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
 addEventListener('mouseup', e => { if (e.button === 0) { sourisG = false; dejaTire = false; } if (e.button === 2) visee = false; });
 addEventListener('contextmenu', e => e.preventDefault());
 addEventListener('wheel', e => {
-  if (!enJeu || J.voiture) return;
+  if (!enJeu) return;
+  if (carte.ouverte) { zoomerCarte(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 33 : 1) * 0.0015)); return; }
+  if (J.voiture) return;
   for (let k = 1; k <= ARMES.length; k++) { const i = (J.arme + (e.deltaY > 0 ? k : -k) + ARMES.length * 2) % ARMES.length; if (J.possede[i]) { changerArme(i); break; } }
 });
 addEventListener('mousemove', e => {
   if (!enJeu || document.pointerLockElement !== renderer.domElement) return;
+  if (carte.ouverte) { deplacerCarte(e.movementX, e.movementY); return; }
   if (J.voiture) J.decalage -= e.movementX * R_.sensibiliteSouris; else J.lacet -= e.movementX * R_.sensibiliteSouris;
   J.tangage = clamp(J.tangage - e.movementY * R_.sensibiliteSouris, -1.3, 1.2);
   J.dernierMouvement = temps;
@@ -930,6 +939,7 @@ $('menu').addEventListener('click', () => {
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
   enJeu = false; $('menu').style.display = 'flex'; $('etat').textContent = 'Pause — clique pour continuer';
+  ouvrirCarte(false);
   for (const k in touches) touches[k] = false;
   sourisG = visee = false;
 });
@@ -1364,18 +1374,39 @@ function majCamera(dt) {
 }
 
 // =====================================================================
-//  Affichage (mini-carte, infos)
+//  Affichage (mini-carte, grande carte, infos)
 // =====================================================================
+const REPERES = [[armurerie, '#d86a10', 'A', 'Armurerie'], [hopital, '#c02020', '+', 'Hôpital'],
+  [chateau, '#8a1010', 'W', 'Château Wolfenstein'], [bunker, '#2a2a2a', 'B', 'Bunker']].filter(r => r[0]);
+// le plan de la ville vu du ciel (1 unité = 1 mètre) : il sert à la mini-carte et à la grande carte
+function dessinerPlan(g) {
+  g.fillStyle = '#8c9196'; g.fillRect(0, 0, TAILLE_X, TAILLE_Z);
+  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038' };
+  for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) { const o = origine(i, j); g.fillStyle = couleurs[CARTE[j][i]] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
+  g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
+}
+function icone(g, x, y, fond, lettre, r = 9) {
+  g.fillStyle = fond; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.font = `bold ${r * 1.45}px Arial`; g.textAlign = 'center'; g.fillText(lettre, x, y + r * 0.55);
+}
+function flecheJoueur(g, x, y, angle, taille) { // angle 0 = vers le haut
+  g.save(); g.translate(x, y); g.rotate(angle); g.scale(taille, taille);
+  g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(0, -9); g.lineTo(7, 7); g.lineTo(0, 3); g.lineTo(-7, 7); g.closePath(); g.fill(); g.stroke();
+  g.restore();
+}
+// ennemis en alerte en rouge, police qui clignote en rouge et bleu
+function pointsCarte(point) {
+  const gyro = Math.sin(performance.now() / 80) > 0 ? '#f33' : '#39f';
+  for (const p of personnes) if (p.vie > 0 && p.alerte && (p.type !== 'flic' || etoiles > 0)) point(p.x, p.z, p.type === 'flic' ? gyro : '#e33');
+  for (const v of voitures) if (v.police && v.conducteur) point(v.x, v.z, gyro, 4);
+}
 const carteImg = document.createElement('canvas');
 carteImg.width = Math.ceil(TAILLE_X); carteImg.height = Math.ceil(TAILLE_Z);
 {
   const g = carteImg.getContext('2d');
-  g.fillStyle = '#8c9196'; g.fillRect(0, 0, carteImg.width, carteImg.height);
-  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038' };
-  for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) { const o = origine(i, j); g.fillStyle = couleurs[CARTE[j][i]] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
-  g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
-  const icone = (p, fond, lettre) => { if (!p) return; g.fillStyle = fond; g.beginPath(); g.arc(p.x, p.z, 9, 0, 7); g.fill(); g.fillStyle = '#fff'; g.font = 'bold 13px Arial'; g.textAlign = 'center'; g.fillText(lettre, p.x, p.z + 5); };
-  icone(armurerie, '#d86a10', 'A'); icone(hopital, '#c02020', '+'); icone(chateau, '#8a1010', 'W');
+  dessinerPlan(g);
+  for (const [p, fond, lettre] of REPERES) icone(g, p.x, p.z, fond, lettre);
 }
 const mctx = $('minicarte').getContext('2d');
 function dessinerMinicarte() {
@@ -1385,19 +1416,63 @@ function dessinerMinicarte() {
   mctx.beginPath(); mctx.arc(110, 110, 110, 0, 7); mctx.clip();
   mctx.fillStyle = '#3a5a3a'; mctx.fillRect(0, 0, 220, 220);
   mctx.save(); mctx.translate(110, 110); mctx.rotate(th); mctx.scale(zoom, zoom); mctx.translate(-J.x, -J.z); mctx.drawImage(carteImg, 0, 0); mctx.restore();
-  const point = (x, z, couleur, r = 3) => { const [a, b] = ecran(x, z); mctx.fillStyle = couleur; mctx.beginPath(); mctx.arc(a, b, r, 0, 7); mctx.fill(); };
-  const gyro = Math.sin(temps * 12) > 0 ? '#f33' : '#39f';
-  for (const p of personnes) if (p.vie > 0 && p.alerte && (p.type !== 'flic' || etoiles > 0)) point(p.x, p.z, p.type === 'flic' ? gyro : '#e33');
-  for (const v of voitures) if (v.police && v.conducteur) point(v.x, v.z, gyro, 4);
+  pointsCarte((x, z, couleur, r = 3) => { const [a, b] = ecran(x, z); mctx.fillStyle = couleur; mctx.beginPath(); mctx.arc(a, b, r, 0, 7); mctx.fill(); });
   const cible = cibleMission();
   if (cible) { // le point jaune reste au bord si l'objectif est loin
     let [a, b] = ecran(cible.x, cible.z); const dx = a - 110, dz = b - 110, l = Math.hypot(dx, dz);
     if (l > 100) { a = 110 + dx / l * 100; b = 110 + dz / l * 100; }
     mctx.fillStyle = '#ffd23a'; mctx.strokeStyle = '#000'; mctx.beginPath(); mctx.arc(a, b, 6, 0, 7); mctx.fill(); mctx.stroke();
   }
-  mctx.fillStyle = '#fff'; mctx.strokeStyle = '#000';
-  mctx.beginPath(); mctx.moveTo(110, 101); mctx.lineTo(117, 117); mctx.lineTo(110, 113); mctx.lineTo(103, 117); mctx.closePath(); mctx.fill(); mctx.stroke();
+  flecheJoueur(mctx, 110, 110, 0, 1);
   mctx.restore();
+}
+
+// la grande carte (touche M) : le nord est en haut, et le jeu est en pause pendant qu'on la regarde
+const ZOOM_MAX = 6, MARGE = 40;   // 6 pixels par mètre au plus ; 40 m d'herbe autour de la ville
+const carte = { ouverte: false, zoom: 1, x: 0, z: 0 };
+const gctx = $('grande-carte').getContext('2d');
+const zoomMin = () => Math.min(innerWidth / (TAILLE_X + 2 * MARGE), innerHeight / (TAILLE_Z + 2 * MARGE)); // toute la ville tient à l'écran
+function ouvrirCarte(ouvrir) {
+  carte.ouverte = ouvrir; $('grande-carte').style.display = ouvrir ? 'block' : 'none';
+  if (!ouvrir) return;
+  carte.zoom = zoomMin(); carte.x = J.x; carte.z = J.z; // on voit toute la ville ; en zoomant, on arrive sur le joueur
+  if (audio) moteurGain.gain.value = sireneGain.gain.value = 0;
+}
+function centreCarte() { // le point de la ville au milieu de l'écran (on ne sort pas de la ville)
+  const borne = (v, demi, taille) => demi * 2 >= taille + 2 * MARGE ? taille / 2 : clamp(v, demi - MARGE, taille + MARGE - demi);
+  return { x: borne(carte.x, innerWidth / 2 / carte.zoom, TAILLE_X), z: borne(carte.z, innerHeight / 2 / carte.zoom, TAILLE_Z) };
+}
+function deplacerCarte(dx, dz) { const c = centreCarte(); carte.x = c.x + dx / carte.zoom; carte.z = c.z + dz / carte.zoom; } // en pixels
+function zoomerCarte(f) { carte.zoom = clamp(carte.zoom * f, zoomMin(), ZOOM_MAX); }
+function texteCarte(g, texte, x, y, taille, alignement = 'center') {
+  g.font = `bold ${taille}px 'Roboto Condensed', Arial, sans-serif`; g.textAlign = alignement;
+  g.lineJoin = 'round'; g.lineWidth = 4; g.strokeStyle = 'rgba(0,0,0,.8)'; g.strokeText(texte, x, y);
+  g.fillStyle = '#fff'; g.fillText(texte, x, y);
+}
+function dessinerGrandeCarte(dt) {
+  const c = $('grande-carte'), l = innerWidth, h = innerHeight, r = Math.min(devicePixelRatio, 2), g = gctx;
+  if (c.width !== Math.round(l * r) || c.height !== Math.round(h * r)) { c.width = Math.round(l * r); c.height = Math.round(h * r); }
+  zoomerCarte(1); // si la fenêtre a changé de taille
+  const dx = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft'), dz = touche('KeyS', 'ArrowDown') - touche('KeyW', 'ArrowUp');
+  if (dx || dz) deplacerCarte(dx * 700 * dt, dz * 700 * dt);
+  const z = carte.zoom, m = centreCarte();
+  const ecran = (x, y) => [l / 2 + (x - m.x) * z, h / 2 + (y - m.z) * z];
+  g.setTransform(r, 0, 0, r, 0, 0);
+  g.fillStyle = '#3a5a3a'; g.fillRect(0, 0, l, h);
+  g.save(); g.translate(l / 2, h / 2); g.scale(z, z); g.translate(-m.x, -m.z); dessinerPlan(g); g.restore();
+  for (const [p, fond, lettre, nom] of REPERES) { const [a, b] = ecran(p.x, p.z); icone(g, a, b, fond, lettre, 13); texteCarte(g, nom, a, b + 31, 16); }
+  pointsCarte((x, y, couleur, rayon = 3) => { const [a, b] = ecran(x, y); g.fillStyle = couleur; g.beginPath(); g.arc(a, b, rayon + 2, 0, 7); g.fill(); });
+  const cible = cibleMission();
+  if (cible) { // l'objectif : un point jaune entouré d'un anneau qui bat
+    const [a, b] = ecran(cible.x, cible.z);
+    g.strokeStyle = '#ffd23a'; g.lineWidth = 2; g.beginPath(); g.arc(a, b, 16 + Math.sin(performance.now() / 200) * 4, 0, 7); g.stroke();
+    g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.beginPath(); g.arc(a, b, 8, 0, 7); g.fill(); g.stroke();
+  }
+  flecheJoueur(g, ...ecran(J.x, J.z), Math.PI - (J.voiture ? J.voiture.angle : J.lacet), 2);
+  g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(0, 0, l, 64); g.fillRect(0, h - 52, l, 52); // bandeaux pour lire les textes
+  if (cible) { g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(36, 32, 8, 0, 7); g.fill(); g.stroke(); }
+  texteCarte(g, $('objectif').textContent, cible ? 54 : 28, 40, 22, 'left');
+  texteCarte(g, 'Molette : zoom   ·   Souris ou flèches : se déplacer   ·   M : fermer', l / 2, h - 19, 19);
 }
 function majHUD(dt) {
   $('barre-vie').firstChild.style.width = `${J.vie / R_.viesJoueur * 100}%`;
@@ -1479,6 +1554,7 @@ let dernier = performance.now();
 function boucle(t) {
   const dt = Math.min(0.05, (t - dernier) / 1000);
   dernier = t;
+  if (carte.ouverte) { dessinerGrandeCarte(dt); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
   if (enJeu) mettreAJour(dt);
   majCamera(dt); majRepere(dt); majHUD(dt);
   soleil.position.set(J.x + soleilDir.x * 200, soleilDir.y * 200, J.z + soleilDir.z * 200);
@@ -1497,7 +1573,7 @@ majJoueur(0);
 requestAnimationFrame(boucle);
 $('etat').textContent = 'Clique pour jouer';
 // pour les tests automatiques
-window.jeu = { J, creerPersonne, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
+window.jeu = { J, carte, ouvrirCarte, centreCarte, creerPersonne, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; } };
 </script>
 </body>

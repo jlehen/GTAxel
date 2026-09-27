@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (nazis, Hitler et B.J. Blazkowicz).
+Mis à jour le 27 septembre 2026 (grande carte avec la touche M).
 
 ## Vision
 
@@ -45,9 +45,10 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | E ou F | Monter en voiture, acheter une arme | Descendre |
 | V | 1re ou 3e personne | Vue intérieure ou extérieure |
 | 1 à 6, molette | Changer d'arme | Rien |
+| M | Ouvrir ou fermer la grande carte | Ouvrir ou fermer la grande carte |
 | Échap | Pause | Pause |
 
-Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W A S D sur un QWERTY.
+Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W A S D sur un QWERTY. Seule la touche M suit la lettre imprimée sur le clavier.
 
 ### Déplacements
 
@@ -309,8 +310,18 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
 | Plein écran | Bords rouges | Quand le joueur est touché |
 | Plein écran | WASTED | Noir et blanc à la mort |
+| Plein écran | Grande carte | Toute la ville, avec la touche M |
 
-**La mini-carte** montre les bâtiments et les parcs, l'armurerie (A orange), l'hôpital (+ rouge) et le château Wolfenstein (W rouge foncé). Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
+**La mini-carte** montre les bâtiments et les parcs, l'armurerie (A orange), l'hôpital (+ rouge), le château Wolfenstein (W rouge foncé) et le bunker (B noir). Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
+
+**La grande carte** s'ouvre et se ferme avec la touche M. Elle couvre tout l'écran et met le jeu en pause : rien ne bouge tant qu'elle est ouverte.
+
+- Le nord est en haut, comme dans le tableau `CARTE`. La carte ne tourne pas.
+- À l'ouverture, on voit toute la ville. La molette zoome jusqu'à 6 pixels par mètre, et le zoom avant amène sur le joueur.
+- La souris, les flèches ou Z Q S D déplacent la vue, sans sortir de la ville.
+- Elle montre les mêmes choses que la mini-carte, avec en plus le nom des lieux : Armurerie, Hôpital, Château Wolfenstein, Bunker.
+- La flèche blanche indique où regarde le joueur, ou dans quel sens roule sa voiture. L'objectif est un point jaune entouré d'un anneau qui bat, et son texte est rappelé en haut à gauche.
+- Échap ferme la carte et affiche le menu de pause.
 
 **Le menu** affiche le titre, une phrase d'histoire (« Tu es B.J. Blazkowicz… »), la liste des touches et « Clique pour jouer ». Échap libère la souris et ramène ce menu en mode pause.
 
@@ -325,22 +336,23 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 500 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 1 580 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
-| 1–91 | HTML et CSS | Interface et menu |
-| 93–184 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS` |
-| 186–272 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
-| 273–354 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
-| 355–589 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
-| 590–752 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 753–1127 | Joueur et PNJ | Tenues des personnages, clavier et souris, tir, achat, conduite |
-| 1128–1299 | Intelligence | Piétons, nazis, circulation, police |
-| 1300–1425 | Missions, caméra, écran | Enchaînement des étapes, vues, mini-carte |
-| 1426–1504 | Boucle principale | Mise à jour et affichage de chaque image |
+| 1–94 | HTML et CSS | Interface et menu |
+| 96–187 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS` |
+| 189–275 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
+| 276–357 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
+| 358–593 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
+| 594–756 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
+| 757–1137 | Joueur et PNJ | Tenues des personnages, clavier et souris, tir, achat, conduite |
+| 1138–1309 | Intelligence | Piétons, nazis, circulation, police |
+| 1310–1376 | Missions, caméra | Enchaînement des étapes, vues |
+| 1377–1500 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1501–1580 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -352,12 +364,15 @@ Tout le jeu tient dans `index.html`, environ 1 500 lignes. Il n'y a ni installat
 
 Le pas de temps est limité à 50 ms, pour qu'un ralentissement ne fasse pas traverser les murs.
 
+Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte est dessinée.
+
 ### Choix techniques
 
 - **Rendu** : ciel physique, tone mapping ACES, ombres douces, reflets sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui.
 - **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : environ 122 appels de dessin et 120 000 triangles par image. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
 - **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
 - **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture.
+- **Cartes** : une seule fonction dessine le plan de la ville. La mini-carte en garde une image toute faite ; la grande carte le redessine à chaque image, pour rester nette quel que soit le zoom.
 - **Ville reproductible** : chaque pâté tire ses nombres au hasard à partir de sa position. La ville est donc la même à chaque partie.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, ou si une mission vise un lieu absent de la carte.
 - **Tests** : `window.jeu` donne accès à l'état du jeu. Un script hors dépôt pilote Chromium sans écran pour vérifier circulation, tirs, police, missions et mort.
