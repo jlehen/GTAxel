@@ -13,6 +13,8 @@
   #minicarte { position: absolute; left: 24px; bottom: 44px; width: 220px; height: 220px; border-radius: 50%; border: 3px solid rgba(0,0,0,.6); }
   #barre-vie { position: absolute; left: 30px; bottom: 24px; width: 214px; height: 10px; background: rgba(0,0,0,.55); }
   #barre-vie > div { height: 100%; width: 100%; background: #56b24c; transition: width .15s; }
+  #barre-gilet { position: absolute; left: 30px; bottom: 12px; width: 214px; height: 6px; background: rgba(0,0,0,.55); display: none; }
+  #barre-gilet > div { height: 100%; background: #4a9ae0; transition: width .15s; }
   #haut-droite { position: absolute; right: 28px; top: 18px; text-align: right; }
   #argent { font: 38px 'Anton', Impact, sans-serif; color: #7fcf6f; }
   #etoiles { font-size: 32px; letter-spacing: 3px; }
@@ -48,6 +50,7 @@
 <div id="hud">
   <canvas id="minicarte" width="220" height="220"></canvas>
   <div id="barre-vie"><div></div></div>
+  <div id="barre-gilet"><div></div></div>
   <div id="haut-droite">
     <div id="argent">0 $</div>
     <div id="etoiles"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
@@ -78,7 +81,7 @@
     <tr><td>Ctrl ou C</td><td>s'accroupir</td></tr>
     <tr><td>E</td><td>monter / descendre de voiture, acheter</td></tr>
     <tr><td>V</td><td>vue 1re / 3e personne</td></tr>
-    <tr><td>1 à 6 ou molette</td><td>changer d'arme</td></tr>
+    <tr><td>1 à 7 ou molette</td><td>changer d'arme</td></tr>
     <tr><td>M</td><td>carte de la ville (molette : zoom)</td></tr>
     <tr><td>Entrée</td><td>code de triche</td></tr>
     <tr><td>Échap</td><td>pause</td></tr>
@@ -110,6 +113,8 @@ const REGLAGES = {
   regeneration: 8,           // points de vie regagnés par seconde...
   delaiRegeneration: 5,      // ...quand on n'a pas été touché depuis ce nombre de secondes
   protectionVoiture: 0.4,    // en voiture on ne prend que 40 % des dégâts
+  giletMax: 100,             // points du gilet pare-balles : il prend les dégâts à la place de ta vie
+  degatsExplosion: 40,       // ce que te fait une explosion (ta roquette, une voiture) si tu es collé dessus
   vitesseMaxVoiture: 32,     // m/s (32 m/s = 115 km/h)
   accelerationVoiture: 14,
   nombrePietons: 30,
@@ -122,7 +127,7 @@ const REGLAGES = {
   degatsPolicier: 5,
   degatsSoldat: 7,
   degatsBoss: 12,
-  degatsHitler: 10,
+  degatsHitler: 35,          // une roquette de bazooka qui te touche en plein
   precisionEnnemis: 0.35,    // 1 = ils ne ratent jamais
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
@@ -139,6 +144,8 @@ const ARMES = [
   { nom: 'Mitraillette',   modele: 'mitraillette', degats: 22, cadence: 0.08, portee: 60,  prix: 800,  munitions: 150, auto: true, dispersion: 0.03 },
   { nom: 'Fusil à pompe',  modele: 'pompe',        degats: 20, cadence: 0.9,  portee: 30,  prix: 1200, munitions: 30, plombs: 8, dispersion: 0.07 },
   { nom: "Fusil d'assaut", modele: 'fusil',        degats: 34, cadence: 0.12, portee: 130, prix: 2000, munitions: 120, auto: true, dispersion: 0.012 },
+  // pas de prix : on ne l'achète pas, Hitler le lâche quand on le tue. explosion = rayon en mètres
+  { nom: 'Bazooka',        modele: 'bazooka',      degats: 250, cadence: 1.5, portee: 150, munitions: 20, explosion: 6 },
 ];
 
 // =====================================================================
@@ -483,6 +490,7 @@ function genererBloc(i, j) {
     boite('porte', X(30), 0.2, Z(23), 2, 2.4, 0.2);
     sol('paves', X(30), 0.21, Z(36), 44, 20);
     [2, 3, 4, 5].forEach((a, k) => stands.push({ arme: a, x: X(15 + k * 10), z: Z(33) }));
+    pickupsDepart.push({ type: 'gilet', x: X(30), z: Z(44), reapparait: true });
   } else if (c === 'B') {
     bunker = { x: X(30), z: Z(30) };
     sol('paves', X(30), 0.21, Z(30), 52, 52);
@@ -499,7 +507,7 @@ function genererBloc(i, j) {
     pnjDepart.push({ type: 'boss', x: X(28), z: Z(30) });
     for (const [a, b] of [[10, 22], [10, 38], [22, 14], [22, 46], [34, 12], [34, 48], [50, 10], [50, 50]]) pnjDepart.push({ type: 'soldat', x: X(a), z: Z(b) });
     soins.push({ x: X(48), z: Z(8) }, { x: X(48), z: Z(52) });
-    pickupsDepart.push({ type: 'arme', arme: 5, x: X(52), z: Z(30) });
+    pickupsDepart.push({ type: 'arme', arme: 5, x: X(52), z: Z(30) }, { type: 'gilet', x: X(14), z: Z(30), reapparait: true });
   } else if (c === 'W') { // le château Wolfenstein, repaire d'Hitler
     chateau = { x: X(30), z: Z(30) };
     sol('paves', X(30), 0.21, Z(30), 52, 52);
@@ -523,7 +531,7 @@ function genererBloc(i, j) {
     pnjDepart.push({ type: 'hitler', x: X(32), z: Z(36) });
     for (const [a, b] of [[12, 14], [12, 30], [12, 46], [24, 44], [40, 44], [50, 14], [50, 30], [50, 46]]) pnjDepart.push({ type: 'soldat', x: X(a), z: Z(b) });
     soins.push({ x: X(9), z: Z(51) }, { x: X(51), z: Z(51) });
-    pickupsDepart.push({ type: 'arme', arme: 3, x: X(30), z: Z(50) });
+    pickupsDepart.push({ type: 'arme', arme: 3, x: X(30), z: Z(50) }, { type: 'gilet', x: X(36), z: Z(50), reapparait: true });
   } else { // places : '.', 'X', et les lieux de mission
     sol('paves', X(30), 0.21, Z(30), S - 8, S - 8);
     for (const [a, b] of [[10, 10], [50, 10], [10, 50], [50, 50]]) { boite('pierre', X(a), 0.2, Z(b), 2.4, 0.6, 2.4); arbre(X(a), Z(b), 1); }
@@ -670,7 +678,7 @@ function animerHumain(h, vitesse, dt, o = {}) {
 }
 
 // armes en 3D (le canon pointe vers +Z)
-const M_METAL = mat('#2b2b2b', { metalness: 0.8, roughness: 0.35 }), M_LAME = mat('#d0d0d0', { metalness: 1, roughness: 0.2 }), M_BOIS = mat('#6b4423');
+const M_METAL = mat('#2b2b2b', { metalness: 0.8, roughness: 0.35 }), M_LAME = mat('#d0d0d0', { metalness: 1, roughness: 0.2 }), M_BOIS = mat('#6b4423'), M_KAKI = mat('#4a5a2a');
 function creerArme(i) {
   const modele = ARMES[i].modele;
   if (!modele) return null;
@@ -680,6 +688,7 @@ function creerArme(i) {
   if (modele === 'pistolet') { b(0.035, 0.05, 0.2, M_METAL, 0, 0.03, 0.05); b(0.03, 0.1, 0.045, M_METAL, 0, -0.03, -0.02); g.userData.bout = 0.16; }
   if (modele === 'mitraillette') { b(0.05, 0.08, 0.28, M_METAL, 0, 0.03, 0.08); b(0.03, 0.16, 0.035, M_METAL, 0, -0.07, 0.05); b(0.03, 0.08, 0.04, M_METAL, 0, -0.03, -0.03); g.userData.bout = 0.23; }
   if (modele === 'pompe') { b(0.045, 0.045, 0.7, M_METAL, 0, 0.03, 0.3); b(0.05, 0.08, 0.25, M_METAL, 0, 0, 0.02); b(0.045, 0.1, 0.3, M_BOIS, 0, -0.03, -0.22); b(0.055, 0.055, 0.18, M_BOIS, 0, -0.01, 0.38); g.userData.bout = 0.65; }
+  if (modele === 'bazooka') { b(0.13, 0.13, 1.1, M_KAKI, 0, 0.08, 0.1); b(0.17, 0.17, 0.12, M_METAL, 0, 0.08, 0.66); b(0.03, 0.12, 0.05, M_METAL, 0, -0.03, 0.05); b(0.03, 0.12, 0.05, M_METAL, 0, -0.03, 0.3); g.userData.bout = 0.7; }
   if (modele === 'fusil') { b(0.05, 0.09, 0.5, M_METAL, 0, 0.02, 0.12); b(0.025, 0.025, 0.3, M_METAL, 0, 0.04, 0.5); b(0.035, 0.17, 0.06, M_METAL, 0, -0.09, 0.16); b(0.04, 0.11, 0.26, M_METAL, 0, -0.01, -0.24); g.userData.bout = 0.64; }
   return g;
 }
@@ -774,7 +783,7 @@ function bip(f1, f2, duree, forme, vol) {
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + duree);
   o.connect(g).connect(audio.destination); o.start(t); o.stop(t + duree);
 }
-const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12], pompe: [0.8, 1200, 0.45], fusil: [0.5, 2000, 0.22] };
+const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12], pompe: [0.8, 1200, 0.45], fusil: [0.5, 2000, 0.22], bazooka: [0.7, 700, 0.5] };
 
 // =====================================================================
 //  Le joueur
@@ -782,9 +791,10 @@ const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12],
 const J = { x: depart.x, z: depart.z, y: 0.2, vy: 0, sol: true, lacet: Math.PI, lacetCam: Math.PI, tangage: -0.1, decalage: 0, angleCorps: Math.PI,
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
-  dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0 };
+  dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0 };
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 scene.add(joueurH.g);
+const giletBJ = piece(new THREE.BoxGeometry(0.47, 0.5, 0.28), '#243a5a', joueurH.haut, 0, 0.42, 0); // visible quand il en porte un
 
 // arme vue en première personne (dessinée par-dessus le reste)
 const vmScene = new THREE.Scene(), vmCamera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.01, 10);
@@ -824,7 +834,7 @@ const TENUES = {
   hitler: () => ({ peau: '#e8c0a0', haut: '#8a7a55', bas: '#1a1a1a', chaussures: '#000', cheveux: '#111', moustache: '#111', brassard: '#b01010' }),
 };
 const VIE_PNJ = { pieton: 50, flic: 70, soldat: 90, boss: 450, hitler: 900 };
-const ARME_PNJ = { flic: 2, soldat: 5, boss: 4, hitler: 3 };
+const ARME_PNJ = { flic: 2, soldat: 5, boss: 4, hitler: 6 };
 const NAZIS = ['soldat', 'boss', 'hitler'];
 const personnes = [];
 function creerPersonne(type, x, z) {
@@ -866,10 +876,11 @@ const M_BILLET = mat('#3a8a3a', { emissive: '#1a4a1a' }), M_SOIN = std(TEX.croix
 function creerObjet(o) {
   const g = new THREE.Group();
   if (o.type === 'soin') g.add(new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), M_SOIN));
+  if (o.type === 'gilet') g.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.25), mat('#243a5a')));
   if (o.type === 'argent') for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.15), M_BILLET); b.position.y = k * 0.05; b.rotation.y = k; g.add(b); }
   if (o.type === 'arme' || o.type === 'stand') { const a = creerArme(o.arme); a.scale.setScalar(2.2); g.add(a); }
   const anneau = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.6, 24).rotateX(-Math.PI / 2),
-    new THREE.MeshBasicMaterial({ color: o.type === 'soin' ? '#f44' : o.type === 'argent' ? '#6f6' : '#fc4', transparent: true, opacity: 0.6, side: THREE.DoubleSide }));
+    new THREE.MeshBasicMaterial({ color: o.type === 'soin' ? '#f44' : o.type === 'argent' ? '#6f6' : o.type === 'gilet' ? '#4a9ae0' : '#fc4', transparent: true, opacity: 0.6, side: THREE.DoubleSide }));
   anneau.position.y = -0.8;
   g.add(anneau);
   if (o.type === 'stand') {
@@ -899,6 +910,26 @@ function flash(pos, taille = 0.6, dans = scene) {
   dans.add(s); effets.push({ o: s, vie: 0.05, dans });
 }
 const lumiereTir = new THREE.PointLight('#ffb050', 0, 12); scene.add(lumiereTir);
+const lumiereBoum = new THREE.PointLight('#ff8030', 0, 40); scene.add(lumiereBoum);
+// une explosion : boule de feu, gros boum, dégâts qui baissent avec la distance, et les voitures proches sautent aussi
+function exploser(pos, rayon, degatsPNJ, degatsJoueur) {
+  const s = new THREE.Sprite(M_FLASH.clone()); s.position.copy(pos); scene.add(s);
+  effets.push({ o: s, vie: 0.6, boule: rayon });
+  lumiereBoum.position.copy(pos); lumiereBoum.intensity = 3000;
+  bruit(clamp(1.2 - dist(pos, J) / 150, 0, 1), 350, 1.4);
+  if (degatsPNJ) for (const p of personnes) { const d = dist(p, pos); if (p.vie > 0 && d < rayon) blesser(p, degatsPNJ * (1 - d / rayon)); }
+  const d = Math.hypot(J.x - pos.x, J.y + 1 - pos.y, J.z - pos.z);
+  if (d < rayon) blesserJoueur(degatsJoueur * (1 - d / rayon));
+  for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v);
+}
+function exploserVoiture(v) {
+  if (v.detruite) return;
+  v.detruite = 0.001; v.conducteur = null; v.vitesse = 0; v.gyro = null;
+  v.m.traverse(o => { if (o.isMesh) o.material = mat('#1c1a18', { roughness: 1 }); }); // carcasse brûlée
+  v.feu = new THREE.Sprite(M_FLASH); v.feu.position.y = 1.3; v.m.add(v.feu);
+  if (v === J.voiture) sortirVoiture();
+  exploser(new THREE.Vector3(v.x, 1, v.z), 7, 150, R_.degatsExplosion);
+}
 
 // repère de mission : colonne lumineuse (ou flèche au-dessus de la cible)
 const repere = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 5, 24, 1, true),
@@ -1008,7 +1039,7 @@ function action() {
   const s = standProche();
   if (s) { acheter(s); return; }
   let v = null, best = 3.5;
-  for (const o of voitures) { const d = dist(o, J); if (d < best) { best = d; v = o; } }
+  for (const o of voitures) { const d = dist(o, J); if (d < best && !o.detruite) { best = d; v = o; } }
   if (v) entrerVoiture(v);
 }
 function acheter(s) {
@@ -1062,6 +1093,14 @@ function tirer() {
     raycaster.setFromCamera(new THREE.Vector2(entre(-d, d), entre(-d, d)), camera);
     const hit = raycaster.intersectObjects(cibles, true)[0];
     const point = hit ? hit.point : raycaster.ray.at(a.portee, new THREE.Vector3());
+    if (a.explosion) { // roquette : elle explose sur ce qu'elle touche, ou par terre
+      const r = raycaster.ray, sol = r.direction.y < 0 ? -r.origin.y / r.direction.y : Infinity;
+      const parTerre = !hit && sol > raycaster.near && sol < a.portee;
+      if (parTerre) r.at(sol, point);
+      traceur(depart, point); flash(depart, J.vue === 1 ? 0.6 : 1.5);
+      if (hit || parTerre) exploser(point, a.explosion, a.degats, R_.degatsExplosion);
+      continue;
+    }
     if (hit) {
       const p = hit.object.userData.personne;
       if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
@@ -1104,11 +1143,12 @@ function blesser(p, degats) {
   if (p.type === 'flic') { crime(1); creerObjet({ type: 'arme', arme: 2, x: p.x, z: p.z }); }
   if (p.type === 'soldat') creerObjet({ type: 'arme', arme: Math.random() < 0.5 ? 3 : 5, x: p.x, z: p.z });
   if (p.type === 'boss') { creerObjet({ type: 'arme', arme: 4, x: p.x + 1, z: p.z }); creerObjet({ type: 'argent', montant: 1000, x: p.x - 1, z: p.z }); }
-  if (p.type === 'hitler') { creerObjet({ type: 'arme', arme: 5, x: p.x + 1, z: p.z }); creerObjet({ type: 'argent', montant: 2000, x: p.x - 1, z: p.z }); }
+  if (p.type === 'hitler') { creerObjet({ type: 'arme', arme: 6, x: p.x + 1, z: p.z }); creerObjet({ type: 'argent', montant: 2000, x: p.x - 1, z: p.z }); }
 }
 function blesserJoueur(degats) {
   if (J.mort) return;
-  J.vie -= degats * (J.voiture ? R_.protectionVoiture : 1);
+  const d = degats * (J.voiture ? R_.protectionVoiture : 1), g = Math.min(J.gilet, d); // le gilet prend les dégâts en premier
+  J.gilet -= g; J.vie -= d - g;
   J.dernierDegat = temps;
   $('rouge').style.opacity = 0.9;
   bip(180, 90, 0.15, 'triangle', 0.3);
@@ -1215,7 +1255,7 @@ function majPersonne(p, dt) {
       p.angle = lerpAngle(p.angle, vise, 8 * dt);
       if (!p.voitJ || d > 22) vitesse = 4.5; else if (d < 6) vitesse = -2;
       if (p.voitJ && p.cooldown <= 0 && Math.abs(diffAngle(p.angle, vise)) < 0.3) {
-        p.cooldown = entre(1, 2) * ({ boss: 0.6, hitler: 0.4 }[p.type] || 1);
+        p.cooldown = entre(1, 2) * ({ boss: 0.6, hitler: 1.5 }[p.type] || 1);
         tirEnnemi(p, d);
       }
     }
@@ -1249,6 +1289,12 @@ function tirEnnemi(p, d) {
   p.h.g.updateMatrixWorld(true);
   const depart = boutDuCanon(p.h, new THREE.Vector3());
   const arrivee = new THREE.Vector3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
+  if (ARMES[ARME_PNJ[p.type]].explosion) { // roquette : ratée, elle explose quand même à 3 à 6 m du joueur
+    if (!reussi) { const a = entre(0, 6.3), r = entre(3, 6); arrivee.set(J.x + Math.sin(a) * r, 0.3, J.z + Math.cos(a) * r); }
+    traceur(depart, arrivee); flash(depart, 1.5); bruit(...SON_ARME.bazooka);
+    exploser(arrivee, 5, 0, degats);
+    return;
+  }
   if (!reussi) arrivee.add(new THREE.Vector3(entre(-2, 2), entre(-1, 1.5), entre(-2, 2)));
   traceur(depart, arrivee); flash(depart, 0.4);
   bruit(0.4 * clamp(1 - d / 120, 0, 1), 1800, 0.18);
@@ -1304,6 +1350,10 @@ function majVoiture(v, dt) {
   v.m.position.set(v.x, hauteurSol(v.x, v.z), v.z); v.m.rotation.y = v.angle;
   if (v.conducteur === 'civil' && d > 280) v.supprimer = true;
   if (v.police && v.renfort && !v.conducteur && v !== J.voiture && d > 150) v.supprimer = true;
+  if (v.detruite) { // elle brûle 12 s, et la carcasse disparaît au bout de 40 s quand on ne la voit plus
+    v.detruite += dt; v.feu.visible = v.detruite < 12; v.feu.scale.setScalar(2 + Math.random());
+    if (v.detruite > 40 && d > 60) v.supprimer = true;
+  }
 }
 
 // faire apparaître piétons et voitures autour du joueur (hors de sa vue)
@@ -1531,18 +1581,20 @@ function dessinerGrandeCarte(dt) {
 function majHUD(dt) {
   $('barre-vie').firstChild.style.width = `${J.vie / R_.viesJoueur * 100}%`;
   $('barre-vie').firstChild.style.background = J.vie < 30 ? '#c0392b' : '#56b24c';
+  $('barre-gilet').style.display = J.gilet > 0 ? 'block' : 'none'; giletBJ.visible = J.gilet > 0;
+  $('barre-gilet').firstChild.style.width = `${J.gilet / R_.giletMax * 100}%`;
   $('argent').textContent = `${J.argent} $`;
   [...$('etoiles').children].forEach((e, i) => e.classList.toggle('on', i < etoiles));
   $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
   const a = ARMES[J.arme];
   $('arme').textContent = a.nom;
-  $('munitions').textContent = a.corps ? '' : `${J.balles[J.arme]} balles`;
+  $('munitions').textContent = a.corps ? '' : `${J.balles[J.arme]} ${a.explosion ? 'roquettes' : 'balles'}`;
   const m = MISSIONS[missionIndex];
   $('objectif').textContent = m ? m.etapes[etapeIndex].texte : 'Ville libre : fais ce que tu veux !';
   $('viseur').style.display = !J.voiture && !J.mort && (J.vue === 1 || visee || !a.corps) ? 'block' : 'none';
   $('vitesse').style.display = J.voiture ? 'block' : 'none';
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h`;
-  const s = standProche(), v = !J.voiture && voitures.some(o => dist(o, J) < 3.5);
+  const s = standProche(), v = !J.voiture && voitures.some(o => dist(o, J) < 3.5 && !o.detruite);
   const aide = J.voiture ? '' : s ? `Appuie sur <b>E</b> pour acheter : ${ARMES[s.arme].nom} (${J.possede[s.arme] ? `munitions ${Math.round(ARMES[s.arme].prix / 2)}` : ARMES[s.arme].prix} $)` : v ? 'Appuie sur <b>E</b> pour monter dans la voiture' : '';
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
@@ -1570,6 +1622,7 @@ function mettreAJour(dt) {
     o.m.rotation.y += dt * 1.5; o.m.position.y = o.base + Math.sin(temps * 2 + o.x) * 0.1;
     if (o.type === 'stand' || J.mort || dist(o, J) > 1.6) continue;
     if (o.type === 'soin') { if (J.vie >= R_.viesJoueur) continue; J.vie = Math.min(R_.viesJoueur, J.vie + 50); annonce('', '+50 vie', 1.5); }
+    if (o.type === 'gilet') { if (J.gilet >= R_.giletMax) continue; J.gilet = R_.giletMax; annonce('', 'Gilet pare-balles !', 1.5); }
     if (o.type === 'argent') { J.argent += o.montant; annonce('', `+${o.montant} $`, 1.5); }
     if (o.type === 'arme') {
       const a = ARMES[o.arme], nouveau = !J.possede[o.arme];
@@ -1580,8 +1633,13 @@ function mettreAJour(dt) {
     bip(600, 1200, 0.15, 'sine', 0.3);
     if (o.reapparait) { o.cache = 60; o.m.visible = false; } else o.supprimer = true;
   }
-  for (const e of effets) { e.vie -= dt; if (e.vie <= 0) { (e.dans || scene).remove(e.o); if (e.o.isLine) e.o.geometry.dispose(); } }
+  for (const e of effets) {
+    e.vie -= dt;
+    if (e.boule) { e.o.scale.setScalar(e.boule * (2.6 - e.vie * 2)); e.o.material.opacity = e.vie / 0.6; } // boule de feu
+    if (e.vie <= 0) { (e.dans || scene).remove(e.o); if (e.o.isLine) e.o.geometry.dispose(); if (e.boule) e.o.material.dispose(); }
+  }
   lumiereTir.intensity = Math.max(0, lumiereTir.intensity - dt * 800);
+  lumiereBoum.intensity = Math.max(0, lumiereBoum.intensity - dt * 6000);
   police(dt); peupler(dt); missions();
   // ménage
   for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); personnes.splice(k, 1); }

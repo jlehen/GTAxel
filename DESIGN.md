@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (codes de triche qui s'annulent en les retapant).
+Mis à jour le 27 septembre 2026 (gilets pare-balles, bazooka d'Hitler, voitures qui explosent).
 
 ## Vision
 
@@ -44,7 +44,7 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | Ctrl ou C | S'accroupir (bascule) | Rien |
 | E ou F | Monter en voiture, acheter une arme | Descendre |
 | V | 1re ou 3e personne | Vue intérieure ou extérieure |
-| 1 à 6, molette | Changer d'arme | Rien |
+| 1 à 7, molette | Changer d'arme | Rien |
 | M | Ouvrir ou fermer la grande carte | Ouvrir ou fermer la grande carte |
 | Entrée | Taper un code de triche | Taper un code de triche |
 | Échap | Pause | Pause |
@@ -97,12 +97,12 @@ On y compte 13 pâtés de tours, 41 d'immeubles, 37 de maisons et 20 parcs. Les 
 | `M` | 4 maisons avec pelouse et arbres, 1 voiture garée |
 | `P` | Pelouse, allées pavées, fontaine, jusqu'à 14 arbres, 1 trousse de soin |
 | `H` | Hôpital : point de réveil, 2 trousses de soin, 1 voiture garée |
-| `A` | Armurerie : 4 stands d'armes devant la boutique |
-| `B` | Bunker nazi : enceinte avec une seule entrée à l'ouest, sacs de sable, 8 soldats, le Kommandant, 2 trousses, 1 fusil d'assaut |
-| `W` | Château Wolfenstein : remparts crénelés de 7 m avec une grande porte au sud, 4 tours à toit pointu, un donjon de 16 m, bannières rouges, 8 soldats, Hitler, 2 trousses, 1 mitraillette |
+| `A` | Armurerie : 4 stands d'armes devant la boutique, 1 gilet pare-balles |
+| `B` | Bunker nazi : enceinte avec une seule entrée à l'ouest, sacs de sable, 8 soldats, le Kommandant, 2 trousses, 1 fusil d'assaut, 1 gilet |
+| `W` | Château Wolfenstein : remparts crénelés de 7 m avec une grande porte au sud, 4 tours à toit pointu, un donjon de 16 m, bannières rouges, 8 soldats, Hitler, 2 trousses, 1 mitraillette, 1 gilet |
 | `.` `X` `a`–`d` | Place pavée avec 4 arbres et 2 voitures garées |
 
-Un étage fait 3 m. Les trousses de soin réapparaissent 60 s après avoir été ramassées.
+Un étage fait 3 m. Les trousses de soin et les gilets pare-balles réapparaissent 60 s après avoir été ramassés.
 
 ### La rue
 
@@ -127,7 +127,7 @@ Seuls les environs du joueur sont vivants. Piétons et voitures apparaissent hor
 
 ## Combat et armes
 
-Il y a 6 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'achètent à l'armurerie ou se ramassent sur les ennemis. Un tir à la tête fait 2,5 fois plus de dégâts.
+Il y a 7 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'achètent à l'armurerie ou se ramassent sur les ennemis. Le bazooka ne s'achète pas : c'est Hitler qui le lâche. Un tir à la tête fait 2,5 fois plus de dégâts.
 
 ### Les armes
 
@@ -139,12 +139,14 @@ Il y a 6 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'ach�
 | Mitraillette | 22 | 12,5 | 60 m | 800 $ | 150 | Automatique, peu précise |
 | Fusil à pompe | 8 plombs × 20 | 1,1 | 30 m | 1 200 $ | 30 | Très dispersé |
 | Fusil d'assaut | 34 | 8,3 | 130 m | 2 000 $ | 120 | Automatique, précis |
+| Bazooka | 250 au centre | 0,67 | 150 m | lâché par Hitler | 10 roquettes | Explose dans un rayon de 6 m |
 
 - Racheter une arme déjà possédée coûte moitié prix et ne donne que des munitions.
 - Une arme ramassée donne la moitié des munitions ; si on l'a déjà, le quart.
 - Les coups de poing et de couteau touchent l'ennemi le plus proche devant soi, jusqu'à 50° de côté.
 - La dispersion est divisée par 2 en visant et doublée en courant.
 - Renverser quelqu'un avec une voiture à plus de 14 km/h fait 200 dégâts.
+- **Bazooka** : la roquette part tout droit et explose sur ce qu'elle touche, ou par terre si on vise le sol. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
 
 ### Les personnages
 
@@ -154,27 +156,30 @@ Il y a 6 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'ach�
 | Policier | 70 | pistolet | 2 | Un pistolet |
 | Soldat nazi | 90 | fusil d'assaut | 3 | Une mitraillette ou un fusil d'assaut |
 | Kommandant | 450 | fusil à pompe | 12 (5 à la tête) | Un fusil à pompe et 1 000 $ |
-| Hitler (boss final) | 900 | mitraillette | 23 (9 à la tête) | Un fusil d'assaut et 2 000 $ |
+| Hitler (boss final) | 900 | bazooka | 23 (9 à la tête) | Le bazooka et 2 000 $ |
 
 Les corps disparaissent au bout de 15 s.
 
 ### Le joueur
 
 - **Vie** : 100 points. Elle remonte de 8 points par seconde après 5 s sans être touché, soit de 0 à 100 en 12,5 s. Une trousse de soin rend 50 points.
+- **Gilet pare-balles** : 100 points de protection (`giletMax`), qui prennent les dégâts à la place de la vie. Il ne se recharge pas tout seul : il faut ramasser un autre gilet. Il y en a 3 : à l'armurerie, dans le bunker (près de l'entrée) et dans le château (près de la porte). Quand B.J. en porte un, on le voit sur son torse, en bleu foncé.
 - **Quand il est touché** : l'écran rougit sur les bords et un son grave retentit.
 
 ### Les ennemis
 
-Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat. Il tire toutes les 1 à 2 s, 0,6 à 1,2 s pour le Kommandant et 0,4 à 0,8 s pour Hitler. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
+Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat. Il tire toutes les 1 à 2 s, 0,6 à 1,2 s pour le Kommandant et 1,5 à 3 s pour Hitler. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
 
 | Ennemi | Dégâts par balle |
 | --- | --- |
 | Policier | 5 |
 | Soldat | 7 |
 | Kommandant | 12 |
-| Hitler | 10 |
+| Hitler | 35 par roquette, au centre de l'explosion |
 
 La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts.
+
+Hitler tire au bazooka. Une roquette qui touche explose sur B.J. ; une roquette ratée explose quand même par terre, entre 3 et 6 m de lui, et peut encore le blesser (rayon de 5 m). Elle fait aussi exploser sa voiture s'il est dedans.
 
 **Temps de survie estimé, sans bouger ni se soigner** :
 
@@ -182,10 +187,10 @@ La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement 
 | --- | --- |
 | 1 policier à 10 m | environ 85 s |
 | Le Kommandant à 10 m | environ 20 s |
-| Hitler à 10 m | environ 17 s |
+| Hitler à 10 m | environ 16 s |
 | Les 8 soldats à 20 m qui voient le joueur | environ 10 s |
 
-Ce sont des calculs à partir des réglages, pas des mesures en jeu.
+Avec un gilet pare-balles, ces temps doublent à peu près. Ce sont des calculs à partir des réglages, pas des mesures en jeu.
 
 Les nazis (soldats, Kommandant et Hitler) ne quittent jamais l'enceinte du bunker ou du château. Ils attaquent quand ils voient le joueur, ou quand il tire à moins de 50 m.
 
@@ -239,9 +244,18 @@ Toutes les voitures se volent, garées ou en circulation, police comprise. Il su
 
 En voiture, le joueur ne prend que 40 % des dégâts, et les ennemis le touchent 30 % moins souvent. En contrepartie, on ne peut pas tirer depuis une voiture.
 
+### Explosions
+
+Une voiture explose quand une roquette explose à côté d'elle (6 m pour celle du joueur, 5 m pour celle d'Hitler). Les balles ne lui font rien.
+
+- L'explosion fait jusqu'à 150 dégâts aux personnages à moins de 7 m, et jusqu'à 40 à B.J. (`degatsExplosion`).
+- Les voitures à moins de 7 m explosent à leur tour : on peut faire sauter toute une file.
+- Si B.J. est dedans, il est éjecté avant l'explosion.
+- Il reste une carcasse noire, qui brûle 12 s. On ne peut plus monter dedans. Elle disparaît au bout de 40 s, quand le joueur est à plus de 60 m.
+
 ### Ce que les voitures ne font pas (encore)
 
-Elles ne s'abîment pas et n'explosent pas. Il n'y a qu'un seul modèle, en plusieurs couleurs, plus la version police avec gyrophares.
+Les balles ne les abîment pas. Il n'y a qu'un seul modèle, en plusieurs couleurs, plus la version police avec gyrophares.
 
 ## Missions et progression
 
@@ -316,13 +330,14 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | --- | --- | --- |
 | Bas gauche | Mini-carte | Ronde, elle tourne avec la caméra. Elle dézoome en voiture. |
 | Bas gauche | Barre de vie | Verte, rouge sous 30 points |
+| Bas gauche | Barre du gilet | Bleue, sous la barre de vie, seulement quand on porte un gilet |
 | Haut droite | Argent | En gros chiffres verts |
 | Haut droite | Étoiles | 5 étoiles, qui clignotent en bleu quand la police voit le joueur |
-| Haut droite | Arme et munitions | Nom de l'arme, nombre de balles |
+| Haut droite | Arme et munitions | Nom de l'arme, nombre de balles ou de roquettes |
 | Haut gauche | Aide | « Appuie sur E pour… » près d'une voiture ou d'un stand |
 | Bas centre | Objectif | Texte de l'étape de mission en cours |
 | Centre | Viseur | Un point blanc, avec une arme à feu, en visant ou en 1re personne |
-| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Tu as semé la police ! » |
+| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! » |
 | Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
 | Plein écran | Bords rouges | Quand le joueur est touché |
 | Plein écran | WASTED | Noir et blanc à la mort |
@@ -345,6 +360,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 ### Sons
 
 - **Armes** : chaque arme à feu a son propre coup de feu. Les tirs ennemis s'entendent moins fort de loin.
+- **Explosions** : un gros boum grave, plus faible de loin.
 - **Voiture** : moteur dont le son monte avec la vitesse, bruit de choc.
 - **Police** : sirène à deux tons, plus forte quand la voiture approche.
 - **Signaux** : bips pour un achat, un objet ramassé, une étape réussie, une blessure, la mort.
@@ -353,22 +369,22 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 630 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 1 690 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
-| 1–97 | HTML et CSS | Interface et menu |
-| 99–210 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
-| 211–297 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
-| 298–379 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
-| 380–615 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
-| 616–779 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 780–1191 | Joueur et PNJ | Tenues des personnages, clavier et souris, saisie des triches, tir, achat, conduite |
-| 1192–1363 | Intelligence | Piétons, nazis, circulation, police |
-| 1364–1430 | Missions, caméra | Enchaînement des étapes, vues |
-| 1431–1554 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1555–1634 | Boucle principale | Mise à jour et affichage de chaque image |
+| 1–101 | HTML et CSS | Interface et menu |
+| 102–217 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
+| 218–303 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
+| 304–385 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
+| 386–622 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
+| 623–787 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
+| 788–1230 | Joueur et PNJ | Tenues des personnages, objets, explosions, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1231–1412 | Intelligence | Piétons, nazis, circulation, police |
+| 1413–1479 | Missions, caméra | Enchaînement des étapes, vues |
+| 1480–1605 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1606–1692 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -387,7 +403,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Rendu** : ciel physique, tone mapping ACES, ombres douces, reflets sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui.
 - **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : environ 122 appels de dessin et 120 000 triangles par image. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
 - **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
-- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture.
+- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka utilise le même rayon : elle arrive tout de suite, il n'y a pas de projectile qui vole. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
 - **Cartes** : une seule fonction dessine le plan de la ville. La mini-carte en garde une image toute faite ; la grande carte le redessine à chaque image, pour rester nette quel que soit le zoom.
 - **Ville reproductible** : chaque pâté tire ses nombres au hasard à partir de sa position. La ville est donc la même à chaque partie.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, ou si une mission vise un lieu absent de la carte.
@@ -402,14 +418,17 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Il n'y a pas de sauvegarde : recharger la page fait tout recommencer.
 - On ne peut entrer dans aucun bâtiment, et rien n'empêche de sortir de la ville dans la plaine.
 - Le soleil est fixe : il n'y a ni nuit ni météo.
-- Les voitures ne s'abîment pas, on ne peut pas tirer depuis une voiture, et la police (65 km/h) ne rattrape pas une voiture lancée à fond (115 km/h).
+- Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture, et la police (65 km/h) ne rattrape pas une voiture lancée à fond (115 km/h).
 - Les missions sont linéaires : une seule à la fois, dans l'ordre.
+- Hitler ne meurt qu'une fois : le bazooka n'a que ses 10 roquettes, et on ne peut pas en racheter.
+- Les roquettes arrivent instantanément : on ne peut pas esquiver celles d'Hitler, seulement se cacher.
 - Il faut Internet, même pour jouer depuis le fichier.
 - Ctrl+W ferme l'onglet dans certains navigateurs : C est plus sûr pour s'accroupir.
 
 ### Pistes pour la suite
 
-- Dégâts et explosions des voitures, tir par la fenêtre.
+- Voitures abîmées par les balles, tir par la fenêtre.
+- Roquettes à acheter à l'armurerie, et une vraie roquette qui vole (qu'on peut esquiver).
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
 - Cycle jour et nuit, avec les lampadaires allumés.
 - Missions au choix, avec des marqueurs sur la carte.
