@@ -213,7 +213,10 @@ const TRICHES = [
   { code: 'BARCA',       texte: 'Maillot du Barça',     effet: b => {
       b.torse.material = std(toile(64, 64, g => { for (let k = 0; k < 4; k++) { g.fillStyle = k % 2 ? '#a50044' : '#004d98'; g.fillRect(k * 16, 0, 16, 64); } }));
       habiller(b.brasD.children[0], '#004d98'); habiller(b.brasG.children[0], '#004d98'); } },
-  { code: 'BEBE',        texte: 'Bébé !',               effet: b => { b.g.scale.setScalar(0.5); b.tete.scale.setScalar(1.7); } },
+  { code: 'BEBE',        texte: 'Bébé !',               effet: b => {
+      b.g.scale.setScalar(0.5); b.tete.scale.setScalar(1.7);
+      habiller(b.torse, PEAU_BJ); habiller(b.bassin, '#f4f4ee'); b.bassin.scale.set(1.12, 1.6, 1.2); // tout nu avec une couche
+      for (const m of [b.brasD.children[0], b.brasG.children[0], b.jambeD.children[0], b.jambeG.children[0], b.jambeD.children[1], b.jambeG.children[1]]) habiller(m, PEAU_BJ); } },
 ];
 
 // =====================================================================
@@ -357,6 +360,7 @@ const TEX = {
   croix: toile(128, 128, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#d42020'; g.fillRect(44, 14, 40, 100); g.fillRect(14, 44, 100, 40); }),
   enseigne: toile(512, 96, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 512, 96); g.fillStyle = '#ff7a1a'; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText('ARMURERIE', 256, 72); }),
   flash: toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,230,1)'); r.addColorStop(0.3, 'rgba(255,200,80,.8)'); r.addColorStop(1, 'rgba(255,120,0,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }),
+  fumee: toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }),
 };
 TEX.route.repeat.set(TAILLE_X / 8, TAILLE_Z / 8);
 TEX.lignes.repeat.set(1, S / 12);
@@ -932,6 +936,7 @@ function exploserVoiture(v) {
   exploser(new THREE.Vector3(v.x, 1, v.z), 7, 150, R_.degatsExplosion);
 }
 // roquettes : elles volent tout droit et explosent sur le premier mur, voiture ou personnage touché, ou par terre
+const M_FUMEE = new THREE.SpriteMaterial({ map: TEX.fumee, color: '#9a9a9a', transparent: true, depthWrite: false });
 const roquettes = [], rayonRoquette = Object.assign(new THREE.Raycaster(), { camera }), GEO_ROQUETTE = new THREE.CylinderGeometry(0.07, 0.07, 0.6, 6).rotateX(Math.PI / 2);
 function lancerRoquette(depart, vers, portee, rayon, degatsPNJ, degatsJoueur, duJoueur) {
   const m = new THREE.Mesh(GEO_ROQUETTE, M_KAKI); m.position.copy(depart); m.lookAt(vers); scene.add(m);
@@ -950,6 +955,8 @@ function majRoquettes(dt) {
     const surJoueur = !r.duJoueur && versJ.addScaledVector(r.dir, -t).length() < 1;
     const avance = hit ? hit.distance : surJoueur ? t : pas;
     pos.addScaledVector(r.dir, avance); r.reste -= avance;
+    // traînée de fumée : une bouffée grise par image, qui grossit et s'efface
+    const f = new THREE.Sprite(M_FUMEE.clone()); f.position.copy(pos); scene.add(f); effets.push({ o: f, vie: 1.2, fumee: 1.2 });
     if (hit || surJoueur || pos.y <= 0 || r.reste <= 0) {
       pos.y = Math.max(pos.y, 0.1);
       r.fini = true; scene.remove(r.m);
@@ -1042,7 +1049,7 @@ function validerTriche() {
 // remet B.J. dans sa tenue normale, puis applique les codes actifs
 function rhabillerBJ() {
   const b = joueurH, T = TENUE_BJ;
-  habiller(b.torse, T.haut); b.torse.clear(); habiller(b.bassin, T.bas);
+  habiller(b.torse, T.haut); b.torse.clear(); habiller(b.bassin, T.bas); b.bassin.scale.set(1, 1, 1);
   for (const bras of [b.brasD, b.brasG]) habiller(bras.children[0], T.haut);
   for (const j of [b.jambeD, b.jambeG]) { habiller(j.children[0], T.bas); j.children[0].scale.set(1, 1, 1); habiller(j.children[1], T.chaussures); j.children[1].visible = true; }
   b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
@@ -1662,7 +1669,8 @@ function mettreAJour(dt) {
   for (const e of effets) {
     e.vie -= dt;
     if (e.boule) { e.o.scale.setScalar(e.boule * (2.6 - e.vie * 2)); e.o.material.opacity = e.vie / 0.6; } // boule de feu
-    if (e.vie <= 0) { (e.dans || scene).remove(e.o); if (e.o.isLine) e.o.geometry.dispose(); if (e.boule) e.o.material.dispose(); }
+    if (e.fumee) { const t = 1 - e.vie / e.fumee; e.o.scale.setScalar(0.4 + t * 1.6); e.o.material.opacity = 0.6 * (1 - t); } // bouffée de fumée
+    if (e.vie <= 0) { (e.dans || scene).remove(e.o); if (e.o.isLine) e.o.geometry.dispose(); if (e.boule || e.fumee) e.o.material.dispose(); }
   }
   lumiereTir.intensity = Math.max(0, lumiereTir.intensity - dt * 800);
   lumiereBoum.intensity = Math.max(0, lumiereBoum.intensity - dt * 6000);

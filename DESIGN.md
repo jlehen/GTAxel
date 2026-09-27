@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (roquettes qui volent et qu'on peut esquiver).
+Mis à jour le 27 septembre 2026 (traînée de fumée des roquettes, bébé tout nu avec une couche).
 
 ## Vision
 
@@ -179,7 +179,7 @@ Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 
 
 La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts.
 
-Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. À 20 m, elle met 1 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle traverse les autres personnages, et fait exploser la voiture de B.J. s'il est dedans.
+Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. Elle laisse une traînée de fumée grise, qui aide à la voir venir. À 20 m, elle met 1 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle traverse les autres personnages, et fait exploser la voiture de B.J. s'il est dedans.
 
 **Temps de survie estimé, sans bouger ni se soigner** :
 
@@ -316,7 +316,7 @@ Les codes de triche changent seulement l'apparence de B.J. Entrée ouvre une cas
 | `SOUTIF` | Torse et bras nus, soutien-gorge rose |
 | `JAMBEDEBOIS` | Jambe droite en bois, sans chaussure |
 | `BARCA` | Maillot du Barça à rayures bleues et grenat |
-| `BEBE` | Deux fois plus petit, avec une grosse tête |
+| `BEBE` | Deux fois plus petit, avec une grosse tête, tout nu avec une couche blanche |
 
 Retaper un code annule son effet. Les effets se combinent : B.J. est remis dans sa tenue normale, puis chaque code actif est appliqué dans l'ordre du tableau. Ils durent même après une mort, mais pas après un rechargement de la page. Ils ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
 
@@ -369,22 +369,22 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 720 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 1 730 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–101 | HTML et CSS | Interface et menu |
-| 102–218 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
-| 219–304 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
-| 305–386 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
-| 387–623 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
-| 624–788 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 789–1255 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
-| 1256–1437 | Intelligence | Piétons, nazis, circulation, police |
-| 1438–1504 | Missions, caméra | Enchaînement des étapes, vues |
-| 1505–1630 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1631–1718 | Boucle principale | Mise à jour et affichage de chaque image |
+| 102–221 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
+| 222–307 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
+| 308–390 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
+| 391–627 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
+| 628–792 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
+| 793–1262 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1263–1444 | Intelligence | Piétons, nazis, circulation, police |
+| 1445–1511 | Missions, caméra | Enchaînement des étapes, vues |
+| 1512–1637 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1638–1726 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -403,7 +403,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Rendu** : ciel physique, tone mapping ACES, ombres douces, reflets sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui.
 - **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : environ 122 appels de dessin et 120 000 triangles par image. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
 - **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
-- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance et un petit rayon de la longueur de son pas cherche un obstacle devant elle. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
+- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance, laisse une bouffée de fumée qui grossit et s'efface en 1,2 s, et un petit rayon de la longueur de son pas cherche un obstacle devant elle. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
 - **Cartes** : une seule fonction dessine le plan de la ville. La mini-carte en garde une image toute faite ; la grande carte le redessine à chaque image, pour rester nette quel que soit le zoom.
 - **Ville reproductible** : chaque pâté tire ses nombres au hasard à partir de sa position. La ville est donc la même à chaque partie.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, ou si une mission vise un lieu absent de la carte.
@@ -421,14 +421,14 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture, et la police (65 km/h) ne rattrape pas une voiture lancée à fond (115 km/h).
 - Les missions sont linéaires : une seule à la fois, dans l'ordre.
 - Hitler ne meurt qu'une fois : le bazooka n'a que ses 10 roquettes, et on ne peut pas en racheter.
-- Les roquettes volent tout droit : pas de fumée derrière elles, et elles ne suivent pas leur cible.
+- Les roquettes volent tout droit : elles ne suivent pas leur cible.
 - Il faut Internet, même pour jouer depuis le fichier.
 - Ctrl+W ferme l'onglet dans certains navigateurs : C est plus sûr pour s'accroupir.
 
 ### Pistes pour la suite
 
 - Voitures abîmées par les balles, tir par la fenêtre.
-- Roquettes à acheter à l'armurerie, traînée de fumée derrière les roquettes.
+- Roquettes à acheter à l'armurerie.
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
 - Cycle jour et nuit, avec les lampadaires allumés.
 - Missions au choix, avec des marqueurs sur la carte.
