@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (traînée de fumée des roquettes, bébé tout nu avec une couche).
+Mis à jour le 27 septembre 2026 (les roquettes d'Hitler touchent aussi les soldats et les passants).
 
 ## Vision
 
@@ -146,7 +146,7 @@ Il y a 7 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'ach�
 - Les coups de poing et de couteau touchent l'ennemi le plus proche devant soi, jusqu'à 50° de côté.
 - La dispersion est divisée par 2 en visant et doublée en courant.
 - Renverser quelqu'un avec une voiture à plus de 14 km/h fait 200 dégâts.
-- **Bazooka** : la roquette part du canon vers le viseur et vole tout droit à 20 m/s (`vitesseRoquette`), plus vite que B.J. qui court (8 m/s). Elle explose sur le premier mur, voiture ou personnage qu'elle touche, par terre si on vise le sol, ou au bout de 150 m. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
+- **Bazooka** : la roquette part du canon vers le viseur et vole tout droit à 20 m/s (`vitesseRoquette`), plus vite que B.J. qui court (8 m/s). Elle explose sur le premier mur ou voiture qu'elle touche, si elle passe à moins de 1 m du milieu du corps d'un personnage, par terre si on vise le sol, ou au bout de 150 m. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
 
 ### Les personnages
 
@@ -179,7 +179,7 @@ Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 
 
 La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts.
 
-Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. Elle laisse une traînée de fumée grise, qui aide à la voir venir. À 20 m, elle met 1 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle traverse les autres personnages, et fait exploser la voiture de B.J. s'il est dedans.
+Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. Elle laisse une traînée de fumée grise, qui aide à la voir venir. À 20 m, elle met 1 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle explose aussi sur les soldats, policiers ou passants qui se trouvent sur son chemin, et les blesse comme le bazooka de B.J. (jusqu'à 250) : on peut se cacher derrière eux. Un piéton ou un policier tué par Hitler ne donne pas d'étoile à B.J. Hitler n'est jamais blessé par sa propre roquette. Elle fait exploser la voiture de B.J. s'il est dedans.
 
 **Temps de survie estimé, sans bouger ni se soigner** :
 
@@ -380,11 +380,11 @@ Tout le jeu tient dans `index.html`, environ 1 730 lignes. Il n'y a ni installat
 | 308–390 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
 | 391–627 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
 | 628–792 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 793–1262 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
-| 1263–1444 | Intelligence | Piétons, nazis, circulation, police |
-| 1445–1511 | Missions, caméra | Enchaînement des étapes, vues |
-| 1512–1637 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1638–1726 | Boucle principale | Mise à jour et affichage de chaque image |
+| 793–1264 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1265–1446 | Intelligence | Piétons, nazis, circulation, police |
+| 1447–1513 | Missions, caméra | Enchaînement des étapes, vues |
+| 1514–1639 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1640–1728 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -403,7 +403,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Rendu** : ciel physique, tone mapping ACES, ombres douces, reflets sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui.
 - **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : environ 122 appels de dessin et 120 000 triangles par image. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
 - **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
-- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance, laisse une bouffée de fumée qui grossit et s'efface en 1,2 s, et un petit rayon de la longueur de son pas cherche un obstacle devant elle. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
+- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance, laisse une bouffée de fumée qui grossit et s'efface en 1,2 s, et un petit rayon de la longueur de son pas cherche un mur ou une voiture devant elle. Les personnages sont faits de pièces fines : pour eux, on regarde plutôt si la roquette passe à moins de 1 m du milieu de leur corps. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
 - **Cartes** : une seule fonction dessine le plan de la ville. La mini-carte en garde une image toute faite ; la grande carte le redessine à chaque image, pour rester nette quel que soit le zoom.
 - **Ville reproductible** : chaque pâté tire ses nombres au hasard à partir de sa position. La ville est donc la même à chaque partie.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, ou si une mission vise un lieu absent de la carte.
