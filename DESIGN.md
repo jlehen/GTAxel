@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (éclairs de tir et explosions plus lumineux).
+Mis à jour le 27 septembre 2026 (fusil de sniper à lunette, vendu à l'armurerie).
 
 ## Vision
 
@@ -38,13 +38,13 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | Z Q S D ou flèches | Se déplacer | Accélérer, freiner, tourner |
 | Souris | Regarder | Tourner la caméra autour de la voiture |
 | Clic gauche | Tirer ou frapper | Rien |
-| Clic droit | Viser (zoom, tir plus précis) | Rien |
+| Clic droit | Viser (zoom, tir plus précis ; lunette avec le fusil de sniper) | Rien |
 | Maj | Courir | Rien |
 | Espace | Sauter (environ 1 m) | Frein à main, virage plus serré |
 | Ctrl ou C | S'accroupir (bascule) | Rien |
 | E ou F | Monter en voiture, acheter une arme | Descendre |
 | V | 1re ou 3e personne | Vue intérieure ou extérieure |
-| 1 à 7, molette | Changer d'arme | Rien |
+| 1 à 8, molette | Changer d'arme | Rien |
 | M | Ouvrir ou fermer la grande carte | Ouvrir ou fermer la grande carte |
 | Entrée | Taper un code de triche | Taper un code de triche |
 | Échap | Pause | Pause |
@@ -64,6 +64,7 @@ Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W
 
 - **3e personne (par défaut)** : caméra 3,8 m derrière l'épaule droite. En visant, elle se rapproche à 1,8 m et le champ de vision passe de 70° à 45°. Elle avance quand un mur la gêne.
 - **1re personne (V)** : l'arme est dessinée par-dessus la scène, avec balancement et recul.
+- **Lunette du fusil de sniper** : en visant, le champ de vision passe à 14° (70° divisé par le `zoom` de l'arme, qui vaut 5). L'écran devient noir autour d'un rond, avec deux traits noirs en croix. La souris est 5 fois plus douce, pour viser finement. L'arme en 1re personne n'est plus dessinée. En 3e personne, la caméra reste derrière l'épaule, et le noir cache B.J.
 - **En voiture** : caméra 8 m derrière, qui recule avec la vitesse et se recale seule après 1,5 s sans bouger la souris.
 - **Mort** : vue plongeante sur le corps pendant 3,5 s.
 
@@ -97,7 +98,7 @@ On y compte 13 pâtés de tours, 41 d'immeubles, 37 de maisons et 20 parcs. Les 
 | `M` | 4 maisons avec pelouse et arbres, 1 voiture garée |
 | `P` | Pelouse, allées pavées, fontaine, jusqu'à 14 arbres, 1 trousse de soin |
 | `H` | Hôpital : point de réveil, 2 trousses de soin, 1 voiture garée |
-| `A` | Armurerie : 4 stands d'armes devant la boutique, 1 gilet pare-balles |
+| `A` | Armurerie : 5 stands d'armes devant la boutique, 1 gilet pare-balles |
 | `B` | Bunker nazi : enceinte avec une seule entrée à l'ouest, sacs de sable, 8 soldats, le Kommandant, 2 trousses, 1 fusil d'assaut, 1 gilet |
 | `W` | Château Wolfenstein : remparts crénelés de 7 m avec une grande porte au sud, 4 tours à toit pointu, un donjon de 16 m, bannières rouges, 8 soldats, Hitler, 2 trousses, 1 mitraillette, 1 gilet |
 | `.` `X` `a`–`d` | Place pavée avec 4 arbres et 2 voitures garées |
@@ -129,7 +130,7 @@ Seuls les environs du joueur sont vivants. Piétons et voitures apparaissent hor
 
 ## Combat et armes
 
-Il y a 7 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'achètent à l'armurerie ou se ramassent sur les ennemis. Le bazooka ne s'achète pas : c'est Hitler qui le lâche. Un tir à la tête fait 2,5 fois plus de dégâts.
+Il y a 8 armes, dont 2 au départ (poings et couteau). Le pistolet, la mitraillette, le fusil à pompe et le fusil d'assaut s'achètent à l'armurerie ou se ramassent sur les ennemis. Le fusil de sniper s'achète seulement à l'armurerie : aucun ennemi ne le lâche. Le bazooka ne s'achète pas : c'est Hitler qui le lâche. Un tir à la tête fait 2,5 fois plus de dégâts.
 
 ### Les armes
 
@@ -142,12 +143,14 @@ Il y a 7 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'ach�
 | Fusil à pompe | 8 plombs × 20 | 1,1 | 30 m | 1 200 $ | 30 | Très dispersé |
 | Fusil d'assaut | 34 | 8,3 | 130 m | 2 000 $ | 120 | Automatique, précis |
 | Bazooka | 250 au centre | 0,67 | 150 m | lâché par Hitler | 10 roquettes | Explose dans un rayon de 6 m |
+| Fusil de sniper | 150 | 0,67 | 250 m | 2 500 $ | 20 | Un clic par tir, lunette qui grossit 5 fois |
 
 - Racheter une arme déjà possédée coûte moitié prix et ne donne que des munitions.
 - Une arme ramassée donne la moitié des munitions ; si on l'a déjà, le quart.
 - Les coups de poing et de couteau touchent l'ennemi le plus proche devant soi, jusqu'à 50° de côté.
 - La dispersion est divisée par 2 en visant et doublée en courant.
 - Renverser quelqu'un avec une voiture à plus de 14 km/h fait 200 dégâts.
+- **Fusil de sniper** : une balle suffit pour un piéton, un policier ou un soldat. Il en faut 3 pour le Kommandant (2 à la tête) et 6 pour Hitler (3 à la tête). Dans la lunette, la balle s'écarte d'au plus 13 cm à 200 m ; sans viser, d'au plus 37 cm à 50 m. Un nazi touché de loin est alerté, mais il ne tire que s'il voit B.J. à moins de 45 m : on peut l'abattre sans risque, par l'entrée du bunker ou la porte du château.
 - **Bazooka** : la roquette part du canon vers le viseur et vole tout droit à 20 m/s (`vitesseRoquette`), plus vite que B.J. qui court (8 m/s). Elle explose sur le premier mur ou voiture qu'elle touche, si elle passe à moins de 1 m du milieu du corps d'un personnage, par terre si on vise le sol, ou au bout de 150 m. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
 
 ### Les personnages
@@ -261,7 +264,7 @@ Les balles ne les abîment pas. Il n'y a qu'un seul modèle, en 10 couleurs, plu
 
 ## Missions et progression
 
-Les 6 missions s'enchaînent dans l'ordre et rapportent 18 200 $ au total. Elles emmènent le joueur de la livraison d'un colis au combat final contre Hitler. L'argent gagné avant le bunker suffit pour s'offrir le fusil d'assaut.
+Les 6 missions s'enchaînent dans l'ordre et rapportent 18 200 $ au total. Elles emmènent le joueur de la livraison d'un colis au combat final contre Hitler. L'argent gagné avant le bunker (3 000 $ une fois le pistolet payé) suffit pour s'offrir le fusil d'assaut ou le fusil de sniper, mais pas les deux.
 
 | # | Mission | Étapes | Récompense |
 | --- | --- | --- | --- |
@@ -338,7 +341,8 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Haut droite | Arme et munitions | Nom de l'arme, nombre de balles ou de roquettes |
 | Haut gauche | Aide | « Appuie sur E pour… » près d'une voiture ou d'un stand |
 | Bas centre | Objectif | Texte de l'étape de mission en cours |
-| Centre | Viseur | Un point blanc, avec une arme à feu, en visant ou en 1re personne |
+| Centre | Viseur | Un point blanc, avec une arme à feu, en visant ou en 1re personne. Caché dans la lunette |
+| Plein écran | Lunette | Un rond avec deux traits en croix et du noir autour, en visant avec le fusil de sniper. Le reste de l'écran (mini-carte, argent) s'affiche par-dessus |
 | Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! » |
 | Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
 | Plein écran | Bords rouges | Quand le joueur est touché |
@@ -371,23 +375,23 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 750 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 1 760 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
-| 1–101 | HTML et CSS | Interface et menu |
-| 103–222 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
-| 223–310 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel et nuages |
-| 311–404 | Textures | Façades, vitres, routes, feuilles et pierres du château dessinées par le programme ; relief et reflets |
-| 405–643 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, arbres, murs invisibles |
-| 644–816 | Personnages, voitures, sons | Modèles en formes simples arrondies, animations, sons synthétisés |
-| 817–1288 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
-| 1289–1470 | Intelligence | Piétons, nazis, circulation, police |
-| 1471–1537 | Missions, caméra | Enchaînement des étapes, vues |
-| 1538–1663 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1664–1753 | Boucle principale | Mise à jour et affichage de chaque image |
+| 1–105 | HTML et CSS | Interface et menu |
+| 107–228 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
+| 229–316 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel et nuages |
+| 317–410 | Textures | Façades, vitres, routes, feuilles et pierres du château dessinées par le programme ; relief et reflets |
+| 411–649 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, arbres, murs invisibles |
+| 650–823 | Personnages, voitures, sons | Modèles en formes simples arrondies, animations, sons synthétisés |
+| 824–1297 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1298–1479 | Intelligence | Piétons, nazis, circulation, police |
+| 1480–1546 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
+| 1547–1673 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1674–1763 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -408,6 +412,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : 50 à 320 appels de dessin et environ 240 000 triangles par image, dont plus de la moitié pour les 327 arbres. Dessiner les ombres en demande autant de plus. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
 - **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
 - **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance, laisse une bouffée de fumée qui grossit et s'efface en 1,2 s, et un petit rayon de la longueur de son pas cherche un mur ou une voiture devant elle. Les personnages sont faits de pièces fines : pour eux, on regarde plutôt si la roquette passe à moins de 1 m du milieu de leur corps. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
+- **Lunette** : seul le champ de vision de la caméra change. Le rond et la croix sont un dessin posé sur l'image (`#lunette`, en CSS), sans rien de plus à calculer. La dispersion d'un tir se compte en part de l'écran : zoomer 5 fois rend donc le tir 5 fois plus précis, sans règle spéciale.
 - **Cartes** : une seule fonction dessine le plan de la ville. La mini-carte en garde une image toute faite ; la grande carte le redessine à chaque image, pour rester nette quel que soit le zoom.
 - **Ville reproductible** : chaque pâté tire ses nombres au hasard à partir de sa position. La ville est donc la même à chaque partie.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, ou si une mission vise un lieu absent de la carte.
@@ -426,6 +431,7 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Les missions sont linéaires : une seule à la fois, dans l'ordre.
 - Hitler ne meurt qu'une fois : le bazooka n'a que ses 10 roquettes, et on ne peut pas en racheter.
 - Les roquettes volent tout droit : elles ne suivent pas leur cible.
+- Le fusil de sniper porte à 250 m, mais les personnages ne sont plus dessinés au-delà de 220 m. Les murs du bunker et du château cachent leurs occupants : il faut viser par l'entrée.
 - Il faut Internet, même pour jouer depuis le fichier.
 - Ctrl+W ferme l'onglet dans certains navigateurs : C est plus sûr pour s'accroupir.
 

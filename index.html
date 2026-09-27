@@ -29,6 +29,9 @@
   #annonce { position: absolute; top: 26%; left: 0; right: 0; text-align: center; font: 58px 'Anton', Impact, sans-serif; color: #f0c850; opacity: 0; transition: opacity .3s; }
   #annonce small { display: block; font: 26px 'Roboto Condensed', Arial, sans-serif; color: #fff; }
   #viseur { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #fff; box-shadow: 0 0 3px #000; }
+  #lunette { position: absolute; inset: 0; display: none; /* deux traits noirs en croix, et du noir autour du rond */
+             background: linear-gradient(#000, #000) center / 100% 2px no-repeat, linear-gradient(#000, #000) center / 2px 100% no-repeat,
+                         radial-gradient(circle, transparent 38vh, #000 38.5vh); }
   #rouge { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 45%, rgba(190,0,0,.75)); opacity: 0; }
   #wasted { position: absolute; top: 38%; left: 0; right: 0; text-align: center; font: 100px 'Anton', Impact, sans-serif; color: #c0392b; letter-spacing: 8px; display: none; }
   #grande-carte { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
@@ -48,6 +51,7 @@
 </head>
 <body>
 <div id="hud">
+  <div id="lunette"></div>
   <canvas id="minicarte" width="220" height="220"></canvas>
   <div id="barre-vie"><div></div></div>
   <div id="barre-gilet"><div></div></div>
@@ -75,13 +79,13 @@
     <tr><td>Z Q S D</td><td>se déplacer / conduire</td></tr>
     <tr><td>Souris</td><td>regarder</td></tr>
     <tr><td>Clic gauche</td><td>tirer / frapper</td></tr>
-    <tr><td>Clic droit</td><td>viser</td></tr>
+    <tr><td>Clic droit</td><td>viser (lunette du sniper)</td></tr>
     <tr><td>Maj</td><td>courir</td></tr>
     <tr><td>Espace</td><td>sauter (frein à main en voiture)</td></tr>
     <tr><td>Ctrl ou C</td><td>s'accroupir</td></tr>
     <tr><td>E</td><td>monter / descendre de voiture, acheter</td></tr>
     <tr><td>V</td><td>vue 1re / 3e personne</td></tr>
-    <tr><td>1 à 7 ou molette</td><td>changer d'arme</td></tr>
+    <tr><td>1 à 8 ou molette</td><td>changer d'arme</td></tr>
     <tr><td>M</td><td>carte de la ville (molette : zoom)</td></tr>
     <tr><td>Entrée</td><td>code de triche</td></tr>
     <tr><td>Échap</td><td>pause</td></tr>
@@ -148,6 +152,8 @@ const ARMES = [
   { nom: "Fusil d'assaut", modele: 'fusil',        degats: 34, cadence: 0.12, portee: 130, prix: 2000, munitions: 120, auto: true, dispersion: 0.012 },
   // pas de prix : on ne l'achète pas, Hitler le lâche quand on le tue. explosion = rayon en mètres
   { nom: 'Bazooka',        modele: 'bazooka',      degats: 250, cadence: 1.5, portee: 150, munitions: 20, explosion: 6 },
+  // zoom : en visant (clic droit), on regarde dans la lunette, qui grossit 5 fois
+  { nom: 'Fusil de sniper', modele: 'sniper',      degats: 150, cadence: 1.5, portee: 250, prix: 2500, munitions: 20, zoom: 5, dispersion: 0.006 },
 ];
 
 // =====================================================================
@@ -508,7 +514,7 @@ function genererBloc(i, j) {
     const en = new THREE.PlaneGeometry(12, 2.25); en.translate(X(30), 4.6, Z(23.06)); ajouterGeo('enseigne', en);
     boite('porte', X(30), 0.2, Z(23), 2, 2.4, 0.2);
     sol('paves', X(30), 0.21, Z(36), 44, 20);
-    [2, 3, 4, 5].forEach((a, k) => stands.push({ arme: a, x: X(15 + k * 10), z: Z(33) }));
+    [2, 3, 4, 5, 7].forEach((a, k) => stands.push({ arme: a, x: X(10 + k * 10), z: Z(33) }));
     pickupsDepart.push({ type: 'gilet', x: X(30), z: Z(44), reapparait: true });
   } else if (c === 'B') {
     bunker = { x: X(30), z: Z(30) };
@@ -710,6 +716,7 @@ function creerArme(i) {
   if (modele === 'mitraillette') { b(0.05, 0.08, 0.28, M_METAL, 0, 0.03, 0.08); b(0.03, 0.16, 0.035, M_METAL, 0, -0.07, 0.05); b(0.03, 0.08, 0.04, M_METAL, 0, -0.03, -0.03); g.userData.bout = 0.23; }
   if (modele === 'pompe') { b(0.045, 0.045, 0.7, M_METAL, 0, 0.03, 0.3); b(0.05, 0.08, 0.25, M_METAL, 0, 0, 0.02); b(0.045, 0.1, 0.3, M_BOIS, 0, -0.03, -0.22); b(0.055, 0.055, 0.18, M_BOIS, 0, -0.01, 0.38); g.userData.bout = 0.65; }
   if (modele === 'bazooka') { b(0.13, 0.13, 1.1, M_KAKI, 0, 0.08, 0.1); b(0.17, 0.17, 0.12, M_METAL, 0, 0.08, 0.66); b(0.03, 0.12, 0.05, M_METAL, 0, -0.03, 0.05); b(0.03, 0.12, 0.05, M_METAL, 0, -0.03, 0.3); g.userData.bout = 0.7; }
+  if (modele === 'sniper') { b(0.045, 0.07, 0.5, M_BOIS, 0, 0.01, 0.05); b(0.022, 0.022, 0.6, M_METAL, 0, 0.04, 0.55); b(0.04, 0.11, 0.28, M_BOIS, 0, -0.02, -0.3); b(0.03, 0.1, 0.04, M_BOIS, 0, -0.06, -0.05); b(0.04, 0.04, 0.26, M_METAL, 0, 0.1, 0.08); g.userData.bout = 0.85; } // la lunette est dessus
   if (modele === 'fusil') { b(0.05, 0.09, 0.5, M_METAL, 0, 0.02, 0.12); b(0.025, 0.025, 0.3, M_METAL, 0, 0.04, 0.5); b(0.035, 0.17, 0.06, M_METAL, 0, -0.09, 0.16); b(0.04, 0.11, 0.26, M_METAL, 0, -0.01, -0.24); g.userData.bout = 0.64; }
   return g;
 }
@@ -812,7 +819,7 @@ function bip(f1, f2, duree, forme, vol) {
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + duree);
   o.connect(g).connect(audio.destination); o.start(t); o.stop(t + duree);
 }
-const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12], pompe: [0.8, 1200, 0.45], fusil: [0.5, 2000, 0.22], bazooka: [0.7, 700, 0.5] };
+const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12], pompe: [0.8, 1200, 0.45], fusil: [0.5, 2000, 0.22], bazooka: [0.7, 700, 0.5], sniper: [0.9, 1500, 0.4] };
 
 // =====================================================================
 //  Le joueur
@@ -915,7 +922,7 @@ function creerObjet(o) {
   if (o.type === 'stand') {
     const piedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal); piedestal.position.y = -0.6; piedestal.castShadow = true; g.add(piedestal);
     anneau.position.y = -1.08;
-    const prix = new THREE.Sprite(new THREE.SpriteMaterial({ map: toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(`${ARMES[o.arme].nom} ${ARMES[o.arme].prix} $`, 128, 42); }) }));
+    const prix = new THREE.Sprite(new THREE.SpriteMaterial({ map: toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(`${ARMES[o.arme].nom} ${ARMES[o.arme].prix} $`, 128, 42, 248); }) }));
     prix.scale.set(2.4, 0.6, 1); prix.position.y = 1; g.add(prix);
   }
   o.m = g; o.base = (o.type === 'stand' ? 1.1 : 0.85) + hauteurSol(o.x, o.z);
@@ -1037,6 +1044,7 @@ addEventListener('keydown', e => {
 });
 addEventListener('keyup', e => touches[e.code] = false);
 const touche = (...codes) => codes.some(c => touches[c]) ? 1 : 0;
+const dansLunette = () => visee && !J.voiture && !J.mort && !!ARMES[J.arme].zoom; // on regarde dans la lunette du sniper
 addEventListener('mousedown', e => { if (!enJeu || carte.ouverte) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
 addEventListener('mouseup', e => { if (e.button === 0) { sourisG = false; dejaTire = false; } if (e.button === 2) visee = false; });
 addEventListener('contextmenu', e => e.preventDefault());
@@ -1049,8 +1057,9 @@ addEventListener('wheel', e => {
 addEventListener('mousemove', e => {
   if (!enJeu || document.pointerLockElement !== renderer.domElement) return;
   if (carte.ouverte) { deplacerCarte(e.movementX, e.movementY); return; }
-  if (J.voiture) J.decalage -= e.movementX * R_.sensibiliteSouris; else J.lacet -= e.movementX * R_.sensibiliteSouris;
-  J.tangage = clamp(J.tangage - e.movementY * R_.sensibiliteSouris, -1.3, 1.2);
+  const s = R_.sensibiliteSouris / (dansLunette() ? ARMES[J.arme].zoom : 1); // dans la lunette, la souris est plus douce
+  if (J.voiture) J.decalage -= e.movementX * s; else J.lacet -= e.movementX * s;
+  J.tangage = clamp(J.tangage - e.movementY * s, -1.3, 1.2);
   J.dernierMouvement = temps;
 });
 $('menu').addEventListener('click', () => {
@@ -1531,7 +1540,7 @@ function majCamera(dt) {
   } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
   else placerCamera(new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z), dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
   camera.rotation.set(J.tangage + J.recul * 0.03, J.lacetCam + Math.PI, 0);
-  const fov = visee && !v ? 45 : 70;
+  const fov = dansLunette() ? 70 / ARMES[J.arme].zoom : visee && !v ? 45 : 70;
   if (Math.abs(camera.fov - fov) > 0.1) { camera.fov += (fov - camera.fov) * Math.min(1, dt * 10); camera.updateProjectionMatrix(); }
 }
 
@@ -1649,7 +1658,8 @@ function majHUD(dt) {
   $('munitions').textContent = a.corps ? '' : `${J.balles[J.arme]} ${a.explosion ? 'roquettes' : 'balles'}`;
   const m = MISSIONS[missionIndex];
   $('objectif').textContent = m ? m.etapes[etapeIndex].texte : 'Ville libre : fais ce que tu veux !';
-  $('viseur').style.display = !J.voiture && !J.mort && (J.vue === 1 || visee || !a.corps) ? 'block' : 'none';
+  $('lunette').style.display = dansLunette() ? 'block' : 'none';
+  $('viseur').style.display = !J.voiture && !J.mort && !dansLunette() && (J.vue === 1 || visee || !a.corps) ? 'block' : 'none';
   $('vitesse').style.display = J.voiture ? 'block' : 'none';
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h`;
   const s = standProche(), v = !J.voiture && voitures.some(o => dist(o, J) < 3.5 && !o.detruite);
@@ -1738,7 +1748,7 @@ function boucle(t) {
   vm.rotation.set(J.recul * 0.15 - J.frappe * 0.8, 0, 0);
   renderer.clear();
   renderer.render(scene, camera);
-  if (J.vue === 1 && !J.voiture && !J.mort) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
+  if (J.vue === 1 && !J.voiture && !J.mort && !dansLunette()) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
   requestAnimationFrame(boucle);
 }
 // premier placement du joueur
