@@ -101,7 +101,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { Sky } from 'three/addons/objects/Sky.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 // =====================================================================
@@ -121,8 +121,6 @@ const REGLAGES = {
   giletMax: 100,             // points du gilet pare-balles : il prend les dégâts à la place de ta vie
   degatsExplosion: 40,       // ce que te fait une explosion (ta roquette, une voiture) si tu es collé dessus
   vitesseRoquette: 20,       // m/s : plus vite que toi quand tu cours, mais on peut encore l'esquiver de loin
-  vitesseMaxVoiture: 32,     // m/s (32 m/s = 115 km/h)
-  accelerationVoiture: 14,
   nombrePietons: 30,
   nombreVoitures: 16,        // voitures qui circulent autour de toi
   vitesseCirculation: 11,
@@ -154,6 +152,32 @@ const ARMES = [
   { nom: 'Bazooka',        modele: 'bazooka',      degats: 250, cadence: 1.5, portee: 150, munitions: 20, explosion: 6 },
   // zoom : en visant (clic droit), on regarde dans la lunette, qui grossit 5 fois
   { nom: 'Fusil de sniper', modele: 'sniper',      degats: 150, cadence: 1.5, portee: 250, prix: 2500, munitions: 20, zoom: 5, dispersion: 0.006 },
+];
+
+// =====================================================================
+//  LES VOITURES : change-les, ou invente les tiennes !
+//  modele : la forme ('classique', 'porsche', 'minibus', '4x4', 'limousine' ou 'tricycle')
+//  vitesse : en m/s (× 3,6 pour avoir des km/h)   virage : 1 = normal, plus grand = tourne plus sec
+//  chance : plus le nombre est grand, plus on en croise (0 = jamais)   couleurs : si on n'en met pas, toutes
+//  son du moteur : grave et aigu = sa note au ralenti et à fond, rapports = le nombre de vitesses,
+//                  rauque = de 0 (tout doux) à 1 (il hurle), petarade = bruit de mobylette
+// =====================================================================
+const VOITURES = [
+  { nom: 'Classique', modele: 'classique', vitesse: 32, acceleration: 14, virage: 1, chance: 6,
+    son: { grave: 50, aigu: 190, rapports: 4, rauque: 0.3, volume: 0.05 } },
+  { nom: 'Porsche', modele: 'porsche', vitesse: 50, acceleration: 22, virage: 1.2, chance: 2, couleurs: ['#c81010', '#f0c020', '#c8c8c8', '#111', '#1a5ad8'],
+    son: { grave: 75, aigu: 340, rapports: 6, rauque: 0.9, volume: 0.06 } },
+  { nom: 'Minibus', modele: 'minibus', vitesse: 25, acceleration: 9, virage: 0.8, chance: 3, couleurs: ['#d8a010', '#2a8a8a', '#c84a20', '#4a7a3a', '#2a6ad8'],
+    son: { grave: 38, aigu: 125, rapports: 4, rauque: 0.5, volume: 0.05, petarade: true } },
+  { nom: '4x4 du désert', modele: '4x4', vitesse: 30, acceleration: 16, virage: 0.9, chance: 2, couleurs: ['#c8a868', '#a88a58', '#77704a'],
+    son: { grave: 30, aigu: 130, rapports: 4, rauque: 0.7, volume: 0.07 } },
+  { nom: 'Limousine', modele: 'limousine', vitesse: 28, acceleration: 10, virage: 0.6, chance: 1, couleurs: ['#111', '#f0f0f0'],
+    son: { grave: 40, aigu: 140, rapports: 5, rauque: 0.1, volume: 0.04 } },
+  { nom: 'Tricycle', modele: 'tricycle', vitesse: 20, acceleration: 12, virage: 1.4, chance: 1,
+    son: { grave: 45, aigu: 260, rapports: 3, rauque: 1, volume: 0.04, petarade: true } },
+  // la voiture de police (police: true) : on ne la croise que quand on est recherché
+  { nom: 'Voiture de police', modele: 'classique', vitesse: 32, acceleration: 14, virage: 1, chance: 0, couleurs: ['#f2f2f2'], police: true,
+    son: { grave: 50, aigu: 210, rapports: 4, rauque: 0.4, volume: 0.05 } },
 ];
 
 // =====================================================================
@@ -208,22 +232,25 @@ const MISSIONS = [
 //  CODES DE TRICHE : appuie sur Entrée, tape le code, puis Entrée
 //  Ils changent l'apparence de B.J. (b). Retape le code pour annuler l'effet.
 // =====================================================================
-const TENUE_BJ = { peau: '#e8b890', haut: '#e8e4d8', bas: '#4a5238', chaussures: '#3a2a1a', cheveux: '#b8955a' };
+//  Un bras ou une jambe est en deux morceaux (haut et bas) : habillerMembre les colorie ensemble.
+//  Au bout, il y a b.brasD.main ou b.jambeD.chaussure.
+const TENUE_BJ = { peau: '#e8b890', haut: '#e8e4d8', bas: '#4a5238', chaussures: '#3a2a1a', cheveux: '#b8955a', manchesCourtes: true };
 const PEAU_BJ = TENUE_BJ.peau;
 const TRICHES = [
-  { code: 'SLIP',        texte: 'En slip !',            effet: b => { habiller(b.bassin, '#fff'); habiller(b.jambeD.children[0], PEAU_BJ); habiller(b.jambeG.children[0], PEAU_BJ); } },
-  { code: 'CHAUSSURE',   texte: 'Une chaussure perdue', effet: b => habiller(b.jambeG.children[1], '#eee') },   // il reste la chaussette
+  { code: 'SLIP',        texte: 'En slip !',            effet: b => { habiller(b.bassin, '#fff'); b.ceinture.visible = false; habillerMembre(b.jambeD, PEAU_BJ); habillerMembre(b.jambeG, PEAU_BJ); } },
+  { code: 'CHAUSSURE',   texte: 'Une chaussure perdue', effet: b => habiller(b.jambeG.chaussure, '#eee') },   // il reste la chaussette
   { code: 'SOUTIF',      texte: 'Torse nu en soutien-gorge', effet: b => {
-      habiller(b.torse, PEAU_BJ); habiller(b.brasD.children[0], PEAU_BJ); habiller(b.brasG.children[0], PEAU_BJ);
+      habiller(b.torse, PEAU_BJ); habillerMembre(b.brasD, PEAU_BJ); habillerMembre(b.brasG, PEAU_BJ);
       piece(GEO.main, '#e0407a', b.torse, 0.09, 0.08, 0.11); piece(GEO.main, '#e0407a', b.torse, -0.09, 0.08, 0.11); } },
-  { code: 'JAMBEDEBOIS', texte: 'Jambe de bois',        effet: b => { habiller(b.jambeD.children[0], '#8b5a2b'); b.jambeD.children[0].scale.set(0.45, 1, 0.45); b.jambeD.children[1].visible = false; } },
+  { code: 'JAMBEDEBOIS', texte: 'Jambe de bois',        effet: b => { habillerMembre(b.jambeD, '#8b5a2b'); b.jambeD.scale.set(0.45, 1, 0.45); b.jambeD.chaussure.visible = false; } },
   { code: 'BARCA',       texte: 'Maillot du Barça',     effet: b => {
-      b.torse.material = std(toile(64, 64, g => { for (let k = 0; k < 4; k++) { g.fillStyle = k % 2 ? '#a50044' : '#004d98'; g.fillRect(k * 16, 0, 16, 64); } }));
-      habiller(b.brasD.children[0], '#004d98'); habiller(b.brasG.children[0], '#004d98'); } },
+      b.torse.material = std(toile(64, 64, g => { for (let k = 0; k < 8; k++) { g.fillStyle = k % 2 ? '#a50044' : '#004d98'; g.fillRect(k * 8, 0, 8, 64); } }));
+      habiller(b.brasD.haut, '#004d98'); habiller(b.brasG.haut, '#004d98'); } },
   { code: 'BEBE',        texte: 'Bébé !',               effet: b => {
       b.g.scale.setScalar(0.5); b.tete.scale.setScalar(1.7);
-      habiller(b.torse, PEAU_BJ); habiller(b.bassin, '#f4f4ee'); b.bassin.scale.set(1.12, 1.6, 1.2); // tout nu avec une couche
-      for (const m of [b.brasD.children[0], b.brasG.children[0], b.jambeD.children[0], b.jambeG.children[0], b.jambeD.children[1], b.jambeG.children[1]]) habiller(m, PEAU_BJ); } },
+      habiller(b.torse, PEAU_BJ); habiller(b.bassin, '#f4f4ee'); b.bassin.scale.set(1.12, 1.6, 1.2); b.ceinture.visible = false; // tout nu avec une couche
+      for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, PEAU_BJ);
+      habiller(b.jambeD.chaussure, PEAU_BJ); habiller(b.jambeG.chaussure, PEAU_BJ); } },
 ];
 
 // =====================================================================
@@ -379,7 +406,25 @@ const TEX = {
   enseigne: toile(512, 96, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 512, 96); g.fillStyle = '#ff7a1a'; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText('ARMURERIE', 256, 72); }),
   flash: toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,230,1)'); r.addColorStop(0.3, 'rgba(255,200,80,.8)'); r.addColorStop(1, 'rgba(255,120,0,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }),
   fumee: toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }),
+  // une jante vue de face : 5 branches, un moyeu et 5 écrous
+  jante: toile(64, 64, (g) => { g.fillStyle = '#121214'; g.fillRect(0, 0, 64, 64); g.strokeStyle = g.fillStyle = '#e4e4e8'; g.lineCap = 'round';
+    for (let k = 0; k < 5; k++) { g.lineWidth = 8; g.beginPath(); g.moveTo(32, 32); g.lineTo(32 + 28 * Math.cos(k * 1.2566), 32 + 28 * Math.sin(k * 1.2566)); g.stroke(); }
+    g.lineWidth = 5; g.beginPath(); g.arc(32, 32, 29, 0, 7); g.stroke(); g.beginPath(); g.arc(32, 32, 10, 0, 7); g.fill();
+    g.fillStyle = '#333'; for (let k = 0; k < 5; k++) { g.beginPath(); g.arc(32 + 6 * Math.cos(k * 1.2566 + 0.6), 32 + 6 * Math.sin(k * 1.2566 + 0.6), 1.3, 0, 7); g.fill(); } }),
+  plaque: toile(128, 32, (g) => { g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, 128, 32); g.fillStyle = '#1a3a9a'; g.fillRect(0, 0, 12, 32); g.fillRect(116, 0, 12, 32);
+    g.fillStyle = '#111'; g.font = 'bold 24px Arial'; g.textAlign = 'center'; g.fillText('GT-4X3L', 64, 25); }),
 };
+// le visage est dessiné sur la tête : le devant de la tête est au quart de l'image
+const cacheVisage = {};
+const visage = peau => cacheVisage[peau] ||= new THREE.MeshStandardMaterial({ roughness: 0.75, map: toile(256, 128, (g, l) => {
+  g.fillStyle = peau; g.fillRect(0, 0, l, 128);
+  for (const x of [l / 4 - 15, l / 4 + 15]) {
+    g.fillStyle = '#f4f0ea'; g.beginPath(); g.ellipse(x, 58, 6.5, 3.6, 0, 0, 7); g.fill();   // l'œil
+    g.fillStyle = '#2a1a10'; g.beginPath(); g.arc(x, 58, 3.2, 0, 7); g.fill();
+    g.fillRect(x - 8, 49.5, 16, 2.6);                                                         // le sourcil
+  }
+  g.fillStyle = 'rgba(110,30,30,.75)'; g.fillRect(l / 4 - 10, 84, 20, 2.6);                   // la bouche
+}) });
 TEX.route.repeat.set(TAILLE_X / 8, TAILLE_Z / 8);
 TEX.lignes.repeat.set(1, S / 12);
 TEX.feuilles.repeat.set(4, 3);
@@ -652,16 +697,25 @@ function voit(a, b) {
 // =====================================================================
 const cacheMat = {};
 const mat = (c, o = {}) => cacheMat[c + JSON.stringify(o)] ||= new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, ...o });
+// une forme ronde faite au tour, comme un vase : une liste de [rayon, hauteur], de bas en haut
+const tour = (points, n = 20, angle = Math.PI * 2) => new THREE.LatheGeometry(points.map(([r, y]) => new THREE.Vector2(r, y)), n, 0, angle);
+// un morceau de bras ou de jambe, de longueur l, qui pend sous son articulation : rond aux deux bouts, plus fin en bas qu'en haut
+const QUART = [0, 0.4, 0.8, 1.2, Math.PI / 2];
+const fuseau = (rHaut, rBas, l) => tour([...QUART.map(a => [rBas * Math.sin(a), -l - rBas * Math.cos(a)]), ...QUART.map(a => [rHaut * Math.cos(a), rHaut * Math.sin(a)])], 12);
 const GEO = {
-  torse: new RoundedBoxGeometry(0.44, 0.6, 0.24, 2, 0.09), bassin: new RoundedBoxGeometry(0.4, 0.18, 0.22, 1, 0.07),
-  tete: new THREE.SphereGeometry(0.125, 16, 12), cou: new THREE.CylinderGeometry(0.05, 0.06, 0.12, 8),
-  bras: new THREE.CapsuleGeometry(0.065, 0.48, 4, 8), jambe: new THREE.CapsuleGeometry(0.085, 0.72, 4, 8),
+  // le torse : large aux épaules, plus fin à la taille, aplati d'avant en arrière
+  torse: tour([[0, -0.3], [0.165, -0.3], [0.175, -0.12], [0.215, 0.08], [0.23, 0.18], [0.205, 0.25], [0.1, 0.295], [0, 0.3]]).scale(1, 1, 0.58),
+  bassin: new RoundedBoxGeometry(0.37, 0.2, 0.21, 2, 0.08), ceinture: new THREE.CylinderGeometry(0.173, 0.173, 0.045, 20).scale(1, 1, 0.6),
+  tete: new THREE.SphereGeometry(0.125, 20, 14).scale(0.9, 1.1, 1), cou: new THREE.CylinderGeometry(0.05, 0.06, 0.12, 8),
+  nez: new THREE.SphereGeometry(0.02, 8, 6).scale(0.8, 1.4, 1), oreille: new THREE.SphereGeometry(0.032, 8, 6).scale(0.4, 1, 0.7),
+  bras: fuseau(0.068, 0.05, 0.3), avantBras: fuseau(0.05, 0.038, 0.27),
+  cuisse: fuseau(0.1, 0.072, 0.45), tibia: fuseau(0.072, 0.05, 0.45),
   main: new THREE.SphereGeometry(0.055, 8, 6), chaussure: new RoundedBoxGeometry(0.13, 0.08, 0.27, 1, 0.035),
   cheveux: new THREE.SphereGeometry(0.135, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.55),
+  cheveuxLongs: new THREE.SphereGeometry(0.132, 14, 10).scale(1, 1.5, 0.6),
   casque: new THREE.SphereGeometry(0.16, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5),
   casquette: new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16), visiere: new THREE.BoxGeometry(0.2, 0.02, 0.12),
-  oeil: new THREE.SphereGeometry(0.018, 6, 4),
-  rebord: new THREE.CylinderGeometry(0.17, 0.2, 0.03, 16), brassard: new THREE.CylinderGeometry(0.073, 0.073, 0.08, 10),
+  rebord: new THREE.CylinderGeometry(0.17, 0.2, 0.03, 16), brassard: new THREE.CylinderGeometry(0.065, 0.065, 0.08, 10),
   moustache: new THREE.BoxGeometry(0.05, 0.028, 0.02), meche: new THREE.BoxGeometry(0.13, 0.035, 0.03),
 };
 function piece(geo, couleur, parent, x, y, z) {
@@ -669,38 +723,59 @@ function piece(geo, couleur, parent, x, y, z) {
   m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m;
 }
 const habiller = (m, couleur) => { m.material = mat(couleur); };
+const habillerMembre = (m, couleur) => { habiller(m.haut, couleur); habiller(m.bas, couleur); };
+// un bras ou une jambe : deux morceaux de longueur l, avec un pli entre les deux (le coude ou le genou)
+function membre(parent, x, y, l, geoHaut, geoBas, couleurHaut, couleurBas) {
+  const m = new THREE.Group(); m.position.set(x, y, 0); parent.add(m);
+  m.haut = piece(geoHaut, couleurHaut, m, 0, 0, 0);
+  m.pli = new THREE.Group(); m.pli.position.y = -l; m.add(m.pli);
+  m.bas = piece(geoBas, couleurBas, m.pli, 0, 0, 0);
+  return m;
+}
 function creerHumain(s) {
   const g = new THREE.Group(), haut = new THREE.Group();
   haut.position.y = 0.95; g.add(haut);
-  const bassin = piece(GEO.bassin, s.bas, haut, 0, 0, 0);
+  const bassin = piece(GEO.bassin, s.bas, haut, 0, 0, 0), ceinture = piece(GEO.ceinture, '#2a2018', haut, 0, 0.095, 0);
   const torse = piece(GEO.torse, s.haut, haut, 0, 0.38, 0);
   piece(GEO.cou, s.peau, haut, 0, 0.72, 0);
-  const tete = piece(GEO.tete, s.peau, haut, 0, 0.86, 0);
-  if (s.casque) { piece(GEO.casque, s.casque, tete, 0, 0.02, 0); piece(GEO.rebord, s.casque, tete, 0, 0.045, 0); } // casque allemand
-  else if (s.casquette) { piece(GEO.casquette, s.casquette, tete, 0, 0.09, 0); piece(GEO.visiere, s.casquette, tete, 0, 0.06, 0.13); }
-  else piece(GEO.cheveux, s.cheveux, tete, 0, 0.012, -0.01);
-  piece(GEO.oeil, '#111', tete, 0.045, 0.02, 0.113); piece(GEO.oeil, '#111', tete, -0.045, 0.02, 0.113);
-  if (s.moustache) { piece(GEO.moustache, s.moustache, tete, 0, -0.035, 0.12); piece(GEO.meche, s.cheveux, tete, 0.02, 0.085, 0.1).rotation.z = -0.35; }
+  const tete = piece(GEO.tete, s.peau, haut, 0, 0.87, 0);
+  tete.material = visage(s.peau);
+  piece(GEO.nez, s.peau, tete, 0, -0.018, 0.122);
+  for (const c of [-1, 1]) piece(GEO.oreille, s.peau, tete, 0.112 * c, 0, -0.01);
+  if (s.casque) { piece(GEO.casque, s.casque, tete, 0, 0.045, 0); piece(GEO.rebord, s.casque, tete, 0, 0.07, 0); } // casque allemand
+  else if (s.casquette) { piece(GEO.casquette, s.casquette, tete, 0, 0.105, 0); piece(GEO.visiere, s.casquette, tete, 0, 0.075, 0.13); }
+  else {
+    piece(GEO.cheveux, s.cheveux, tete, 0, 0.012, -0.012).rotation.x = -0.6;   // penchés vers l'arrière : ils dégagent le front
+    if (s.cheveuxLongs) piece(GEO.cheveuxLongs, s.cheveux, tete, 0, -0.08, -0.07);
+  }
+  if (s.moustache) { piece(GEO.moustache, s.moustache, tete, 0, -0.05, 0.12); piece(GEO.meche, s.cheveux, tete, 0.02, 0.09, 0.095).rotation.z = -0.35; }
   // le personnage regarde vers +Z : son bras droit est du côté -X
-  const [brasD, brasG] = [-1, 1].map(c => { const b = new THREE.Group(); b.position.set(0.29 * c, 0.62, 0); haut.add(b);
-    piece(GEO.bras, s.haut, b, 0, -0.26, 0); piece(GEO.main, s.peau, b, 0, -0.57, 0); return b; });
-  const [jambeD, jambeG] = [-1, 1].map(c => { const j = new THREE.Group(); j.position.set(0.11 * c, 0.95, 0); g.add(j);
-    piece(GEO.jambe, s.bas, j, 0, -0.45, 0); piece(GEO.chaussure, s.chaussures, j, 0, -0.9, 0.04); return j; });
-  if (s.brassard) piece(GEO.brassard, s.brassard, brasG, 0, -0.14, 0);
-  return { g, haut, tete, torse, bassin, brasD, brasG, jambeD, jambeG, phase: Math.random() * 6, arme: null };
+  const [brasD, brasG] = [-1, 1].map(c => { const b = membre(haut, 0.255 * c, 0.6, 0.3, GEO.bras, GEO.avantBras, s.haut, s.manchesCourtes ? s.peau : s.haut);
+    b.main = piece(GEO.main, s.peau, b.pli, 0, -0.29, 0); b.main.scale.set(0.8, 1.3, 0.55); return b; });
+  const [jambeD, jambeG] = [-1, 1].map(c => { const j = membre(g, 0.1 * c, 0.95, 0.45, GEO.cuisse, GEO.tibia, s.bas, s.short ? s.peau : s.bas);
+    j.chaussure = piece(GEO.chaussure, s.chaussures, j.pli, 0, -0.45, 0.045); return j; });
+  if (s.brassard) piece(GEO.brassard, s.brassard, brasG, 0, -0.15, 0);
+  if (s.taille) g.scale.set(s.taille * s.carrure, s.taille, s.taille * s.carrure);
+  return { g, haut, tete, torse, bassin, ceinture, brasD, brasG, jambeD, jambeG, tenue: s, phase: Math.random() * 6, arme: null };
 }
 function animerHumain(h, vitesse, dt, o = {}) {
   h.phase += dt * (vitesse > 0.2 ? 2.5 + vitesse * 1.3 : 0);
-  const amp = vitesse > 0.2 ? Math.min(0.95, 0.35 + vitesse * 0.08) : 0, s = Math.sin(h.phase) * amp;
-  h.jambeG.rotation.x = s; h.jambeD.rotation.x = -s;
-  h.brasG.rotation.set(-s * 0.8, 0, 0.08); h.brasD.rotation.set(s * 0.8, 0, -0.08);
-  if (o.arme) { h.brasD.rotation.set(-1.45, 0, 0); h.brasG.rotation.set(-1.3, 0, -0.55); }
-  if (o.frappe > 0) h.brasD.rotation.x = -1.7 * Math.sin(o.frappe * Math.PI);
-  if (o.enAir) { h.jambeG.rotation.x = 0.6; h.jambeD.rotation.x = -0.2; }
-  const hy = o.accroupi ? 0.6 : 0.95;
-  h.haut.position.y = hy; h.jambeG.position.y = h.jambeD.position.y = hy;
-  h.jambeG.scale.y = h.jambeD.scale.y = hy / 0.95;
-  h.haut.rotation.x = o.accroupi ? 0.25 : 0;
+  const amp = vitesse > 0.2 ? Math.min(0.95, 0.35 + vitesse * 0.08) : 0, s = Math.sin(h.phase) * amp, c = Math.cos(h.phase) * amp;
+  // accroupi ou assis : les cuisses partent vers l'avant et les genoux se plient
+  const cuisse = o.assis ? 1.4 : o.accroupi ? 0.9 : 0, genou = o.assis ? 1.1 : cuisse * 2;
+  h.jambeG.rotation.x = s - cuisse; h.jambeD.rotation.x = -s - cuisse;
+  // en marchant, le genou se plie quand la jambe revient vers l'avant
+  h.jambeG.pli.rotation.x = genou + Math.max(0, -c) * 1.5; h.jambeD.pli.rotation.x = genou + Math.max(0, c) * 1.5;
+  h.brasG.rotation.set(-s * 0.8, 0, 0.1); h.brasD.rotation.set(s * 0.8, 0, -0.1);
+  h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.15 - amp * 1.1;   // plus on va vite, plus les coudes sont pliés
+  if (o.arme) { h.brasD.rotation.set(-1.45, 0, 0); h.brasG.rotation.set(-1.3, 0, -0.55); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = 0; }
+  if (o.assis) { h.brasD.rotation.set(-0.95, 0, -0.3); h.brasG.rotation.set(-0.95, 0, 0.3); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.5; } // les mains au guidon
+  if (o.frappe > 0) { h.brasD.rotation.x = -1.7 * Math.sin(o.frappe * Math.PI); h.brasD.pli.rotation.x = -1.3 * (1 - Math.sin(o.frappe * Math.PI)); }
+  if (o.enAir) { h.jambeG.rotation.x = 0.6; h.jambeD.rotation.x = -0.4; h.jambeG.pli.rotation.x = 0.9; h.jambeD.pli.rotation.x = 0.5; }
+  // à chaque pas, le corps descend un peu quand les jambes sont écartées
+  const hy = (o.accroupi ? 0.6 : 0.95) - Math.min(0.06, 0.5 * (1 - Math.cos(s)));
+  h.haut.position.y = h.jambeG.position.y = h.jambeD.position.y = hy;
+  h.haut.rotation.x = o.accroupi ? 0.25 : amp * 0.12;   // on se penche en avant pour courir
   h.g.rotation.x = -(o.mort || 0) * Math.PI / 2;
 }
 
@@ -720,13 +795,13 @@ function creerArme(i) {
   if (modele === 'fusil') { b(0.05, 0.09, 0.5, M_METAL, 0, 0.02, 0.12); b(0.025, 0.025, 0.3, M_METAL, 0, 0.04, 0.5); b(0.035, 0.17, 0.06, M_METAL, 0, -0.09, 0.16); b(0.04, 0.11, 0.26, M_METAL, 0, -0.01, -0.24); g.userData.bout = 0.64; }
   return g;
 }
-function donnerArme(h, i) {
-  if (h.arme) h.brasD.remove(h.arme);
+function donnerArme(h, i) { // l'arme tient dans la main droite, au bout de l'avant-bras
+  if (h.arme) h.brasD.pli.remove(h.arme);
   h.arme = creerArme(i);
-  if (h.arme) { h.arme.position.set(0, -0.6, 0.03); h.arme.rotation.x = Math.PI / 2; h.brasD.add(h.arme); }
+  if (h.arme) { h.arme.position.set(0, -0.3, 0.03); h.arme.rotation.x = Math.PI / 2; h.brasD.pli.add(h.arme); }
 }
 function boutDuCanon(h, v) {
-  if (!h.arme) return h.brasD.localToWorld(v.set(0, -0.6, 0));
+  if (!h.arme) return h.brasD.pli.localToWorld(v.set(0, -0.3, 0));
   return h.arme.localToWorld(v.set(0, 0.03, h.arme.userData.bout));
 }
 
@@ -734,53 +809,225 @@ function boutDuCanon(h, v) {
 //  Voitures
 // =====================================================================
 const PEINTURES = ['#9e1010', '#111', '#e8e8e8', '#1a3a8a', '#b8b8b8', '#0e5a2e', '#d8a010', '#5a1a6a', '#2a6ad8', '#e06010'];
-function effiler(g, kx, kz) { // resserre le haut d'une boîte : pare-brise et vitres penchés
-  const p = g.attributes.position;
-  for (let i = 0; i < p.count; i++) if (p.getY(i) > 0) p.setXYZ(i, p.getX(i) * kx, p.getY(i), p.getZ(i) * kz);
-  g.computeVertexNormals();
-  return g;
-}
-const GEO_V = {
-  caisse: new RoundedBoxGeometry(1.9, 0.55, 4.4, 3, 0.14), bas: new THREE.BoxGeometry(1.84, 0.22, 4.2),
-  cabine: effiler(new THREE.BoxGeometry(1.74, 0.52, 2.6), 0.84, 0.6), toit: new RoundedBoxGeometry(1.5, 0.07, 1.62, 1, 0.03),
-  phare: new THREE.BoxGeometry(0.42, 0.14, 0.05), calandre: new THREE.BoxGeometry(0.9, 0.16, 0.04),
-  parechoc: new RoundedBoxGeometry(1.94, 0.2, 0.3, 2, 0.08), retro: new RoundedBoxGeometry(0.18, 0.1, 0.08, 1, 0.03),
-  pneu: new THREE.CylinderGeometry(0.36, 0.36, 0.26, 24).rotateZ(Math.PI / 2), jante: new THREE.CylinderGeometry(0.22, 0.22, 0.28, 16).rotateZ(Math.PI / 2),
-  gyro: new THREE.BoxGeometry(0.55, 0.13, 0.26), bande: new THREE.BoxGeometry(1.96, 0.14, 3.2),
-};
 const M_VITRE = new THREE.MeshStandardMaterial({ color: '#34404c', metalness: 0.9, roughness: 0.05 });
-const M_PNEU = mat('#151515', { roughness: 0.9 }), M_JANTE = mat('#bbb', { metalness: 1, roughness: 0.3 });
+const M_PNEU = mat('#151515', { roughness: 0.9 }), M_JANTE = new THREE.MeshStandardMaterial({ map: TEX.jante, metalness: 0.7, roughness: 0.35 });
+const M_NOIR = mat('#1a1a1a', { roughness: 0.6 }), M_CHROME = mat('#e0e0e0', { metalness: 1, roughness: 0.15 });
+const M_PLAQUE = new THREE.MeshStandardMaterial({ map: TEX.plaque, roughness: 0.6 });
 const M_PHARE = mat('#fff', { emissive: '#fff8e0', emissiveIntensity: 1.5 }), M_FEU = mat('#a00', { emissive: '#f00', emissiveIntensity: 1 });
 const cachePeinture = {};
 const peinture = c => cachePeinture[c] ||= new THREE.MeshPhysicalMaterial({ color: c, metalness: 0.55, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08 });
-function modeleVoiture(couleur, police) {
-  const g = new THREE.Group();
-  const add = (geo, m, x, y, z) => { const e = new THREE.Mesh(geo, m); e.position.set(x, y, z); e.castShadow = true; g.add(e); return e; };
-  add(GEO_V.caisse, peinture(couleur), 0, 0.64, 0);
-  add(GEO_V.bas, mat('#1a1a1a'), 0, 0.4, 0);
-  add(GEO_V.cabine, M_VITRE, 0, 1.17, -0.25);
-  add(GEO_V.toit, peinture(couleur), 0, 1.44, -0.25);
-  add(GEO_V.calandre, mat('#222'), 0, 0.62, 2.21);
-  for (const z of [-2.1, 2.1]) add(GEO_V.parechoc, mat('#1a1a1a'), 0, 0.42, z);
-  for (const x of [-0.62, 0.62]) { add(GEO_V.phare, M_PHARE, x, 0.76, 2.2); add(GEO_V.phare, M_FEU, x, 0.76, -2.2); add(GEO_V.retro, peinture(couleur), x * 1.6, 0.98, 0.75); }
-  const roues = [];
-  for (const [x, z] of [[-0.88, 1.35], [0.88, 1.35], [-0.88, -1.35], [0.88, -1.35]]) {
-    const r = new THREE.Group(); r.position.set(x, 0.36, z); g.add(r);
-    const p = new THREE.Mesh(GEO_V.pneu, M_PNEU); p.castShadow = true; r.add(p); r.add(new THREE.Mesh(GEO_V.jante, M_JANTE));
-    roues.push(r);
+
+// petits outils pour fabriquer les pièces : une boîte (aux bords arrondis si r > 0), un tube, un phare rond, une pièce de chaque côté
+const lerp = THREE.MathUtils.lerp;
+const bloc = (l, h, p, x, y, z, r = 0) => (r ? new RoundedBoxGeometry(l, h, p, 1, r) : new THREE.BoxGeometry(l, h, p)).translate(x, y, z);
+function tube(rayon, l, x, y, z, axe = 'x') {
+  const g = new THREE.CylinderGeometry(rayon, rayon, l, 14);
+  if (axe === 'x') g.rotateZ(Math.PI / 2); if (axe === 'z') g.rotateX(Math.PI / 2);
+  return g.translate(x, y, z);
+}
+const rond = (r, x, y, z) => new THREE.SphereGeometry(r, 14, 10).scale(1, 1, 0.4).translate(x, y, z);
+const deux = fabriquer => [fabriquer(-1), fabriquer(1)];
+const aile = (r, l, x, y, z) => tour([[r, -l / 2], [r + 0.03, -l / 2], [r + 0.03, l / 2], [r, l / 2]], 12, Math.PI).rotateZ(Math.PI / 2).translate(x, y, z);   // un demi-anneau au-dessus d'une roue
+const fusion = liste => liste.length ? mergeGeometries(liste.map(g => g.index ? g.toNonIndexed() : g)) : null;
+// déforme une forme point par point, puis refait ses reflets : lisses sur les arrondis, nets sur les arêtes
+function deformer(g, f) {
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) p.setXYZ(i, ...f(p.getX(i), p.getY(i), p.getZ(i)));
+  return toCreasedNormals(g, 0.7);
+}
+const GEO_V = {
+  pneu: tour([[0.2, -0.11], [0.3, -0.12], [0.33, -0.09], [0.34, 0], [0.33, 0.09], [0.3, 0.12], [0.2, 0.11]], 24).rotateZ(Math.PI / 2),
+  jante: new THREE.CylinderGeometry(0.22, 0.22, 0.2, 24).rotateZ(Math.PI / 2), gyro: bloc(0.5, 0.12, 0.26, 0, 0, 0, 0.04),
+};
+
+// La forme de chaque modèle, en mètres : z = vers l'avant de la voiture, y = la hauteur, x = vers sa gauche.
+//  roue : le rayon des roues   essieux : où elles sont [arrière, avant]   garde : la hauteur du dessous de la voiture
+//  profil : le dessus de la carrosserie vue de côté, de l'arrière vers l'avant, en points [z, y]
+//  cabine : bas et haut = où elle commence et finit [arrière, avant], y = [son bas, le toit], vitres = la hauteur où commencent les vitres,
+//           piliers = où couper les vitres de côté (0 = tout à l'arrière, 1 = tout à l'avant)
+//  portes : où sont les bords des portes   poignees : où sont les poignées   oeil : tes yeux en vue intérieure [x, y, z]
+//  plus : les pièces en plus, rangées par matière : f.peint, f.noir, f.chrome, f.phares (blancs), f.feux (rouges)
+const MODELES = {
+  classique: { longueur: 4.4, largeur: 1.8, hauteur: 1.45, roue: 0.33, essieux: [-1.35, 1.38], garde: 0.24, oeil: [0.38, 1.2, -0.1],
+    profil: [[-2.2, 0.86], [-1.2, 0.92], [1, 0.9], [2.1, 0.8], [2.2, 0.55]],
+    cabine: { bas: [-1.65, 1.1], haut: [-0.95, 0.35], y: [0.84, 1.45], vitres: 0.95, largeur: [1.74, 1.4], piliers: [0.58] },
+    portes: [0.92, -0.05, -0.98], poignees: [0.1, -0.85], pareChocs: 'chrome',
+    plus: f => {
+      f.phares.push(...deux(c => bloc(0.34, 0.13, 0.08, 0.56 * c, 0.68, 2.13, 0.03)));
+      f.feux.push(...deux(c => bloc(0.32, 0.12, 0.08, 0.56 * c, 0.7, -2.18, 0.03)));
+      f.noir.push(bloc(0.7, 0.13, 0.06, 0, 0.68, 2.135));                        // la calandre
+      f.chrome.push(tube(0.035, 0.3, 0.5, 0.26, -2.12, 'z'));                    // le pot d'échappement
+    } },
+  porsche: { longueur: 4.3, largeur: 1.9, hauteur: 1.28, roue: 0.33, essieux: [-1.25, 1.3], garde: 0.16, arrondi: 0.2, oeil: [0.4, 1.06, -0.25],
+    profil: [[-2.15, 0.62], [-1.9, 0.84], [-0.9, 0.88], [0.8, 0.86], [1.5, 0.83], [2.05, 0.62], [2.15, 0.42]],
+    cabine: { bas: [-1.95, 1], haut: [-0.4, 0.15], y: [0.78, 1.28], vitres: 0.9, largeur: [1.76, 1.32], piliers: [0.54] },
+    portes: [0.85, -0.35], poignees: [-0.2],
+    plus: f => {
+      f.phares.push(...deux(c => new THREE.SphereGeometry(0.13, 14, 10).scale(1, 0.55, 1.35).translate(0.62 * c, 0.69, 1.82)));   // des phares ronds, comme des yeux de grenouille
+      f.feux.push(bloc(1.5, 0.05, 0.06, 0, 0.76, -1.99));                         // un bandeau rouge sur toute la largeur
+      f.peint.push(bloc(1.5, 0.035, 0.3, 0, 0.99, -1.85, 0.015), ...deux(c => bloc(0.05, 0.12, 0.12, 0.5 * c, 0.92, -1.85)));     // l'aileron
+      f.noir.push(bloc(1.2, 0.08, 0.05, 0, 0.26, 2.13));                         // l'entrée d'air
+      f.chrome.push(...deux(c => tube(0.045, 0.3, 0.45 * c, 0.24, -2.05, 'z')));  // deux pots d'échappement
+    } },
+  minibus: { longueur: 5, largeur: 1.95, hauteur: 2.1, roue: 0.35, essieux: [-1.5, 1.7], garde: 0.3, arrondi: 0.16, oeil: [0.45, 1.75, 1.6],
+    profil: [[-2.5, 1.2], [2.42, 1.2], [2.5, 1]],
+    cabine: { bas: [-2.44, 2.4], haut: [-2.36, 1.95], y: [1.1, 2.1], vitres: 1.27, largeur: [1.9, 1.72], piliers: [0.3, 0.52, 0.75] },
+    portes: [2.25, 1.2, -1], poignees: [1.35, 1.05], pareChocs: 'chrome', deuxTons: '#f0ece0',   // le haut est couleur crème
+    plus: f => {
+      f.phares.push(...deux(c => rond(0.14, 0.62 * c, 0.9, 2.5)));
+      f.feux.push(...deux(c => bloc(0.14, 0.3, 0.08, 0.72 * c, 0.95, -2.48, 0.03)));
+      f.chrome.push(rond(0.13, 0, 1, 2.5));                                       // l'écusson sur le nez
+    } },
+  '4x4': { longueur: 4.8, largeur: 2.05, hauteur: 2, roue: 0.48, essieux: [-1.45, 1.5], garde: 0.5, arrondi: 0.07, oeil: [0.45, 1.72, 0.2],
+    profil: [[-2.4, 1.24], [2.3, 1.2], [2.4, 1]],
+    cabine: { bas: [-2.36, 0.95], haut: [-2.3, 0.62], y: [1.14, 2], vitres: 1.3, largeur: [1.96, 1.8], piliers: [0.45, 0.71] },
+    portes: [0.9, 0, -0.88], poignees: [0.15, -0.73], pareChocs: 'noir',
+    plus: f => {
+      f.phares.push(...deux(c => rond(0.13, 0.72 * c, 0.86, 2.4)), ...[-0.6, -0.2, 0.2, 0.6].map(x => rond(0.09, x, 2.15, 0.02)));   // les phares, et 4 projecteurs sur le toit
+      f.feux.push(...deux(c => bloc(0.12, 0.26, 0.08, 0.78 * c, 1, -2.38, 0.03)));
+      f.noir.push(bloc(1.1, 0.3, 0.06, 0, 0.86, 2.39));                           // la calandre
+      for (const z of [-1.45, 1.5]) f.noir.push(...deux(c => aile(0.55, 0.16, 1.0 * c, 0.48, z)));   // les élargisseurs d'ailes
+      // le pare-buffle : des tubes devant la calandre
+      f.noir.push(tube(0.04, 1.5, 0, 1.05, 2.56), tube(0.04, 1.5, 0, 0.72, 2.56), ...deux(c => tube(0.04, 0.4, 0.45 * c, 0.88, 2.56, 'y')), ...deux(c => tube(0.04, 0.2, 0.45 * c, 0.72, 2.46, 'z')));
+      // la galerie sur le toit, avec une caisse et deux jerricans
+      f.noir.push(...deux(c => bloc(0.04, 0.04, 2.2, 0.8 * c, 2.07, -1.05)), ...[-2.1, -1.4, -0.7, 0].map(z => bloc(1.64, 0.04, 0.04, 0, 2.07, z)));
+      f.noir.push(bloc(0.9, 0.3, 0.6, 0.2, 2.24, -0.6, 0.03), ...deux(c => bloc(0.18, 0.42, 0.34, 0.35 * c, 2.3, -1.7, 0.04)));
+      f.noir.push(bloc(0.09, 0.95, 0.09, -1.04, 1.62, 0.78, 0.03));               // la prise d'air en hauteur, pour rouler dans le sable
+      f.noir.push(GEO_V.pneu.clone().rotateY(Math.PI / 2).scale(1.4, 1.4, 1.4).translate(0.3, 1.2, -2.5));   // la roue de secours
+      f.peint.push(tube(0.3, 0.2, 0.3, 1.2, -2.56, 'z'));
+    } },
+  limousine: { longueur: 7.4, largeur: 1.85, hauteur: 1.45, roue: 0.33, essieux: [-2.8, 2.85], garde: 0.22, oeil: [0.38, 1.2, 1.45],
+    profil: [[-3.7, 0.86], [-2.7, 0.92], [2.5, 0.9], [3.6, 0.8], [3.7, 0.55]],
+    cabine: { bas: [-3.15, 2.6], haut: [-2.45, 1.85], y: [0.84, 1.45], vitres: 0.95, largeur: [1.78, 1.44], piliers: [0.31, 0.55, 0.79] },
+    portes: [2.4, 1.4, -1.35, -2.35], poignees: [1.55, -2.2], pareChocs: 'chrome',
+    plus: f => {
+      f.phares.push(...deux(c => bloc(0.36, 0.13, 0.08, 0.57 * c, 0.68, 3.63, 0.03)));
+      f.feux.push(...deux(c => bloc(0.34, 0.12, 0.08, 0.57 * c, 0.7, -3.68, 0.03)));
+      f.chrome.push(bloc(0.7, 0.2, 0.06, 0, 0.66, 3.64), bloc(1.862, 0.03, 6.2, 0, 0.6, 0));   // la calandre, et une baguette chromée sur les côtés
+      f.chrome.push(tube(0.035, 0.3, 0.5, 0.25, -3.62, 'z'));
+    } },
+  // le tricycle n'a ni carrosserie ni cabine : tout est dans « plus ». Ses roues : [x, z, épaisseur], la roue avant en dernier
+  tricycle: { longueur: 2.5, largeur: 1.3, hauteur: 1.25, roue: 0.3, roues: [[-0.53, -0.8], [0.53, -0.8], [0, 0.95, 0.6]], oeil: [0, 1.6, -0.1],
+    siege: [0.82, -0.15], ouvert: true,   // siege : [hauteur, z] des hanches du pilote. ouvert : on le voit, et rien ne le protège
+    plus: f => {
+      f.peint.push(bloc(0.32, 0.26, 0.62, 0, 0.8, 0.3, 0.1), ...deux(c => aile(0.34, 0.3, 0.53 * c, 0.3, -0.8)));   // le réservoir et les garde-boue
+      f.noir.push(bloc(0.4, 0.1, 0.6, 0, 0.72, -0.25, 0.04), bloc(0.38, 0.32, 0.08, 0, 0.9, -0.58, 0.03));   // la selle et son dossier
+      f.noir.push(bloc(0.3, 0.32, 0.5, 0, 0.47, 0.2, 0.04));                     // le moteur
+      f.chrome.push(tube(0.04, 1, 0, 0.3, -0.8), tube(0.04, 1.5, 0, 0.5, 0, 'z'), tube(0.03, 0.7, 0, 0.28, 0.45));   // l'essieu, le cadre, les repose-pieds
+      f.chrome.push(...deux(c => tube(0.04, 1, 0.2 * c, 0.3, -0.75, 'z')));       // les pots d'échappement
+      f.feux.push(...deux(c => bloc(0.14, 0.06, 0.04, 0.53 * c, 0.4, -1.17)));
+      // ce qui tourne avec la roue avant : la fourche, le guidon et le phare (mesurés depuis le milieu de la roue)
+      f.guidon.push(...deux(c => new THREE.CylinderGeometry(0.025, 0.025, 0.95, 8).rotateX(-0.5).translate(0.09 * c, 0.4, -0.22)), tube(0.022, 0.72, 0, 0.82, -0.55));
+      f.lampe.push(rond(0.1, 0, 0.62, -0.18));
+    } },
+};
+VOITURES.forEach(t => { if (!MODELES[t.modele]) alert(`Voitures : le modèle "${t.modele}" de "${t.nom}" n'existe pas !`); });
+
+// la carrosserie : son profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur
+function coque(m) {
+  const s = new THREE.Shape(), p = m.profil, z0 = p[0][0], z1 = p.at(-1)[0], R = m.roue + 0.07, a = Math.asin((m.garde - m.roue) / R);
+  const V = (x, y) => new THREE.Vector2(x, y);
+  const coins = [V(z0 + 0.6, m.garde), V(z0, m.garde), ...p.map(q => V(...q)), V(z1, m.garde), V(z1 - 0.6, m.garde)];
+  s.moveTo(z0 + 0.3, m.garde);
+  for (let k = 1; k < coins.length - 1; k++) { // on arrondit chaque coin
+    const avant = coins[k].clone().sub(coins[k - 1]), apres = coins[k + 1].clone().sub(coins[k]), r = Math.min(m.arrondi || 0.12, avant.length() / 2, apres.length() / 2);
+    const debut = coins[k].clone().addScaledVector(avant.normalize(), -r);
+    s.lineTo(debut.x, debut.y);
+    const fin = coins[k].clone().addScaledVector(apres.normalize(), r);
+    s.quadraticCurveTo(coins[k].x, coins[k].y, fin.x, fin.y);
   }
+  for (const z of [...m.essieux].reverse()) s.absarc(z, m.roue, R, a, Math.PI - a, false);   // le creux au-dessus de chaque roue
+  // tous les bords sont arrondis : de 7 cm vus de côté, de 16 cm vus du ciel ou de face
+  const b = 0.16, W = m.largeur / 2, g = new THREE.ExtrudeGeometry(s, { depth: m.largeur - 2 * b, bevelThickness: b, bevelSize: 0.07, bevelOffset: -0.07, bevelSegments: 4, curveSegments: 8 });
+  toCreasedNormals(g.rotateY(-Math.PI / 2).translate(W - b, 0, 0), 0.7);
+  // les flancs sont plats : leurs reflets regardent droit sur le côté
+  const pos = g.attributes.position, n = g.attributes.normal;
+  for (let i = 0; i < pos.count; i++) if (Math.abs(pos.getX(i)) > W - 0.001) n.setXYZ(i, Math.sign(pos.getX(i)), 0, 0);
+  return g;
+}
+// une vitre plate à 4 coins, qu'on ne voit que de dehors (de l'intérieur, on regarde à travers)
+function vitrePlate(coins, milieu) {
+  const [a, b, c, d] = coins, n = b.clone().sub(a).cross(d.clone().sub(a));
+  const g = new THREE.BufferGeometry().setFromPoints(n.dot(a.clone().sub(milieu)) > 0 ? [a, b, c, a, c, d] : [a, c, b, a, d, c]);
+  g.computeVertexNormals();
+  return g;
+}
+// la cabine : une boîte arrondie, plus étroite et plus courte en haut, avec les vitres posées dessus
+function cabine(m, f) {
+  const c = m.cabine, l = c.bas[1] - c.bas[0], h = c.y[1] - c.y[0], w = c.largeur[0];
+  // un point de la cabine. cote : -1 à droite, 1 à gauche · t : 0 en bas, 1 au toit · u : 0 à l'arrière, 1 à l'avant
+  const P = (cote, t, u) => new THREE.Vector3(cote * lerp(w, c.largeur[1], t) / 2, lerp(c.y[0], c.y[1], t), lerp(lerp(c.bas[0], c.bas[1], u), lerp(c.haut[0], c.haut[1], u), t));
+  f.toit.push(deformer(new RoundedBoxGeometry(w, h, l, 3, 0.09), (x, y, z) => P(x / (w / 2), y / h + 0.5, z / l + 0.5).toArray()));
+  const milieu = P(0, 0.5, 0.5), t0 = (c.vitres - c.y[0]) / h, t1 = 1 - 0.11 / h, a = 1 - 0.13 / (w / 2);
+  const vitre = (coins, dx, dz) => f.vitres.push(vitrePlate(coins.map(q => P(...q).add(new THREE.Vector3(dx, 0, dz))), milieu));
+  vitre([[-a, t0, 1], [a, t0, 1], [a, t1, 1], [-a, t1, 1]], 0, 0.012);    // le pare-brise
+  vitre([[-a, t0, 0], [a, t0, 0], [a, t1, 0], [-a, t1, 0]], 0, -0.012);   // la vitre arrière
+  const bords = [0.13 / l, ...c.piliers, 1 - 0.13 / l];                      // les vitres de côté, entre les piliers
+  for (const cote of [-1, 1]) for (let k = 0; k < bords.length - 1; k++) {
+    const u0 = bords[k] + 0.04 / l, u1 = bords[k + 1] - 0.04 / l;
+    vitre([[cote, t0, u0], [cote, t0, u1], [cote, t1, u1], [cote, t1, u0]], cote * 0.012, 0);
+  }
+  f.peint.push(...deux(k => bloc(0.2, 0.11, 0.08, k * (w / 2 + 0.11), c.vitres + 0.07, lerp(c.bas[1], c.haut[1], t0) - 0.12, 0.03)));   // les rétroviseurs
+}
+// toutes les pièces d'un modèle, fabriquées une seule fois et rangées par matière
+const cacheFormes = {};
+function formesVoiture(nom) {
+  if (cacheFormes[nom]) return cacheFormes[nom];
+  const m = MODELES[nom], L = m.longueur / 2, W = m.largeur / 2, c = m.cabine, e = 0.12 * m.roue / 0.34;   // e : la demi-épaisseur d'un pneu
+  const f = { peint: [], toit: [], vitres: [], noir: [], chrome: [], phares: [], feux: [], plaques: [], guidon: [], lampe: [] };
+  if (m.profil) {
+    f.peint.push(coque(m));
+    for (const z of m.essieux) f.noir.push(...deux(k => bloc(0.03, 2 * m.roue + 0.07 - m.garde, 2 * m.roue + 0.2, k * (W - 2 * e - 0.03), m.roue + 0.035 + m.garde / 2, z)));   // le fond des passages de roue
+    if (m.pareChocs) f[m.pareChocs].push(bloc(m.largeur * 0.93, 0.15, 0.24, 0, m.garde + 0.16, L - 0.08, 0.06), bloc(m.largeur * 0.93, 0.15, 0.24, 0, m.garde + 0.16, -L + 0.08, 0.06));
+    const zPlaque = L + (m.pareChocs ? 0.045 : 0.006), yPlaque = m.garde + (m.pareChocs ? 0.16 : 0.26);
+    f.plaques.push(new THREE.PlaneGeometry(0.5, 0.12).translate(0, yPlaque, zPlaque), new THREE.PlaneGeometry(0.5, 0.12).rotateY(Math.PI).translate(0, yPlaque, -zPlaque));
+  }
+  if (c) {
+    cabine(m, f);
+    // le bord des portes et les poignées : des barres qui traversent la voiture et dépassent à peine de chaque côté
+    for (const z of m.portes) f.noir.push(bloc(m.largeur + 0.008, c.y[0] - m.garde - 0.11, 0.014, 0, (c.y[0] + m.garde) / 2 + 0.035, z));
+    for (const z of m.poignees) f.chrome.push(bloc(m.largeur + 0.03, 0.03, 0.13, 0, c.y[0] - 0.1, z));
+  }
+  m.plus(f);
+  const r = { bande: bloc(m.largeur + 0.02, 0.14, m.longueur * 0.68, 0, m.garde + 0.42, 0), gyro: [m.hauteur + 0.06, c ? (c.haut[0] + c.haut[1]) / 2 : -0.9] };
+  for (const k in f) r[k] = fusion(f[k]);
+  return cacheFormes[nom] = r;
+}
+function modeleVoiture(type, couleur, police) {
+  const m = MODELES[type.modele], f = formesVoiture(type.modele), W = m.largeur / 2, e = 0.12 * m.roue / 0.34;
+  const g = new THREE.Group(), corps = new THREE.Group();   // le corps penche quand on freine ou qu'on tourne, pas les roues
+  g.add(corps);
+  const poser = (geo, matiere, dans = corps) => { if (!geo) return null; const p = new THREE.Mesh(geo, matiere); p.castShadow = true; dans.add(p); return p; };
+  poser(f.peint, peinture(couleur)); poser(f.toit, peinture(m.deuxTons || couleur)); poser(f.vitres, M_VITRE);
+  poser(f.noir, M_NOIR); poser(f.chrome, M_CHROME); poser(f.phares, M_PHARE); poser(f.feux, M_FEU); poser(f.plaques, M_PLAQUE);
+  const roues = [];
+  for (const [x, z, epaisseur = 1] of m.roues || m.essieux.flatMap(z => [[e + 0.005 - W, z], [W - e - 0.005, z]])) {
+    const pivot = new THREE.Group(), tourne = new THREE.Group();   // pivot : la roue braque. tourne : elle roule
+    pivot.position.set(x, m.roue, z); pivot.add(tourne); g.add(pivot);
+    tourne.scale.set(epaisseur * m.roue / 0.34, m.roue / 0.34, m.roue / 0.34);
+    poser(GEO_V.pneu, M_PNEU, tourne); poser(GEO_V.jante, M_JANTE, tourne);
+    roues.push({ pivot, tourne, avant: z > 0 });
+  }
+  poser(f.guidon, M_CHROME, roues.at(-1).pivot); poser(f.lampe, M_PHARE, roues.at(-1).pivot);
   let gyro = null;
   if (police) {
-    add(GEO_V.bande, mat('#1a3a9a'), 0, 0.72, 0);
-    gyro = [add(GEO_V.gyro, new THREE.MeshStandardMaterial({ color: '#f22', emissive: '#f00' }), 0.3, 1.54, -0.3),
-            add(GEO_V.gyro, new THREE.MeshStandardMaterial({ color: '#22f', emissive: '#00f' }), -0.3, 1.54, -0.3)];
+    poser(f.bande, mat('#1a3a9a'));
+    gyro = [['#f22', '#f00', 0.28], ['#22f', '#00f', -0.28]].map(([c, lueur, x]) => { const p = poser(GEO_V.gyro, new THREE.MeshStandardMaterial({ color: c, emissive: lueur })); p.position.set(x, ...f.gyro); return p; });
   }
-  return { g, roues, gyro };
+  return { g, corps, roues, gyro };
+}
+const typePolice = VOITURES.find(t => t.police) || VOITURES[0];
+function typeAuHasard() { // plus la « chance » d'un type est grande, plus il sort souvent
+  let n = Math.random() * VOITURES.reduce((s, t) => s + t.chance, 0);
+  return VOITURES.find(t => (n -= t.chance) < 0) || VOITURES[0];
 }
 const voitures = [];
-function creerVoiture(x, z, angle, police = false) {
-  const { g, roues, gyro } = modeleVoiture(police ? '#f2f2f2' : hasard(PEINTURES), police);
-  const v = { m: g, roues, gyro, x, z, angle, vitesse: 0, conducteur: null, police, attente: 0, choc: false };
+function creerVoiture(x, z, angle, police = false, type = police ? typePolice : typeAuHasard()) {
+  const forme = MODELES[type.modele], { g, corps, roues, gyro } = modeleVoiture(type, hasard(type.couleurs || PEINTURES), police);
+  // pour les chocs, une voiture est une file de cercles posés le long de son axe : cercles = où ils sont, de l'arrière vers l'avant
+  const rayon = forme.largeur / 2 + 0.12, bout = forme.longueur / 2 + 0.15 - rayon, n = Math.max(2, Math.ceil(bout * 2 / 2.7) + 1);
+  const cercles = Array.from({ length: n }, (_, k) => bout * (2 * k / (n - 1) - 1));
+  const v = { m: g, corps, roues, gyro, type, forme, rayon, cercles, x, z, angle, vitesse: 0, avant: { vitesse: 0, angle }, braque: 0, gaz: 0, conducteur: null, police, attente: 0, choc: false };
   g.traverse(o => o.userData.voiture = v);
   scene.add(g); voitures.push(v);
   return v;
@@ -791,19 +1038,46 @@ const local = (v, lx, lz) => ({ x: v.x + lx * Math.cos(v.angle) + lz * Math.sin(
 // =====================================================================
 //  Sons (fabriqués par le programme)
 // =====================================================================
-let audio = null, bruitBuf, moteur, moteurGain, sirene, sireneGain;
+let audio = null, bruitBuf, moteurs, roulement, crissement, sirene, sireneGain;
 function initAudio() {
   if (audio) return;
   audio = new AudioContext();
   bruitBuf = audio.createBuffer(1, audio.sampleRate, audio.sampleRate);
   const d = bruitBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  moteur = audio.createOscillator(); moteur.type = 'sawtooth';
-  const f = audio.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 500;
-  moteurGain = audio.createGain(); moteurGain.gain.value = 0;
-  moteur.connect(f).connect(moteurGain).connect(audio.destination); moteur.start();
+  moteurs = [creerMoteur(), creerMoteur()];   // le moteur de ta voiture, et celui de la voiture la plus proche
+  // un souffle qui ne s'arrête jamais : grave pour le roulement (avec la vitesse), aigu pour les pneus qui crissent (au frein à main)
+  const souffle = audio.createBufferSource(); souffle.buffer = bruitBuf; souffle.loop = true; souffle.start();
+  const voie = (type, frequence, Q) => { const f = audio.createBiquadFilter(), g = audio.createGain(); f.type = type; f.frequency.value = frequence; f.Q.value = Q; g.gain.value = 0;
+    souffle.connect(f).connect(g).connect(audio.destination); return g.gain; };
+  roulement = voie('lowpass', 350, 0.7); crissement = voie('bandpass', 1500, 5);
   sirene = audio.createOscillator(); sirene.type = 'square';
   sireneGain = audio.createGain(); sireneGain.gain.value = 0;
   sirene.connect(sireneGain).connect(audio.destination); sirene.start();
+}
+// un moteur : deux notes (celle du moteur, et la même une octave plus bas) qui passent dans un filtre
+function creerMoteur() {
+  const m = { notes: [audio.createOscillator(), audio.createOscillator()], filtre: audio.createBiquadFilter(), volume: audio.createGain(), voiture: null };
+  m.filtre.type = 'lowpass'; m.volume.gain.value = 0;
+  for (const n of m.notes) { n.connect(m.filtre); n.start(); }
+  m.filtre.connect(m.volume).connect(audio.destination);
+  return m;
+}
+// le régime du moteur, de 0 (ralenti) à 1 (à fond) : il monte dans chaque rapport, puis retombe quand on passe le suivant
+function regime(v) {
+  const n = v.type.son.rapports, x = Math.min(1, Math.abs(v.vitesse) / v.type.vitesse);
+  for (let k = 1; k < n; k++) { const fin = (k / n) ** 1.5; if (x <= fin) return x / fin; }   // les premiers rapports sont plus courts
+  return x;
+}
+// fait chanter le moteur m comme celui de la voiture v (null = silence). gaz : de 0 à 1, fort : de 0 (loin) à 1 (tout près)
+function reglerMoteur(m, v, gaz, fort) {
+  const t = audio.currentTime;
+  if (!v) { m.volume.gain.setTargetAtTime(0, t, 0.1); return; }
+  const s = v.type.son, r = regime(v), note = s.grave + (s.aigu - s.grave) * r;
+  if (m.voiture !== v) { m.voiture = v; m.notes[0].type = s.petarade ? 'square' : 'sawtooth'; m.notes[1].type = 'sawtooth'; m.filtre.Q.value = 0.7 + s.rauque * 3; }
+  m.notes[0].frequency.setTargetAtTime(note, t, 0.05); m.notes[1].frequency.setTargetAtTime(note * 0.503, t, 0.05);
+  // plus le moteur est rauque, tourne vite et accélère, plus on laisse passer les sons aigus
+  m.filtre.frequency.setTargetAtTime(200 + s.rauque * 900 + r * (400 + s.rauque * 1500) * (0.5 + 0.5 * gaz), t, 0.1);
+  m.volume.gain.setTargetAtTime(s.volume * fort * (0.55 + 0.45 * gaz), t, 0.1);
 }
 function bruit(vol, freq, duree) {
   if (!audio || vol <= 0.01) return;
@@ -830,7 +1104,7 @@ const J = { x: depart.x, z: depart.z, y: 0.2, vy: 0, sol: true, lacet: Math.PI, 
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0 };
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 scene.add(joueurH.g);
-const giletBJ = piece(new THREE.BoxGeometry(0.47, 0.5, 0.28), '#243a5a', joueurH.haut, 0, 0.42, 0); // visible quand il en porte un
+const giletBJ = piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#243a5a', joueurH.haut, 0, 0.4, 0); // visible quand il en porte un
 
 // arme vue en première personne (dessinée par-dessus le reste)
 const vmScene = new THREE.Scene(), vmCamera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.01, 10);
@@ -863,7 +1137,9 @@ addEventListener('resize', () => {
 const PEAUX = ['#f0c8a0', '#e0b090', '#c89060', '#8a5a34', '#5a3a20'];
 const TENUES = {
   pieton: () => ({ peau: hasard(PEAUX), haut: hasard(['#c33', '#36a', '#eee', '#222', '#3a3', '#e90', '#a3a', '#678']),
-    bas: hasard(['#2a3a5a', '#222', '#6a5a40', '#444', '#8a8a8a']), chaussures: hasard(['#222', '#eee', '#6b4423']), cheveux: hasard(['#1a1208', '#3a2a1a', '#8a6a3a', '#d8c080', '#555']) }),
+    bas: hasard(['#2a3a5a', '#222', '#6a5a40', '#444', '#8a8a8a']), chaussures: hasard(['#222', '#eee', '#6b4423']), cheveux: hasard(['#1a1208', '#3a2a1a', '#8a6a3a', '#d8c080', '#555']),
+    // tout le monde n'a pas la même taille, la même carrure, ni la même coiffure
+    taille: entre(0.9, 1.06), carrure: entre(0.9, 1.15), cheveuxLongs: Math.random() < 0.4, manchesCourtes: Math.random() < 0.5, short: Math.random() < 0.25 }),
   flic: () => ({ peau: hasard(PEAUX), haut: '#1d2f5a', bas: '#141e36', chaussures: '#111', casquette: '#141e36' }),
   soldat: () => ({ peau: hasard(PEAUX.slice(0, 2)), haut: '#5d6352', bas: '#4a4f42', chaussures: '#111', casque: '#4a5040', brassard: '#b01010' }),
   boss: () => ({ peau: '#e0b090', haut: '#222', bas: '#111', chaussures: '#000', casquette: '#111', brassard: '#b01010' }),
@@ -873,8 +1149,8 @@ const VIE_PNJ = { pieton: 50, flic: 70, soldat: 90, boss: 450, hitler: 900 };
 const ARME_PNJ = { flic: 2, soldat: 5, boss: 4, hitler: 6 };
 const NAZIS = ['soldat', 'boss', 'hitler'];
 const personnes = [];
-function creerPersonne(type, x, z) {
-  const h = creerHumain(TENUES[type]());
+function creerPersonne(type, x, z, tenue = TENUES[type]()) {
+  const h = creerHumain(tenue);
   if (type === 'boss') h.g.scale.setScalar(1.15);
   const p = { type, h, x, z, angle: Math.random() * 6.28, vie: VIE_PNJ[type], cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
   if (ARME_PNJ[type] !== undefined) donnerArme(h, ARME_PNJ[type]);
@@ -1083,9 +1359,9 @@ function validerTriche() {
 // remet B.J. dans sa tenue normale, puis applique les codes actifs
 function rhabillerBJ() {
   const b = joueurH, T = TENUE_BJ;
-  habiller(b.torse, T.haut); b.torse.clear(); habiller(b.bassin, T.bas); b.bassin.scale.set(1, 1, 1);
-  for (const bras of [b.brasD, b.brasG]) habiller(bras.children[0], T.haut);
-  for (const j of [b.jambeD, b.jambeG]) { habiller(j.children[0], T.bas); j.children[0].scale.set(1, 1, 1); habiller(j.children[1], T.chaussures); j.children[1].visible = true; }
+  habiller(b.torse, T.haut); b.torse.clear(); habiller(b.bassin, T.bas); b.bassin.scale.set(1, 1, 1); b.ceinture.visible = true;
+  for (const bras of [b.brasD, b.brasG]) { habiller(bras.haut, T.haut); habiller(bras.bas, T.manchesCourtes ? T.peau : T.haut); }
+  for (const j of [b.jambeD, b.jambeG]) { habillerMembre(j, T.bas); j.scale.set(1, 1, 1); habiller(j.chaussure, T.chaussures); j.chaussure.visible = true; }
   b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
   for (const t of TRICHES) if (t.actif) t.effet(b);
 }
@@ -1093,7 +1369,7 @@ document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
   saisie = null; $('triche').style.display = 'none';
   enJeu = false; $('menu').style.display = 'flex'; $('etat').textContent = 'Pause — clique pour continuer';
-  ouvrirCarte(false);
+  ouvrirCarte(false); audio?.suspend();
   for (const k in touches) touches[k] = false;
   sourisG = visee = false;
 });
@@ -1107,9 +1383,14 @@ function action() {
   if (J.voiture) { sortirVoiture(); return; }
   const s = standProche();
   if (s) { acheter(s); return; }
-  let v = null, best = 3.5;
-  for (const o of voitures) { const d = dist(o, J); if (d < best && !o.detruite) { best = d; v = o; } }
+  const v = voitureProche();
   if (v) entrerVoiture(v);
+}
+// la voiture dans laquelle on peut monter : la plus proche, si on est à moins de 1,30 m de son bout
+function voitureProche() {
+  let v = null, best = Infinity;
+  for (const o of voitures) { const d = dist(o, J); if (d < best && d < o.forme.longueur / 2 + 1.3 && !o.detruite) { best = d; v = o; } }
+  return v;
 }
 function acheter(s) {
   const a = ARMES[s.arme], possede = J.possede[s.arme], prix = possede ? Math.round(a.prix / 2) : a.prix;
@@ -1121,7 +1402,7 @@ function acheter(s) {
 }
 function entrerVoiture(v) {
   if (v.conducteur) { // on sort le conducteur !
-    const p = local(v, 1.8, 0.3), c = creerPersonne(v.police ? 'flic' : 'pieton', p.x, p.z);
+    const p = local(v, v.rayon + 0.8, 0.3), c = creerPersonne(v.police ? 'flic' : 'pieton', p.x, p.z, v.pilote?.tenue);
     resoudre(c, 0.35);
     if (v.police) c.alerte = true; else c.peur = 8;
     v.conducteur = null;
@@ -1131,7 +1412,7 @@ function entrerVoiture(v) {
 }
 function sortirVoiture() {
   const v = J.voiture;
-  for (const lx of [1.9, -1.9]) {
+  for (const lx of [v.rayon + 0.85, -v.rayon - 0.85]) {
     const p = local(v, lx, 0);
     if (!dansBatiment(p.x, 1, p.z)) { J.x = p.x; J.z = p.z; break; }
   }
@@ -1212,9 +1493,10 @@ function blesser(p, degats, parJoueur = true) {
   if (p.type === 'boss') { creerObjet({ type: 'arme', arme: 4, x: p.x + 1, z: p.z }); creerObjet({ type: 'argent', montant: 1000, x: p.x - 1, z: p.z }); }
   if (p.type === 'hitler') { creerObjet({ type: 'arme', arme: 6, x: p.x + 1, z: p.z }); creerObjet({ type: 'argent', montant: 2000, x: p.x - 1, z: p.z }); }
 }
+const abrite = () => J.voiture && !J.voiture.forme.ouvert;   // une carrosserie protège, pas un tricycle
 function blesserJoueur(degats) {
   if (J.mort) return;
-  const d = degats * (J.voiture ? R_.protectionVoiture : 1), g = Math.min(J.gilet, d); // le gilet prend les dégâts en premier
+  const d = degats * (abrite() ? R_.protectionVoiture : 1), g = Math.min(J.gilet, d); // le gilet prend les dégâts en premier
   J.gilet -= g; J.vie -= d - g;
   J.dernierDegat = temps;
   $('rouge').style.opacity = 0.9;
@@ -1249,9 +1531,9 @@ function majJoueur(dt) {
   J.vy -= R_.gravite * dt; J.y += J.vy * dt;
   if (J.y <= hs) { J.y = hs; J.vy = 0; J.sol = true; }
   resoudre(J, 0.35);
-  for (const o of voitures) for (const lz of [1.3, -1.3]) { // on ne traverse pas les voitures
-    const c = local(o, 0, lz), d = dist(c, J);
-    if (d < 1.4 && d > 0) { J.x = c.x + (J.x - c.x) / d * 1.4; J.z = c.z + (J.z - c.z) / d * 1.4; }
+  for (const o of voitures) for (const lz of o.cercles) { // on ne traverse pas les voitures
+    const c = local(o, 0, lz), d = dist(c, J), r = o.rayon + 0.35;
+    if (d < r && d > 0) { J.x = c.x + (J.x - c.x) / d * r; J.z = c.z + (J.z - c.z) / d * r; }
   }
   // orientation du corps : vers la caméra avec une arme à feu, sinon vers où on marche
   if (!ARMES[J.arme].corps || visee || J.vue === 1) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
@@ -1261,28 +1543,39 @@ function majJoueur(dt) {
 }
 function conduire(v, dt) {
   const gaz = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), volant = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
-  if (gaz > 0) v.vitesse += R_.accelerationVoiture * dt * (v.vitesse < 0 ? 2.5 : 1);
-  else if (gaz < 0) v.vitesse -= R_.accelerationVoiture * dt * (v.vitesse > 0 ? 2.5 : 0.6);
+  const t = v.type;
+  if (gaz > 0) v.vitesse += t.acceleration * dt * (v.vitesse < 0 ? 2.5 : 1);
+  else if (gaz < 0) v.vitesse -= t.acceleration * dt * (v.vitesse > 0 ? 2.5 : 0.6);
   else v.vitesse *= Math.pow(0.6, dt);
   if (touches.Space) v.vitesse *= Math.pow(0.05, dt); // frein à main
-  v.vitesse = clamp(v.vitesse, -10, R_.vitesseMaxVoiture);
-  const braquage = clamp(Math.abs(v.vitesse) / 6, 0, 1) * (1 - Math.abs(v.vitesse) / R_.vitesseMaxVoiture * 0.5) * Math.sign(v.vitesse);
-  v.angle -= volant * 1.9 * braquage * dt * (touches.Space ? 1.6 : 1);
+  v.vitesse = clamp(v.vitesse, -10, t.vitesse);
+  v.gaz = gaz * Math.sign(v.vitesse || gaz) > 0 ? 1 : 0;   // on accélère (pour le bruit du moteur) : pas quand on freine
+  const braquage = clamp(Math.abs(v.vitesse) / 6, 0, 1) * (1 - Math.abs(v.vitesse) / t.vitesse * 0.5) * Math.sign(v.vitesse);
+  v.angle -= volant * 1.9 * t.virage * braquage * dt * (touches.Space ? 1.6 : 1);
+  v.braque = -volant * 0.45;
   bougerVoiture(v, dt, true);
   J.x = v.x; J.z = v.z; J.vitesse = Math.abs(v.vitesse);
+  if (v.forme.siege) { // sur un tricycle, on voit B.J. assis au guidon
+    J.y = hauteurSol(v.x, v.z);
+    const p = local(v, 0, v.forme.siege[1]);
+    joueurH.g.position.set(p.x, J.y + v.forme.siege[0] - 0.95, p.z); joueurH.g.rotation.y = v.angle;
+    animerHumain(joueurH, 0, dt, { assis: true });
+  }
   if (temps - J.dernierMouvement > 1.5) { J.decalage *= Math.pow(0.1, dt); J.tangage += (-0.12 - J.tangage) * Math.min(1, dt * 2); }
 }
 function bougerVoiture(v, dt, parJoueur) {
   v.x += Math.sin(v.angle) * v.vitesse * dt; v.z += Math.cos(v.angle) * v.vitesse * dt;
   let choc = false;
-  for (const lz of [1.3, -1.3]) {
+  for (const lz of v.cercles) {
     const c = local(v, 0, lz), avant = { ...c };
-    if (resoudre(c, 1.05)) { v.x += c.x - avant.x; v.z += c.z - avant.z; choc = true; }
+    if (resoudre(c, v.rayon)) { v.x += c.x - avant.x; v.z += c.z - avant.z; choc = true; }
   }
   for (const o of voitures) {
-    if (o === v) continue;
-    const d = dist(o, v);
-    if (d < 2.6 && d > 0) { v.x = o.x + (v.x - o.x) / d * 2.6; v.z = o.z + (v.z - o.z) / d * 2.6; choc = true; }
+    if (o === v || dist(o, v) > (v.forme.longueur + o.forme.longueur) / 2 + 1) continue;
+    for (const lz of v.cercles) for (const oz of o.cercles) { // chaque cercle de la voiture contre chaque cercle de l'autre
+      const a = local(v, 0, lz), b = local(o, 0, oz), d = dist(a, b), r = v.rayon + o.rayon;
+      if (d < r && d > 0) { v.x += (a.x - b.x) / d * (r - d); v.z += (a.z - b.z) / d * (r - d); choc = true; }
+    }
   }
   if (choc) {
     if (!v.choc && Math.abs(v.vitesse) > 6) { bruit(Math.min(0.8, Math.abs(v.vitesse) / 30), 500, 0.35); v.vitesse *= 0.35; }
@@ -1290,8 +1583,7 @@ function bougerVoiture(v, dt, parJoueur) {
   }
   v.choc = choc;
   if (parJoueur && Math.abs(v.vitesse) > 4) { // on renverse les piétons
-    const avant = local(v, 0, Math.sign(v.vitesse) * 1.6);
-    for (const p of personnes) if (p.vie > 0 && (dist(p, avant) < 1.3 || dist(p, v) < 1.4)) blesser(p, 200);
+    for (const p of personnes) if (p.vie > 0 && v.cercles.some(lz => dist(p, local(v, 0, lz)) < v.rayon + 0.4)) blesser(p, 200);
   }
 }
 
@@ -1351,7 +1643,7 @@ function tirEnnemi(p, d) {
   let chance = R_.precisionEnnemis * clamp(1.2 - d / 50, 0.2, 1);
   if (J.accroupi) chance *= 0.5;
   if (J.vitesse > 6) chance *= 0.6;
-  if (J.voiture) chance *= 0.7;
+  if (abrite()) chance *= 0.7;
   const reussi = Math.random() < chance;
   p.h.g.updateMatrixWorld(true);
   const depart = boutDuCanon(p.h, new THREE.Vector3());
@@ -1382,13 +1674,14 @@ function majVoitureIA(v, dt) {
   const r = v.route;
   if (v.police && dist(v, J) < 30) { // arrivés : les policiers descendent
     v.conducteur = null;
-    for (const lx of [1.9, -1.9]) { const p = local(v, lx, 0), f = creerPersonne('flic', p.x, p.z); f.renfort = true; resoudre(f, 0.35); }
+    for (const lx of [v.rayon + 0.85, -v.rayon - 0.85]) { const p = local(v, lx, 0), f = creerPersonne('flic', p.x, p.z); f.renfort = true; resoudre(f, 0.35); }
     return;
   }
   const fx = Math.sin(v.angle), fz = Math.cos(v.angle);
   const devant = (o, portee, largeur) => { const dx = o.x - v.x, dz = o.z - v.z, a = dx * fx + dz * fz; return a > 0 && a < portee && Math.abs(dx * fz - dz * fx) < largeur; };
-  let bloque = voitures.some(o => o !== v && devant(o, 9, 2));
-  if (!v.police) bloque ||= (!J.voiture && devant(J, 7, 1.6)) || personnes.some(p => p.vie > 0 && devant(p, 7, 1.6));
+  const nez = v.forme.longueur / 2;   // les distances sont comptées depuis le milieu de la voiture : on ajoute sa demi-longueur
+  let bloque = voitures.some(o => o !== v && devant(o, 4.6 + nez + o.forme.longueur / 2, 2));
+  if (!v.police) bloque ||= (!J.voiture && devant(J, 4.8 + nez, 1.6)) || personnes.some(p => p.vie > 0 && devant(p, 4.8 + nez, 1.6));
   v.attente = bloque ? v.attente + dt : 0;
   if (v.attente > 5) { // bloquée trop longtemps : demi-tour
     v.attente = 0;
@@ -1396,13 +1689,14 @@ function majVoitureIA(v, dt) {
     v.route = { i: r.i + dx, j: r.j + dz, d: (r.d + 2) % 4, t: PAS - r.t };
     return;
   }
-  const cible = bloque ? 0 : v.police ? R_.vitessePolice : R_.vitesseCirculation;
+  const cible = bloque ? 0 : Math.min(v.type.vitesse, v.police ? R_.vitessePolice : R_.vitesseCirculation);
   v.vitesse += clamp(cible - v.vitesse, -25 * dt, 8 * dt);
   for (let k = 0; k < 40 && dist(v, pointRoute(r, r.t)) < 6; k++) {
     r.t += 0.5;
     if (r.t >= PAS) { r.i += DIRS[r.d][0]; r.j += DIRS[r.d][1]; r.t -= PAS; r.d = choisirDirection(v, r.i, r.j, r.d); }
   }
   const c = pointRoute(r, r.t);
+  v.braque = clamp(diffAngle(v.angle, angleVers(v, c)), -0.45, 0.45);
   v.angle += clamp(diffAngle(v.angle, angleVers(v, c)), -0.3 * v.vitesse * dt, 0.3 * v.vitesse * dt);
   v.x += Math.sin(v.angle) * v.vitesse * dt; v.z += Math.cos(v.angle) * v.vitesse * dt;
 }
@@ -1413,7 +1707,22 @@ function majVoiture(v, dt) {
   if (v === J.voiture) {}
   else if (v.conducteur) majVoitureIA(v, dt);
   else if (Math.abs(v.vitesse) > 0.05) { v.vitesse *= Math.pow(0.3, dt); bougerVoiture(v, dt, false); }
-  for (const r of v.roues) r.children[0].rotation.x = r.children[1].rotation.x += v.vitesse * dt / 0.36;
+  if (!v.conducteur && v !== J.voiture) v.braque = 0;
+  for (const r of v.roues) { r.tourne.rotation.x += v.vitesse * dt / v.forme.roue; if (r.avant) r.pivot.rotation.y += (v.braque - r.pivot.rotation.y) * Math.min(1, dt * 8); }
+  // la carrosserie pique du nez quand on freine, se cabre quand on accélère et penche dans les virages
+  if (dt > 0) {
+    const k = Math.min(1, dt * 6), pousse = (v.vitesse - v.avant.vitesse) / dt, virage = diffAngle(v.avant.angle, v.angle) / dt * v.vitesse;
+    v.corps.rotation.x += (clamp(-pousse * 0.003, -0.05, 0.05) - v.corps.rotation.x) * k;
+    v.corps.rotation.z += (clamp(virage * 0.004, -0.07, 0.07) - v.corps.rotation.z) * k;
+  }
+  v.avant = { vitesse: v.vitesse, angle: v.angle };
+  if (v.forme.siege && !v.pilote !== !v.conducteur) { // un tricycle qui roule tout seul montre son pilote
+    if (v.conducteur) {
+      v.pilote = creerHumain(TENUES.pieton());
+      v.pilote.g.position.set(0, v.forme.siege[0] - 0.95, v.forme.siege[1]); v.pilote.g.traverse(o => o.userData.voiture = v);
+      animerHumain(v.pilote, 0, 0, { assis: true }); v.corps.add(v.pilote.g);
+    } else { v.corps.remove(v.pilote.g); v.pilote = null; }
+  }
   v.m.position.set(v.x, hauteurSol(v.x, v.z), v.z); v.m.rotation.y = v.angle;
   if (v.conducteur === 'civil' && d > 280) v.supprimer = true;
   if (v.police && v.renfort && !v.conducteur && v !== J.voiture && d > 150) v.supprimer = true;
@@ -1527,16 +1836,17 @@ function majCamera(dt) {
   const v = J.voiture;
   J.lacetCam = v ? v.angle + J.decalage : J.lacet;
   const dir = new THREE.Vector3(Math.sin(J.lacetCam) * Math.cos(J.tangage), Math.sin(J.tangage), Math.cos(J.lacetCam) * Math.cos(J.tangage));
-  joueurH.g.visible = !v && J.vue !== 1;
+  joueurH.g.visible = (!v || !!v.forme.siege) && J.vue !== 1;   // en voiture on ne voit pas B.J., sauf sur un tricycle
   if (J.mort) {
-    joueurH.g.visible = !v;
+    joueurH.g.visible = !v || !!v.forme.siege;
     placerCamera(new THREE.Vector3(J.x, J.y + 0.5, J.z), new THREE.Vector3(0.3, -0.9, 0.3).normalize(), 5, 0);
     camera.lookAt(J.x, J.y, J.z);
     return;
   }
   if (v) {
-    if (J.vue === 1) { const p = local(v, 0.4, 0.1); camera.position.set(p.x, 1.25, p.z); }
-    else placerCamera(new THREE.Vector3(v.x, 1.8, v.z), dir, 8 + Math.abs(v.vitesse) * 0.08, 0);
+    const [ox, oy, oz] = v.forme.oeil;
+    if (J.vue === 1) { const p = local(v, ox, oz); camera.position.set(p.x, hauteurSol(v.x, v.z) + oy, p.z); }
+    else placerCamera(new THREE.Vector3(v.x, v.forme.hauteur + 0.35, v.z), dir, v.forme.longueur + 3.6 + Math.abs(v.vitesse) * 0.08, 0); // plus la voiture est grande, plus on recule
   } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
   else placerCamera(new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z), dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
   camera.rotation.set(J.tangage + J.recul * 0.03, J.lacetCam + Math.PI, 0);
@@ -1605,9 +1915,9 @@ const gctx = $('grande-carte').getContext('2d');
 const zoomMin = () => Math.min(innerWidth / (TAILLE_X + 2 * MARGE), innerHeight / (TAILLE_Z + 2 * MARGE)); // toute la ville tient à l'écran
 function ouvrirCarte(ouvrir) {
   carte.ouverte = ouvrir; $('grande-carte').style.display = ouvrir ? 'block' : 'none';
+  if (audio) { if (ouvrir) audio.suspend(); else audio.resume(); }   // pas de bruit de moteur pendant la pause
   if (!ouvrir) return;
   carte.zoom = zoomMin(); carte.x = J.x; carte.z = J.z; // on voit toute la ville ; en zoomant, on arrive sur le joueur
-  if (audio) moteurGain.gain.value = sireneGain.gain.value = 0;
 }
 function centreCarte() { // le point de la ville au milieu de l'écran (on ne sort pas de la ville)
   const borne = (v, demi, taille) => demi * 2 >= taille + 2 * MARGE ? taille / 2 : clamp(v, demi - MARGE, taille + MARGE - demi);
@@ -1662,8 +1972,8 @@ function majHUD(dt) {
   $('viseur').style.display = !J.voiture && !J.mort && !dansLunette() && (J.vue === 1 || visee || !a.corps) ? 'block' : 'none';
   $('vitesse').style.display = J.voiture ? 'block' : 'none';
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h`;
-  const s = standProche(), v = !J.voiture && voitures.some(o => dist(o, J) < 3.5 && !o.detruite);
-  const aide = J.voiture ? '' : s ? `Appuie sur <b>E</b> pour acheter : ${ARMES[s.arme].nom} (${J.possede[s.arme] ? `munitions ${Math.round(ARMES[s.arme].prix / 2)}` : ARMES[s.arme].prix} $)` : v ? 'Appuie sur <b>E</b> pour monter dans la voiture' : '';
+  const s = standProche(), v = !J.voiture && voitureProche();
+  const aide = J.voiture ? '' : s ? `Appuie sur <b>E</b> pour acheter : ${ARMES[s.arme].nom} (${J.possede[s.arme] ? `munitions ${Math.round(ARMES[s.arme].prix / 2)}` : ARMES[s.arme].prix} $)` : v ? `Appuie sur <b>E</b> pour monter : ${v.type.nom}` : '';
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
@@ -1716,10 +2026,14 @@ function mettreAJour(dt) {
   for (let k = voitures.length - 1; k >= 0; k--) if (voitures[k].supprimer && voitures[k] !== J.voiture) { scene.remove(voitures[k].m); voitures.splice(k, 1); }
   for (let k = objets.length - 1; k >= 0; k--) if (objets[k].supprimer) { scene.remove(objets[k].m); objets.splice(k, 1); }
   for (let k = effets.length - 1; k >= 0; k--) if (effets[k].vie <= 0) effets.splice(k, 1);
-  // sons de moteur et de sirène
+  // sons : ton moteur, celui de la voiture qui passe le plus près, le roulement, les pneus et la sirène
   if (audio) {
-    moteurGain.gain.value = J.voiture ? 0.06 : 0;
-    if (J.voiture) moteur.frequency.value = 45 + Math.abs(J.voiture.vitesse) * 4;
+    const v = J.voiture, t = audio.currentTime;
+    reglerMoteur(moteurs[0], v, v?.gaz, 1);
+    let proche = null, d = 40; for (const o of voitures) if (o !== v && o.conducteur && dist(o, J) < d) { d = dist(o, J); proche = o; }
+    reglerMoteur(moteurs[1], proche, 0.4, (1 - d / 40) ** 2 * 0.7);
+    roulement.setTargetAtTime(v ? Math.min(0.07, Math.abs(v.vitesse) * 0.002) : 0, t, 0.1);
+    crissement.setTargetAtTime(v && touches.Space && Math.abs(v.vitesse) > 6 ? 0.05 : 0, t, 0.05);
     let dp = Infinity; for (const v of voitures) if (v.police && v.conducteur) dp = Math.min(dp, dist(v, J));
     sireneGain.gain.value = dp < 180 ? 0.035 * (1 - dp / 180) : 0;
     sirene.frequency.value = Math.sin(temps * 5) > 0 ? 700 : 950;
@@ -1756,7 +2070,7 @@ majJoueur(0);
 requestAnimationFrame(boucle);
 $('etat').textContent = 'Clique pour jouer';
 // pour les tests automatiques
-window.jeu = { J, carte, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
+window.jeu = { J, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; } };
 </script>
 </body>

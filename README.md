@@ -32,7 +32,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 - **Vie** : elle remonte toute seule si on n'est pas touché pendant 5 secondes. Les trousses de soin rendent 50 points. En voiture, on prend beaucoup moins de dégâts.
 - **Gilet pare-balles** : il prend les dégâts à la place de ta vie (barre bleue). Il y en a un à l'armurerie, un dans le bunker et un dans le château.
 - **Police** : faire des bêtises donne des étoiles (jusqu'à 5). À partir de 2 étoiles, la police arrive en voiture. Reste 12 secondes hors de sa vue pour perdre une étoile.
-- **Voitures** : elles circulent en ville. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler.
+- **Voitures** : elles circulent en ville. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler. Il y en a 6 types, chacun avec sa vitesse et son bruit de moteur : la classique, la Porsche (180 km/h !), le minibus, le gros 4x4 du désert, la limousine et le tricycle. Attention : sur le tricycle, rien ne te protège des balles.
 - **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse. La dernière mission t'envoie au château Wolfenstein (W rouge sur la mini-carte) pour éliminer Hitler.
 - **Carte** : la touche M affiche toute la ville en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), l'armurerie, l'hôpital, le bunker et le château.
 - **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`… à toi de voir ce qu'ils font ! Retape un code pour l'annuler.
@@ -42,9 +42,10 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 
 Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier :
 
-1. **`REGLAGES`** : vitesses, vie, dégâts des ennemis, nombre de voitures et de piétons… Si le jeu rame, mets `ombres: false`.
+1. **`REGLAGES`** : vitesses à pied, vie, dégâts des ennemis, nombre de voitures et de piétons… Si le jeu rame, mets `ombres: false`.
 2. **`ARMES`** : dégâts, cadence de tir, prix, munitions de chaque arme, rayon d'explosion du bazooka, zoom de la lunette du fusil de sniper.
-3. **`CARTE`** : chaque lettre est un pâté de maisons, les routes sont ajoutées toutes seules. Toutes les lignes doivent avoir la même longueur.
+3. **`VOITURES`** : vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de voiture, et la chance de la croiser. Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
+4. **`CARTE`** : chaque lettre est un pâté de maisons, les routes sont ajoutées toutes seules. Toutes les lignes doivent avoir la même longueur.
 
    | Lettre | Pâté de maisons |
    |---|---|
@@ -60,7 +61,7 @@ Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier
    | `X` | Départ du joueur |
    | `a` `b` `c`… | Lieux de mission |
 
-4. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture`, `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`.
-5. **`TRICHES`** : renomme les codes ou invente les tiens.
+5. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture`, `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`.
+6. **`TRICHES`** : renomme les codes ou invente les tiens.
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).

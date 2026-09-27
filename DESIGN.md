@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (fusil de sniper à lunette, vendu à l'armurerie).
+Mis à jour le 27 septembre 2026 (6 types de véhicules, personnages articulés, bruits de moteur ; fusil de sniper à lunette).
 
 ## Vision
 
@@ -10,7 +10,7 @@ GTAxel est un jeu d'action en 3D, en monde ouvert, qui se joue dans le navigateu
 
 - **Liberté** : dès le départ, on va où on veut, à pied ou en voiture volée. Les missions sont un fil conducteur, pas un couloir.
 - **Pardonnant** : les ennemis visent mal, la vie remonte toute seule et la mort ne coûte que 100 $. On doit pouvoir faire des bêtises sans être puni trop vite.
-- **Bidouillable** : tout tient dans un seul fichier `index.html`. Les réglages, les armes, la carte et les missions sont des tableaux commentés en français, en haut du fichier. On voit une modification en appuyant sur F5.
+- **Bidouillable** : tout tient dans un seul fichier `index.html`. Les réglages, les armes, les voitures, la carte et les missions sont des tableaux commentés en français, en haut du fichier. On voit une modification en appuyant sur F5.
 - **Zéro installation** : un double-clic ou un lien suffit, pourvu qu'on ait Internet. En ligne : [jlehen.github.io/GTAxel](https://jlehen.github.io/GTAxel/).
 
 Pas de sang ni de gore : les personnages touchés tombent au sol. Pas de croix gammée non plus : les nazis se reconnaissent à leur uniforme, leur casque allemand et leur brassard rouge, et leurs bannières portent un W pour Wolfenstein.
@@ -29,7 +29,7 @@ flowchart LR
   P --> W[WASTED<br>la vie tombe à 0] --> H[Réveil à l'hôpital<br>-100 $, plus d'étoiles] --> E
 ```
 
-Une partie commence à pied, sans argent, avec les poings et un couteau. Le héros, B.J. Blazkowicz, a les cheveux blonds courts, un maillot blanc et un pantalon militaire. Il n'y a pas de fin : après la 6e mission, la ville reste libre.
+Une partie commence à pied, sans argent, avec les poings et un couteau. Le héros, B.J. Blazkowicz, a les cheveux blonds courts, un maillot blanc à manches courtes et un pantalon militaire. Il n'y a pas de fin : après la 6e mission, la ville reste libre.
 
 ### Contrôles
 
@@ -65,7 +65,7 @@ Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W
 - **3e personne (par défaut)** : caméra 3,8 m derrière l'épaule droite. En visant, elle se rapproche à 1,8 m et le champ de vision passe de 70° à 45°. Elle avance quand un mur la gêne.
 - **1re personne (V)** : l'arme est dessinée par-dessus la scène, avec balancement et recul.
 - **Lunette du fusil de sniper** : en visant, le champ de vision passe à 14° (70° divisé par le `zoom` de l'arme, qui vaut 5). L'écran devient noir autour d'un rond, avec deux traits noirs en croix. La souris est 5 fois plus douce, pour viser finement. L'arme en 1re personne n'est plus dessinée. En 3e personne, la caméra reste derrière l'épaule, et le noir cache B.J.
-- **En voiture** : caméra 8 m derrière, qui recule avec la vitesse et se recale seule après 1,5 s sans bouger la souris.
+- **En voiture** : caméra 8 m derrière une voiture classique, 11 m derrière une limousine, 6 m derrière un tricycle. Elle recule avec la vitesse et se recale seule après 1,5 s sans bouger la souris. En vue intérieure (V), les yeux sont à la place du conducteur.
 - **Mort** : vue plongeante sur le corps pendant 3,5 s.
 
 ## Le monde
@@ -124,9 +124,9 @@ Seuls les environs du joueur sont vivants. Piétons et voitures apparaissent hor
 | Disparaissent au-delà de | 200 m | 280 m |
 | Vitesse | 1,4 m/s | 11 m/s (40 km/h) |
 
-- **Piétons** : ils vont de coin en coin sur les trottoirs et traversent aux passages piétons (30 % de chances à chaque coin). Ils s'enfuient pendant 8 s si on tire à moins de 40 m ou si on les frappe.
-- **Voitures** : elles roulent sur la voie de droite et choisissent leur direction à chaque carrefour (60 % tout droit). Elles s'arrêtent devant un obstacle, et font demi-tour après 5 s bloquées.
-- **Voitures garées** : 49 au départ, prêtes à être volées.
+- **Piétons** : ils vont de coin en coin sur les trottoirs et traversent aux passages piétons (30 % de chances à chaque coin). Ils s'enfuient pendant 8 s si on tire à moins de 40 m ou si on les frappe. Ils n'ont pas tous la même taille (10 % de moins à 6 % de plus que B.J.), ni la même carrure. 4 sur 10 ont les cheveux longs, la moitié des manches courtes, 1 sur 4 un short.
+- **Voitures** : elles roulent sur la voie de droite et choisissent leur direction à chaque carrefour (60 % tout droit). Elles s'arrêtent devant un obstacle, et font demi-tour après 5 s bloquées. Le type de chaque voiture est tiré au sort (voir « Véhicules »).
+- **Voitures garées** : 49 au départ, prêtes à être volées. Leur type est tiré au sort de la même façon.
 
 ## Combat et armes
 
@@ -164,6 +164,8 @@ Il y a 8 armes, dont 2 au départ (poings et couteau). Le pistolet, la mitraille
 | Hitler (boss final) | 900 | bazooka | 23 (9 à la tête) | Le bazooka et 2 000 $ |
 
 Les corps disparaissent au bout de 15 s.
+
+Un personnage a un visage (yeux, sourcils, bouche, nez, oreilles), des coudes et des genoux. Ses genoux se plient quand il marche, quand il s'accroupit et quand il s'assoit sur un tricycle. Plus il va vite, plus ses coudes sont pliés et plus il se penche en avant.
 
 ### Le joueur
 
@@ -229,18 +231,36 @@ La sirène s'entend à moins de 180 m d'une voiture de police en route, et les p
 
 ## Véhicules
 
-Toutes les voitures se volent, garées ou en circulation, police comprise. Il suffit d'appuyer sur E à moins de 3,5 m. Si quelqu'un conduit, il est éjecté : un civil s'enfuit, un policier attaque.
+Tous les véhicules se volent, garés ou en circulation, police comprise. Il suffit d'appuyer sur E à moins de 1,30 m du bout du véhicule (3,50 m de son milieu pour une voiture classique). Si quelqu'un conduit, il est éjecté : un civil s'enfuit, un policier attaque.
+
+### Les types de véhicules
+
+Il y a 6 types, plus la voiture de police. Ils sont décrits dans le tableau `VOITURES`, en haut de `index.html`.
+
+| Type | Vitesse maximale | 0 à 100 km/h | Virage | Chance | Taille (long. × larg. × haut.) | Couleurs | Signes particuliers |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Classique | 115 km/h (32 m/s) | 2,0 s | 1 | 6 | 4,4 × 1,8 × 1,45 m | les 10 | Berline à 4 portes, pare-chocs chromés |
+| Porsche | 180 km/h (50 m/s) | 1,3 s | 1,2 | 2 | 4,3 × 1,9 × 1,28 m | rouge, jaune, gris, noir, bleu | Basse, phares ronds, aileron, 2 pots d'échappement |
+| Minibus | 90 km/h (25 m/s) | jamais | 0,8 | 3 | 5 × 1,95 × 2,1 m | 5 couleurs vives | Haut couleur crème, phares ronds, 4 vitres de chaque côté |
+| 4x4 du désert | 108 km/h (30 m/s) | 1,7 s | 0,9 | 2 | 4,8 × 2,05 × 2 m | sable, kaki | Grosses roues, pare-buffle, galerie avec jerricans, roue de secours, 4 projecteurs |
+| Limousine | 101 km/h (28 m/s) | 2,7 s | 0,6 | 1 | 7,4 × 1,85 × 1,45 m | noir, blanc | Très longue, 4 vitres de chaque côté, baguettes chromées |
+| Tricycle | 72 km/h (20 m/s) | jamais | 1,4 | 1 | 2,5 × 1,3 × 1,25 m | les 10 | Moto à 3 roues : on voit le pilote, et rien ne le protège |
+| Voiture de police | 115 km/h (32 m/s) | 2,0 s | 1 | 0 | 4,4 × 1,8 × 1,45 m | blanc | Classique avec bande bleue et gyrophares |
+
+- **Chance** : sur 15 véhicules tirés au sort, il y a en moyenne 6 classiques, 3 minibus, 2 Porsche, 2 4x4, 1 limousine et 1 tricycle. La voiture de police n'est jamais tirée au sort : elle n'arrive que quand on est recherché.
+- **Virage** : 1 = comme la classique. Le tricycle tourne sec, la limousine très large.
+- Les vitesses et les temps du tableau ont été mesurés en ligne droite, pied au plancher.
+- En circulation, tout le monde roule à 40 km/h.
 
 ### Conduite
 
 | Caractéristique | Valeur |
 | --- | --- |
-| Vitesse maximale | 115 km/h (32 m/s) |
 | Marche arrière | 36 km/h |
-| 0 à 100 km/h | environ 2 s |
 | Freinage | 2,5 fois plus fort que l'accélération |
 
 - La direction ne répond pas à l'arrêt. Elle est la plus vive vers 20 km/h, puis deux fois moins à pleine vitesse.
+- Les roues avant braquent quand on tourne. La carrosserie pique du nez au freinage, se cabre à l'accélération et penche dans les virages (4° au plus).
 - Le frein à main (Espace) freine fort et serre le virage.
 - Contre un mur ou une autre voiture, au-dessus de 22 km/h, il y a un bruit de choc et la voiture perd 65 % de sa vitesse.
 - En descendant, le joueur sort du côté qui n'est pas contre un mur. La voiture continue sur son élan puis s'arrête.
@@ -248,6 +268,8 @@ Toutes les voitures se volent, garées ou en circulation, police comprise. Il su
 ### Protection
 
 En voiture, le joueur ne prend que 40 % des dégâts, et les ennemis le touchent 30 % moins souvent. En contrepartie, on ne peut pas tirer depuis une voiture.
+
+Le tricycle n'a pas de carrosserie : il ne protège pas. On y prend les mêmes dégâts qu'à pied, et on ne peut pas tirer non plus.
 
 ### Explosions
 
@@ -260,7 +282,7 @@ Une voiture explose quand une roquette explose à côté d'elle (6 m pour celle 
 
 ### Ce que les voitures ne font pas (encore)
 
-Les balles ne les abîment pas. Il n'y a qu'un seul modèle, en 10 couleurs, plus la version police avec gyrophares. Ce modèle a une carrosserie arrondie, un pare-brise et des vitres inclinés, des pare-chocs et des rétroviseurs.
+Les balles ne les abîment pas. Les portes ne s'ouvrent pas. On ne voit personne dans les voitures fermées : seul le pilote d'un tricycle est visible. Il n'y a pas de klaxon, et les feux arrière ne s'allument pas plus fort au freinage.
 
 ## Missions et progression
 
@@ -339,7 +361,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Haut droite | Argent | En gros chiffres verts |
 | Haut droite | Étoiles | 5 étoiles, qui clignotent en bleu quand la police voit le joueur |
 | Haut droite | Arme et munitions | Nom de l'arme, nombre de balles ou de roquettes |
-| Haut gauche | Aide | « Appuie sur E pour… » près d'une voiture ou d'un stand |
+| Haut gauche | Aide | « Appuie sur E pour… » près d'un stand ou d'un véhicule, avec son nom (« monter : Porsche ») |
 | Bas centre | Objectif | Texte de l'étape de mission en cours |
 | Centre | Viseur | Un point blanc, avec une arme à feu, en visant ou en 1re personne. Caché dans la lunette |
 | Plein écran | Lunette | Un rond avec deux traits en croix et du noir autour, en visant avec le fusil de sniper. Le reste de l'écran (mini-carte, argent) s'affiche par-dessus |
@@ -367,31 +389,46 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 
 - **Armes** : chaque arme à feu a son propre coup de feu. Les tirs ennemis s'entendent moins fort de loin.
 - **Explosions** : un gros boum grave, plus faible de loin.
-- **Voiture** : moteur dont le son monte avec la vitesse, bruit de choc.
+- **Moteur** : chaque type de véhicule a le sien (tableau ci-dessous). Le son monte dans chaque rapport, puis retombe quand on passe le suivant. Il est plus fort et plus clair quand on accélère que quand on lève le pied.
+- **Voitures des autres** : on entend le moteur de la voiture qui roule le plus près, à moins de 40 m.
+- **Roulement et pneus** : un souffle grave qui monte avec la vitesse, un crissement au frein à main au-dessus de 22 km/h, un bruit de choc.
+- **Pause** : le menu et la grande carte coupent tous les sons.
 - **Police** : sirène à deux tons, plus forte quand la voiture approche.
 - **Signaux** : bips pour un achat, un objet ramassé, une étape réussie, une blessure, la mort.
+
+| Type | Note au ralenti | Note à fond | Rapports | Rauque (0 à 1) | Volume | Caractère |
+| --- | --- | --- | --- | --- | --- | --- |
+| Classique | 50 Hz | 190 Hz | 4 | 0,3 | 0,05 | Moteur ordinaire |
+| Porsche | 75 Hz | 340 Hz | 6 | 0,9 | 0,06 | Aigu, il hurle |
+| Minibus | 38 Hz | 125 Hz | 4 | 0,5 | 0,05 | Grave, il pétarade |
+| 4x4 du désert | 30 Hz | 130 Hz | 4 | 0,7 | 0,07 | Très grave et fort |
+| Limousine | 40 Hz | 140 Hz | 5 | 0,1 | 0,04 | Feutré |
+| Tricycle | 45 Hz | 260 Hz | 3 | 1 | 0,04 | Mobylette |
+| Voiture de police | 50 Hz | 210 Hz | 4 | 0,4 | 0,05 | Comme la classique, un peu plus aigu |
 
 Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed pour le texte (Google Fonts).
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 760 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 2 080 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–105 | HTML et CSS | Interface et menu |
-| 107–228 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
-| 229–316 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel et nuages |
-| 317–410 | Textures | Façades, vitres, routes, feuilles et pierres du château dessinées par le programme ; relief et reflets |
-| 411–649 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, arbres, murs invisibles |
-| 650–823 | Personnages, voitures, sons | Modèles en formes simples arrondies, animations, sons synthétisés |
-| 824–1297 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
-| 1298–1479 | Intelligence | Piétons, nazis, circulation, police |
-| 1480–1546 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
-| 1547–1673 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1674–1763 | Boucle principale | Mise à jour et affichage de chaque image |
+| 107–255 | **Zones à modifier** | `REGLAGES`, `ARMES`, `VOITURES`, `CARTE`, `MISSIONS`, `TRICHES` |
+| 256–343 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel et nuages |
+| 344–455 | Textures | Façades, vitres, routes, feuilles, pierres du château, jantes, plaques et visages dessinés par le programme ; relief et reflets |
+| 456–694 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, arbres, murs invisibles |
+| 695–807 | Personnages | Corps articulés, animations, armes en 3D |
+| 808–1037 | Voitures | Outils pour fabriquer les pièces, forme des 6 modèles (`MODELES`), carrosserie, cabine, roues |
+| 1038–1097 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés |
+| 1098–1589 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1590–1788 | Intelligence | Piétons, nazis, circulation, police |
+| 1789–1856 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
+| 1857–1983 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1984–2077 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -409,25 +446,30 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 
 - **Rendu** : ciel physique avec nuages, tone mapping ACES (exposition 0,5), ombres douces, reflets du ciel sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui. Les éclairs de tir, les traits des balles, les flammes et les boules de feu sont dessinés à pleine lumière, sans passer par l'exposition (`toneMapped: false`).
 - **Textures** : chaque texture est dessinée deux fois plus fin qu'avant, sur 512 points de côté pour la plupart. Le même dessin sert de relief : le clair ressort, le foncé se creuse. Chaque façade a un second dessin, invisible, qui dit où ça brille : les murs sont mats, les vitres sont des miroirs.
-- **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : 50 à 320 appels de dessin et environ 240 000 triangles par image, dont plus de la moitié pour les 327 arbres. Dessiner les ombres en demande autant de plus. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
-- **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
+- **Personnages** : le torse, les bras et les jambes sont des formes faites « au tour », comme des vases. Chaque morceau de bras ou de jambe finit par une boule de la taille de la boule du morceau suivant : le coude et le genou ne se voient pas. Le visage est une image dessinée sur la tête, une par couleur de peau. Un personnage compte une vingtaine de pièces.
+- **Voitures** : la carrosserie est un profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur. Tous ses bords sont arrondis. La cabine est une boîte arrondie, plus étroite et plus courte en haut ; les vitres sont des plaques posées dessus, visibles seulement de dehors, pour qu'on voie à travers en vue intérieure. Les pièces d'un modèle sont fabriquées une seule fois, puis fusionnées par matière : une voiture compte 8 objets pour le corps et 2 par roue. Le tricycle est fait de pièces simples, sans profil ni cabine.
+- **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : 50 à 300 appels de dessin et environ 250 000 triangles par image, dont plus de la moitié pour les 327 arbres. Dessiner les ombres en demande autant de plus. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
+- **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur et piétons sont des cercles repoussés hors des boîtes. Une voiture est une file de 2 à 4 cercles posés le long de son axe (2 pour la classique, 4 pour la limousine), un peu plus larges qu'elle. La même grille sert à savoir si un ennemi voit le joueur.
 - **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance, laisse une bouffée de fumée qui grossit et s'efface en 1,2 s, et un petit rayon de la longueur de son pas cherche un mur ou une voiture devant elle. Les personnages sont faits de pièces fines : pour eux, on regarde plutôt si la roquette passe à moins de 1 m du milieu de leur corps. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
 - **Lunette** : seul le champ de vision de la caméra change. Le rond et la croix sont un dessin posé sur l'image (`#lunette`, en CSS), sans rien de plus à calculer. La dispersion d'un tir se compte en part de l'écran : zoomer 5 fois rend donc le tir 5 fois plus précis, sans règle spéciale.
 - **Cartes** : une seule fonction dessine le plan de la ville. La mini-carte en garde une image toute faite ; la grande carte le redessine à chaque image, pour rester nette quel que soit le zoom.
 - **Ville reproductible** : chaque pâté tire ses nombres au hasard à partir de sa position. La ville est donc la même à chaque partie.
-- **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, ou si une mission vise un lieu absent de la carte.
-- **Tests** : `window.jeu` donne accès à l'état du jeu. Un script hors dépôt pilote Chromium sans écran pour vérifier circulation, tirs, police, missions et mort.
+- **Sons de moteur** : un moteur, c'est deux notes (celle du moteur et la même une octave plus bas) qui passent dans un filtre. Le filtre laisse passer plus d'aigus quand le moteur est rauque, tourne vite ou accélère. Il y a deux moteurs : celui du joueur et celui de la voiture la plus proche. Les premiers rapports sont plus courts que les derniers.
+- **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, ou si une voiture demande un modèle qui n'existe pas.
+- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation, les tirs, les explosions, la police, les triches et la mort. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
 
 ## Limites connues et pistes
 
-Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique et le son n'ont pas encore été vérifiés : les tests ont tourné en rendu logiciel.
+Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique et le son n'ont pas encore été vérifiés : les tests ont tourné en rendu logiciel. Les bruits de moteur ont été mesurés, pas écoutés : les réglages du tableau `VOITURES` sont à ajuster à l'oreille.
 
 ### Limites actuelles
 
 - Il n'y a pas de sauvegarde : recharger la page fait tout recommencer.
 - On ne peut entrer dans aucun bâtiment, et rien n'empêche de sortir de la ville dans la plaine.
 - Le soleil est fixe : il n'y a ni nuit ni météo.
-- Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture, et la police (65 km/h) ne rattrape pas une voiture lancée à fond (115 km/h).
+- Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture, et la police (65 km/h) ne rattrape aucun véhicule lancé à fond, pas même le tricycle (72 km/h).
+- Les voitures qui roulent toutes seules ne regardent que le milieu des autres : une limousine peut couper un virage et mordre sur le trottoir.
+- Sur un tricycle, B.J. garde son arme à la main.
 - Les missions sont linéaires : une seule à la fois, dans l'ordre.
 - Hitler ne meurt qu'une fois : le bazooka n'a que ses 10 roquettes, et on ne peut pas en racheter.
 - Les roquettes volent tout droit : elles ne suivent pas leur cible.
@@ -437,7 +479,7 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 
 ### Pistes pour la suite
 
-- Voitures abîmées par les balles, tir par la fenêtre.
+- Voitures abîmées par les balles, tir par la fenêtre, klaxon.
 - Roquettes à acheter à l'armurerie.
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
 - Cycle jour et nuit, avec les lampadaires allumés.
