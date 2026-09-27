@@ -1551,23 +1551,27 @@ function animerHumain(h, vitesse, dt, o = {}) {
   // la danse, en trois pas. Seule la danse écarte les jambes, penche la tête ou met sur la pointe des pieds
   const pas = o.danse?.pas;
   let penche = o.accroupi ? 0.25 : amp * 0.12, monte = 0;   // on se penche en avant pour courir
-  h.tete.rotation.x = 0;
+  h.tete.rotation.x = 0; h.brasD.position.y = 0.6;
   for (const j of [h.jambeG, h.jambeD]) { j.rotation.z = 0; j.chaussure.rotation.set(0, 0, 0); }
-  if (pas === 'moonwalk') { // il marche vers l'avant mais il recule : le pied qui avance glisse sur la pointe, les bras bougent à peine
+  if (pas === 'moonwalk') { // il marche vers l'avant mais il recule : le pied qui avance glisse sur la pointe, le bras gauche bouge à peine
     for (const j of [h.jambeG, h.jambeD]) j.chaussure.rotation.x = j.pli.rotation.x * 0.8;
-    h.brasG.rotation.x *= 0.3; h.brasD.rotation.x *= 0.3; h.tete.rotation.x = 0.3;
+    h.brasG.rotation.x *= 0.3;
   }
-  if (pas === 'toupie') { // sur la pointe des pieds, les bras serrés contre lui, un genou plié
-    h.brasD.rotation.set(-0.5, 0, 0.35); h.brasG.rotation.set(-0.5, 0, -0.35); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -1.9;
+  if (pas === 'toupie') { // sur la pointe des pieds, le bras gauche serré contre lui, un genou plié
+    h.brasG.rotation.set(-0.5, 0, -0.35); h.brasG.pli.rotation.x = -1.9;
     h.jambeG.rotation.x = -0.3; h.jambeG.pli.rotation.x = 0.6;
     h.jambeG.chaussure.rotation.x = h.jambeD.chaussure.rotation.x = 0.7; monte = 0.08;
   }
-  if (pas === 'pose') { // « Who's bad ? » : jambes écartées, penché en avant, les poings serrés, il te regarde
+  if (pas === 'moonwalk' || pas === 'toupie') { // la tête baissée, le coude en avant : la main droite tient le bord du chapeau
+    h.tete.rotation.x = 0.3; h.brasD.rotation.set(-1.69, 0.815, 0); h.brasD.pli.rotation.x = -1.81;
+  }
+  if (pas === 'pose') { // le geste de Michael Jackson : la main droite entre les jambes, le bras gauche tendu sur le côté, les genoux pliés, sur la pointe des pieds
     const e = Math.min(1, o.danse.k * 10);   // il prend la pose d'un coup sec
-    h.jambeG.rotation.set(-0.3 * e, 0, 0.35 * e); h.jambeD.rotation.set(-0.3 * e, 0, -0.35 * e); h.jambeG.pli.rotation.x = h.jambeD.pli.rotation.x = 0.6 * e;
-    h.jambeG.chaussure.rotation.set(-0.3 * e, 0, -0.35 * e); h.jambeD.chaussure.rotation.set(-0.3 * e, 0, 0.35 * e);   // les pieds restent à plat
-    h.brasG.rotation.set(0.35 * e, 0, 0.4 * e); h.brasD.rotation.set(0.35 * e, 0, -0.4 * e); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.7 * e;
-    h.tete.rotation.x = -0.35 * e; penche = 0.4 * e; monte = -0.09 * e;
+    h.jambeG.rotation.set(-0.35 * e, 0, 0.22 * e); h.jambeD.rotation.set(-0.35 * e, 0, -0.22 * e); h.jambeG.pli.rotation.x = h.jambeD.pli.rotation.x = 0.7 * e;
+    h.jambeG.chaussure.rotation.set(0.25 * e, 0, -0.22 * e); h.jambeD.chaussure.rotation.set(0.25 * e, 0, 0.22 * e);
+    h.brasD.rotation.set(-0.11 * e, 0, 0.42 * e); h.brasD.pli.rotation.x = -0.25 * e; h.brasD.position.y = 0.6 - 0.1 * e;   // il baisse l'épaule : son bras est trop court
+    h.brasG.rotation.set(0, 0, 1.75 * e); h.brasG.pli.rotation.x = -0.1 * e;
+    h.tete.rotation.x = 0.35 * e; penche = -0.12 * e;   // le bassin en avant, la tête baissée sous le chapeau
   }
   // à chaque pas, le corps descend un peu quand les jambes sont écartées
   const hy = (o.accroupi ? 0.6 : 0.95) - Math.min(0.06, 0.5 * (1 - Math.cos(s))) + monte;
@@ -1916,6 +1920,30 @@ function bip(f1, f2, duree, forme, vol) {
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + duree);
   o.connect(g).connect(audio.destination); o.start(t); o.stop(t + duree);
 }
+// le petit cri de Michael Jackson, « hi-hiii ! » : une voix de tête très aiguë, en deux fois, avec le souffle du « h » entre les deux
+let voixMJ;
+function criMJ() {
+  if (!audio) return;
+  const t0 = audio.currentTime;
+  voixMJ ||= audio.createPeriodicWave(new Float32Array(6), new Float32Array([0, 1, 0.4, 0.5, 0.15, 0.06]));   // la note et ses harmoniques : la 3e fait le « i »
+  for (const [debut, duree, note] of [[0, 0.1, 900], [0.16, 0.36, 1050]]) {
+    const t = t0 + debut, o = audio.createOscillator(), g = audio.createGain(), tremble = audio.createOscillator(), force = audio.createGain();
+    o.setPeriodicWave(voixMJ);
+    o.frequency.setValueAtTime(note * 0.7, t); o.frequency.exponentialRampToValueAtTime(note, t + 0.05);                  // la voix monte d'un coup...
+    o.frequency.setValueAtTime(note, t + duree * 0.55); o.frequency.exponentialRampToValueAtTime(note * 0.75, t + duree);   // ...et retombe à la fin
+    tremble.frequency.value = 6.5; force.gain.value = note * 0.015; tremble.connect(force).connect(o.frequency);           // elle tremble un peu
+    g.gain.setValueAtTime(0.001, t); g.gain.exponentialRampToValueAtTime(0.25, t + 0.03);
+    g.gain.setValueAtTime(0.25, t + duree * 0.6); g.gain.exponentialRampToValueAtTime(0.001, t + duree);
+    o.connect(g).connect(audio.destination);
+    for (const n of [o, tremble]) { n.start(t); n.stop(t + duree); }
+  }
+  // le souffle : léger tout le long, fort pendant le « h »
+  const s = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+  s.buffer = bruitBuf; f.type = 'bandpass'; f.frequency.value = 3000; f.Q.value = 1.5;
+  g.gain.setValueAtTime(0.03, t0); g.gain.setValueAtTime(0.03, t0 + 0.09); g.gain.linearRampToValueAtTime(0.2, t0 + 0.13);
+  g.gain.linearRampToValueAtTime(0.03, t0 + 0.19); g.gain.setValueAtTime(0.03, t0 + 0.4); g.gain.linearRampToValueAtTime(0, t0 + 0.52);
+  s.connect(f).connect(g).connect(audio.destination); s.start(t0); s.stop(t0 + 0.52);
+}
 const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12], pompe: [0.8, 1200, 0.45], fusil: [0.5, 2000, 0.22], bazooka: [0.7, 700, 0.5], sniper: [0.9, 1500, 0.4] };
 
 // =====================================================================
@@ -1928,6 +1956,12 @@ const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, 
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 scene.add(joueurH.g);
 const giletBJ = piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#243a5a', joueurH.haut, 0, 0.4, 0); // visible quand il en porte un
+// le chapeau de la danse : il tourne autour du milieu de la tête, pour être rabattu sur les yeux
+const chapeauBJ = new THREE.Group(); chapeauBJ.rotation.x = 0.3; joueurH.tete.add(chapeauBJ);
+piece(new THREE.CylinderGeometry(0.125, 0.145, 0.13, 20), '#151515', chapeauBJ, 0, 0.14, 0);    // la calotte
+piece(new THREE.CylinderGeometry(0.148, 0.148, 0.035, 20), '#d8d8d8', chapeauBJ, 0, 0.095, 0);  // le ruban
+piece(new THREE.CylinderGeometry(0.22, 0.22, 0.012, 24), '#151515', chapeauBJ, 0, 0.075, 0);    // le bord
+chapeauBJ.visible = false;
 
 // arme vue en première personne (dessinée par-dessus le reste)
 const vmScene = new THREE.Scene(), vmCamera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.01, 10);
@@ -2207,7 +2241,7 @@ function danser() {
 function pasDeDanse(dt) {
   const [moon, toupie, pose] = R_.moonwalk, t = J.danse, passe = x => t < x && t + dt >= x;
   J.danse += dt;
-  if (passe(moon) || passe(moon + 0.2)) bip(1300, 1900, 0.13, 'sine', 0.25);   // « hee-hee ! »
+  if (passe(moon)) criMJ();
   if (passe(moon + toupie)) { annonce('WHO\'S BAD ?', '', pose); bruit(0.6, 2500, 0.15); }
   if (t < moon) { J.angleCorps = lerpAngle(J.angleCorps, J.angleDanse, 10 * dt); return { pas: 'moonwalk', k: t / moon }; }
   if (t < moon + toupie) { const k = (t - moon) / toupie; J.angleCorps = J.angleDanse + 4.5 * Math.PI * (1 - (1 - k) ** 2); return { pas: 'toupie', k }; }
@@ -2965,6 +2999,7 @@ function mettreAJour(dt) {
     if (sourisG && !J.voiture && !J.nage && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
+  chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
   for (const p of personnes) majPersonne(p, dt);
   for (const v of voitures) majVoiture(v, dt);
   for (const o of objets) {
@@ -3044,7 +3079,7 @@ majJoueur(0);
 requestAnimationFrame(boucle);
 $('etat').textContent = 'Clique pour jouer';
 // pour les tests automatiques
-window.jeu = { J, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
+window.jeu = { J, joueurH, criMJ, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; } };
 </script>

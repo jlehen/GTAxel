@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (Q S D trois fois de suite : B.J. danse comme Michael Jackson).
+Mis à jour le 27 septembre 2026 (la danse de Michael Jackson : chapeau rabattu sur les yeux, petit cri aigu, pose finale la main entre les jambes).
 
 ## Vision
 
@@ -75,11 +75,12 @@ La danse dure 6 s, en trois pas. Leurs durées sont dans le réglage `moonwalk` 
 
 | Pas | Durée | Ce que fait B.J. |
 | --- | --- | --- |
-| Moonwalk | 3 s | Il se met de profil et recule d'environ 4,4 m, à 1,5 m/s (`vitesseMoonwalk`). Ses jambes marchent vers l'avant, le pied qui avance glisse sur la pointe, ses bras bougent à peine et il regarde ses pieds. « Moonwalk ! » s'affiche |
-| Toupie | 1 s | Il fait 2 tours et quart sur la pointe des pieds, vite puis de moins en moins, les bras serrés contre lui et un genou plié. On entend « hee-hee » |
-| Pose | 2 s | Face à la caméra, d'un coup sec : jambes écartées, genoux pliés, penché en avant, les bras en arrière, la tête relevée. « WHO'S BAD ? » s'affiche |
+| Moonwalk | 3 s | Il se met de profil et recule d'environ 4,4 m, à 1,5 m/s (`vitesseMoonwalk`). Ses jambes marchent vers l'avant, le pied qui avance glisse sur la pointe. La tête baissée, le coude en avant, il tient le bord de son chapeau de la main droite ; son bras gauche bouge à peine. « Moonwalk ! » s'affiche |
+| Toupie | 1 s | Il fait 2 tours et quart sur la pointe des pieds, vite puis de moins en moins, la main droite toujours au chapeau, le bras gauche serré contre lui et un genou plié. Il pousse son petit cri : « hi-hiii ! » |
+| Pose | 2 s | Face à la caméra, d'un coup sec, le geste de Michael Jackson : la main droite entre les jambes, le bras gauche tendu sur le côté, les genoux pliés et écartés, sur la pointe des pieds, le bassin en avant, la tête baissée sous le chapeau. « WHO'S BAD ? » s'affiche |
 
 - La danse passe en 3e personne, pour qu'on la voie. Les angles sont pris par rapport à la caméra au moment où la danse commence ; ensuite, la souris tourne autour de B.J. sans le déranger.
+- **Le chapeau** : un chapeau noir à ruban clair, rabattu sur les yeux. B.J. le porte du début à la fin de la danse, et seulement pour danser.
 - B.J. range son arme pour danser. Le moonwalk s'arrête contre un mur comme une marche normale.
 - Appuyer sur une touche pour bouger, sauter ou s'accroupir, tirer ou viser arrête la danse tout de suite. Monter en voiture, tomber à l'eau ou mourir aussi. La dernière touche de la suite, si elle reste enfoncée, ne l'arrête pas.
 - On ne danse qu'à pied : en voiture, en bateau ou en nageant, la suite de touches ne fait rien.
@@ -504,7 +505,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 - **Pause** : le menu et la grande carte coupent tous les sons.
 - **Police** : sirène à deux tons, plus forte quand la voiture approche.
 - **Signaux** : bips pour un achat, un objet ramassé, une étape réussie, une blessure, la mort.
-- **Danse** : deux petits cris aigus (« hee-hee ») au début de la toupie, un bruit sec quand B.J. prend la pose.
+- **Danse** : le petit cri de Michael Jackson (« hi-hiii ! ») au début de la toupie, un bruit sec quand B.J. prend la pose. Le cri dure une demi-seconde : une voix de tête en deux fois, un « hi » court vers 900 Hz, le souffle du « h », puis un « hiii » plus long vers 1 050 Hz. Chaque fois, la voix monte d'un coup, tremble un peu et retombe à la fin.
 
 | Type | Note au ralenti | Note à fond | Rapports | Rauque (0 à 1) | Volume | Caractère |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -522,7 +523,7 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 3 050 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 3 100 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
@@ -534,15 +535,15 @@ Tout le jeu tient dans `index.html`, environ 3 050 lignes. Il n'y a ni installat
 | 598–790 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, panneaux, visages dessinés par le programme ; matières |
 | 791–1408 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`), rues, routes et ponts, pontons, pistes, terrain et végétation, eau, fusion |
 | 1409–1463 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
-| 1464–1604 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
-| 1605–1860 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), carrosserie, cabine, roues |
-| 1861–1920 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés |
-| 1921–2377 | Joueur et PNJ | Tenues, objets, explosions, roquettes, clavier et souris, suite de touches de la danse, triches, danse (`danser`, `pasDeDanse`), ascenseur, tir, achat |
-| 2378–2501 | Mise à jour du joueur | Marche, nage, moonwalk, conduite, pentes, sauts, voitures qui coulent, bateaux |
-| 2502–2731 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
-| 2732–2799 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
-| 2800–2954 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
-| 2955–3052 | Boucle principale | Mise à jour et affichage de chaque image |
+| 1464–1608 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
+| 1609–1864 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), carrosserie, cabine, roues |
+| 1865–1948 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés, cri de la danse (`criMJ`) |
+| 1949–2411 | Joueur et PNJ | Tenues, chapeau de la danse, objets, explosions, roquettes, clavier et souris, suite de touches de la danse, triches, danse (`danser`, `pasDeDanse`), ascenseur, tir, achat |
+| 2412–2535 | Mise à jour du joueur | Marche, nage, moonwalk, conduite, pentes, sauts, voitures qui coulent, bateaux |
+| 2536–2765 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
+| 2766–2833 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
+| 2834–2988 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
+| 2989–3087 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -561,7 +562,8 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Rendu** : ciel physique avec nuages, tone mapping ACES (exposition 0,5), ombres douces, reflets du ciel sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui. Les éclairs de tir, les traits des balles, les flammes et les boules de feu sont dessinés à pleine lumière, sans passer par l'exposition (`toneMapped: false`).
 - **Textures** : chaque texture est dessinée deux fois plus fin qu'avant, sur 512 points de côté pour la plupart. Le même dessin sert de relief : le clair ressort, le foncé se creuse. Chaque façade a un second dessin, invisible, qui dit où ça brille : les murs sont mats, les vitres sont des miroirs.
 - **Personnages** : le torse, les bras et les jambes sont des formes faites « au tour », comme des vases. Chaque morceau de bras ou de jambe finit par une boule de la taille de la boule du morceau suivant : le coude et le genou ne se voient pas. Le visage est une image dessinée sur la tête, une par couleur de peau. Un personnage compte une vingtaine de pièces.
-- **Danse** : le jeu retient le nom des dernières touches enfoncées, bout à bout. Quand la fin de cette liste est trois fois `touchesDanse`, la danse commence, et les touches encore enfoncées sont oubliées. `J.danse` compte les secondes depuis le début de la danse (0 = il ne danse pas). À chaque image, `pasDeDanse` dit quel pas est en cours et tourne le corps ; `animerHumain` place les bras, les jambes, les pieds et la tête. Le moonwalk réutilise l'animation de la marche : c'est le corps qui recule. `animerHumain` remet les pieds, la tête et l'écart des jambes à zéro à chaque image, pour tous les personnages : la pose ne reste jamais collée.
+- **Danse** : le jeu retient le nom des dernières touches enfoncées, bout à bout. Quand la fin de cette liste est trois fois `touchesDanse`, la danse commence, et les touches encore enfoncées sont oubliées. `J.danse` compte les secondes depuis le début de la danse (0 = il ne danse pas). À chaque image, `pasDeDanse` dit quel pas est en cours et tourne le corps ; `animerHumain` place les bras, les jambes, les pieds et la tête. Le moonwalk réutilise l'animation de la marche : c'est le corps qui recule. `animerHumain` remet les pieds, la tête, l'épaule droite et l'écart des jambes à zéro à chaque image, pour tous les personnages : la pose ne reste jamais collée. Les angles du bras droit ont été calculés pour que la main tombe juste sur le bord du chapeau, puis entre les jambes. Pour la pose, l'épaule droite descend de 10 cm : les bras du personnage sont trop courts pour ce geste. Le chapeau est accroché à la tête et tourne autour de son milieu, ce qui le rabat sur les yeux ; il est caché hors de la danse.
+- **Cri de la danse** : il est fabriqué par le programme, comme tous les sons, et non pris sur un disque : la voix de Michael Jackson appartient à ses ayants droit, et le jeu est publié sur Internet. La voix est une note avec ses harmoniques (la 3e, vers 3 000 Hz, donne le son « i »), et le souffle est un bruit filtré autour de 3 000 Hz.
 - **Voitures** : la carrosserie est un profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur. Tous ses bords sont arrondis. La cabine est une boîte arrondie, plus étroite et plus courte en haut ; les vitres sont des plaques posées dessus, visibles seulement de dehors, pour qu'on voie à travers en vue intérieure. Les pièces d'un modèle sont fabriquées une seule fois, puis fusionnées par matière : une voiture compte 8 objets pour le corps et 2 par roue. Le tricycle est fait de pièces simples, sans profil ni cabine.
 - **Terrain** : une grille de points tous les 9,25 m (8 par case), dont la hauteur est calculée une fois au chargement (`HT`), puis creusée sous les routes. Chaque carré est fait de deux triangles ; `hauteurTerrain` retrouve la hauteur exacte du triangle dessiné, pour que personne ne flotte ni ne s'enfonce. Les couleurs du sol sont posées sur chaque point, puis teintent un grain gris.
 - **Hauteur du sol** : `hauteurSol(x, z, y)` prend la plus haute de ces surfaces : terrain, trottoir d'un pâté, rue, route ou pont de campagne. Si on lui donne la hauteur des pieds (`y`), elle compte aussi les planchers, marches, toits et meubles qui ne dépassent pas de plus de 60 cm : c'est ce qui fait marcher les escaliers. Un pont ne compte que si on est dessus, pas si on nage dessous.
@@ -580,7 +582,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 
 ## Limites connues et pistes
 
-Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique et le son n'ont pas encore été vérifiés : les tests ont tourné en rendu logiciel. Le pays, bien plus grand, fait dessiner jusqu'à deux fois plus de triangles qu'avant : si le jeu rame, baisser `distanceVue` (500) ou couper les ombres (`ombres: false`). Les bruits de moteur ont été mesurés, pas écoutés : les réglages du tableau `VOITURES` sont à ajuster à l'oreille.
+Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique et le son n'ont pas encore été vérifiés : les tests ont tourné en rendu logiciel. Le pays, bien plus grand, fait dessiner jusqu'à deux fois plus de triangles qu'avant : si le jeu rame, baisser `distanceVue` (500) ou couper les ombres (`ombres: false`). Les bruits de moteur ont été mesurés, pas écoutés : les réglages du tableau `VOITURES` sont à ajuster à l'oreille. Le cri de la danse aussi : ses notes et sa force ont été mesurées, mais personne ne l'a encore écouté.
 
 ### Limites actuelles
 
