@@ -28,7 +28,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 
 ## Le jeu
 
-- **Armes** : on commence avec les poings et un couteau. Les autres s'achètent à l'**armurerie** (A orange sur la mini-carte) ou se ramassent sur les ennemis : pistolet, mitraillette, fusil à pompe, fusil d'assaut. Un tir à la tête fait beaucoup plus de dégâts. Hitler tire au **bazooka** et le lâche quand on le tue : ses roquettes explosent et font sauter les voitures.
+- **Armes** : on commence avec les poings et un couteau. Les autres s'achètent à l'**armurerie** (A orange sur la mini-carte) ou se ramassent sur les ennemis : pistolet, mitraillette, fusil à pompe, fusil d'assaut. Un tir à la tête fait beaucoup plus de dégâts. Hitler tire au **bazooka** et le lâche quand on le tue : ses roquettes volent moins vite qu'une voiture mais plus vite que toi, explosent et font sauter les voitures : cours sur le côté pour les esquiver !
 - **Vie** : elle remonte toute seule si on n'est pas touché pendant 5 secondes. Les trousses de soin rendent 50 points. En voiture, on prend beaucoup moins de dégâts.
 - **Gilet pare-balles** : il prend les dégâts à la place de ta vie (barre bleue). Il y en a un à l'armurerie, un dans le bunker et un dans le château.
 - **Police** : faire des bêtises donne des étoiles (jusqu'à 5). À partir de 2 étoiles, la police arrive en voiture. Reste 12 secondes hors de sa vue pour perdre une étoile.

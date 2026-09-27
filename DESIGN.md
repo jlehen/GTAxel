@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (gilets pare-balles, bazooka d'Hitler, voitures qui explosent).
+Mis à jour le 27 septembre 2026 (roquettes qui volent et qu'on peut esquiver).
 
 ## Vision
 
@@ -146,7 +146,7 @@ Il y a 7 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'ach�
 - Les coups de poing et de couteau touchent l'ennemi le plus proche devant soi, jusqu'à 50° de côté.
 - La dispersion est divisée par 2 en visant et doublée en courant.
 - Renverser quelqu'un avec une voiture à plus de 14 km/h fait 200 dégâts.
-- **Bazooka** : la roquette part tout droit et explose sur ce qu'elle touche, ou par terre si on vise le sol. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
+- **Bazooka** : la roquette part du canon vers le viseur et vole tout droit à 20 m/s (`vitesseRoquette`), plus vite que B.J. qui court (8 m/s). Elle explose sur le premier mur, voiture ou personnage qu'elle touche, par terre si on vise le sol, ou au bout de 150 m. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
 
 ### Les personnages
 
@@ -179,7 +179,7 @@ Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 
 
 La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts.
 
-Hitler tire au bazooka. Une roquette qui touche explose sur B.J. ; une roquette ratée explose quand même par terre, entre 3 et 6 m de lui, et peut encore le blesser (rayon de 5 m). Elle fait aussi exploser sa voiture s'il est dedans.
+Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. À 20 m, elle met 1 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle traverse les autres personnages, et fait exploser la voiture de B.J. s'il est dedans.
 
 **Temps de survie estimé, sans bouger ni se soigner** :
 
@@ -187,10 +187,10 @@ Hitler tire au bazooka. Une roquette qui touche explose sur B.J. ; une roquette 
 | --- | --- |
 | 1 policier à 10 m | environ 85 s |
 | Le Kommandant à 10 m | environ 20 s |
-| Hitler à 10 m | environ 16 s |
+| Hitler à 10 m, sans bouger | environ 16 s |
 | Les 8 soldats à 20 m qui voient le joueur | environ 10 s |
 
-Avec un gilet pare-balles, ces temps doublent à peu près. Ce sont des calculs à partir des réglages, pas des mesures en jeu.
+Avec un gilet pare-balles, ces temps doublent à peu près. Contre Hitler, on tient bien plus longtemps en esquivant ses roquettes. Ce sont des calculs à partir des réglages, pas des mesures en jeu.
 
 Les nazis (soldats, Kommandant et Hitler) ne quittent jamais l'enceinte du bunker ou du château. Ils attaquent quand ils voient le joueur, ou quand il tire à moins de 50 m.
 
@@ -369,22 +369,22 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 690 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 1 720 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–101 | HTML et CSS | Interface et menu |
-| 102–217 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
-| 218–303 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
-| 304–385 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
-| 386–622 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
-| 623–787 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 788–1230 | Joueur et PNJ | Tenues des personnages, objets, explosions, clavier et souris, saisie des triches, tir, achat, conduite |
-| 1231–1412 | Intelligence | Piétons, nazis, circulation, police |
-| 1413–1479 | Missions, caméra | Enchaînement des étapes, vues |
-| 1480–1605 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1606–1692 | Boucle principale | Mise à jour et affichage de chaque image |
+| 102–218 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
+| 219–304 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
+| 305–386 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
+| 387–623 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
+| 624–788 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
+| 789–1255 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1256–1437 | Intelligence | Piétons, nazis, circulation, police |
+| 1438–1504 | Missions, caméra | Enchaînement des étapes, vues |
+| 1505–1630 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1631–1718 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -403,7 +403,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Rendu** : ciel physique, tone mapping ACES, ombres douces, reflets sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui.
 - **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : environ 122 appels de dessin et 120 000 triangles par image. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
 - **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
-- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka utilise le même rayon : elle arrive tout de suite, il n'y a pas de projectile qui vole. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
+- **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance et un petit rayon de la longueur de son pas cherche un obstacle devant elle. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
 - **Cartes** : une seule fonction dessine le plan de la ville. La mini-carte en garde une image toute faite ; la grande carte le redessine à chaque image, pour rester nette quel que soit le zoom.
 - **Ville reproductible** : chaque pâté tire ses nombres au hasard à partir de sa position. La ville est donc la même à chaque partie.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, ou si une mission vise un lieu absent de la carte.
@@ -421,14 +421,14 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture, et la police (65 km/h) ne rattrape pas une voiture lancée à fond (115 km/h).
 - Les missions sont linéaires : une seule à la fois, dans l'ordre.
 - Hitler ne meurt qu'une fois : le bazooka n'a que ses 10 roquettes, et on ne peut pas en racheter.
-- Les roquettes arrivent instantanément : on ne peut pas esquiver celles d'Hitler, seulement se cacher.
+- Les roquettes volent tout droit : pas de fumée derrière elles, et elles ne suivent pas leur cible.
 - Il faut Internet, même pour jouer depuis le fichier.
 - Ctrl+W ferme l'onglet dans certains navigateurs : C est plus sûr pour s'accroupir.
 
 ### Pistes pour la suite
 
 - Voitures abîmées par les balles, tir par la fenêtre.
-- Roquettes à acheter à l'armurerie, et une vraie roquette qui vole (qu'on peut esquiver).
+- Roquettes à acheter à l'armurerie, traînée de fumée derrière les roquettes.
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
 - Cycle jour et nuit, avec les lampadaires allumés.
 - Missions au choix, avec des marqueurs sur la carte.

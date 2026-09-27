@@ -115,6 +115,7 @@ const REGLAGES = {
   protectionVoiture: 0.4,    // en voiture on ne prend que 40 % des dégâts
   giletMax: 100,             // points du gilet pare-balles : il prend les dégâts à la place de ta vie
   degatsExplosion: 40,       // ce que te fait une explosion (ta roquette, une voiture) si tu es collé dessus
+  vitesseRoquette: 20,       // m/s : plus vite que toi quand tu cours, mais on peut encore l'esquiver de loin
   vitesseMaxVoiture: 32,     // m/s (32 m/s = 115 km/h)
   accelerationVoiture: 14,
   nombrePietons: 30,
@@ -930,6 +931,33 @@ function exploserVoiture(v) {
   if (v === J.voiture) sortirVoiture();
   exploser(new THREE.Vector3(v.x, 1, v.z), 7, 150, R_.degatsExplosion);
 }
+// roquettes : elles volent tout droit et explosent sur le premier mur, voiture ou personnage touché, ou par terre
+const roquettes = [], rayonRoquette = Object.assign(new THREE.Raycaster(), { camera }), GEO_ROQUETTE = new THREE.CylinderGeometry(0.07, 0.07, 0.6, 6).rotateX(Math.PI / 2);
+function lancerRoquette(depart, vers, portee, rayon, degatsPNJ, degatsJoueur, duJoueur) {
+  const m = new THREE.Mesh(GEO_ROQUETTE, M_KAKI); m.position.copy(depart); m.lookAt(vers); scene.add(m);
+  const feu = new THREE.Sprite(M_FLASH); feu.position.z = -0.45; feu.scale.setScalar(0.7); m.add(feu); // la flamme derrière
+  roquettes.push({ m, dir: vers.clone().sub(depart).normalize(), reste: portee, rayon, degatsPNJ, degatsJoueur, duJoueur });
+}
+function majRoquettes(dt) {
+  for (const r of roquettes) {
+    const pos = r.m.position, pas = Math.min(R_.vitesseRoquette * dt, r.reste);
+    const cibles = [...batiments, ...voitures.map(v => v.m)];
+    if (r.duJoueur) for (const p of personnes) if (p.vie > 0 && dist(p, pos) < pas + 3) cibles.push(p.h.g);
+    rayonRoquette.set(pos, r.dir); rayonRoquette.far = pas;
+    const hit = rayonRoquette.intersectObjects(cibles, true)[0];
+    // la roquette d'un ennemi explose si elle passe à moins de 1 m de B.J.
+    const versJ = new THREE.Vector3(J.x, J.y + 1, J.z).sub(pos), t = clamp(versJ.dot(r.dir), 0, pas);
+    const surJoueur = !r.duJoueur && versJ.addScaledVector(r.dir, -t).length() < 1;
+    const avance = hit ? hit.distance : surJoueur ? t : pas;
+    pos.addScaledVector(r.dir, avance); r.reste -= avance;
+    if (hit || surJoueur || pos.y <= 0 || r.reste <= 0) {
+      pos.y = Math.max(pos.y, 0.1);
+      r.fini = true; scene.remove(r.m);
+      exploser(pos, r.rayon, r.degatsPNJ, r.degatsJoueur);
+    }
+  }
+  for (let k = roquettes.length - 1; k >= 0; k--) if (roquettes[k].fini) roquettes.splice(k, 1);
+}
 
 // repère de mission : colonne lumineuse (ou flèche au-dessus de la cible)
 const repere = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 5, 24, 1, true),
@@ -1093,12 +1121,9 @@ function tirer() {
     raycaster.setFromCamera(new THREE.Vector2(entre(-d, d), entre(-d, d)), camera);
     const hit = raycaster.intersectObjects(cibles, true)[0];
     const point = hit ? hit.point : raycaster.ray.at(a.portee, new THREE.Vector3());
-    if (a.explosion) { // roquette : elle explose sur ce qu'elle touche, ou par terre
-      const r = raycaster.ray, sol = r.direction.y < 0 ? -r.origin.y / r.direction.y : Infinity;
-      const parTerre = !hit && sol > raycaster.near && sol < a.portee;
-      if (parTerre) r.at(sol, point);
-      traceur(depart, point); flash(depart, J.vue === 1 ? 0.6 : 1.5);
-      if (hit || parTerre) exploser(point, a.explosion, a.degats, R_.degatsExplosion);
+    if (a.explosion) { // roquette : elle part du canon vers le viseur
+      flash(depart, J.vue === 1 ? 0.6 : 1.5);
+      lancerRoquette(depart, point, a.portee, a.explosion, a.degats, R_.degatsExplosion, true);
       continue;
     }
     if (hit) {
@@ -1289,10 +1314,10 @@ function tirEnnemi(p, d) {
   p.h.g.updateMatrixWorld(true);
   const depart = boutDuCanon(p.h, new THREE.Vector3());
   const arrivee = new THREE.Vector3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
-  if (ARMES[ARME_PNJ[p.type]].explosion) { // roquette : ratée, elle explose quand même à 3 à 6 m du joueur
-    if (!reussi) { const a = entre(0, 6.3), r = entre(3, 6); arrivee.set(J.x + Math.sin(a) * r, 0.3, J.z + Math.cos(a) * r); }
-    traceur(depart, arrivee); flash(depart, 1.5); bruit(...SON_ARME.bazooka);
-    exploser(arrivee, 5, 0, degats);
+  if (ARMES[ARME_PNJ[p.type]].explosion) { // roquette : visée sur toi (ou à 3 à 6 m si ratée), elle vole : bouge pour l'esquiver !
+    if (!reussi) { const a = entre(0, 6.3), r = entre(3, 6); arrivee.set(J.x + Math.sin(a) * r, 0, J.z + Math.cos(a) * r); }
+    flash(depart, 1.5); bruit(...SON_ARME.bazooka);
+    lancerRoquette(depart, arrivee, 150, 5, 0, degats, false);
     return;
   }
   if (!reussi) arrivee.add(new THREE.Vector3(entre(-2, 2), entre(-1, 1.5), entre(-2, 2)));
@@ -1633,6 +1658,7 @@ function mettreAJour(dt) {
     bip(600, 1200, 0.15, 'sine', 0.3);
     if (o.reapparait) { o.cache = 60; o.m.visible = false; } else o.supprimer = true;
   }
+  majRoquettes(dt);
   for (const e of effets) {
     e.vie -= dt;
     if (e.boule) { e.o.scale.setScalar(e.boule * (2.6 - e.vie * 2)); e.o.material.opacity = e.vie / 0.6; } // boule de feu
