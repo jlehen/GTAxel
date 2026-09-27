@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (grande carte avec la touche M).
+Mis à jour le 27 septembre 2026 (grande carte avec la touche M, codes de triche).
 
 ## Vision
 
@@ -46,6 +46,7 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | V | 1re ou 3e personne | Vue intérieure ou extérieure |
 | 1 à 6, molette | Changer d'arme | Rien |
 | M | Ouvrir ou fermer la grande carte | Ouvrir ou fermer la grande carte |
+| Entrée | Taper un code de triche | Taper un code de triche |
 | Échap | Pause | Pause |
 
 Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W A S D sur un QWERTY. Seule la touche M suit la lettre imprimée sur le clavier.
@@ -290,6 +291,21 @@ Une mission est une liste d'étapes. Chaque étape est validée dès que sa cond
 
 Quand la vie tombe à 0, l'écran passe en noir et blanc avec « WASTED » pendant 3,5 s. Le joueur se réveille devant l'hôpital avec toute sa vie, 100 $ de moins et 0 étoile. Il garde ses armes, ses munitions et sa progression dans les missions.
 
+## Codes de triche
+
+Les codes de triche changent seulement l'apparence de B.J. Entrée ouvre une case « Code : » ; on tape le code, puis Entrée. Pendant la saisie, les touches ne font plus bouger le joueur. Entrée ne fait rien quand la grande carte est ouverte. Un mauvais code affiche « Code inconnu ».
+
+| Code | Effet |
+| --- | --- |
+| `SLIP` | En slip : jambes nues, slip blanc |
+| `CHAUSSURE` | Perd la chaussure gauche (il reste la chaussette blanche) |
+| `SOUTIF` | Torse et bras nus, soutien-gorge rose |
+| `JAMBEDEBOIS` | Jambe droite en bois, sans chaussure |
+| `BARCA` | Maillot du Barça à rayures bleues et grenat |
+| `BEBE` | Deux fois plus petit, avec une grosse tête |
+
+Les effets s'ajoutent et durent jusqu'au rechargement de la page, même après une mort. Ils ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
+
 ## Interface et son
 
 L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, argent et étoiles en haut à droite. Tous les sons sont fabriqués par le programme ; il n'y a aucun fichier audio.
@@ -311,6 +327,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Plein écran | Bords rouges | Quand le joueur est touché |
 | Plein écran | WASTED | Noir et blanc à la mort |
 | Plein écran | Grande carte | Toute la ville, avec la touche M |
+| Centre | Code de triche | « Code : … » pendant la saisie |
 
 **La mini-carte** montre les bâtiments et les parcs, l'armurerie (A orange), l'hôpital (+ rouge), le château Wolfenstein (W rouge foncé) et le bunker (B noir). Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
 
@@ -336,23 +353,22 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 580 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
-
+Tout le jeu tient dans `index.html`, environ 1 620 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
-| 1–94 | HTML et CSS | Interface et menu |
-| 96–187 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS` |
-| 189–275 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
-| 276–357 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
-| 358–593 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
-| 594–756 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 757–1137 | Joueur et PNJ | Tenues des personnages, clavier et souris, tir, achat, conduite |
-| 1138–1309 | Intelligence | Piétons, nazis, circulation, police |
-| 1310–1376 | Missions, caméra | Enchaînement des étapes, vues |
-| 1377–1500 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1501–1580 | Boucle principale | Mise à jour et affichage de chaque image |
+| 1–97 | HTML et CSS | Interface et menu |
+| 99–209 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
+| 210–296 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
+| 297–378 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
+| 379–614 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
+| 615–778 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
+| 779–1180 | Joueur et PNJ | Tenues des personnages, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1181–1352 | Intelligence | Piétons, nazis, circulation, police |
+| 1353–1419 | Missions, caméra | Enchaînement des étapes, vues |
+| 1420–1543 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1544–1623 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
