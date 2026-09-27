@@ -90,14 +90,15 @@
 
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
 } }
 </script>
 <script type="module">
 import * as THREE from 'three';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 // =====================================================================
 //  RÉGLAGES : change ces nombres pour modifier le jeu !
@@ -269,35 +270,37 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.85;
+renderer.toneMappingExposure = 0.5;
 renderer.shadowMap.enabled = R_.ombres;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.autoClear = false;
 document.body.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0xbfd0e0, 120, 650);
+scene.fog = new THREE.Fog(0xa9c4e0, 120, 650);
 const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 1500);
 camera.rotation.order = 'YXZ';
 scene.add(camera);
 
-// ciel réaliste + reflets sur les vitres et les voitures
+// ciel réaliste avec nuages + reflets sur les vitres et les voitures
 const soleilDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(50), THREE.MathUtils.degToRad(140));
 const ciel = new Sky();
 ciel.scale.setScalar(1000);
-ciel.material.uniforms.turbidity.value = 5;
-ciel.material.uniforms.rayleigh.value = 1.2;
+ciel.material.uniforms.turbidity.value = 3;
+ciel.material.uniforms.rayleigh.value = 1.5;
 ciel.material.uniforms.mieCoefficient.value = 0.004;
 ciel.material.uniforms.mieDirectionalG.value = 0.8;
 ciel.material.uniforms.sunPosition.value.copy(soleilDir);
 {
   const pmrem = new THREE.PMREMGenerator(renderer);
   const s = new THREE.Scene(); s.add(ciel);
+  ciel.material.uniforms.showSunDisc.value = 0;   // pas de disque du soleil dans les reflets : la lumière « soleil » éclaire déjà
   scene.environment = pmrem.fromScene(s).texture;
+  ciel.material.uniforms.showSunDisc.value = 1;
+  scene.environmentIntensity = 0.7;
   scene.add(ciel);
 }
 scene.add(new THREE.HemisphereLight(0xcfe4ff, 0x5a5040, 0.35));
-const soleil = new THREE.DirectionalLight(0xfff1dd, 2.4);
+const soleil = new THREE.DirectionalLight(0xfff1dd, 4.5);
 soleil.castShadow = true;
 soleil.shadow.mapSize.set(2048, 2048);
 Object.assign(soleil.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 1, far: 500 });
@@ -309,8 +312,9 @@ scene.add(soleil, soleil.target);
 //  Textures dessinées par le programme
 // =====================================================================
 function toile(l, h, dessin) {
-  const c = document.createElement('canvas'); c.width = l; c.height = h;
-  dessin(c.getContext('2d'), l, h);
+  const c = document.createElement('canvas'); c.width = l * 2; c.height = h * 2;   // 2 fois plus de points que demandé : image plus nette
+  const g = c.getContext('2d'); g.scale(2, 2);
+  dessin(g, l, h);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
@@ -327,20 +331,28 @@ function vitre(g, x, y, w, h, [r, v, b] = [60, 90, 120]) {
   gr.addColorStop(1, `rgb(${r >> 1},${v >> 1},${b >> 1})`);
   g.fillStyle = gr; g.fillRect(x, y, w, h);
   if (Math.random() < 0.25) { g.fillStyle = 'rgba(235,225,200,.55)'; g.fillRect(x, y, w, h * entre(0.3, 0.7)); }
+  if (g.reflets) { g.reflets.fillStyle = '#001ae6'; g.reflets.fillRect(x, y, w, h); }   // une vitre : lisse et brillante comme un miroir
 }
 function facade(fond, cols, rangs, fenetre, avant, hauteur = 256) {
-  return toile(256, hauteur, (g, l, h) => {
+  // un deuxième dessin, invisible, dit où ça brille (vert = rugueux, bleu = métal) : les murs sont mats, les vitres reflètent le ciel
+  const reflets = toile(256, hauteur, (g, l, h) => { g.fillStyle = '#00e000'; g.fillRect(0, 0, l, h); });
+  reflets.colorSpace = THREE.NoColorSpace;
+  const t = toile(256, hauteur, (g, l, h) => {
+    g.reflets = reflets.image.getContext('2d');
     g.fillStyle = fond; g.fillRect(0, 0, l, h); grain(g, l, h, 3000, 0.06);
     if (avant) avant(g, l, h);
     for (let r = 0; r < rangs; r++) for (let c = 0; c < cols; c++) fenetre(g, c * l / cols, r * h / rangs, l / cols, h / rangs);
   });
+  t.reflets = reflets;
+  return t;
 }
 const TEX = {
   route: toile(256, 256, (g, l, h) => { g.fillStyle = '#3a3a3c'; g.fillRect(0, 0, l, h); grain(g, l, h, 8000, 0.07); }),
   lignes: toile(64, 256, (g) => { g.fillStyle = '#eee'; g.fillRect(30, 0, 4, 80); g.fillRect(3, 0, 3, 256); g.fillRect(58, 0, 3, 256); }),
   zebra: toile(128, 32, (g) => { g.fillStyle = '#eee'; for (let k = 0; k < 8; k++) g.fillRect(k * 16 + 3, 0, 10, 32); }),
   trottoir: toile(256, 256, (g, l, h) => { g.fillStyle = '#aaa79f'; g.fillRect(0, 0, l, h); grain(g, l, h, 4000, 0.08); g.fillStyle = 'rgba(0,0,0,.25)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 64, 0, 2, h); g.fillRect(0, k * 64, l, 2); } }),
-  herbe: toile(256, 256, (g, l, h) => { g.fillStyle = '#4a7a35'; g.fillRect(0, 0, l, h); for (let i = 0; i < 6000; i++) { g.fillStyle = `hsl(${entre(80, 110)},${entre(30, 50)}%,${entre(22, 38)}%)`; g.fillRect(Math.random() * l, Math.random() * h, 2, 3); } }),
+  feuilles: toile(256, 256, (g, l, h) => { g.fillStyle = '#2f5a22'; g.fillRect(0, 0, l, h); for (let i = 0; i < 2500; i++) { g.fillStyle = `hsl(${entre(85, 125)},${entre(35, 60)}%,${entre(14, 40)}%)`; g.beginPath(); g.ellipse(Math.random() * l, Math.random() * h, entre(3, 7), entre(2, 4), Math.random() * 3, 0, 7); g.fill(); } }),
+  herbe: toile(256, 256, (g, l, h) => { g.fillStyle = '#4a7a35'; g.fillRect(0, 0, l, h); for (let i = 0; i < 20000; i++) { g.fillStyle = `hsl(${entre(75, 115)},${entre(30, 55)}%,${entre(20, 40)}%)`; g.fillRect(Math.random() * l, Math.random() * h, 0.7, entre(1.5, 4)); } }),
   paves: toile(256, 256, (g, l, h) => { g.fillStyle = '#8a7a6a'; g.fillRect(0, 0, l, h); for (let y = 0; y < 16; y++) for (let x = 0; x < 9; x++) { g.fillStyle = `hsl(25,${entre(10, 25)}%,${entre(45, 60)}%)`; g.fillRect(x * 32 + (y % 2) * 16 - 16 + 1, y * 16 + 1, 30, 14); } }),
   toit: toile(256, 256, (g, l, h) => { g.fillStyle = '#6d6d6a'; g.fillRect(0, 0, l, h); grain(g, l, h, 12000, 0.15); }),
   tuiles: toile(256, 256, (g, l, h) => { g.fillStyle = '#7a2e1e'; g.fillRect(0, 0, l, h); for (let y = 0; y < 16; y++) { for (let x = 0; x < 17; x++) { g.fillStyle = `rgba(255,${entre(80, 140) | 0},60,${entre(0, 0.15)})`; g.fillRect(x * 16 + (y % 2) * 8 - 8, y * 16, 15, 13); } g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, y * 16 + 13, l, 3); } }),
@@ -364,18 +376,20 @@ const TEX = {
 };
 TEX.route.repeat.set(TAILLE_X / 8, TAILLE_Z / 8);
 TEX.lignes.repeat.set(1, S / 12);
+TEX.feuilles.repeat.set(4, 3);
 
-const std = (map, o = {}) => new THREE.MeshStandardMaterial({ map, roughness: 0.85, ...o });
+// le dessin sert aussi de relief (clair = bosse, foncé = creux)
+const std = (map, o = {}) => new THREE.MeshStandardMaterial({ map, roughness: 0.85, bumpMap: map, bumpScale: 0.15,
+  ...(map?.reflets && { roughnessMap: map.reflets, metalnessMap: map.reflets, roughness: 1, metalness: 1 }), ...o });
 const MAT = {
   route: std(TEX.route, { roughness: 0.95 }),
   lignes: std(TEX.lignes, { transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
   zebra: std(TEX.zebra, { transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
   trottoir: std(TEX.trottoir), herbe: std(TEX.herbe, { roughness: 1 }), paves: std(TEX.paves),
   toit: std(TEX.toit, { roughness: 1 }), tuiles: std(TEX.tuiles), ardoise: std(TEX.tuiles, { color: '#667' }),
-  brique: std(TEX.brique), beton: std(TEX.beton), moderne: std(TEX.moderne, { metalness: 0.3, roughness: 0.4 }),
-  verre: std(TEX.verre, { metalness: 0.8, roughness: 0.12 }), verre2: std(TEX.verre2, { metalness: 0.8, roughness: 0.15 }),
+  brique: std(TEX.brique), beton: std(TEX.beton), moderne: std(TEX.moderne), verre: std(TEX.verre), verre2: std(TEX.verre2),
   maison1: std(TEX.maison), maison2: std(TEX.maison, { color: '#cfe0ff' }), maison3: std(TEX.maison, { color: '#ffc8b0' }),
-  hopital: std(TEX.hopital, { roughness: 0.5 }), magasin: std(TEX.magasin), bunker: std(TEX.bunker, { roughness: 1 }),
+  hopital: std(TEX.hopital), magasin: std(TEX.magasin), bunker: std(TEX.bunker, { roughness: 1 }),
   metal: std(null, { color: '#8a8d90', metalness: 0.6, roughness: 0.4 }), sacs: std(null, { color: '#8a7a5a', roughness: 1 }),
   pierre: std(null, { color: '#b8b2a6' }), eau: std(null, { color: '#2a5a7a', metalness: 0.3, roughness: 0.05 }),
   porte: std(null, { color: '#222', roughness: 0.6 }),
@@ -584,7 +598,9 @@ function instances(geo, mat, liste, placer) {
 }
 instances(new THREE.CylinderGeometry(0.15, 0.25, 3, 7).translate(0, 1.5, 0), std(null, { color: '#5a3d24' }), arbres,
   (o, e) => { o.position.set(e.x, 0.2, e.z); o.scale.setScalar(e.s); });
-instances(new THREE.IcosahedronGeometry(1.9, 1).translate(0, 4.4, 0), std(null, { color: '#3d6e2a', flatShading: true }), arbres,
+// feuillage : plusieurs boules collées, [x, y, z, rayon]
+instances(mergeGeometries([[0, 4.4, 0, 1.7], [0.9, 3.9, 0.3, 1.2], [-0.8, 4, -0.5, 1.25], [0.1, 4.1, 0.9, 1.1], [-0.2, 5.3, -0.1, 1.2]]
+  .map(([x, y, z, r]) => new THREE.IcosahedronGeometry(r, 1).translate(x, y, z))), std(TEX.feuilles, { roughness: 1, bumpScale: 0.6 }), arbres,
   (o, e) => { o.position.set(e.x, 0.2, e.z); o.scale.setScalar(e.s); o.rotation.y = e.x; });
 {
   const poteau = mergeGeometries([new THREE.CylinderGeometry(0.07, 0.11, 7, 6).translate(0, 3.5, 0), new THREE.BoxGeometry(0.1, 0.1, 1.8).translate(0, 7, 0.85)]);
@@ -631,10 +647,10 @@ function voit(a, b) {
 const cacheMat = {};
 const mat = (c, o = {}) => cacheMat[c + JSON.stringify(o)] ||= new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, ...o });
 const GEO = {
-  torse: new THREE.BoxGeometry(0.44, 0.6, 0.24), bassin: new THREE.BoxGeometry(0.4, 0.18, 0.22),
+  torse: new RoundedBoxGeometry(0.44, 0.6, 0.24, 2, 0.09), bassin: new RoundedBoxGeometry(0.4, 0.18, 0.22, 1, 0.07),
   tete: new THREE.SphereGeometry(0.125, 16, 12), cou: new THREE.CylinderGeometry(0.05, 0.06, 0.12, 8),
   bras: new THREE.CapsuleGeometry(0.065, 0.48, 4, 8), jambe: new THREE.CapsuleGeometry(0.085, 0.72, 4, 8),
-  main: new THREE.SphereGeometry(0.055, 8, 6), chaussure: new THREE.BoxGeometry(0.13, 0.08, 0.27),
+  main: new THREE.SphereGeometry(0.055, 8, 6), chaussure: new RoundedBoxGeometry(0.13, 0.08, 0.27, 1, 0.035),
   cheveux: new THREE.SphereGeometry(0.135, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.55),
   casque: new THREE.SphereGeometry(0.16, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5),
   casquette: new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16), visiere: new THREE.BoxGeometry(0.2, 0.02, 0.12),
@@ -711,14 +727,21 @@ function boutDuCanon(h, v) {
 //  Voitures
 // =====================================================================
 const PEINTURES = ['#9e1010', '#111', '#e8e8e8', '#1a3a8a', '#b8b8b8', '#0e5a2e', '#d8a010', '#5a1a6a', '#2a6ad8', '#e06010'];
+function effiler(g, kx, kz) { // resserre le haut d'une boîte : pare-brise et vitres penchés
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) if (p.getY(i) > 0) p.setXYZ(i, p.getX(i) * kx, p.getY(i), p.getZ(i) * kz);
+  g.computeVertexNormals();
+  return g;
+}
 const GEO_V = {
-  caisse: new THREE.BoxGeometry(1.9, 0.55, 4.4), bas: new THREE.BoxGeometry(1.94, 0.22, 4.3),
-  cabine: new THREE.BoxGeometry(1.72, 0.52, 2.3), toit: new THREE.BoxGeometry(1.66, 0.06, 1.9),
+  caisse: new RoundedBoxGeometry(1.9, 0.55, 4.4, 3, 0.14), bas: new THREE.BoxGeometry(1.84, 0.22, 4.2),
+  cabine: effiler(new THREE.BoxGeometry(1.74, 0.52, 2.6), 0.84, 0.6), toit: new RoundedBoxGeometry(1.5, 0.07, 1.62, 1, 0.03),
   phare: new THREE.BoxGeometry(0.42, 0.14, 0.05), calandre: new THREE.BoxGeometry(0.9, 0.16, 0.04),
-  pneu: new THREE.CylinderGeometry(0.36, 0.36, 0.26, 16).rotateZ(Math.PI / 2), jante: new THREE.CylinderGeometry(0.22, 0.22, 0.28, 10).rotateZ(Math.PI / 2),
+  parechoc: new RoundedBoxGeometry(1.94, 0.2, 0.3, 2, 0.08), retro: new RoundedBoxGeometry(0.18, 0.1, 0.08, 1, 0.03),
+  pneu: new THREE.CylinderGeometry(0.36, 0.36, 0.26, 24).rotateZ(Math.PI / 2), jante: new THREE.CylinderGeometry(0.22, 0.22, 0.28, 16).rotateZ(Math.PI / 2),
   gyro: new THREE.BoxGeometry(0.55, 0.13, 0.26), bande: new THREE.BoxGeometry(1.96, 0.14, 3.2),
 };
-const M_VITRE = new THREE.MeshPhysicalMaterial({ color: '#0d141b', metalness: 0.9, roughness: 0.05 });
+const M_VITRE = new THREE.MeshStandardMaterial({ color: '#34404c', metalness: 0.9, roughness: 0.05 });
 const M_PNEU = mat('#151515', { roughness: 0.9 }), M_JANTE = mat('#bbb', { metalness: 1, roughness: 0.3 });
 const M_PHARE = mat('#fff', { emissive: '#fff8e0', emissiveIntensity: 1.5 }), M_FEU = mat('#a00', { emissive: '#f00', emissiveIntensity: 1 });
 const cachePeinture = {};
@@ -729,9 +752,10 @@ function modeleVoiture(couleur, police) {
   add(GEO_V.caisse, peinture(couleur), 0, 0.64, 0);
   add(GEO_V.bas, mat('#1a1a1a'), 0, 0.4, 0);
   add(GEO_V.cabine, M_VITRE, 0, 1.17, -0.25);
-  add(GEO_V.toit, peinture(couleur), 0, 1.45, -0.3);
-  add(GEO_V.calandre, mat('#222'), 0, 0.58, 2.21);
-  for (const x of [-0.62, 0.62]) { add(GEO_V.phare, M_PHARE, x, 0.72, 2.2); add(GEO_V.phare, M_FEU, x, 0.72, -2.2); }
+  add(GEO_V.toit, peinture(couleur), 0, 1.44, -0.25);
+  add(GEO_V.calandre, mat('#222'), 0, 0.62, 2.21);
+  for (const z of [-2.1, 2.1]) add(GEO_V.parechoc, mat('#1a1a1a'), 0, 0.42, z);
+  for (const x of [-0.62, 0.62]) { add(GEO_V.phare, M_PHARE, x, 0.76, 2.2); add(GEO_V.phare, M_FEU, x, 0.76, -2.2); add(GEO_V.retro, peinture(couleur), x * 1.6, 0.98, 0.75); }
   const roues = [];
   for (const [x, z] of [[-0.88, 1.35], [0.88, 1.35], [-0.88, -1.35], [0.88, -1.35]]) {
     const r = new THREE.Group(); r.position.set(x, 0.36, z); g.add(r);
@@ -805,7 +829,7 @@ const giletBJ = piece(new THREE.BoxGeometry(0.47, 0.5, 0.28), '#243a5a', joueurH
 const vmScene = new THREE.Scene(), vmCamera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.01, 10);
 vmScene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.2));
 { const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(1, 2, 1); vmScene.add(l); }
-vmScene.environment = scene.environment;
+vmScene.environment = scene.environment; vmScene.environmentIntensity = 0.25;
 const vm = new THREE.Group(); vmScene.add(vm);
 function construireVM() {
   vm.clear();
@@ -1698,7 +1722,7 @@ function majRepere(dt) {
 
 let dernier = performance.now();
 function boucle(t) {
-  const dt = Math.min(0.05, (t - dernier) / 1000);
+  const dt = clamp((t - dernier) / 1000, 0, 0.05);
   dernier = t;
   if (carte.ouverte) { dessinerGrandeCarte(dt); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
   if (enJeu) mettreAJour(dt);
@@ -1706,6 +1730,7 @@ function boucle(t) {
   soleil.position.set(J.x + soleilDir.x * 200, soleilDir.y * 200, J.z + soleilDir.z * 200);
   soleil.target.position.set(J.x, 0, J.z);
   ciel.position.copy(camera.position);
+  ciel.material.uniforms.time.value = t / 1000;     // les nuages avancent
   // arme en première personne : balancement en marchant, recul au tir
   vm.position.set(0.2 + Math.sin(joueurH.phase) * 0.01, -0.2 - Math.abs(Math.cos(joueurH.phase)) * 0.01, -0.5 + J.recul * 0.05);
   vm.rotation.set(J.recul * 0.15 - J.frappe * 0.8, 0, 0);
@@ -1719,7 +1744,7 @@ majJoueur(0);
 requestAnimationFrame(boucle);
 $('etat').textContent = 'Clique pour jouer';
 // pour les tests automatiques
-window.jeu = { J, carte, ouvrirCarte, centreCarte, creerPersonne, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
+window.jeu = { J, carte, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; } };
 </script>
 </body>

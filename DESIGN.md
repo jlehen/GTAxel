@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (traînée de fumée des roquettes, bébé tout nu avec une couche).
+Mis à jour le 27 septembre 2026 (graphismes plus réalistes : nuages, relief, vitres miroir, voitures arrondies).
 
 ## Vision
 
@@ -107,7 +107,9 @@ Un étage fait 3 m. Les trousses de soin et les gilets pare-balles réapparaisse
 ### La rue
 
 - Trottoirs de 20 cm, lampadaires tous les 18 m, passages piétons à chaque carrefour.
-- Ciel réaliste avec un soleil fixe et des ombres. Le brouillard commence à 120 m et cache tout au-delà de 650 m.
+- Ciel réaliste avec des nuages qui avancent lentement, un soleil fixe et des ombres. Le brouillard commence à 120 m et cache tout au-delà de 650 m.
+- Les vitres des immeubles reflètent le ciel ; les murs, les pavés et les tuiles ont du relief.
+- Les arbres ont un feuillage fait de 5 boules de feuilles.
 - Autour de la ville, une plaine d'herbe sans limite ni obstacle.
 
 ### La population
@@ -255,7 +257,7 @@ Une voiture explose quand une roquette explose à côté d'elle (6 m pour celle 
 
 ### Ce que les voitures ne font pas (encore)
 
-Les balles ne les abîment pas. Il n'y a qu'un seul modèle, en plusieurs couleurs, plus la version police avec gyrophares.
+Les balles ne les abîment pas. Il n'y a qu'un seul modèle, en 10 couleurs, plus la version police avec gyrophares. Ce modèle a une carrosserie arrondie, un pare-brise et des vitres inclinés, des pare-chocs et des rétroviseurs.
 
 ## Missions et progression
 
@@ -369,22 +371,23 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 730 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 1 750 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–101 | HTML et CSS | Interface et menu |
-| 102–221 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
-| 222–307 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
-| 308–390 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
-| 391–627 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
-| 628–792 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 793–1262 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
-| 1263–1444 | Intelligence | Piétons, nazis, circulation, police |
-| 1445–1511 | Missions, caméra | Enchaînement des étapes, vues |
-| 1512–1637 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1638–1726 | Boucle principale | Mise à jour et affichage de chaque image |
+| 103–222 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
+| 223–310 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel et nuages |
+| 311–404 | Textures | Façades, vitres, routes, feuilles et pierres du château dessinées par le programme ; relief et reflets |
+| 405–643 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, arbres, murs invisibles |
+| 644–816 | Personnages, voitures, sons | Modèles en formes simples arrondies, animations, sons synthétisés |
+| 817–1286 | Joueur et PNJ | Tenues des personnages, objets, explosions, roquettes, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1287–1468 | Intelligence | Piétons, nazis, circulation, police |
+| 1469–1535 | Missions, caméra | Enchaînement des étapes, vues |
+| 1536–1661 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1662–1751 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -400,8 +403,9 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 
 ### Choix techniques
 
-- **Rendu** : ciel physique, tone mapping ACES, ombres douces, reflets sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui.
-- **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : environ 122 appels de dessin et 120 000 triangles par image. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
+- **Rendu** : ciel physique avec nuages, tone mapping ACES (exposition 0,5), ombres douces, reflets du ciel sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui.
+- **Textures** : chaque texture est dessinée deux fois plus fin qu'avant, sur 512 points de côté pour la plupart. Le même dessin sert de relief : le clair ressort, le foncé se creuse. Chaque façade a un second dessin, invisible, qui dit où ça brille : les murs sont mats, les vitres sont des miroirs.
+- **Performance** : les bâtiments sont fusionnés en un objet par matière, et les arbres et lampadaires sont dessinés en un seul lot. Résultat mesuré : 50 à 320 appels de dessin et environ 240 000 triangles par image, dont plus de la moitié pour les 327 arbres. Dessiner les ombres en demande autant de plus. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
 - **Collisions** : chaque bâtiment est une boîte, rangée dans une grille de cases de 25 m. Joueur, piétons et voitures sont des cercles repoussés hors des boîtes. La même grille sert à savoir si un ennemi voit le joueur.
 - **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture. La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance, laisse une bouffée de fumée qui grossit et s'efface en 1,2 s, et un petit rayon de la longueur de son pas cherche un obstacle devant elle. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
 - **Cartes** : une seule fonction dessine le plan de la ville. La mini-carte en garde une image toute faite ; la grande carte le redessine à chaque image, pour rester nette quel que soit le zoom.
@@ -431,4 +435,5 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Roquettes à acheter à l'armurerie.
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
 - Cycle jour et nuit, avec les lampadaires allumés.
+- Effets d'image (halo autour des lumières, coins assombris) : essayés puis retirés. En plein jour, le halo délave toute l'image et les coins assombris ne se voient presque pas, pour un coût élevé. À retenter avec la nuit.
 - Missions au choix, avec des marqueurs sur la carte.
