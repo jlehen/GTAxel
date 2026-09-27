@@ -191,9 +191,10 @@ const MISSIONS = [
 
 // =====================================================================
 //  CODES DE TRICHE : appuie sur Entrée, tape le code, puis Entrée
-//  Ils changent l'apparence de B.J. (b). Recharge la page pour revenir à la normale.
+//  Ils changent l'apparence de B.J. (b). Retape le code pour annuler l'effet.
 // =====================================================================
-const PEAU_BJ = '#e8b890';
+const TENUE_BJ = { peau: '#e8b890', haut: '#e8e4d8', bas: '#4a5238', chaussures: '#3a2a1a', cheveux: '#b8955a' };
+const PEAU_BJ = TENUE_BJ.peau;
 const TRICHES = [
   { code: 'SLIP',        texte: 'En slip !',            effet: b => { habiller(b.bassin, '#fff'); habiller(b.jambeD.children[0], PEAU_BJ); habiller(b.jambeG.children[0], PEAU_BJ); } },
   { code: 'CHAUSSURE',   texte: 'Une chaussure perdue', effet: b => habiller(b.jambeG.children[1], '#eee') },   // il reste la chaussette
@@ -782,7 +783,7 @@ const J = { x: depart.x, z: depart.z, y: 0.2, vy: 0, sol: true, lacet: Math.PI, 
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0 };
-const joueurH = creerHumain({ peau: PEAU_BJ, haut: '#e8e4d8', bas: '#4a5238', chaussures: '#3a2a1a', cheveux: '#b8955a' }); // B.J. Blazkowicz
+const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 scene.add(joueurH.g);
 
 // arme vue en première personne (dessinée par-dessus le reste)
@@ -975,8 +976,18 @@ function validerTriche() {
   const t = TRICHES.find(t => t.code.toUpperCase() === saisie);
   saisie = null; $('triche').style.display = 'none';
   if (!t) { annonce('', 'Code inconnu', 1.5); return; }
-  t.effet(joueurH);
-  annonce('', t.texte, 2);
+  t.actif = !t.actif; // retaper un code annule son effet
+  rhabillerBJ();
+  annonce('', t.actif ? t.texte : `${t.texte} (annulé)`, 2);
+}
+// remet B.J. dans sa tenue normale, puis applique les codes actifs
+function rhabillerBJ() {
+  const b = joueurH, T = TENUE_BJ;
+  habiller(b.torse, T.haut); b.torse.clear(); habiller(b.bassin, T.bas);
+  for (const bras of [b.brasD, b.brasG]) habiller(bras.children[0], T.haut);
+  for (const j of [b.jambeD, b.jambeG]) { habiller(j.children[0], T.bas); j.children[0].scale.set(1, 1, 1); habiller(j.children[1], T.chaussures); j.children[1].visible = true; }
+  b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
+  for (const t of TRICHES) if (t.actif) t.effet(b);
 }
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;

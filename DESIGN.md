@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (grande carte avec la touche M, codes de triche).
+Mis à jour le 27 septembre 2026 (codes de triche qui s'annulent en les retapant).
 
 ## Vision
 
@@ -304,7 +304,7 @@ Les codes de triche changent seulement l'apparence de B.J. Entrée ouvre une cas
 | `BARCA` | Maillot du Barça à rayures bleues et grenat |
 | `BEBE` | Deux fois plus petit, avec une grosse tête |
 
-Les effets s'ajoutent et durent jusqu'au rechargement de la page, même après une mort. Ils ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
+Retaper un code annule son effet. Les effets se combinent : B.J. est remis dans sa tenue normale, puis chaque code actif est appliqué dans l'ordre du tableau. Ils durent même après une mort, mais pas après un rechargement de la page. Ils ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
 
 ## Interface et son
 
@@ -353,22 +353,22 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 620 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 1 630 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–97 | HTML et CSS | Interface et menu |
-| 99–209 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
-| 210–296 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
-| 297–378 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
-| 379–614 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
-| 615–778 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 779–1180 | Joueur et PNJ | Tenues des personnages, clavier et souris, saisie des triches, tir, achat, conduite |
-| 1181–1352 | Intelligence | Piétons, nazis, circulation, police |
-| 1353–1419 | Missions, caméra | Enchaînement des étapes, vues |
-| 1420–1543 | Écran | Plan de la ville, mini-carte, grande carte, infos |
-| 1544–1623 | Boucle principale | Mise à jour et affichage de chaque image |
+| 99–210 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS`, `TRICHES` |
+| 211–297 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
+| 298–379 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
+| 380–615 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
+| 616–779 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
+| 780–1191 | Joueur et PNJ | Tenues des personnages, clavier et souris, saisie des triches, tir, achat, conduite |
+| 1192–1363 | Intelligence | Piétons, nazis, circulation, police |
+| 1364–1430 | Missions, caméra | Enchaînement des étapes, vues |
+| 1431–1554 | Écran | Plan de la ville, mini-carte, grande carte, infos |
+| 1555–1634 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 

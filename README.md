@@ -34,7 +34,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 - **Voitures** : elles circulent en ville. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler.
 - **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse. La dernière mission t'envoie au château Wolfenstein (W rouge sur la mini-carte) pour éliminer Hitler.
 - **Carte** : la touche M affiche toute la ville en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), l'armurerie, l'hôpital, le bunker et le château.
-- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`… à toi de voir ce qu'ils font !
+- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`… à toi de voir ce qu'ils font ! Retape un code pour l'annuler.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital (+ rouge sur la mini-carte) et tu perds 100 $.
 
 ## Modifier le jeu
