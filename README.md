@@ -1,6 +1,6 @@
 # GTAxel
 
-Un jeu d'action en 3D dans une ville, inspiré de **GTA** et **Wolfenstein** : on vole des voitures, on échappe à la police, on achète des armes et on attaque le bunker du Kommandant.
+Un jeu d'action en 3D dans une ville, inspiré de **GTA** et **Wolfenstein** : tu es **B.J. Blazkowicz**. Tu voles des voitures, tu échappes à la police, tu achètes des armes, tu attaques le bunker nazi du Kommandant, puis tu affrontes le boss final, **Hitler**, dans le château Wolfenstein.
 
 ## Jouer
 
@@ -30,7 +30,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 - **Vie** : elle remonte toute seule si on n'est pas touché pendant 5 secondes. Les trousses de soin rendent 50 points. En voiture, on prend beaucoup moins de dégâts.
 - **Police** : faire des bêtises donne des étoiles (jusqu'à 5). À partir de 2 étoiles, la police arrive en voiture. Reste 12 secondes hors de sa vue pour perdre une étoile.
 - **Voitures** : elles circulent en ville. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler.
-- **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse.
+- **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse. La dernière mission t'envoie au château Wolfenstein (W rouge sur la mini-carte) pour éliminer Hitler.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital (+ rouge sur la mini-carte) et tu perds 100 $.
 
 ## Modifier le jeu
@@ -49,11 +49,12 @@ Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier
    | `P` | Parc |
    | `A` | Armurerie |
    | `H` | Hôpital |
-   | `B` | Bunker militaire (soldats + Kommandant) |
+   | `B` | Bunker nazi (soldats + Kommandant) |
+   | `W` | Château Wolfenstein (soldats + Hitler, le boss final) |
    | `.` | Place |
    | `X` | Départ du joueur |
    | `a` `b` `c`… | Lieux de mission |
 
-4. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture`, `eliminer`, `etoiles`, `semer`, `arme`.
+4. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture`, `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`.
 
-Recharge la page (F5) pour voir tes changements.
+Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).

@@ -1,10 +1,10 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026.
+Mis à jour le 27 septembre 2026 (nazis, Hitler et B.J. Blazkowicz).
 
 ## Vision
 
-GTAxel est un jeu d'action en 3D, en monde ouvert, qui se joue dans le navigateur. Il mélange GTA (ville libre, voitures, police) et Wolfenstein (le bunker et son Kommandant). Il a été imaginé par un garçon de 10 à 13 ans, qui doit pouvoir le modifier lui-même.
+GTAxel est un jeu d'action en 3D, en monde ouvert, qui se joue dans le navigateur. Il mélange GTA (ville libre, voitures, police) et Wolfenstein : on incarne B.J. Blazkowicz, qui chasse les nazis de la ville jusqu'au boss final, Hitler, dans le château Wolfenstein. Il a été imaginé par un garçon de 10 à 13 ans, qui doit pouvoir le modifier lui-même.
 
 **Piliers de design**
 
@@ -13,7 +13,7 @@ GTAxel est un jeu d'action en 3D, en monde ouvert, qui se joue dans le navigateu
 - **Bidouillable** : tout tient dans un seul fichier `index.html`. Les réglages, les armes, la carte et les missions sont des tableaux commentés en français, en haut du fichier. On voit une modification en appuyant sur F5.
 - **Zéro installation** : un double-clic ou un lien suffit, pourvu qu'on ait Internet. En ligne : [jlehen.github.io/GTAxel](https://jlehen.github.io/GTAxel/).
 
-Pas de sang ni de gore : les personnages touchés tombent au sol.
+Pas de sang ni de gore : les personnages touchés tombent au sol. Pas de croix gammée non plus : les nazis se reconnaissent à leur uniforme, leur casque allemand et leur brassard rouge, et leurs bannières portent un W pour Wolfenstein.
 
 ## Boucle de jeu et contrôles
 
@@ -22,14 +22,14 @@ Le joueur alterne entre deux boucles. Les missions rapportent l'argent qui achè
 ```mermaid
 flowchart LR
   E[Explorer la ville<br>à pied ou en voiture]
-  E --> M[Faire une mission<br>suivre le point jaune] --> G[Gagner de l'argent<br>200 à 5 000 $] --> A[Acheter des armes<br>à l'armurerie]
-  A -- armes plus fortes : on peut viser le bunker --> E
+  E --> M[Faire une mission<br>suivre le point jaune] --> G[Gagner de l'argent<br>200 à 10 000 $] --> A[Acheter des armes<br>à l'armurerie]
+  A -- armes plus fortes : bunker, puis château --> E
   E --> B[Faire des bêtises<br>voler, frapper, tirer] --> P[La police arrive<br>1 à 5 étoiles]
   P --> S[Semer la police<br>12 s caché = -1 étoile] --> E
   P --> W[WASTED<br>la vie tombe à 0] --> H[Réveil à l'hôpital<br>-100 $, plus d'étoiles] --> E
 ```
 
-Une partie commence à pied, sans argent, avec les poings et un couteau. Il n'y a pas de fin : après la 5e mission, la ville reste libre.
+Une partie commence à pied, sans argent, avec les poings et un couteau. Le héros, B.J. Blazkowicz, a les cheveux blonds courts, un maillot blanc et un pantalon militaire. Il n'y a pas de fin : après la 6e mission, la ville reste libre.
 
 ### Contrôles
 
@@ -72,7 +72,7 @@ La ville mesure environ 900 m × 750 m : 120 pâtés de 60 m de côté, séparé
 La carte actuelle (tableau `CARTE` de `index.html`, 12 colonnes × 10 lignes) :
 
 ```
-MMMMPPIIIMMM
+MMMMPPIIIMWM
 MXMMPPIaTIMM
 MMHIIITTTIIM
 PPIIATTTTIIP
@@ -84,7 +84,7 @@ MMPPIIIIIPMM
 MMMMMMPPPMMM
 ```
 
-On y compte 13 pâtés de tours, 41 d'immeubles, 38 de maisons et 20 parcs. Les tours occupent le centre, les maisons et les parcs la bordure. Le bunker est en bas à droite de la carte, loin du départ en haut à gauche.
+On y compte 13 pâtés de tours, 41 d'immeubles, 37 de maisons et 20 parcs. Les tours occupent le centre, les maisons et les parcs la bordure. Le bunker est en bas à droite de la carte et le château Wolfenstein en haut à droite, loin du départ en haut à gauche.
 
 ### Types de pâtés
 
@@ -96,7 +96,8 @@ On y compte 13 pâtés de tours, 41 d'immeubles, 38 de maisons et 20 parcs. Les 
 | `P` | Pelouse, allées pavées, fontaine, jusqu'à 14 arbres, 1 trousse de soin |
 | `H` | Hôpital : point de réveil, 2 trousses de soin, 1 voiture garée |
 | `A` | Armurerie : 4 stands d'armes devant la boutique |
-| `B` | Bunker : enceinte avec une seule entrée à l'ouest, sacs de sable, 8 soldats, le Kommandant, 2 trousses, 1 fusil d'assaut |
+| `B` | Bunker nazi : enceinte avec une seule entrée à l'ouest, sacs de sable, 8 soldats, le Kommandant, 2 trousses, 1 fusil d'assaut |
+| `W` | Château Wolfenstein : remparts crénelés de 7 m avec une grande porte au sud, 4 tours à toit pointu, un donjon de 16 m, bannières rouges, 8 soldats, Hitler, 2 trousses, 1 mitraillette |
 | `.` `X` `a`–`d` | Place pavée avec 4 arbres et 2 voitures garées |
 
 Un étage fait 3 m. Les trousses de soin réapparaissent 60 s après avoir été ramassées.
@@ -149,8 +150,9 @@ Il y a 6 armes, dont 2 au départ (poings et couteau). Les 4 armes à feu s'ach�
 | --- | --- | --- | --- | --- |
 | Piéton | 50 | aucune | 2 | 10 à 69 $ (6 fois sur 10) |
 | Policier | 70 | pistolet | 2 | Un pistolet |
-| Soldat | 90 | fusil d'assaut | 3 | Une mitraillette ou un fusil d'assaut |
+| Soldat nazi | 90 | fusil d'assaut | 3 | Une mitraillette ou un fusil d'assaut |
 | Kommandant | 450 | fusil à pompe | 12 (5 à la tête) | Un fusil à pompe et 1 000 $ |
+| Hitler (boss final) | 900 | mitraillette | 23 (9 à la tête) | Un fusil d'assaut et 2 000 $ |
 
 Les corps disparaissent au bout de 15 s.
 
@@ -161,13 +163,14 @@ Les corps disparaissent au bout de 15 s.
 
 ### Les ennemis
 
-Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat. Il tire toutes les 1 à 2 s, ou 0,6 à 1,2 s pour le Kommandant. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
+Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat. Il tire toutes les 1 à 2 s, 0,6 à 1,2 s pour le Kommandant et 0,4 à 0,8 s pour Hitler. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
 
 | Ennemi | Dégâts par balle |
 | --- | --- |
 | Policier | 5 |
 | Soldat | 7 |
 | Kommandant | 12 |
+| Hitler | 10 |
 
 La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts.
 
@@ -177,11 +180,12 @@ La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement 
 | --- | --- |
 | 1 policier à 10 m | environ 85 s |
 | Le Kommandant à 10 m | environ 20 s |
+| Hitler à 10 m | environ 17 s |
 | Les 8 soldats à 20 m qui voient le joueur | environ 10 s |
 
 Ce sont des calculs à partir des réglages, pas des mesures en jeu.
 
-Les soldats ne quittent jamais l'enceinte du bunker. Ils attaquent quand ils voient le joueur, ou quand il tire à moins de 50 m.
+Les nazis (soldats, Kommandant et Hitler) ne quittent jamais l'enceinte du bunker ou du château. Ils attaquent quand ils voient le joueur, ou quand il tire à moins de 50 m.
 
 ## Police et recherche
 
@@ -239,7 +243,7 @@ Elles ne s'abîment pas et n'explosent pas. Il n'y a qu'un seul modèle, en plus
 
 ## Missions et progression
 
-Les 5 missions s'enchaînent dans l'ordre et rapportent 8 200 $ au total. Elles emmènent le joueur de la livraison d'un colis à l'attaque du bunker. L'argent gagné avant le bunker suffit pour s'offrir le fusil d'assaut.
+Les 6 missions s'enchaînent dans l'ordre et rapportent 18 200 $ au total. Elles emmènent le joueur de la livraison d'un colis au combat final contre Hitler. L'argent gagné avant le bunker suffit pour s'offrir le fusil d'assaut.
 
 | # | Mission | Étapes | Récompense |
 | --- | --- | --- | --- |
@@ -248,6 +252,7 @@ Les 5 missions s'enchaînent dans l'ordre et rapportent 8 200 $ au total. Elles 
 | 3 | Voleur de voitures | Amener une voiture au garage `c` | 1 000 $ |
 | 4 | Course-poursuite | Monter à 3 étoiles, puis semer la police | 1 500 $ |
 | 5 | Opération bunker | Aller au point `d`, puis éliminer le Kommandant | 5 000 $ |
+| 6 | Le château Wolfenstein | Éliminer Hitler dans le château | 10 000 $ |
 
 Après la dernière mission, l'objectif affiche « Ville libre : fais ce que tu veux ! ».
 
@@ -259,7 +264,7 @@ Une mission est une liste d'étapes. Chaque étape est validée dès que sa cond
 | --- | --- |
 | `aller` | Être à moins de 4 m du lieu |
 | `voiture` | Être en voiture à moins de 7 m du lieu |
-| `eliminer` | Plus aucun personnage de ce type en vie (`boss` ou `soldat`) |
+| `eliminer` | Plus aucun personnage de ce type en vie (`soldat`, `boss` ou `hitler`) |
 | `etoiles` | Avoir au moins ce nombre d'étoiles |
 | `semer` | Revenir à 0 étoile |
 | `arme` | Posséder l'arme nommée |
@@ -274,7 +279,8 @@ Une mission est une liste d'étapes. Chaque étape est validée dès que sa cond
 
 | Source | Montant |
 | --- | --- |
-| Missions | 200 à 5 000 $ |
+| Missions | 200 à 10 000 $ |
+| Hitler | 2 000 $ |
 | Le Kommandant | 1 000 $ |
 | Piétons tués | 10 à 69 $, 6 fois sur 10 |
 | Mort | -100 $ |
@@ -304,9 +310,9 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Plein écran | Bords rouges | Quand le joueur est touché |
 | Plein écran | WASTED | Noir et blanc à la mort |
 
-**La mini-carte** montre les bâtiments et les parcs, l'armurerie (A orange) et l'hôpital (+ rouge). Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
+**La mini-carte** montre les bâtiments et les parcs, l'armurerie (A orange), l'hôpital (+ rouge) et le château Wolfenstein (W rouge foncé). Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
 
-**Le menu** affiche le titre, la liste des touches et « Clique pour jouer ». Échap libère la souris et ramène ce menu en mode pause.
+**Le menu** affiche le titre, une phrase d'histoire (« Tu es B.J. Blazkowicz… »), la liste des touches et « Clique pour jouer ». Échap libère la souris et ramène ce menu en mode pause.
 
 ### Sons
 
@@ -319,22 +325,22 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 1 460 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 1 500 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.170 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
-| 1–89 | HTML et CSS | Interface et menu |
-| 92–176 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS` |
-| 180–265 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
-| 266–344 | Textures | Façades, vitres et routes dessinées par le programme |
-| 345–555 | Ville et collisions | Construction des pâtés, routes, murs invisibles |
-| 556–714 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
-| 715–1086 | Joueur | Clavier et souris, tir, achat, conduite |
-| 1087–1258 | Intelligence | Piétons, ennemis, circulation, police |
-| 1259–1384 | Missions, caméra, écran | Enchaînement des étapes, vues, mini-carte |
-| 1385–1463 | Boucle principale | Mise à jour et affichage de chaque image |
+| 1–91 | HTML et CSS | Interface et menu |
+| 93–184 | **Zones à modifier** | `REGLAGES`, `ARMES`, `CARTE`, `MISSIONS` |
+| 186–272 | Outils, géographie, moteur 3D | Calculs, scène, lumières, ciel |
+| 273–354 | Textures | Façades, vitres, routes et pierres du château dessinées par le programme |
+| 355–589 | Ville et collisions | Construction des pâtés (dont bunker et château), routes, murs invisibles |
+| 590–752 | Personnages, voitures, sons | Modèles en formes simples, animations, sons synthétisés |
+| 753–1127 | Joueur et PNJ | Tenues des personnages, clavier et souris, tir, achat, conduite |
+| 1128–1299 | Intelligence | Piétons, nazis, circulation, police |
+| 1300–1425 | Missions, caméra, écran | Enchaînement des étapes, vues, mini-carte |
+| 1426–1504 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 

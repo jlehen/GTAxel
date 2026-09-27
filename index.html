@@ -35,6 +35,7 @@
   #menu h1 { font: 120px 'Anton', Impact, sans-serif; margin: 0; letter-spacing: 4px;
              background: linear-gradient(#fff 40%, #f0c850); -webkit-background-clip: text; background-clip: text; color: transparent;
              filter: drop-shadow(5px 5px 0 #000); }
+  #histoire { font-size: 22px; max-width: 700px; margin-top: 6px; }
   #etat { font-size: 28px; margin: 10px 0 26px; color: #f0c850; }
   #menu table { border-collapse: collapse; font-size: 18px; }
   #menu td { padding: 3px 14px; }
@@ -61,6 +62,7 @@
 </div>
 <div id="menu">
   <h1>GTAxel</h1>
+  <div id="histoire">Tu es B.J. Blazkowicz. Chasse les nazis de la ville et abats Hitler dans le château Wolfenstein !</div>
   <div id="etat">Chargement… (il faut une connexion Internet)</div>
   <table>
     <tr><td>Z Q S D</td><td>se déplacer / conduire</td></tr>
@@ -114,6 +116,7 @@ const REGLAGES = {
   degatsPolicier: 5,
   degatsSoldat: 7,
   degatsBoss: 12,
+  degatsHitler: 10,
   precisionEnnemis: 0.35,    // 1 = ils ne ratent jamais
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
@@ -134,11 +137,12 @@ const ARMES = [
 
 // =====================================================================
 //  LA CARTE : chaque lettre est un pâté de maisons (les routes sont ajoutées toutes seules)
-//  T tours   I immeubles   M maisons   P parc   A armurerie   H hôpital   B bunker
+//  T tours   I immeubles   M maisons   P parc   A armurerie   H hôpital   B bunker nazi
+//  W château Wolfenstein (repaire d'Hitler)
 //  . place   X départ du joueur   a b c d ... lieux de mission (des places)
 // =====================================================================
 const CARTE = [
-  "MMMMPPIIIMMM",
+  "MMMMPPIIIMWM",
   "MXMMPPIaTIMM",
   "MMHIIITTTIIM",
   "PPIIATTTTIIP",
@@ -152,7 +156,7 @@ const CARTE = [
 
 // =====================================================================
 //  LES MISSIONS : invente les tiennes !
-//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'boss' ou 'soldat')
+//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss' ou 'hitler')
 //  etoiles (nombre) · semer · arme (le nom d'une arme à posséder)
 // =====================================================================
 const MISSIONS = [
@@ -171,8 +175,11 @@ const MISSIONS = [
     { type: 'semer', texte: 'Sème la police !' },
   ]},
   { nom: 'Opération bunker', recompense: 5000, etapes: [
-    { type: 'aller', lieu: 'd', texte: 'Va près du bunker militaire' },
+    { type: 'aller', lieu: 'd', texte: 'Va près du bunker nazi' },
     { type: 'eliminer', cible: 'boss', texte: 'Élimine le Kommandant dans le bunker' },
+  ]},
+  { nom: 'Le château Wolfenstein', recompense: 10000, etapes: [
+    { type: 'eliminer', cible: 'hitler', texte: 'Boss final : élimine Hitler dans le château Wolfenstein (W sur la carte)' },
   ]},
 ];
 
@@ -209,7 +216,7 @@ function hauteurSol(x, z) { // 0 sur la route, 0.2 sur les trottoirs
 }
 
 const lieux = {};
-let depart = centre(0, 0), hopital = null, armurerie = null;
+let depart = centre(0, 0), hopital = null, armurerie = null, chateau = null;
 for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
   const c = CARTE[j][i];
   if (c === 'X') depart = centre(i, j);
@@ -312,6 +319,8 @@ const TEX = {
   hopital: facade('#f2f2ee', 1, 4, (g, x, y, w, h) => vitre(g, 0, y + h * .3, w, h * .45, [50, 90, 140])),
   magasin: facade('#4a2a22', 4, 2, (g, x, y, w, h) => { if (y > 0) { g.fillStyle = '#222'; g.fillRect(x, y + 8, w, h - 8); vitre(g, x + 4, y + 14, w - 8, h - 20, [70, 60, 50]); } else vitre(g, x + w * .2, y + h * .25, w * .6, h * .5); }, null, 128),
   bunker: toile(256, 256, (g, l, h) => { g.fillStyle = '#6e6e66'; g.fillRect(0, 0, l, h); grain(g, l, h, 6000, 0.1); g.fillStyle = 'rgba(0,0,0,.3)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 64, 0, 2, h); g.fillRect(0, k * 64, l, 2); } for (let i = 0; i < 12; i++) { g.fillStyle = 'rgba(40,35,20,.15)'; g.fillRect(Math.random() * l, Math.random() * h, 6, entre(20, 80)); } }),
+  pierres: toile(256, 256, (g, l, h) => { g.fillStyle = '#4a4744'; g.fillRect(0, 0, l, h); for (let y = 0; y < 8; y++) for (let x = 0; x < 5; x++) { g.fillStyle = `hsl(30,${entre(3, 8)}%,${entre(38, 52)}%)`; g.fillRect(x * 64 + (y % 2) * 32 - 32 + 2, y * 32 + 2, 60, 28); } grain(g, l, h, 5000, 0.08); }),
+  banniere: toile(128, 256, (g) => { g.fillStyle = '#a01010'; g.fillRect(0, 0, 128, 256); g.fillStyle = '#eee'; g.beginPath(); g.arc(64, 100, 44, 0, 7); g.fill(); g.fillStyle = '#111'; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText('W', 64, 123); }),
   croix: toile(128, 128, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#d42020'; g.fillRect(44, 14, 40, 100); g.fillRect(14, 44, 100, 40); }),
   enseigne: toile(512, 96, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 512, 96); g.fillStyle = '#ff7a1a'; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText('ARMURERIE', 256, 72); }),
   flash: toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,230,1)'); r.addColorStop(0.3, 'rgba(255,200,80,.8)'); r.addColorStop(1, 'rgba(255,120,0,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }),
@@ -333,13 +342,14 @@ const MAT = {
   metal: std(null, { color: '#8a8d90', metalness: 0.6, roughness: 0.4 }), sacs: std(null, { color: '#8a7a5a', roughness: 1 }),
   pierre: std(null, { color: '#b8b2a6' }), eau: std(null, { color: '#2a5a7a', metalness: 0.3, roughness: 0.05 }),
   porte: std(null, { color: '#222', roughness: 0.6 }),
+  chateau: std(TEX.pierres, { roughness: 0.95 }), banniere: std(TEX.banniere, { side: THREE.DoubleSide }),
   croix: std(TEX.croix, { emissive: '#fff', emissiveMap: TEX.croix, emissiveIntensity: 0.3 }),
   enseigne: std(TEX.enseigne, { emissive: '#fff', emissiveMap: TEX.enseigne, emissiveIntensity: 0.8 }),
 };
 // taille (en mètres) couverte par une répétition de chaque texture
 const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [12, 12], verre2: [12, 12], hopital: [12, 12],
   maison1: [6, 6], maison2: [6, 6], maison3: [6, 6], magasin: [12, 6], bunker: [8, 8], toit: [8, 8], trottoir: [4, 4],
-  herbe: [6, 6], paves: [4, 4] };
+  herbe: [6, 6], paves: [4, 4], chateau: [4, 4] };
 
 // =====================================================================
 //  Construction de la ville
@@ -464,6 +474,30 @@ function genererBloc(i, j) {
     for (const [a, b] of [[10, 22], [10, 38], [22, 14], [22, 46], [34, 12], [34, 48], [50, 10], [50, 50]]) pnjDepart.push({ type: 'soldat', x: X(a), z: Z(b) });
     soins.push({ x: X(48), z: Z(8) }, { x: X(48), z: Z(52) });
     pickupsDepart.push({ type: 'arme', arme: 5, x: X(52), z: Z(30) });
+  } else if (c === 'W') { // le château Wolfenstein, repaire d'Hitler
+    chateau = { x: X(30), z: Z(30) };
+    sol('paves', X(30), 0.21, Z(30), 52, 52);
+    const mur = (x, z, l, p) => boite('chateau', X(x), 0.2, Z(z), l, 7, p, true);
+    mur(30, 4.5, 52, 1.5); mur(55.5, 30, 1.5, 52); mur(4.5, 30, 1.5, 52);
+    mur(14.75, 55.5, 21.5, 1.5); mur(45.25, 55.5, 21.5, 1.5);          // mur sud avec la grande porte
+    for (let k = 7; k <= 53; k += 3) {                                  // créneaux
+      for (const [a, b] of [[k, 4.5], [55.5, k], [4.5, k]]) boite('chateau', X(a), 7.2, Z(b), 1.5, 1, 1.5);
+      if (k < 25 || k > 35) boite('chateau', X(k), 7.2, Z(55.5), 1.5, 1, 1.5);
+    }
+    for (const [a, b] of [[5.5, 5.5], [54.5, 5.5], [5.5, 54.5], [54.5, 54.5]]) { // tours avec toit pointu
+      boite('chateau', X(a), 0.2, Z(b), 6, 12, 6, true);
+      ajouterGeo('ardoise', new THREE.ConeGeometry(4.6, 6, 4).rotateY(Math.PI / 4).translate(X(a), 15.2, Z(b)));
+    }
+    boite('chateau', X(32), 0.2, Z(22), 22, 16, 18, true);             // le donjon
+    boite('toit', X(32), 16.2, Z(22), 22.5, 0.5, 18.5);
+    boite('porte', X(32), 0.2, Z(31), 3, 4, 0.2);
+    const banniere = (x, y, z, l, h) => ajouterGeo('banniere', new THREE.PlaneGeometry(l, h).translate(X(x), y, Z(z)));
+    banniere(25, 10, 31.06, 3, 8); banniere(39, 10, 31.06, 3, 8);       // sur le donjon
+    banniere(20, 4, 56.3, 2.5, 5); banniere(40, 4, 56.3, 2.5, 5);       // de chaque côté de la porte
+    pnjDepart.push({ type: 'hitler', x: X(32), z: Z(36) });
+    for (const [a, b] of [[12, 14], [12, 30], [12, 46], [24, 44], [40, 44], [50, 14], [50, 30], [50, 46]]) pnjDepart.push({ type: 'soldat', x: X(a), z: Z(b) });
+    soins.push({ x: X(9), z: Z(51) }, { x: X(51), z: Z(51) });
+    pickupsDepart.push({ type: 'arme', arme: 3, x: X(30), z: Z(50) });
   } else { // places : '.', 'X', et les lieux de mission
     sol('paves', X(30), 0.21, Z(30), S - 8, S - 8);
     for (const [a, b] of [[10, 10], [50, 10], [10, 50], [50, 50]]) { boite('pierre', X(a), 0.2, Z(b), 2.4, 0.6, 2.4); arbre(X(a), Z(b), 1); }
@@ -566,6 +600,8 @@ const GEO = {
   casque: new THREE.SphereGeometry(0.16, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5),
   casquette: new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16), visiere: new THREE.BoxGeometry(0.2, 0.02, 0.12),
   oeil: new THREE.SphereGeometry(0.018, 6, 4),
+  rebord: new THREE.CylinderGeometry(0.17, 0.2, 0.03, 16), brassard: new THREE.CylinderGeometry(0.073, 0.073, 0.08, 10),
+  moustache: new THREE.BoxGeometry(0.05, 0.028, 0.02), meche: new THREE.BoxGeometry(0.13, 0.035, 0.03),
 };
 function piece(geo, couleur, parent, x, y, z) {
   const m = new THREE.Mesh(geo, mat(couleur));
@@ -578,15 +614,17 @@ function creerHumain(s) {
   piece(GEO.torse, s.haut, haut, 0, 0.38, 0);
   piece(GEO.cou, s.peau, haut, 0, 0.72, 0);
   const tete = piece(GEO.tete, s.peau, haut, 0, 0.86, 0);
-  if (s.casque) piece(GEO.casque, s.casque, tete, 0, 0.02, 0);
+  if (s.casque) { piece(GEO.casque, s.casque, tete, 0, 0.02, 0); piece(GEO.rebord, s.casque, tete, 0, 0.045, 0); } // casque allemand
   else if (s.casquette) { piece(GEO.casquette, s.casquette, tete, 0, 0.09, 0); piece(GEO.visiere, s.casquette, tete, 0, 0.06, 0.13); }
   else piece(GEO.cheveux, s.cheveux, tete, 0, 0.012, -0.01);
   piece(GEO.oeil, '#111', tete, 0.045, 0.02, 0.113); piece(GEO.oeil, '#111', tete, -0.045, 0.02, 0.113);
+  if (s.moustache) { piece(GEO.moustache, s.moustache, tete, 0, -0.035, 0.12); piece(GEO.meche, s.cheveux, tete, 0.02, 0.085, 0.1).rotation.z = -0.35; }
   // le personnage regarde vers +Z : son bras droit est du côté -X
   const [brasD, brasG] = [-1, 1].map(c => { const b = new THREE.Group(); b.position.set(0.29 * c, 0.62, 0); haut.add(b);
     piece(GEO.bras, s.haut, b, 0, -0.26, 0); piece(GEO.main, s.peau, b, 0, -0.57, 0); return b; });
   const [jambeD, jambeG] = [-1, 1].map(c => { const j = new THREE.Group(); j.position.set(0.11 * c, 0.95, 0); g.add(j);
     piece(GEO.jambe, s.bas, j, 0, -0.45, 0); piece(GEO.chaussure, s.chaussures, j, 0, -0.9, 0.04); return j; });
+  if (s.brassard) piece(GEO.brassard, s.brassard, brasG, 0, -0.14, 0);
   return { g, haut, tete, brasD, brasG, jambeD, jambeG, phase: Math.random() * 6, arme: null };
 }
 function animerHumain(h, vitesse, dt, o = {}) {
@@ -718,7 +756,7 @@ const J = { x: depart.x, z: depart.z, y: 0.2, vy: 0, sol: true, lacet: Math.PI, 
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0 };
-const joueurH = creerHumain({ peau: '#e0b090', haut: '#f4f4f4', bas: '#3a4a6a', chaussures: '#222', cheveux: '#3a2a1a' });
+const joueurH = creerHumain({ peau: '#e8b890', haut: '#e8e4d8', bas: '#4a5238', chaussures: '#3a2a1a', cheveux: '#b8955a' }); // B.J. Blazkowicz
 scene.add(joueurH.g);
 
 // arme vue en première personne (dessinée par-dessus le reste)
@@ -754,11 +792,13 @@ const TENUES = {
   pieton: () => ({ peau: hasard(PEAUX), haut: hasard(['#c33', '#36a', '#eee', '#222', '#3a3', '#e90', '#a3a', '#678']),
     bas: hasard(['#2a3a5a', '#222', '#6a5a40', '#444', '#8a8a8a']), chaussures: hasard(['#222', '#eee', '#6b4423']), cheveux: hasard(['#1a1208', '#3a2a1a', '#8a6a3a', '#d8c080', '#555']) }),
   flic: () => ({ peau: hasard(PEAUX), haut: '#1d2f5a', bas: '#141e36', chaussures: '#111', casquette: '#141e36' }),
-  soldat: () => ({ peau: hasard(PEAUX), haut: '#4b5320', bas: '#3b4218', chaussures: '#2a2a1a', casque: '#3b4218' }),
-  boss: () => ({ peau: '#e0b090', haut: '#222', bas: '#111', chaussures: '#000', casquette: '#111' }),
+  soldat: () => ({ peau: hasard(PEAUX.slice(0, 2)), haut: '#5d6352', bas: '#4a4f42', chaussures: '#111', casque: '#4a5040', brassard: '#b01010' }),
+  boss: () => ({ peau: '#e0b090', haut: '#222', bas: '#111', chaussures: '#000', casquette: '#111', brassard: '#b01010' }),
+  hitler: () => ({ peau: '#e8c0a0', haut: '#8a7a55', bas: '#1a1a1a', chaussures: '#000', cheveux: '#111', moustache: '#111', brassard: '#b01010' }),
 };
-const VIE_PNJ = { pieton: 50, flic: 70, soldat: 90, boss: 450 };
-const ARME_PNJ = { flic: 2, soldat: 5, boss: 4 };
+const VIE_PNJ = { pieton: 50, flic: 70, soldat: 90, boss: 450, hitler: 900 };
+const ARME_PNJ = { flic: 2, soldat: 5, boss: 4, hitler: 3 };
+const NAZIS = ['soldat', 'boss', 'hitler'];
 const personnes = [];
 function creerPersonne(type, x, z) {
   const h = creerHumain(TENUES[type]());
@@ -768,7 +808,7 @@ function creerPersonne(type, x, z) {
   h.g.traverse(o => o.userData.personne = p);
   h.g.position.set(x, hauteurSol(x, z), z);
   scene.add(h.g); personnes.push(p);
-  if (type === 'soldat' || type === 'boss') { const [i, j] = blocEn(x, z), o = origine(i, j); p.zone = [o.x + 6, o.z + 6, o.x + S - 6, o.z + S - 6]; }
+  if (NAZIS.includes(type)) { const [i, j] = blocEn(x, z), o = origine(i, j); p.zone = [o.x + 6, o.z + 6, o.x + S - 6, o.z + S - 6]; }
   else initChemin(p);
   return p;
 }
@@ -970,7 +1010,7 @@ function tirer() {
     if (p.vie <= 0) continue;
     const d = dist(p, J);
     if (p.type === 'pieton' && d < 40) p.peur = 8;
-    if ((p.type === 'soldat' || p.type === 'boss') && d < 50) p.alerte = true;
+    if (NAZIS.includes(p.type) && d < 50) p.alerte = true;
     if (p.type === 'flic' && d < 30 && etoiles === 0) crime(1);
   }
 }
@@ -1000,6 +1040,7 @@ function blesser(p, degats) {
   if (p.type === 'flic') { crime(1); creerObjet({ type: 'arme', arme: 2, x: p.x, z: p.z }); }
   if (p.type === 'soldat') creerObjet({ type: 'arme', arme: Math.random() < 0.5 ? 3 : 5, x: p.x, z: p.z });
   if (p.type === 'boss') { creerObjet({ type: 'arme', arme: 4, x: p.x + 1, z: p.z }); creerObjet({ type: 'argent', montant: 1000, x: p.x - 1, z: p.z }); }
+  if (p.type === 'hitler') { creerObjet({ type: 'arme', arme: 5, x: p.x + 1, z: p.z }); creerObjet({ type: 'argent', montant: 2000, x: p.x - 1, z: p.z }); }
 }
 function blesserJoueur(degats) {
   if (J.mort) return;
@@ -1099,7 +1140,7 @@ function majPersonne(p, dt) {
   }
   p.cooldown -= dt; p.peur -= dt;
   let vitesse = 0, arme = false;
-  const hostile = p.type === 'soldat' || p.type === 'boss' || (p.type === 'flic' && etoiles > 0);
+  const hostile = NAZIS.includes(p.type) || (p.type === 'flic' && etoiles > 0);
   if (hostile && !J.mort) {
     p.vuTimer -= dt;
     if (p.vuTimer <= 0) { p.vuTimer = 0.3; p.voitJ = d < (p.type === 'flic' ? 70 : 45) && voit(p, J); if (p.voitJ) p.alerte = true; }
@@ -1110,7 +1151,7 @@ function majPersonne(p, dt) {
       p.angle = lerpAngle(p.angle, vise, 8 * dt);
       if (!p.voitJ || d > 22) vitesse = 4.5; else if (d < 6) vitesse = -2;
       if (p.voitJ && p.cooldown <= 0 && Math.abs(diffAngle(p.angle, vise)) < 0.3) {
-        p.cooldown = entre(1, 2) * (p.type === 'boss' ? 0.6 : 1);
+        p.cooldown = entre(1, 2) * ({ boss: 0.6, hitler: 0.4 }[p.type] || 1);
         tirEnnemi(p, d);
       }
     }
@@ -1135,7 +1176,7 @@ function majPersonne(p, dt) {
   }
 }
 function tirEnnemi(p, d) {
-  const degats = { flic: R_.degatsPolicier, soldat: R_.degatsSoldat, boss: R_.degatsBoss }[p.type];
+  const degats = { flic: R_.degatsPolicier, soldat: R_.degatsSoldat, boss: R_.degatsBoss, hitler: R_.degatsHitler }[p.type];
   let chance = R_.precisionEnnemis * clamp(1.2 - d / 50, 0.2, 1);
   if (J.accroupi) chance *= 0.5;
   if (J.vitesse > 6) chance *= 0.6;
@@ -1330,11 +1371,11 @@ carteImg.width = Math.ceil(TAILLE_X); carteImg.height = Math.ceil(TAILLE_Z);
 {
   const g = carteImg.getContext('2d');
   g.fillStyle = '#8c9196'; g.fillRect(0, 0, carteImg.width, carteImg.height);
-  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070' };
+  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038' };
   for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) { const o = origine(i, j); g.fillStyle = couleurs[CARTE[j][i]] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
   g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
   const icone = (p, fond, lettre) => { if (!p) return; g.fillStyle = fond; g.beginPath(); g.arc(p.x, p.z, 9, 0, 7); g.fill(); g.fillStyle = '#fff'; g.font = 'bold 13px Arial'; g.textAlign = 'center'; g.fillText(lettre, p.x, p.z + 5); };
-  icone(armurerie, '#d86a10', 'A'); icone(hopital, '#c02020', '+');
+  icone(armurerie, '#d86a10', 'A'); icone(hopital, '#c02020', '+'); icone(chateau, '#8a1010', 'W');
 }
 const mctx = $('minicarte').getContext('2d');
 function dessinerMinicarte() {
