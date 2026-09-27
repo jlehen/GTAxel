@@ -11,6 +11,7 @@ Ou ouvre `index.html` dans un navigateur (double-clic). Il faut une connexion In
 | Touche | Action |
 |---|---|
 | Z Q S D ou flèches | Se déplacer / conduire |
+| Q S D, 3 fois de suite | Danser comme Michael Jackson |
 | Souris | Regarder |
 | Clic gauche | Tirer / frapper |
 | Clic droit | Viser (zoom, lunette avec le fusil de sniper) |
@@ -40,13 +41,14 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 - **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse. La dernière mission t'envoie au château Wolfenstein (W rouge sur la mini-carte) pour éliminer Hitler.
 - **Carte** : la touche M affiche tout le pays en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants. Elle te dit aussi dans quelle colonne et quelle ligne du tableau `CARTE` tu es.
 - **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`… à toi de voir ce qu'ils font ! Retape un code pour l'annuler.
+- **Danse** : tape Q S D trois fois de suite (A S D sur un clavier QWERTY) : B.J. fait le moonwalk, tourne sur lui-même et prend la pose « Who's bad ? » de Michael Jackson. Bouge pour l'arrêter.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital le plus proche (+ rouge sur la mini-carte) et tu perds 100 $.
 
 ## Modifier le jeu
 
 Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier :
 
-1. **`REGLAGES`** : vitesses à pied et à la nage, vie, dégâts des ennemis, nombre de voitures et de piétons, hauteur des montagnes… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
+1. **`REGLAGES`** : vitesses à pied et à la nage, vie, dégâts des ennemis, nombre de voitures et de piétons, hauteur des montagnes, touches et durée de la danse… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
 2. **`ARMES`** : dégâts, cadence de tir, prix, munitions de chaque arme, rayon d'explosion du bazooka, zoom de la lunette du fusil de sniper.
 3. **`VOITURES`** : vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de voiture ou de bateau, et la chance de la croiser. Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
 4. **`CARTE`** : tout le pays vu du ciel, le nord en haut. Chaque signe est une case de 74 m. Toutes les lignes doivent avoir la même longueur.

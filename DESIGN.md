@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (grande carte inspirée de GTA 5 : relief, eau, routes de campagne, ponts, bateaux, nage, bâtiments où l'on entre).
+Mis à jour le 27 septembre 2026 (Q S D trois fois de suite : B.J. danse comme Michael Jackson).
 
 ## Vision
 
@@ -36,6 +36,7 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | Touche | À pied | En voiture |
 | --- | --- | --- |
 | Z Q S D ou flèches | Se déplacer | Accélérer, freiner, tourner |
+| Q S D, 3 fois de suite | Danser comme Michael Jackson | Rien |
 | Souris | Regarder | Tourner la caméra autour de la voiture |
 | Clic gauche | Tirer ou frapper (pas en nageant) | Rien |
 | Clic droit | Viser (zoom, tir plus précis ; lunette avec le fusil de sniper) | Rien |
@@ -61,9 +62,28 @@ Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W
 | Accroupi | 2 m/s |
 | Nage (Maj) | 4 m/s |
 | Nage | 2,2 m/s |
+| Moonwalk (pendant la danse) | 1,5 m/s, à reculons |
 
 - Une marche de 60 cm au plus se monte sans sauter (`PASMAX`) : escaliers, trottoirs, lits, conteneurs empilés... Le terrain, lui, se monte à pied quelle que soit la pente.
 - **Nage** : là où l'eau est trop profonde pour avoir pied (plus de 1,30 m), B.J. nage, couché à la surface. Il ne peut ni tirer, ni sauter, ni s'accroupir, et son arme est rangée. En nageant, il remonte sur une plage ou un ponton (marche de 1,90 m au plus). On ne se noie pas.
+
+### La danse
+
+Taper gauche, arrière, droite trois fois de suite (Q S D Q S D Q S D, ou A S D sur un clavier QWERTY) fait danser B.J. comme Michael Jackson. Il faut 9 touches sans aucune autre au milieu ; il n'y a pas de temps limite. Les touches sont dans le réglage `touchesDanse`.
+
+La danse dure 6 s, en trois pas. Leurs durées sont dans le réglage `moonwalk` (3, 1 et 2 s).
+
+| Pas | Durée | Ce que fait B.J. |
+| --- | --- | --- |
+| Moonwalk | 3 s | Il se met de profil et recule d'environ 4,4 m, à 1,5 m/s (`vitesseMoonwalk`). Ses jambes marchent vers l'avant, le pied qui avance glisse sur la pointe, ses bras bougent à peine et il regarde ses pieds. « Moonwalk ! » s'affiche |
+| Toupie | 1 s | Il fait 2 tours et quart sur la pointe des pieds, vite puis de moins en moins, les bras serrés contre lui et un genou plié. On entend « hee-hee » |
+| Pose | 2 s | Face à la caméra, d'un coup sec : jambes écartées, genoux pliés, penché en avant, les bras en arrière, la tête relevée. « WHO'S BAD ? » s'affiche |
+
+- La danse passe en 3e personne, pour qu'on la voie. Les angles sont pris par rapport à la caméra au moment où la danse commence ; ensuite, la souris tourne autour de B.J. sans le déranger.
+- B.J. range son arme pour danser. Le moonwalk s'arrête contre un mur comme une marche normale.
+- Appuyer sur une touche pour bouger, sauter ou s'accroupir, tirer ou viser arrête la danse tout de suite. Monter en voiture, tomber à l'eau ou mourir aussi. La dernière touche de la suite, si elle reste enfoncée, ne l'arrête pas.
+- On ne danse qu'à pied : en voiture, en bateau ou en nageant, la suite de touches ne fait rien.
+- Comme ce sont les touches pour se déplacer, B.J. fait quelques pas de côté et en arrière avant de danser.
 
 ### Caméras
 
@@ -441,7 +461,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Bas centre | Objectif | Texte de l'étape de mission en cours |
 | Centre | Viseur | Un point blanc, avec une arme à feu, en visant ou en 1re personne. Caché dans la lunette et en nageant |
 | Plein écran | Lunette | Un rond avec deux traits en croix et du noir autour, en visant avec le fusil de sniper. Le reste de l'écran (mini-carte, argent) s'affiche par-dessus |
-| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! » |
+| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? » |
 | Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
 | Plein écran | Bords rouges | Quand le joueur est touché |
 | Plein écran | WASTED | Noir et blanc à la mort |
@@ -484,6 +504,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 - **Pause** : le menu et la grande carte coupent tous les sons.
 - **Police** : sirène à deux tons, plus forte quand la voiture approche.
 - **Signaux** : bips pour un achat, un objet ramassé, une étape réussie, une blessure, la mort.
+- **Danse** : deux petits cris aigus (« hee-hee ») au début de la toupie, un bruit sec quand B.J. prend la pose.
 
 | Type | Note au ralenti | Note à fond | Rapports | Rauque (0 à 1) | Volume | Caractère |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -501,27 +522,27 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 3 000 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 3 050 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–106 | HTML et CSS | Interface et menu |
-| 107–349 | **Zones à modifier** | `REGLAGES`, `ARMES`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `TRICHES` |
-| 350–594 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) |
-| 595–787 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, panneaux, visages dessinés par le programme ; matières |
-| 788–1405 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`), rues, routes et ponts, pontons, pistes, terrain et végétation, eau, fusion |
-| 1406–1460 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
-| 1461–1580 | Personnages | Corps articulés, animations (dont la nage), armes en 3D |
-| 1581–1836 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), carrosserie, cabine, roues |
-| 1837–1896 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés |
-| 1897–2329 | Joueur et PNJ | Tenues, objets, explosions, roquettes, clavier et souris, triches, ascenseur, tir, achat |
-| 2330–2447 | Mise à jour du joueur | Marche, nage, conduite, pentes, sauts, voitures qui coulent, bateaux |
-| 2448–2677 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
-| 2678–2745 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
-| 2746–2900 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
-| 2901–2997 | Boucle principale | Mise à jour et affichage de chaque image |
+| 107–352 | **Zones à modifier** | `REGLAGES`, `ARMES`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `TRICHES` |
+| 353–597 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) |
+| 598–790 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, panneaux, visages dessinés par le programme ; matières |
+| 791–1408 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`), rues, routes et ponts, pontons, pistes, terrain et végétation, eau, fusion |
+| 1409–1463 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
+| 1464–1604 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
+| 1605–1860 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), carrosserie, cabine, roues |
+| 1861–1920 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés |
+| 1921–2377 | Joueur et PNJ | Tenues, objets, explosions, roquettes, clavier et souris, suite de touches de la danse, triches, danse (`danser`, `pasDeDanse`), ascenseur, tir, achat |
+| 2378–2501 | Mise à jour du joueur | Marche, nage, moonwalk, conduite, pentes, sauts, voitures qui coulent, bateaux |
+| 2502–2731 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
+| 2732–2799 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
+| 2800–2954 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
+| 2955–3052 | Boucle principale | Mise à jour et affichage de chaque image |
 
 ### À chaque image
 
@@ -540,6 +561,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Rendu** : ciel physique avec nuages, tone mapping ACES (exposition 0,5), ombres douces, reflets du ciel sur les vitres et la carrosserie, brouillard. Le soleil suit le joueur pour garder des ombres nettes autour de lui. Les éclairs de tir, les traits des balles, les flammes et les boules de feu sont dessinés à pleine lumière, sans passer par l'exposition (`toneMapped: false`).
 - **Textures** : chaque texture est dessinée deux fois plus fin qu'avant, sur 512 points de côté pour la plupart. Le même dessin sert de relief : le clair ressort, le foncé se creuse. Chaque façade a un second dessin, invisible, qui dit où ça brille : les murs sont mats, les vitres sont des miroirs.
 - **Personnages** : le torse, les bras et les jambes sont des formes faites « au tour », comme des vases. Chaque morceau de bras ou de jambe finit par une boule de la taille de la boule du morceau suivant : le coude et le genou ne se voient pas. Le visage est une image dessinée sur la tête, une par couleur de peau. Un personnage compte une vingtaine de pièces.
+- **Danse** : le jeu retient le nom des dernières touches enfoncées, bout à bout. Quand la fin de cette liste est trois fois `touchesDanse`, la danse commence, et les touches encore enfoncées sont oubliées. `J.danse` compte les secondes depuis le début de la danse (0 = il ne danse pas). À chaque image, `pasDeDanse` dit quel pas est en cours et tourne le corps ; `animerHumain` place les bras, les jambes, les pieds et la tête. Le moonwalk réutilise l'animation de la marche : c'est le corps qui recule. `animerHumain` remet les pieds, la tête et l'écart des jambes à zéro à chaque image, pour tous les personnages : la pose ne reste jamais collée.
 - **Voitures** : la carrosserie est un profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur. Tous ses bords sont arrondis. La cabine est une boîte arrondie, plus étroite et plus courte en haut ; les vitres sont des plaques posées dessus, visibles seulement de dehors, pour qu'on voie à travers en vue intérieure. Les pièces d'un modèle sont fabriquées une seule fois, puis fusionnées par matière : une voiture compte 8 objets pour le corps et 2 par roue. Le tricycle est fait de pièces simples, sans profil ni cabine.
 - **Terrain** : une grille de points tous les 9,25 m (8 par case), dont la hauteur est calculée une fois au chargement (`HT`), puis creusée sous les routes. Chaque carré est fait de deux triangles ; `hauteurTerrain` retrouve la hauteur exacte du triangle dessiné, pour que personne ne flotte ni ne s'enfonce. Les couleurs du sol sont posées sur chaque point, puis teintent un grain gris.
 - **Hauteur du sol** : `hauteurSol(x, z, y)` prend la plus haute de ces surfaces : terrain, trottoir d'un pâté, rue, route ou pont de campagne. Si on lui donne la hauteur des pieds (`y`), elle compte aussi les planchers, marches, toits et meubles qui ne dépassent pas de plus de 60 cm : c'est ce qui fait marcher les escaliers. Un pont ne compte que si on est dessus, pas si on nage dessous.
@@ -574,6 +596,7 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture ou un bateau, et la police (65 km/h) ne rattrape aucun véhicule lancé à fond, pas même le tricycle (72 km/h).
 - Les voitures qui roulent toutes seules ne regardent que le milieu des autres : une limousine peut couper un virage et mordre sur le trottoir.
 - Sur un tricycle ou un bateau, B.J. garde son arme à la main.
+- La danse passe en 3e personne et n'en revient pas toute seule : il faut appuyer sur V. Pendant le moonwalk, les pieds glissent un peu au lieu de rester posés, et les ennemis continuent de tirer. Comme la suite de touches n'a pas de temps limite, on peut lancer la danse sans le vouloir, en esquivant à gauche, en arrière, à droite trois fois.
 - Les missions sont linéaires : une seule à la fois, dans l'ordre.
 - Hitler ne meurt qu'une fois : le bazooka n'a que ses 10 roquettes, et on ne peut pas en racheter.
 - Les roquettes volent tout droit : elles ne suivent pas leur cible.

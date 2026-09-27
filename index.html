@@ -140,6 +140,9 @@ const REGLAGES = {
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m
   vitesseNage: 2.2,          // dans l'eau
   vitesseNageRapide: 4,      // dans l'eau, avec Maj
+  touchesDanse: ['KeyA', 'KeyS', 'KeyD'], // à taper 3 fois de suite pour danser : gauche, arrière, droite (Q S D sur un clavier français)
+  moonwalk: [3, 1, 2],       // la danse, en secondes : le moonwalk, la toupie, puis la pose « Who's bad ? »
+  vitesseMoonwalk: 1.5,      // m/s, à reculons
 };
 
 // =====================================================================
@@ -1545,10 +1548,31 @@ function animerHumain(h, vitesse, dt, o = {}) {
     h.brasD.pli.rotation.x = h.brasG.pli.rotation.x = -0.2;
     h.jambeG.rotation.x = Math.sin(h.phase * 2) * 0.3; h.jambeD.rotation.x = -Math.sin(h.phase * 2) * 0.3; h.jambeG.pli.rotation.x = h.jambeD.pli.rotation.x = 0.1;
   }
+  // la danse, en trois pas. Seule la danse écarte les jambes, penche la tête ou met sur la pointe des pieds
+  const pas = o.danse?.pas;
+  let penche = o.accroupi ? 0.25 : amp * 0.12, monte = 0;   // on se penche en avant pour courir
+  h.tete.rotation.x = 0;
+  for (const j of [h.jambeG, h.jambeD]) { j.rotation.z = 0; j.chaussure.rotation.set(0, 0, 0); }
+  if (pas === 'moonwalk') { // il marche vers l'avant mais il recule : le pied qui avance glisse sur la pointe, les bras bougent à peine
+    for (const j of [h.jambeG, h.jambeD]) j.chaussure.rotation.x = j.pli.rotation.x * 0.8;
+    h.brasG.rotation.x *= 0.3; h.brasD.rotation.x *= 0.3; h.tete.rotation.x = 0.3;
+  }
+  if (pas === 'toupie') { // sur la pointe des pieds, les bras serrés contre lui, un genou plié
+    h.brasD.rotation.set(-0.5, 0, 0.35); h.brasG.rotation.set(-0.5, 0, -0.35); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -1.9;
+    h.jambeG.rotation.x = -0.3; h.jambeG.pli.rotation.x = 0.6;
+    h.jambeG.chaussure.rotation.x = h.jambeD.chaussure.rotation.x = 0.7; monte = 0.08;
+  }
+  if (pas === 'pose') { // « Who's bad ? » : jambes écartées, penché en avant, les poings serrés, il te regarde
+    const e = Math.min(1, o.danse.k * 10);   // il prend la pose d'un coup sec
+    h.jambeG.rotation.set(-0.3 * e, 0, 0.35 * e); h.jambeD.rotation.set(-0.3 * e, 0, -0.35 * e); h.jambeG.pli.rotation.x = h.jambeD.pli.rotation.x = 0.6 * e;
+    h.jambeG.chaussure.rotation.set(-0.3 * e, 0, -0.35 * e); h.jambeD.chaussure.rotation.set(-0.3 * e, 0, 0.35 * e);   // les pieds restent à plat
+    h.brasG.rotation.set(0.35 * e, 0, 0.4 * e); h.brasD.rotation.set(0.35 * e, 0, -0.4 * e); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.7 * e;
+    h.tete.rotation.x = -0.35 * e; penche = 0.4 * e; monte = -0.09 * e;
+  }
   // à chaque pas, le corps descend un peu quand les jambes sont écartées
-  const hy = (o.accroupi ? 0.6 : 0.95) - Math.min(0.06, 0.5 * (1 - Math.cos(s)));
+  const hy = (o.accroupi ? 0.6 : 0.95) - Math.min(0.06, 0.5 * (1 - Math.cos(s))) + monte;
   h.haut.position.y = h.jambeG.position.y = h.jambeD.position.y = hy;
-  h.haut.rotation.x = o.accroupi ? 0.25 : amp * 0.12;   // on se penche en avant pour courir
+  h.haut.rotation.x = penche;
   h.g.rotation.x = o.nage ? 1.35 : -(o.mort || 0) * Math.PI / 2;
 }
 
@@ -1900,7 +1924,7 @@ const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12],
 const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, sol: true, nage: false, lacet: Math.PI, lacetCam: Math.PI, tangage: -0.1, decalage: 0, angleCorps: Math.PI,
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
-  dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0 };
+  dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0 };
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 scene.add(joueurH.g);
 const giletBJ = piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#243a5a', joueurH.haut, 0, 0.4, 0); // visible quand il en porte un
@@ -2111,10 +2135,12 @@ addEventListener('keydown', e => {
     $('triche').textContent = `Code : ${saisie}_`;
     return;
   }
-  touches[e.code] = true;
+  if (!e.repeat || !J.danse) touches[e.code] = true;   // pendant la danse, une touche restée enfoncée ne compte pas
   if (e.repeat) return;
   if (e.key.toLowerCase() === 'm') { ouvrirCarte(!carte.ouverte); return; } // la lettre M, quel que soit le clavier
   if (carte.ouverte) return;
+  suite = (suite + e.code + ' ').slice(-SUITE_DANSE.length);
+  if (suite === SUITE_DANSE) { suite = ''; danser(); }
   if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture) J.accroupi = !J.accroupi;
@@ -2166,6 +2192,28 @@ function rhabillerBJ() {
   for (const j of [b.jambeD, b.jambeG]) { habillerMembre(j, T.bas); j.scale.set(1, 1, 1); habiller(j.chaussure, T.chaussures); j.chaussure.visible = true; }
   b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
   for (const t of TRICHES) if (t.actif) t.effet(b);
+}
+// la danse (gauche, arrière, droite, 3 fois de suite) : B.J. se met de profil, pour qu'on voie bien le moonwalk
+const SUITE_DANSE = (R_.touchesDanse.join(' ') + ' ').repeat(3);
+let suite = '';   // les dernières touches tapées
+function danser() {
+  if (J.voiture || J.nage || J.mort) return;   // on ne danse qu'à pied
+  for (const k in touches) touches[k] = false;  // la dernière touche est encore enfoncée : on l'oublie, sinon elle arrêterait la danse
+  J.danse = 0.001; J.angleDanse = J.lacet + Math.PI / 2; J.vue = 3; J.accroupi = false;
+  annonce('', 'Moonwalk !', 2);
+}
+// un pas de danse par image : B.J. recule de profil en moonwalk, fait la toupie (2 tours et quart), puis prend la pose face à la caméra
+// renvoie le pas en cours, et où il en est de 0 à 1, pour animerHumain
+function pasDeDanse(dt) {
+  const [moon, toupie, pose] = R_.moonwalk, t = J.danse, passe = x => t < x && t + dt >= x;
+  J.danse += dt;
+  if (passe(moon) || passe(moon + 0.2)) bip(1300, 1900, 0.13, 'sine', 0.25);   // « hee-hee ! »
+  if (passe(moon + toupie)) { annonce('WHO\'S BAD ?', '', pose); bruit(0.6, 2500, 0.15); }
+  if (t < moon) { J.angleCorps = lerpAngle(J.angleCorps, J.angleDanse, 10 * dt); return { pas: 'moonwalk', k: t / moon }; }
+  if (t < moon + toupie) { const k = (t - moon) / toupie; J.angleCorps = J.angleDanse + 4.5 * Math.PI * (1 - (1 - k) ** 2); return { pas: 'toupie', k }; }
+  if (t > moon + toupie + pose) J.danse = 0;
+  J.angleCorps = J.angleDanse + Math.PI / 2;
+  return { pas: 'pose', k: (t - moon - toupie) / pose };
 }
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
@@ -2334,8 +2382,11 @@ function majJoueur(dt) {
   const av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
   const court = touche('ShiftLeft', 'ShiftRight') && !visee;
   if ((court || J.nage) && J.accroupi) J.accroupi = false;
-  const v = J.nage ? (court ? R_.vitesseNageRapide : R_.vitesseNage) : J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche;
+  if (J.danse && (av || lat || touches.Space || J.accroupi || sourisG || visee || J.nage)) J.danse = 0;   // bouger, sauter, s'accroupir, tirer ou viser arrête la danse
+  const moonwalk = J.danse > 0 && J.danse < R_.moonwalk[0];
+  const v = moonwalk ? R_.vitesseMoonwalk : J.nage ? (court ? R_.vitesseNageRapide : R_.vitesseNage) : J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche;
   let mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat;
+  if (moonwalk) { mx = -Math.sin(J.angleCorps); mz = -Math.cos(J.angleCorps); }   // le moonwalk : il recule
   const n = Math.hypot(mx, mz);
   if (n > 0) { mx /= n; mz /= n; J.x += mx * v * dt; J.z += mz * v * dt; }
   J.vitesse = n > 0 ? v : 0;
@@ -2351,14 +2402,17 @@ function majJoueur(dt) {
     const c = local(o, 0, lz), d = dist(c, J), r = o.rayon + 0.35;
     if (d < r && d > 0) { J.x = c.x + (J.x - c.x) / d * r; J.z = c.z + (J.z - c.z) / d * r; }
   }
-  // orientation du corps : vers la caméra avec une arme à feu, sinon vers où on marche
-  if (!J.nage && (!ARMES[J.arme].corps || visee || J.vue === 1)) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
-  else if (n > 0) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(mx, mz), 10 * dt);
+  // orientation du corps : celle de la danse, sinon vers la caméra avec une arme à feu, sinon vers où on marche
+  const danse = J.danse ? pasDeDanse(dt) : null;
+  if (!danse) {
+    if (!J.nage && (!ARMES[J.arme].corps || visee || J.vue === 1)) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
+    else if (n > 0) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(mx, mz), 10 * dt);
+  }
   if (J.nage) joueurH.g.position.set(J.x - Math.sin(J.angleCorps) * 0.9, EAU - 0.25, J.z - Math.cos(J.angleCorps) * 0.9);   // couché dans l'eau
   else joueurH.g.position.set(J.x, J.y, J.z);
   joueurH.g.rotation.y = J.angleCorps;
-  if (joueurH.arme) joueurH.arme.visible = !J.nage;
-  animerHumain(joueurH, J.vitesse, dt, { arme: !ARMES[J.arme].corps && !J.nage, accroupi: J.accroupi, frappe: J.frappe, enAir: !J.sol && !J.nage, nage: J.nage });
+  if (joueurH.arme) joueurH.arme.visible = !J.nage && !danse;   // il range son arme pour nager ou danser
+  animerHumain(joueurH, J.vitesse, dt, { arme: !ARMES[J.arme].corps && !J.nage && !danse, accroupi: J.accroupi, frappe: J.frappe, enAir: !J.sol && !J.nage, nage: J.nage, danse });
 }
 function conduire(v, dt) {
   const gaz = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), volant = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
@@ -2903,6 +2957,7 @@ function majHUD(dt) {
 // =====================================================================
 function mettreAJour(dt) {
   temps += dt;
+  if (J.mort || J.voiture) J.danse = 0;   // on ne danse qu'à pied
   if (J.mort) { J.mort += dt; animerHumain(joueurH, 0, dt, { mort: Math.min(1, J.mort * 3) }); if (J.mort > 3.5) reapparaitre(); }
   else {
     if (J.voiture) conduire(J.voiture, dt); else majJoueur(dt);
