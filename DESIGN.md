@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 27 septembre 2026 (la danse de Michael Jackson : chapeau rabattu sur les yeux, petit cri aigu, pose finale la main entre les jambes).
+Mis à jour le 28 septembre 2026 (voitures qui sautent et s'abîment, pistes de cascades comme dans *Stunts* : tremplins, loopings, tire-bouchon, virage relevé, ponts).
 
 ## Vision
 
@@ -43,7 +43,7 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | Maj | Courir | Rien |
 | Espace | Sauter (environ 1 m), rien en nageant | Frein à main, virage plus serré |
 | Ctrl ou C | S'accroupir (bascule) | Rien |
-| E ou F | Monter en voiture ou en bateau, acheter une arme, prendre l'ascenseur | Descendre |
+| E ou F | Monter en voiture ou en bateau, acheter une arme, prendre l'ascenseur | Descendre (pas en plein looping) |
 | V | 1re ou 3e personne | Vue intérieure ou extérieure |
 | 1 à 8, molette | Changer d'arme | Rien |
 | M | Ouvrir ou fermer la grande carte | Ouvrir ou fermer la grande carte |
@@ -161,6 +161,29 @@ Deux stations-service isolées bordent les grandes routes, et la maison de Frank
 - Une route monte et descend en douceur : sa hauteur est lissée le long de son tracé, et le terrain est creusé ou remblayé sur 7 m de chaque côté, puis rejoint le reste en 13 m. La route du château reste raide : environ 30 %.
 - **Ponts** : une route au-dessus de l'eau reste au moins 3,5 m au-dessus de la surface, pour que les bateaux passent dessous. Le tablier fait 1,2 m d'épaisseur, avec deux rambardes et un pilier tous les 3 points de la route. Les rambardes ne retiennent pas : on peut tomber à l'eau.
 - **Pontons** : une jetée de planches de 36 m part de la plage vers le large, 50 cm au-dessus de l'eau. Il y en a 5 : Vespucci, Paleto Bay, Sandy Shores (sur l'Alamo Sea), le port de Los Santos et Chumash.
+
+### Les pistes de cascades
+
+Deux pistes pour faire le fou en voiture, inspirées du jeu *Stunts* (1990). Elles sont décrites dans le tableau `CASCADES` : une case de départ, une direction, puis des morceaux posés bout à bout. Une piste fait 9 m de large, en goudron avec des bordures rouges et blanches. Toute la piste est à une seule hauteur, celle du terrain en moyenne ; le terrain est mis à plat dessous sur 7,5 m de chaque côté du milieu, puis rejoint le reste en 15 m. Il n'y pousse ni arbre ni rocher. Une voiture attend à côté du départ.
+
+| Piste | Où | Départ | Morceaux, dans l'ordre | Voiture |
+| --- | --- | --- | --- | --- |
+| Stunt Park de Palomino | À l'est de Los Santos, au sud du réservoir | Colonne 32, ligne 49, vers l'est | Tremplin (2,5 m, trou de 16 m), looping, 4 bosses, virage relevé de 180°, tire-bouchon, pont de 5 m, tremplin (3 m, trou de 22 m) | Porsche |
+| Sauts de Grand Senora | Dans le désert, à l'est de Harmony | Colonne 27, ligne 30, vers l'est | Tremplins de 3 et 4 m (trous de 25 et 35 m), pont de 6 m, tremplin de 5 m (trou de 45 m) | Classique |
+
+| Morceau | Forme | Réglages (et leur valeur si on n'en met pas) |
+| --- | --- | --- |
+| `droit` | Une ligne droite, par terre | `longueur` (30 m) |
+| `virage` | Un arc de cercle. Relevé, il penche vers l'intérieur : le bord extérieur monte à 4,5 m pour 30°. Il se relève sur le premier quart et redevient plat sur le dernier | `sens` (`'gauche'` ou `'droite'`), `angle` (90°), `rayon` (25 m), `releve` (0°) |
+| `tremplin` | Une rampe à 30 % jusqu'à la hauteur, un trou, puis une rampe à 20 % pour retomber. Avec `saut: 0`, la rampe s'arrête dans le vide | `hauteur` (3 m), `saut` (20 m) |
+| `looping` | Un cercle debout. La sortie est décalée de 11 m à droite de l'entrée | `rayon` (9 m) |
+| `tire-bouchon` | La piste fait un tour complet sur elle-même en avançant : au milieu, à deux rayons de haut, on roule la tête en bas | `longueur` (40 m), `rayon` (5 m) |
+| `pont` | Une rampe à 25 %, un pont sur des piliers, une rampe pour redescendre | `hauteur` (5 m), `longueur` (30 m) |
+| `bosses` | Des bosses de 10 m de long, qui font décoller à grande vitesse | `nombre` (4), `hauteur` (1,2 m) |
+
+- **Rampes pleines** : les rampes, les bosses et les virages relevés sont en béton jusqu'au sol. On bute contre leurs côtés et contre le bout d'un tremplin, on ne passe pas au travers. Là où le bord est à plus de 1 m du sol, deux rambardes retiennent la voiture. Sous un pont, on passe entre les piliers.
+- **Vitesse** : le premier tremplin de Palomino se saute entre 60 et 80 km/h environ ; plus vite, on dépasse la rampe d'arrivée et on retombe par terre. Le looping demande au moins 76 km/h en bas, le tire-bouchon environ 60 km/h (voir « Conduite »).
+- Sur la mini-carte et la grande carte, les pistes sont des traits orange, et un rond « C » orange marque leur départ, avec leur nom.
 
 ### Les bâtiments où l'on entre
 
@@ -353,10 +376,12 @@ Il y a 6 types de voitures, la voiture de police et 2 bateaux. Ils sont décrits
 - La direction ne répond pas à l'arrêt. Elle est la plus vive vers 20 km/h, puis deux fois moins à pleine vitesse.
 - Les roues avant braquent quand on tourne. La carrosserie pique du nez au freinage, se cabre à l'accélération et penche dans les virages (4° au plus).
 - Le frein à main (Espace) freine fort et serre le virage.
-- Contre un mur ou une autre voiture, au-dessus de 22 km/h, il y a un bruit de choc et la voiture perd 65 % de sa vitesse.
+- Contre un mur ou une autre voiture, au-dessus de 22 km/h, il y a un bruit de choc et la voiture perd 65 % de sa vitesse. Au-dessus de 11 km/h (vers le mur), elle s'abîme (voir « Dégâts »).
 - En descendant, le joueur sort du côté qui n'est pas contre un mur. La voiture continue sur son élan puis s'arrête.
-- **Pentes** : la voiture suit le sol et penche avec lui, en avant et sur le côté. La pente la freine en montée et la pousse en descente (9,8 m/s² × le sinus de la pente) : une classique monte la route du château sans peine.
-- **Sauts** : sur une bosse ou au bout d'une pente prise trop vite, la voiture décolle et retombe. En l'air, ni gaz, ni frein, ni volant.
+- **Pentes** : la voiture suit le sol et penche avec lui, en avant et sur le côté. La pente la freine en montée et la pousse en descente (`graviteVoiture`, 9,8 m/s², × le sinus de la pente) : une classique monte la route du château sans peine.
+- **Sauts** : la voiture tombe avec la vraie gravité (9,8 m/s², `graviteVoiture`). Elle décolle quand le sol descend plus vite qu'elle ne tombe : au bout d'un tremplin, en haut d'une bosse ou d'une côte prise vite, un peu en montant sur un trottoir. Au bout d'un tremplin, elle garde tout l'élan de la rampe, même quand ses roues avant sont déjà dans le vide. En l'air, ni gaz, ni frein, ni volant, et son nez suit peu à peu la trajectoire. Un saut de moins de 30 cm ne compte pas : les amortisseurs le prennent, et on garde la main.
+- **Retomber** : elle rebondit un peu (20 % de la vitesse du choc, au-dessus de 3 m/s). Au-dessus de 7 m/s (une chute de 2,5 m sur du plat), elle s'abîme : ses roues se tordent, et l'avant ou l'arrière se cabosse si elle retombe sur le nez ou sur l'arrière (penchée de plus de 17° par rapport au sol). Retomber sur une rampe dans le sens de la pente ne fait presque rien. Après plus de 0,8 s en l'air, « SAUT ! » annonce la longueur du saut.
+- **Loopings et tire-bouchons** : la voiture y roule comme sur des rails, sur son élan : ni moteur, ni frein, ni volant, et la pente la ralentit en montant. Elle reste plaquée tant que (vitesse² × courbure) + (9,8 × la part de la piste tournée vers le haut) reste positif. En haut d'un looping de 9 m, il faut 9,4 m/s, donc au moins 76 km/h en bas ; en haut du tire-bouchon, 9,2 m/s, soit environ 60 km/h en bas. Sinon, elle tombe (« Pas assez d'élan ! ») comme elle est, souvent sur le toit : le toit s'écrase, les vitres éclatent, puis elle se remet d'un coup sur ses roues. Trop lente avant d'être à la verticale, elle redescend en arrière. À la sortie, « LOOPING ! » ou « TIRE-BOUCHON ! » s'affiche. On y entre par un bout ou par l'autre, en avant ou en marche arrière. En vue intérieure (V), la caméra tourne avec la voiture.
 - **Dans l'eau** : à plus de 40 cm d'eau, la voiture freine fort. À plus de 1,10 m, elle coule : B.J. en sort à la nage, et on ne peut plus y remonter. Elle disparaît au bout de 25 s, quand le joueur est à plus de 60 m.
 
 ### Protection
@@ -365,6 +390,29 @@ En voiture, le joueur ne prend que 40 % des dégâts, et les ennemis le touchent
 
 Le tricycle, le hors-bord et le jet-ski n'ont pas de carrosserie : ils ne protègent pas. On y prend les mêmes dégâts qu'à pied, et on ne peut pas tirer non plus.
 
+### Dégâts
+
+Une voiture a cinq côtés, qui s'abîment de 0 (neuve) à 1 (épave) : l'avant, l'arrière, la gauche, la droite et le toit. Les bateaux ne s'abîment pas. Le réglage `degatsVoitures` multiplie tous les dégâts (0 = jamais).
+
+| Ce qui arrive | Dégâts, du côté touché |
+| --- | --- |
+| Choc contre un mur, un pilier, une voiture | (vitesse vers l'obstacle − 3 m/s) × 0,03 : 0,2 à 36 km/h, 0,5 à 72 km/h, 0,8 à 108 km/h. Frotter un mur en biais abîme peu. L'autre voiture prend autant, de son côté |
+| Retomber à plus de 7 m/s | (vitesse − 7) × 0,05 à l'avant ou à l'arrière si elle tombe sur le nez ou l'arrière ; la moitié aux roues |
+| Retomber sur le toit | 0,3 + 0,03 par m/s au toit |
+| Une balle | Dégâts de l'arme ÷ 2 000 (0,02 au pistolet), un petit creux de 3 cm, et la vitre la plus proche (à moins de 80 cm) se fêle, puis se brise |
+| Une roquette | Tout casse, et la voiture explose (voir plus bas) |
+
+Ce qui se voit :
+
+- **Tôle** : la carrosserie s'enfonce autour du choc, sur 0,5 à 1,2 m, de 60 % de la force en mètres (40 cm au plus d'un coup, 45 cm en tout), et elle se froisse. Chaque choc fait sa bosse : une voiture peut être cabossée à plusieurs endroits.
+- **Vitres** : un choc de plus de 0,08 près d'une vitre la fêle (des fissures blanches) ; une vitre déjà fêlée, ou un choc de plus de 0,3, la brise : elle tombe en éclats. Un côté abîmé à plus de 0,7 brise toutes ses vitres, et un toit à plus de 0,4 les brise toutes.
+- **Pièces qui partent** : les pare-chocs et leur plaque (avant ou arrière, à partir de 0,45 à 0,65), les rétroviseurs (sur le côté, 0,25 à 0,45), l'aileron de la Porsche, et sur le 4x4 le pare-buffle, la roue de secours et la galerie du toit. Elles volent, rebondissent, puis restent 30 s par terre.
+- **Phares** : ils s'éteignent quand l'avant passe 0,35 ; les feux arrière, quand l'arrière passe 0,35.
+- **Roues** : un choc à moins de 1,5 m d'une roue la tord : elle part de travers (jusqu'à 11°), penche et se dandine en tournant. Des roues avant tordues tirent la voiture d'un côté : il faut tenir le volant. Une chute trop dure tord les quatre.
+- **Moteur** : quand l'avant est abîmé, la vitesse maximale baisse (−45 % pour une épave). Au-dessus de 0,5, le moteur fume gris ; au-dessus de 0,8, noir.
+- **Réparer** : entrer en voiture dans un garage LS Customs la répare, gratuitement (« Voiture réparée ! »).
+- Une voiture n'explose jamais à force de chocs : on peut rouler avec une épave.
+
 ### Explosions
 
 Une voiture explose quand une roquette explose à côté d'elle (6 m pour celle du joueur, 5 m pour celle d'Hitler). Les balles ne lui font rien.
@@ -372,11 +420,12 @@ Une voiture explose quand une roquette explose à côté d'elle (6 m pour celle 
 - L'explosion fait jusqu'à 150 dégâts aux personnages à moins de 7 m, et jusqu'à 40 à B.J. (`degatsExplosion`).
 - Les voitures à moins de 7 m explosent à leur tour : on peut faire sauter toute une file.
 - Si B.J. est dedans, il est éjecté avant l'explosion.
+- Toutes ses vitres volent en éclats, ses pièces partent en l'air et sa tôle s'enfonce des quatre côtés.
 - Il reste une carcasse noire, qui brûle 12 s. On ne peut plus monter dedans. Elle disparaît au bout de 40 s, quand le joueur est à plus de 60 m.
 
 ### Ce que les voitures ne font pas (encore)
 
-Les balles ne les abîment pas. Les portes ne s'ouvrent pas. On ne voit personne dans les voitures fermées : seul le pilote d'un tricycle est visible. Il n'y a pas de klaxon, et les feux arrière ne s'allument pas plus fort au freinage.
+Les balles les cabossent et cassent leurs vitres, mais ne les font pas exploser. Elles ne font pas de tonneaux et ne dérapent pas. Les portes ne s'ouvrent pas. On ne voit personne dans les voitures fermées : seul le pilote d'un tricycle est visible. Il n'y a pas de klaxon, et les feux arrière ne s'allument pas plus fort au freinage.
 
 ## Missions et progression
 
@@ -462,7 +511,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Bas centre | Objectif | Texte de l'étape de mission en cours |
 | Centre | Viseur | Un point blanc, avec une arme à feu, en visant ou en 1re personne. Caché dans la lunette et en nageant |
 | Plein écran | Lunette | Un rond avec deux traits en croix et du noir autour, en visant avec le fusil de sniper. Le reste de l'écran (mini-carte, argent) s'affiche par-dessus |
-| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? » |
+| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? », « SAUT ! 35 m », « LOOPING ! », « Pas assez d'élan ! », « Voiture réparée ! » |
 | Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
 | Plein écran | Bords rouges | Quand le joueur est touché |
 | Plein écran | WASTED | Noir et blanc à la mort |
@@ -480,8 +529,9 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | $ vert | Banque | Z rouge foncé | Tour Maze Bank |
 | S vert | Supérette | B noir | Bunker |
 | E rouge | Station-service | W rouge foncé | Château Wolfenstein |
+| C orange | Départ d'une piste de cascades | | |
 
- Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
+ Les pistes de cascades sont des traits orange. Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
 
 **La grande carte** s'ouvre et se ferme avec la touche M. Elle couvre tout l'écran et met le jeu en pause : rien ne bouge tant qu'elle est ouverte.
 
@@ -502,6 +552,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 - **Moteur** : chaque type de véhicule a le sien (tableau ci-dessous). Le son monte dans chaque rapport, puis retombe quand on passe le suivant. Il est plus fort et plus clair quand on accélère que quand on lève le pied.
 - **Voitures des autres** : on entend le moteur de la voiture qui roule le plus près, à moins de 40 m.
 - **Roulement et pneus** : un souffle grave qui monte avec la vitesse, un crissement au frein à main au-dessus de 22 km/h, un bruit de choc.
+- **Dégâts** : un bruit de tôle, d'autant plus fort que le choc est fort ; un tintement quand une vitre se fêle, un bruit de verre quand elle se brise ; un choc sourd quand la voiture retombe trop fort.
 - **Pause** : le menu et la grande carte coupent tous les sons.
 - **Police** : sirène à deux tons, plus forte quand la voiture approche.
 - **Signaux** : bips pour un achat, un objet ramassé, une étape réussie, une blessure, la mort.
@@ -523,27 +574,28 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 3 100 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 3 650 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–106 | HTML et CSS | Interface et menu |
-| 107–352 | **Zones à modifier** | `REGLAGES`, `ARMES`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `TRICHES` |
-| 353–597 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) |
-| 598–790 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, panneaux, visages dessinés par le programme ; matières |
-| 791–1408 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`), rues, routes et ponts, pontons, pistes, terrain et végétation, eau, fusion |
-| 1409–1463 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
-| 1464–1608 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
-| 1609–1864 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), carrosserie, cabine, roues |
-| 1865–1948 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés, cri de la danse (`criMJ`) |
-| 1949–2411 | Joueur et PNJ | Tenues, chapeau de la danse, objets, explosions, roquettes, clavier et souris, suite de touches de la danse, triches, danse (`danser`, `pasDeDanse`), ascenseur, tir, achat |
-| 2412–2535 | Mise à jour du joueur | Marche, nage, moonwalk, conduite, pentes, sauts, voitures qui coulent, bateaux |
-| 2536–2765 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
-| 2766–2833 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
-| 2834–2988 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
-| 2989–3087 | Boucle principale | Mise à jour et affichage de chaque image |
+| 107–399 | **Zones à modifier** | `REGLAGES`, `ARMES`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
+| 400–760 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
+| 761–964 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, panneaux, visages dessinés par le programme ; matières |
+| 965–1654 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion |
+| 1655–1710 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
+| 1711–1855 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
+| 1856–2143 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), pièces qui partent, carrosserie, cabine, roues, `habillerVoiture` |
+| 2144–2289 | Dégâts des voitures | `abimer`, bosses (`bosseler`), vitres, pièces qui partent (`detacher`), roues tordues, morceaux qui volent (`debris`) |
+| 2290–2373 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés, cri de la danse (`criMJ`) |
+| 2374–2843 | Joueur et PNJ | Tenues, chapeau de la danse, objets, explosions, roquettes, clavier et souris, suite de touches de la danse, triches, danse (`danser`, `pasDeDanse`), ascenseur, tir, achat |
+| 2844–3061 | Mise à jour du joueur | Marche, nage, moonwalk, conduite, chocs, pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
+| 3062–3301 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
+| 3302–3372 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
+| 3373–3529 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
+| 3530–3631 | Boucle principale | Mise à jour et affichage de chaque image, garage qui répare |
 
 ### À chaque image
 
@@ -564,21 +616,24 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Personnages** : le torse, les bras et les jambes sont des formes faites « au tour », comme des vases. Chaque morceau de bras ou de jambe finit par une boule de la taille de la boule du morceau suivant : le coude et le genou ne se voient pas. Le visage est une image dessinée sur la tête, une par couleur de peau. Un personnage compte une vingtaine de pièces.
 - **Danse** : le jeu retient le nom des dernières touches enfoncées, bout à bout. Quand la fin de cette liste est trois fois `touchesDanse`, la danse commence, et les touches encore enfoncées sont oubliées. `J.danse` compte les secondes depuis le début de la danse (0 = il ne danse pas). À chaque image, `pasDeDanse` dit quel pas est en cours et tourne le corps ; `animerHumain` place les bras, les jambes, les pieds et la tête. Le moonwalk réutilise l'animation de la marche : c'est le corps qui recule. `animerHumain` remet les pieds, la tête, l'épaule droite et l'écart des jambes à zéro à chaque image, pour tous les personnages : la pose ne reste jamais collée. Les angles du bras droit ont été calculés pour que la main tombe juste sur le bord du chapeau, puis entre les jambes. Pour la pose, l'épaule droite descend de 10 cm : les bras du personnage sont trop courts pour ce geste. Le chapeau est accroché à la tête et tourne autour de son milieu, ce qui le rabat sur les yeux ; il est caché hors de la danse.
 - **Cri de la danse** : il est fabriqué par le programme, comme tous les sons, et non pris sur un disque : la voix de Michael Jackson appartient à ses ayants droit, et le jeu est publié sur Internet. La voix est une note avec ses harmoniques (la 3e, vers 3 000 Hz, donne le son « i »), et le souffle est un bruit filtré autour de 3 000 Hz.
-- **Voitures** : la carrosserie est un profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur. Tous ses bords sont arrondis. La cabine est une boîte arrondie, plus étroite et plus courte en haut ; les vitres sont des plaques posées dessus, visibles seulement de dehors, pour qu'on voie à travers en vue intérieure. Les pièces d'un modèle sont fabriquées une seule fois, puis fusionnées par matière : une voiture compte 8 objets pour le corps et 2 par roue. Le tricycle est fait de pièces simples, sans profil ni cabine.
+- **Voitures** : la carrosserie est un profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur. Tous ses bords sont arrondis. La cabine est une boîte arrondie, plus étroite et plus courte en haut ; les vitres sont des plaques posées dessus, visibles seulement de dehors, pour qu'on voie à travers en vue intérieure. Les pièces d'un modèle sont fabriquées une seule fois, puis fusionnées par matière : une voiture neuve compte 8 objets pour le corps et 2 par roue. Le tricycle est fait de pièces simples, sans profil ni cabine.
+- **Dégâts** : au premier choc, la voiture reçoit sa propre copie des formes (sans les pièces qui peuvent partir), ses vitres une par une et ses pièces à part : elle passe à une vingtaine d'objets. Une bosse déplace les points de la tôle autour du choc ; chaque point bouge selon sa place de départ, donc deux points collés bougent pareil et la tôle ne se déchire pas. Les triangles qui ont bougé renvoient la lumière chacun à sa façon : c'est ce qui donne l'air froissé. Une pièce qui part est accrochée au monde, là où elle était, et tombe comme un débris. Le garage refait la voiture toute neuve (`habillerVoiture`).
 - **Terrain** : une grille de points tous les 9,25 m (8 par case), dont la hauteur est calculée une fois au chargement (`HT`), puis creusée sous les routes. Chaque carré est fait de deux triangles ; `hauteurTerrain` retrouve la hauteur exacte du triangle dessiné, pour que personne ne flotte ni ne s'enfonce. Les couleurs du sol sont posées sur chaque point, puis teintent un grain gris.
 - **Hauteur du sol** : `hauteurSol(x, z, y)` prend la plus haute de ces surfaces : terrain, trottoir d'un pâté, rue, route ou pont de campagne. Si on lui donne la hauteur des pieds (`y`), elle compte aussi les planchers, marches, toits et meubles qui ne dépassent pas de plus de 60 cm : c'est ce qui fait marcher les escaliers. Un pont ne compte que si on est dessus, pas si on nage dessous.
 - **Routes de campagne** : chaque suite de cases `=` ou `#` devient une ligne de points, arrondie trois fois (on coupe chaque coin au quart et aux trois quarts). Les routes et les rues forment un seul réseau de points reliés (`NOEUDS`) : les voitures qui roulent seules le suivent, et la police y cherche le chemin le plus court vers le joueur (algorithme de Dijkstra). Les morceaux de route sont rangés dans une grille de 25 m, pour trouver vite la route sous une voiture.
 - **Bâtiments visitables** : une seule fonction, `batiment`, fabrique les murs, la porte, les planchers, l'escalier, le toit et les lampes. Les meubles se placent comme si la porte était au sud ; la fonction tourne le tout selon le côté de la porte. Tout est fait de boîtes, rangées avec les autres.
 - **Performance** : le pays est découpé en morceaux de 8 × 8 cases (592 m). Dans chaque morceau, les bâtiments sont fusionnés en un objet par matière, et chaque sorte d'arbre et les lampadaires sont dessinés en un seul lot. Seuls les morceaux à moins de `distanceVue` (plus leur demi-diagonale) sont dessinés. Les arbres de la campagne ont moins de facettes que ceux de la ville. Résultat mesuré en rendu logiciel : 150 à 450 appels de dessin et 250 000 à 550 000 triangles par image, ombres comprises. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
 - **Chargement** : la construction du pays prend environ 2 s en rendu logiciel (relief 0,4 s, pâtés 0,2 s, terrain 0,9 s). Le plus long reste le dessin des textures et du ciel.
-- **Collisions** : chaque mur, plancher, marche ou meuble est une boîte avec un bas et un haut, rangée dans une grille de cases de 25 m. On passe sous une boîte dont le bas est au-dessus de la tête, et on monte sur une boîte assez basse. Joueur et piétons sont des cercles repoussés hors des boîtes. Une voiture est une file de 2 à 4 cercles posés le long de son axe (2 pour la classique, 4 pour la limousine), un peu plus larges qu'elle. La même grille, et le terrain, servent à savoir si un ennemi voit le joueur : une colline cache aussi.
+- **Collisions** : chaque mur, plancher, marche ou meuble est une boîte avec un bas et un haut, rangée dans une grille de cases de 25 m. On passe sous une boîte dont le bas est au-dessus de la tête, et on monte sur une boîte assez basse, sauf sur les murs des loopings (`mur`). Joueur et piétons sont des cercles repoussés hors des boîtes. Une voiture est une file de 2 à 4 cercles posés le long de son axe (2 pour la classique, 4 pour la limousine), un peu plus larges qu'elle. La même grille, et le terrain, servent à savoir si un ennemi voit le joueur : une colline cache aussi.
 - **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture, ou sur le terrain (on avance le long du rayon mètre par mètre, sans regarder les triangles). La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance, laisse une bouffée de fumée qui grossit et s'efface en 1,2 s, et un petit rayon de la longueur de son pas cherche un mur ou une voiture devant elle. Les personnages sont faits de pièces fines : pour eux, on regarde plutôt si la roquette passe à moins de 1 m du milieu de leur corps. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
 - **Lunette** : seul le champ de vision de la caméra change. Le rond et la croix sont un dessin posé sur l'image (`#lunette`, en CSS), sans rien de plus à calculer. La dispersion d'un tir se compte en part de l'écran : zoomer 5 fois rend donc le tir 5 fois plus précis, sans règle spéciale.
 - **Cartes** : le terrain vu du ciel est une petite image, un point par point de la grille, colorée comme le sol et éclairée selon la pente. Une fonction dessine par-dessus les routes, les rues, les pistes et les bâtiments. La mini-carte garde une image toute faite du tout, à un point pour 2 m ; la grande carte redessine les routes et les bâtiments à chaque image, pour rester nette quel que soit le zoom.
 - **Pays reproductible** : chaque pâté et chaque case de campagne tirent leurs nombres au hasard à partir de leur position, et les bosses du terrain viennent d'un bruit calculé. Le pays est donc le même à chaque partie.
 - **Sons de moteur** : un moteur, c'est deux notes (celle du moteur et la même une octave plus bas) qui passent dans un filtre. Le filtre laisse passer plus d'aigus quand le moteur est rauque, tourne vite ou accélère. Il y a deux moteurs : celui du joueur et celui de la voiture la plus proche. Les premiers rapports sont plus courts que les derniers.
-- **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, ou si une voiture demande un modèle qui n'existe pas.
-- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage et l'enchaînement des premières missions, et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
+- **Pistes de cascades** : chaque morceau de `CASCADES` devient une ligne de points, tous les 1 à 2 m, avec pour chacun trois directions : devant, le haut de la piste, la gauche. Le dessus est un ruban de goudron, les côtés et le dessous des bandes de béton. Là où la piste n'est pas trop penchée (moins de 18°), elle compte comme un sol : `pisteSous` trouve le morceau sous la voiture, sa hauteur et sa pente, même relevée sur le côté. Les côtés des rampes sont des boîtes de collision, en 3 bandes sur la largeur, dont le haut est le bas de la piste à cet endroit : on roule dessus, mais on bute contre. Dans un looping ou un tire-bouchon, la voiture roule « sur des rails » : sa place, son haut et son devant viennent de la ligne de points, et la courbure calculée à chaque point dit si elle reste plaquée.
+- **Sauts** : la voiture tombe toujours ; elle est « au sol » quand elle arrive plus bas que le sol, et prend alors la vitesse de montée du sol. Cette vitesse vient de la pente sous ses roues, ou de la pente de la piste de cascades sous son milieu : un trottoir ne la fait presque pas sauter, le bout d'un tremplin, si.
+- **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, si une voiture demande un modèle qui n'existe pas, ou si une piste de cascades a un morceau inconnu.
+- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
 
 ## Limites connues et pistes
 
@@ -590,7 +645,11 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Seuls les pâtés spéciaux ont un bâtiment où entrer ; tours, immeubles et maisons restent pleins. Les intérieurs sont faits de boîtes, sans fenêtres percées : la lumière vient du ciel et des lampes du plafond, qui brillent sans éclairer.
 - En 3e personne, la caméra est à l'étroit dans les petites pièces (la caravane de Trevor) : la vue à la 1re personne (V) y est plus confortable.
 - La route du château est raide (environ 30 %) : la carte n'a pas la place pour des lacets. Les pentes autour des villes perchées sont des falaises de roche.
-- Les rambardes des ponts de campagne ne retiennent pas les voitures, et les voitures n'ont pas de dégâts de chute. On ne se fait pas mal en tombant, même du haut du gratte-ciel.
+- Les rambardes des ponts de campagne ne retiennent pas les voitures. On ne se fait pas mal en tombant, même du haut du gratte-ciel, et B.J. ne prend rien quand sa voiture s'écrase.
+- Les voitures ne dérapent pas : elles tournent aussi bien à toute vitesse. Un virage relevé penche, mais ne permet pas d'aller plus vite. Elles ne font pas de tonneaux : retombée sur le toit, une voiture se remet d'un coup sur ses roues.
+- Dans un looping ou un tire-bouchon, la voiture ne peut ni accélérer ni tourner, et reste à la même place dans la largeur de la piste.
+- Une piste de cascades est à une seule hauteur : sur un terrain en pente, elle creuse ou remblaie beaucoup. Rien n'empêche deux morceaux de se croiser, et une piste peut passer dans une ville ou dans l'eau.
+- Les pièces tombées et les éclats de vitre traversent les voitures. Les voitures qui roulent toutes seules ne vont pas sur les pistes, et ne s'abîment que si on les tape.
 - On ne nage pas dans la piscine de Michael, et on ne peut pas plonger sous l'eau.
 - Pas de piétons ni de policiers à pied à la campagne : seules les voitures y circulent.
 - Les bateaux ne circulent pas tout seuls, et la police ne va pas sur l'eau : en bateau, on la sème facilement.
@@ -608,7 +667,10 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 
 ### Pistes pour la suite
 
-- Voitures abîmées par les balles, tir par la fenêtre, klaxon.
+- Tir par la fenêtre, klaxon.
+- Chrono et records sur les pistes de cascades, une mission de cascades.
+- Une voiture trop abîmée qui prend feu puis explose, comme dans GTA.
+- Des dérapages dans les virages pris trop vite : les virages relevés serviraient alors vraiment.
 - Roquettes à acheter à l'armurerie.
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
 - Des missions qui utilisent la grande carte : courses de bateau, livraisons à Paleto Bay, braquage de la banque.

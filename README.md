@@ -37,7 +37,9 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 - **Vie** : elle remonte toute seule si on n'est pas touché pendant 5 secondes. Les trousses de soin rendent 50 points. En voiture, on prend beaucoup moins de dégâts.
 - **Gilet pare-balles** : il prend les dégâts à la place de ta vie (barre bleue). Il y en a un dans chaque armurerie et chaque commissariat, un dans le bunker et un dans le château.
 - **Police** : faire des bêtises donne des étoiles (jusqu'à 5). À partir de 2 étoiles, la police arrive en voiture. Reste 12 secondes hors de sa vue pour perdre une étoile.
-- **Voitures** : elles circulent en ville et sur les routes de campagne. Elles penchent dans les pentes et s'envolent sur les bosses prises trop vite. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler. Il y en a 6 types, chacun avec sa vitesse et son bruit de moteur : la classique, la Porsche (180 km/h !), le minibus, le gros 4x4 du désert, la limousine et le tricycle. Attention : sur le tricycle, rien ne te protège des balles.
+- **Voitures** : elles circulent en ville et sur les routes de campagne. Elles penchent dans les pentes, décollent sur les bosses et au bout des tremplins, et retombent plus ou moins bien. Appuie sur E à côté d'une voiture pour éjecter le conducteur et la voler. Il y en a 6 types, chacun avec sa vitesse et son bruit de moteur : la classique, la Porsche (180 km/h !), le minibus, le gros 4x4 du désert, la limousine et le tricycle. Attention : sur le tricycle, rien ne te protège des balles.
+- **Dégâts** : une voiture qui cogne se cabosse là où elle a tapé. Ses vitres se fêlent puis se brisent, ses pare-chocs et ses rétroviseurs tombent, ses phares s'éteignent, ses roues se tordent (elle tire d'un côté) et son moteur fume et va moins vite. Les balles font des petits trous et cassent les vitres. Le garage **LS Customs** (G violet) répare gratuitement la voiture dans laquelle tu entres.
+- **Cascades** : deux pistes comme dans le jeu *Stunts* (C orange sur la mini-carte). Le **Stunt Park de Palomino**, à l'est de Los Santos, a un tremplin, un looping, des bosses, un virage relevé, un tire-bouchon et un pont. Les **Sauts de Grand Senora**, près de Harmony, enchaînent trois grands tremplins et un pont. Une voiture t'attend au départ. Dans le looping, il faut au moins 76 km/h pour passer en haut, sinon tu tombes sur le toit !
 - **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse. La dernière mission t'envoie au château Wolfenstein (W rouge sur la mini-carte) pour éliminer Hitler.
 - **Carte** : la touche M affiche tout le pays en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants. Elle te dit aussi dans quelle colonne et quelle ligne du tableau `CARTE` tu es.
 - **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`… à toi de voir ce qu'ils font ! Retape un code pour l'annuler.
@@ -48,7 +50,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 
 Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier :
 
-1. **`REGLAGES`** : vitesses à pied et à la nage, vie, dégâts des ennemis, nombre de voitures et de piétons, hauteur des montagnes, touches et durée de la danse… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
+1. **`REGLAGES`** : vitesses à pied et à la nage, vie, dégâts des ennemis, nombre de voitures et de piétons, hauteur des montagnes, touches et durée de la danse, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
 2. **`ARMES`** : dégâts, cadence de tir, prix, munitions de chaque arme, rayon d'explosion du bazooka, zoom de la lunette du fusil de sniper.
 3. **`VOITURES`** : vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de voiture ou de bateau, et la chance de la croiser. Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
 4. **`CARTE`** : tout le pays vu du ciel, le nord en haut. Chaque signe est une case de 74 m. Toutes les lignes doivent avoir la même longueur.
@@ -84,6 +86,7 @@ Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier
    Une route (`=`) doit toucher le coin d'un pâté pour se brancher sur les rues d'une ville.
 
 5. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture`, `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`. Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ».
-6. **`TRICHES`** : renomme les codes ou invente les tiens.
+6. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
+7. **`TRICHES`** : renomme les codes ou invente les tiens.
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).
