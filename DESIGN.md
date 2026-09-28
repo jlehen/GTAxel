@@ -1,15 +1,15 @@
 # GTAxel — Document de design
 
-Mis à jour le 28 septembre 2026 (voitures qui sautent et s'abîment, pistes de cascades comme dans *Stunts* : tremplins, loopings, tire-bouchon, virage relevé, ponts).
+Mis à jour le 28 septembre 2026 (braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard ; police en force à 4 et 5 étoiles, heavy robot pilotable ; codes `IDKFA` et `MISSION` + numéro).
 
 ## Vision
 
-GTAxel est un jeu d'action en 3D, en monde ouvert, qui se joue dans le navigateur. Il mélange GTA (ville libre, voitures, police) et Wolfenstein : on incarne B.J. Blazkowicz, qui chasse les nazis de Los Santos et de ses environs jusqu'au boss final, Hitler, dans le château Wolfenstein, sur le mont Chiliad. Il a été imaginé par un garçon de 10 à 13 ans, qui doit pouvoir le modifier lui-même.
+GTAxel est un jeu d'action en 3D, en monde ouvert, qui se joue dans le navigateur. Il mélange GTA (ville libre, voitures, police, braquages) et Wolfenstein : on incarne B.J. Blazkowicz, qui chasse les nazis de Los Santos et de ses environs jusqu'au boss final, Hitler, dans le château Wolfenstein, sur le mont Chiliad, puis braque un musée, une bijouterie et une grande banque. Il a été imaginé par un garçon de 10 à 13 ans, qui doit pouvoir le modifier lui-même.
 
 **Piliers de design**
 
 - **Liberté** : dès le départ, on va où on veut, à pied ou en voiture volée. Les missions sont un fil conducteur, pas un couloir.
-- **Pardonnant** : les ennemis visent mal, la vie remonte toute seule et la mort ne coûte que 100 $. On doit pouvoir faire des bêtises sans être puni trop vite.
+- **Pardonnant** : les ennemis visent mal, la vie remonte toute seule et la mort ne coûte que 100 $. On doit pouvoir faire des bêtises sans être puni trop vite. Les braquages sont l'exception voulue : ils doivent être « le plus réalistes possible », donc dangereux (vigiles qui visent bien, mitrailleuses, fumée toxique, heavy robot). Mourir y coûte toujours 100 $, et on garde le butin déjà volé.
 - **Bidouillable** : tout tient dans un seul fichier `index.html`. Les réglages, les armes, les voitures, la carte et les missions sont des tableaux commentés en français, en haut du fichier. On voit une modification en appuyant sur F5.
 - **Zéro installation** : un double-clic ou un lien suffit, pourvu qu'on ait Internet. En ligne : [jlehen.github.io/GTAxel](https://jlehen.github.io/GTAxel/).
 
@@ -22,14 +22,14 @@ Le joueur alterne entre deux boucles. Les missions rapportent l'argent qui achè
 ```mermaid
 flowchart LR
   E[Explorer le pays<br>à pied, en voiture ou en bateau]
-  E --> M[Faire une mission<br>suivre le point jaune] --> G[Gagner de l'argent<br>200 à 10 000 $] --> A[Acheter des armes<br>à l'armurerie]
+  E --> M[Faire une mission<br>suivre le point jaune] --> G[Gagner de l'argent<br>200 à 250 000 $] --> A[Acheter des armes<br>à l'armurerie]
   A -- armes plus fortes : bunker, puis château --> E
   E --> B[Faire des bêtises<br>voler, frapper, tirer] --> P[La police arrive<br>1 à 5 étoiles]
   P --> S[Semer la police<br>12 s caché = -1 étoile] --> E
   P --> W[WASTED<br>la vie tombe à 0] --> H[Réveil à l'hôpital<br>-100 $, plus d'étoiles] --> E
 ```
 
-Une partie commence à pied, sans argent, avec les poings et un couteau. Le héros, B.J. Blazkowicz, a les cheveux blonds courts, un maillot blanc à manches courtes et un pantalon militaire. Il n'y a pas de fin : après la 6e mission, le pays reste libre.
+Une partie commence à pied, sans argent, avec les poings et un couteau. Le héros, B.J. Blazkowicz, a les cheveux blonds courts, un maillot blanc à manches courtes et un pantalon militaire. Il n'y a pas de fin : après la 10e mission, le pays reste libre.
 
 ### Contrôles
 
@@ -43,7 +43,7 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | Maj | Courir | Rien |
 | Espace | Sauter (environ 1 m), rien en nageant | Frein à main, virage plus serré |
 | Ctrl ou C | S'accroupir (bascule) | Rien |
-| E ou F | Monter en voiture ou en bateau, acheter une arme, prendre l'ascenseur | Descendre (pas en plein looping) |
+| E ou F | Monter en voiture ou en bateau, acheter une arme ou le masque à gaz, prendre l'ascenseur, parler au garagiste, voler le butin, poser la perceuse ou l'explosif, éjecter le pilote du heavy robot ou monter dedans | Descendre (pas en plein looping) |
 | V | 1re ou 3e personne | Vue intérieure ou extérieure |
 | 1 à 8, molette | Changer d'arme | Rien |
 | M | Ouvrir ou fermer la grande carte | Ouvrir ou fermer la grande carte |
@@ -51,6 +51,8 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | Échap | Pause | Pause |
 
 Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W A S D sur un QWERTY. Seule la touche M suit la lettre imprimée sur le clavier.
+
+**Dans le heavy robot** : Z Q S D le font marcher (4 m/s, 6 m/s avec Maj), la souris le tourne et vise, le clic gauche tire à la mitrailleuse lourde, le clic droit lance une roquette, E fait descendre, V passe de la vue derrière l'épaule à la vue dans la cabine. On ne peut ni sauter, ni s'accroupir, ni changer d'arme, ni danser.
 
 ### Déplacements
 
@@ -101,7 +103,7 @@ Le pays est une île inspirée de celle de GTA 5, en plus petit et plus simple :
 
 Tout est construit au chargement à partir du tableau `CARTE` de `index.html` : 70 lignes de 48 signes, le nord en haut. Chaque signe est une case de 74 m. Une lettre est un pâté de maisons de 60 m, entouré de rues de 14 m. Les autres signes sont du terrain, sans rues. Le pays est le même à chaque partie.
 
-La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 26 de tours et 23 de docks. Il y a aussi 63 cases de piste d'aéroport, 135 cases de route et 1 523 cases d'eau.
+La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 25 de tours et 23 de docks. Il y a aussi 63 cases de piste d'aéroport, 135 cases de route et 1 523 cases d'eau.
 
 ### Les signes de la carte
 
@@ -113,6 +115,7 @@ La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 26 de tours et
 | `P` | Pelouse, allées pavées, fontaine, jusqu'à 14 arbres, 1 trousse de soin |
 | `.` `X` `a`–`z` | Place pavée avec 4 arbres et 2 voitures garées. `X` est le départ, les minuscules sont les lieux de mission |
 | `A` `H` `C` `S` `G` `K` `Z` `E` `L` `O` `R` `J` `F` `D` `N` `B` `W` | Pâtés où l'on peut entrer (tableau plus bas) |
+| `U` `V` `Q` | Pâtés à braquer, où l'on entre aussi : musée, bijouterie, grande banque (voir « Braquages ») |
 | `~` | Eau : mer, lac ou rivière |
 | `_` | Plage de sable |
 | `,` | Herbe, avec des arbres par-ci par-là |
@@ -138,7 +141,7 @@ La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 26 de tours et
 
 | Ville | Où | Ce qu'on y trouve |
 | --- | --- | --- |
-| Los Santos | Sud | Vinewood, le centre (tours, gratte-ciel Maze Bank, banque, commissariat), Vespucci et sa plage, la villa de Michael, l'hôpital, l'armurerie, LS Customs, le fleuve et ses deux ponts, l'aéroport et ses hangars, le port avec ses conteneurs et ses grues |
+| Los Santos | Sud | Vinewood et son musée d'art, le centre (tours, gratte-ciel Maze Bank, banque, grande banque Pacific Standard, commissariat), la bijouterie Vangelico, Vespucci et sa plage, la villa de Michael, l'hôpital, l'armurerie, LS Customs, le fleuve et ses deux ponts, l'aéroport et ses hangars, le port avec ses conteneurs et ses grues |
 | Paleto Bay | Nord | Maisons, supérette, hôpital, armurerie, station-service, garage LS Customs |
 | Grapeseed | Nord-est | Deux fermes et une supérette au milieu des champs |
 | Sandy Shores | Au sud de l'Alamo Sea | Caravane de Trevor, bar Yellow Jack, supérette, hôpital, commissariat, armurerie, aérodrome |
@@ -191,11 +194,11 @@ Un bâtiment visitable a des murs de 30 cm, une porte, un sol, des lampes au pla
 
 | Lettre | Bâtiment | Étages visitables | Ce qu'il y a dedans |
 | --- | --- | --- | --- |
-| `A` | Armurerie | Rez-de-chaussée | Comptoir, armes au mur, les 5 stands d'armes, 1 gilet pare-balles |
+| `A` | Armurerie | Rez-de-chaussée | Comptoir, armes au mur, les 5 stands d'armes, le stand du masque à gaz, 1 gilet pare-balles |
 | `H` | Hôpital | Hall (4 étages pleins au-dessus) | Accueil, chaises, lits, 2 trousses de soin. On se réveille devant la porte |
 | `C` | Commissariat | 2 étages et le toit | Accueil, bancs, 3 cellules à barreaux ; bureaux et 1 gilet en haut ; 2 voitures de police garées devant |
 | `S` | Supérette 24/7 | Rez-de-chaussée | Rayons, frigos, caisse, 1 trousse de soin, 1 voiture garée |
-| `G` | Garage LS Customs | Un grand atelier de 5,5 m de haut | Pont élévateur, pneus, établi, 1 voiture. On y entre en voiture par une porte de 11 m |
+| `G` | Garage LS Customs | Un grand atelier de 5,5 m de haut | Pont élévateur, pneus, établi, 1 voiture, le garagiste (combinaison bleue, casquette rouge) qui blinde les voitures. On y entre en voiture par une porte de 11 m |
 | `K` | Banque | Hall de 5 m de haut | Colonnes, guichets, coffre-fort ouvert avec des lingots et 2 000 $ (voir « Argent ») |
 | `Z` | Gratte-ciel Maze Bank | Hall, et le toit à 141 m | Accueil, ascenseur jusqu'au toit, hélistation, antenne, garde-fou |
 | `E` | Station-service | Petite boutique | Rayon, frigos, caisse, 1 trousse de soin ; pompes sous un auvent |
@@ -208,6 +211,9 @@ Un bâtiment visitable a des murs de 30 cm, une porte, un sol, des lampes au pla
 | `N` | Hangar d'avions | Un hangar de 10 m de haut | Un avion ; porte de 32 m |
 | `B` | Bunker nazi | Le bunker, par l'ouest | Voir ci-dessous |
 | `W` | Château Wolfenstein | Le donjon : 4 étages de 4 m et le toit crénelé | Trône, grande table ; 2 trousses de soin (au 2e étage et sur le toit) |
+| `U` | Musée d'art de Los Santos | Une grande salle de 6 m de haut | Portique à 6 colonnes et fronton, sol en marbre, le grand tableau derrière un cordon rouge, la couronne, 2 vitrines de bijoux, 2 statues, 4 autres tableaux, des bancs ; 4 vigiles et 2 chiens |
+| `V` | Bijouterie Vangelico | Une boutique de 3,6 m de haut | Façade noire et or, murs en bois, 8 vitrines de bijoux, le gros diamant sur une colonne noire ; 1 vigile devant la porte |
+| `Q` | Banque Pacific Standard | Un hall de 6 m de haut (4 étages pleins au-dessus) | Portique à piliers, guichets, colonnes de marbre ; au fond, le couloir des lasers, la porte ronde du coffre-fort, la grille et le pactole ; 3 vigiles |
 
 - **Bunker** (`B`) : enceinte de 4 m avec une seule entrée à l'ouest, sacs de sable. Le bunker lui-même s'ouvre aussi à l'ouest : dedans, le Kommandant, 2 soldats, des caisses, une table et un fusil d'assaut. Dehors, 6 soldats, 2 trousses de soin et 1 gilet.
 - **Château** (`W`) : remparts crénelés de 7 m avec une grande porte au sud, 4 tours à toit pointu, bannières rouges. Hitler et 8 soldats gardent la cour. Dans la cour aussi : 2 trousses, 1 mitraillette, 1 gilet.
@@ -272,20 +278,24 @@ Il y a 8 armes, dont 2 au départ (poings et couteau). Le pistolet, la mitraille
 | Soldat nazi | 90 | fusil d'assaut | 3 | Une mitraillette ou un fusil d'assaut |
 | Kommandant | 450 | fusil à pompe | 12 (5 à la tête) | Un fusil à pompe et 1 000 $ |
 | Hitler (boss final) | 900 | bazooka | 23 (9 à la tête) | Le bazooka et 2 000 $ |
+| Vigile (braquages) | 100 | pistolet, fusil à pompe, mitraillette ou fusil d'assaut | 3 | Son arme |
+| Chien de garde | 45 | ses crocs | 2 | Rien |
+| Policier d'élite (4 étoiles) | 140 | fusil d'assaut | 4 | Un fusil d'assaut |
 
-Les corps disparaissent au bout de 15 s.
+Les corps disparaissent au bout de 15 s. Le chien est un berger allemand, fauve au dos noir, oreilles dressées ; mort, il tombe sur le côté. Le policier d'élite porte un casque, une tenue noire et un gilet pare-balles.
 
 Un personnage a un visage (yeux, sourcils, bouche, nez, oreilles), des coudes et des genoux. Ses genoux se plient quand il marche, quand il s'accroupit et quand il s'assoit sur un tricycle. Plus il va vite, plus ses coudes sont pliés et plus il se penche en avant.
 
 ### Le joueur
 
 - **Vie** : 100 points. Elle remonte de 8 points par seconde après 5 s sans être touché, soit de 0 à 100 en 12,5 s. Une trousse de soin rend 50 points.
+- **Masque à gaz** : il s'achète 500 $ à l'armurerie (`prixMasque`), une fois pour toutes. B.J. le met tout seul dans la fumée toxique de la bijouterie, qui ne lui fait alors plus rien. On le voit sur son visage : du caoutchouc noir, deux hublots, une cartouche filtrante.
 - **Gilet pare-balles** : 100 points de protection (`giletMax`), qui prennent les dégâts à la place de la vie. Il ne se recharge pas tout seul : il faut ramasser un autre gilet. Il y en a 7 : dans les 3 armureries, au premier étage des 2 commissariats, dans le bunker (près de l'entrée) et dans le château (près de la porte). Quand B.J. en porte un, on le voit sur son torse, en bleu foncé.
 - **Quand il est touché** : l'écran rougit sur les bords et un son grave retentit.
 
 ### Les ennemis
 
-Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat. Il tire toutes les 1 à 2 s, 0,6 à 1,2 s pour le Kommandant et 1,5 à 3 s pour Hitler. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
+Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat ou un vigile. Il tire toutes les 1 à 2 s, 0,6 à 1,2 s pour le Kommandant et 1,5 à 3 s pour Hitler. Les vigiles et les policiers d'élite armés d'une mitraillette ou d'un fusil d'assaut tirent en rafales : 3 à 5 balles à 0,13 s d'écart, puis une pause de 1,2 à 2 s. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
 
 | Ennemi | Dégâts par balle |
 | --- | --- |
@@ -293,8 +303,13 @@ Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 
 | Soldat | 7 |
 | Kommandant | 12 |
 | Hitler | 35 par roquette, au centre de l'explosion |
+| Vigile | 9, le double au fusil à pompe à moins de 15 m (`degatsGarde`) |
+| Policier d'élite | 9 (`degatsElite`) |
+| Chien de garde | 12 par morsure, toutes les 0,9 s (`degatsChien`) |
+| Heavy robot | 10 par balle de mitrailleuse, 40 par roquette (`degatsRobot`, `degatsRoquetteRobot`) |
+| Mitrailleuses de la banque | 5 par balle (`degatsMitrailleuse`) |
 
-La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts.
+La chance de toucher vaut 35 % à courte distance (`precisionEnnemis`) et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Les vigiles, les policiers d'élite et le heavy robot visent mieux : 50 % de près (`precisionPros`) ; les mitrailleuses de la banque, 30 %. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts ; dans une voiture blindée, rien ne passe ; dans le heavy robot, on ne prend que 30 % des dégâts (`protectionRobot`).
 
 Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. Elle laisse une traînée de fumée grise, qui aide à la voir venir. À 20 m, elle met 1 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle explose aussi sur les soldats, policiers ou passants qui se trouvent sur son chemin, et les blesse comme le bazooka de B.J. (jusqu'à 250) : on peut se cacher derrière eux. Un piéton ou un policier tué par Hitler ne donne pas d'étoile à B.J. Hitler n'est jamais blessé par sa propre roquette. Elle fait exploser la voiture de B.J. s'il est dedans.
 
@@ -322,23 +337,40 @@ Le niveau de recherche va de 0 à 5 étoiles. Chaque bêtise ajoute une étoile 
 - Frapper un policier, ou tirer à moins de 30 m de lui, quand on n'a encore aucune étoile.
 - Voler une voiture de police, ou n'importe quelle voiture sous les yeux de la police.
 - Braquer la banque : prendre les 2 000 $ du coffre donne 3 étoiles d'un coup.
+- Déclencher l'alarme d'un braquage : on monte d'un coup à 4 étoiles (musée, bijouterie) ou 5 (banque Pacific Standard).
+- Tuer un vigile.
 
 ### La réponse de la police
 
-| Étoiles | Policiers à pied, au plus | Voitures de police en route, au plus | Temps minimum pour tout perdre |
-| --- | --- | --- | --- |
-| 1 | 2 | 0 | 12 s |
-| 2 | 4 | 1 | 24 s |
-| 3 | 6 | 2 | 36 s |
-| 4 | 8 | 3 | 48 s |
-| 5 | 8 | 3 | 60 s |
+| Étoiles | Policiers au plus (à pied et en route) | Voitures de police en route, au plus | En plus | Temps minimum pour tout perdre |
+| --- | --- | --- | --- | --- |
+| 1 | 2 | 0 | | 12 s |
+| 2 | 6 | 1 | | 24 s |
+| 3 | 10 | 2 | | 36 s |
+| 4 | 16 | 4 | Une voiture sur deux est un fourgon blindé, avec 4 policiers d'élite | 48 s |
+| 5 | 22 | 5 | Le heavy robot | 60 s |
+
+Ces nombres sont dans les réglages `policiers` et `voituresPolice`. Les policiers qui arrivent en voiture comptent déjà (2 par voiture, 4 par fourgon) : la police ne dépasse pas le nombre du tableau.
 
 - **À pied** : un renfort apparaît toutes les 4 s, hors de vue, entre 45 et 170 m, au coin d'un pâté : il n'y en a pas en pleine campagne.
 - **En voiture** : dès 2 étoiles, une voiture de police apparaît toutes les 6 s entre 90 et 230 m. Elle roule à 65 km/h, sur les rues comme sur les routes de campagne, et prend à chaque carrefour le chemin le plus court jusqu'au joueur (recalculé chaque seconde). À moins de 30 m, elle s'arrête et 2 policiers en descendent.
+- **Fourgons blindés** : dès 4 étoiles (`etoilesBlindes`), une voiture sur deux est un fourgon blindé. Il roule à 122 km/h (`vitesseBlindes`) : il rattrape une voiture classique, pas une Porsche. Les balles ne lui font rien, il tient 3 roquettes. Arrivé, il débarque 4 policiers d'élite, qui tirent en rafales.
+- **Après une alarme de braquage**, pendant une minute, les renforts à pied et en voiture arrivent 3 fois plus vite (toutes les 1,3 s et toutes les 2 s).
 - **Être vu** : un policier vivant à moins de 50 m avec une ligne de vue dégagée, ou une voiture de police conduite à moins de 50 m. Les étoiles clignotent en bleu tant que la police voit le joueur.
 - **Fin de poursuite** : à 0 étoile, les renforts à plus de 50 m disparaissent. Mourir remet aussi les étoiles à 0.
 
 La sirène s'entend à moins de 180 m d'une voiture de police en route, et les policiers apparaissent en points rouges et bleus sur la mini-carte.
+
+### Le heavy robot
+
+À 5 étoiles (`etoilesRobot`), la police envoie un heavy robot, comme dans *Wolfenstein : The New Order*. Il arrive 15 s après la 5e étoile, hors de vue, entre 70 et 170 m ; il n'y en a qu'un à la fois, et le suivant arrive 15 s après qu'on s'en est débarrassé. Quand on perd toutes ses étoiles, il repart s'il est à plus de 50 m.
+
+- **Le robot** : 4,7 m de haut, gris-bleu acier, sur deux grosses jambes avec des vérins. Son torse est une caisse blindée, avec « POLICE » sur le ventre, deux gyrophares, deux phares et deux pots d'échappement. Devant, derrière une vitre blindée, un policier est assis aux commandes. Au bras gauche, une mitrailleuse à 6 canons qui tournent ; au bras droit, un lance-roquettes à 4 tubes.
+- **Il marche** à 4 m/s (`vitesseRobot`), droit sur B.J. quand il le voit (à moins de 110 m), sinon par les rues, en suivant le chemin des voitures de police. Chaque pas fait un bruit sourd, et fait trembler la caméra quand il est à moins de 40 m. Il bute contre les murs et les voitures, ne passe pas sous les portes et ne va pas dans plus de 2 m d'eau.
+- **Il tire** quand il voit B.J. et lui fait face : des rafales de 10 énormes balles (un gros trait jaune), à 0,12 s d'écart, puis une pause de 1,5 à 2,5 s ; et une roquette toutes les 5 à 8 s, comme celles d'Hitler (rayon 5 m). Ses balles cabossent la voiture où se trouve B.J.
+- **Le vaincre** : son blindage arrête tout (les balles ricochent), sauf la vitre de la cabine. Elle tient 350 points (`vitreRobot`) : 9 balles de pistolet, 11 de fusil d'assaut, ou 2 roquettes. Une fois la vitre en éclats, on peut abattre le pilote (70 points, tête × 2,5 ; une explosion le blesse aussi), ou s'approcher à moins de 3,8 m et appuyer sur E pour l'éjecter : il tombe à côté et attaque. Sans pilote, le robot s'agenouille.
+- **Le piloter** : E à côté d'un robot sans pilote fait monter B.J. dans la cabine (on le voit assis, derrière la vitre cassée). La mitrailleuse lourde fait 45 dégâts par balle, 11 balles par seconde, et porte à 150 m ; les roquettes font 250 dégâts (rayon 6 m), une toutes les 1,2 s. Il a 500 balles et 12 roquettes (tableau `ARMES_ROBOT`). Dedans, on ne prend que 30 % des dégâts. En mourant, B.J. est éjecté.
+- Sur la mini-carte, le robot est un gros point qui clignote en rouge et bleu, gris quand personne ne le pilote.
 
 ## Véhicules
 
@@ -346,7 +378,7 @@ Tous les véhicules se volent, garés ou en circulation, police comprise. Il suf
 
 ### Les types de véhicules
 
-Il y a 6 types de voitures, la voiture de police et 2 bateaux. Ils sont décrits dans le tableau `VOITURES`, en haut de `index.html`.
+Il y a 6 types de voitures, la voiture et le fourgon blindé de la police, et 2 bateaux. Ils sont décrits dans le tableau `VOITURES`, en haut de `index.html`.
 
 | Type | Vitesse maximale | 0 à 100 km/h | Virage | Chance | Taille (long. × larg. × haut.) | Couleurs | Signes particuliers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -357,10 +389,11 @@ Il y a 6 types de voitures, la voiture de police et 2 bateaux. Ils sont décrits
 | Limousine | 101 km/h (28 m/s) | 2,7 s | 0,6 | 1 | 7,4 × 1,85 × 1,45 m | noir, blanc | Très longue, 4 vitres de chaque côté, baguettes chromées |
 | Tricycle | 72 km/h (20 m/s) | jamais | 1,4 | 1 | 2,5 × 1,3 × 1,25 m | les 10 | Moto à 3 roues : on voit le pilote, et rien ne le protège |
 | Voiture de police | 115 km/h (32 m/s) | 2,0 s | 1 | 0 | 4,4 × 1,8 × 1,45 m | blanc | Classique avec bande bleue et gyrophares |
+| Fourgon blindé | 137 km/h (38 m/s) | 2,3 s (calculé) | 0,8 | 0 | 5,8 × 2,3 × 2,55 m | noir | Caisse d'acier, petites vitres, grosses roues, pare-buffle, marchepieds, « POLICE » sur les flancs, gyrophares, projecteurs. Blindé : les balles ricochent, il tient 3 roquettes |
 | Hors-bord | 108 km/h (30 m/s) | pas mesuré | 0,8 | 0 | 5,5 × 2,1 × 1,4 m | blanc, rouge, bleu, noir | Coque en V, pare-brise, moteur à l'arrière ; on voit le pilote |
 | Jet-ski | 86 km/h (24 m/s) | pas mesuré | 1,5 | 0 | 3 × 1,15 × 1,1 m | jaune, bleu, rouge, vert | Petite coque, selle, guidon ; on voit le pilote |
 
-- **Chance** : sur 15 véhicules tirés au sort, il y a en moyenne 6 classiques, 3 minibus, 2 Porsche, 2 4x4, 1 limousine et 1 tricycle. La voiture de police n'est jamais tirée au sort : elle n'arrive que quand on est recherché.
+- **Chance** : sur 15 véhicules tirés au sort, il y a en moyenne 6 classiques, 3 minibus, 2 Porsche, 2 4x4, 1 limousine et 1 tricycle. La voiture et le fourgon de police ne sont jamais tirés au sort : ils n'arrivent que quand on est recherché.
 - **Virage** : 1 = comme la classique. Le tricycle tourne sec, la limousine très large.
 - Les vitesses et les temps du tableau ont été mesurés en ligne droite, pied au plancher.
 - En circulation, tout le monde roule à 40 km/h.
@@ -390,6 +423,15 @@ En voiture, le joueur ne prend que 40 % des dégâts, et les ennemis le touchent
 
 Le tricycle, le hors-bord et le jet-ski n'ont pas de carrosserie : ils ne protègent pas. On y prend les mêmes dégâts qu'à pied, et on ne peut pas tirer non plus.
 
+### La voiture blindée façon Mad Max
+
+Le garagiste de LS Customs blinde les voitures rapides, celles qui vont à au moins 144 km/h (`vitesseBlindable`, 40 m/s) : parmi les voitures du jeu, seule la Porsche. On gare la voiture dans le garage, on descend, et on appuie sur E devant le garagiste : il prend 5 000 $ (`prixBlindage`), des étincelles jaillissent de la soudure, et la voiture est blindée. S'il n'y a pas de voiture dans le garage, si elle n'est pas assez rapide, déjà blindée, ou s'il manque de l'argent, il le dit.
+
+- **Ce qui se voit** : des plaques d'acier rouillé soudées sur les flancs (un peu de travers, avec des rivets et des soudures), sur le capot, le toit et l'arrière ; des barreaux sur le pare-brise et la vitre arrière, deux barres sur les vitres de côté ; un pare-chocs en acier à 5 pointes ; deux pots d'échappement tout droits derrière.
+- **Ce que ça fait** : les balles ricochent (« piou ») sans rien abîmer ; les chocs l'abîment 3 fois moins ; elle encaisse 3 roquettes (`roquettesBlindage`), qui la cabossent, et explose à la 4e. Un message dit combien de roquettes elle peut encore prendre. Tant qu'elle tient, rien n'atteint B.J. à l'intérieur : ni balle, ni explosion.
+- **Ce que ça coûte** : elle est plus lourde et garde 92 % de sa vitesse et de son accélération (`lourdeurBlindage`) : une Porsche blindée monte à 166 km/h.
+- Le garage la répare comme les autres, sans enlever le blindage. Le fourgon blindé de la police, s'il est volé, protège de la même façon.
+
 ### Dégâts
 
 Une voiture a cinq côtés, qui s'abîment de 0 (neuve) à 1 (épave) : l'avant, l'arrière, la gauche, la droite et le toit. Les bateaux ne s'abîment pas. Le réglage `degatsVoitures` multiplie tous les dégâts (0 = jamais).
@@ -399,7 +441,7 @@ Une voiture a cinq côtés, qui s'abîment de 0 (neuve) à 1 (épave) : l'avant,
 | Choc contre un mur, un pilier, une voiture | (vitesse vers l'obstacle − 3 m/s) × 0,03 : 0,2 à 36 km/h, 0,5 à 72 km/h, 0,8 à 108 km/h. Frotter un mur en biais abîme peu. L'autre voiture prend autant, de son côté |
 | Retomber à plus de 7 m/s | (vitesse − 7) × 0,05 à l'avant ou à l'arrière si elle tombe sur le nez ou l'arrière ; la moitié aux roues |
 | Retomber sur le toit | 0,3 + 0,03 par m/s au toit |
-| Une balle | Dégâts de l'arme ÷ 2 000 (0,02 au pistolet), un petit creux de 3 cm, et la vitre la plus proche (à moins de 80 cm) se fêle, puis se brise |
+| Une balle | Dégâts de l'arme ÷ 2 000 (0,02 au pistolet), un petit creux de 3 cm, et la vitre la plus proche (à moins de 80 cm) se fêle, puis se brise. Rien sur une voiture blindée |
 | Une roquette | Tout casse, et la voiture explose (voir plus bas) |
 
 Ce qui se voit :
@@ -415,7 +457,7 @@ Ce qui se voit :
 
 ### Explosions
 
-Une voiture explose quand une roquette explose à côté d'elle (6 m pour celle du joueur, 5 m pour celle d'Hitler). Les balles ne lui font rien.
+Une voiture explose quand une roquette explose à côté d'elle (6 m pour celle du joueur, 5 m pour celle d'Hitler ou du heavy robot). Les balles ne lui font rien. Une voiture blindée encaisse 3 explosions avant d'exploser à la 4e.
 
 - L'explosion fait jusqu'à 150 dégâts aux personnages à moins de 7 m, et jusqu'à 40 à B.J. (`degatsExplosion`).
 - Les voitures à moins de 7 m explosent à leur tour : on peut faire sauter toute une file.
@@ -429,7 +471,7 @@ Les balles les cabossent et cassent leurs vitres, mais ne les font pas exploser.
 
 ## Missions et progression
 
-Les 6 missions s'enchaînent dans l'ordre et rapportent 18 200 $ au total. Elles emmènent le joueur de la livraison d'un colis au combat final contre Hitler. L'argent gagné avant le bunker (3 000 $ une fois le pistolet payé) suffit pour s'offrir le fusil d'assaut ou le fusil de sniper, mais pas les deux.
+Les 10 missions s'enchaînent dans l'ordre et rapportent 428 200 $ au total. Les 6 premières emmènent le joueur de la livraison d'un colis au combat final contre Hitler (18 200 $). L'argent gagné avant le bunker (3 000 $ une fois le pistolet payé) suffit pour s'offrir le fusil d'assaut ou le fusil de sniper, mais pas les deux. Les 4 suivantes sont les braquages : d'abord la voiture blindée pour s'enfuir, puis le musée, la bijouterie et la grande banque (voir « Braquages »).
 
 | # | Mission | Étapes | Récompense |
 | --- | --- | --- | --- |
@@ -439,8 +481,14 @@ Les 6 missions s'enchaînent dans l'ordre et rapportent 18 200 $ au total. Elles
 | 4 | Course-poursuite | Monter à 3 étoiles, puis semer la police | 1 500 $ |
 | 5 | Opération bunker | Aller au point `d`, à Fort Zancudo, puis éliminer le Kommandant dans le bunker | 5 000 $ |
 | 6 | Le château Wolfenstein | Éliminer Hitler dans le château, sur le mont Chiliad | 10 000 $ |
+| 7 | Mad Max | Amener une voiture rapide (une Porsche) au garage LS Customs, puis payer le garagiste pour la blinder (5 000 $) | rien |
+| 8 | Le musée d'art | Garer la voiture blindée devant le musée (`U`), voler le grand tableau, les 2 vitrines de bijoux, la couronne et les 2 statues, puis semer la police et rapporter le butin à la planque (la caravane de Trevor, `R`), dans la voiture blindée | 60 000 $ |
+| 9 | La bijouterie Vangelico | Garer la voiture blindée devant la bijouterie (`V`), voler le gros diamant, puis semer la police et le rapporter à la planque | 100 000 $ |
+| 10 | Le casse de la Pacific Standard | Garer la voiture blindée devant la banque (`Q`), passer les lasers, percer le coffre-fort, faire sauter la grille, prendre le pactole, puis semer la police et le rapporter à la planque | 250 000 $ |
 
-Les premières missions restent dans Los Santos. Le bunker est à environ 2,5 km du garage, par la Great Ocean Highway ; le château est tout au nord.
+Les premières missions restent dans Los Santos. Le bunker est à environ 2,5 km du garage, par la Great Ocean Highway ; le château est tout au nord. La planque des braquages, la caravane de Trevor à Sandy Shores, est à environ 2 km des trois bâtiments.
+
+Pour tester une mission sans refaire les précédentes, le code de triche `MISSION` suivi d'un numéro y saute directement (voir « Codes de triche »).
 
 Après la dernière mission, l'objectif affiche « Pays libre : fais ce que tu veux ! ».
 
@@ -451,36 +499,82 @@ Une mission est une liste d'étapes. Chaque étape est validée dès que sa cond
 | Type | Condition |
 | --- | --- |
 | `aller` | Être à moins de 4 m du lieu. Un lieu est une lettre de la carte : s'il y en a plusieurs (un garage `G`), c'est la plus proche qui compte |
-| `voiture` | Être en voiture à moins de 7 m du lieu |
+| `voiture` | Être en voiture à moins de 7 m du lieu. On peut exiger `rapide: true` (une voiture qui va à au moins `vitesseBlindable`), `blindee: true` (une voiture blindée) et `sansPolice: true` (0 étoile). Devant un pâté à braquer, le lieu est l'endroit où se garer, sur la place devant l'entrée |
 | `eliminer` | Plus aucun personnage de ce type en vie (`soldat`, `boss` ou `hitler`) |
 | `etoiles` | Avoir au moins ce nombre d'étoiles |
 | `semer` | Revenir à 0 étoile |
 | `arme` | Posséder l'arme nommée |
+| `blindage` | Avoir une voiture blindée par le garagiste |
+| `voler` | Tout le butin du pâté (lettre `lieu`) est dans le sac |
 
 ### Guidage
 
 - Un point jaune sur la mini-carte montre l'objectif. Il reste collé au bord quand l'objectif est loin.
-- Dans le monde, une colonne jaune lumineuse de 5 m marque le lieu, ou une flèche jaune flotte au-dessus de la cible à éliminer.
+- Dans le monde, une colonne jaune lumineuse de 5 m marque le lieu, ou une flèche jaune flotte au-dessus de la cible à éliminer ou du butin à voler. Pendant un braquage, elle montre le plus proche de ce qu'on peut prendre ou actionner tout de suite (la perceuse, puis l'explosif, puis le pactole), et le garagiste pour la mission Mad Max.
 - Le texte de l'étape s'affiche en bas de l'écran. À la fin, un bandeau annonce « MISSION RÉUSSIE » et la récompense.
 
 ### Argent
 
 | Source | Montant |
 | --- | --- |
-| Missions | 200 à 10 000 $ |
+| Missions | 200 à 250 000 $ |
 | Hitler | 2 000 $ |
 | Le Kommandant | 1 000 $ |
 | Piétons tués | 10 à 69 $, 6 fois sur 10 |
 | Coffre de la banque | 2 000 $ et 3 étoiles ; il se remplit de nouveau au bout de 5 minutes |
 | Mort | -100 $ |
+| Blindage chez le garagiste | -5 000 $ |
+| Masque à gaz | -500 $ |
 
 ### Mort
 
-Quand la vie tombe à 0, l'écran passe en noir et blanc avec « WASTED » pendant 3,5 s. Le joueur se réveille devant l'hôpital le plus proche (il y en a 3 : Los Santos, Sandy Shores, Paleto Bay) avec toute sa vie, 100 $ de moins et 0 étoile. Il garde ses armes, ses munitions et sa progression dans les missions.
+Quand la vie tombe à 0, l'écran passe en noir et blanc avec « WASTED » pendant 3,5 s. Le joueur se réveille devant l'hôpital le plus proche (il y en a 3 : Los Santos, Sandy Shores, Paleto Bay) avec toute sa vie, 100 $ de moins et 0 étoile. Il garde ses armes, ses munitions, son masque, le butin déjà dans son sac et sa progression dans les missions. S'il pilotait le heavy robot, il en est éjecté.
+
+## Braquages
+
+Trois bâtiments de Los Santos se braquent : le musée d'art (`U`), la bijouterie Vangelico (`V`) et la banque Pacific Standard (`Q`). Chacun a son alarme, ses gardes et son butin. On peut y entrer à toute heure : tant qu'on ne vole rien, qu'on ne tire pas et qu'on ne sort pas d'arme devant un vigile, rien ne se passe. Ils sont faits pour être réalistes et dangereux ; les missions 8 à 10 les enchaînent (voir « Missions »).
+
+### Le butin
+
+- On vole avec E, à moins de 2 m de l'objet. Un objet sous vitrine fait voler la vitre en éclats. Tout va dans le sac, qu'on voit sur le dos de B.J. ; on peut continuer à tirer.
+- Le butin n'a pas de prix à l'objet : c'est la récompense de la mission qui le paie, quand on arrive à la planque (la caravane de Trevor) dans la voiture blindée, avec 0 étoile. Le sac se vide alors.
+- Le butin volé ne revient pas. Mourir ne fait pas perdre le butin déjà dans le sac.
+
+| Bâtiment | Butin |
+| --- | --- |
+| Musée d'art | Le grand tableau, une « Nuit étoilée » de 4,2 × 2,6 m (on découpe la toile, le cadre doré reste) ; la couronne en or à 8 pointes, sertie de rubis et de saphirs, sur un coussin de velours ; le collier de rubis ; les bagues en diamant ; la statue grecque en marbre, grandeur nature ; le chat égyptien en or |
+| Bijouterie Vangelico | Le gros diamant, taillé en brillant, qui tourne et scintille sous sa cloche de verre |
+| Banque Pacific Standard | Le pactole : deux palettes de liasses de billets, avec des lingots d'or dessus |
+
+### L'alarme
+
+L'alarme se déclenche quand on vole un objet, quand on pose la perceuse, quand on touche un laser, quand on blesse un vigile ou un chien, quand on tire à moins de 50 m de l'un d'eux, ou quand un vigile ou un chien voit B.J. à moins de 15 m avec une arme à feu à la main (pas en voiture).
+
+- Les étoiles montent d'un coup : 4 pour le musée et la bijouterie, 5 pour la banque. Pendant une minute, les renforts de police arrivent 3 fois plus vite.
+- Tous les vigiles et les chiens du bâtiment attaquent.
+- On l'entend jusqu'à 250 m : une sonnerie à deux notes, hachée 16 fois par seconde. Les gyrophares du bâtiment (sur la façade et au plafond) clignotent en rouge, et une lumière rouge clignote dedans.
+- Elle s'arrête quand on a semé la police (0 étoile) ou qu'on est mort ; les vigiles se calment.
+
+### Les vigiles et les chiens
+
+- **Les vigiles** (chemise grise, pantalon et casquette noirs) restent dans leur pâté. Ils ont chacun leur arme, pistolet, fusil à pompe, mitraillette ou fusil d'assaut, et visent bien (voir « Les ennemis »). Musée : 4 vigiles (dont un sur la place), banque : 3, bijouterie : 1 devant la porte.
+- **Les chiens** (2 au musée) restent aussi dans leur pâté. En alerte, ils courent à 9 m/s, plus vite que B.J., et mordent (12 points toutes les 0,9 s). Ils ne mordent pas à travers une carrosserie : autour d'une voiture ou du robot, ils aboient.
+
+### La bijouterie : la fumée toxique
+
+Quand l'alarme sonne, des bouches au plafond lâchent une fumée verdâtre qui remplit la boutique en 5 s. Dedans, sans masque à gaz, B.J. tousse et perd jusqu'à 12 points de vie par seconde (`degatsFumee`) : le gilet ne protège pas. L'écran se voile de vert. Avec le masque à gaz (armurerie, 500 $), la fumée ne fait plus rien et le voile est léger. La fumée se dissipe en 15 s après l'alarme.
+
+### La banque : lasers, mitrailleuses, coffre-fort
+
+- **Le couloir des lasers** : derrière le hall, un couloir de 3,6 m de large et 11 m de long mène au coffre. 7 lasers rouges le barrent : 4 en travers (dont un à 35 cm du sol, à sauter, un à 1,35 m, à passer accroupi, et deux qui montent et descendent) et 3 debout, qui balaient le couloir de gauche à droite. Il faut passer entre eux, au bon moment.
+- **Les mitrailleuses** : si B.J. touche un laser, l'alarme sonne et 3 mitrailleuses automatiques descendent du plafond (deux dans le couloir, une dans la salle du coffre). Elles suivent B.J. et tirent pendant 5 s (`dureeMitrailleuses`), 5 balles par seconde chacune, s'il est en vue. Debout, sans gilet, deux mitrailleuses font perdre environ 75 points en 5 s (on peut en mourir, avec un peu de malchance) ; accroupi, deux fois moins. On peut les détruire : 60 points chacune.
+- **La perceuse thermique** : devant la porte ronde du coffre-fort (3,2 m, en acier, avec son volant à trois branches et ses 16 boulons), E pose une perceuse jaune sur son pied magnétique. Elle perce pendant 40 s (`dureePerceuse`), avec des étincelles et un bruit strident ; l'aide affiche le pourcentage. L'alarme sonne tout de suite : il faut tenir. Puis la porte pivote sur ses gonds en 3 s.
+- **L'explosif** : derrière la porte, une grille de barreaux ferme la salle du coffre. E colle un pain de plastic avec son détonateur ; la diode clignote et bipe, de plus en plus vite, pendant 5 s (`dureeCharge`). L'explosion (rayon 5 m, jusqu'à 70 points pour B.J.) fait voler les 4 panneaux de la grille. Il faut s'éloigner !
+- **Le pactole** est alors au fond, entre les murs de coffres de location.
 
 ## Codes de triche
 
-Les codes de triche changent seulement l'apparence de B.J. Entrée ouvre une case « Code : » ; on tape le code, puis Entrée. Pendant la saisie, les touches ne font plus bouger le joueur. Entrée ne fait rien quand la grande carte est ouverte. Un mauvais code affiche « Code inconnu ».
+Il y a deux sortes de codes de triche : ceux qui changent l'apparence de B.J. (un « effet »), et ceux qui font une action tout de suite, pour tester le jeu. Entrée ouvre une case « Code : » ; on tape le code, puis Entrée. Pendant la saisie, les touches ne font plus bouger le joueur. Entrée ne fait rien quand la grande carte est ouverte. Un mauvais code affiche « Code inconnu ».
 
 | Code | Effet |
 | --- | --- |
@@ -490,8 +584,10 @@ Les codes de triche changent seulement l'apparence de B.J. Entrée ouvre une cas
 | `JAMBEDEBOIS` | Jambe droite en bois, sans chaussure |
 | `BARCA` | Maillot du Barça à rayures bleues et grenat |
 | `BEBE` | Deux fois plus petit, avec une grosse tête, tout nu avec une couche blanche |
+| `IDKFA` | Comme dans *Doom* : toutes les armes (bazooka compris), au moins 3 fois leurs munitions, le gilet pare-balles plein et le masque à gaz |
+| `MISSION` suivi d'un numéro | Saute à cette mission, à sa première étape (`MISSION8` : le musée ; `MISSION11` : pays libre). Le sac est vidé. Si la mission a besoin d'une voiture blindée et qu'il n'y en a pas, une Porsche blindée apparaît à 5 m de B.J. |
 
-Retaper un code annule son effet. Les effets se combinent : B.J. est remis dans sa tenue normale, puis chaque code actif est appliqué dans l'ordre du tableau. Ils durent même après une mort, mais pas après un rechargement de la page. Ils ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
+Les codes à action se retapent autant qu'on veut ; un nombre tapé juste après le code lui est donné (`MISSION8`). Retaper un code d'apparence annule son effet. Les effets se combinent : B.J. est remis dans sa tenue normale, puis chaque code actif est appliqué dans l'ordre du tableau. Ils durent même après une mort, mais pas après un rechargement de la page. Les codes d'apparence ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
 
 ## Interface et son
 
@@ -504,16 +600,17 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Bas gauche | Mini-carte | Ronde, elle tourne avec la caméra. Elle dézoome en voiture ou en bateau. |
 | Bas gauche | Barre de vie | Verte, rouge sous 30 points |
 | Bas gauche | Barre du gilet | Bleue, sous la barre de vie, seulement quand on porte un gilet |
-| Haut droite | Argent | En gros chiffres verts |
+| Haut droite | Argent | En gros chiffres verts, les milliers séparés (« 250 000 $ ») |
 | Haut droite | Étoiles | 5 étoiles, qui clignotent en bleu quand la police voit le joueur |
-| Haut droite | Arme et munitions | Nom de l'arme, nombre de balles ou de roquettes |
-| Haut gauche | Aide | « Appuie sur E pour… » près d'un stand, d'un ascenseur ou d'un véhicule, avec son nom (« monter : Porsche ») |
+| Haut droite | Arme et munitions | Nom de l'arme, nombre de balles ou de roquettes. Dans le heavy robot : « Heavy robot », ses balles et ses roquettes |
+| Haut gauche | Aide | « Appuie sur E pour… » près d'un stand, d'un ascenseur, d'un véhicule (avec son nom : « monter : Porsche »), du garagiste, du butin, de la porte du coffre, de la grille ou du heavy robot. Pendant le perçage du coffre, à moins de 40 m : « Perceuse thermique : 63 % » |
 | Bas centre | Objectif | Texte de l'étape de mission en cours |
-| Centre | Viseur | Un point blanc, avec une arme à feu, en visant ou en 1re personne. Caché dans la lunette et en nageant |
+| Centre | Viseur | Un point blanc, avec une arme à feu, en visant, en 1re personne ou dans le heavy robot. Caché dans la lunette et en nageant |
 | Plein écran | Lunette | Un rond avec deux traits en croix et du noir autour, en visant avec le fusil de sniper. Le reste de l'écran (mini-carte, argent) s'affiche par-dessus |
-| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? », « SAUT ! 35 m », « LOOPING ! », « Pas assez d'élan ! », « Voiture réparée ! » |
+| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? », « SAUT ! 35 m », « LOOPING ! », « Pas assez d'élan ! », « Voiture réparée ! », « MAD MAX ! », « ALARME ! », « BUTIN ! », « LASER TOUCHÉ ! », « COFFRE-FORT PERCÉ ! », « BOUM ! », « HEAVY ROBOT ! », « MISSION 8 », ce que dit le garagiste |
 | Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
 | Plein écran | Bords rouges | Quand le joueur est touché |
+| Plein écran | Fumée | Un voile vert-gris dans la fumée toxique de la bijouterie, léger avec le masque à gaz |
 | Plein écran | WASTED | Noir et blanc à la mort |
 | Plein écran | Grande carte | Tout le pays, avec la touche M |
 | Centre | Code de triche | « Code : … » pendant la saisie |
@@ -529,9 +626,10 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | $ vert | Banque | Z rouge foncé | Tour Maze Bank |
 | S vert | Supérette | B noir | Bunker |
 | E rouge | Station-service | W rouge foncé | Château Wolfenstein |
-| C orange | Départ d'une piste de cascades | | |
+| C orange | Départ d'une piste de cascades | U brun | Musée d'art |
+| V doré | Bijouterie Vangelico | Q vert foncé | Banque Pacific Standard |
 
- Les pistes de cascades sont des traits orange. Les ennemis en alerte sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. La flèche blanche du joueur est au centre.
+ Les pistes de cascades sont des traits orange. Les ennemis en alerte (dont les vigiles et les chiens) sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. Le heavy robot est un gros point, rouge et bleu avec son pilote, gris sans. La flèche blanche du joueur est au centre.
 
 **La grande carte** s'ouvre et se ferme avec la touche M. Elle couvre tout l'écran et met le jeu en pause : rien ne bouge tant qu'elle est ouverte.
 
@@ -556,6 +654,9 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 - **Pause** : le menu et la grande carte coupent tous les sons.
 - **Police** : sirène à deux tons, plus forte quand la voiture approche.
 - **Signaux** : bips pour un achat, un objet ramassé, une étape réussie, une blessure, la mort.
+- **Braquages** : la sonnerie de l'alarme ; le tintement et le fracas d'une vitrine brisée ; la toux dans la fumée toxique ; le crissement de la perceuse thermique ; les bips de l'explosif, de plus en plus rapides ; les rafales des mitrailleuses automatiques ; les aboiements des chiens.
+- **Blindage** : le « piou » d'une balle qui ricoche sur une voiture blindée ou sur le heavy robot ; le bruit de la soudure chez le garagiste.
+- **Heavy robot** : un bruit sourd à chaque pas ; sa mitrailleuse, plus grave que les autres ; ses roquettes, comme celles du bazooka.
 - **Danse** : le petit cri de Michael Jackson (« hi-hiii ! ») au début de la toupie, un bruit sec quand B.J. prend la pose. Le cri dure une demi-seconde : une voix de tête en deux fois, un « hi » court vers 900 Hz, le souffle du « h », puis un « hiii » plus long vers 1 050 Hz. Chaque fois, la voix monte d'un coup, tremble un peu et retombe à la fin.
 
 | Type | Note au ralenti | Note à fond | Rapports | Rauque (0 à 1) | Volume | Caractère |
@@ -567,6 +668,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Limousine | 40 Hz | 140 Hz | 5 | 0,1 | 0,04 | Feutré |
 | Tricycle | 45 Hz | 260 Hz | 3 | 1 | 0,04 | Mobylette |
 | Voiture de police | 50 Hz | 210 Hz | 4 | 0,4 | 0,05 | Comme la classique, un peu plus aigu |
+| Fourgon blindé | 28 Hz | 120 Hz | 5 | 0,8 | 0,07 | Très grave, rauque et fort |
 | Hors-bord | 40 Hz | 150 Hz | 1 | 0,6 | 0,06 | Grave, sans changer de rapport |
 | Jet-ski | 60 Hz | 280 Hz | 1 | 0,9 | 0,05 | Aigu, il pétarade |
 
@@ -574,33 +676,36 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 3 650 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 4 670 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
-| 1–106 | HTML et CSS | Interface et menu |
-| 107–399 | **Zones à modifier** | `REGLAGES`, `ARMES`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
-| 400–760 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
-| 761–964 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, panneaux, visages dessinés par le programme ; matières |
-| 965–1654 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion |
-| 1655–1710 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
-| 1711–1855 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
-| 1856–2143 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), pièces qui partent, carrosserie, cabine, roues, `habillerVoiture` |
-| 2144–2289 | Dégâts des voitures | `abimer`, bosses (`bosseler`), vitres, pièces qui partent (`detacher`), roues tordues, morceaux qui volent (`debris`) |
-| 2290–2373 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés, cri de la danse (`criMJ`) |
-| 2374–2843 | Joueur et PNJ | Tenues, chapeau de la danse, objets, explosions, roquettes, clavier et souris, suite de touches de la danse, triches, danse (`danser`, `pasDeDanse`), ascenseur, tir, achat |
-| 2844–3061 | Mise à jour du joueur | Marche, nage, moonwalk, conduite, chocs, pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
-| 3062–3301 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
-| 3302–3372 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
-| 3373–3529 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
-| 3530–3631 | Boucle principale | Mise à jour et affichage de chaque image, garage qui répare |
+| 1–108 | HTML et CSS | Interface et menu |
+| 109–466 | **Zones à modifier** | `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
+| 467–827 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
+| 828–1085 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, panneaux, visages, marbre, tableaux, coffres, billets, tôle rouillée dessinés par le programme ; matières |
+| 1086–1896 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`, dont les trois pâtés à braquer et le garagiste), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion |
+| 1897–1952 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
+| 1953–2097 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
+| 2098–2436 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 9 modèles (`MODELES`, dont le fourgon blindé), pièces qui partent, carrosserie, cabine, roues, blindage Mad Max (`formesBlindage`, `estBlindee`), `habillerVoiture` |
+| 2437–2583 | Dégâts des voitures | `abimer`, bosses (`bosseler`), vitres, pièces qui partent (`detacher`), roues tordues, morceaux qui volent (`debris`) |
+| 2584–2675 | Sons | Moteurs, roulement, sirène, sonnerie d'alarme, bruits et bips synthétisés, cri de la danse (`criMJ`) |
+| 2676–2921 | Joueur, personnages, objets | Tenues, chapeau de la danse ; vigiles, policiers d'élite (`creerElite`), chiens (`creerChien`, `animerChien`) ; objets, explosions (la voiture blindée encaisse), roquettes, étincelles, éclats de verre |
+| 2922–3220 | Braquages | Masque à gaz, sac du butin, butin (`creerButin`), pièces qui bougent (`construireBraquage`), alarme (`declencherAlarme`), vol (`voler`), perceuse, explosif, fumée, lasers, mitrailleuses, coffre-fort (`majBraquages`) |
+| 3221–3449 | Heavy robot | Le robot (`creerRobot`), sa marche, son chemin par les rues (`cheminRobot`), ses tirs, sa vitre et son pilote (`toucherRobot`), monter, descendre, piloter (`piloterRobot`), apparition |
+| 3450–3776 | État, clavier, actions | État du jeu, clavier et souris, suite de touches de la danse, triches (`validerTriche`), danse (`danser`, `pasDeDanse`), ascenseur, garagiste (`payerBlindage`), achat, tir (`tirer`, aussi depuis le robot), blessures, mort |
+| 3777–4003 | Mise à jour du joueur | Marche, nage, moonwalk, conduite (plus lourde en voiture blindée), chocs (contre le robot aussi), pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
+| 4004–4286 | Intelligence | Piétons, nazis, vigiles, chiens (`majChien`), circulation sur le réseau des routes, chemin de la police, apparitions, police à 4 et 5 étoiles (fourgons blindés, heavy robot) |
+| 4287–4385 | Missions, caméra | Enchaînement des étapes, saut de mission (`sauterMission`), vues (dont le robot), tremblement des pas du robot, zoom de la lunette |
+| 4386–4550 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos, aides et voile de fumée |
+| 4551–4668 | Boucle principale | Mise à jour et affichage de chaque image, garage qui répare, sonnerie d'alarme |
 
 ### À chaque image
 
-1. Déplacer le joueur, à pied, à la nage, en voiture ou en bateau, et tirer si le bouton est enfoncé.
-2. Faire réfléchir et bouger chaque personnage, puis chaque voiture, et la poser sur le sol (ou sur l'eau).
+1. Déplacer le joueur, à pied, à la nage, en voiture, en bateau ou dans le heavy robot, et tirer si le bouton est enfoncé.
+2. Faire réfléchir et bouger chaque personnage, puis chaque voiture, et la poser sur le sol (ou sur l'eau), puis chaque heavy robot. Faire vivre les braquages : alarme, fumée, lasers, mitrailleuses, perceuse et explosif.
 3. Ramasser les objets touchés par le joueur.
 4. Gérer la police, repeupler autour du joueur, vérifier la mission.
 5. Placer la caméra, mettre à jour l'écran, choisir les morceaux du pays à dessiner, dessiner la scène.
@@ -632,8 +737,12 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Sons de moteur** : un moteur, c'est deux notes (celle du moteur et la même une octave plus bas) qui passent dans un filtre. Le filtre laisse passer plus d'aigus quand le moteur est rauque, tourne vite ou accélère. Il y a deux moteurs : celui du joueur et celui de la voiture la plus proche. Les premiers rapports sont plus courts que les derniers.
 - **Pistes de cascades** : chaque morceau de `CASCADES` devient une ligne de points, tous les 1 à 2 m, avec pour chacun trois directions : devant, le haut de la piste, la gauche. Le dessus est un ruban de goudron, les côtés et le dessous des bandes de béton. Là où la piste n'est pas trop penchée (moins de 18°), elle compte comme un sol : `pisteSous` trouve le morceau sous la voiture, sa hauteur et sa pente, même relevée sur le côté. Les côtés des rampes sont des boîtes de collision, en 3 bandes sur la largeur, dont le haut est le bas de la piste à cet endroit : on roule dessus, mais on bute contre. Dans un looping ou un tire-bouchon, la voiture roule « sur des rails » : sa place, son haut et son devant viennent de la ligne de points, et la courbure calculée à chaque point dit si elle reste plaquée.
 - **Sauts** : la voiture tombe toujours ; elle est « au sol » quand elle arrive plus bas que le sol, et prend alors la vitesse de montée du sol. Cette vitesse vient de la pente sous ses roues, ou de la pente de la piste de cascades sous son milieu : un trottoir ne la fait presque pas sauter, le bout d'un tremplin, si.
+- **Braquages** : `genererBloc` construit les parties fixes d'un pâté à braquer (murs, vitrines, socles, couloir, mur du coffre, fusionnées avec le reste du morceau) et note le reste dans un objet « braquage » : gyrophares, zone de fumée, lasers, mitrailleuses, porte et grille, butin, vigiles et chiens. Ce qui bouge ou disparaît est construit plus tard (`construireBraquage`, `creerButin`), dans un groupe par bâtiment, caché au-delà de 300 m. Le lieu d'un pâté à braquer, pour les missions, est déplacé sur la place devant l'entrée. La porte du coffre et la grille sont des boîtes de collision qu'on coupe en mettant leur haut à `-Infinity` (`ajouterCollision` rend la boîte) ; la porte ouverte en a une autre, coupée au départ. Chaque image, `majBraquages` fait clignoter l'alarme, monter la fumée, bouger les lasers (et regarde s'ils passent à moins de 25 cm de B.J., 28 cm pour un laser debout, entre ses pieds et 1,75 m, ou 1,15 m accroupi), tirer les mitrailleuses et avancer la perceuse et l'explosif.
+- **Vigiles et chiens** : ce sont des personnages comme les autres (`personnes`), avec un `braquage` et une zone. Un vigile a son arme à lui (`armeIdx`) et peut tirer en rafales (`rafale`). Le chien a son propre corps (`creerChien` : un corps en gélule, 4 pattes qui avancent en diagonale, une queue qui remue) et son propre comportement (`majChien`).
+- **Voiture blindée** : `v.blindee` ajoute deux pièces au modèle, la tôle rouillée et l'acier (`formesBlindage`, calculées une fois par modèle à partir de sa forme : profil, cabine, longueur). Elles se cabossent comme le reste. `estBlindee` dit si une voiture est blindée, par le garagiste ou parce que c'est un fourgon de police.
+- **Heavy robot** : un modèle articulé (bassin, torse, bras, hanches, genoux, pieds), comme les personnages, avec un policier assis dedans. Il est rangé à part (`robots`), avec sa propre marche, ses tirs et ses dégâts. Pour tirer depuis le robot, `tirer` reçoit l'arme du robot (`ARMES_ROBOT`) au lieu de celle de B.J. ; les balles partent de ses canons, et le rayon ignore le robot lui-même. Une roquette ignore le robot qui l'a tirée.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, si une voiture demande un modèle qui n'existe pas, ou si une piste de cascades a un morceau inconnu.
-- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
+- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, les codes `IDKFA` et `MISSION`, le blindage chez le garagiste (sans et avec assez d'argent), la voiture blindée sous les balles et les roquettes, les trois braquages de bout en bout (butin, alarme, vigiles et chiens, fumée avec et sans masque, lasers et mitrailleuses, perceuse, explosif, planque avec et sans police), les fourgons blindés à 4 étoiles, le heavy robot à 5 étoiles (il tire, sa vitre casse, on éjecte le pilote, on le pilote, on tire, on descend), et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
 
 ## Limites connues et pistes
 
@@ -654,11 +763,16 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Pas de piétons ni de policiers à pied à la campagne : seules les voitures y circulent.
 - Les bateaux ne circulent pas tout seuls, et la police ne va pas sur l'eau : en bateau, on la sème facilement.
 - Le soleil est fixe : il n'y a ni nuit ni météo.
-- Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture ou un bateau, et la police (65 km/h) ne rattrape aucun véhicule lancé à fond, pas même le tricycle (72 km/h).
+- Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture ou un bateau, et la police (65 km/h) ne rattrape aucun véhicule lancé à fond, pas même le tricycle (72 km/h). Seuls les fourgons blindés (122 km/h, à partir de 4 étoiles) rattrapent les voitures lentes ; ils ne foncent pas dans la voiture de B.J. pour l'arrêter, et il n'y a pas de barrages.
 - Les voitures qui roulent toutes seules ne regardent que le milieu des autres : une limousine peut couper un virage et mordre sur le trottoir.
 - Sur un tricycle ou un bateau, B.J. garde son arme à la main.
 - La danse passe en 3e personne et n'en revient pas toute seule : il faut appuyer sur V. Pendant le moonwalk, les pieds glissent un peu au lieu de rester posés, et les ennemis continuent de tirer. Comme la suite de touches n'a pas de temps limite, on peut lancer la danse sans le vouloir, en esquivant à gauche, en arrière, à droite trois fois.
-- Les missions sont linéaires : une seule à la fois, dans l'ordre.
+- Les missions sont linéaires : une seule à la fois, dans l'ordre. Les braquages ne se font qu'après Hitler ; le code `MISSION` permet d'y sauter.
+- Chaque braquage ne se fait qu'une fois : le butin volé ne revient pas, et les vigiles et les chiens tués non plus. Le butin n'a de valeur qu'avec la mission (il n'y a pas de receleur).
+- Les vigiles ne font pas de rondes : ils attendent à leur place. Vigiles et chiens restent dans leur pâté : on les sème en sortant de la place. Les lasers ne voient que B.J. (pas les policiers), et le robot ne passe pas les portes : il ne peut pas entrer dans la banque.
+- La fumée toxique est faite de 26 nuages plats, qui ne sortent pas de la boutique ; les vigiles et les policiers ne la craignent pas.
+- Le heavy robot ne peut pas être détruit : seule la vitre de sa cabine casse. Il ne monte pas les escaliers, n'écrase pas les voitures, et suit les rues quand il ne voit pas B.J. : il peut rester coincé derrière un pâté. Une fois pris, on ne peut pas recharger ses munitions.
+- La lumière rouge de l'alarme est une vraie lumière de plus, allumée en permanence (éteinte quand il n'y a pas d'alarme) : elle coûte un peu de calcul à chaque image, partout.
 - Hitler ne meurt qu'une fois : le bazooka n'a que ses 10 roquettes, et on ne peut pas en racheter.
 - Les roquettes volent tout droit : elles ne suivent pas leur cible.
 - Le fusil de sniper porte à 250 m, mais les personnages ne sont plus dessinés au-delà de 220 m. Les murs du bunker et du château cachent leurs occupants : il faut viser par l'entrée.
@@ -673,7 +787,8 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Des dérapages dans les virages pris trop vite : les virages relevés serviraient alors vraiment.
 - Roquettes à acheter à l'armurerie.
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
-- Des missions qui utilisent la grande carte : courses de bateau, livraisons à Paleto Bay, braquage de la banque.
+- Des missions qui utilisent la grande carte : courses de bateau, livraisons à Paleto Bay.
+- Des braquages à refaire, avec un receleur qui rachète le butin, et des coéquipiers (un chauffeur, un pirate informatique) ; la police qui barre les routes et fonce dans la voiture du joueur.
 - Des étages visitables dans les tours et les immeubles, des fenêtres percées.
 - Un parachute pour sauter du gratte-ciel, des hélicoptères sur l'hélistation.
 - La grande roue de Del Perro et le panneau Vinewood.

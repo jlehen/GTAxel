@@ -32,6 +32,7 @@
   #lunette { position: absolute; inset: 0; display: none; /* deux traits noirs en croix, et du noir autour du rond */
              background: linear-gradient(#000, #000) center / 100% 2px no-repeat, linear-gradient(#000, #000) center / 2px 100% no-repeat,
                          radial-gradient(circle, transparent 38vh, #000 38.5vh); }
+  #fumee { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(165,180,135,.6), rgba(110,125,85,.95)); opacity: 0; }
   #rouge { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 45%, rgba(190,0,0,.75)); opacity: 0; }
   #wasted { position: absolute; top: 38%; left: 0; right: 0; text-align: center; font: 100px 'Anton', Impact, sans-serif; color: #c0392b; letter-spacing: 8px; display: none; }
   #grande-carte { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
@@ -65,6 +66,7 @@
   <div id="objectif"></div>
   <div id="annonce"></div>
   <div id="viseur"></div>
+  <div id="fumee"></div>
   <div id="rouge"></div>
   <div id="wasted">WASTED</div>
   <div id="vitesse"></div>
@@ -117,7 +119,8 @@ const REGLAGES = {
   viesJoueur: 100,
   regeneration: 8,           // points de vie regagnés par seconde...
   delaiRegeneration: 5,      // ...quand on n'a pas été touché depuis ce nombre de secondes
-  protectionVoiture: 0.4,    // en voiture on ne prend que 40 % des dégâts
+  protectionVoiture: 0.4,    // en voiture on ne prend que 40 % des dégâts (une voiture blindée, elle, arrête tout)
+  protectionRobot: 0.3,      // dans le heavy robot, on ne prend que 30 % des dégâts
   giletMax: 100,             // points du gilet pare-balles : il prend les dégâts à la place de ta vie
   degatsExplosion: 40,       // ce que te fait une explosion (ta roquette, une voiture) si tu es collé dessus
   vitesseRoquette: 20,       // m/s : plus vite que toi quand tu cours, mais on peut encore l'esquiver de loin
@@ -125,14 +128,27 @@ const REGLAGES = {
   nombreVoitures: 16,        // voitures qui circulent autour de toi
   vitesseCirculation: 11,
   vitessePolice: 18,
-  etoilesVoituresPolice: 2,  // à partir de combien d'étoiles la police arrive en voiture
   delaiPerteEtoile: 12,      // secondes sans être vu par la police pour perdre une étoile
-  maxPoliciers: 8,
+  // combien de policiers au plus (à pied, et ceux qui arrivent en voiture), et de voitures de police en route, pour 0, 1, 2, 3, 4 et 5 étoiles
+  policiers: [0, 2, 6, 10, 16, 22],
+  voituresPolice: [0, 0, 1, 2, 4, 5],
+  etoilesBlindes: 4,         // à partir de 4 étoiles : une voiture de police sur deux est un fourgon blindé, avec 4 policiers d'élite
+  vitesseBlindes: 34,        // m/s (122 km/h) : les fourgons blindés roulent vite !
+  etoilesRobot: 5,           // à partir de 5 étoiles : le heavy robot de la police arrive
+  vitesseRobot: 4,           // m/s : il marche lentement, mais ses roquettes vont vite
+  vitreRobot: 350,           // la vitre blindée de sa cabine : il faut la casser pour atteindre le pilote
   degatsPolicier: 5,
   degatsSoldat: 7,
   degatsBoss: 12,
   degatsHitler: 35,          // une roquette de bazooka qui te touche en plein
+  degatsGarde: 9,            // les vigiles des braquages
+  degatsElite: 9,            // les policiers d'élite des fourgons blindés
+  degatsChien: 12,           // une morsure de chien de garde
+  degatsRobot: 10,           // une énorme balle de la mitrailleuse du heavy robot
+  degatsRoquetteRobot: 40,   // une roquette du heavy robot, en plein
+  degatsMitrailleuse: 5,     // une balle des mitrailleuses automatiques de la banque (5 par seconde)
   precisionEnnemis: 0.35,    // 1 = ils ne ratent jamais
+  precisionPros: 0.5,        // les vigiles, les policiers d'élite, le robot et les mitrailleuses visent mieux
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
   ombres: true,              // mets false si le jeu rame
@@ -145,6 +161,16 @@ const REGLAGES = {
   vitesseMoonwalk: 1.5,      // m/s, à reculons
   graviteVoiture: 9.8,       // la vraie gravité de la Terre pour les voitures qui sautent (mets 1.6 pour rouler sur la Lune !)
   degatsVoitures: 1,         // 1 = normal, 2 = les voitures s'abîment deux fois plus vite, 0 = jamais
+  // les braquages
+  prixBlindage: 5000,        // ce que le garagiste de LS Customs demande pour blinder une voiture façon Mad Max
+  vitesseBlindable: 40,      // m/s : il ne blinde que les voitures rapides (la Porsche va à 50)
+  lourdeurBlindage: 0.92,    // une voiture blindée garde 92 % de sa vitesse et de son accélération
+  roquettesBlindage: 3,      // une voiture blindée encaisse 3 roquettes : la 4e la fait exploser
+  prixMasque: 500,           // le masque à gaz, à l'armurerie : il protège de la fumée toxique
+  degatsFumee: 12,           // vie perdue par seconde dans la fumée toxique, sans masque (le gilet ne protège pas)
+  dureePerceuse: 40,         // secondes pour que la perceuse thermique perce la porte du coffre-fort
+  dureeCharge: 5,            // secondes avant que l'explosif saute
+  dureeMitrailleuses: 5,     // secondes de tir des mitrailleuses automatiques quand on touche un laser
 };
 
 // =====================================================================
@@ -162,10 +188,15 @@ const ARMES = [
   // zoom : en visant (clic droit), on regarde dans la lunette, qui grossit 5 fois
   { nom: 'Fusil de sniper', modele: 'sniper',      degats: 150, cadence: 1.5, portee: 250, prix: 2500, munitions: 20, zoom: 5, dispersion: 0.006 },
 ];
+// les armes du heavy robot, quand tu le pilotes : clic gauche = la mitrailleuse, clic droit = les roquettes
+const ARMES_ROBOT = {
+  lourde:    { nom: 'Mitrailleuse lourde', modele: 'lourde',    degats: 45,  cadence: 0.09, portee: 150, munitions: 500, auto: true, dispersion: 0.015 },
+  roquettes: { nom: 'Roquettes',           modele: 'roquettes', degats: 250, cadence: 1.2,  portee: 150, munitions: 12, explosion: 6 },
+};
 
 // =====================================================================
 //  LES VOITURES : change-les, ou invente les tiennes !
-//  modele : la forme ('classique', 'porsche', 'minibus', '4x4', 'limousine', 'tricycle', et pour les bateaux 'horsbord' ou 'jetski')
+//  modele : la forme ('classique', 'porsche', 'minibus', '4x4', 'limousine', 'tricycle', 'fourgon', et pour les bateaux 'horsbord' ou 'jetski')
 //  vitesse : en m/s (× 3,6 pour avoir des km/h)   virage : 1 = normal, plus grand = tourne plus sec
 //  chance : plus le nombre est grand, plus on en croise (0 = jamais)   couleurs : si on n'en met pas, toutes
 //  son du moteur : grave et aigu = sa note au ralenti et à fond, rapports = le nombre de vitesses,
@@ -187,6 +218,9 @@ const VOITURES = [
   // la voiture de police (police: true) : on ne la croise que quand on est recherché
   { nom: 'Voiture de police', modele: 'classique', vitesse: 32, acceleration: 14, virage: 1, chance: 0, couleurs: ['#f2f2f2'], police: true,
     son: { grave: 50, aigu: 210, rapports: 4, rauque: 0.4, volume: 0.05 } },
+  // le fourgon blindé de la police (blinde: true : les balles ne lui font rien) : il arrive à partir de 4 étoiles
+  { nom: 'Fourgon blindé', modele: 'fourgon', vitesse: 38, acceleration: 12, virage: 0.8, chance: 0, couleurs: ['#1c1f24'], police: true, blinde: true,
+    son: { grave: 28, aigu: 120, rapports: 5, rauque: 0.8, volume: 0.07 } },
   // les bateaux (bateau: true) : ils n'avancent que sur l'eau. On les trouve aux pontons (& sur la carte)
   { nom: 'Hors-bord', modele: 'horsbord', vitesse: 30, acceleration: 8, virage: 0.8, chance: 0, bateau: true, couleurs: ['#f0f0f0', '#c81010', '#1a5ad8', '#111'],
     son: { grave: 40, aigu: 150, rapports: 1, rauque: 0.6, volume: 0.06 } },
@@ -208,6 +242,9 @@ const VOITURES = [
 //    L maison de Franklin*              O villa de Michael*                   R caravane de Trevor
 //    J bar Yellow Jack                  F ferme*          D docks du port   N hangar d'avions
 //    B bunker nazi    W château Wolfenstein* (repaire d'Hitler)
+//  Les pâtés à braquer (gardés, avec une alarme) :
+//    U musée d'art (vigiles et chiens)  V bijouterie Vangelico (fumée toxique)
+//    Q grande banque Pacific Standard (lasers, mitrailleuses, coffre-fort)
 //  Les autres signes sont le terrain, sans rues :
 //    ~ eau (mer, lac, rivière)          _ plage           , herbe           ; champs
 //    : désert         * forêt           1 à 9 collines et montagnes (plus le chiffre est grand, plus c'est haut)
@@ -263,11 +300,11 @@ const CARTE = [
   "~~~_,=2,,,,,,,,,,,,=,,,,,,,,,=,,13455431,~~~~~~~",  // 43
   "~~~~,,=,,,,,_MMMOMMIIPIIMMMM=,,,1~~55431,~~~~~~~",  // 44
   "~~~~~,=,,,,,_MMMMMIIIXITIIIMM,,,1~~44431,~~~~~~~",  // 45
-  "~~~~~~_=,,,,_IMPMIIHIIITIIPMMM,,,~~3331,,~~~~~~~",  // 46
+  "~~~~~~_=,,,,_IMPMIIHIIITIIUMMM,,,~~3331,,~~~~~~~",  // 46
   "~~~~~~~~=====IIMIIIIITIIIII~~~~~~~~111,,,~~~~~~~",  // 47
-  "~~~~~~~~~,,_IIIIPIIIATTTIII~IIM,,,,,,,,,,~~~~~~~",  // 48
+  "~~~~~~~~~,,_IIIIVIIIATTTIII~IIM,,,,,,,,,,~~~~~~~",  // 48
   "~~~~~~~~~~,_IIIMIIIITTZKTTI~IIM,,,,,,,,,,~~~~~~~",  // 49
-  "~~~~~~~~~~~,_IIIIIaTTTTTCTT+IIM,,,,,,,,,~~~~~~~~",  // 50
+  "~~~~~~~~~~~,_IIIIIaTTQTTCTT+IIM,,,,,,,,,~~~~~~~~",  // 50
   "~~~~~~~~~~&__IIPIIIITTTbTTI~III,,,,121,,~~~~~~~~",  // 51
   "~~~~~~~~~~~_,_IIIIIIITTTTII~IMM,,,23332,~~~~~~~~",  // 52
   "~~~~~~~~~~~~,_IISIIIIIIPIII~IIP,,,24442~~~~~~~~~",  // 53
@@ -302,6 +339,9 @@ const NOMS_LIEUX = [
 //  lieu : une lettre de la CARTE. S'il y en a plusieurs (un garage 'G'...), c'est la plus proche qui compte.
 //  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss' ou 'hitler')
 //  etoiles (nombre) · semer · arme (le nom d'une arme à posséder)
+//  blindage (avoir une voiture blindée par le garagiste) · voler (lieu : tout le butin de ce pâté est dans le sac)
+//  Pour « voiture », on peut exiger : rapide: true (une voiture rapide), blindee: true, sansPolice: true (0 étoile)
+//  Pour tester : le code de triche MISSION8 (Entrée, MISSION8, Entrée) saute à la mission 8.
 // =====================================================================
 const MISSIONS = [
   { nom: 'Le colis', recompense: 500, etapes: [
@@ -324,6 +364,26 @@ const MISSIONS = [
   ]},
   { nom: 'Le château Wolfenstein', recompense: 10000, etapes: [
     { type: 'eliminer', cible: 'hitler', texte: 'Boss final : élimine Hitler dans le château Wolfenstein, sur le mont Chiliad (W sur la carte)' },
+  ]},
+  // les braquages : il faut d'abord une voiture pour s'enfuir, rapide et blindée
+  { nom: 'Mad Max', recompense: 0, etapes: [
+    { type: 'voiture', lieu: 'G', rapide: true, texte: 'Vole une voiture rapide (une Porsche) et amène-la au garage LS Customs' },
+    { type: 'blindage', texte: 'Descends et paie le garagiste (touche E) : 5 000 $ pour blinder ta Porsche façon Mad Max' },
+  ]},
+  { nom: 'Le musée d\'art', recompense: 60000, etapes: [
+    { type: 'voiture', lieu: 'U', blindee: true, texte: 'Gare ta voiture blindée devant le musée d\'art (U sur la carte)' },
+    { type: 'voler', lieu: 'U', texte: 'Vole le grand tableau, les bijoux, la couronne et les statues (touche E). Attention aux vigiles et aux chiens !' },
+    { type: 'voiture', lieu: 'R', blindee: true, sansPolice: true, texte: 'Sème la police, puis rapporte le butin à la planque (la caravane de Trevor, à Sandy Shores) dans ta voiture blindée' },
+  ]},
+  { nom: 'La bijouterie Vangelico', recompense: 100000, etapes: [
+    { type: 'voiture', lieu: 'V', blindee: true, texte: 'Gare ta voiture blindée devant la bijouterie Vangelico (V sur la carte). Un masque à gaz s\'achète à l\'armurerie' },
+    { type: 'voler', lieu: 'V', texte: 'Vole le gros diamant (touche E). L\'alarme lâche une fumée toxique : fais vite !' },
+    { type: 'voiture', lieu: 'R', blindee: true, sansPolice: true, texte: 'Sème la police, puis rapporte le diamant à la planque (la caravane de Trevor) dans ta voiture blindée' },
+  ]},
+  { nom: 'Le casse de la Pacific Standard', recompense: 250000, etapes: [
+    { type: 'voiture', lieu: 'Q', blindee: true, texte: 'Gare ta voiture blindée devant la banque Pacific Standard (Q sur la carte)' },
+    { type: 'voler', lieu: 'Q', texte: 'Passe les lasers sans les toucher, perce le coffre-fort, fais sauter la grille et prends le pactole (touche E)' },
+    { type: 'voiture', lieu: 'R', blindee: true, sansPolice: true, texte: 'Sème la police, puis rapporte le pactole à la planque (la caravane de Trevor) dans ta voiture blindée' },
   ]},
 ];
 
@@ -374,7 +434,8 @@ const CASCADES = [
 
 // =====================================================================
 //  CODES DE TRICHE : appuie sur Entrée, tape le code, puis Entrée
-//  Ils changent l'apparence de B.J. (b). Retape le code pour annuler l'effet.
+//  Ceux qui ont un « effet » changent l'apparence de B.J. (b) : retape le code pour annuler l'effet.
+//  Ceux qui ont une « action » la font tout de suite. Un nombre tapé après le code est donné à l'action (MISSION8 → 8).
 // =====================================================================
 //  Un bras ou une jambe est en deux morceaux (haut et bas) : habillerMembre les colorie ensemble.
 //  Au bout, il y a b.brasD.main ou b.jambeD.chaussure.
@@ -395,6 +456,12 @@ const TRICHES = [
       habiller(b.torse, PEAU_BJ); habiller(b.bassin, '#f4f4ee'); b.bassin.scale.set(1.12, 1.6, 1.2); b.ceinture.visible = false; // tout nu avec une couche
       for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, PEAU_BJ);
       habiller(b.jambeD.chaussure, PEAU_BJ); habiller(b.jambeG.chaussure, PEAU_BJ); } },
+  // comme dans Doom : toutes les armes, plein de munitions, le gilet et le masque à gaz
+  { code: 'IDKFA',       texte: 'Toutes les armes, plein de munitions, gilet et masque à gaz !', action: () => {
+      ARMES.forEach((a, i) => { J.possede[i] = true; if (!a.corps) J.balles[i] = Math.max(J.balles[i], a.munitions * 3); });
+      J.gilet = R_.giletMax; J.masque = true; } },
+  // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
+  { code: 'MISSION',     texte: 'Saut de mission',      action: n => sauterMission(n) },
 ];
 
 // =====================================================================
@@ -898,6 +965,54 @@ const TEX = {
   conteneur: toile(128, 64, (g, l, h) => { g.fillStyle = '#ddd'; g.fillRect(0, 0, l, h); for (let x = 0; x < l; x += 6) { g.fillStyle = 'rgba(0,0,0,.22)'; g.fillRect(x, 2, 2, h - 4); } g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, l, 2); g.fillRect(0, h - 2, l, 2); }),
   produits: toile(128, 64, (g) => { g.fillStyle = '#eee'; g.fillRect(0, 0, 128, 64); for (let r = 0; r < 4; r++) { g.fillStyle = '#999'; g.fillRect(0, r * 16 + 14, 128, 2); for (let x = 2; x < 126; x += entre(5, 9)) { g.fillStyle = `hsl(${Math.random() * 360},60%,50%)`; g.fillRect(x, r * 16 + entre(2, 6), entre(3, 6), 14 - 4); } } }),
   helipad: toile(128, 128, (g) => { g.fillStyle = '#555'; g.fillRect(0, 0, 128, 128); g.strokeStyle = '#f0c020'; g.lineWidth = 5; g.beginPath(); g.arc(64, 64, 52, 0, 7); g.stroke(); g.fillStyle = '#fff'; g.font = 'bold 80px Arial'; g.textAlign = 'center'; g.fillText('H', 64, 93); }),
+  // les braquages : du marbre veiné, la façade en pierre du musée et de la grande banque, la vitrine noir et or de la bijouterie
+  marbre: toile(256, 256, (g, l, h) => { g.fillStyle = '#e6e2da'; g.fillRect(0, 0, l, h); grain(g, l, h, 3000, 0.05);
+    g.strokeStyle = 'rgba(90,90,100,.14)';
+    for (let k = 0; k < 10; k++) { g.lineWidth = entre(0.3, 1); let x = Math.random() * l, y = Math.random() * h; g.beginPath(); g.moveTo(x, y); for (let s = 0; s < 12; s++) { x += entre(-10, 30); y += entre(-20, 20); g.lineTo(x, y); } g.stroke(); }
+    g.fillStyle = 'rgba(0,0,0,.18)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 64, 0, 1, h); g.fillRect(0, k * 64, l, 1); } }),
+  musee: facade('#d8cdb2', 4, 2, (g, x, y, w, h) => { g.fillStyle = '#bfb396'; g.fillRect(x + w * .28 - 4, y + h * .18 - 6, w * .44 + 8, h * .66 + 10); vitre(g, x + w * .28, y + h * .18, w * .44, h * .62, [45, 55, 65]); },
+    (g, l, h) => { g.fillStyle = 'rgba(0,0,0,.12)'; for (let y = 0; y < h; y += 8) { g.fillRect(0, y, l, 1); for (let x = (y / 8 % 2) * 12; x < l; x += 24) g.fillRect(x, y, 1, 8); } }),
+  luxe: facade('#161618', 2, 1, (g, x, y, w, h) => { g.fillStyle = '#c8a040'; g.fillRect(x + 6, y + h * .12, w - 12, h * .72); vitre(g, x + 9, y + h * .12 + 3, w - 18, h * .72 - 6, [70, 60, 45]); }, null, 128),
+  // le grand tableau du musée, une « Nuit étoilée » : un ciel en tourbillons, des étoiles, la lune, un village et un cyprès
+  nuitEtoilee: toile(256, 160, (g, l, h) => {
+    const ciel = g.createLinearGradient(0, 0, 0, h); ciel.addColorStop(0, '#0e2a6a'); ciel.addColorStop(0.7, '#2a5aa8'); ciel.addColorStop(1, '#1a3a5a');
+    g.fillStyle = ciel; g.fillRect(0, 0, l, h); g.lineCap = 'round';
+    for (let i = 0; i < 1400; i++) { // des coups de pinceau qui tournent
+      const x = Math.random() * l, y = Math.random() * h * 0.8, a = Math.sin(x / 26) * 2 + Math.cos(y / 17) * 1.5;
+      g.strokeStyle = `hsla(${entre(200, 235)},${entre(40, 75)}%,${entre(30, 78)}%,.75)`; g.lineWidth = entre(1, 2.4);
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * 7, y + Math.sin(a) * 7); g.stroke();
+    }
+    for (const [x, y, r] of [[38, 28, 7], [92, 20, 5], [148, 38, 6], [186, 16, 5], [118, 66, 4], [62, 72, 5], [206, 60, 4]]) {
+      const e = g.createRadialGradient(x, y, 0, x, y, r * 2.6); e.addColorStop(0, '#fffbd0'); e.addColorStop(0.4, '#f0d040'); e.addColorStop(1, 'rgba(240,200,60,0)');
+      g.fillStyle = e; g.beginPath(); g.arc(x, y, r * 2.6, 0, 7); g.fill();
+    }
+    g.fillStyle = '#f8e070'; g.beginPath(); g.arc(228, 28, 12, 0, 7); g.fill(); g.fillStyle = '#e8a020'; g.beginPath(); g.arc(233, 25, 10, 0, 7); g.fill();   // la lune
+    g.fillStyle = '#16305a'; g.beginPath(); g.moveTo(0, h - 38); for (let x = 0; x <= l; x += 16) g.lineTo(x, h - 38 - Math.sin(x / 40) * 8); g.lineTo(l, h); g.lineTo(0, h); g.fill();   // les collines
+    for (let k = 0; k < 13; k++) { const x = 72 + k * 13, y = h - 26 + (k % 3) * 3; g.fillStyle = '#1e2c48'; g.fillRect(x, y, 10, 12);
+      g.fillStyle = '#10182a'; g.beginPath(); g.moveTo(x - 1, y); g.lineTo(x + 5, y - 5); g.lineTo(x + 11, y); g.fill(); g.fillStyle = '#f0c840'; g.fillRect(x + 3, y + 4, 3, 3); }
+    g.fillStyle = '#10182a'; g.beginPath(); g.moveTo(150, h - 26); g.lineTo(154, h - 58); g.lineTo(158, h - 26); g.fill();   // le clocher
+    g.fillStyle = '#0c2414'; g.beginPath(); g.moveTo(22, h); for (let y = h; y > 18; y -= 8) g.lineTo(34 - (h - y) * 0.06 + Math.sin(y) * 4, y); g.lineTo(40, 14);
+    for (let y = 18; y < h; y += 8) g.lineTo(46 + (y - 18) * 0.06 + Math.cos(y) * 4, y); g.fill();   // le cyprès
+    grain(g, l, h, 2000, 0.08);
+  }),
+  // les autres tableaux du musée : un paysage et un portrait
+  paysage: toile(128, 96, (g, l, h) => { const c = g.createLinearGradient(0, 0, 0, h); c.addColorStop(0, '#8ab8e0'); c.addColorStop(1, '#f0e0b0'); g.fillStyle = c; g.fillRect(0, 0, l, h);
+    g.fillStyle = '#5a7a3a'; g.beginPath(); g.moveTo(0, 60); for (let x = 0; x <= l; x += 8) g.lineTo(x, 58 - Math.sin(x / 20) * 10); g.lineTo(l, h); g.lineTo(0, h); g.fill();
+    g.fillStyle = '#c8a040'; g.fillRect(0, 76, l, 20); for (let k = 0; k < 5; k++) { g.fillStyle = '#2a4a1a'; g.beginPath(); g.arc(12 + k * 26, 58, 7, 0, 7); g.fill(); } grain(g, l, h, 800, 0.1); }),
+  portrait: toile(96, 128, (g, l, h) => { g.fillStyle = '#3a2a18'; g.fillRect(0, 0, l, h); g.fillStyle = '#1a1410'; g.beginPath(); g.ellipse(48, 110, 34, 40, 0, 0, 7); g.fill();
+    g.fillStyle = '#d8b088'; g.beginPath(); g.ellipse(48, 52, 15, 20, 0, 0, 7); g.fill(); g.fillStyle = '#2a1a10'; g.beginPath(); g.ellipse(48, 42, 18, 14, 0, Math.PI, 0); g.fill();
+    g.fillRect(31, 42, 5, 30); g.fillRect(60, 42, 5, 30); g.fillStyle = '#d8b088'; g.fillRect(36, 100, 24, 8); grain(g, l, h, 800, 0.1); }),
+  // le mur du coffre-fort : des coffres de location, chacun avec sa serrure
+  coffres: toile(128, 128, (g) => { g.fillStyle = '#7a7d80'; g.fillRect(0, 0, 128, 128);
+    for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) { g.fillStyle = '#b4b8bc'; g.fillRect(x * 32 + 2, y * 32 + 2, 28, 28); g.fillStyle = '#444'; g.beginPath(); g.arc(x * 32 + 23, y * 32 + 16, 2.5, 0, 7); g.fill(); g.fillStyle = '#e0e0d8'; g.fillRect(x * 32 + 6, y * 32 + 13, 9, 6); } }),
+  // des liasses de billets, avec leur bande de papier
+  billets: toile(128, 64, (g) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) { g.fillStyle = `hsl(${entre(95, 115)},${entre(20, 35)}%,${entre(36, 48)}%)`; g.fillRect(x * 32 + 1, y * 16 + 1, 30, 14); g.fillStyle = '#f0ead8'; g.fillRect(x * 32 + 13, y * 16 + 1, 6, 14); } }),
+  // la tôle rouillée du blindage Mad Max, 4 fois plus longue que haute : de l'acier gris, des taches de rouille, des rivets, des soudures
+  rouille: toile(256, 64, (g, l, h) => { g.fillStyle = '#6a655e'; g.fillRect(0, 0, l, h);
+    for (let i = 0; i < 70; i++) { const r = entre(2, 9); g.fillStyle = `hsla(${entre(14, 30)},${entre(45, 70)}%,${entre(22, 38)}%,${entre(0.35, 0.8)})`; g.beginPath(); g.ellipse(Math.random() * l, Math.random() * h, r * entre(1, 1.6), r, Math.random() * 3, 0, 7); g.fill(); }
+    grain(g, l, h, 3000, 0.12);
+    g.strokeStyle = 'rgba(25,22,20,.7)'; g.lineWidth = 2; for (const x of [l / 3, l * 2 / 3]) { g.beginPath(); g.moveTo(x + entre(-6, 6), 0); g.lineTo(x + entre(-6, 6), h); g.stroke(); }
+    g.fillStyle = '#26221e'; for (let k = 5; k < l; k += 16) for (const y of [4, h - 4]) { g.beginPath(); g.arc(k, y, 1.6, 0, 7); g.fill(); } }),
 };
 // un panneau : du texte en couleur sur un fond sombre
 function enseigne(texte, couleur, fond = '#111') {
@@ -955,12 +1070,18 @@ const MAT = {
   cactus: std(null, { color: '#4a7a3a' }),
   police: enseigne('POLICE', '#fff', '#1a3a9a'), superette: enseigne('24/7', '#fff', '#0a7a3a'), customs: enseigne('LS CUSTOMS', '#fc4'), banque: enseigne('BANQUE', '#e8d8a0', '#1a2a1a'),
   yellowjack: enseigne('YELLOW JACK', '#f0d020'), essence: enseigne('ESSENCE', '#fff', '#c01818'), maze: enseigne('MAZE BANK', '#fff', '#801010'),
+  // les braquages
+  marbre: std(TEX.marbre, { roughness: 0.25, bumpScale: 0.02 }), musee: std(TEX.musee), banqueQ: std(TEX.musee, { color: '#f4ecdc' }), luxe: std(TEX.luxe),
+  paysage: std(TEX.paysage, { roughness: 0.7, bumpScale: 0.05 }), portrait: std(TEX.portrait, { roughness: 0.7, bumpScale: 0.05 }), coffres: std(TEX.coffres, { metalness: 0.6, roughness: 0.4 }),
+  vitrine: std(null, { color: '#cfe6f0', metalness: 0.2, roughness: 0.02, transparent: true, opacity: 0.25, depthWrite: false }),
+  enseigneMusee: enseigne('MUSÉE D\'ART DE LOS SANTOS', '#3a2a10', '#e8dcc0'), vangelico: enseigne('VANGELICO', '#e8c060'), pacific: enseigne('PACIFIC STANDARD', '#fff', '#1a3a2a'),
 };
 // taille (en mètres) couverte par une répétition de chaque texture
 const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [12, 12], verre2: [12, 12], hopital: [12, 12],
   maison1: [6, 6], maison2: [6, 6], maison3: [6, 6], magasin: [12, 6], bunker: [8, 8], toit: [8, 8], trottoir: [4, 4],
   herbe: [6, 6], paves: [4, 4], chateau: [4, 4], carrelage: [2, 2], parquet: [3, 3], planches: [3, 3], grange: [6, 6], tole: [6, 6],
-  conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2] };
+  conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2],
+  marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2] };
 
 // =====================================================================
 //  Construction du pays
@@ -984,6 +1105,7 @@ function ajouterCollision(x1, z1, x2, z2, h, y0 = -1000, mur = false) {
       if (!cellules.has(k)) cellules.set(k, []);
       cellules.get(k).push(b);
     }
+  return b;   // on peut la couper plus tard (h = -Infinity) : une porte qui s'ouvre
 }
 function pourBoites(x1, z1, x2, z2, f) {
   for (let cx = Math.floor(x1 / CELL); cx <= Math.floor(x2 / CELL); cx++)
@@ -1108,6 +1230,7 @@ function avion(x, y, z, angle = 0) {
 const CONTENEURS = ['conteneur1', 'conteneur2', 'conteneur3', 'conteneur4'];
 
 const stands = [], soins = [], pnjDepart = [], voituresGarees = [], pickupsDepart = [], ascenseurs = [], bateauxDepart = [], hopitaux = [];
+const garagistes = [], braquages = [], butinsDepart = [];
 let chateau = null, bunker = null;
 function genererBloc(i, j) {
   const c = CARTE[j][i], o = origine(i, j), rnd = graine(i * 7919 + j * 104729);
@@ -1120,6 +1243,15 @@ function genererBloc(i, j) {
   }
   const herbe = () => sol('herbe', X(S / 2), 0.21, Z(S / 2), S - 4, S - 4);
   const panneau = (mat, x, y, z, l, h) => geoBloc(mat, new THREE.PlaneGeometry(l, h).translate(x, y, z));   // un panneau tourné vers le sud
+  // un pâté à braquer : combien d'étoiles donne son alarme, et où garer la voiture devant (le lieu des missions)
+  const braquage = (etoiles, garer) => {
+    const B = { lettre: c, x: X(30), z: Z(30), y: Y0, etoiles, gyros: [], lasers: [], tourelles: [] };
+    braquages.push(B); Object.assign(lieux[c].find(q => q.x === X(30) && q.z === Z(30)), garer);
+    return B;
+  };
+  const garde = (B, arme, p) => pnjDepart.push({ type: 'garde', arme, braquage: B, ...p });   // un vigile, avec son arme (un numéro du tableau ARMES)
+  const chien = (B, p) => pnjDepart.push({ type: 'chien', braquage: B, ...p });
+  const butin = (B, o, p) => butinsDepart.push({ B, ...o, ...p });   // ce qu'on vole (ou ce qu'on actionne) avec E
   if (c === 'T') {
     const mats = ['verre', 'verre2', 'moderne'];
     if (rnd() < 0.5) {
@@ -1160,6 +1292,7 @@ function genererBloc(i, j) {
     b.meuble('noirMeuble', 0, 0, -7.45, 26, 2.6, 0.3);                                // les armes au mur
     for (let k = 0; k < 8; k++) b.meuble('metal', -11 + k * 3.1, 0, -7.2, 1.6, 0.12, 0.1, 1.2 + (k % 2) * 0.6);
     [2, 3, 4, 5, 7].forEach((a, k) => stands.push({ arme: a, ...b.point(-10 + k * 5, 0, 0) }));
+    stands.push({ masque: true, ...b.point(-12.5, 0, 3.5) });                          // le masque à gaz
     pickupsDepart.push({ type: 'gilet', ...b.point(12.5, 0, 5), reapparait: true });
   } else if (c === 'C') { // le commissariat : un étage de bureaux, et le toit
     const b = batiment({ x: X(30), z: Z(22), l: 30, p: 20, mat: 'beton', etages: 2, toit: true, largeurPorte: 3 });
@@ -1195,6 +1328,8 @@ function genererBloc(i, j) {
     for (let k = 0; k < 4; k++) b.meuble('noirMeuble', 11, 0, -8 + k * 1.1, 0.9, 1.2 + (k % 2) * 0.4, 0.9);   // les pneus
     b.meuble('bois', 2, 0, -9.8, 8, 1, 0.8);                                         // l'établi
     voituresGarees.push({ ...b.point(-8, 0, -3.5), a: 0 });
+    const g = b.point(2, 0, -8.6); garagistes.push(g);                                // le garagiste, devant son établi : il blinde les voitures
+    ajouterCollision(g.x - 0.3, g.z - 0.3, g.x + 0.3, g.z + 0.3, g.y + 1.8, g.y);
   } else if (c === 'K') { // la banque : un coffre-fort plein d'argent... et la police arrive
     const b = batiment({ x: X(30), z: Z(24), l: 32, p: 22, mat: 'beton', hEtage: 5, plein: 2, largeurPorte: 4, hauteurPorte: 3.5 });
     for (let k = -2; k <= 2; k++) if (k) boite('pierre', X(30 + k * 6), 0.2, Z(36.5), 1.2, 5, 1.2, true);   // les colonnes
@@ -1332,6 +1467,113 @@ function genererBloc(i, j) {
     for (const [a, b] of [[12, 14], [12, 30], [12, 46], [24, 44], [40, 44], [50, 14], [50, 30], [50, 46]]) pnjDepart.push({ type: 'soldat', x: X(a), z: Z(b) });
     soins.push({ x: X(9), z: Z(51) }, { x: X(51), z: Z(51) });
     pickupsDepart.push({ type: 'arme', arme: 3, x: X(30), z: Z(50) }, { type: 'gilet', x: X(36), z: Z(50), reapparait: true });
+  } else if (c === 'U') { // le musée d'art : des œuvres gardées par des vigiles armés et des chiens
+    const B = braquage(4, { x: X(30), z: Z(52) });
+    const b = batiment({ x: X(30), z: Z(22), l: 40, p: 28, mat: 'musee', hEtage: 6, plein: 1, largeurPorte: 4, hauteurPorte: 3.6, sol: 'marbre' });
+    const { iu, iw } = b;
+    // le portique : des colonnes, une frise avec le nom, et un fronton en triangle
+    for (const x of [8.5, 14, 19.5, 40.5, 46, 51.5]) {
+      geoBloc('pierre', new THREE.CylinderGeometry(0.55, 0.65, 7.2, 16).translate(X(x), 0.4 + 3.6, Z(38.5)));
+      ajouterCollision(X(x) - 0.6, Z(38.5) - 0.6, X(x) + 0.6, Z(38.5) + 0.6, Y0 + 7.6, Y0);
+    }
+    boite('pierre', X(30), 0.2, Z(38.25), 46, 0.2, 4.5, true);                        // le sol du portique : une marche
+    boite('pierre', X(30), 7.6, Z(37.5), 46, 1.2, 4);
+    geoBloc('pierre', new THREE.CylinderGeometry(1, 1, 4, 3).rotateX(-Math.PI / 2).scale(26.5, 2.2, 1).translate(X(30), 8.8 + 1.1, Z(37.5)));
+    panneau('enseigneMusee', X(30), 8.2, Z(39.56), 16, 0.9);
+    sol('paves', X(30), 0.21, Z(50), 56, 18);
+    // le grand tableau au fond, dans son cadre doré, derrière un cordon rouge
+    b.meuble('jaune', 0, 0, -iw + 0.05, 4.8, 3.2, 0.1, 1.1);
+    b.meuble('noirMeuble', 0, 0, -iw + 0.11, 4.2, 2.6, 0.02, 1.4);                  // le fond du cadre : on le voit quand la toile est volée
+    butin(B, { modele: 'tableau', nom: 'le grand tableau' }, b.point(0, 0, -iw + 0.13));
+    for (const u of [-3, 0, 3]) b.meuble('metal', u, 0, -iw + 2.2, 0.08, 0.95, 0.08);
+    b.B('rouge', 0, b.niveau(0) + 0.82, -iw + 2.2, 6, 0.04, 0.04, false);
+    // la couronne au milieu, les bijoux dans deux vitrines, les statues sur leur socle
+    b.meuble('marbre', 0, 0, -1, 1, 1.1, 1);
+    butin(B, { modele: 'couronne', nom: 'la couronne' }, b.point(0, 0, -1));
+    for (const [u, modele, nom] of [[-9, 'collier', 'le collier de rubis'], [9, 'bagues', 'les bagues en diamant']]) {
+      b.meuble('bois', u, 0, -3, 2.4, 0.95, 1.2);
+      butin(B, { modele, nom }, b.point(u, 0, -3));
+    }
+    for (const [u, modele, nom] of [[-14, 'statue', 'la statue grecque en marbre'], [14, 'chat', 'le chat égyptien en or']]) {
+      b.meuble('marbre', u, 0, -9, 1.3, 0.8, 1.3);
+      butin(B, { modele, nom }, b.point(u, 0, -9));
+    }
+    for (const w of [-6, 4]) for (const s of [-1, 1]) { // d'autres tableaux aux murs
+      b.meuble('jaune', s * (iu - 0.04), 0, w, 0.06, 2, 3, 1.3); b.meuble(w > 0 ? 'paysage' : 'portrait', s * (iu - 0.08), 0, w, 0.04, 1.7, 2.6, 1.45);
+    }
+    for (const s of [-1, 1]) b.meuble('cuir', s * 5, 0, 5, 3.2, 0.45, 0.8);           // les bancs
+    // les vigiles, chacun avec son arme : pistolet, fusil à pompe, mitraillette, fusil d'assaut ; et deux chiens
+    garde(B, 2, b.point(-12, 0, 6)); garde(B, 4, b.point(12, 0, 6)); garde(B, 3, b.point(0, 0, -7)); garde(B, 5, { x: X(18), z: Z(46) });
+    chien(B, b.point(-6, 0, -8)); chien(B, { x: X(42), z: Z(47) });
+    B.gyros.push({ x: X(24), y: Y0 + 4.3, z: Z(36.2) }, { x: X(36), y: Y0 + 4.3, z: Z(36.2) }, { ...b.point(0, 0, 0), y: Y0 + 5.8 });
+    B.lumiere = { ...b.point(0, 0, 0), y: Y0 + 4 };
+  } else if (c === 'V') { // la bijouterie Vangelico : le gros diamant, une alarme qui hurle et clignote, de la fumée toxique
+    const B = braquage(4, { x: X(30), z: Z(46) });
+    const b = batiment({ x: X(30), z: Z(24), l: 22, p: 14, mat: 'luxe', hEtage: 3.6, plein: 1, sol: 'marbre', mur: 'bois', largeurPorte: 2.4, hauteurPorte: 2.8 });
+    panneau('vangelico', X(30), 4.4, Z(31.06), 10, 1.9);
+    sol('paves', X(30), 0.21, Z(45), 54, 26);
+    for (const x of [16, 44]) { boite('pierre', X(x), 0.2, Z(36), 1.6, 0.7, 1.6, true); arbre(X(x), Z(36), 0.7); }   // des bacs à fleurs
+    // les vitrines, le long des murs : des bijoux en or et en argent sur du velours, sous une cloche en verre
+    const vitrine = (u, w, lu, lw) => {
+      b.meuble('noirMeuble', u, 0, w, lu, 0.85, lw); b.B('rouge', u, b.niveau(0) + 0.85, w, lu - 0.1, 0.02, lw - 0.1, false);
+      for (let k = 0; k < 8; k++) b.B(k % 3 ? 'jaune' : 'blanc', u + (lu > lw ? (k - 3.5) * lu / 9 : 0), b.niveau(0) + 0.87, w + (lu > lw ? 0 : (k - 3.5) * lw / 9), 0.07, 0.02, 0.07, false);
+      b.B('vitrine', u, b.niveau(0) + 0.87, w, lu, 0.3, lw, false);
+    };
+    for (const u of [-6.5, -2.2, 2.2, 6.5]) vitrine(u, -5.5, 3.6, 0.9);
+    for (const s of [-1, 1]) for (const w of [-1.5, 2.5]) vitrine(s * 9.6, w, 0.9, 3);
+    // le gros diamant, au milieu, sur une colonne noire
+    b.meuble('noirMeuble', 0, 0, 0.5, 0.8, 1.05, 0.8);
+    butin(B, { modele: 'diamant', nom: 'le gros diamant' }, b.point(0, 0, 0.5));
+    for (const u of [-6, 0, 6]) b.B('metal', u, b.niveau(1) - 0.33, -2, 0.6, 0.03, 0.6, false);   // les bouches d'où sort la fumée toxique
+    garde(B, 2, { x: X(25), z: Z(35) });                                                // un vigile devant la porte
+    B.fumee = { x1: X(30) - b.iu, z1: Z(24) - b.iw, x2: X(30) + b.iu, z2: Z(24) + b.iw, y1: Y0 + 0.25, y2: Y0 + 3.85 };
+    B.gyros.push({ x: X(25.5), y: Y0 + 3.3, z: Z(31.2) }, { x: X(34.5), y: Y0 + 3.3, z: Z(31.2) }, { ...b.point(0, 0, -3), y: Y0 + 3.4 });
+    B.lumiere = { ...b.point(0, 0, 0), y: Y0 + 2.6 };
+  } else if (c === 'Q') { // la grande banque Pacific Standard : des lasers, des mitrailleuses, un coffre-fort blindé
+    const B = braquage(5, { x: X(30), z: Z(53) });
+    const b = batiment({ x: X(30), z: Z(25), l: 44, p: 36, mat: 'banqueQ', hEtage: 6, plein: 4, largeurPorte: 5, hauteurPorte: 4, sol: 'marbre', mur: 'marbre' });
+    const sol0 = b.niveau(0), P = (u, w) => ({ x: X(30) + u, z: Z(25) + w });   // la porte est au sud : u vers l'est, w vers le sud
+    // le portique : des piliers, une frise avec le nom
+    for (const x of [9, 15, 21, 39, 45, 51]) boite('pierre', X(x), 0.4, Z(45.5), 1.4, 7, 1.4, true);
+    boite('pierre', X(30), 0.2, Z(45), 46, 0.2, 4, true);
+    boite('pierre', X(30), 7.4, Z(44.6), 46, 1.4, 3.2);
+    panneau('pacific', X(30), 8.1, Z(46.26), 16, 1.1);
+    sol('paves', X(30), 0.21, Z(53), 56, 12);
+    // le hall : des guichets sur les côtés, des colonnes de marbre
+    for (const s of [-1, 1]) { b.meuble('bois', s * 13, 0, 3, 14, 1.2, 1); b.meuble('ecran', s * 13, 0, 2.8, 0.6, 0.4, 0.08, 1.2); }
+    for (const u of [-16, -8, 8, 16]) b.meuble('marbre', u, 0, 10, 1.2, 6, 1.2);
+    // le mur du fond du hall, avec l'entrée du couloir des lasers au milieu
+    for (const s of [-1, 1]) b.meuble('platre', s * 11.85, 0, 0, 19.7, 6, 0.4);
+    b.meuble('platre', 0, 0, 0, 4.4, 2.6, 0.4, 3.4);
+    // le couloir des lasers : 3,6 m de large, 11 m de long, plafond à 3,4 m
+    for (const s of [-1, 1]) b.meuble('beton2', s * 2, 0, -5.8, 0.4, 6, 11.2);
+    b.meuble('platre', 0, 0, -5.8, 3.6, 0.2, 11.2, 3.4);
+    // le mur du coffre : 1 m de béton, avec le trou de la porte ronde
+    for (const s of [-1, 1]) b.meuble('beton2', s * 4.75, 0, -11.9, 6.9, 6, 1);
+    b.meuble('beton2', 0, 0, -11.9, 2.6, 3.1, 1, 2.9);
+    // la salle du coffre : des coffres de location aux murs, et le pactole sur deux palettes
+    for (const s of [-1, 1]) { b.meuble('metal', s * 8, 0, -15.05, 0.4, 6, 5.3); b.meuble('coffres', s * 7.55, 0, -15.05, 0.5, 3, 5.2); }
+    b.meuble('coffres', 0, 0, -17.45, 14.6, 3, 0.5);
+    for (const s of [-1, 1]) b.meuble('bois', s * 2.5, 0, -15.6, 1.4, 0.15, 1.1);
+    butin(B, { outil: 'perceuse', nom: 'la perceuse thermique' }, b.point(0, 0, -10.2));
+    butin(B, { outil: 'charge', nom: "l'explosif", apres: 'ouvert' }, b.point(0, 0, -13));
+    butin(B, { modele: 'pactole', nom: 'le pactole', apres: 'sautee' }, b.point(0, 0, -15.6));
+    // la porte ronde (fermée : un bouchon de collision), et la grille derrière
+    B.porte = { ...P(0, -11.4), y: Y0 + sol0 };
+    B.bouchonPorte = ajouterCollision(X(30) - 1.3, Z(25) - 12.4, X(30) + 1.3, Z(25) - 11.4, Y0 + sol0 + 2.9, Y0);
+    B.bouchonOuvert = ajouterCollision(X(30) - 1.85, Z(25) - 11.2, X(30) - 1.35, Z(25) - 7.95, -Infinity, Y0);   // la porte ouverte : coupé pour l'instant
+    B.grille = { ...P(0, -13.6), y: Y0 + sol0 };
+    B.bouchonGrille = ajouterCollision(X(30) - 7.6, Z(25) - 13.7, X(30) + 7.6, Z(25) - 13.5, Y0 + 3.3, Y0);
+    // les lasers : 'h' = en travers du couloir, à une hauteur qui bouge ; 'v' = debout, qui balaie le couloir de gauche à droite
+    // a = le milieu (hauteur ou côté), b = de combien il bouge, v = à quelle vitesse (0 = il ne bouge pas)
+    const laser = (sorte, w, a, bb, v, phase) => B.lasers.push({ sorte, ...P(0, w), y0: Y0 + sol0, a, b: bb, v, phase });
+    laser('h', -1.5, 0.9, 0.6, 1.4, 0); laser('v', -3, 0, 1.6, 1.1, 0); laser('h', -4.5, 1.4, 1, 0.9, 1); laser('h', -5.8, 0.35, 0, 0, 0);
+    laser('v', -7.2, 0, 1.6, 1.3, 2); laser('h', -8.6, 1.35, 0, 0, 0); laser('v', -10, 0, 1.7, 0.8, 4);
+    // les mitrailleuses automatiques, au plafond du couloir et de la salle du coffre
+    B.tourelles.push({ ...P(0, -3.2), y: Y0 + sol0 + 3.4 }, { ...P(0, -8.4), y: Y0 + sol0 + 3.4 }, { ...P(0, -15.2), y: Y0 + sol0 + 5.7 });
+    garde(B, 5, b.point(-10, 0, 8)); garde(B, 4, b.point(10, 0, 8)); garde(B, 2, b.point(3, 0, 14));
+    B.gyros.push({ x: X(22), y: Y0 + 6.2, z: Z(43.2) }, { x: X(38), y: Y0 + 6.2, z: Z(43.2) }, { ...P(0, -6), y: Y0 + sol0 + 3.3 });
+    B.lumiere = { ...P(0, -6), y: Y0 + sol0 + 2.5 };
   } else { // places : '.', 'X', et les lieux de mission
     sol('paves', X(30), 0.21, Z(30), S - 8, S - 8);
     for (const [a, b] of [[10, 10], [50, 10], [10, 50], [50, 50]]) { boite('pierre', X(a), 0.2, Z(b), 2.4, 0.6, 2.4); arbre(X(a), Z(b), 1); }
@@ -1655,11 +1897,11 @@ function majMorceaux() {
 // =====================================================================
 //  Collisions, sol et ligne de vue
 // =====================================================================
-function resoudre(o, r) { // pousse un cercle (o.x, o.z, rayon r) hors des bâtiments ; renvoie true si choc
+function resoudre(o, r, haut = 1.7) { // pousse un cercle (o.x, o.z, rayon r, haut de « haut » mètres) hors des bâtiments ; renvoie true si choc
   const y = o.y ?? hauteurSol(o.x, o.z);
   let choc = false;
   pourBoites(o.x - r, o.z - r, o.x + r, o.z + r, b => {
-    if (b.h <= y + PASMAX || b.y0 >= y + 1.7) return;   // une marche qu'on monte, ou quelque chose au-dessus de la tête
+    if (b.h <= y + PASMAX || b.y0 >= y + haut) return;   // une marche qu'on monte, ou quelque chose au-dessus de la tête
     const px = clamp(o.x, b.x1, b.x2), pz = clamp(o.z, b.z1, b.z2);
     const dx = o.x - px, dz = o.z - pz, d2 = dx * dx + dz * dz;
     if (d2 >= r * r) return;
@@ -1954,6 +2196,21 @@ const MODELES = {
       f.chrome.push(bloc(0.7, 0.2, 0.06, 0, 0.66, 3.64), bloc(1.862, 0.03, 6.2, 0, 0.6, 0));   // la calandre, et une baguette chromée sur les côtés
       f.chrome.push(tube(0.035, 0.3, 0.5, 0.25, -3.62, 'z'));
     } },
+  // le fourgon blindé de la police : une grosse caisse d'acier, de petites vitres, un pare-buffle et des marchepieds
+  fourgon: { longueur: 5.8, largeur: 2.3, hauteur: 2.55, roue: 0.5, essieux: [-1.95, 1.9], garde: 0.5, arrondi: 0.1, oeil: [0.5, 2.1, 1.1],
+    profil: [[-2.9, 1.55], [2.3, 1.55], [2.9, 1.3]],
+    cabine: { bas: [-2.85, 1.75], haut: [-2.8, 1.45], y: [1.5, 2.55], vitres: 1.95, largeur: [2.26, 2.16], piliers: [0.3, 0.55, 0.78] },
+    portes: [1.7, 0.45, -2.2], poignees: [0.6, -2.05], pareChocs: 'noir',
+    plus: (f, piece) => {
+      f.phares.push(...deux(c => bloc(0.3, 0.16, 0.08, 0.78 * c, 1.15, 2.9, 0.03)));
+      f.feux.push(...deux(c => bloc(0.14, 0.3, 0.08, 1.0 * c, 1.2, -2.9, 0.03)));
+      f.noir.push(bloc(1.2, 0.35, 0.06, 0, 1.15, 2.91));                         // la calandre
+      f.noir.push(...deux(c => bloc(0.25, 0.06, 3.2, 1.27 * c, 0.62, 0)));       // les marchepieds
+      f.noir.push(bloc(1.8, 0.06, 2.4, 0, 2.62, -1));                              // la galerie sur le toit
+      f.phares.push(...deux(c => rond(0.1, 0.5 * c, 2.72, 0.2)));                 // deux projecteurs sur le toit
+      // le pare-buffle : un gros butoir pour pousser les voitures
+      piece('avant', 0.5)('noir', tube(0.07, 2.1, 0, 0.95, 3.12), tube(0.07, 2.1, 0, 0.6, 3.12), ...deux(c => tube(0.06, 0.5, 0.7 * c, 0.78, 3.12, 'y')), ...deux(c => tube(0.05, 0.3, 0.7 * c, 0.6, 3.0, 'z')));
+    } },
   // le tricycle n'a ni carrosserie ni cabine : tout est dans « plus ». Ses roues : [x, z, épaisseur], la roue avant en dernier
   tricycle: { longueur: 2.5, largeur: 1.3, hauteur: 1.25, roue: 0.3, roues: [[-0.53, -0.8], [0.53, -0.8], [0, 0.95, 0.6]], oeil: [0, 1.6, -0.1],
     siege: [0.82, -0.15], ouvert: true,   // siege : [hauteur, z] des hanches du pilote. ouvert : on le voit, et rien ne le protège
@@ -2086,7 +2343,40 @@ function formesVoiture(nom) {
   r.fenetres = f.vitres.map(g => { g.computeBoundingBox(); const centre = g.boundingBox.getCenter(V3()); return { forme: g, centre, zone: zoneDe(m, centre, V3()) }; });
   return cacheFormes[nom] = r;
 }
-function modeleVoiture(type, couleur, police) {
+// le blindage façon Mad Max : de la tôle rouillée soudée sur les flancs, le capot, le toit et l'arrière,
+// des grilles sur les vitres, un pare-chocs à pointes et deux gros pots d'échappement
+const M_ROUILLE = new THREE.MeshStandardMaterial({ map: TEX.rouille, metalness: 0.5, roughness: 0.8, bumpMap: TEX.rouille, bumpScale: 0.3 });
+const M_ACIER = mat('#4a4d52', { metalness: 0.85, roughness: 0.35 });
+const cacheBlindage = {};
+function formesBlindage(nom) {
+  if (cacheBlindage[nom]) return cacheBlindage[nom];
+  const m = MODELES[nom], c = m.cabine, L = m.longueur / 2, W = m.largeur / 2, h = c.y[1] - c.y[0], rouille = [], acier = [];
+  // la hauteur de la carrosserie à l'endroit z (son profil vu de côté)
+  const dessus = z => { const p = m.profil; let k = 0; while (k < p.length - 2 && p[k + 1][0] < z) k++; return lerp(p[k][1], p[k + 1][1], clamp((z - p[k][0]) / (p[k + 1][0] - p[k][0]), 0, 1)); };
+  // une barre (ou une plaque de largeur l) d'épaisseur e, du point A au point B
+  const barre = (A, B, l, e, liste) => { const o = new THREE.Object3D(); o.position.copy(A).add(B).multiplyScalar(0.5); o.lookAt(B); o.updateMatrix(); liste.push(new THREE.BoxGeometry(l, e, A.distanceTo(B)).applyMatrix4(o.matrix)); };
+  // un point de la cabine, comme dans cabine() : cote -1 à droite, 1 à gauche · t : 0 en bas, 1 au toit · u : 0 à l'arrière, 1 à l'avant
+  const P = (cote, t, u) => V3(cote * lerp(c.largeur[0], c.largeur[1], t) / 2, lerp(c.y[0], c.y[1], t), lerp(lerp(c.bas[0], c.bas[1], u), lerp(c.haut[0], c.haut[1], u), t));
+  const t0 = (c.vitres - c.y[0]) / h, t1 = 1 - 0.1 / h, bas = m.garde + 0.1, haut = c.y[0] - 0.02;
+  // les plaques sur les flancs, un peu de travers, comme soudées à la main
+  for (const s of [-1, 1]) for (const [z1, z2, penche] of [[-L * 0.88, 0.1, 0.03], [-0.1, L * 0.82, -0.04]])
+    rouille.push(new THREE.BoxGeometry(0.05, haut - bas, z2 - z1).rotateX(penche).translate(s * (W + 0.03), (bas + haut) / 2, (z1 + z2) / 2));
+  barre(V3(0, dessus(c.bas[1] + 0.1) + 0.03, c.bas[1] + 0.1), V3(0, dessus(L - 0.3) + 0.03, L - 0.3), m.largeur * 0.8, 0.04, rouille);   // le capot
+  rouille.push(bloc(c.largeur[1] * 0.9, 0.04, (c.haut[1] - c.haut[0]) * 0.85, 0, c.y[1] + 0.02, (c.haut[0] + c.haut[1]) / 2));        // le toit
+  rouille.push(bloc(m.largeur * 0.9, 0.4, 0.05, 0, m.garde + 0.35, -L - 0.04));                                                      // l'arrière
+  acier.push(bloc(m.largeur * 1.04, 0.16, 0.14, 0, m.garde + 0.22, L + 0.12, 0.03));                                                 // le pare-chocs...
+  for (let k = 0; k < 5; k++) acier.push(new THREE.ConeGeometry(0.06, 0.4, 8).rotateX(Math.PI / 2).translate((k - 2) * m.largeur * 0.22, m.garde + 0.22, L + 0.39));   // ...et ses pointes
+  // les grilles : des barreaux sur le pare-brise et la vitre arrière, deux barres sur les vitres de côté
+  for (const [u, n, dz] of [[1, 6, 0.05], [0, 4, -0.05]]) {
+    for (let k = 0; k < n; k++) { const x = (k / (n - 1) - 0.5) * 1.7; barre(P(x, t0, u).add(V3(0, 0, dz)), P(x, t1, u).add(V3(0, 0, dz)), 0.035, 0.035, acier); }
+    for (const t of [t0, t1]) barre(P(-0.9, t, u).add(V3(0, 0, dz)), P(0.9, t, u).add(V3(0, 0, dz)), 0.035, 0.035, acier);
+  }
+  for (const s of [-1, 1]) for (const t of [t0 + (1 - t0) * 0.35, t0 + (1 - t0) * 0.75]) barre(P(s, t, 0.06).add(V3(s * 0.03, 0, 0)), P(s, t, 0.94).add(V3(s * 0.03, 0, 0)), 0.035, 0.035, acier);
+  for (const s of [-1, 1]) acier.push(tube(0.07, 1, s * (W - 0.22), dessus(-L + 0.45) + 0.5, -L + 0.45, 'y'));   // les pots d'échappement, tout droits
+  return cacheBlindage[nom] = { rouille: fusion(rouille), acier: fusion(acier) };
+}
+const estBlindee = v => !!(v && (v.blindee || v.type.blinde));   // une voiture blindée : par le garagiste, ou un fourgon de la police
+function modeleVoiture(type, couleur, police, blindee = false) {
   const m = MODELES[type.modele], f = formesVoiture(type.modele), W = m.largeur / 2, e = 0.12 * m.roue / 0.34;
   const g = new THREE.Group(), corps = new THREE.Group();   // le corps penche quand on freine ou qu'on tourne, pas les roues
   g.add(corps);
@@ -2109,9 +2399,12 @@ function modeleVoiture(type, couleur, police) {
     parts.bande = poser(f.bande, mats.bande = mat('#1a3a9a'));
     gyro = [['#f22', '#f00', 0.28], ['#22f', '#00f', -0.28]].map(([c, lueur, x]) => { const p = poser(GEO_V.gyro, new THREE.MeshStandardMaterial({ color: c, emissive: lueur })); p.position.set(x, ...f.gyro); return p; });
   }
+  if (type.blinde) // « POLICE » en grand sur les flancs du fourgon
+    parts.ecusson = poser(fusion(deux(c => new THREE.PlaneGeometry(2.4, 0.5).rotateY(c * Math.PI / 2).translate(c * (m.largeur / 2 + 0.012), 1.2, -0.4))), mats.ecusson = MAT.police);
+  if (blindee) { const b = formesBlindage(type.modele); parts.rouille = poser(b.rouille, mats.rouille = M_ROUILLE); parts.acier = poser(b.acier, mats.acier = M_ACIER); }
   return { m: g, corps, roues, gyro, parts, mats };
 }
-const typePolice = VOITURES.find(t => t.police) || VOITURES[0];
+const typePolice = VOITURES.find(t => t.police && !t.blinde) || VOITURES[0], typeBlinde = VOITURES.find(t => t.blinde) || typePolice;
 function typeAuHasard() { // plus la « chance » d'un type est grande, plus il sort souvent
   let n = Math.random() * VOITURES.reduce((s, t) => s + t.chance, 0);
   return VOITURES.find(t => (n -= t.chance) < 0) || VOITURES[0];
@@ -2131,7 +2424,7 @@ function creerVoiture(x, z, angle, police = false, type = police ? typePolice : 
 // fabrique (ou refait, au garage) la voiture en 3D, toute neuve
 function habillerVoiture(v) {
   if (v.m) scene.remove(v.m);
-  Object.assign(v, modeleVoiture(v.type, v.couleur, v.police), { abimee: false, degats: { avant: 0, arriere: 0, gauche: 0, droite: 0, toit: 0 }, fenetres: [], pieces: [], deformables: [] });
+  Object.assign(v, modeleVoiture(v.type, v.couleur, v.police, v.blindee), { abimee: false, degats: { avant: 0, arriere: 0, gauche: 0, droite: 0, toit: 0 }, fenetres: [], pieces: [], deformables: [], roquettes: 0 });
   v.m.rotation.order = 'YXZ';   // elle tourne, puis elle penche (dans les pentes)
   v.m.traverse(o => o.userData.voiture = v);
   scene.add(v.m);
@@ -2213,7 +2506,8 @@ function bosseler(v, P, D, prof, rayon) {
 // la voiture v prend un choc au point P (dans son repère : x à gauche, y en haut, z devant), poussé dans la direction D.
 // force : de 0 (rien) à 1 (très fort). balle : un tir, qui fait un petit trou et fêle la vitre la plus proche
 function abimer(v, P, D, force, balle = false) {
-  force *= R_.degatsVoitures;
+  if (balle && estBlindee(v)) { bip(2600, 900, 0.1, 'sawtooth', 0.04 * clamp(1.3 - dist(v, J) / 60, 0, 1)); return; }   // les balles ricochent sur le blindage
+  force *= R_.degatsVoitures * (estBlindee(v) ? 0.35 : 1);
   if (v.type.bateau || v.detruite || force <= 0.005) return;
   if (!v.abimee) preparerDegats(v);
   const zone = zoneDe(v.forme, P, D);
@@ -2290,7 +2584,7 @@ function majDebris(dt) {
 // =====================================================================
 //  Sons (fabriqués par le programme)
 // =====================================================================
-let audio = null, bruitBuf, moteurs, roulement, crissement, sirene, sireneGain;
+let audio = null, bruitBuf, moteurs, roulement, crissement, sirene, sireneGain, alarmeSon, alarmeGain;
 function initAudio() {
   if (audio) return;
   audio = new AudioContext();
@@ -2305,6 +2599,13 @@ function initAudio() {
   sirene = audio.createOscillator(); sirene.type = 'square';
   sireneGain = audio.createGain(); sireneGain.gain.value = 0;
   sirene.connect(sireneGain).connect(audio.destination); sirene.start();
+  // la sonnerie d'alarme : une note carrée, hachée 16 fois par seconde
+  alarmeSon = audio.createOscillator(); alarmeSon.type = 'square';
+  const hache = audio.createOscillator(), profondeurHache = audio.createGain(), sonne = audio.createGain();
+  hache.type = 'square'; hache.frequency.value = 16; profondeurHache.gain.value = 0.5; sonne.gain.value = 0.5;
+  hache.connect(profondeurHache).connect(sonne.gain); hache.start();
+  alarmeGain = audio.createGain(); alarmeGain.gain.value = 0;
+  alarmeSon.connect(sonne).connect(alarmeGain).connect(audio.destination); alarmeSon.start();
 }
 // un moteur : deux notes (celle du moteur, et la même une octave plus bas) qui passent dans un filtre
 function creerMoteur() {
@@ -2369,7 +2670,8 @@ function criMJ() {
   g.gain.linearRampToValueAtTime(0.03, t0 + 0.19); g.gain.setValueAtTime(0.03, t0 + 0.4); g.gain.linearRampToValueAtTime(0, t0 + 0.52);
   s.connect(f).connect(g).connect(audio.destination); s.start(t0); s.stop(t0 + 0.52);
 }
-const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12], pompe: [0.8, 1200, 0.45], fusil: [0.5, 2000, 0.22], bazooka: [0.7, 700, 0.5], sniper: [0.9, 1500, 0.4] };
+const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12], pompe: [0.8, 1200, 0.45], fusil: [0.5, 2000, 0.22], bazooka: [0.7, 700, 0.5], sniper: [0.9, 1500, 0.4],
+  lourde: [0.7, 1100, 0.2], roquettes: [0.7, 700, 0.5] };
 
 // =====================================================================
 //  Le joueur
@@ -2377,7 +2679,8 @@ const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12],
 const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, sol: true, nage: false, lacet: Math.PI, lacetCam: Math.PI, tangage: -0.1, decalage: 0, angleCorps: Math.PI,
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
-  dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0 };
+  dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0,
+  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0 };   // sac : le nombre d'objets volés dans le sac
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 scene.add(joueurH.g);
 const giletBJ = piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#243a5a', joueurH.haut, 0, 0.4, 0); // visible quand il en porte un
@@ -2426,22 +2729,61 @@ const TENUES = {
   soldat: () => ({ peau: hasard(PEAUX.slice(0, 2)), haut: '#5d6352', bas: '#4a4f42', chaussures: '#111', casque: '#4a5040', brassard: '#b01010' }),
   boss: () => ({ peau: '#e0b090', haut: '#222', bas: '#111', chaussures: '#000', casquette: '#111', brassard: '#b01010' }),
   hitler: () => ({ peau: '#e8c0a0', haut: '#8a7a55', bas: '#1a1a1a', chaussures: '#000', cheveux: '#111', moustache: '#111', brassard: '#b01010' }),
+  // les vigiles des braquages, les policiers d'élite (casque et tenue noire) et le garagiste (combinaison bleue)
+  garde: () => ({ peau: hasard(PEAUX), haut: '#5a6068', bas: '#1c1c20', chaussures: '#111', casquette: '#1c1c20' }),
+  elite: () => ({ peau: hasard(PEAUX), haut: '#1a1c20', bas: '#1a1c20', chaussures: '#111', casque: '#22252a' }),
+  garagiste: () => ({ peau: hasard(PEAUX), haut: '#2a4a7a', bas: '#2a4a7a', chaussures: '#222', casquette: '#b02020' }),
 };
-const VIE_PNJ = { pieton: 50, flic: 70, soldat: 90, boss: 450, hitler: 900 };
+const VIE_PNJ = { pieton: 50, flic: 70, soldat: 90, boss: 450, hitler: 900, garde: 100, chien: 45 };
 const ARME_PNJ = { flic: 2, soldat: 5, boss: 4, hitler: 6 };
-const NAZIS = ['soldat', 'boss', 'hitler'];
+const NAZIS = ['soldat', 'boss', 'hitler'], VIGILES = ['garde', 'chien'];   // ils restent dans leur pâté
 const personnes = [];
-function creerPersonne(type, x, z, tenue = TENUES[type](), y = hauteurSol(x, z)) {
-  const h = creerHumain(tenue);
+function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z)) {
+  const h = type === 'chien' ? creerChien() : creerHumain(tenue);
   if (type === 'boss') h.g.scale.setScalar(1.15);
   const p = { type, h, x, y, z, angle: Math.random() * 6.28, vie: VIE_PNJ[type], cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
   if (ARME_PNJ[type] !== undefined) donnerArme(h, ARME_PNJ[type]);
   h.g.traverse(o => o.userData.personne = p);
   h.g.position.set(x, y, z);
   scene.add(h.g); personnes.push(p);
-  if (NAZIS.includes(type)) { const [i, j] = blocEn(x, z), o = origine(i, j); p.zone = [o.x + 6, o.z + 6, o.x + S - 6, o.z + S - 6]; }
+  if (NAZIS.includes(type) || VIGILES.includes(type)) { const [i, j] = blocEn(x, z), o = origine(i, j); p.zone = [o.x + 6, o.z + 6, o.x + S - 6, o.z + S - 6]; }
   else initChemin(p);
   return p;
+}
+// un policier d'élite (des fourgons blindés) : un casque, un gilet, un fusil d'assaut, et il tire en rafales
+function creerElite(x, z) {
+  const p = creerPersonne('flic', x, z, TENUES.elite());
+  p.elite = true; p.vie = 140; p.armeIdx = 5; p.rafale = 0; donnerArme(p.h, 5);
+  piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#2a2d33', p.h.haut, 0, 0.4, 0);   // son gilet pare-balles
+  return p;
+}
+// un chien de garde (un berger allemand) : il regarde vers +Z, comme les personnages
+function creerChien() {
+  const g = new THREE.Group(), corps = new THREE.Group(), fauve = '#8a5a2a', noir = '#1e1a16';
+  corps.position.y = 0.55; g.add(corps);
+  piece(new THREE.CapsuleGeometry(0.16, 0.55, 4, 10).rotateX(Math.PI / 2), fauve, corps, 0, 0, 0);
+  piece(new THREE.CapsuleGeometry(0.14, 0.4, 4, 10).rotateX(Math.PI / 2), noir, corps, 0, 0.06, -0.02).scale.set(1.05, 0.8, 1);   // le dos noir
+  const tete = new THREE.Group(); tete.position.set(0, 0.22, 0.42); corps.add(tete);
+  piece(new THREE.SphereGeometry(0.12, 12, 10), fauve, tete, 0, 0, 0);
+  piece(new THREE.CylinderGeometry(0.05, 0.075, 0.2, 10).rotateX(Math.PI / 2), fauve, tete, 0, -0.04, 0.15);   // le museau
+  piece(new THREE.SphereGeometry(0.03, 8, 6), '#111', tete, 0, -0.02, 0.25);                                  // la truffe
+  for (const c of [-1, 1]) { piece(new THREE.ConeGeometry(0.045, 0.14, 6), noir, tete, 0.065 * c, 0.13, -0.02); piece(new THREE.SphereGeometry(0.018, 6, 4), '#111', tete, 0.055 * c, 0.03, 0.1); }   // les oreilles dressées, les yeux
+  const queue = new THREE.Group(); queue.position.set(0, 0.05, -0.42); corps.add(queue);
+  piece(new THREE.CylinderGeometry(0.035, 0.05, 0.4, 6).translate(0, -0.2, 0), noir, queue, 0, 0, 0); queue.rotation.x = -0.6;
+  const pattes = [[-1, 0.28], [1, 0.28], [-1, -0.3], [1, -0.3]].map(([c, z]) => {
+    const p = new THREE.Group(); p.position.set(0.1 * c, -0.02, z); corps.add(p);
+    piece(new THREE.CylinderGeometry(0.045, 0.035, 0.52, 6).translate(0, -0.26, 0), fauve, p, 0, 0, 0);
+    return p;
+  });
+  return { g, corps, tete, queue, pattes, phase: 0, chien: true };
+}
+function animerChien(h, vitesse, dt, mort = 0) {
+  h.phase += dt * (vitesse > 0.2 ? 4 + vitesse * 1.6 : 0);
+  const a = vitesse > 0.2 ? Math.min(0.8, 0.3 + vitesse * 0.07) : 0, s = Math.sin(h.phase) * a;
+  h.pattes.forEach((p, k) => p.rotation.x = k === 0 || k === 3 ? s : -s);   // les pattes en diagonale avancent ensemble
+  h.corps.position.y = 0.55 - Math.abs(s) * 0.04;
+  h.queue.rotation.y = Math.sin(temps * (vitesse > 0.2 ? 6 : 2)) * 0.3;
+  h.g.rotation.z = mort * Math.PI / 2;   // mort : couché sur le côté
 }
 // les piétons marchent sur les trottoirs, d'un coin à l'autre, et traversent aux passages piétons
 function coin(i, j, k) { const o = origine(i, j); return { x: o.x + (k === 1 || k === 2 ? S - 2 : 2), z: o.z + (k >= 2 ? S - 2 : 2) }; }
@@ -2472,7 +2814,7 @@ function creerObjet(o) {
   if (o.type === 'soin') g.add(new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), M_SOIN));
   if (o.type === 'gilet') g.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.25), mat('#243a5a')));
   if (o.type === 'argent') for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.15), M_BILLET); b.position.y = k * 0.05; b.rotation.y = k; g.add(b); }
-  if (o.type === 'arme' || o.type === 'stand') { const a = creerArme(o.arme); a.scale.setScalar(2.2); g.add(a); }
+  if (o.type === 'arme' || o.type === 'stand') { const a = o.masque ? creerMasque() : creerArme(o.arme); a.scale.setScalar(2.2); g.add(a); }
   const anneau = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.6, 24).rotateX(-Math.PI / 2),
     new THREE.MeshBasicMaterial({ color: o.type === 'soin' ? '#f44' : o.type === 'argent' ? '#6f6' : o.type === 'gilet' ? '#4a9ae0' : '#fc4', transparent: true, opacity: 0.6, side: THREE.DoubleSide }));
   anneau.position.y = -0.8;
@@ -2480,7 +2822,8 @@ function creerObjet(o) {
   if (o.type === 'stand') {
     const piedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal); piedestal.position.y = -0.6; piedestal.castShadow = true; g.add(piedestal);
     anneau.position.y = -1.08;
-    const prix = new THREE.Sprite(new THREE.SpriteMaterial({ map: toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(`${ARMES[o.arme].nom} ${ARMES[o.arme].prix} $`, 128, 42, 248); }) }));
+    const texte = o.masque ? `Masque à gaz ${R_.prixMasque} $` : `${ARMES[o.arme].nom} ${ARMES[o.arme].prix} $`;
+    const prix = new THREE.Sprite(new THREE.SpriteMaterial({ map: toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(texte, 128, 42, 248); }) }));
     prix.scale.set(2.4, 0.6, 1); prix.position.y = 1; g.add(prix);
   }
   o.m = g; o.base = (o.type === 'stand' ? 1.1 : 0.85) + (o.y ?? hauteurSol(o.x, o.z));
@@ -2489,7 +2832,7 @@ function creerObjet(o) {
   return o;
 }
 soins.forEach(s => creerObjet({ type: 'soin', x: s.x, z: s.z, reapparait: true }));
-stands.forEach(s => creerObjet({ type: 'stand', arme: s.arme, x: s.x, z: s.z }));
+stands.forEach(s => creerObjet({ type: 'stand', arme: s.arme, masque: s.masque, x: s.x, z: s.z }));
 pickupsDepart.forEach(creerObjet);
 
 const effets = [];
@@ -2515,10 +2858,18 @@ function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null) {
   if (degatsPNJ) for (const p of personnes) { const d = Math.hypot(p.x - pos.x, p.y + 1 - pos.y, p.z - pos.z); if (p.vie > 0 && p !== tireur && d < rayon) blesser(p, degatsPNJ * (1 - d / rayon), !tireur); }
   const d = Math.hypot(J.x - pos.x, J.y + 1 - pos.y, J.z - pos.z);
   if (d < rayon) blesserJoueur(degatsJoueur * (1 - d / rayon));
-  for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v);
+  for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v, pos);
+  // le heavy robot : l'explosion casse la vitre de sa cabine, puis blesse son pilote
+  for (const r of robots) { const d = Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z); if (r !== tireur && d < rayon + 1.5) toucherRobot(r, degatsPNJ * (1 - d / (rayon + 1.5)), null, !tireur); }
 }
-function exploserVoiture(v) {
+function exploserVoiture(v, pos = v) {
   if (v.detruite) return;
+  if (estBlindee(v) && ++v.roquettes <= R_.roquettesBlindage) { // le blindage encaisse : ça cabosse, mais ça tient
+    const P = versLocal(v, pos.x - v.x, pos.z - v.z), l = Math.hypot(P.x, P.z) || 1;
+    abimer(v, V3(P.x / l * v.forme.largeur / 2, v.forme.hauteur * 0.5, P.z / l * v.forme.longueur / 2), V3(-P.x / l, -0.2, -P.z / l), 0.6);
+    if (v === J.voiture) annonce('', R_.roquettesBlindage - v.roquettes > 0 ? `Le blindage tient ! (encore ${R_.roquettesBlindage - v.roquettes} roquettes)` : 'Le blindage est à bout : la prochaine roquette la fait sauter !', 2.5);
+    return;
+  }
   toutCasser(v);   // les vitres volent en éclats et les pièces partent
   v.detruite = 0.001; v.conducteur = null; v.vitesse = 0; v.gyro = null;
   v.m.traverse(o => { if (o.isMesh) o.material = mat('#1c1a18', { roughness: 1 }); }); // carcasse brûlée
@@ -2529,22 +2880,23 @@ function exploserVoiture(v) {
 // roquettes : elles volent tout droit et explosent sur le premier mur, voiture ou personnage touché, ou par terre
 const M_FUMEE = new THREE.SpriteMaterial({ map: TEX.fumee, color: '#9a9a9a', transparent: true, depthWrite: false });
 const roquettes = [], rayonRoquette = Object.assign(new THREE.Raycaster(), { camera }), GEO_ROQUETTE = new THREE.CylinderGeometry(0.07, 0.07, 0.6, 6).rotateX(Math.PI / 2);
-function lancerRoquette(depart, vers, portee, rayon, degatsPNJ, degatsJoueur, tireur) {
+// ignore : un robot que la roquette traverse (celui qui l'a tirée)
+function lancerRoquette(depart, vers, portee, rayon, degatsPNJ, degatsJoueur, tireur, ignore = tireur) {
   const m = new THREE.Mesh(GEO_ROQUETTE, M_KAKI); m.position.copy(depart); m.lookAt(vers); scene.add(m);
   const feu = new THREE.Sprite(M_FLASH); feu.position.z = -0.45; feu.scale.setScalar(0.7); m.add(feu); // la flamme derrière
-  roquettes.push({ m, dir: vers.clone().sub(depart).normalize(), reste: portee, rayon, degatsPNJ, degatsJoueur, tireur });
+  roquettes.push({ m, dir: vers.clone().sub(depart).normalize(), reste: portee, rayon, degatsPNJ, degatsJoueur, tireur, ignore });
 }
 function majRoquettes(dt) {
   for (const r of roquettes) {
     const pos = r.m.position, pas = Math.min(R_.vitesseRoquette * dt, r.reste);
     rayonRoquette.set(pos, r.dir); rayonRoquette.far = pas;
-    const hit = rayonRoquette.intersectObjects([...batiments, ...voitures.map(v => v.m)], true)[0];
+    const hit = rayonRoquette.intersectObjects([...batiments, ...voitures.map(v => v.m), ...robots.filter(o => o !== r.ignore).map(o => o.m.g)], true)[0];
     let avance = hit ? hit.distance : pas, touche = !!hit;
     // un personnage (ou B.J., pour les roquettes ennemies) est touché si elle passe à moins de 1 m du milieu de son corps
     const frole = (x, y, z) => { const v = new THREE.Vector3(x, y, z).sub(pos), t = clamp(v.dot(r.dir), 0, pas);
       if (t < avance && v.addScaledVector(r.dir, -t).length() < 1) { avance = t; touche = true; } };
     for (const p of personnes) if (p.vie > 0 && p !== r.tireur) frole(p.x, p.y + 1, p.z);
-    if (r.tireur) frole(J.x, J.y + 1, J.z);
+    if (r.tireur) frole(J.x, J.y + (J.robot ? 3 : 1), J.z);
     pos.addScaledVector(r.dir, avance); r.reste -= avance;
     // traînée de fumée : une bouffée grise par image, qui grossit et s'efface
     const f = new THREE.Sprite(M_FUMEE.clone()); f.position.copy(pos); scene.add(f); effets.push({ o: f, vie: 1.2, fumee: 1.2 });
@@ -2557,6 +2909,536 @@ function majRoquettes(dt) {
   }
   for (let k = roquettes.length - 1; k >= 0; k--) if (roquettes[k].fini) roquettes.splice(k, 1);
 }
+// des étincelles qui volent, rebondissent et s'éteignent (soudure, perceuse, balle sur du métal)
+function etincelles(pos, n = 6, force = 3) {
+  for (let k = 0; k < n; k++) { const s = new THREE.Sprite(M_FLASH); s.scale.setScalar(entre(0.06, 0.16)); s.position.copy(pos); scene.add(s); lancerDebris(s, V3(entre(-force, force), entre(0, force), entre(-force, force)), entre(0.2, 0.6)); }
+}
+// des éclats de verre qui tombent d'une vitre brisée
+function eclats(mesh, n = 16) {
+  const c = mesh.getWorldPosition(V3());
+  for (let k = 0; k < n; k++) { const e = new THREE.Mesh(GEO_ECLAT, M_ECLAT); e.position.copy(c).add(V3(entre(-0.4, 0.4), entre(-0.2, 0.3), entre(-0.4, 0.4))); scene.add(e); lancerDebris(e, V3(entre(-2, 2), entre(0.5, 3), entre(-2, 2)), entre(1, 2)); }
+}
+
+// =====================================================================
+//  Les braquages : le butin, l'alarme, la fumée toxique, les lasers, les mitrailleuses, le coffre-fort
+// =====================================================================
+// le masque à gaz : B.J. le met tout seul dans la fumée, s'il en a acheté un (le visage regarde vers +Z)
+function creerMasque() {
+  const g = new THREE.Group(), caoutchouc = mat('#1e2020', { roughness: 0.7 }), verre = mat('#2a3a40', { metalness: 0.8, roughness: 0.1 });
+  const p = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; g.add(o); return o; };
+  p(new RoundedBoxGeometry(0.2, 0.19, 0.09, 2, 0.04), caoutchouc, 0, -0.01, 0.1);
+  for (const c of [-1, 1]) p(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 14).rotateX(Math.PI / 2), verre, 0.045 * c, 0.02, 0.15);   // les hublots
+  p(new THREE.CylinderGeometry(0.045, 0.05, 0.08, 14).rotateX(Math.PI / 2 + 0.4), mat('#4a5a2a'), 0, -0.08, 0.17);                    // la cartouche filtrante
+  p(new THREE.TorusGeometry(0.125, 0.01, 6, 24).rotateX(Math.PI / 2), caoutchouc, 0, 0.02, 0);                                          // la sangle
+  return g;
+}
+const masqueBJ = creerMasque(); joueurH.tete.add(masqueBJ); masqueBJ.visible = false;
+const sacBJ = piece(new RoundedBoxGeometry(0.46, 0.34, 0.24, 2, 0.08), '#1a1a1a', joueurH.haut, 0, 0.42, -0.25); sacBJ.visible = false;   // le sac du butin, sur le dos
+
+// le butin : chaque objet a son dessin, posé en (x, y, z), y étant le sol. o.vitre : sa vitrine, qui vole en éclats quand on le prend
+const M_OR = mat('#e0b030', { metalness: 1, roughness: 0.22 }), M_OR2 = mat('#e0b030', { metalness: 1, roughness: 0.22, side: THREE.DoubleSide });
+const M_ARGENT = mat('#d8d8dc', { metalness: 1, roughness: 0.2 }), M_VELOURS = mat('#6a0e18', { roughness: 1 }), M_MARBRE = mat('#eeebe4', { roughness: 0.3 });
+const M_TABLEAU = new THREE.MeshStandardMaterial({ map: TEX.nuitEtoilee, roughness: 0.7 }), M_BILLETS = new THREE.MeshStandardMaterial({ map: TEX.billets, roughness: 0.8 });
+const M_DIAMANT = new THREE.MeshPhysicalMaterial({ color: '#f4fbff', metalness: 0.3, roughness: 0, clearcoat: 1, envMapIntensity: 4, flatShading: true, emissive: '#334', transparent: true, opacity: 0.92 });
+const butins = [];
+function creerButin(o) {
+  const g = new THREE.Group(), m = o.modele;
+  const b = (geo, matiere, x = 0, y = 0, z = 0, dans = g) => { const e = new THREE.Mesh(geo, matiere); e.position.set(x, y, z); e.castShadow = true; dans.add(e); return e; };
+  const vitrine = (l, h, p, y) => { o.vitre = b(new THREE.BoxGeometry(l, h, p), MAT.vitrine, 0, y + h / 2); o.vitre.castShadow = false; };
+  const pierre = (couleur, r, x, y, z) => b(new THREE.OctahedronGeometry(r), mat(couleur, { metalness: 0.3, roughness: 0.05, emissive: couleur, emissiveIntensity: 0.3 }), x, y, z);
+  if (m === 'tableau') b(new THREE.PlaneGeometry(4.2, 2.6), M_TABLEAU, 0, 2.7, 0).castShadow = false;   // la toile, qu'on découpe dans son cadre
+  if (m === 'couronne') { // un anneau d'or à 8 pointes, serti de rubis et de saphirs, sur un coussin de velours
+    b(new RoundedBoxGeometry(0.46, 0.08, 0.46, 2, 0.03), M_VELOURS, 0, 1.14);
+    b(new THREE.CylinderGeometry(0.15, 0.13, 0.12, 32, 1, true), M_OR2, 0, 1.24);
+    for (let k = 0; k < 8; k++) {
+      const a = k * Math.PI / 4, x = Math.sin(a), z = Math.cos(a);
+      b(new THREE.ConeGeometry(0.03, 0.11, 6), M_OR, x * 0.15, 1.35, z * 0.15); b(new THREE.SphereGeometry(0.018, 8, 6), M_OR, x * 0.15, 1.41, z * 0.15);
+      pierre(k % 2 ? '#c01020' : '#1040c0', 0.022, x * 0.155, 1.24, z * 0.155);
+    }
+    vitrine(0.7, 0.7, 0.7, 1.1);
+  }
+  if (m === 'collier' || m === 'bagues') { // des bijoux sur du velours, dans une vitrine
+    b(new THREE.BoxGeometry(2.2, 0.03, 1), M_VELOURS, 0, 0.965);
+    if (m === 'collier') {
+      for (const [x, r] of [[-0.45, 0.22], [0.45, 0.16]]) {
+        b(new THREE.TorusGeometry(r, 0.012, 8, 32).rotateX(Math.PI / 2), M_OR, x, 0.99, 0);
+        for (let k = 0; k < 9; k++) { const a = Math.PI * (0.15 + k * 0.0875); pierre('#c01020', r * 0.14, x + Math.cos(a) * r, 1.0, Math.sin(a) * r); }
+      }
+    } else for (let k = 0; k < 7; k++) { const x = (k - 3) * 0.28; b(new THREE.TorusGeometry(0.035, 0.008, 6, 16), k % 2 ? M_OR : M_ARGENT, x, 1.02, 0); pierre('#e8f4ff', 0.02, x, 1.07, 0); }
+    vitrine(2.3, 0.4, 1.1, 0.95);
+  }
+  if (m === 'statue') { // une statue grecque en marbre, grandeur nature : un athlète qui lève le bras
+    const h = creerHumain({ peau: '#eee', haut: '#eee', bas: '#eee', chaussures: '#eee', cheveux: '#eee' });
+    animerHumain(h, 0, 0);
+    h.brasD.rotation.set(-2.7, 0, -0.25); h.brasD.pli.rotation.x = -0.4; h.brasG.rotation.set(0.1, 0, 0.3);
+    h.jambeG.rotation.x = -0.2; h.jambeG.pli.rotation.x = 0.35; h.tete.rotation.y = 0.35;
+    h.g.traverse(e => { if (e.isMesh) e.material = M_MARBRE; });
+    h.g.position.y = 0.8; g.add(h.g);
+  }
+  if (m === 'chat') { // un chat égyptien en or, assis, avec un collier bleu
+    b(new THREE.SphereGeometry(0.2, 16, 12).scale(1, 0.6, 1.1), M_OR, 0, 0.9, -0.02);
+    b(new THREE.CylinderGeometry(0.1, 0.17, 0.5, 16), M_OR, 0, 1.12, 0);
+    b(new THREE.SphereGeometry(0.11, 14, 10).scale(1, 1, 1.1), M_OR, 0, 1.44, 0.04);
+    for (const c of [-1, 1]) { b(new THREE.ConeGeometry(0.035, 0.12, 6), M_OR, 0.06 * c, 1.56, 0.03); b(new THREE.CylinderGeometry(0.03, 0.035, 0.46, 8), M_OR, 0.07 * c, 1.05, 0.14); }
+    b(new THREE.TorusGeometry(0.1, 0.02, 6, 16).rotateX(Math.PI / 2), mat('#1a4ab0', { roughness: 0.3 }), 0, 1.3, 0.01);
+    b(new THREE.TorusGeometry(0.16, 0.025, 6, 12, Math.PI).rotateX(Math.PI / 2), M_OR, 0, 0.83, 0);   // la queue, enroulée
+  }
+  if (m === 'diamant') { // le gros diamant, taillé en brillant, sur un coussin noir, sous une cloche de verre
+    b(new RoundedBoxGeometry(0.34, 0.06, 0.34, 2, 0.02), mat('#111', { roughness: 1 }), 0, 1.08);
+    o.pierre = b(new THREE.LatheGeometry([[0, -0.09], [0.1, 0], [0.075, 0.04], [0, 0.04]].map(([x, y]) => new THREE.Vector2(x, y)), 8), M_DIAMANT, 0, 1.22);
+    o.eclat = new THREE.Sprite(M_FLASH); o.eclat.position.set(0.03, 1.25, 0.05); g.add(o.eclat);   // il scintille
+    vitrine(0.5, 0.55, 0.5, 1.05);
+  }
+  if (m === 'pactole') // des liasses de billets et des lingots d'or, sur deux palettes
+    for (const s of [-1, 1]) {
+      b(new THREE.BoxGeometry(1.3, 0.9, 1), M_BILLETS, s * 2.5, 0.6);
+      for (let k = 0; k < 6; k++) b(new THREE.BoxGeometry(0.28, 0.08, 0.13), M_OR, s * 2.5 + (k % 3 - 1) * 0.36, 1.09 + Math.floor(k / 3) * 0.08, (Math.floor(k / 3) - 0.5) * 0.2);
+    }
+  g.position.set(o.x, o.y, o.z); o.B.groupe.add(g);
+  o.g = g; o.pris = false; butins.push(o);
+}
+
+// les pièces qui bougent dans un pâté à braquer : gyrophares, fumée, lasers, mitrailleuses, porte du coffre, grille
+const GEO_GYRO_ALARME = new THREE.SphereGeometry(0.16, 12, 8);
+const M_LASER = new THREE.MeshBasicMaterial({ color: '#ff2a2a', toneMapped: false });
+const M_HALO_LASER = new THREE.MeshBasicMaterial({ color: '#ff1010', transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+const M_PORTE_COFFRE = mat('#a4aab0', { metalness: 0.9, roughness: 0.3 });
+const lumiereAlarme = new THREE.PointLight('#ff2010', 0, 30); scene.add(lumiereAlarme);
+function construireBraquage(B) {
+  const G = B.groupe = new THREE.Group(); scene.add(G);
+  const b = (geo, matiere, x = 0, y = 0, z = 0, dans = G) => { const e = new THREE.Mesh(geo, matiere); e.position.set(x, y, z); e.castShadow = true; dans.add(e); return e; };
+  B.alarme = false; B.tir = 0;
+  // les gyrophares de l'alarme : ils clignotent en rouge quand elle sonne
+  B.matAlarme = new THREE.MeshStandardMaterial({ color: '#8a2010', emissive: '#ff2a10', emissiveIntensity: 0 });
+  for (const p of B.gyros) b(GEO_GYRO_ALARME, B.matAlarme, p.x, p.y, p.z);
+  // la fumée toxique : des nuages qui remplissent la boutique
+  if (B.fumee) {
+    const f = B.fumee; B.densite = 0;
+    B.nuages = Array.from({ length: 26 }, () => {
+      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.fumee, color: '#aab890', transparent: true, opacity: 0, depthWrite: false }));
+      s.position.set(entre(f.x1 + 1, f.x2 - 1), entre(f.y1 + 0.4, f.y2 - 0.4), entre(f.z1 + 1, f.z2 - 1)); s.scale.setScalar(entre(3, 5)); s.visible = false; G.add(s); return s;
+    });
+  }
+  // les lasers : un fil rouge dans son halo, avec un petit boîtier à chaque bout
+  for (const l of B.lasers) {
+    const long = l.sorte === 'h' ? 3.6 : 3.4;
+    l.m = b(new THREE.CylinderGeometry(0.01, 0.01, long, 6), M_LASER); l.m.castShadow = false;
+    b(new THREE.CylinderGeometry(0.045, 0.045, long, 8), M_HALO_LASER, 0, 0, 0, l.m).castShadow = false;
+    for (const s of [-1, 1]) b(new THREE.BoxGeometry(0.1, 0.1, 0.1), M_NOIR, 0, s * long / 2, 0, l.m);
+    if (l.sorte === 'h') l.m.rotation.z = Math.PI / 2;
+  }
+  // les mitrailleuses automatiques : cachées dans le plafond, elles descendent pour tirer
+  for (const t of B.tourelles) {
+    Object.assign(t, { vie: 60, sortie: 0, cd: 0, m: new THREE.Group(), tete: new THREE.Group(), canon: new THREE.Group() });
+    t.m.position.set(t.x, t.y + 0.6, t.z); G.add(t.m);
+    b(new THREE.CylinderGeometry(0.05, 0.05, 0.38, 8), M_ACIER, 0, -0.19, 0, t.m);                   // la tige
+    t.tete.position.y = -0.4; t.m.add(t.tete); t.tete.add(t.canon);
+    b(new THREE.BoxGeometry(0.26, 0.22, 0.5), M_ACIER, 0, 0, 0, t.canon);
+    b(new THREE.CylinderGeometry(0.035, 0.035, 0.55, 8).rotateX(Math.PI / 2), M_METAL, 0, 0.02, 0.5, t.canon);   // le canon
+    b(new THREE.BoxGeometry(0.14, 0.16, 0.22), mat('#3a3a2a'), 0.2, -0.02, -0.05, t.canon);          // la boîte de balles
+    b(new THREE.SphereGeometry(0.025, 6, 4), M_FEU, 0, 0.13, 0.15, t.canon);                         // un voyant rouge
+    t.m.traverse(e => e.userData.tourelle = t);
+  }
+  // la porte ronde du coffre-fort (3,2 m) : elle tourne sur ses gonds, à gauche
+  if (B.porte) {
+    const p = B.porte;
+    b(new THREE.TorusGeometry(1.66, 0.12, 10, 40), M_ACIER, p.x, p.y + 1.55, p.z + 0.03);            // le cadre, sur le mur
+    b(new THREE.BoxGeometry(0.35, 1.4, 0.5), M_ACIER, p.x - 1.75, p.y + 1.55, p.z + 0.25);           // les gonds
+    B.pivotPorte = new THREE.Group(); B.pivotPorte.position.set(p.x - 1.6, p.y, p.z + 0.25); G.add(B.pivotPorte);
+    const porte = B.facePorte = new THREE.Group(); porte.position.set(1.6, 1.55, 0); B.pivotPorte.add(porte);
+    b(new THREE.CylinderGeometry(1.6, 1.6, 0.5, 48).rotateX(Math.PI / 2), M_PORTE_COFFRE, 0, 0, 0, porte);
+    b(new THREE.TorusGeometry(1.3, 0.05, 8, 48), M_ACIER, 0, 0, 0.26, porte);
+    b(new THREE.CylinderGeometry(0.28, 0.28, 0.18, 24).rotateX(Math.PI / 2), M_ACIER, 0, 0, 0.32, porte);   // le moyeu
+    for (let k = 0; k < 3; k++) { // le volant, à trois branches, avec ses boules
+      const a = k * Math.PI / 3; b(new THREE.BoxGeometry(1.7, 0.08, 0.08), M_CHROME, 0, 0, 0.42, porte).rotation.z = a;
+      for (const s of [-1, 1]) b(new THREE.SphereGeometry(0.07, 10, 8), M_CHROME, Math.cos(a) * 0.85 * s, Math.sin(a) * 0.85 * s, 0.42, porte);
+    }
+    for (let k = 0; k < 16; k++) b(new THREE.CylinderGeometry(0.06, 0.06, 0.08, 10).rotateX(Math.PI / 2), M_ACIER, Math.cos(k * Math.PI / 8) * 1.47, Math.sin(k * Math.PI / 8) * 1.47, 0.27, porte);   // les boulons
+    B.ouverture = 0;
+  }
+  // la grille, en 4 panneaux de barreaux (l'explosif les fait voler)
+  if (B.grille) {
+    const p = B.grille;
+    B.panneaux = [-1.5, -0.5, 0.5, 1.5].map(k => {
+      const f = [];
+      for (let x = -1.85; x < 1.9; x += 0.2) f.push(new THREE.BoxGeometry(0.05, 3.1, 0.05).translate(x, 0, 0));
+      for (const y of [-1.5, 0, 1.5]) f.push(new THREE.BoxGeometry(3.8, 0.1, 0.08).translate(0, y, 0));
+      return b(fusion(f), M_ACIER, p.x + k * 3.8, p.y + 1.6, p.z);
+    });
+    b(new THREE.BoxGeometry(0.3, 0.4, 0.2), M_NOIR, -1.75, -0.4, 0.12, B.panneaux[2]);             // la serrure
+  }
+}
+braquages.forEach(construireBraquage);
+butinsDepart.forEach(creerButin);
+
+// l'alarme sonne : la police arrive vite et nombreuse, les vigiles et les chiens attaquent
+let renfortsRapides = 0;
+function declencherAlarme(B) {
+  if (!B || B.alarme) return;
+  B.alarme = true; renfortsRapides = 60;
+  etoiles = Math.max(etoiles, B.etoiles); tempsCalme = 0;
+  for (const p of personnes) if (p.braquage === B) p.alerte = true;
+  annonce('ALARME !', 'La police arrive, et en force !', 3);
+}
+function butinProche() {
+  let best = null, bd = 2;
+  for (const o of butins) { if (o.pris || (o.apres && !o.B[o.apres])) continue; const d = dist(o, J); if (d < bd && Math.abs(o.y - J.y) < 1.6) { bd = d; best = o; } }
+  return best;
+}
+// E à côté du butin : on le vole... ou on pose la perceuse, ou l'explosif
+function voler(o) {
+  const B = o.B;
+  o.pris = true;
+  if (o.outil === 'perceuse') { B.perceuse = 0.001; poserPerceuse(B); declencherAlarme(B); annonce('', `La perceuse thermique attaque la porte : ${R_.dureePerceuse} secondes. Défends-toi !`, 3.5); return; }
+  if (o.outil === 'charge') { B.charge = R_.dureeCharge; poserCharge(B); annonce('', `Explosif posé : éloigne-toi ! (${R_.dureeCharge} s)`, 2.5); return; }
+  if (o.vitre) { eclats(o.vitre); bruit(0.5, 9000, 0.4); bip(2800, 2000, 0.2, 'triangle', 0.1); }   // la vitrine vole en éclats
+  o.g.visible = false; J.sac++;
+  bip(600, 1200, 0.15, 'sine', 0.3);
+  annonce('BUTIN !', `${o.nom[0].toUpperCase()}${o.nom.slice(1)} : dans le sac`, 2.5);
+  declencherAlarme(B);
+}
+// la perceuse thermique, sur son pied magnétique, collée à la porte (elle tourne avec la porte)
+function poserPerceuse(B) {
+  const p = B.perceuseM = new THREE.Group(); p.position.set(0.55, -0.35, 0.25); B.facePorte.add(p);
+  const b = (geo, m, x, y, z) => { const e = new THREE.Mesh(geo, m); e.position.set(x, y, z); e.castShadow = true; p.add(e); };
+  b(new THREE.BoxGeometry(0.4, 0.4, 0.1), M_ACIER, 0, -0.35, 0.05); b(new THREE.BoxGeometry(0.1, 0.55, 0.1), M_ACIER, 0, -0.1, 0.2);
+  b(new THREE.CylinderGeometry(0.13, 0.13, 0.5, 16).rotateX(Math.PI / 2), mat('#e0a020', { roughness: 0.5 }), 0, 0.2, 0.42);   // le corps jaune
+  b(new THREE.BoxGeometry(0.16, 0.12, 0.25), M_NOIR, 0, 0.36, 0.45);
+  b(new THREE.CylinderGeometry(0.03, 0.02, 0.2, 8).rotateX(Math.PI / 2), M_CHROME, 0, 0.2, 0.08);                              // le foret
+}
+// l'explosif : un pain de plastic et son détonateur, avec une diode qui clignote
+function poserCharge(B) {
+  const g = B.chargeM = new THREE.Group(), p = B.grille; g.position.set(p.x, p.y + 1.25, p.z + 0.14); B.groupe.add(g);
+  const b = (geo, m, x, y, z) => { const e = new THREE.Mesh(geo, m); e.position.set(x, y, z); g.add(e); return e; };
+  b(new THREE.BoxGeometry(0.28, 0.16, 0.08), mat('#d8cfa8', { roughness: 0.9 }), 0, 0, 0); b(new THREE.BoxGeometry(0.1, 0.06, 0.04), M_NOIR, 0, 0.02, 0.05);
+  b(new THREE.TorusGeometry(0.06, 0.005, 4, 12, Math.PI), mat('#c02020'), -0.06, 0.07, 0.04);
+  B.led = b(new THREE.SphereGeometry(0.015, 6, 4), M_FEU, 0.03, 0.03, 0.075);
+}
+function sauterGrille(B) {
+  const p = B.grille;
+  B.groupe.remove(B.chargeM); B.sautee = true; B.bouchonGrille.h = -Infinity;
+  exploser(V3(p.x, p.y + 1.25, p.z), 5, 200, 70);
+  for (const g of B.panneaux) { lancerDebris(g, V3(entre(-2, 2), entre(2, 4), entre(-5, -2)), 30); debris.at(-1).tourne.multiplyScalar(0.25); }
+  annonce('BOUM !', 'La grille a sauté : prends le pactole !', 3);
+}
+function tousser() { bruit(0.3, 1800, 0.18); setTimeout(() => bruit(0.25, 1500, 0.2), 250); }
+function majBraquages(dt) {
+  const clignote = Math.sin(temps * 14) > 0;
+  let proche = null;
+  J.fumee = 0;
+  for (const B of braquages) {
+    const d = dist(B, J);
+    B.groupe.visible = d < 300;
+    if (B.alarme && etoiles === 0) { // la police est semée (ou B.J. est mort) : l'alarme s'arrête, les vigiles se calment
+      B.alarme = false;
+      for (const p of personnes) if (p.braquage === B) p.alerte = false;
+    }
+    if (B.alarme && (!proche || d < dist(proche, J))) proche = B;
+    B.matAlarme.emissiveIntensity = B.alarme && clignote ? 8 : 0;
+    if (B.fumee) majFumee(B, dt);
+    majCoffre(B, dt, d);
+    if (d < 120) { majLasers(B); majTourelles(B, dt); }
+  }
+  // la lumière rouge de l'alarme, dans le bâtiment le plus proche
+  lumiereAlarme.intensity = proche && dist(proche, J) < 80 && clignote ? 120 : 0;
+  if (proche) lumiereAlarme.position.set(proche.lumiere.x, proche.lumiere.y, proche.lumiere.z);
+  for (const o of butins) if (o.pierre && !o.pris) { o.pierre.rotation.y += dt * 0.6; o.eclat.scale.setScalar(0.04 + 0.22 * Math.max(0, Math.sin(temps * 2.3)) ** 6); }
+  masqueBJ.visible = J.masque && J.fumee > 0;
+  sacBJ.visible = J.sac > 0;
+}
+// la fumée toxique remplit la boutique quand l'alarme sonne. Sans masque, elle fait tousser et perdre de la vie (le gilet ne protège pas)
+function majFumee(B, dt) {
+  const f = B.fumee;
+  B.densite = clamp(B.densite + (B.alarme ? dt / 5 : -dt / 15), 0, 1);
+  B.nuages.forEach((s, k) => { s.visible = B.densite > 0.01; s.material.opacity = 0.55 * B.densite; s.material.rotation += dt * (k % 2 ? 0.15 : -0.15); });
+  const dedans = J.x > f.x1 && J.x < f.x2 && J.z > f.z1 && J.z < f.z2 && J.y > f.y1 - 0.5 && J.y < f.y2 && !J.voiture;
+  if (!dedans || B.densite < 0.15 || J.mort) return;
+  J.fumee = Math.max(J.fumee, B.densite);
+  if (J.masque) return;
+  J.vie -= R_.degatsFumee * B.densite * dt; J.dernierDegat = temps;
+  if ((J.toux = (J.toux || 0) - dt) <= 0) { J.toux = 1.2; tousser(); }
+  if (J.vie <= 0) mourir();
+}
+// les lasers bougent. Si B.J. en touche un, les mitrailleuses tirent pendant 5 secondes (et l'alarme sonne)
+function majLasers(B) {
+  const haut = J.accroupi ? 1.15 : 1.75;
+  let touche = false;
+  for (const l of B.lasers) {
+    const s = l.v ? Math.sin(temps * l.v + l.phase) : 0;
+    if (l.sorte === 'h') { const y = l.y0 + l.a + l.b * s; l.m.position.set(l.x, y, l.z); touche ||= Math.abs(J.z - l.z) < 0.25 && Math.abs(J.x - l.x) < 1.9 && y > J.y && y < J.y + haut; }
+    else { const x = l.x + l.a + l.b * s; l.m.position.set(x, l.y0 + 1.7, l.z); touche ||= Math.hypot(J.x - x, J.z - l.z) < 0.28 && J.y > l.y0 - 1 && J.y < l.y0 + 3.4; }
+  }
+  if (touche && !J.mort && !J.voiture && !J.robot && !(B.tir > 0)) {
+    B.tir = R_.dureeMitrailleuses; declencherAlarme(B);
+    annonce('LASER TOUCHÉ !', `Les mitrailleuses tirent pendant ${R_.dureeMitrailleuses} secondes : cache-toi !`, 2.5); bip(1800, 1800, 0.5, 'square', 0.15);
+  }
+}
+function majTourelles(B, dt) {
+  B.tir = Math.max(0, B.tir - dt);
+  for (const t of B.tourelles) {
+    const actif = B.tir > 0 && t.vie > 0;
+    t.sortie = clamp(t.sortie + (actif ? dt * 4 : -dt), 0, 1);
+    t.m.position.y = t.y + 0.6 * (1 - t.sortie);
+    if (!actif || t.sortie < 1 || J.mort) continue;
+    t.m.updateMatrixWorld(true);
+    const bout = t.tete.getWorldPosition(V3()), cible = V3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z), dx = cible.x - bout.x, dz = cible.z - bout.z;
+    t.tete.rotation.y = Math.atan2(dx, dz); t.canon.rotation.x = Math.atan2(bout.y - cible.y, Math.hypot(dx, dz));   // elle suit B.J.
+    if ((t.cd -= dt) > 0) continue;
+    t.cd = 0.2;
+    if (!voit({ x: bout.x, z: bout.z, y: bout.y - 1.5 }, J)) continue;
+    const d = bout.distanceTo(cible), reussi = Math.random() < 0.6 * R_.precisionPros * clamp(1.2 - d / 40, 0.3, 1) * (J.accroupi ? 0.5 : 1) * (J.vitesse > 6 ? 0.6 : 1);
+    if (!reussi) cible.add(V3(entre(-1, 1), entre(-0.8, 0.8), entre(-1, 1)));
+    t.canon.updateMatrixWorld(true);
+    const depart = t.canon.localToWorld(V3(0, 0.02, 0.78));
+    traceur(depart, cible); flash(depart, 0.45); lumiereTir.position.copy(depart); lumiereTir.intensity = 40;
+    bruit(0.35 * clamp(1 - d / 80, 0.2, 1), 3200, 0.08);
+    if (reussi) blesserJoueur(R_.degatsMitrailleuse);
+  }
+}
+// le coffre-fort : la perceuse perce, la porte s'ouvre, l'explosif compte à rebours
+function majCoffre(B, dt, d) {
+  const fort = clamp(1.2 - d / 60, 0, 1);
+  if (B.perceuse > 0 && !B.ouvert) {
+    B.perceuse += dt;
+    B.perceuseM.updateMatrixWorld(true);
+    if (Math.random() < dt * 30) etincelles(B.perceuseM.localToWorld(V3(0, 0.2, 0)), 2, 2.5);
+    if ((B.tBruit = (B.tBruit || 0) - dt) <= 0) { B.tBruit = 0.1; bruit(0.2 * fort, 5000, 0.1); bip(1900 + Math.random() * 200, 1700, 0.1, 'sawtooth', 0.03 * fort); }
+    if (B.perceuse >= R_.dureePerceuse) { // percée : la porte s'ouvre
+      B.ouvert = true; B.bouchonOuvert.h = B.bouchonPorte.h; B.bouchonPorte.h = -Infinity;
+      annonce('COFFRE-FORT PERCÉ !', 'La porte s\'ouvre : fais sauter la grille', 3); bip(160, 60, 2.5, 'sawtooth', 0.3 * fort);
+    }
+  }
+  if (B.ouvert && B.ouverture < 1) { B.ouverture = Math.min(1, B.ouverture + dt / 3); B.pivotPorte.rotation.y = -Math.PI / 2 * (1 - (1 - B.ouverture) ** 2); }
+  if (B.charge > 0) {
+    const avant = B.charge, vite = B.charge < 2 ? 4 : 1;
+    B.charge -= dt;
+    if (Math.floor(avant * vite) !== Math.floor(B.charge * vite)) bip(2200, 2200, 0.07, 'square', 0.25 * fort);
+    B.led.visible = (B.charge * vite * 2) % 2 < 1;
+    if (B.charge <= 0) sauterGrille(B);
+  }
+}
+
+// =====================================================================
+//  Le heavy robot de la police (comme dans Wolfenstein : The New Order)
+//  Un policier le pilote, derrière la vitre blindée de sa cabine. Casse la vitre, puis abats le pilote
+//  ou éjecte-le (E) : tu peux ensuite monter dedans et le piloter.
+// =====================================================================
+const M_ROBOT = mat('#34404e', { metalness: 0.75, roughness: 0.4 }), M_ROBOT2 = mat('#1c2026', { metalness: 0.6, roughness: 0.5 }), M_PISTON = mat('#b8bcc0', { metalness: 1, roughness: 0.25 });
+const M_VITRE_ROBOT = new THREE.MeshStandardMaterial({ color: '#8ab0c8', metalness: 0.9, roughness: 0.05, transparent: true, opacity: 0.4, depthWrite: false });
+const M_BALLE_LOURDE = new THREE.MeshBasicMaterial({ color: '#ffd070', toneMapped: false });
+const GEO_BALLE = new THREE.CylinderGeometry(0.035, 0.035, 1, 6).translate(0, 0.5, 0).rotateX(Math.PI / 2);   // de z = 0 à z = 1
+const robots = [];
+function creerRobot(x, z, angle) {
+  const g = new THREE.Group(), bassin = new THREE.Group(), torse = new THREE.Group();
+  g.add(bassin); bassin.position.y = 2.3; bassin.add(torse); torse.position.y = 0.3;
+  const b = (geo, m, dans, x = 0, y = 0, z = 0) => { const e = new THREE.Mesh(geo, m); e.position.set(x, y, z); e.castShadow = true; dans.add(e); return e; };
+  const caisse = (l, h, p, m, dans, x, y, z, r = 0.06) => b(new RoundedBoxGeometry(l, h, p, 2, r), m, dans, x, y, z);
+  caisse(1.8, 0.6, 1.25, M_ROBOT2, bassin, 0, 0, 0);
+  // la caisse blindée, avec la cabine du pilote devant : un trou fermé par la vitre
+  caisse(2.3, 1.9, 1.2, M_ROBOT, torse, 0, 1.05, -0.35, 0.18);                                    // le dos
+  caisse(2.3, 0.85, 0.7, M_ROBOT, torse, 0, 0.5, 0.55, 0.1);                                      // le bas de la cabine
+  caisse(2.3, 0.3, 0.7, M_ROBOT, torse, 0, 1.85, 0.55, 0.1);                                      // le toit de la cabine
+  for (const s of [-1, 1]) caisse(0.6, 0.8, 0.7, M_ROBOT, torse, s * 0.85, 1.32, 0.55, 0.08);     // les montants
+  const vitre = b(new THREE.BoxGeometry(1.1, 0.8, 0.05), M_VITRE_ROBOT, torse, 0, 1.31, 0.88); vitre.castShadow = false; vitre.userData.vitre = true;
+  // le pilote : un policier assis aux commandes, qu'on voit derrière la vitre
+  const pilote = creerHumain(TENUES.flic()); pilote.g.scale.setScalar(0.85); pilote.g.position.set(0, 1.45 - 1.82 * 0.85, 0.3);
+  animerHumain(pilote, 0, 0, { assis: true }); torse.add(pilote.g); pilote.jambeD.visible = pilote.jambeG.visible = false;   // ses jambes sont dans la caisse
+  // les gyrophares, « POLICE » devant, deux phares, les pots d'échappement dans le dos
+  const gyros = [['#f22', '#f00', 0.35], ['#22f', '#00f', -0.35]].map(([c, l, x]) => b(new THREE.BoxGeometry(0.4, 0.14, 0.24), new THREE.MeshStandardMaterial({ color: c, emissive: l }), torse, x, 2.08, 0.1));
+  b(new THREE.PlaneGeometry(1.3, 0.3), MAT.police, torse, 0, 0.35, 0.906);                        // « POLICE » sur le ventre
+  for (const s of [-1, 1]) b(new THREE.BoxGeometry(0.22, 0.14, 0.06), M_PHARE, torse, s * 0.8, 0.75, 0.91);
+  for (const s of [-1, 1]) b(new THREE.CylinderGeometry(0.1, 0.12, 0.9, 10), M_ROBOT2, torse, s * 0.6, 2.0, -0.85);
+  // les bras : une mitrailleuse à 6 canons à gauche, un lance-roquettes à droite
+  const bras = [1, -1].map(s => {
+    const epaule = new THREE.Group(); epaule.position.set(s * 1.45, 1.45, -0.2); torse.add(epaule);
+    b(new THREE.SphereGeometry(0.32, 14, 10), M_ROBOT2, epaule); caisse(0.45, 0.9, 0.45, M_ROBOT, epaule, 0, -0.45, 0);
+    const arme = new THREE.Group(); arme.position.y = -0.9; epaule.add(arme);
+    return { epaule, arme };
+  });
+  const canons = new THREE.Group(); canons.position.z = 0.5; bras[0].arme.add(canons);
+  b(new THREE.CylinderGeometry(0.24, 0.24, 0.6, 16).rotateX(Math.PI / 2), M_ROBOT2, bras[0].arme, 0, 0, 0.1);
+  for (let k = 0; k < 6; k++) b(new THREE.CylinderGeometry(0.045, 0.045, 1.2, 8).rotateX(Math.PI / 2), M_METAL, canons, Math.cos(k * Math.PI / 3) * 0.12, Math.sin(k * Math.PI / 3) * 0.12, 0.5);
+  b(new THREE.CylinderGeometry(0.2, 0.2, 0.06, 16).rotateX(Math.PI / 2), M_ROBOT2, canons, 0, 0, 0.9);
+  b(new THREE.BoxGeometry(0.35, 0.45, 0.5), mat('#3a3a2a'), bras[0].arme, 0.35, -0.05, -0.05);    // la boîte de munitions
+  caisse(0.7, 0.7, 1, M_ROBOT2, bras[1].arme, 0, 0, 0.3);
+  for (const [x, y] of [[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]]) b(new THREE.CylinderGeometry(0.1, 0.1, 0.05, 12).rotateX(Math.PI / 2), M_NOIR, bras[1].arme, x, y, 0.81);   // les tubes des roquettes
+  // les jambes : cuisse, genou, tibia avec son vérin, gros pied
+  const jambes = [-1, 1].map(s => {
+    const hanche = new THREE.Group(); hanche.position.x = s * 0.7; bassin.add(hanche);
+    b(new THREE.SphereGeometry(0.34, 12, 10), M_ROBOT2, hanche);
+    caisse(0.72, 1.1, 0.78, M_ROBOT, hanche, 0, -0.58, 0, 0.1);
+    b(new THREE.CylinderGeometry(0.07, 0.07, 0.9, 8), M_PISTON, hanche, s * 0.42, -0.55, 0.1);        // le vérin de la cuisse
+    const genou = new THREE.Group(); genou.position.y = -1.1; hanche.add(genou);
+    b(new THREE.SphereGeometry(0.32, 12, 10), M_ROBOT2, genou); caisse(0.5, 0.45, 0.2, M_ROBOT, genou, 0, 0.05, 0.36, 0.06);   // le genou et sa genouillère
+    caisse(0.6, 1, 0.66, M_ROBOT, genou, 0, -0.52, 0, 0.1);
+    b(new THREE.CylinderGeometry(0.07, 0.07, 0.8, 8), M_PISTON, genou, 0, -0.45, -0.42);             // le vérin du tibia
+    const pied = new THREE.Group(); pied.position.y = -1.05; genou.add(pied);
+    caisse(0.9, 0.28, 1.4, M_ROBOT2, pied, 0, -0.01, 0.2);
+    return { hanche, genou, pied };
+  });
+  const r = { m: { g, bassin, torse, bras, jambes, canons, vitre, pilote, gyros }, x, z, y: hauteurSol(x, z), angle, vieVitre: R_.vitreRobot, pilote: 'police', vieP: 70,
+    cd: 1, rafale: 10, cdRoq: entre(3, 5), phase: 0, vuTimer: 0, munitions: { lourde: ARMES_ROBOT.lourde.munitions, roquettes: ARMES_ROBOT.roquettes.munitions }, cdJ: { lourde: 0, roquettes: 0 } };
+  g.traverse(e => e.userData.robot = r); pilote.g.traverse(e => e.userData.piloteRobot = true);
+  g.position.set(r.x, r.y, r.z); g.rotation.y = angle;
+  scene.add(g); robots.push(r);
+  return r;
+}
+// il marche : les jambes se lèvent l'une après l'autre, chaque pas fait trembler le sol. tangage : les bras visent vers le haut ou le bas
+function animerRobot(r, vitesse, dt, tangage = 0) {
+  const m = r.m, avant = Math.sin(r.phase);
+  r.phase += dt * vitesse * 1.3;
+  const s = Math.sin(r.phase), a = vitesse > 0.2 ? 0.38 : 0, assis = !r.pilote && r !== J.robot;   // sans pilote, il reste à genoux
+  m.jambes.forEach((j, k) => {
+    const sg = k ? -1 : 1;
+    j.hanche.rotation.x = assis ? -1 : -sg * s * a; j.genou.rotation.x = assis ? 2 : Math.max(0, sg * Math.cos(r.phase)) * a * 1.4;
+    j.pied.rotation.x = -j.hanche.rotation.x - j.genou.rotation.x;
+  });
+  m.bassin.position.y = assis ? 1.45 : 2.3 - Math.abs(s) * a * 0.2;
+  if (a && Math.sign(s) !== Math.sign(avant)) pasRobot(r);
+  for (const b of m.bras) b.arme.rotation.x = assis ? 0.6 : -clamp(tangage, -0.6, 0.6);
+  m.canons.rotation.z += dt * (r.tire ? 25 : 0);
+  const on = r.pilote === 'police' && Math.sin(temps * 14) > 0;
+  m.gyros[0].material.emissiveIntensity = r.pilote === 'police' ? (on ? 4 : 0.1) : 0; m.gyros[1].material.emissiveIntensity = r.pilote === 'police' ? (on ? 0.1 : 4) : 0;
+}
+function pasRobot(r) {
+  const d = dist(r, J);
+  bruit(0.7 * clamp(1 - d / 120, 0, 1), 150, 0.35);
+  J.secousse = Math.max(J.secousse || 0, 0.25 * clamp(1 - d / 40, 0, 1));   // la caméra tremble quand il est tout près
+}
+// il bute contre les murs et les voitures, et ne va pas dans l'eau profonde
+function bougerRobot(r, ax, az) {
+  resoudre(r, 1.3, 4.5);
+  for (const o of voitures) for (const lz of o.cercles) {
+    const c = local(o, 0, lz), d = dist(c, r), rr = o.rayon + 1.3;
+    if (d < rr && d > 0 && Math.abs(o.y - r.y) < 3) { r.x = c.x + (r.x - c.x) / d * rr; r.z = c.z + (r.z - c.z) / d * rr; }
+  }
+  if (profondeur(r.x, r.z) > 2) { r.x = ax; r.z = az; }
+  r.y = hauteurSol(r.x, r.z, r.y);
+}
+// le chemin vers B.J. quand le robot ne le voit pas : par les rues, comme les voitures de police.
+// r.noeud : le point du réseau des routes qu'il vise ; il le garde jusqu'à y être, puis prend le suivant vers B.J.
+function cheminRobot(r) {
+  if (!distPolice) return J;
+  const loin = k => Math.hypot(NOEUDS[k].x - r.x, NOEUDS[k].z - r.z);
+  if (r.noeud === undefined) { // d'abord, rejoindre la rue la plus proche
+    let best = Infinity;
+    NOEUDS.forEach((q, k) => { if (q.voisins.length && loin(k) < best) { best = loin(k); r.noeud = k; } });
+    if (r.noeud === undefined) return J;
+  }
+  if (loin(r.noeud) > 4) return NOEUDS[r.noeud];
+  const n = r.noeud, suivant = NOEUDS[n].voisins.reduce((m, k) => distPolice[k] < distPolice[m] ? k : m);
+  if (distPolice[suivant] >= distPolice[n]) return J;   // il est au plus près de B.J. par les rues
+  r.noeud = suivant;
+  return NOEUDS[suivant];
+}
+function majRobot(r, dt) {
+  const d = dist(r, J);
+  r.m.g.visible = d < 350;
+  if (r === J.robot) return;
+  let vitesse = 0, tangage = 0;
+  r.tire = false;
+  if (r.pilote === 'police' && etoiles === 0 && d > 60) r.supprimer = true;   // la police est semée : il s'en va
+  if (r.pilote === 'police' && etoiles > 0 && !J.mort) {
+    if ((r.vuTimer -= dt) <= 0) { r.vuTimer = 0.3; r.voitJ = d < 110 && voit({ x: r.x, z: r.z, y: r.y + 2 }, J); if (r.voitJ) r.noeud = undefined; else r.cible = cheminRobot(r); }
+    const cible = r.voitJ ? J : r.cible || J;
+    r.angle = lerpAngle(r.angle, angleVers(r, cible), 1.5 * dt);
+    if (!r.voitJ || d > 20) vitesse = R_.vitesseRobot;
+    tangage = Math.atan2(J.y + 1 - (r.y + 3.4), d);
+    if (r.voitJ && Math.abs(diffAngle(r.angle, angleVers(r, J))) < 0.35) {
+      r.tire = r.rafale > 0;
+      if ((r.cd -= dt) <= 0) { if (r.rafale-- > 0) { r.cd = 0.12; tirRobot(r, d); } else { r.rafale = 10; r.cd = entre(1.5, 2.5); } }
+      if ((r.cdRoq -= dt) <= 0) { r.cdRoq = entre(5, 8); roquetteRobot(r, d); }
+    }
+  }
+  if (vitesse) { const ax = r.x, az = r.z; r.x += Math.sin(r.angle) * vitesse * dt; r.z += Math.cos(r.angle) * vitesse * dt; bougerRobot(r, ax, az); }
+  animerRobot(r, vitesse, dt, tangage);
+  r.m.g.position.set(r.x, r.y, r.z); r.m.g.rotation.y = r.angle;
+}
+// une énorme balle : un trait jaune épais
+function balleLourde(a, b) { const m = new THREE.Mesh(GEO_BALLE, M_BALLE_LOURDE); m.position.copy(a); m.lookAt(b); m.scale.z = a.distanceTo(b); scene.add(m); effets.push({ o: m, vie: 0.06 }); }
+const boutRobot = (r, roquette) => { r.m.g.updateMatrixWorld(true); return roquette ? r.m.bras[1].arme.localToWorld(V3(0, 0, 0.9)) : r.m.canons.localToWorld(V3(0, 0, 1.15)); };
+function tirRobot(r, d) {
+  const depart = boutRobot(r, false), arrivee = V3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
+  let chance = R_.precisionPros * clamp(1.2 - d / 60, 0.2, 1);
+  if (J.accroupi) chance *= 0.5; if (J.vitesse > 6) chance *= 0.6; if (abrite()) chance *= 0.7;
+  const reussi = Math.random() < chance;
+  if (!reussi) arrivee.add(V3(entre(-2.5, 2.5), entre(-1, 2), entre(-2.5, 2.5)));
+  balleLourde(depart, arrivee); flash(depart, 1.1);
+  bruit(0.6 * clamp(1 - d / 150, 0.1, 1), 1100, 0.2);
+  if (!reussi) return;
+  blesserJoueur(R_.degatsRobot);
+  const v = J.voiture;   // la balle cabosse la voiture où tu es
+  if (v) { const D = versLocal(v, J.x - r.x, J.z - r.z), l = Math.hypot(D.x, D.z) || 1; abimer(v, V3(-D.x / l * v.forme.largeur / 2, 0.8, -D.z / l * v.forme.longueur / 2), V3(D.x / l, 0, D.z / l), R_.degatsRobot / 400, true); }
+}
+function roquetteRobot(r, d) {
+  const depart = boutRobot(r, true), arrivee = V3(J.x, J.y + 1, J.z);
+  if (Math.random() > R_.precisionPros * clamp(1.2 - d / 60, 0.3, 1)) { const a = entre(0, 6.3), e = entre(3, 6); arrivee.set(J.x + Math.sin(a) * e, 0, J.z + Math.cos(a) * e); arrivee.y = hauteurSol(arrivee.x, arrivee.z, J.y); }
+  flash(depart, 1.5); bruit(...SON_ARME.bazooka);
+  lancerRoquette(depart, arrivee, 150, 5, 250, R_.degatsRoquetteRobot, r);
+}
+// une balle ou une explosion sur le robot : d'abord la vitre de la cabine, ensuite le pilote (le reste est blindé)
+function toucherRobot(r, degats, objet = null, parJoueur = true) {
+  if (objet && !objet.userData.vitre && !objet.userData.piloteRobot) { bip(2600, 900, 0.1, 'sawtooth', 0.04); return; }   // ça ricoche sur le blindage
+  if (r.vieVitre > 0) { r.vieVitre -= degats; if (r.vieVitre <= 0) casserVitreRobot(r); return; }
+  if (r.pilote !== 'police') return;
+  r.vieP -= degats * (objet && objet === r.m.pilote.tete ? 2.5 : 1);
+  if (r.vieP > 0) return;
+  r.pilote = null; r.piloteMort = true; r.m.pilote.g.rotation.x = 0.5;   // il s'effondre sur les commandes
+  if (parJoueur) crime(1);
+  if (dist(r, J) < 100) annonce('', 'Pilote abattu : monte dans le robot (touche E) !', 3);
+}
+function casserVitreRobot(r) {
+  const v = r.m.vitre;
+  r.vieVitre = 0; r.m.g.updateMatrixWorld(true); eclats(v, 24); v.parent.remove(v);
+  bruit(0.6, 9000, 0.5); bip(2800, 1800, 0.3, 'triangle', 0.1);
+  if (dist(r, J) < 100) annonce('', 'La vitre du robot est cassée : vise le pilote, ou éjecte-le (touche E) !', 3);
+}
+const robotProche = () => robots.find(r => r !== J.robot && dist(r, J) < 3.8 && Math.abs(r.y - J.y) < 2);
+function ejecterPilote(r) {
+  r.pilote = null; r.m.torse.remove(r.m.pilote.g);
+  const f = creerPersonne('flic', r.x + Math.cos(r.angle) * 2.6, r.z - Math.sin(r.angle) * 2.6);
+  f.alerte = true; f.renfort = true; f.vie = r.vieP; resoudre(f, 0.35);
+  annonce('', 'Pilote éjecté ! Monte dans le robot (touche E)', 3);
+}
+function monterRobot(r) {
+  if (r.m.pilote.g.parent) r.m.torse.remove(r.m.pilote.g);   // le pilote abattu sort de la cabine
+  J.robot = r; r.pilote = 'joueur'; J.accroupi = false; J.danse = 0; J.lacet = r.angle; J.tangage = 0;
+  joueurH.jambeD.visible = joueurH.jambeG.visible = false;   // assis dans la cabine : ses jambes sont dans la caisse
+  annonce('HEAVY ROBOT !', 'Clic gauche : mitrailleuse · clic droit : roquettes · E : descendre', 4);
+}
+function sortirRobot() {
+  const r = J.robot;
+  J.robot = null; r.pilote = null; joueurH.jambeD.visible = joueurH.jambeG.visible = true;
+  J.x = r.x + Math.cos(r.angle) * 2.6; J.z = r.z - Math.sin(r.angle) * 2.6; J.y = hauteurSol(J.x, J.z, r.y + 1); J.vy = 0;
+  resoudre(J, 0.35);
+}
+// tu pilotes le robot : il marche où tu vas (Z Q S D, Maj pour aller plus vite) et se tourne vers où tu regardes
+function piloterRobot(r, dt) {
+  const av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
+  const mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat, n = Math.hypot(mx, mz);
+  const v = touche('ShiftLeft', 'ShiftRight') ? 6 : R_.vitesseRobot;
+  if (n) { const ax = r.x, az = r.z; r.x += mx / n * v * dt; r.z += mz / n * v * dt; bougerRobot(r, ax, az); }
+  r.angle = lerpAngle(r.angle, J.lacet, 3 * dt);
+  r.tire = sourisG && r.munitions.lourde > 0;
+  animerRobot(r, n ? v : 0, dt, J.tangage);
+  r.m.g.position.set(r.x, r.y, r.z); r.m.g.rotation.y = r.angle;
+  J.x = r.x; J.z = r.z; J.y = r.y; J.vitesse = n ? v : 0;
+  // B.J. est assis dans la cabine
+  r.m.g.updateMatrixWorld(true);
+  joueurH.g.position.copy(r.m.torse.localToWorld(V3(0, 1.45 - 1.82, 0.3))); joueurH.g.rotation.set(0, r.angle, 0);
+  if (joueurH.arme) joueurH.arme.visible = false;
+  animerHumain(joueurH, 0, dt, { assis: true });
+}
+function apparaitreRobot() {
+  const proches = NOEUDS.filter(n => { const d = Math.hypot(n.x - J.x, n.z - J.z); return d > 70 && d < 170 && n.voisins.length; });
+  for (let essai = 0; essai < 20 && proches.length; essai++) {
+    const n = hasard(proches);
+    if (voit({ x: n.x, z: n.z, y: n.y + 2 }, J) || robots.some(o => dist(o, n) < 10)) continue;
+    creerRobot(n.x, n.z, angleVers(n, J));
+    annonce('', 'Le heavy robot de la police arrive !', 3); bruit(0.6, 120, 1.2);
+    return;
+  }
+}
 
 // repère de mission : colonne lumineuse (ou flèche au-dessus de la cible)
 const repere = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 5, 24, 1, true),
@@ -2568,11 +3450,17 @@ scene.add(fleche);
 // =====================================================================
 //  État du jeu
 // =====================================================================
-let etoiles = 0, tempsCalme = 0, vuParPolice = false, tVu = 0, tRenfort = 0, tVoiturePolice = 0, tPeupler = 0, temps = 0;
+let etoiles = 0, tempsCalme = 0, vuParPolice = false, tVu = 0, tRenfort = 0, tVoiturePolice = 0, tRobot = 15, tPeupler = 0, temps = 0;
 let saisie = null; // code de triche en cours de frappe
 let missionIndex = 0, etapeIndex = 0, enJeu = false, visee = false, sourisG = false, dejaTire = false, tempsAnnonce = 0;
 const touches = {};
-pnjDepart.forEach(p => creerPersonne(p.type, p.x, p.z, undefined, p.y));
+pnjDepart.forEach(p => {
+  const q = creerPersonne(p.type, p.x, p.z, undefined, p.y);
+  q.braquage = p.braquage;
+  if (p.arme !== undefined) { q.armeIdx = p.arme; donnerArme(q.h, p.arme); if (ARMES[p.arme].auto) q.rafale = 0; }   // un vigile, avec son arme
+});
+// les garagistes de LS Customs attendent devant leur établi
+for (const g of garagistes) { const h = creerHumain(TENUES.garagiste()); h.g.position.set(g.x, g.y, g.z); animerHumain(h, 0, 0); scene.add(h.g); }
 const typeNomme = nom => nom && VOITURES.find(t => t.nom === nom);
 voituresGarees.forEach(v => creerVoiture(v.x, v.z, v.a, !!v.police, typeNomme(v.type) || undefined));
 bateauxDepart.forEach(b => creerVoiture(b.x, b.z, b.a, false, typeNomme(b.type) || undefined));
@@ -2603,19 +3491,19 @@ addEventListener('keydown', e => {
   if (suite === SUITE_DANSE) { suite = ''; danser(); }
   if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
-  if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture) J.accroupi = !J.accroupi;
-  if (e.code.startsWith('Digit')) changerArme(+e.code.slice(5) - 1);
+  if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot) J.accroupi = !J.accroupi;
+  if (e.code.startsWith('Digit') && !J.robot) changerArme(+e.code.slice(5) - 1);
 });
 addEventListener('keyup', e => touches[e.code] = false);
 const touche = (...codes) => codes.some(c => touches[c]) ? 1 : 0;
-const dansLunette = () => visee && !J.voiture && !J.mort && !!ARMES[J.arme].zoom; // on regarde dans la lunette du sniper
+const dansLunette = () => visee && !J.voiture && !J.robot && !J.mort && !!ARMES[J.arme].zoom; // on regarde dans la lunette du sniper
 addEventListener('mousedown', e => { if (!enJeu || carte.ouverte) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
 addEventListener('mouseup', e => { if (e.button === 0) { sourisG = false; dejaTire = false; } if (e.button === 2) visee = false; });
 addEventListener('contextmenu', e => e.preventDefault());
 addEventListener('wheel', e => {
   if (!enJeu) return;
   if (carte.ouverte) { zoomerCarte(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 33 : 1) * 0.0015)); return; }
-  if (J.voiture) return;
+  if (J.voiture || J.robot) return;
   for (let k = 1; k <= ARMES.length; k++) { const i = (J.arme + (e.deltaY > 0 ? k : -k) + ARMES.length * 2) % ARMES.length; if (J.possede[i]) { changerArme(i); break; } }
 });
 addEventListener('mousemove', e => {
@@ -2637,9 +3525,12 @@ function validerTriche() {
     $('triche').textContent = 'Code : _'; $('triche').style.display = 'block';
     return;
   }
-  const t = TRICHES.find(t => t.code.toUpperCase() === saisie);
+  // un code, ou un code avec une action suivi d'un nombre (MISSION8)
+  const t = TRICHES.find(t => t.code.toUpperCase() === saisie) || TRICHES.find(t => t.action && /^\d+$/.test(saisie.slice(t.code.length)) && saisie.startsWith(t.code.toUpperCase()));
+  const n = t && +saisie.slice(t.code.length);
   saisie = null; $('triche').style.display = 'none';
   if (!t) { annonce('', 'Code inconnu', 1.5); return; }
+  if (t.action) { t.action(n); if (t.code !== 'MISSION') annonce('', t.texte, 2.5); return; }
   t.actif = !t.actif; // retaper un code annule son effet
   rhabillerBJ();
   annonce('', t.actif ? t.texte : `${t.texte} (annulé)`, 2);
@@ -2657,7 +3548,7 @@ function rhabillerBJ() {
 const SUITE_DANSE = (R_.touchesDanse.join(' ') + ' ').repeat(3);
 let suite = '';   // les dernières touches tapées
 function danser() {
-  if (J.voiture || J.nage || J.mort) return;   // on ne danse qu'à pied
+  if (J.voiture || J.robot || J.nage || J.mort) return;   // on ne danse qu'à pied
   for (const k in touches) touches[k] = false;  // la dernière touche est encore enfoncée : on l'oublie, sinon elle arrêterait la danse
   J.danse = 0.001; J.angleDanse = J.lacet + Math.PI / 2; J.vue = 3; J.accroupi = false;
   annonce('', 'Moonwalk !', 2);
@@ -2697,8 +3588,16 @@ function ascenseurProche() {
 function action() {
   if (J.mort) return;
   if (J.voiture) { if (!J.voiture.rail) sortirVoiture(); return; }   // pas en plein looping !
+  if (J.robot) { sortirRobot(); return; }
   const s = standProche();
   if (s) { acheter(s); return; }
+  const g = garagisteProche();
+  if (g) { payerBlindage(g); return; }
+  const o = butinProche();
+  if (o) { voler(o); return; }
+  const r = robotProche();   // le heavy robot : on éjecte son pilote (vitre cassée), ou on monte dedans (plus de pilote)
+  if (r && r.pilote === 'police' && r.vieVitre <= 0) { ejecterPilote(r); return; }
+  if (r && !r.pilote) { monterRobot(r); return; }
   const a = ascenseurProche();
   if (a) { J.x = a.vers.x; J.z = a.vers.z; J.y = a.vers.y; J.vy = 0; bip(400, 800, 0.4, 'sine', 0.2); return; }
   const v = voitureProche();
@@ -2710,7 +3609,30 @@ function voitureProche() {
   for (const o of voitures) { const d = dist(o, J); if (d < best && d < o.forme.longueur / 2 + 1.3 && !o.detruite && !o.coule && Math.abs(o.y - J.y) < 2.5) { best = d; v = o; } }
   return v;
 }
+const garagisteProche = () => garagistes.find(g => dist(g, J) < 2.5 && Math.abs(g.y - J.y) < 1.5);
+// le garagiste blinde, façon Mad Max, la voiture rapide garée dans son garage
+function payerBlindage(g) {
+  // la voiture du garage : de préférence une voiture rapide pas encore blindée, sinon la plus proche
+  const proches = voitures.filter(o => dist(o, g) < 14 && !o.detruite && !o.coule && !o.type.bateau).sort((a, b) => dist(a, g) - dist(b, g));
+  const v = proches.find(o => o.type.vitesse >= R_.vitesseBlindable && !o.forme.ouvert && !estBlindee(o)) || proches[0];
+  const dit = texte => annonce('', `Le garagiste : « ${texte} »`, 4);
+  if (!v) return dit('Amène-moi une voiture rapide dans le garage, et je te la blinde.');
+  if (estBlindee(v)) return dit('Elle est déjà blindée !');
+  if (v.type.vitesse < R_.vitesseBlindable || v.forme.ouvert) return dit(`Ta ${v.type.nom} n'est pas assez rapide. Il me faut une voiture rapide, comme une Porsche.`);
+  if (J.argent < R_.prixBlindage) return dit(`Le blindage, c'est ${R_.prixBlindage} $. Reviens quand tu les auras.`);
+  J.argent -= R_.prixBlindage; v.blindee = true; habillerVoiture(v);
+  for (let k = 0; k < 12; k++) { const p = local(v, entre(-1, 1) * v.forme.largeur / 2, entre(-1, 1) * v.forme.longueur / 2); etincelles(V3(p.x, v.y + entre(0.3, 1.1), p.z), 5); }   // la soudure
+  bruit(0.5, 5000, 0.8); bip(700, 1400, 0.3, 'sine', 0.3);
+  annonce('MAD MAX !', `Ta ${v.type.nom} est blindée : les balles ne passent plus, et elle tient ${R_.roquettesBlindage} roquettes`, 4);
+}
 function acheter(s) {
+  if (s.masque) { // le masque à gaz : on n'en a besoin que d'un
+    if (J.masque) { annonce('', 'Tu as déjà un masque à gaz', 2); return; }
+    if (J.argent < R_.prixMasque) { annonce('Pas assez d\'argent', `Il te faut ${R_.prixMasque} $`, 2); bip(300, 200, 0.2, 'square', 0.2); return; }
+    J.argent -= R_.prixMasque; J.masque = true; bip(700, 1400, 0.2, 'sine', 0.3);
+    annonce('Masque à gaz acheté !', 'Il te protège de la fumée toxique', 2.5);
+    return;
+  }
   const a = ARMES[s.arme], possede = J.possede[s.arme], prix = possede ? Math.round(a.prix / 2) : a.prix;
   if (J.argent < prix) { annonce('Pas assez d\'argent', `Il te faut ${prix} $`, 2); bip(300, 200, 0.2, 'square', 0.2); return; }
   J.argent -= prix; J.possede[s.arme] = true; J.balles[s.arme] += a.munitions;
@@ -2744,19 +3666,21 @@ function positionTir() {
   joueurH.g.updateMatrixWorld(true);
   return boutDuCanon(joueurH, vTmp);
 }
-function tirer() {
-  const a = ARMES[J.arme];
-  J.cooldown = a.cadence; J.angleCorps = J.lacet;
+// a : l'arme (dans le heavy robot, sa mitrailleuse ou ses roquettes : ARMES_ROBOT)
+function tirer(a = ARMES[J.arme]) {
+  const rb = J.robot, stock = rb ? rb.munitions : J.balles, k = rb ? a.modele : J.arme;
+  if (rb) rb.cdJ[a.modele] = a.cadence; else { J.cooldown = a.cadence; J.angleCorps = J.lacet; }
   if (a.corps) { frapper(a); return; }
-  if (J.balles[J.arme] <= 0) { bip(1000, 900, 0.05, 'square', 0.15); annonce('', 'Plus de munitions', 1); J.cooldown = 0.3; return; }
-  J.balles[J.arme]--; J.recul = 1;
+  if (stock[k] <= 0) { bip(1000, 900, 0.05, 'square', 0.15); annonce('', 'Plus de munitions', 1); if (!rb) J.cooldown = 0.3; return; }
+  stock[k]--; J.recul = 1;
   bruit(...SON_ARME[a.modele]);
-  const depart = positionTir().clone();
-  if (J.vue === 1) flash(vTmp2.set(0, 0.03, -0.75).applyMatrix4(vm.matrixWorld), 0.25, vmScene); else flash(depart);
+  const depart = rb ? boutRobot(rb, a.explosion) : positionTir().clone();
+  if (J.vue === 1 && !rb) flash(vTmp2.set(0, 0.03, -0.75).applyMatrix4(vm.matrixWorld), 0.25, vmScene); else flash(depart, rb ? 1.1 : 0.6);
   lumiereTir.position.copy(depart); lumiereTir.intensity = 70;
-  const cibles = [...batiments, ...personnes.filter(p => p.vie > 0 && dist(p, J) < a.portee + 5 && p.h.g.visible).map(p => p.h.g), ...voitures.filter(v => v.m.visible).map(v => v.m)];
+  const cibles = [...batiments, ...personnes.filter(p => p.vie > 0 && dist(p, J) < a.portee + 5 && p.h.g.visible).map(p => p.h.g), ...voitures.filter(v => v.m.visible).map(v => v.m),
+    ...robots.filter(r => r !== rb && r.m.g.visible).map(r => r.m.g), ...braquages.filter(B => dist(B, J) < 150).flatMap(B => B.tourelles.filter(t => t.vie > 0 && t.sortie > 0).map(t => t.m))];
   raycaster.far = a.portee;
-  raycaster.near = J.vue === 3 ? camera.position.distanceTo(vTmp2.set(J.x, J.y + 1.5, J.z)) : 0;
+  raycaster.near = rb ? camera.position.distanceTo(vTmp2.set(rb.x, rb.y + 3.4, rb.z)) + 1 : J.vue === 3 ? camera.position.distanceTo(vTmp2.set(J.x, J.y + 1.5, J.z)) : 0;
   for (let k = 0; k < (a.plombs || 1); k++) {
     const d = (a.dispersion || 0.004) * (visee ? 0.5 : 1) * (J.vitesse > 5 ? 2 : 1);
     raycaster.setFromCamera(new THREE.Vector2(entre(-d, d), entre(-d, d)), camera);
@@ -2766,27 +3690,31 @@ function tirer() {
     const point = hit ? hit.point : raycaster.ray.at(Math.min(t, a.portee), new THREE.Vector3());
     if (a.explosion) { // roquette : elle part du canon vers le viseur
       flash(depart, J.vue === 1 ? 0.6 : 1.5);
-      lancerRoquette(depart, point, a.portee, a.explosion, a.degats, R_.degatsExplosion, null);
+      lancerRoquette(depart, point, a.portee, a.explosion, a.degats, R_.degatsExplosion, null, rb);
       continue;
     }
     if (hit || t < Infinity) {
-      const p = hit?.object.userData.personne;
+      const u = hit?.object.userData || {}, p = u.personne;
       if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
-      const vc = !p && hit?.object.userData.voiture;
+      const vc = !p && u.voiture;
       if (vc) { // une voiture : un petit trou dans la tôle, et la vitre touchée se fêle (puis se brise)
         const q = vc.m.quaternion.clone().invert();
         abimer(vc, vc.m.worldToLocal(hit.point.clone()), raycaster.ray.direction.clone().applyQuaternion(q), a.degats / 400, true);
       }
+      if (!p && !vc && u.robot) toucherRobot(u.robot, a.degats, hit.object);   // le heavy robot : la vitre, puis le pilote
+      if (!p && !vc && u.tourelle && (u.tourelle.vie -= a.degats) <= 0) { // une mitrailleuse de la banque, détruite
+        const tr = u.tourelle; tr.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
+      }
       flash(point, 0.3);
     }
-    traceur(depart, point);
+    if (a.modele === 'lourde') balleLourde(depart, point); else traceur(depart, point);
   }
-  // le bruit fait fuir les piétons et alerte soldats et policiers
+  // le bruit fait fuir les piétons et alerte soldats, vigiles et policiers
   for (const p of personnes) {
     if (p.vie <= 0) continue;
     const d = dist(p, J);
     if (p.type === 'pieton' && d < 40) p.peur = 8;
-    if (NAZIS.includes(p.type) && d < 50) p.alerte = true;
+    if ((NAZIS.includes(p.type) || VIGILES.includes(p.type)) && d < 50) { p.alerte = true; declencherAlarme(p.braquage); }
     if (p.type === 'flic' && d < 30 && etoiles === 0) crime(1);
   }
 }
@@ -2810,33 +3738,38 @@ function blesser(p, degats, parJoueur = true) {
   p.vie -= degats; p.alerte = true;
   if (p.type === 'pieton') p.peur = 8;
   if (p.type === 'flic' && etoiles === 0 && parJoueur) crime(1);
+  declencherAlarme(p.braquage);   // un vigile ou un chien touché : l'alarme sonne
   if (p.vie > 0) return;
   // il tombe et lâche quelque chose
   p.mort = 0.001;
   if (p.type === 'pieton') { if (parJoueur) crime(1); if (Math.random() < 0.6) creerObjet({ type: 'argent', montant: 10 + Math.floor(Math.random() * 60), x: p.x, z: p.z , y: p.y }); }
-  if (p.type === 'flic') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: 2, x: p.x, z: p.z , y: p.y }); }
+  if (p.type === 'flic') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.elite ? 5 : 2, x: p.x, z: p.z , y: p.y }); }
+  if (p.type === 'garde') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
   if (p.type === 'soldat') creerObjet({ type: 'arme', arme: Math.random() < 0.5 ? 3 : 5, x: p.x, z: p.z , y: p.y });
   if (p.type === 'boss') { creerObjet({ type: 'arme', arme: 4, x: p.x + 1, z: p.z , y: p.y }); creerObjet({ type: 'argent', montant: 1000, x: p.x - 1, z: p.z , y: p.y }); }
   if (p.type === 'hitler') { creerObjet({ type: 'arme', arme: 6, x: p.x + 1, z: p.z , y: p.y }); creerObjet({ type: 'argent', montant: 2000, x: p.x - 1, z: p.z , y: p.y }); }
 }
 const abrite = () => J.voiture && !J.voiture.forme.ouvert;   // une carrosserie protège, pas un tricycle
 function blesserJoueur(degats) {
-  if (J.mort) return;
-  const d = degats * (abrite() ? R_.protectionVoiture : 1), g = Math.min(J.gilet, d); // le gilet prend les dégâts en premier
+  if (J.mort || estBlindee(J.voiture)) return;   // dans une voiture blindée, rien ne passe
+  const d = degats * (abrite() ? R_.protectionVoiture : J.robot ? R_.protectionRobot : 1), g = Math.min(J.gilet, d); // le gilet prend les dégâts en premier
   J.gilet -= g; J.vie -= d - g;
   J.dernierDegat = temps;
   $('rouge').style.opacity = 0.9;
   bip(180, 90, 0.15, 'triangle', 0.3);
-  if (J.vie <= 0) { J.vie = 0; J.mort = 0.001; $('wasted').style.display = 'block'; renderer.domElement.style.filter = 'grayscale(1) brightness(.7)'; bip(200, 50, 1.5, 'sine', 0.4); }
+  if (J.vie <= 0) mourir();
 }
+function mourir() { J.vie = 0; J.mort = 0.001; $('wasted').style.display = 'block'; renderer.domElement.style.filter = 'grayscale(1) brightness(.7)'; bip(200, 50, 1.5, 'sine', 0.4); }
 function reapparaitre() {
   J.mort = 0; J.vie = R_.viesJoueur; J.argent = Math.max(0, J.argent - 100);
   if (J.voiture) sortirVoiture();
+  if (J.robot) sortirRobot();
   const h = hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);   // l'hôpital le plus proche
   J.x = h.x; J.z = h.z; J.y = hauteurSol(J.x, J.z); J.vy = 0; J.lacet = 0; J.accroupi = false; J.nage = false;
   etoiles = 0;
   for (const p of personnes) { p.alerte = false; if (p.renfort) p.supprimer = true; }
   for (const v of voitures) if (v.police && v.renfort) v.supprimer = true;
+  for (const r of robots) if (r.pilote === 'police') r.supprimer = true;
   $('wasted').style.display = 'none'; renderer.domElement.style.filter = '';
   annonce('', 'Tu te réveilles à l\'hôpital le plus proche (-100 $)', 3);
 }
@@ -2868,6 +3801,7 @@ function majJoueur(dt) {
     const c = local(o, 0, lz), d = dist(c, J), r = o.rayon + 0.35;
     if (d < r && d > 0) { J.x = c.x + (J.x - c.x) / d * r; J.z = c.z + (J.z - c.z) / d * r; }
   }
+  for (const o of robots) { const d = dist(o, J), r = 1.6; if (d < r && d > 0 && Math.abs(o.y - J.y) < 4) { J.x = o.x + (J.x - o.x) / d * r; J.z = o.z + (J.z - o.z) / d * r; } }   // ni à travers le robot
   // orientation du corps : celle de la danse, sinon vers la caméra avec une arme à feu, sinon vers où on marche
   const danse = J.danse ? pasDeDanse(dt) : null;
   if (!danse) {
@@ -2883,15 +3817,16 @@ function majJoueur(dt) {
 function conduire(v, dt) {
   const gaz = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), volant = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
   const t = v.type, auSol = !v.enAir && !v.rail;   // en l'air, les roues ne touchent rien : ni gaz, ni frein, ni volant
+  const lourd = v.blindee ? R_.lourdeurBlindage : 1, acc = t.acceleration * lourd;   // le blindage Mad Max pèse lourd
   if (auSol) {
-    if (gaz > 0) v.vitesse += t.acceleration * dt * (v.vitesse < 0 ? 2.5 : 1);
-    else if (gaz < 0) v.vitesse -= t.acceleration * dt * (v.vitesse > 0 ? 2.5 : 0.6);
+    if (gaz > 0) v.vitesse += acc * dt * (v.vitesse < 0 ? 2.5 : 1);
+    else if (gaz < 0) v.vitesse -= acc * dt * (v.vitesse > 0 ? 2.5 : 0.6);
     else v.vitesse *= Math.pow(0.6, dt);
     if (touches.Space) v.vitesse *= Math.pow(0.05, dt); // frein à main
     if (!t.bateau) v.vitesse -= R_.graviteVoiture * Math.sin(v.tangage) * dt;   // la pente freine en montée et pousse en descente
   }
   // un moteur abîmé (l'avant) ne pousse plus aussi vite
-  if (!v.rail) v.vitesse = clamp(v.vitesse, -10, t.vitesse * (1 - 0.45 * v.degats.avant));
+  if (!v.rail) v.vitesse = clamp(v.vitesse, -10, t.vitesse * lourd * (1 - 0.45 * v.degats.avant));
   v.gaz = gaz * Math.sign(v.vitesse || gaz) > 0 ? 1 : 0;   // on accélère (pour le bruit du moteur) : pas quand on freine
   const braquage = clamp(Math.abs(v.vitesse) / 6, 0, 1) * (1 - Math.abs(v.vitesse) / t.vitesse * 0.5) * Math.sign(v.vitesse) * (auSol ? 1 : 0);
   // des roues avant tordues tirent la voiture d'un côté : il faut tenir le volant
@@ -2935,6 +3870,13 @@ function bougerVoiture(v, dt, parJoueur) {
         v.x += nx * (r - d); v.z += nz * (r - d); choc = true;
         noter((a.x + b.x) / 2, (a.z + b.z) / 2, nx, nz, -((vx - Math.sin(o.angle) * o.vitesse) * nx + (vz - Math.cos(o.angle) * o.vitesse) * nz), o);
       }
+    }
+  }
+  for (const o of robots) { // le heavy robot : aussi solide qu'un mur
+    if (Math.abs(o.y - v.y) > 3) continue;
+    for (const lz of v.cercles) {
+      const a = local(v, 0, lz), d = dist(a, o), r = v.rayon + 1.3;
+      if (d < r && d > 0) { const nx = (a.x - o.x) / d, nz = (a.z - o.z) / d; v.x += nx * (r - d); v.z += nz * (r - d); choc = true; noter(a.x - nx * v.rayon, a.z - nz * v.rayon, nx, nz, -(vx * nx + vz * nz)); }
     }
   }
   if (choc) {
@@ -3067,18 +4009,22 @@ function majPersonne(p, dt) {
   p.h.g.visible = d < 220;
   if (p.vie <= 0) {
     p.mort = Math.min(1, p.mort + dt * 3);
-    animerHumain(p.h, 0, dt, { mort: p.mort });
-    p.h.g.position.y = p.y + p.mort * 0.12;
+    if (p.h.chien) animerChien(p.h, 0, dt, p.mort); else animerHumain(p.h, 0, dt, { mort: p.mort });
+    p.h.g.position.y = p.y + p.mort * (p.h.chien ? 0.15 : 0.12);
     p.tempsMort = (p.tempsMort || 0) + dt;
     if (p.tempsMort > 15) p.supprimer = true;
     return;
   }
+  if (p.h.chien) { majChien(p, dt, d); return; }
   p.cooldown -= dt; p.peur -= dt;
   let vitesse = 0, arme = false;
-  const hostile = NAZIS.includes(p.type) || (p.type === 'flic' && etoiles > 0);
+  const vigile = p.type === 'garde', hostile = NAZIS.includes(p.type) || vigile || (p.type === 'flic' && etoiles > 0);
   if (hostile && !J.mort) {
     p.vuTimer -= dt;
-    if (p.vuTimer <= 0) { p.vuTimer = 0.3; p.voitJ = d < (p.type === 'flic' ? 70 : 45) && voit(p, J); if (p.voitJ) p.alerte = true; }
+    if (p.vuTimer <= 0) { // un vigile n'attaque que s'il voit B.J. arme à la main, de près (ou si l'alarme sonne)
+      p.vuTimer = 0.3; p.voitJ = d < (p.type === 'flic' ? 70 : 45) && voit(p, J);
+      if (p.voitJ && !p.alerte && (!vigile || (d < 15 && armeEnMain()))) { p.alerte = true; declencherAlarme(p.braquage); }
+    }
     if (p.type === 'flic') p.alerte = true;
     if (p.alerte) {
       arme = true;
@@ -3086,7 +4032,9 @@ function majPersonne(p, dt) {
       p.angle = lerpAngle(p.angle, vise, 8 * dt);
       if (!p.voitJ || d > 22) vitesse = 4.5; else if (d < 6) vitesse = -2;
       if (p.voitJ && p.cooldown <= 0 && Math.abs(diffAngle(p.angle, vise)) < 0.3) {
-        p.cooldown = entre(1, 2) * ({ boss: 0.6, hitler: 1.5 }[p.type] || 1);
+        // les vigiles et les policiers d'élite à la mitraillette ou au fusil d'assaut tirent en rafales de 3 à 5 balles
+        if (p.rafale !== undefined) p.cooldown = p.rafale-- > 0 ? 0.13 : (p.rafale = 2 + Math.floor(Math.random() * 3), entre(1.2, 2));
+        else p.cooldown = entre(1, 2) * ({ boss: 0.6, hitler: 1.5 }[p.type] || 1);
         tirEnnemi(p, d);
       }
     }
@@ -3114,9 +4062,34 @@ function majPersonne(p, dt) {
     animerHumain(p.h, Math.abs(vitesse), dt, { arme });
   }
 }
+// B.J. a une arme à feu à la main (pas en voiture) : les vigiles et les chiens le remarquent
+const armeEnMain = () => !ARMES[J.arme].corps && !J.voiture && !J.robot;
+// un chien de garde : il court plus vite que B.J., mord, et aboie autour des voitures
+function majChien(p, dt, d) {
+  let vitesse = 0;
+  p.cooldown -= dt;
+  if ((p.vuTimer -= dt) <= 0) { p.vuTimer = 0.3; if (!p.alerte && d < 15 && armeEnMain() && voit(p, J)) { p.alerte = true; declencherAlarme(p.braquage); } }
+  if (p.alerte && !J.mort) {
+    p.angle = lerpAngle(p.angle, angleVers(p, J), 10 * dt);
+    const dedans = J.voiture || J.robot;   // il ne mord pas à travers la carrosserie
+    if (d > (dedans ? 3 : 1.1)) vitesse = 9;
+    else if (!dedans && p.cooldown <= 0) { p.cooldown = 0.9; blesserJoueur(R_.degatsChien); aboyer(p); }
+    if ((p.tAboie = (p.tAboie ?? entre(0.3, 1)) - dt) <= 0) { p.tAboie = entre(0.6, 1.4); aboyer(p); }
+  }
+  if (vitesse) {
+    p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt;
+    resoudre(p, 0.3);
+    p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]);
+    p.y = hauteurSol(p.x, p.z, p.y);
+  }
+  if (p.h.g.visible) { p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle; animerChien(p.h, vitesse, dt); }
+}
+function aboyer(p) { const f = clamp(1 - dist(p, J) / 60, 0, 1) * 0.4; bruit(f, 1400, 0.09); bip(560, 330, 0.11, 'sawtooth', f * 0.25); }
 function tirEnnemi(p, d) {
-  const degats = { flic: R_.degatsPolicier, soldat: R_.degatsSoldat, boss: R_.degatsBoss, hitler: R_.degatsHitler }[p.type];
-  let chance = R_.precisionEnnemis * clamp(1.2 - d / 50, 0.2, 1);
+  const arme = ARMES[p.armeIdx ?? ARME_PNJ[p.type]], pro = p.elite || p.type === 'garde';
+  // un fusil à pompe fait deux fois plus mal de près
+  const degats = (p.elite ? R_.degatsElite : { flic: R_.degatsPolicier, soldat: R_.degatsSoldat, boss: R_.degatsBoss, hitler: R_.degatsHitler, garde: R_.degatsGarde }[p.type]) * (arme.plombs && d < 15 ? 2 : 1);
+  let chance = (pro ? R_.precisionPros : R_.precisionEnnemis) * clamp(1.2 - d / 50, 0.2, 1);
   if (J.accroupi) chance *= 0.5;
   if (J.vitesse > 6) chance *= 0.6;
   if (abrite()) chance *= 0.7;
@@ -3124,10 +4097,10 @@ function tirEnnemi(p, d) {
   p.h.g.updateMatrixWorld(true);
   const depart = boutDuCanon(p.h, new THREE.Vector3());
   const arrivee = new THREE.Vector3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
-  if (ARMES[ARME_PNJ[p.type]].explosion) { // roquette : visée sur toi (ou à 3 à 6 m si ratée), elle vole : bouge pour l'esquiver !
+  if (arme.explosion) { // roquette : visée sur toi (ou à 3 à 6 m si ratée), elle vole : bouge pour l'esquiver !
     if (!reussi) { const a = entre(0, 6.3), r = entre(3, 6); arrivee.set(J.x + Math.sin(a) * r, 0, J.z + Math.cos(a) * r); arrivee.y = hauteurSol(arrivee.x, arrivee.z, J.y); }
     flash(depart, 1.5); bruit(...SON_ARME.bazooka);
-    lancerRoquette(depart, arrivee, 150, 5, ARMES[ARME_PNJ[p.type]].degats, degats, p); // elle blesse aussi les soldats sur son chemin
+    lancerRoquette(depart, arrivee, 150, 5, arme.degats, degats, p); // elle blesse aussi les soldats sur son chemin
     return;
   }
   if (!reussi) arrivee.add(new THREE.Vector3(entre(-2, 2), entre(-1, 1.5), entre(-2, 2)));
@@ -3172,15 +4145,17 @@ function calculerDistPolice() {
 }
 function majVoitureIA(v, dt) {
   const r = v.route;
-  if (v.police && dist(v, J) < 30) { // arrivés : les policiers descendent
+  if (v.police && dist(v, J) < 30) { // arrivés : les policiers descendent (4 policiers d'élite d'un fourgon blindé)
     v.conducteur = null;
-    for (const lx of [v.rayon + 0.85, -v.rayon - 0.85]) { const p = local(v, lx, 0), f = creerPersonne('flic', p.x, p.z); f.renfort = true; resoudre(f, 0.35); }
+    for (const lx of [v.rayon + 0.85, -v.rayon - 0.85]) for (const lz of v.type.blinde ? [-1.2, 1.2] : [0]) {
+      const p = local(v, lx, lz), f = v.type.blinde ? creerElite(p.x, p.z) : creerPersonne('flic', p.x, p.z); f.renfort = true; resoudre(f, 0.35);
+    }
     return;
   }
   const fx = Math.sin(v.angle), fz = Math.cos(v.angle);
   const devant = (o, portee, largeur) => { const dx = o.x - v.x, dz = o.z - v.z, a = dx * fx + dz * fz; return a > 0 && a < portee && Math.abs(dx * fz - dz * fx) < largeur; };
   const nez = v.forme.longueur / 2;   // les distances sont comptées depuis le milieu de la voiture : on ajoute sa demi-longueur
-  let bloque = voitures.some(o => o !== v && devant(o, 4.6 + nez + o.forme.longueur / 2, 2));
+  let bloque = voitures.some(o => o !== v && devant(o, 4.6 + nez + o.forme.longueur / 2, 2)) || robots.some(o => devant(o, 5 + nez, 2.5));
   if (!v.police) bloque ||= (!J.voiture && devant(J, 4.8 + nez, 1.6)) || personnes.some(p => p.vie > 0 && devant(p, 4.8 + nez, 1.6));
   v.attente = bloque ? v.attente + dt : 0;
   if (v.attente > 5) { // bloquée trop longtemps : demi-tour
@@ -3188,7 +4163,7 @@ function majVoitureIA(v, dt) {
     v.route = { a: r.b, b: r.a, t: longueurRoute(r) - r.t };
     return;
   }
-  const cible = bloque ? 0 : Math.min(v.type.vitesse, v.police ? R_.vitessePolice : R_.vitesseCirculation);
+  const cible = bloque ? 0 : Math.min(v.type.vitesse, v.type.blinde ? R_.vitesseBlindes : v.police ? R_.vitessePolice : R_.vitesseCirculation);
   v.vitesse += clamp(cible - v.vitesse, -25 * dt, 8 * dt);
   for (let k = 0; k < 40 && dist(v, pointRoute(r, r.t)) < 6; k++) {
     r.t += 0.5;
@@ -3243,7 +4218,7 @@ function majVoiture(v, dt) {
 }
 
 // faire apparaître piétons et voitures autour du joueur (hors de sa vue)
-function apparaitreVoiture(police) {
+function apparaitreVoiture(police, type) {
   const proches = [];
   NOEUDS.forEach((n, k) => { const d = Math.hypot(n.x - J.x, n.z - J.z); if (d > 40 && d < 240 && n.voisins.length) proches.push(k); });
   for (let essai = 0; essai < 20 && proches.length; essai++) {
@@ -3251,7 +4226,7 @@ function apparaitreVoiture(police) {
     r.t = entre(0, longueurRoute(r));
     const p = pointRoute(r, r.t), dd = dist(p, J);
     if (dd < (police ? 90 : 60) || dd > 230 || voitures.some(o => dist(o, p) < 12) || (dd < 130 && voit({ ...p, y: NOEUDS[a].y }, J))) continue;
-    const v = creerVoiture(p.x, p.z, angleVers(NOEUDS[r.a], NOEUDS[r.b]), police);
+    const v = creerVoiture(p.x, p.z, angleVers(NOEUDS[r.a], NOEUDS[r.b]), police, type);
     v.conducteur = police ? 'police' : 'civil'; v.route = r; v.renfort = police; v.vitesse = police ? 10 : 5;
     return v;
   }
@@ -3282,21 +4257,31 @@ function police(dt) {
   if (tempsCalme > R_.delaiPerteEtoile) {
     etoiles--; tempsCalme = 0;
     if (etoiles === 0) {
-      annonce('', 'Tu as semé la police !', 2.5);
+      annonce('', 'Tu as semé la police !', 2.5); renfortsRapides = 0;
       for (const p of personnes) if (p.renfort && dist(p, J) > 50) p.supprimer = true;
       for (const v of voitures) if (v.police && v.renfort && v !== J.voiture && dist(v, J) > 50) v.supprimer = true;
+      for (const r of robots) if (r.pilote === 'police' && dist(r, J) > 50) r.supprimer = true;
     }
   }
-  const flics = personnes.filter(p => p.type === 'flic' && p.vie > 0).length;
+  // les policiers à pied, plus ceux qui arrivent en voiture (2 par voiture, 4 par fourgon blindé)
+  const enRoute = voitures.filter(v => v.police && v.conducteur), blindes = enRoute.filter(v => v.type.blinde).length;
+  const flics = personnes.filter(p => p.type === 'flic' && p.vie > 0).length + enRoute.length * 2 + blindes * 2, max = R_.policiers[etoiles];
   tDistPolice -= dt;
-  if (tDistPolice <= 0 && voitures.some(v => v.police && v.conducteur)) { tDistPolice = 1; distPolice = calculerDistPolice(); }
+  if (tDistPolice <= 0 && (voitures.some(v => v.police && v.conducteur) || robots.some(r => r.pilote === 'police'))) { tDistPolice = 1; distPolice = calculerDistPolice(); }
+  // après une alarme de braquage, les renforts arrivent 3 fois plus vite pendant une minute
+  renfortsRapides -= dt;
+  const vite = renfortsRapides > 0 ? 3 : 1;
   tRenfort -= dt;
-  if (tRenfort <= 0 && flics < Math.min(R_.maxPoliciers, etoiles * 2)) { tRenfort = 4; const f = apparaitrePersonne('flic'); if (f) f.renfort = true; }
-  if (etoiles >= R_.etoilesVoituresPolice) {
-    tVoiturePolice -= dt;
-    const n = voitures.filter(v => v.police && v.conducteur).length;
-    if (tVoiturePolice <= 0 && n < Math.min(3, etoiles - 1) && flics < R_.maxPoliciers) { tVoiturePolice = 6; apparaitreVoiture(true); }
+  if (tRenfort <= 0 && flics < max) { tRenfort = 4 / vite; const f = apparaitrePersonne('flic'); if (f) f.renfort = true; }
+  tVoiturePolice -= dt;
+  if (tVoiturePolice <= 0 && enRoute.length < R_.voituresPolice[etoiles] && flics < max) {
+    tVoiturePolice = 6 / vite;
+    // à partir de 4 étoiles, une voiture sur deux est un fourgon blindé
+    apparaitreVoiture(true, etoiles >= R_.etoilesBlindes && blindes <= enRoute.length - blindes ? typeBlinde : typePolice);
   }
+  // à 5 étoiles, le heavy robot arrive (un à la fois, 15 s après le précédent)
+  if (etoiles < R_.etoilesRobot || robots.some(r => r.pilote === 'police')) tRobot = 15;
+  else if ((tRobot -= dt) <= 0) { tRobot = 15; apparaitreRobot(); }
 }
 
 // =====================================================================
@@ -3305,7 +4290,10 @@ function police(dt) {
 function etapeFinie(et) {
   switch (et.type) {
     case 'aller': return dist(J, lieuProche(et.lieu, J)) < 4;
-    case 'voiture': return J.voiture && dist(J, lieuProche(et.lieu, J)) < 7;
+    case 'voiture': { const v = J.voiture;   // rapide : une voiture rapide · blindee : une voiture blindée · sansPolice : 0 étoile
+      return !!v && dist(J, lieuProche(et.lieu, J)) < 7 && (!et.rapide || v.type.vitesse >= R_.vitesseBlindable) && (!et.blindee || estBlindee(v)) && (!et.sansPolice || etoiles === 0); }
+    case 'blindage': return voitures.some(v => v.blindee && !v.detruite);
+    case 'voler': return !butins.some(o => o.B.lettre === et.lieu && !o.outil && !o.pris);
     case 'eliminer': return !personnes.some(p => p.type === et.cible && p.vie > 0);
     case 'etoiles': return etoiles >= et.nombre;
     case 'semer': return etoiles === 0;
@@ -3315,7 +4303,12 @@ function etapeFinie(et) {
 function cibleMission() {
   const m = MISSIONS[missionIndex];
   if (!m) return null;
-  const et = m.etapes[etapeIndex];
+  const et = m.etapes[etapeIndex], proche = l => l.reduce((m, o) => !m || dist(o, J) < dist(m, J) ? o : m, null);
+  if (et.type === 'voler') { // ce qu'on peut prendre (ou actionner) tout de suite, sinon la suite
+    const reste = butins.filter(o => o.B.lettre === et.lieu && !o.pris), dispo = reste.filter(o => !o.apres || o.B[o.apres]);
+    return proche(dispo.length ? dispo : reste) || lieuProche(et.lieu, J);
+  }
+  if (et.type === 'blindage') return proche(garagistes);
   if (et.lieu) return lieuProche(et.lieu, J);
   if (et.type === 'eliminer') return personnes.find(p => p.type === et.cible && p.vie > 0) || null;
   if (et.type === 'arme') return objets.filter(o => o.type === 'stand' && o.arme === indexArme(et.arme)).reduce((m, o) => !m || dist(o, J) < dist(m, J) ? o : m, null) || lieuProche('A', J);
@@ -3326,9 +4319,24 @@ function missions() {
   if (!m || !etapeFinie(m.etapes[etapeIndex])) return;
   bip(500, 1500, 0.5, 'triangle', 0.3);
   if (++etapeIndex < m.etapes.length) return;
-  J.argent += m.recompense;
+  J.argent += m.recompense; J.sac = 0;   // le butin est livré à la planque
   missionIndex++; etapeIndex = 0;
-  annonce(missionIndex < MISSIONS.length ? 'MISSION RÉUSSIE' : 'BRAVO !', missionIndex < MISSIONS.length ? `${m.nom} : +${m.recompense} $` : 'Toutes les missions sont finies !', 4);
+  annonce(missionIndex < MISSIONS.length ? 'MISSION RÉUSSIE' : 'BRAVO !', missionIndex < MISSIONS.length ? `${m.nom}${m.recompense ? ` : +${montant(m.recompense)}` : ''}` : 'Toutes les missions sont finies !', 4);
+}
+const montant = n => `${n.toLocaleString('fr-FR')} $`;   // 250000 → « 250 000 $ »
+// le code de triche MISSION8 : on saute à la mission 8. Si elle a besoin d'une voiture blindée, il y en a une à côté
+function sauterMission(n) {
+  missionIndex = clamp(Math.round(n) - 1, 0, MISSIONS.length); etapeIndex = 0; J.sac = 0;
+  const m = MISSIONS[missionIndex];
+  if (m?.etapes.some(e => e.blindee) && !voitures.some(v => v.blindee && !v.detruite) && !J.voiture) {
+    for (let k = 0; k < 16; k++) { // une place libre autour de B.J.
+      const a = k * Math.PI / 8, x = J.x + Math.sin(a) * 5, z = J.z + Math.cos(a) * 5, y = hauteurSol(x, z, J.y + 0.6);
+      if (Math.abs(y - J.y) > 0.8 || [-1, 0, 1].some(e => dansBatiment(x + Math.cos(a) * e * 2.5, y + 1, z - Math.sin(a) * e * 2.5))) continue;
+      const v = creerVoiture(x, z, a + Math.PI / 2, false, typeNomme('Porsche')); v.blindee = true; habillerVoiture(v);
+      break;
+    }
+  }
+  annonce(`MISSION ${missionIndex + 1}`, m ? m.nom : 'Pays libre', 3);
 }
 
 // =====================================================================
@@ -3362,11 +4370,16 @@ function majCamera(dt) {
     if (J.vue === 1 && v.quat) { v.m.updateMatrixWorld(); camera.position.copy(v.m.localToWorld(V3(ox, oy, oz))); }   // dans un looping, on tourne avec la voiture
     else if (J.vue === 1) { const p = local(v, ox, oz); camera.position.set(p.x, v.y + oy, p.z); }
     else placerCamera(new THREE.Vector3(v.x, v.y + v.forme.hauteur + 0.35, v.z), dir, v.forme.longueur + 3.6 + Math.abs(v.vitesse) * 0.08, 0); // plus la voiture est grande, plus on recule
+  } else if (J.robot) { // dans le heavy robot : derrière son épaule, ou dans la cabine
+    const r = J.robot;
+    if (J.vue === 1) { r.m.g.updateMatrixWorld(true); camera.position.copy(r.m.torse.localToWorld(V3(0, 1.5, 0.75))); }
+    else placerCamera(new THREE.Vector3(r.x, r.y + 4.4, r.z), dir, 7.5, 1.4);
   } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
   else placerCamera(new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z), dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
   camera.rotation.set(J.tangage + J.recul * 0.03, J.lacetCam + Math.PI, 0);
   if (v && v.quat && J.vue === 1) camera.quaternion.copy(v.quat).multiply(DEMI_TOUR);
-  const fov = dansLunette() ? 70 / ARMES[J.arme].zoom : visee && !v ? 45 : 70;
+  if (J.secousse > 0.005) { camera.position.x += entre(-1, 1) * J.secousse; camera.position.y += entre(-1, 1) * J.secousse; J.secousse *= Math.pow(0.01, dt); }   // les pas du robot font trembler
+  const fov = dansLunette() ? 70 / ARMES[J.arme].zoom : visee && !v && !J.robot ? 45 : 70;
   if (Math.abs(camera.fov - fov) > 0.1) { camera.fov += (fov - camera.fov) * Math.min(1, dt * 10); camera.updateProjectionMatrix(); }
 }
 
@@ -3377,7 +4390,8 @@ function majCamera(dt) {
 const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital'], C: ['#1a3a9a', 'P', 'Commissariat'], G: ['#7a3ac0', 'G', 'LS Customs'],
   K: ['#1a7a3a', '$', 'Banque'], S: ['#0a7a3a', 'S', 'Supérette'], E: ['#c01818', 'E', 'Station-service'], Z: ['#801010', 'Z', 'Tour Maze Bank'],
   L: ['#2a9a2a', 'F', 'Maison de Franklin'], O: ['#2a6ad8', 'M', 'Villa de Michael'], R: ['#e07a10', 'T', 'Caravane de Trevor'], J: ['#b89a10', 'Y', 'Yellow Jack'],
-  B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'] };
+  B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'],
+  U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'] };
 const REPERES = [];   // [lieu, couleur, lettre, nom]
 for (const [c, [fond, lettre, nom]] of Object.entries(ICONES)) for (const p of lieux[c] || []) REPERES.push([p, fond, lettre, nom]);
 for (const c of CASCADES) REPERES.push([c.depart, '#d8501a', 'C', c.nom]);   // le départ des pistes de cascades
@@ -3420,6 +4434,7 @@ function pointsCarte(point) {
   const gyro = Math.sin(performance.now() / 80) > 0 ? '#f33' : '#39f';
   for (const p of personnes) if (p.vie > 0 && p.alerte && (p.type !== 'flic' || etoiles > 0)) point(p.x, p.z, p.type === 'flic' ? gyro : '#e33');
   for (const v of voitures) if (v.police && v.conducteur) point(v.x, v.z, gyro, 4);
+  for (const r of robots) if (r !== J.robot) point(r.x, r.z, r.pilote === 'police' ? gyro : '#aaa', 6);   // le heavy robot : un gros point
 }
 // la mini-carte garde une image toute faite du pays, à un point pour 2 mètres
 const ECHELLE_IMG = 0.5, carteImg = document.createElement('canvas');
@@ -3505,21 +4520,27 @@ function majHUD(dt) {
   $('barre-vie').firstChild.style.background = J.vie < 30 ? '#c0392b' : '#56b24c';
   $('barre-gilet').style.display = J.gilet > 0 ? 'block' : 'none'; giletBJ.visible = J.gilet > 0;
   $('barre-gilet').firstChild.style.width = `${J.gilet / R_.giletMax * 100}%`;
-  $('argent').textContent = `${J.argent} $`;
+  $('argent').textContent = montant(J.argent);
   [...$('etoiles').children].forEach((e, i) => e.classList.toggle('on', i < etoiles));
   $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
-  const a = ARMES[J.arme];
-  $('arme').textContent = a.nom;
-  $('munitions').textContent = a.corps ? '' : `${J.balles[J.arme]} ${a.explosion ? 'roquettes' : 'balles'}`;
+  const a = ARMES[J.arme], rb = J.robot;
+  $('arme').textContent = rb ? 'Heavy robot' : a.nom;
+  $('munitions').textContent = rb ? `${rb.munitions.lourde} balles · ${rb.munitions.roquettes} roquettes` : a.corps ? '' : `${J.balles[J.arme]} ${a.explosion ? 'roquettes' : 'balles'}`;
   const m = MISSIONS[missionIndex];
   $('objectif').textContent = m ? m.etapes[etapeIndex].texte : 'Pays libre : fais ce que tu veux !';
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
-  $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !dansLunette() && (J.vue === 1 || visee || !a.corps) ? 'block' : 'none';
+  $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !dansLunette() && (J.vue === 1 || visee || !a.corps || rb) ? 'block' : 'none';
+  $('fumee').style.opacity = J.fumee * (J.masque ? 0.25 : 0.8);   // la fumée toxique brouille la vue (moins avec le masque)
   $('vitesse').style.display = J.voiture ? 'block' : 'none';
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h`;
-  const s = standProche(), asc = !J.voiture && ascenseurProche(), v = !J.voiture && voitureProche();
-  const aide = J.voiture ? '' : s ? `Appuie sur <b>E</b> pour acheter : ${ARMES[s.arme].nom} (${J.possede[s.arme] ? `munitions ${Math.round(ARMES[s.arme].prix / 2)}` : ARMES[s.arme].prix} $)`
-    : asc ? `Appuie sur <b>E</b> pour prendre l'ascenseur (${asc.monte ? 'monter sur le toit' : 'redescendre'})` : v ? `Appuie sur <b>E</b> pour monter : ${v.type.nom}` : '';
+  const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
+  const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40);
+  const aide = !aPied ? '' : s ? (s.masque ? `Appuie sur <b>E</b> pour acheter : masque à gaz (${R_.prixMasque} $)` : `Appuie sur <b>E</b> pour acheter : ${ARMES[s.arme].nom} (${J.possede[s.arme] ? `munitions ${Math.round(ARMES[s.arme].prix / 2)}` : ARMES[s.arme].prix} $)`)
+    : g ? `Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max (${montant(R_.prixBlindage)})`
+    : o ? (o.outil === 'perceuse' ? 'Appuie sur <b>E</b> pour poser la perceuse thermique sur la porte du coffre-fort' : o.outil === 'charge' ? 'Appuie sur <b>E</b> pour coller l\'explosif sur la grille' : `Appuie sur <b>E</b> pour voler ${o.nom}`)
+    : r && r.pilote === 'police' && r.vieVitre <= 0 ? 'Appuie sur <b>E</b> pour éjecter le pilote du robot' : r && !r.pilote ? 'Appuie sur <b>E</b> pour monter dans le heavy robot'
+    : asc ? `Appuie sur <b>E</b> pour prendre l'ascenseur (${asc.monte ? 'monter sur le toit' : 'redescendre'})` : v ? `Appuie sur <b>E</b> pour monter : ${v.type.nom}`
+    : perce ? `Perceuse thermique : ${Math.floor(perce.perceuse / R_.dureePerceuse * 100)} %. Tiens bon !` : '';
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
@@ -3532,17 +4553,23 @@ function majHUD(dt) {
 // =====================================================================
 function mettreAJour(dt) {
   temps += dt;
-  if (J.mort || J.voiture) J.danse = 0;   // on ne danse qu'à pied
+  if (J.mort || J.voiture || J.robot) J.danse = 0;   // on ne danse qu'à pied
   if (J.mort) { J.mort += dt; animerHumain(joueurH, 0, dt, { mort: Math.min(1, J.mort * 3) }); if (J.mort > 3.5) reapparaitre(); }
   else {
-    if (J.voiture) conduire(J.voiture, dt); else majJoueur(dt);
+    if (J.voiture) conduire(J.voiture, dt); else if (J.robot) piloterRobot(J.robot, dt); else majJoueur(dt);
     J.cooldown -= dt; J.frappe = Math.max(0, J.frappe - dt * 3.3); J.recul = Math.max(0, J.recul - dt * 8);
-    if (sourisG && !J.voiture && !J.nage && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
+    if (J.robot) { // dans le heavy robot : clic gauche = la mitrailleuse, clic droit = les roquettes
+      const r = J.robot; for (const k in r.cdJ) r.cdJ[k] -= dt;
+      if (sourisG && r.cdJ.lourde <= 0) tirer(ARMES_ROBOT.lourde);
+      if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
+    } else if (sourisG && !J.voiture && !J.nage && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
   for (const p of personnes) majPersonne(p, dt);
   for (const v of voitures) majVoiture(v, dt);
+  for (const r of robots) majRobot(r, dt);
+  majBraquages(dt);
   for (const o of objets) {
     if (o.cache) { o.cache -= dt; if (o.cache <= 0) { o.cache = 0; o.m.visible = true; } continue; }
     o.m.rotation.y += dt * 1.5; o.m.position.y = o.base + Math.sin(temps * 2 + o.x) * 0.1;
@@ -3575,6 +4602,7 @@ function mettreAJour(dt) {
   for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); personnes.splice(k, 1); }
   for (let k = voitures.length - 1; k >= 0; k--) if (voitures[k].supprimer && voitures[k] !== J.voiture) { scene.remove(voitures[k].m); voitures.splice(k, 1); }
   for (let k = objets.length - 1; k >= 0; k--) if (objets[k].supprimer) { scene.remove(objets[k].m); objets.splice(k, 1); }
+  for (let k = robots.length - 1; k >= 0; k--) if ((robots[k].supprimer || (!robots[k].pilote && dist(robots[k], J) > 600)) && robots[k] !== J.robot) { scene.remove(robots[k].m.g); robots.splice(k, 1); }
   for (let k = effets.length - 1; k >= 0; k--) if (effets[k].vie <= 0) effets.splice(k, 1);
   // sons : ton moteur, celui de la voiture qui passe le plus près, le roulement, les pneus et la sirène
   if (audio) {
@@ -3587,12 +4615,17 @@ function mettreAJour(dt) {
     let dp = Infinity; for (const v of voitures) if (v.police && v.conducteur) dp = Math.min(dp, dist(v, J));
     sireneGain.gain.value = dp < 180 ? 0.035 * (1 - dp / 180) : 0;
     sirene.frequency.value = Math.sin(temps * 5) > 0 ? 700 : 950;
+    // la sonnerie de l'alarme d'un braquage : on l'entend jusqu'à 250 m
+    let da = Infinity; for (const B of braquages) if (B.alarme) da = Math.min(da, dist(B, J));
+    alarmeGain.gain.setTargetAtTime(da < 250 ? 0.05 * (1 - da / 250) : 0, t, 0.05);
+    alarmeSon.frequency.value = temps % 0.8 < 0.4 ? 980 : 780;
   }
 }
 function majRepere(dt) {
   const cible = cibleMission(), et = MISSIONS[missionIndex]?.etapes[etapeIndex];
-  repere.visible = !!cible && et.type !== 'eliminer';
-  fleche.visible = !!cible && et.type === 'eliminer';
+  const surCible = et?.type === 'eliminer' || et?.type === 'voler';   // une flèche au-dessus de la cible, ou du butin
+  repere.visible = !!cible && !surCible;
+  fleche.visible = !!cible && surCible;
   if (cible) { const y = cible.y ?? hauteurSol(cible.x, cible.z); repere.position.set(cible.x, y + 2.5, cible.z); fleche.position.set(cible.x, y + 2.9 + Math.sin(temps * 4) * 0.15, cible.z); fleche.rotation.y += dt * 2; }
 }
 
@@ -3625,7 +4658,11 @@ $('etat').textContent = 'Clique pour jouer';
 window.jeu = { J, joueurH, criMJ, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris,
-  get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; } };
+  braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
+  exploser, blesserJoueur, cibleMission, V3, ARMES_ROBOT, robotProche,
+  get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
+  get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
+  set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
 </html>
