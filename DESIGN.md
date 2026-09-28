@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 28 septembre 2026 (braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard ; police en force à 4 et 5 étoiles, heavy robot pilotable ; codes `IDKFA` et `MISSION` + numéro).
+Mis à jour le 29 septembre 2026 (braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard ; police en force à 4 et 5 étoiles, heavy robot pilotable ; codes de triche `IDKFA`, `MISSION` + numéro, `GOKU`, Super Saiyan, et `Z6PO` ou `C3PO`, un robot doré plus lent et plus solide).
 
 ## Vision
 
@@ -65,6 +65,8 @@ Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W
 | Nage (Maj) | 4 m/s |
 | Nage | 2,2 m/s |
 | Moonwalk (pendant la danse) | 1,5 m/s, à reculons |
+
+Le code de triche `Z6PO` multiplie toutes ces vitesses par 0,6.
 
 - Une marche de 60 cm au plus se monte sans sauter (`PASMAX`) : escaliers, trottoirs, lits, conteneurs empilés... Le terrain, lui, se monte à pied quelle que soit la pente.
 - **Nage** : là où l'eau est trop profonde pour avoir pied (plus de 1,30 m), B.J. nage, couché à la surface. Il ne peut ni tirer, ni sauter, ni s'accroupir, et son arme est rangée. En nageant, il remonte sur une plage ou un ponton (marche de 1,90 m au plus). On ne se noie pas.
@@ -308,6 +310,8 @@ Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 
 | Chien de garde | 12 par morsure, toutes les 0,9 s (`degatsChien`) |
 | Heavy robot | 10 par balle de mitrailleuse, 40 par roquette (`degatsRobot`, `degatsRoquetteRobot`) |
 | Mitrailleuses de la banque | 5 par balle (`degatsMitrailleuse`) |
+
+Avec le code de triche `Z6PO`, les balles font moitié moins mal (2,5 pour un policier), même celles des mitrailleuses de la banque et du heavy robot ; pas les roquettes ni les morsures de chien.
 
 La chance de toucher vaut 35 % à courte distance (`precisionEnnemis`) et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Les vigiles, les policiers d'élite et le heavy robot visent mieux : 50 % de près (`precisionPros`) ; les mitrailleuses de la banque, 30 %. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts ; dans une voiture blindée, rien ne passe ; dans le heavy robot, on ne prend que 30 % des dégâts (`protectionRobot`).
 
@@ -574,7 +578,7 @@ Quand l'alarme sonne, des bouches au plafond lâchent une fumée verdâtre qui r
 
 ## Codes de triche
 
-Il y a deux sortes de codes de triche : ceux qui changent l'apparence de B.J. (un « effet »), et ceux qui font une action tout de suite, pour tester le jeu. Entrée ouvre une case « Code : » ; on tape le code, puis Entrée. Pendant la saisie, les touches ne font plus bouger le joueur. Entrée ne fait rien quand la grande carte est ouverte. Un mauvais code affiche « Code inconnu ».
+Il y a deux sortes de codes de triche : ceux qui changent l'apparence de B.J. (un « effet »), et ceux qui font une action tout de suite, pour tester le jeu. Parmi les codes d'apparence, seul `Z6PO` change aussi le jeu. Entrée ouvre une case « Code : » ; on tape le code, puis Entrée. Pendant la saisie, les touches ne font plus bouger le joueur. Entrée ne fait rien quand la grande carte est ouverte. Un mauvais code affiche « Code inconnu ». Les chiffres se tapent avec ou sans Maj : sur un clavier français, la touche 6 donne « 6 » et non « - », et la touche 8 donne « 8 » et non « _ ».
 
 | Code | Effet |
 | --- | --- |
@@ -584,10 +588,20 @@ Il y a deux sortes de codes de triche : ceux qui changent l'apparence de B.J. (u
 | `JAMBEDEBOIS` | Jambe droite en bois, sans chaussure |
 | `BARCA` | Maillot du Barça à rayures bleues et grenat |
 | `BEBE` | Deux fois plus petit, avec une grosse tête, tout nu avec une couche blanche |
+| `GOKU` | San Goku en Super Saiyan : kimono orange déchiré en haut, l'épaule droite nue, t-shirt bleu qui dépasse au col et à la manche gauche, ceinture, bracelets et bottes bleus. Ses cheveux dorés se dressent en 13 pics, et une aura dorée l'entoure, avec des flammes qui montent |
+| `Z6PO` ou `C3PO` | Z6PO, le robot doré : tout en or, la tête chauve avec deux yeux orange qui brillent et une bouche en fente, des fils gris à la taille, le bas de la jambe droite en argent. Il bouge comme un robot, va 0,6 fois moins vite, et les balles lui font moitié moins mal |
 | `IDKFA` | Comme dans *Doom* : toutes les armes (bazooka compris), au moins 3 fois leurs munitions, le gilet pare-balles plein et le masque à gaz |
 | `MISSION` suivi d'un numéro | Saute à cette mission, à sa première étape (`MISSION8` : le musée ; `MISSION11` : pays libre). Le sac est vidé. Si la mission a besoin d'une voiture blindée et qu'il n'y en a pas, une Porsche blindée apparaît à 5 m de B.J. |
 
-Les codes à action se retapent autant qu'on veut ; un nombre tapé juste après le code lui est donné (`MISSION8`). Retaper un code d'apparence annule son effet. Les effets se combinent : B.J. est remis dans sa tenue normale, puis chaque code actif est appliqué dans l'ordre du tableau. Ils durent même après une mort, mais pas après un rechargement de la page. Les codes d'apparence ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
+**Z6PO** (`C3PO` est un autre nom pour le même code : taper l'un annule l'autre) :
+
+- **Il bouge comme un robot** : sa pose ne change que 8 fois par pas, par à-coups. Il fait de petits pas, les genoux presque raides, les coudes pliés et les bras un peu écartés, qui bougent à peine. Il ne se penche pas pour courir, mais se dandine d'un pied sur l'autre. Il se tourne par crans d'environ 11°.
+- **Plus lent** : toutes ses allures sont multipliées par 0,6 (`vitesse`) : 2,4 m/s en marchant, 4,8 m/s en courant, et même la nage et le moonwalk. En voiture ou dans le heavy robot, rien ne change.
+- **Plus solide** : les balles lui font moitié moins mal (`balles`) : celles des policiers, des soldats, du Kommandant, des vigiles, des policiers d'élite, des mitrailleuses de la banque et de la mitrailleuse du heavy robot. Les roquettes, les explosions et les morsures de chien, non.
+
+Les codes à action se retapent autant qu'on veut ; un nombre tapé juste après le code lui est donné (`MISSION8`). Retaper un code d'apparence annule son effet. Les effets se combinent : B.J. est remis dans sa tenue normale, puis chaque code actif est appliqué dans l'ordre du tableau (Z6PO passe donc tout en or, même le kimono de Goku, mais ce que Goku ajoute reste : les pics de cheveux, les bracelets, le haut des bottes et l'aura). Ils durent même après une mort, mais pas après un rechargement de la page. À part Z6PO, les codes d'apparence ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
+
+Dans ce tableau, un code a un `texte` (l'annonce) et un `effet` (ce qu'il change sur B.J.) ou une `action` (ce qu'il fait tout de suite). Il peut avoir un `alias` (un autre nom), une `vitesse` et des `balles` (des nombres qui multiplient ses allures et les dégâts des balles ; s'il y a plusieurs codes actifs, ils se multiplient entre eux) et `robot: true` (il bouge par à-coups).
 
 ## Interface et son
 
@@ -676,31 +690,31 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 4 670 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 4 740 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–108 | HTML et CSS | Interface et menu |
-| 109–466 | **Zones à modifier** | `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
-| 467–827 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
-| 828–1085 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, panneaux, visages, marbre, tableaux, coffres, billets, tôle rouillée dessinés par le programme ; matières |
-| 1086–1896 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`, dont les trois pâtés à braquer et le garagiste), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion |
-| 1897–1952 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
-| 1953–2097 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
-| 2098–2436 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 9 modèles (`MODELES`, dont le fourgon blindé), pièces qui partent, carrosserie, cabine, roues, blindage Mad Max (`formesBlindage`, `estBlindee`), `habillerVoiture` |
-| 2437–2583 | Dégâts des voitures | `abimer`, bosses (`bosseler`), vitres, pièces qui partent (`detacher`), roues tordues, morceaux qui volent (`debris`) |
-| 2584–2675 | Sons | Moteurs, roulement, sirène, sonnerie d'alarme, bruits et bips synthétisés, cri de la danse (`criMJ`) |
-| 2676–2921 | Joueur, personnages, objets | Tenues, chapeau de la danse ; vigiles, policiers d'élite (`creerElite`), chiens (`creerChien`, `animerChien`) ; objets, explosions (la voiture blindée encaisse), roquettes, étincelles, éclats de verre |
-| 2922–3220 | Braquages | Masque à gaz, sac du butin, butin (`creerButin`), pièces qui bougent (`construireBraquage`), alarme (`declencherAlarme`), vol (`voler`), perceuse, explosif, fumée, lasers, mitrailleuses, coffre-fort (`majBraquages`) |
-| 3221–3449 | Heavy robot | Le robot (`creerRobot`), sa marche, son chemin par les rues (`cheminRobot`), ses tirs, sa vitre et son pilote (`toucherRobot`), monter, descendre, piloter (`piloterRobot`), apparition |
-| 3450–3776 | État, clavier, actions | État du jeu, clavier et souris, suite de touches de la danse, triches (`validerTriche`), danse (`danser`, `pasDeDanse`), ascenseur, garagiste (`payerBlindage`), achat, tir (`tirer`, aussi depuis le robot), blessures, mort |
-| 3777–4003 | Mise à jour du joueur | Marche, nage, moonwalk, conduite (plus lourde en voiture blindée), chocs (contre le robot aussi), pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
-| 4004–4286 | Intelligence | Piétons, nazis, vigiles, chiens (`majChien`), circulation sur le réseau des routes, chemin de la police, apparitions, police à 4 et 5 étoiles (fourgons blindés, heavy robot) |
-| 4287–4385 | Missions, caméra | Enchaînement des étapes, saut de mission (`sauterMission`), vues (dont le robot), tremblement des pas du robot, zoom de la lunette |
-| 4386–4550 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos, aides et voile de fumée |
-| 4551–4668 | Boucle principale | Mise à jour et affichage de chaque image, garage qui répare, sonnerie d'alarme |
+| 109–505 | **Zones à modifier** | `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
+| 506–866 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
+| 867–1124 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, panneaux, visages, marbre, tableaux, coffres, billets, tôle rouillée dessinés par le programme ; matières |
+| 1125–1935 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`, dont les trois pâtés à braquer et le garagiste), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion |
+| 1936–1991 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
+| 1992–2147 | Personnages | Corps articulés, pièces des codes de triche (`accessoire`), animations (dont la nage, les trois pas de la danse et la marche raide de Z6PO), armes en 3D |
+| 2148–2486 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 9 modèles (`MODELES`, dont le fourgon blindé), pièces qui partent, carrosserie, cabine, roues, blindage Mad Max (`formesBlindage`, `estBlindee`), `habillerVoiture` |
+| 2487–2633 | Dégâts des voitures | `abimer`, bosses (`bosseler`), vitres, pièces qui partent (`detacher`), roues tordues, morceaux qui volent (`debris`) |
+| 2634–2725 | Sons | Moteurs, roulement, sirène, sonnerie d'alarme, bruits et bips synthétisés, cri de la danse (`criMJ`) |
+| 2726–2983 | Joueur, personnages, objets | Tenues, chapeau de la danse, aura de Goku ; vigiles, policiers d'élite (`creerElite`), chiens (`creerChien`, `animerChien`) ; objets, explosions (la voiture blindée encaisse), roquettes, étincelles, éclats de verre |
+| 2984–3282 | Braquages | Masque à gaz, sac du butin, butin (`creerButin`), pièces qui bougent (`construireBraquage`), alarme (`declencherAlarme`), vol (`voler`), perceuse, explosif, fumée, lasers, mitrailleuses, coffre-fort (`majBraquages`) |
+| 3283–3511 | Heavy robot | Le robot (`creerRobot`), sa marche, son chemin par les rues (`cheminRobot`), ses tirs, sa vitre et son pilote (`toucherRobot`), monter, descendre, piloter (`piloterRobot`), apparition |
+| 3512–3841 | État, clavier, actions | État du jeu, clavier et souris, suite de touches de la danse, triches (`validerTriche`, `rhabillerBJ`, `parTriche`), danse (`danser`, `pasDeDanse`), ascenseur, garagiste (`payerBlindage`), achat, tir (`tirer`, aussi depuis le robot), blessures, mort |
+| 3842–4069 | Mise à jour du joueur | Marche (et vitesse des codes de triche), nage, moonwalk, conduite (plus lourde en voiture blindée), chocs (contre le robot aussi), pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
+| 4070–4352 | Intelligence | Piétons, nazis, vigiles, chiens (`majChien`), circulation sur le réseau des routes, chemin de la police, apparitions, police à 4 et 5 étoiles (fourgons blindés, heavy robot) |
+| 4353–4451 | Missions, caméra | Enchaînement des étapes, saut de mission (`sauterMission`), vues (dont le robot), tremblement des pas du robot, zoom de la lunette |
+| 4452–4616 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos, aides et voile de fumée |
+| 4617–4735 | Boucle principale | Mise à jour et affichage de chaque image, garage qui répare, sonnerie d'alarme, aura qui tremble |
 
 ### À chaque image
 
@@ -720,6 +734,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Textures** : chaque texture est dessinée deux fois plus fin qu'avant, sur 512 points de côté pour la plupart. Le même dessin sert de relief : le clair ressort, le foncé se creuse. Chaque façade a un second dessin, invisible, qui dit où ça brille : les murs sont mats, les vitres sont des miroirs.
 - **Personnages** : le torse, les bras et les jambes sont des formes faites « au tour », comme des vases. Chaque morceau de bras ou de jambe finit par une boule de la taille de la boule du morceau suivant : le coude et le genou ne se voient pas. Le visage est une image dessinée sur la tête, une par couleur de peau. Un personnage compte une vingtaine de pièces.
 - **Danse** : le jeu retient le nom des dernières touches enfoncées, bout à bout. Quand la fin de cette liste est trois fois `touchesDanse`, la danse commence, et les touches encore enfoncées sont oubliées. `J.danse` compte les secondes depuis le début de la danse (0 = il ne danse pas). À chaque image, `pasDeDanse` dit quel pas est en cours et tourne le corps ; `animerHumain` place les bras, les jambes, les pieds et la tête. Le moonwalk réutilise l'animation de la marche : c'est le corps qui recule. `animerHumain` remet les pieds, la tête, l'épaule droite et l'écart des jambes à zéro à chaque image, pour tous les personnages : la pose ne reste jamais collée. Les angles du bras droit ont été calculés pour que la main tombe juste sur le bord du chapeau, puis entre les jambes. Pour la pose, l'épaule droite descend de 10 cm : les bras du personnage sont trop courts pour ce geste. Le chapeau est accroché à la tête et tourne autour de son milieu, ce qui le rabat sur les yeux ; il est caché hors de la danse.
+- **Codes de triche** : au chargement, le jeu retient la matière de chaque pièce de B.J. (`userData.habit`). `rhabillerBJ` la lui remet, rend visibles les pièces cachées, remet les tailles à 1 et enlève les pièces ajoutées par les codes (faites avec `accessoire`, reconnues à leur nom), puis applique les codes actifs. Un nouveau code n'a donc qu'à décrire son effet. Les cheveux de Goku sont 13 cônes dorés posés sur la tête, penchés vers le ciel. L'aura est une forme faite au tour, de 2,5 m de haut, dont la lumière s'ajoute à l'image : son dessin, des traits clairs en bas et effacés en haut, glisse vers le haut à chaque image, et sa force tremble au hasard. Le robot arrondit l'avancée de la marche au huitième de pas, et l'angle de son corps à 0,2 radian près : c'est ce qui le fait bouger par à-coups.
 - **Cri de la danse** : il est fabriqué par le programme, comme tous les sons, et non pris sur un disque : la voix de Michael Jackson appartient à ses ayants droit, et le jeu est publié sur Internet. La voix est une note avec ses harmoniques (la 3e, vers 3 000 Hz, donne le son « i »), et le souffle est un bruit filtré autour de 3 000 Hz.
 - **Voitures** : la carrosserie est un profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur. Tous ses bords sont arrondis. La cabine est une boîte arrondie, plus étroite et plus courte en haut ; les vitres sont des plaques posées dessus, visibles seulement de dehors, pour qu'on voie à travers en vue intérieure. Les pièces d'un modèle sont fabriquées une seule fois, puis fusionnées par matière : une voiture neuve compte 8 objets pour le corps et 2 par roue. Le tricycle est fait de pièces simples, sans profil ni cabine.
 - **Dégâts** : au premier choc, la voiture reçoit sa propre copie des formes (sans les pièces qui peuvent partir), ses vitres une par une et ses pièces à part : elle passe à une vingtaine d'objets. Une bosse déplace les points de la tôle autour du choc ; chaque point bouge selon sa place de départ, donc deux points collés bougent pareil et la tôle ne se déchire pas. Les triangles qui ont bougé renvoient la lumière chacun à sa façon : c'est ce qui donne l'air froissé. Une pièce qui part est accrochée au monde, là où elle était, et tombe comme un débris. Le garage refait la voiture toute neuve (`habillerVoiture`).
@@ -742,7 +757,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Voiture blindée** : `v.blindee` ajoute deux pièces au modèle, la tôle rouillée et l'acier (`formesBlindage`, calculées une fois par modèle à partir de sa forme : profil, cabine, longueur). Elles se cabossent comme le reste. `estBlindee` dit si une voiture est blindée, par le garagiste ou parce que c'est un fourgon de police.
 - **Heavy robot** : un modèle articulé (bassin, torse, bras, hanches, genoux, pieds), comme les personnages, avec un policier assis dedans. Il est rangé à part (`robots`), avec sa propre marche, ses tirs et ses dégâts. Pour tirer depuis le robot, `tirer` reçoit l'arme du robot (`ARMES_ROBOT`) au lieu de celle de B.J. ; les balles partent de ses canons, et le rayon ignore le robot lui-même. Une roquette ignore le robot qui l'a tirée.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, si une voiture demande un modèle qui n'existe pas, ou si une piste de cascades a un morceau inconnu.
-- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, les codes `IDKFA` et `MISSION`, le blindage chez le garagiste (sans et avec assez d'argent), la voiture blindée sous les balles et les roquettes, les trois braquages de bout en bout (butin, alarme, vigiles et chiens, fumée avec et sans masque, lasers et mitrailleuses, perceuse, explosif, planque avec et sans police), les fourgons blindés à 4 étoiles, le heavy robot à 5 étoiles (il tire, sa vitre casse, on éjecte le pilote, on le pilote, on tire, on descend), et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
+- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, les codes `IDKFA` et `MISSION`, les codes `GOKU` et `Z6PO` (vitesse du robot, balles, alias `C3PO`, annulation), le blindage chez le garagiste (sans et avec assez d'argent), la voiture blindée sous les balles et les roquettes, les trois braquages de bout en bout (butin, alarme, vigiles et chiens, fumée avec et sans masque, lasers et mitrailleuses, perceuse, explosif, planque avec et sans police), les fourgons blindés à 4 étoiles, le heavy robot à 5 étoiles (il tire, sa vitre casse, on éjecte le pilote, on le pilote, on tire, on descend), et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
 
 ## Limites connues et pistes
 
@@ -766,6 +781,7 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture ou un bateau, et la police (65 km/h) ne rattrape aucun véhicule lancé à fond, pas même le tricycle (72 km/h). Seuls les fourgons blindés (122 km/h, à partir de 4 étoiles) rattrapent les voitures lentes ; ils ne foncent pas dans la voiture de B.J. pour l'arrêter, et il n'y a pas de barrages.
 - Les voitures qui roulent toutes seules ne regardent que le milieu des autres : une limousine peut couper un virage et mordre sur le trottoir.
 - Sur un tricycle ou un bateau, B.J. garde son arme à la main.
+- Codes de triche : Goku garde les yeux et les sourcils de B.J. (pas les yeux verts du Super Saiyan), et le chapeau de la danse passe à travers ses cheveux. Z6PO nage, alors que le vrai robot coulerait.
 - La danse passe en 3e personne et n'en revient pas toute seule : il faut appuyer sur V. Pendant le moonwalk, les pieds glissent un peu au lieu de rester posés, et les ennemis continuent de tirer. Comme la suite de touches n'a pas de temps limite, on peut lancer la danse sans le vouloir, en esquivant à gauche, en arrière, à droite trois fois.
 - Les missions sont linéaires : une seule à la fois, dans l'ordre. Les braquages ne se font qu'après Hitler ; le code `MISSION` permet d'y sauter.
 - Chaque braquage ne se fait qu'une fois : le butin volé ne revient pas, et les vigiles et les chiens tués non plus. Le butin n'a de valeur qu'avec la mission (il n'y a pas de receleur).

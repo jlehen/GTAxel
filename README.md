@@ -50,7 +50,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 
   Chaque fois, beaucoup de police arrive, et vite. Sème-la, puis rapporte le butin à la planque, la caravane de Trevor à Sandy Shores, dans ta voiture blindée.
 - **Carte** : la touche M affiche tout le pays en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants. Elle te dit aussi dans quelle colonne et quelle ligne du tableau `CARTE` tu es.
-- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`… à toi de voir ce qu'ils font ! Retape un code pour l'annuler. Et pour tester : `IDKFA` donne toutes les armes et plein de munitions, comme dans *Doom* ; `MISSION` suivi d'un numéro saute directement à cette mission (`MISSION8` : le musée), avec une voiture blindée à côté s'il en faut une.
+- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`, `GOKU`, `Z6PO` (ou `C3PO`)… à toi de voir ce qu'ils font ! Retape un code pour l'annuler. Et pour tester : `IDKFA` donne toutes les armes et plein de munitions, comme dans *Doom* ; `MISSION` suivi d'un numéro saute directement à cette mission (`MISSION8` : le musée), avec une voiture blindée à côté s'il en faut une.
 - **Danse** : tape Q S D trois fois de suite (A S D sur un clavier QWERTY) : B.J. met son chapeau et fait le moonwalk, tourne sur lui-même en poussant son petit cri, puis prend la pose de Michael Jackson, la main entre les jambes : « Who's bad ? ». Bouge pour l'arrêter.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital le plus proche (+ rouge sur la mini-carte) et tu perds 100 $.
 
@@ -97,6 +97,6 @@ Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier
 
 5. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture` (avec `rapide`, `blindee` ou `sansPolice` si tu veux), `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`, `blindage`, `voler`. Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ». Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
 6. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
-7. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite).
+7. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`) ou plus solide (`balles: 0.5`).
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).
