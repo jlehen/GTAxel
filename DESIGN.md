@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 28 septembre 2026 (voitures qui sautent et s'abîment, pistes de cascades comme dans *Stunts* : tremplins, loopings, tire-bouchon, virage relevé, ponts).
+Mis à jour le 28 septembre 2026 (codes de triche `GOKU`, Super Saiyan, et `Z6PO` ou `C3PO`, un robot doré plus lent et plus solide).
 
 ## Vision
 
@@ -63,6 +63,8 @@ Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W
 | Nage (Maj) | 4 m/s |
 | Nage | 2,2 m/s |
 | Moonwalk (pendant la danse) | 1,5 m/s, à reculons |
+
+Le code de triche `Z6PO` multiplie toutes ces vitesses par 0,6.
 
 - Une marche de 60 cm au plus se monte sans sauter (`PASMAX`) : escaliers, trottoirs, lits, conteneurs empilés... Le terrain, lui, se monte à pied quelle que soit la pente.
 - **Nage** : là où l'eau est trop profonde pour avoir pied (plus de 1,30 m), B.J. nage, couché à la surface. Il ne peut ni tirer, ni sauter, ni s'accroupir, et son arme est rangée. En nageant, il remonte sur une plage ou un ponton (marche de 1,90 m au plus). On ne se noie pas.
@@ -294,6 +296,8 @@ Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 
 | Kommandant | 12 |
 | Hitler | 35 par roquette, au centre de l'explosion |
 
+Avec le code de triche `Z6PO`, les balles font moitié moins mal (2,5 pour un policier) ; pas les roquettes d'Hitler.
+
 La chance de toucher vaut 35 % à courte distance et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts.
 
 Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. Elle laisse une traînée de fumée grise, qui aide à la voir venir. À 20 m, elle met 1 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle explose aussi sur les soldats, policiers ou passants qui se trouvent sur son chemin, et les blesse comme le bazooka de B.J. (jusqu'à 250) : on peut se cacher derrière eux. Un piéton ou un policier tué par Hitler ne donne pas d'étoile à B.J. Hitler n'est jamais blessé par sa propre roquette. Elle fait exploser la voiture de B.J. s'il est dedans.
@@ -480,7 +484,7 @@ Quand la vie tombe à 0, l'écran passe en noir et blanc avec « WASTED » penda
 
 ## Codes de triche
 
-Les codes de triche changent seulement l'apparence de B.J. Entrée ouvre une case « Code : » ; on tape le code, puis Entrée. Pendant la saisie, les touches ne font plus bouger le joueur. Entrée ne fait rien quand la grande carte est ouverte. Un mauvais code affiche « Code inconnu ».
+Les codes de triche changent l'apparence de B.J. ; seul `Z6PO` change aussi le jeu. Entrée ouvre une case « Code : » ; on tape le code, puis Entrée. Pendant la saisie, les touches ne font plus bouger le joueur. Entrée ne fait rien quand la grande carte est ouverte. Un mauvais code affiche « Code inconnu ». Les chiffres se tapent avec ou sans Maj : sur un clavier français, la touche 6 donne « 6 » et non « - ».
 
 | Code | Effet |
 | --- | --- |
@@ -490,8 +494,18 @@ Les codes de triche changent seulement l'apparence de B.J. Entrée ouvre une cas
 | `JAMBEDEBOIS` | Jambe droite en bois, sans chaussure |
 | `BARCA` | Maillot du Barça à rayures bleues et grenat |
 | `BEBE` | Deux fois plus petit, avec une grosse tête, tout nu avec une couche blanche |
+| `GOKU` | San Goku en Super Saiyan : kimono orange déchiré en haut, l'épaule droite nue, t-shirt bleu qui dépasse au col et à la manche gauche, ceinture, bracelets et bottes bleus. Ses cheveux dorés se dressent en 13 pics, et une aura dorée l'entoure, avec des flammes qui montent |
+| `Z6PO` ou `C3PO` | Z6PO, le robot doré : tout en or, la tête chauve avec deux yeux orange qui brillent et une bouche en fente, des fils gris à la taille, le bas de la jambe droite en argent. Il bouge comme un robot, va 0,6 fois moins vite, et les balles lui font moitié moins mal |
 
-Retaper un code annule son effet. Les effets se combinent : B.J. est remis dans sa tenue normale, puis chaque code actif est appliqué dans l'ordre du tableau. Ils durent même après une mort, mais pas après un rechargement de la page. Ils ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
+**Z6PO** (`C3PO` est un autre nom pour le même code : taper l'un annule l'autre) :
+
+- **Il bouge comme un robot** : sa pose ne change que 8 fois par pas, par à-coups. Il fait de petits pas, les genoux presque raides, les coudes pliés et les bras un peu écartés, qui bougent à peine. Il ne se penche pas pour courir, mais se dandine d'un pied sur l'autre. Il se tourne par crans d'environ 11°.
+- **Plus lent** : toutes ses allures sont multipliées par 0,6 (`vitesse`) : 2,4 m/s en marchant, 4,8 m/s en courant, et même la nage et le moonwalk. En voiture, rien ne change.
+- **Plus solide** : les balles des policiers, des soldats et du Kommandant lui font moitié moins mal (`balles`). Les roquettes d'Hitler et les explosions, non.
+
+Retaper un code annule son effet. Les effets se combinent : B.J. est remis dans sa tenue normale, puis chaque code actif est appliqué dans l'ordre du tableau (Z6PO passe donc tout en or, même le kimono de Goku, mais ce que Goku ajoute reste : les pics de cheveux, les bracelets, le haut des bottes et l'aura). Ils durent même après une mort, mais pas après un rechargement de la page. À part Z6PO, ils ne changent rien au jeu : la caméra reste à hauteur d'adulte pour le bébé, et l'arme vue en 1re personne ne change pas. Les codes sont dans le tableau `TRICHES`, en haut de `index.html`.
+
+Dans ce tableau, un code a un `texte` (l'annonce), un `effet` (ce qu'il change sur B.J.), et peut avoir un `alias` (un autre nom), une `vitesse` et des `balles` (des nombres qui multiplient ses allures et les dégâts des balles ; s'il y a plusieurs codes actifs, ils se multiplient entre eux) et `robot: true` (il bouge par à-coups).
 
 ## Interface et son
 
@@ -574,28 +588,28 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 3 650 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 3 700 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–106 | HTML et CSS | Interface et menu |
-| 107–399 | **Zones à modifier** | `REGLAGES`, `ARMES`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
-| 400–760 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
-| 761–964 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, panneaux, visages dessinés par le programme ; matières |
-| 965–1654 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion |
-| 1655–1710 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
-| 1711–1855 | Personnages | Corps articulés, animations (dont la nage et les trois pas de la danse), armes en 3D |
-| 1856–2143 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), pièces qui partent, carrosserie, cabine, roues, `habillerVoiture` |
-| 2144–2289 | Dégâts des voitures | `abimer`, bosses (`bosseler`), vitres, pièces qui partent (`detacher`), roues tordues, morceaux qui volent (`debris`) |
-| 2290–2373 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés, cri de la danse (`criMJ`) |
-| 2374–2843 | Joueur et PNJ | Tenues, chapeau de la danse, objets, explosions, roquettes, clavier et souris, suite de touches de la danse, triches, danse (`danser`, `pasDeDanse`), ascenseur, tir, achat |
-| 2844–3061 | Mise à jour du joueur | Marche, nage, moonwalk, conduite, chocs, pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
-| 3062–3301 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
-| 3302–3372 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
-| 3373–3529 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
-| 3530–3631 | Boucle principale | Mise à jour et affichage de chaque image, garage qui répare |
+| 107–438 | **Zones à modifier** | `REGLAGES`, `ARMES`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
+| 439–799 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
+| 800–1003 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, panneaux, visages dessinés par le programme ; matières |
+| 1004–1693 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion |
+| 1694–1749 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
+| 1750–1905 | Personnages | Corps articulés, pièces des codes de triche (`accessoire`), animations (dont la nage, les trois pas de la danse et la marche du robot), armes en 3D |
+| 1906–2193 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 8 modèles (`MODELES`), pièces qui partent, carrosserie, cabine, roues, `habillerVoiture` |
+| 2194–2339 | Dégâts des voitures | `abimer`, bosses (`bosseler`), vitres, pièces qui partent (`detacher`), roues tordues, morceaux qui volent (`debris`) |
+| 2340–2423 | Sons | Moteurs, roulement, sirène, bruits et bips synthétisés, cri de la danse (`criMJ`) |
+| 2424–2908 | Joueur et PNJ | Tenues, chapeau de la danse, aura de Goku, objets, explosions, roquettes, clavier et souris, suite de touches de la danse, triches (`validerTriche`, `rhabillerBJ`, `parTriche`), danse (`danser`, `pasDeDanse`), ascenseur, tir, achat |
+| 2909–3127 | Mise à jour du joueur | Marche (et vitesse des codes de triche), nage, moonwalk, conduite, chocs, pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
+| 3128–3367 | Intelligence | Piétons, nazis, circulation sur le réseau des routes, chemin de la police, apparitions |
+| 3368–3438 | Missions, caméra | Enchaînement des étapes, vues, zoom de la lunette |
+| 3439–3595 | Écran | Repères, image du terrain, plan, mini-carte, grande carte, infos |
+| 3596–3698 | Boucle principale | Mise à jour et affichage de chaque image, garage qui répare, aura qui tremble |
 
 ### À chaque image
 
@@ -615,6 +629,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Textures** : chaque texture est dessinée deux fois plus fin qu'avant, sur 512 points de côté pour la plupart. Le même dessin sert de relief : le clair ressort, le foncé se creuse. Chaque façade a un second dessin, invisible, qui dit où ça brille : les murs sont mats, les vitres sont des miroirs.
 - **Personnages** : le torse, les bras et les jambes sont des formes faites « au tour », comme des vases. Chaque morceau de bras ou de jambe finit par une boule de la taille de la boule du morceau suivant : le coude et le genou ne se voient pas. Le visage est une image dessinée sur la tête, une par couleur de peau. Un personnage compte une vingtaine de pièces.
 - **Danse** : le jeu retient le nom des dernières touches enfoncées, bout à bout. Quand la fin de cette liste est trois fois `touchesDanse`, la danse commence, et les touches encore enfoncées sont oubliées. `J.danse` compte les secondes depuis le début de la danse (0 = il ne danse pas). À chaque image, `pasDeDanse` dit quel pas est en cours et tourne le corps ; `animerHumain` place les bras, les jambes, les pieds et la tête. Le moonwalk réutilise l'animation de la marche : c'est le corps qui recule. `animerHumain` remet les pieds, la tête, l'épaule droite et l'écart des jambes à zéro à chaque image, pour tous les personnages : la pose ne reste jamais collée. Les angles du bras droit ont été calculés pour que la main tombe juste sur le bord du chapeau, puis entre les jambes. Pour la pose, l'épaule droite descend de 10 cm : les bras du personnage sont trop courts pour ce geste. Le chapeau est accroché à la tête et tourne autour de son milieu, ce qui le rabat sur les yeux ; il est caché hors de la danse.
+- **Codes de triche** : au chargement, le jeu retient la matière de chaque pièce de B.J. (`userData.habit`). `rhabillerBJ` la lui remet, rend visibles les pièces cachées, remet les tailles à 1 et enlève les pièces ajoutées par les codes (faites avec `accessoire`, reconnues à leur nom), puis applique les codes actifs. Un nouveau code n'a donc qu'à décrire son effet. Les cheveux de Goku sont 13 cônes dorés posés sur la tête, penchés vers le ciel. L'aura est une forme faite au tour, de 2,5 m de haut, dont la lumière s'ajoute à l'image : son dessin, des traits clairs en bas et effacés en haut, glisse vers le haut à chaque image, et sa force tremble au hasard. Le robot arrondit l'avancée de la marche au huitième de pas, et l'angle de son corps à 0,2 radian près : c'est ce qui le fait bouger par à-coups.
 - **Cri de la danse** : il est fabriqué par le programme, comme tous les sons, et non pris sur un disque : la voix de Michael Jackson appartient à ses ayants droit, et le jeu est publié sur Internet. La voix est une note avec ses harmoniques (la 3e, vers 3 000 Hz, donne le son « i »), et le souffle est un bruit filtré autour de 3 000 Hz.
 - **Voitures** : la carrosserie est un profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur. Tous ses bords sont arrondis. La cabine est une boîte arrondie, plus étroite et plus courte en haut ; les vitres sont des plaques posées dessus, visibles seulement de dehors, pour qu'on voie à travers en vue intérieure. Les pièces d'un modèle sont fabriquées une seule fois, puis fusionnées par matière : une voiture neuve compte 8 objets pour le corps et 2 par roue. Le tricycle est fait de pièces simples, sans profil ni cabine.
 - **Dégâts** : au premier choc, la voiture reçoit sa propre copie des formes (sans les pièces qui peuvent partir), ses vitres une par une et ses pièces à part : elle passe à une vingtaine d'objets. Une bosse déplace les points de la tôle autour du choc ; chaque point bouge selon sa place de départ, donc deux points collés bougent pareil et la tôle ne se déchire pas. Les triangles qui ont bougé renvoient la lumière chacun à sa façon : c'est ce qui donne l'air froissé. Une pièce qui part est accrochée au monde, là où elle était, et tombe comme un débris. Le garage refait la voiture toute neuve (`habillerVoiture`).
@@ -633,7 +648,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Pistes de cascades** : chaque morceau de `CASCADES` devient une ligne de points, tous les 1 à 2 m, avec pour chacun trois directions : devant, le haut de la piste, la gauche. Le dessus est un ruban de goudron, les côtés et le dessous des bandes de béton. Là où la piste n'est pas trop penchée (moins de 18°), elle compte comme un sol : `pisteSous` trouve le morceau sous la voiture, sa hauteur et sa pente, même relevée sur le côté. Les côtés des rampes sont des boîtes de collision, en 3 bandes sur la largeur, dont le haut est le bas de la piste à cet endroit : on roule dessus, mais on bute contre. Dans un looping ou un tire-bouchon, la voiture roule « sur des rails » : sa place, son haut et son devant viennent de la ligne de points, et la courbure calculée à chaque point dit si elle reste plaquée.
 - **Sauts** : la voiture tombe toujours ; elle est « au sol » quand elle arrive plus bas que le sol, et prend alors la vitesse de montée du sol. Cette vitesse vient de la pente sous ses roues, ou de la pente de la piste de cascades sous son milieu : un trottoir ne la fait presque pas sauter, le bout d'un tremplin, si.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, si une voiture demande un modèle qui n'existe pas, ou si une piste de cascades a un morceau inconnu.
-- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
+- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, les codes `GOKU` et `Z6PO` (vitesse du robot, balles, alias `C3PO`, annulation), et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
 
 ## Limites connues et pistes
 
@@ -657,6 +672,7 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture ou un bateau, et la police (65 km/h) ne rattrape aucun véhicule lancé à fond, pas même le tricycle (72 km/h).
 - Les voitures qui roulent toutes seules ne regardent que le milieu des autres : une limousine peut couper un virage et mordre sur le trottoir.
 - Sur un tricycle ou un bateau, B.J. garde son arme à la main.
+- Codes de triche : Goku garde les yeux et les sourcils de B.J. (pas les yeux verts du Super Saiyan), et le chapeau de la danse passe à travers ses cheveux. Z6PO nage, alors que le vrai robot coulerait.
 - La danse passe en 3e personne et n'en revient pas toute seule : il faut appuyer sur V. Pendant le moonwalk, les pieds glissent un peu au lieu de rester posés, et les ennemis continuent de tirer. Comme la suite de touches n'a pas de temps limite, on peut lancer la danse sans le vouloir, en esquivant à gauche, en arrière, à droite trois fois.
 - Les missions sont linéaires : une seule à la fois, dans l'ordre.
 - Hitler ne meurt qu'une fois : le bazooka n'a que ses 10 roquettes, et on ne peut pas en racheter.

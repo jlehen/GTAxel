@@ -375,9 +375,13 @@ const CASCADES = [
 // =====================================================================
 //  CODES DE TRICHE : appuie sur Entrée, tape le code, puis Entrée
 //  Ils changent l'apparence de B.J. (b). Retape le code pour annuler l'effet.
+//  alias : un autre code qui fait la même chose.
+//  Ils peuvent aussi changer le jeu : vitesse (0.5 = deux fois plus lent), balles (0.5 = les balles
+//  font moitié moins mal), robot (il bouge par à-coups).
 // =====================================================================
 //  Un bras ou une jambe est en deux morceaux (haut et bas) : habillerMembre les colorie ensemble.
 //  Au bout, il y a b.brasD.main ou b.jambeD.chaussure.
+//  accessoire ajoute une pièce, qui s'en va quand on annule le code.
 const TENUE_BJ = { peau: '#e8b890', haut: '#e8e4d8', bas: '#4a5238', chaussures: '#3a2a1a', cheveux: '#b8955a', manchesCourtes: true };
 const PEAU_BJ = TENUE_BJ.peau;
 const TRICHES = [
@@ -385,7 +389,7 @@ const TRICHES = [
   { code: 'CHAUSSURE',   texte: 'Une chaussure perdue', effet: b => habiller(b.jambeG.chaussure, '#eee') },   // il reste la chaussette
   { code: 'SOUTIF',      texte: 'Torse nu en soutien-gorge', effet: b => {
       habiller(b.torse, PEAU_BJ); habillerMembre(b.brasD, PEAU_BJ); habillerMembre(b.brasG, PEAU_BJ);
-      piece(GEO.main, '#e0407a', b.torse, 0.09, 0.08, 0.11); piece(GEO.main, '#e0407a', b.torse, -0.09, 0.08, 0.11); } },
+      accessoire(GEO.main, '#e0407a', b.torse, 0.09, 0.08, 0.11); accessoire(GEO.main, '#e0407a', b.torse, -0.09, 0.08, 0.11); } },
   { code: 'JAMBEDEBOIS', texte: 'Jambe de bois',        effet: b => { habillerMembre(b.jambeD, '#8b5a2b'); b.jambeD.scale.set(0.45, 1, 0.45); b.jambeD.chaussure.visible = false; } },
   { code: 'BARCA',       texte: 'Maillot du Barça',     effet: b => {
       b.torse.material = std(toile(64, 64, g => { for (let k = 0; k < 8; k++) { g.fillStyle = k % 2 ? '#a50044' : '#004d98'; g.fillRect(k * 8, 0, 8, 64); } }));
@@ -395,6 +399,41 @@ const TRICHES = [
       habiller(b.torse, PEAU_BJ); habiller(b.bassin, '#f4f4ee'); b.bassin.scale.set(1.12, 1.6, 1.2); b.ceinture.visible = false; // tout nu avec une couche
       for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, PEAU_BJ);
       habiller(b.jambeD.chaussure, PEAU_BJ); habiller(b.jambeG.chaussure, PEAU_BJ); } },
+  { code: 'GOKU',        texte: 'San Goku, Super Saiyan !', effet: b => {
+      const orange = '#f07818', bleu = '#1a3a9a';
+      b.torse.material = std(toile(128, 128, g => { // le kimono orange, déchiré en haut : le devant est à gauche de l'image, l'épaule droite aux trois quarts
+        g.scale(2, 2); g.fillStyle = orange; g.fillRect(0, 0, 64, 64);
+        g.fillStyle = bleu; g.fillRect(0, 0, 64, 5);                               // le t-shirt bleu dépasse au col...
+        for (const x of [0, 64]) { g.beginPath(); g.moveTo(x - 11, 0); g.lineTo(x + 11, 0); g.lineTo(x, 26); g.fill(); } // ...et en V devant
+        const trou = pts => { g.fillStyle = PEAU_BJ; g.beginPath(); pts.forEach(([x, y]) => g.lineTo(x, y)); g.fill(); g.strokeStyle = '#b04c08'; g.lineWidth = 1.2; g.stroke(); };
+        trou([[36, 0], [38, 7], [35, 12], [40, 16], [38, 22], [44, 25], [43, 31], [48, 29], [50, 35], [53, 30], [57, 32], [58, 25], [62, 22], [60, 15], [63, 9], [61, 0]]); // l'épaule droite nue
+        trou([[8, 33], [12, 31], [11, 36], [14, 38], [9, 39]]); trou([[25, 40], [28, 38], [29, 35], [31, 39], [34, 40], [31, 42], [32, 45], [28, 43], [26, 45]]); // deux accrocs
+      }));
+      habiller(b.bassin, orange); habillerMembre(b.jambeD, orange); habillerMembre(b.jambeG, orange); habiller(b.ceinture, bleu);
+      habiller(b.brasD.haut, PEAU_BJ); habiller(b.brasG.haut, bleu);            // l'épaule droite est nue, la manche du t-shirt bleu à gauche
+      for (const m of [b.brasD, b.brasG]) accessoire(new THREE.CylinderGeometry(0.05, 0.05, 0.08, 12), bleu, m.pli, 0, -0.21, 0); // les bracelets
+      for (const j of [b.jambeD, b.jambeG]) { habiller(j.chaussure, bleu); accessoire(new THREE.CylinderGeometry(0.068, 0.062, 0.17, 12), bleu, j.pli, 0, -0.36, 0); } // les bottes
+      // Super Saiyan : les cheveux dorés se dressent en pics [tour de la tête (0 = devant), penché (0 = tout droit), longueur]
+      const or = mat('#ffd83a', { emissive: '#8a6a00' });
+      b.cheveux.material = or;
+      for (const [a, p, l] of [[3.1, 0.25, 0.3], [2.4, 0.6, 0.26], [-2.4, 0.6, 0.26], [1.6, 0.9, 0.22], [-1.6, 0.9, 0.22], [3.1, 1, 0.26],
+        [2.6, 1.4, 0.2], [-2.6, 1.4, 0.2], [0.6, 0.55, 0.22], [-0.6, 0.55, 0.22], [0, 0.4, 0.2], [1.1, 1.1, 0.16], [-1.1, 1.1, 0.16]]) {
+        const d = V3(Math.sin(a) * Math.sin(p), Math.cos(p), Math.cos(a) * Math.sin(p));
+        const pic = accessoire(new THREE.ConeGeometry(0.045, 1, 6).translate(0, 0.5, 0), '#ffd83a', b.tete, d.x * 0.09, 0.03 + d.y * 0.09, d.z * 0.09);
+        pic.material = or; pic.scale.y = l;
+        pic.quaternion.setFromUnitVectors(V3(0, 1, 0), d.add(V3(0, 0.5, 0)).normalize());  // ils montent vers le ciel
+      }
+      for (const c of [-1, 1]) { const m = accessoire(new THREE.ConeGeometry(0.02, 0.12, 5), '#ffd83a', b.tete, 0.03 * c, 0.07, 0.105); m.material = or; m.rotation.set(-2.6, 0, 0.3 * c); } // deux mèches sur le front
+      b.g.add(auraBJ);   // l'aura dorée
+    } },
+  { code: 'Z6PO', alias: 'C3PO', texte: 'Z6PO, le robot doré', vitesse: 0.6, balles: 0.5, robot: true, effet: b => {
+      const dore = mat('#e8a030', { metalness: 0.75, roughness: 0.3 });
+      b.g.traverse(o => { if (o.userData.habit) o.material = dore; });   // tout en or, même la tête
+      b.cheveux.visible = false; habiller(b.ceinture, '#3a3a3a');         // la tête chauve, des fils à la taille
+      b.jambeD.bas.material = mat('#b8b8c0', { metalness: 1, roughness: 0.3 });   // le bas de la jambe droite en argent, comme dans le film
+      for (const c of [-1, 1]) accessoire(new THREE.SphereGeometry(0.024, 12, 8), '#ffb020', b.tete, 0.042 * c, 0.012, 0.1).material = mat('#ffb020', { emissive: '#ff8c00' }); // les yeux qui brillent
+      accessoire(GEO.moustache, '#2a2a2a', b.tete, 0, -0.058, 0.11);   // la bouche : une fente
+    } },
 ];
 
 // =====================================================================
@@ -1740,6 +1779,8 @@ function piece(geo, couleur, parent, x, y, z) {
 }
 const habiller = (m, couleur) => { m.material = mat(couleur); };
 const habillerMembre = (m, couleur) => { habiller(m.haut, couleur); habiller(m.bas, couleur); };
+// une pièce ajoutée par un code de triche : rhabillerBJ l'enlève
+const accessoire = (geo, couleur, parent, x, y, z) => { const m = piece(geo, couleur, parent, x, y, z); m.name = 'accessoire'; return m; };
 // un bras ou une jambe : deux morceaux de longueur l, avec un pli entre les deux (le coude ou le genou)
 function membre(parent, x, y, l, geoHaut, geoBas, couleurHaut, couleurBas) {
   const m = new THREE.Group(); m.position.set(x, y, 0); parent.add(m);
@@ -1759,10 +1800,11 @@ function creerHumain(s) {
   tete.material = visage(s.peau);
   piece(GEO.nez, s.peau, tete, 0, -0.018, 0.122);
   for (const c of [-1, 1]) piece(GEO.oreille, s.peau, tete, 0.112 * c, 0, -0.01);
+  let cheveux = null;
   if (s.casque) { piece(GEO.casque, s.casque, tete, 0, 0.045, 0); piece(GEO.rebord, s.casque, tete, 0, 0.07, 0); } // casque allemand
   else if (s.casquette) { piece(GEO.casquette, s.casquette, tete, 0, 0.105, 0); piece(GEO.visiere, s.casquette, tete, 0, 0.075, 0.13); }
   else {
-    piece(GEO.cheveux, s.cheveux, tete, 0, 0.012, -0.012).rotation.x = -0.6;   // penchés vers l'arrière : ils dégagent le front
+    cheveux = piece(GEO.cheveux, s.cheveux, tete, 0, 0.012, -0.012); cheveux.rotation.x = -0.6;   // penchés vers l'arrière : ils dégagent le front
     if (s.cheveuxLongs) piece(GEO.cheveuxLongs, s.cheveux, tete, 0, -0.08, -0.07);
   }
   if (s.moustache) { piece(GEO.moustache, s.moustache, tete, 0, -0.05, 0.12); piece(GEO.meche, s.cheveux, tete, 0.02, 0.09, 0.095).rotation.z = -0.35; }
@@ -1773,11 +1815,13 @@ function creerHumain(s) {
     j.chaussure = piece(GEO.chaussure, s.chaussures, j.pli, 0, -0.45, 0.045); return j; });
   if (s.brassard) piece(GEO.brassard, s.brassard, brasG, 0, -0.15, 0);
   if (s.taille) g.scale.set(s.taille * s.carrure, s.taille, s.taille * s.carrure);
-  return { g, haut, tete, torse, bassin, ceinture, brasD, brasG, jambeD, jambeG, tenue: s, phase: Math.random() * 6, arme: null };
+  return { g, haut, tete, cheveux, torse, bassin, ceinture, brasD, brasG, jambeD, jambeG, tenue: s, phase: Math.random() * 6, arme: null };
 }
 function animerHumain(h, vitesse, dt, o = {}) {
   h.phase += dt * (vitesse > 0.2 ? 2.5 + vitesse * 1.3 : 0);
-  const amp = vitesse > 0.2 ? Math.min(0.95, 0.35 + vitesse * 0.08) : 0, s = Math.sin(h.phase) * amp, c = Math.cos(h.phase) * amp;
+  // un robot bouge par à-coups : sa pose ne change que 8 fois par pas, et il fait de petits pas
+  const phase = o.robot ? Math.round(h.phase / (Math.PI / 4)) * Math.PI / 4 : h.phase;
+  const amp = vitesse > 0.2 ? Math.min(o.robot ? 0.28 : 0.95, 0.35 + vitesse * 0.08) : 0, s = Math.sin(phase) * amp, c = Math.cos(phase) * amp;
   // accroupi ou assis : les cuisses partent vers l'avant et les genoux se plient
   const cuisse = o.assis ? 1.4 : o.accroupi ? 0.9 : 0, genou = o.assis ? 1.1 : cuisse * 2;
   h.jambeG.rotation.x = s - cuisse; h.jambeD.rotation.x = -s - cuisse;
@@ -1785,6 +1829,11 @@ function animerHumain(h, vitesse, dt, o = {}) {
   h.jambeG.pli.rotation.x = genou + Math.max(0, -c) * 1.5; h.jambeD.pli.rotation.x = genou + Math.max(0, c) * 1.5;
   h.brasG.rotation.set(-s * 0.8, 0, 0.1); h.brasD.rotation.set(s * 0.8, 0, -0.1);
   h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.15 - amp * 1.1;   // plus on va vite, plus les coudes sont pliés
+  if (o.robot) { // raide comme un robot : les genoux presque droits, les coudes pliés, les bras un peu écartés qui bougent à peine
+    h.jambeG.pli.rotation.x = genou + Math.max(0, -c) * 0.3; h.jambeD.pli.rotation.x = genou + Math.max(0, c) * 0.3;
+    h.brasG.rotation.set(-s * 0.3, 0, 0.2); h.brasD.rotation.set(s * 0.3, 0, -0.2);
+    h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.6;
+  }
   if (o.arme) { h.brasD.rotation.set(-1.45, 0, 0); h.brasG.rotation.set(-1.3, 0, -0.55); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = 0; }
   if (o.assis) { h.brasD.rotation.set(-0.95, 0, -0.3); h.brasG.rotation.set(-0.95, 0, 0.3); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.5; } // les mains au guidon
   if (o.frappe > 0) { h.brasD.rotation.x = -1.7 * Math.sin(o.frappe * Math.PI); h.brasD.pli.rotation.x = -1.3 * (1 - Math.sin(o.frappe * Math.PI)); }
@@ -1797,7 +1846,7 @@ function animerHumain(h, vitesse, dt, o = {}) {
   }
   // la danse, en trois pas. Seule la danse écarte les jambes, penche la tête ou met sur la pointe des pieds
   const pas = o.danse?.pas;
-  let penche = o.accroupi ? 0.25 : amp * 0.12, monte = 0;   // on se penche en avant pour courir
+  let penche = o.accroupi ? 0.25 : o.robot ? 0 : amp * 0.12, monte = 0;   // on se penche en avant pour courir, pas un robot
   h.tete.rotation.x = 0; h.brasD.position.y = 0.6;
   for (const j of [h.jambeG, h.jambeD]) { j.rotation.z = 0; j.chaussure.rotation.set(0, 0, 0); }
   if (pas === 'moonwalk') { // il marche vers l'avant mais il recule : le pied qui avance glisse sur la pointe, le bras gauche bouge à peine
@@ -1824,6 +1873,7 @@ function animerHumain(h, vitesse, dt, o = {}) {
   const hy = (o.accroupi ? 0.6 : 0.95) - Math.min(0.06, 0.5 * (1 - Math.cos(s))) + monte;
   h.haut.position.y = h.jambeG.position.y = h.jambeD.position.y = hy;
   h.haut.rotation.x = penche;
+  h.haut.rotation.z = o.robot ? s * 0.25 : 0;   // un robot se dandine d'un pied sur l'autre
   h.g.rotation.x = o.nage ? 1.35 : -(o.mort || 0) * Math.PI / 2;
 }
 
@@ -2379,6 +2429,7 @@ const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, 
   balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0 };
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
+joueurH.g.traverse(o => o.userData.habit = o.material);   // sa tenue normale, pour la lui remettre après les codes de triche
 scene.add(joueurH.g);
 const giletBJ = piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#243a5a', joueurH.haut, 0, 0.4, 0); // visible quand il en porte un
 // le chapeau de la danse : il tourne autour du milieu de la tête, pour être rabattu sur les yeux
@@ -2387,6 +2438,17 @@ piece(new THREE.CylinderGeometry(0.125, 0.145, 0.13, 20), '#151515', chapeauBJ, 
 piece(new THREE.CylinderGeometry(0.148, 0.148, 0.035, 20), '#d8d8d8', chapeauBJ, 0, 0.095, 0);  // le ruban
 piece(new THREE.CylinderGeometry(0.22, 0.22, 0.012, 24), '#151515', chapeauBJ, 0, 0.075, 0);    // le bord
 chapeauBJ.visible = false;
+// l'aura dorée du Super Saiyan (code GOKU) : des flammes qui montent autour de lui
+const auraBJ = new THREE.Mesh(tour([[0, 0], [0.45, 0.05], [0.6, 0.6], [0.55, 1.3], [0.35, 1.9], [0.1, 2.35], [0, 2.5]], 32),
+  new THREE.MeshBasicMaterial({ color: '#ffc830', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false,
+    map: toile(64, 64, g => { g.fillStyle = '#101010'; g.fillRect(0, 0, 64, 64);   // un léger voile doré...
+      for (let k = 0; k < 80; k++) { // ...et des flammes : claires en bas, elles s'effacent vers le haut
+        const x = Math.random() * 64, y = Math.random() * 64, l = 8 + Math.random() * 24, w = 1 + Math.random() * 3, a = 0.3 + Math.random() * 0.5;
+        for (const y0 of [y, y - 64]) { // dessinée deux fois : le haut de l'image se raccorde au bas
+          const d = g.createLinearGradient(0, y0, 0, y0 + l); d.addColorStop(0, 'rgba(255,255,255,0)'); d.addColorStop(1, `rgba(255,255,255,${a})`);
+          g.fillStyle = d; g.fillRect(x, y0, w, l);
+        } } }) }));
+auraBJ.name = 'accessoire';
 
 // arme vue en première personne (dessinée par-dessus le reste)
 const vmScene = new THREE.Scene(), vmCamera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.01, 10);
@@ -2590,8 +2652,9 @@ addEventListener('keydown', e => {
   if (!['F5', 'F11', 'F12', 'Escape'].includes(e.code)) e.preventDefault();
   if ((e.code === 'Enter' || e.code === 'NumpadEnter') && !carte.ouverte) { validerTriche(); return; }
   if (saisie !== null) { // on tape un code de triche : les touches ne font plus bouger le joueur
+    const c = /^(Digit|Numpad)\d$/.test(e.code) ? e.code.slice(-1) : e.key;   // un chiffre, même sans Maj sur un clavier français
     if (e.code === 'Backspace') saisie = saisie.slice(0, -1);
-    else if (/^[a-z0-9]$/i.test(e.key) && saisie.length < 20) saisie += e.key.toUpperCase();
+    else if (/^[a-z0-9]$/i.test(c) && saisie.length < 20) saisie += c.toUpperCase();
     $('triche').textContent = `Code : ${saisie}_`;
     return;
   }
@@ -2637,22 +2700,24 @@ function validerTriche() {
     $('triche').textContent = 'Code : _'; $('triche').style.display = 'block';
     return;
   }
-  const t = TRICHES.find(t => t.code.toUpperCase() === saisie);
+  const t = TRICHES.find(t => [t.code, t.alias].some(c => c?.toUpperCase() === saisie));
   saisie = null; $('triche').style.display = 'none';
   if (!t) { annonce('', 'Code inconnu', 1.5); return; }
   t.actif = !t.actif; // retaper un code annule son effet
   rhabillerBJ();
   annonce('', t.actif ? t.texte : `${t.texte} (annulé)`, 2);
 }
-// remet B.J. dans sa tenue normale, puis applique les codes actifs
+// remet B.J. dans sa tenue normale (sans accessoires), puis applique les codes actifs
 function rhabillerBJ() {
-  const b = joueurH, T = TENUE_BJ;
-  habiller(b.torse, T.haut); b.torse.clear(); habiller(b.bassin, T.bas); b.bassin.scale.set(1, 1, 1); b.ceinture.visible = true;
-  for (const bras of [b.brasD, b.brasG]) { habiller(bras.haut, T.haut); habiller(bras.bas, T.manchesCourtes ? T.peau : T.haut); }
-  for (const j of [b.jambeD, b.jambeG]) { habillerMembre(j, T.bas); j.scale.set(1, 1, 1); habiller(j.chaussure, T.chaussures); j.chaussure.visible = true; }
-  b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
+  const b = joueurH, enTrop = [];
+  b.g.traverse(o => { if (o.name === 'accessoire') enTrop.push(o); if (o.userData.habit) { o.material = o.userData.habit; o.visible = true; } });
+  for (const o of enTrop) o.removeFromParent();
+  for (const j of [b.jambeD, b.jambeG]) j.scale.set(1, 1, 1);
+  b.bassin.scale.set(1, 1, 1); b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
   for (const t of TRICHES) if (t.actif) t.effet(b);
 }
+// ce que les codes actifs changent au jeu : leurs nombres se multiplient (1 = rien ne change)
+const parTriche = cle => TRICHES.reduce((k, t) => t.actif && t[cle] !== undefined ? k * t[cle] : k, 1);
 // la danse (gauche, arrière, droite, 3 fois de suite) : B.J. se met de profil, pour qu'on voie bien le moonwalk
 const SUITE_DANSE = (R_.touchesDanse.join(' ') + ' ').repeat(3);
 let suite = '';   // les dernières touches tapées
@@ -2850,7 +2915,8 @@ function majJoueur(dt) {
   if ((court || J.nage) && J.accroupi) J.accroupi = false;
   if (J.danse && (av || lat || touches.Space || J.accroupi || sourisG || visee || J.nage)) J.danse = 0;   // bouger, sauter, s'accroupir, tirer ou viser arrête la danse
   const moonwalk = J.danse > 0 && J.danse < R_.moonwalk[0];
-  const v = moonwalk ? R_.vitesseMoonwalk : J.nage ? (court ? R_.vitesseNageRapide : R_.vitesseNage) : J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche;
+  const v = (moonwalk ? R_.vitesseMoonwalk : J.nage ? (court ? R_.vitesseNageRapide : R_.vitesseNage) : J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche) * parTriche('vitesse');
+  const robot = TRICHES.some(t => t.actif && t.robot);
   let mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat;
   if (moonwalk) { mx = -Math.sin(J.angleCorps); mz = -Math.cos(J.angleCorps); }   // le moonwalk : il recule
   const n = Math.hypot(mx, mz);
@@ -2876,9 +2942,9 @@ function majJoueur(dt) {
   }
   if (J.nage) joueurH.g.position.set(J.x - Math.sin(J.angleCorps) * 0.9, EAU - 0.25, J.z - Math.cos(J.angleCorps) * 0.9);   // couché dans l'eau
   else joueurH.g.position.set(J.x, J.y, J.z);
-  joueurH.g.rotation.y = J.angleCorps;
+  joueurH.g.rotation.y = robot ? Math.round(J.angleCorps / 0.2) * 0.2 : J.angleCorps;   // un robot se tourne par crans
   if (joueurH.arme) joueurH.arme.visible = !J.nage && !danse;   // il range son arme pour nager ou danser
-  animerHumain(joueurH, J.vitesse, dt, { arme: !ARMES[J.arme].corps && !J.nage && !danse, accroupi: J.accroupi, frappe: J.frappe, enAir: !J.sol && !J.nage, nage: J.nage, danse });
+  animerHumain(joueurH, J.vitesse, dt, { arme: !ARMES[J.arme].corps && !J.nage && !danse, accroupi: J.accroupi, frappe: J.frappe, enAir: !J.sol && !J.nage, nage: J.nage, danse, robot });
 }
 function conduire(v, dt) {
   const gaz = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), volant = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
@@ -3133,7 +3199,7 @@ function tirEnnemi(p, d) {
   if (!reussi) arrivee.add(new THREE.Vector3(entre(-2, 2), entre(-1, 1.5), entre(-2, 2)));
   traceur(depart, arrivee); flash(depart, 0.4);
   bruit(0.4 * clamp(1 - d / 120, 0, 1), 1800, 0.18);
-  if (reussi) blesserJoueur(degats);
+  if (reussi) blesserJoueur(degats * parTriche('balles'));
 }
 
 // voitures qui roulent toutes seules : elles suivent une "carotte" qui avance sur la voie de droite du réseau des routes.
@@ -3541,6 +3607,7 @@ function mettreAJour(dt) {
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
+  auraBJ.material.map.offset.y -= dt * 1.5; auraBJ.material.opacity = 0.45 + Math.random() * 0.25;   // l'aura monte et tremble
   for (const p of personnes) majPersonne(p, dt);
   for (const v of voitures) majVoiture(v, dt);
   for (const o of objets) {

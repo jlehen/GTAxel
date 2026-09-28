@@ -42,7 +42,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 - **Cascades** : deux pistes comme dans le jeu *Stunts* (C orange sur la mini-carte). Le **Stunt Park de Palomino**, à l'est de Los Santos, a un tremplin, un looping, des bosses, un virage relevé, un tire-bouchon et un pont. Les **Sauts de Grand Senora**, près de Harmony, enchaînent trois grands tremplins et un pont. Une voiture t'attend au départ. Dans le looping, il faut au moins 76 km/h pour passer en haut, sinon tu tombes sur le toit !
 - **Missions** : suis le point jaune sur la mini-carte et la colonne lumineuse. La dernière mission t'envoie au château Wolfenstein (W rouge sur la mini-carte) pour éliminer Hitler.
 - **Carte** : la touche M affiche tout le pays en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants. Elle te dit aussi dans quelle colonne et quelle ligne du tableau `CARTE` tu es.
-- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`… à toi de voir ce qu'ils font ! Retape un code pour l'annuler.
+- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`, `GOKU`, `Z6PO` (ou `C3PO`)… à toi de voir ce qu'ils font ! Retape un code pour l'annuler.
 - **Danse** : tape Q S D trois fois de suite (A S D sur un clavier QWERTY) : B.J. met son chapeau et fait le moonwalk, tourne sur lui-même en poussant son petit cri, puis prend la pose de Michael Jackson, la main entre les jambes : « Who's bad ? ». Bouge pour l'arrêter.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital le plus proche (+ rouge sur la mini-carte) et tu perds 100 $.
 
@@ -87,6 +87,6 @@ Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier
 
 5. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture`, `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`. Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ».
 6. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
-7. **`TRICHES`** : renomme les codes ou invente les tiens.
+7. **`TRICHES`** : renomme les codes ou invente les tiens. Un code peut aussi te rendre plus rapide (`vitesse: 2`) ou plus solide (`balles: 0.5`).
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).
