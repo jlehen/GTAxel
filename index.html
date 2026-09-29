@@ -3827,6 +3827,7 @@ scene.add(fleche);
 //  État du jeu
 // =====================================================================
 let etoiles = 0, tempsCalme = 0, vuParPolice = false, tVu = 0, tRenfort = 0, tVoiturePolice = 0, tRobot = 15, tPeupler = 0, temps = 0;
+let elan = { x: 0, z: 0 }, dernierJ = null;   // où va B.J., en m/s (peupler le mesure toutes les demi-secondes)
 let saisie = null; // code de triche en cours de frappe
 let missionIndex = 0, etapeIndex = 0, enJeu = false, visee = false, sourisG = false, dejaTire = false, tempsAnnonce = 0;
 const touches = {};
@@ -4590,7 +4591,7 @@ function majVoiture(v, dt) {
     } else { v.corps.remove(v.pilote.g); v.pilote = null; }
   }
   poserVoiture(v, dt);
-  if (v.conducteur === 'civil' && d > 280) v.supprimer = true;
+  if (v.conducteur === 'civil' && (d > 280 || (d > 120 && derriere(v)))) v.supprimer = true;
   if (v.coule > 25 && d > 60) v.supprimer = true;
   if (v.police && v.renfort && !v.conducteur && v !== J.voiture && d > 150) v.supprimer = true;
   if (v.detruite) { // elle brûle 12 s, et la carcasse disparaît au bout de 40 s quand on ne la voit plus
@@ -4600,6 +4601,9 @@ function majVoiture(v, dt) {
 }
 
 // faire apparaître piétons et voitures autour du joueur (hors de sa vue)
+// quand B.J. roule vite (plus de 10 m/s : plus vite qu'en courant), ce qui est derrière lui ne sert à rien : il s'en éloigne.
+// Les piétons et les voitures apparaissent alors devant lui, et ceux qu'il a laissés loin derrière disparaissent plus tôt
+const derriere = p => Math.hypot(elan.x, elan.z) > 10 && (p.x - J.x) * elan.x + (p.z - J.z) * elan.z < 0;
 function apparaitreVoiture(police, type) {
   const proches = [];
   NOEUDS.forEach((n, k) => { const d = Math.hypot(n.x - J.x, n.z - J.z); if (d > 40 && d < 240 && n.voisins.length) proches.push(k); });
@@ -4607,7 +4611,7 @@ function apparaitreVoiture(police, type) {
     const a = hasard(proches), r = { a, b: hasard(NOEUDS[a].voisins), t: 0 };
     r.t = entre(0, longueurRoute(r));
     const p = pointRoute(r, r.t), dd = dist(p, J);
-    if (dd < (police ? 90 : 60) || dd > 230 || voitures.some(o => dist(o, p) < 12) || (dd < 130 && voit({ ...p, y: NOEUDS[a].y }, J))) continue;
+    if (dd < (police ? 90 : 60) || dd > 230 || (!police && derriere(p)) || voitures.some(o => dist(o, p) < 12) || (dd < 130 && voit({ ...p, y: NOEUDS[a].y }, J))) continue;
     const v = creerVoiture(p.x, p.z, angleVers(NOEUDS[r.a], NOEUDS[r.b]), police, type);
     v.conducteur = police ? 'police' : 'civil'; v.route = r; v.renfort = police; v.vitesse = police ? 10 : 5;
     return v;
@@ -4619,7 +4623,7 @@ function apparaitrePersonne(type) {
     const i = bi + Math.floor(entre(-2, 3)), j = bj + Math.floor(entre(-2, 3));
     if (!typeBloc(i, j)) continue;
     const p = coin(i, j, Math.floor(Math.random() * 4)), d = dist(p, J);
-    if (d < 45 || d > 170 || (d < 110 && voit(p, J))) continue;
+    if (d < 45 || d > 170 || (type === 'pieton' && derriere(p)) || (d < 110 && voit(p, J))) continue;
     return creerPersonne(type, p.x, p.z);
   }
 }
@@ -4627,12 +4631,15 @@ function peupler(dt) {
   tPeupler -= dt;
   if (tPeupler > 0) return;
   tPeupler = 0.5;
-  for (const p of personnes) if (p.type === 'pieton' && dist(p, J) > 200) p.supprimer = true;
-  // autant que choisi dans le menu (FOULES) ; plus on en veut, plus il en apparaît à la fois, pour que la ville se remplisse aussi vite
+  if (dernierJ) elan = { x: (J.x - dernierJ.x) / 0.5, z: (J.z - dernierJ.z) / 0.5 };
+  dernierJ = { x: J.x, z: J.z };
+  for (const p of personnes) if (p.type === 'pieton' && (dist(p, J) > 200 || (dist(p, J) > 60 && derriere(p)))) p.supprimer = true;
+  // autant que choisi dans le menu (FOULES). Il en apparaît jusqu'à un huitième à la fois : en voiture, la ville se remplit devant B.J.
+  // aussi vite qu'elle se vide derrière lui (mais pas tout d'un coup, ce qui ferait sauter l'image)
   const pietons = personnes.filter(p => p.type === 'pieton').length, civiles = voitures.filter(v => v.conducteur === 'civil').length;
   const { pietons: voulus } = FOULES[foule.pietons], { voitures: voulues } = FOULES[foule.voitures];
-  for (let k = pietons; k < Math.min(voulus, pietons + Math.ceil(voulus / 30)); k++) apparaitrePersonne('pieton');
-  for (let k = civiles; k < Math.min(voulues, civiles + Math.ceil(voulues / 16)); k++) apparaitreVoiture(false);
+  for (let k = pietons; k < Math.min(voulus, pietons + Math.ceil(voulus / 8)); k++) apparaitrePersonne('pieton');
+  for (let k = civiles; k < Math.min(voulues, civiles + Math.ceil(voulues / 8)); k++) apparaitreVoiture(false);
 }
 function police(dt) {
   if (etoiles === 0) return;
