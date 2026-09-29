@@ -3295,14 +3295,14 @@ function reglerMoteur(m, v, gaz, fort) {
   m.volume.gain.setTargetAtTime(s.volume * fort * (0.55 + 0.45 * gaz), t, 0.1);
 }
 function bruit(vol, freq, duree) {
-  if (!audio || vol <= 0.01) return;
+  if (!audio || !(vol > 0.01)) return;   // « pas plus que » : un volume NaN (impossible) ne passe pas, il arrêterait tout le jeu
   const t = audio.currentTime, s = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
   s.buffer = bruitBuf; f.type = 'lowpass'; f.frequency.value = freq;
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + duree);
   s.connect(f).connect(g).connect(audio.destination); s.start(t, Math.random() * 0.5); s.stop(t + duree);
 }
 function bip(f1, f2, duree, forme, vol) {
-  if (!audio) return;
+  if (!audio || !(vol > 0)) return;
   const t = audio.currentTime, o = audio.createOscillator(), g = audio.createGain();
   o.type = forme; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + duree);
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + duree);
@@ -3566,7 +3566,8 @@ const M_FUMEE = new THREE.SpriteMaterial({ map: TEX.fumee, color: '#9a9a9a', tra
 const roquettes = [], rayonRoquette = Object.assign(new THREE.Raycaster(), { camera }), GEO_ROQUETTE = new THREE.CylinderGeometry(0.07, 0.07, 0.6, 6).rotateX(Math.PI / 2);
 // ignore : un robot que la roquette traverse (celui qui l'a tirée)
 function lancerRoquette(depart, vers, portee, rayon, degatsPNJ, degatsJoueur, tireur, ignore = tireur) {
-  const m = new THREE.Mesh(GEO_ROQUETTE, M_KAKI); m.position.copy(depart); m.lookAt(vers); scene.add(m);
+  if (![depart, vers].every(p => Number.isFinite(p.x + p.y + p.z))) return console.error('Roquette vers un point impossible (NaN) : pas tirée', depart, vers, tireur);   // F12 : la pile dit qui a tiré
+  const m =new THREE.Mesh(GEO_ROQUETTE, M_KAKI); m.position.copy(depart); m.lookAt(vers); scene.add(m);
   const feu = new THREE.Sprite(M_FLASH); feu.position.z = -0.45; feu.scale.setScalar(0.7); m.add(feu); // la flamme derrière
   roquettes.push({ m, dir: vers.clone().sub(depart).normalize(), reste: portee, rayon, degatsPNJ, degatsJoueur, tireur, ignore });
 }
