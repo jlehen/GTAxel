@@ -254,6 +254,7 @@ const TRADUCTIONS = {
   'Bébé !':           { de: 'Baby!', en: 'Baby!', gsw: 'Bébé!' },
   'San Goku, Super Saiyan !': { de: 'Son Goku, Super-Saiyajin!', en: 'Goku, Super Saiyan!', gsw: 'Son Goku, Super-Saiyajin!' },
   'Z6PO, le robot doré': { de: 'C-3PO, der goldene Roboter', en: 'C-3PO, the golden robot', gsw: 'C-3PO, de goldig Roboter' },
+  'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
   'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
   // les annonces
   'Moonwalk !':       { de: 'Moonwalk!', en: 'Moonwalk!', gsw: 'Moonwalk!' },
@@ -812,6 +813,8 @@ const TRICHES = [
   { code: 'IDKFA',       texte: 'Toutes les armes, plein de munitions, gilet et masque à gaz !', action: () => {
       ARMES.forEach((a, i) => { J.possede[i] = true; if (!a.corps) J.balles[i] = Math.max(J.balles[i], a.munitions * 3); });
       J.gilet = R_.giletMax; J.masque = true; } },
+  // pour tester ce qui coûte cher : 100 000 $ d'un coup (change le nombre pour en avoir plus ou moins)
+  { code: 'RICHE',       texte: 'Riche ! +100 000 $',   action: () => { J.argent += 100000; } },
   // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
   { code: 'MISSION',     texte: 'Saut de mission',      action: n => sauterMission(n) },
 ];
