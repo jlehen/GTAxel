@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 29 septembre 2026 (braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard ; police en force à 4 et 5 étoiles, heavy robot pilotable ; codes de triche `IDKFA`, `MISSION` + numéro, `RICHE` (100 000 $), `GOKU`, Super Saiyan, et `Z6PO` ou `C3PO`, un robot doré plus lent et plus solide ; menu des langues : français, allemand, anglais et züritüütsch, enseignes comprises ; légende de la grande carte ; foule au choix dans le menu, piétons et voitures : Peu, Normal, Beaucoup ou Énorme, Beaucoup au départ ; accidents : tonneaux, tête-à-queue et voitures qui décollent selon la force du choc, voiture couchée qui brûle puis explose, carrosserie qui s'écrase là où ça tape et d'autant plus que c'est fort, vitres brisées sombres avec des éclats, lampadaires qui tombent, bornes en béton autour des places, pneus qui crèvent sous les balles ; tirer sur une voiture touche celui qui la conduit, et le tuer donne une étoile ; une voiture trop abîmée prend feu, puis explose ; un son au volume impossible ne fige plus le jeu).
+Mis à jour le 29 septembre 2026 (immeubles où l'on entre : des étages, et le toit par l'escalier, une échelle ou un escalier de secours, ou une terrasse ; avions et hélicoptères à piloter à l'aéroport ; dos d'âne dans les rues ; gangs dans leur quartier ; roquettes un peu plus rapides ; une voiture en toupie renverse les piétons et pousse les autres voitures ; une borne restée sous la voiture ne la bloque plus ; braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard ; police en force à 4 et 5 étoiles, heavy robot pilotable ; codes de triche `IDKFA`, `MISSION` + numéro, `RICHE` (100 000 $), `GOKU`, Super Saiyan, et `Z6PO` ou `C3PO`, un robot doré plus lent et plus solide ; menu des langues : français, allemand, anglais et züritüütsch, enseignes comprises ; légende de la grande carte ; foule au choix dans le menu, piétons et voitures : Peu, Normal, Beaucoup ou Énorme, Beaucoup au départ ; accidents : tonneaux, tête-à-queue et voitures qui décollent selon la force du choc, voiture couchée qui brûle puis explose, carrosserie qui s'écrase là où ça tape et d'autant plus que c'est fort, vitres brisées sombres avec des éclats, lampadaires qui tombent, bornes en béton autour des places, pneus qui crèvent sous les balles ; tirer sur une voiture touche celui qui la conduit, et le tuer donne une étoile ; une voiture trop abîmée prend feu, puis explose ; un son au volume impossible ne fige plus le jeu).
 
 ## Vision
 
@@ -21,7 +21,7 @@ Le joueur alterne entre deux boucles. Les missions rapportent l'argent qui achè
 
 ```mermaid
 flowchart LR
-  E[Explorer le pays<br>à pied, en voiture ou en bateau]
+  E[Explorer le pays<br>à pied, en voiture, en bateau ou en avion]
   E --> M[Faire une mission<br>suivre le point jaune] --> G[Gagner de l'argent<br>200 à 250 000 $] --> A[Acheter des armes<br>à l'armurerie]
   A -- armes plus fortes : bunker, puis château --> E
   E --> B[Faire des bêtises<br>voler, frapper, tirer] --> P[La police arrive<br>1 à 5 étoiles]
@@ -43,7 +43,7 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | Maj | Courir | Rien |
 | Espace | Sauter (environ 1 m), rien en nageant | Frein à main, virage plus serré |
 | Ctrl ou C | S'accroupir (bascule) | Rien |
-| E ou F | Monter en voiture ou en bateau, acheter une arme ou le masque à gaz, prendre l'ascenseur, parler au garagiste, voler le butin, poser la perceuse ou l'explosif, éjecter le pilote du heavy robot ou monter dedans | Descendre (pas en plein looping) |
+| E ou F | Monter en voiture, en bateau, en avion ou en hélicoptère, acheter une arme ou le masque à gaz, prendre l'ascenseur, parler au garagiste, voler le butin, poser la perceuse ou l'explosif, éjecter le pilote du heavy robot ou monter dedans | Descendre (pas en plein looping, ni en plein vol) |
 | V | 1re ou 3e personne | Vue intérieure ou extérieure |
 | 1 à 8, molette | Changer d'arme | Rien |
 | M | Ouvrir ou fermer la grande carte | Ouvrir ou fermer la grande carte |
@@ -51,6 +51,10 @@ Une partie commence à pied, sans argent, avec les poings et un couteau. Le hér
 | Échap | Pause | Pause |
 
 Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W A S D sur un QWERTY. Seule la touche M suit la lettre imprimée sur le clavier.
+
+**En avion** : Z accélère, S ralentit (et freine au sol). L'avion va là où l'on regarde avec la souris ; au clavier, Q et D tournent, Espace et C lèvent ou baissent le nez. **En hélicoptère** : Espace monte, C descend, Z Q S D le font avancer, reculer et glisser sur le côté, la souris le tourne. Dans les deux, V passe de la vue derrière à la vue du cockpit, et E ne fait descendre qu'une fois posé (voir « Avions et hélicoptères »).
+
+**Sur une échelle** : on grimpe en avançant vers le mur, on descend en s'en éloignant, Espace fait lâcher prise.
 
 **Dans le heavy robot** : Z Q S D le font marcher (4 m/s, 6 m/s avec Maj), la souris le tourne et vise, le clic gauche tire à la mitrailleuse lourde, le clic droit lance une roquette, E fait descendre, V passe de la vue derrière l'épaule à la vue dans la cabine. On ne peut ni sauter, ni s'accroupir, ni changer d'arme, ni danser.
 
@@ -65,6 +69,7 @@ Les touches sont repérées par leur position : Z Q S D sur un clavier AZERTY, W
 | Nage (Maj) | 4 m/s |
 | Nage | 2,2 m/s |
 | Moonwalk (pendant la danse) | 1,5 m/s, à reculons |
+| Sur une échelle | 2,5 m/s, vers le haut ou vers le bas |
 
 Le code de triche `Z6PO` multiplie toutes ces vitesses par 0,6.
 
@@ -105,14 +110,14 @@ Le pays est une île inspirée de celle de GTA 5, en plus petit et plus simple :
 
 Tout est construit au chargement à partir du tableau `CARTE` de `index.html` : 70 lignes de 48 signes, le nord en haut. Chaque signe est une case de 74 m. Une lettre est un pâté de maisons de 60 m, entouré de rues de 14 m. Les autres signes sont du terrain, sans rues. Le pays est le même à chaque partie.
 
-La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 25 de tours et 23 de docks. Il y a aussi 63 cases de piste d'aéroport, 135 cases de route et 1 523 cases d'eau.
+La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 25 de tours et 23 de docks. Il y a aussi 63 cases de piste d'aéroport (dont 2 avec un avion et 2 avec un hélicoptère), 135 cases de route et 1 523 cases d'eau.
 
 ### Les signes de la carte
 
 | Signe | Contenu |
 | --- | --- |
 | `T` | Une grande tour de 20 à 45 étages, ou 4 tours de 12 à 29 étages, en verre ou modernes |
-| `I` | 2 ou 4 immeubles de 3 à 10 étages, en brique, béton ou modernes |
+| `I` | 2 ou 4 immeubles de 3 à 10 étages, en brique, béton ou modernes, avec une porte sur la rue. On entre dans environ 1 sur 5 (voir « Les immeubles où l'on entre ») |
 | `M` | 4 maisons avec pelouse et arbres, 1 voiture garée |
 | `P` | Pelouse, allées pavées, fontaine, jusqu'à 14 arbres, 1 trousse de soin |
 | `.` `X` `a`–`z` | Place pavée avec 4 arbres et 2 voitures garées, entourée de bornes en béton (une tous les 3 m, à 3 m du bord, sauf sur 12 m au milieu de chaque côté pour entrer en voiture). `X` est le départ, les minuscules sont les lieux de mission |
@@ -129,7 +134,9 @@ La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 25 de tours et
 | `#` | Pont : une route qui passe sur l'eau |
 | `+` | Pont en ville : les rues autour de cette case d'eau passent dessus |
 | `&` | Ponton en planches, avec un hors-bord et un jet-ski amarrés |
-| `!` | Piste d'aéroport, parfois avec un avion posé dessus |
+| `!` | Piste d'aéroport |
+| `^` | Piste d'aéroport avec un avion à piloter |
+| `@` | Piste d'aéroport avec une hélistation et un hélicoptère à piloter |
 
 ### Le relief et l'eau
 
@@ -143,13 +150,13 @@ La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 25 de tours et
 
 | Ville | Où | Ce qu'on y trouve |
 | --- | --- | --- |
-| Los Santos | Sud | Vinewood et son musée d'art, le centre (tours, gratte-ciel Maze Bank, banque, grande banque Pacific Standard, commissariat), la bijouterie Vangelico, Vespucci et sa plage, la villa de Michael, l'hôpital, l'armurerie, LS Customs, le fleuve et ses deux ponts, l'aéroport et ses hangars, le port avec ses conteneurs et ses grues |
+| Los Santos | Sud | Vinewood et son musée d'art, le centre (tours, gratte-ciel Maze Bank, banque, grande banque Pacific Standard, commissariat), la bijouterie Vangelico, Vespucci et sa plage, la villa de Michael, l'hôpital, l'armurerie, LS Customs, le fleuve et ses deux ponts, l'aéroport, ses hangars, ses avions et ses hélicoptères, le port avec ses conteneurs et ses grues ; les gangs Families, Ballas et Vagos au sud |
 | Paleto Bay | Nord | Maisons, supérette, hôpital, armurerie, station-service, garage LS Customs |
 | Grapeseed | Nord-est | Deux fermes et une supérette au milieu des champs |
-| Sandy Shores | Au sud de l'Alamo Sea | Caravane de Trevor, bar Yellow Jack, supérette, hôpital, commissariat, armurerie, aérodrome |
+| Sandy Shores | Au sud de l'Alamo Sea | Caravane de Trevor, bar Yellow Jack, supérette, hôpital, commissariat, armurerie, aérodrome avec un avion, le gang Lost MC |
 | Harmony | Désert | Station-service et supérette |
 | Chumash | Côte ouest | Maisons et supérette |
-| Fort Zancudo | Côte ouest | Le bunker nazi, une caserne, un hangar et une piste |
+| Fort Zancudo | Côte ouest | Le bunker nazi, une caserne, un hangar avec un avion et une piste |
 | Mont Chiliad | Nord | Le château Wolfenstein, au bout d'une route de montagne |
 
 Deux stations-service isolées bordent les grandes routes, et la maison de Franklin domine Los Santos dans les collines de Vinewood.
@@ -157,6 +164,7 @@ Deux stations-service isolées bordent les grandes routes, et la maison de Frank
 ### Les routes
 
 - **En ville**, les rues longent chaque pâté, avec trottoirs de 20 cm, lampadaires tous les 18 m (une voiture lancée les renverse) et passages piétons à chaque carrefour. Une rue qui traverse l'eau (`+`) est un pont avec des garde-fous.
+- **Dos d'âne** : une rue de ville sur 8 environ (`dosDAne`, 0,12) a un dos d'âne en son milieu, jamais sur un pont : 86 en tout. C'est une bosse arrondie de 12 cm (`hauteurDosDAne`) sur 4 m, peinte de bandes jaunes et noires en biais, sur toute la largeur de la rue. Les voitures qui circulent ralentissent à 18 km/h en passant dessus (pas la police). Voir « Conduite » pour ce qu'il fait à la voiture de B.J.
 - **À la campagne**, les cases `=` et `#` qui se touchent (même en diagonale) forment des routes de 10 m de large, arrondies dans les virages. Le bout d'une route se branche sur le coin de pâté le plus proche, dans son prolongement. Les grandes routes :
   - la **Great Ocean Highway**, qui longe la côte ouest de Los Santos à Paleto Bay, avec deux ponts ;
   - la **Senora Freeway**, qui monte de Los Santos à Sandy Shores, puis à Grapeseed et Paleto Bay par la côte nord ;
@@ -210,7 +218,7 @@ Un bâtiment visitable a des murs de 30 cm, une porte, un sol, des lampes au pla
 | `J` | Bar Yellow Jack | Rez-de-chaussée | Bar, bouteilles, tabourets, billard, tables, 1 tricycle devant |
 | `F` | Ferme | Grange et grenier | Bottes de paille ; silo dehors ; 1 4x4 |
 | `D` | Docks | Entrepôt (une fois sur deux) | Conteneurs dedans et dehors, empilés jusqu'à 3 ; ou un parc à conteneurs avec une grue à portique |
-| `N` | Hangar d'avions | Un hangar de 10 m de haut | Un avion ; porte de 32 m |
+| `N` | Hangar d'avions | Un hangar de 10 m de haut | Un avion à piloter, le nez vers la porte de 32 m |
 | `B` | Bunker nazi | Le bunker, par l'ouest | Voir ci-dessous |
 | `W` | Château Wolfenstein | Le donjon : 4 étages de 4 m et le toit crénelé | Trône, grande table ; 2 trousses de soin (au 2e étage et sur le toit) |
 | `U` | Musée d'art de Los Santos | Une grande salle de 6 m de haut | Portique à 6 colonnes et fronton, sol en marbre, le grand tableau derrière un cordon rouge, la couronne, 2 vitrines de bijoux, 2 statues, 4 autres tableaux, des bancs ; 4 vigiles et 2 chiens |
@@ -219,7 +227,22 @@ Un bâtiment visitable a des murs de 30 cm, une porte, un sol, des lampes au pla
 
 - **Bunker** (`B`) : enceinte de 4 m avec une seule entrée à l'ouest, sacs de sable. Le bunker lui-même s'ouvre aussi à l'ouest : dedans, le Kommandant, 2 soldats, des caisses, une table et un fusil d'assaut. Dehors, 6 soldats, 2 trousses de soin et 1 gilet.
 - **Château** (`W`) : remparts crénelés de 7 m avec une grande porte au sud, 4 tours à toit pointu, bannières rouges. Hitler et 8 soldats gardent la cour. Dans la cour aussi : 2 trousses, 1 mitraillette, 1 gilet.
-- Les autres bâtiments (tours, immeubles, maisons) sont pleins : on ne peut pas y entrer.
+- Les tours, les maisons et 4 immeubles sur 5 sont pleins : on ne peut pas y entrer. Un immeuble plein a une porte fermée (un panneau sombre) sur la rue.
+
+#### Les immeubles où l'on entre
+
+Dans les pâtés `I`, un immeuble sur 5 environ (`immeublesVisitables`, 0,2) se visite : 104 sur la carte. Sa porte (1,8 m de large) donne sur la rue la plus proche, au nord ou au sud du pâté. Dedans, chaque étage a du parquet, un canapé, une table basse et une lampe ; l'escalier monte au fond à gauche, comme dans les autres bâtiments. Un immeuble visitable a au plus 6 étages : s'il devait en avoir plus, il est ramené à 6. Il y en a de 5 sortes, tirées au hasard, toujours les mêmes d'une partie à l'autre :
+
+| Sorte | Nombre | Comment on arrive en haut |
+| --- | --- | --- |
+| Escalier jusqu'au toit | 33 | L'escalier intérieur monte jusqu'au toit, qui a un garde-fou de 1,1 m |
+| Échelle | 13 | L'escalier s'arrête au dernier étage. Une échelle en métal monte le long du mur de côté, du trottoir jusqu'à 1 m au-dessus du garde-fou |
+| Escalier de secours | 23 | L'escalier s'arrête au dernier étage. Dehors, contre le mur de côté, un escalier en métal monte en zigzag (deux volées côte à côte, un palier à chaque étage) jusqu'en haut du garde-fou ; dedans, une marche de 55 cm aide à passer du toit au garde-fou |
+| Terrasse, par l'intérieur | 16 | Le bas prend tout le pâté, sur 2 étages de moins ; l'escalier intérieur arrive sur son toit, la terrasse. Un haut plus petit (la moitié côté porte, 30 cm en retrait des bords) est posé dessus, avec sa porte sur la terrasse et son propre escalier, jusqu'à son toit une fois sur deux |
+| Terrasse, par dehors | 19 | Pareil, mais on monte sur la terrasse par un escalier de secours dehors |
+
+- Les échelles et les escaliers de secours sont sur le côté du bâtiment qui donne sur une rue, jamais entre deux immeubles.
+- **Grimper à l'échelle** : en bas, on avance vers le mur, à moins de 70 cm de l'échelle : B.J. l'attrape, face au mur. En avançant vers le mur, il monte à 2,5 m/s ; en s'en éloignant, il descend. En haut, il passe par-dessus le garde-fou et se retrouve sur le toit. Pour redescendre, on avance vers le bord du toit, juste au-dessus de l'échelle. Espace fait lâcher prise (on ne se fait pas mal en tombant). Au pied d'une échelle, l'aide dit « Avance contre l'échelle pour grimper ».
 
 Un étage fait 3 m, sauf mention contraire. Les trousses de soin et les gilets pare-balles réapparaissent 60 s après avoir été ramassés.
 
@@ -248,6 +271,23 @@ Seuls les environs du joueur sont vivants. Piétons et voitures apparaissent hor
 - **Voitures garées** : il y en a devant les maisons, les places, les magasins et dans les garages, prêtes à être volées. Leur type est tiré au sort de la même façon, sauf chez Michael (une Porsche), Franklin (une classique), Trevor (un 4x4), à la ferme (un 4x4), au Yellow Jack (un tricycle) et au commissariat (2 voitures de police).
 - Personne d'autre que B.J. ne va dans l'eau profonde : les piétons et les ennemis font demi-tour au bord.
 
+### Les gangs
+
+Quatre gangs traînent dans leur quartier, un pâté de maisons chacun (tableau `GANGS`, en haut de `index.html`). Sur la mini-carte et la grande carte, leur quartier est colorié de leur couleur, et la légende les nomme (« Gang Ballas »).
+
+| Gang | Couleur | Où | Membres | Arme |
+| --- | --- | --- | --- | --- |
+| Families | vert vif | Sud de Los Santos (colonne 18, ligne 55) | 5 | Pistolet |
+| Ballas | violet | Sud de Los Santos (22, 56) | 5 | Mitraillette, en rafales |
+| Vagos | jaune | Est du fleuve, à Los Santos (30, 54) | 5 | Pistolet |
+| Lost MC | noir | Sandy Shores, près de la supérette (33, 24) | 4 | Fusil à pompe |
+
+- **Tant qu'on les laisse tranquilles**, ils restent en rond au milieu de leur pâté, entre les maisons, et se font face. Un membre de gang porte un maillot et une casquette de la couleur de son gang.
+- **Ils attaquent** si on en frappe, en blesse ou en renverse un, si on tire à moins de 50 m d'eux, ou si l'un d'eux voit B.J. à moins de 15 m avec une arme à feu à la main (pas en voiture). Alors tout le gang attaque, comme des policiers : 70 points de vie (2 balles de pistolet), 6 dégâts par balle (`degatsGang`), le double au fusil à pompe de près. Ils ne quittent pas leur pâté.
+- **Ils se calment** quand B.J. est à plus de 100 m, ou quand il meurt.
+- **Un membre tué** lâche son arme et 20 à 99 $. Ça ne donne pas d'étoile : la police ne s'en mêle pas.
+- **Ils reviennent** : quand B.J. est à plus de 250 m de leur quartier, un gang qui a perdu des membres revient au complet.
+
 ## Combat et armes
 
 Il y a 8 armes, dont 2 au départ (poings et couteau). Le pistolet, la mitraillette, le fusil à pompe et le fusil d'assaut s'achètent à l'armurerie ou se ramassent sur les ennemis. Le fusil de sniper s'achète seulement à l'armurerie : aucun ennemi ne le lâche. Le bazooka ne s'achète pas : c'est Hitler qui le lâche. Un tir à la tête fait 2,5 fois plus de dégâts.
@@ -272,7 +312,7 @@ Il y a 8 armes, dont 2 au départ (poings et couteau). Le pistolet, la mitraille
 - Renverser quelqu'un avec une voiture à plus de 14 km/h fait 200 dégâts.
 - **Pneus** : une balle dans un pneu le crève (pas sur une voiture blindée). À plus de 50 km/h, la voiture part en tête-à-queue : de quoi arrêter une voiture de police (voir « Accidents »).
 - **Fusil de sniper** : une balle suffit pour un piéton, un policier ou un soldat. Il en faut 3 pour le Kommandant (2 à la tête) et 6 pour Hitler (3 à la tête). Dans la lunette, la balle s'écarte d'au plus 13 cm à 200 m ; sans viser, d'au plus 37 cm à 50 m. Un nazi touché de loin est alerté, mais il ne tire que s'il voit B.J. à moins de 45 m : on peut l'abattre sans risque, par l'entrée du bunker ou la porte du château.
-- **Bazooka** : la roquette part du canon vers le viseur et vole tout droit à 20 m/s (`vitesseRoquette`), plus vite que B.J. qui court (8 m/s). Elle explose sur le premier mur ou voiture qu'elle touche, si elle passe à moins de 1 m du milieu du corps d'un personnage, par terre si on vise le sol, ou au bout de 150 m. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
+- **Bazooka** : la roquette part du canon vers le viseur et vole tout droit à 25 m/s (90 km/h, `vitesseRoquette`), plus vite que B.J. qui court (8 m/s). Elle explose sur le premier mur ou voiture qu'elle touche, si elle passe à moins de 1 m du milieu du corps d'un personnage, par terre si on vise le sol, ou au bout de 150 m. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
 
 ### Les personnages
 
@@ -286,6 +326,7 @@ Il y a 8 armes, dont 2 au départ (poings et couteau). Le pistolet, la mitraille
 | Vigile (braquages) | 100 | pistolet, fusil à pompe, mitraillette ou fusil d'assaut | 3 | Son arme |
 | Chien de garde | 45 | ses crocs | 2 | Rien |
 | Policier d'élite (4 étoiles) | 140 | fusil d'assaut | 4 | Un fusil d'assaut |
+| Membre de gang | 70 | celle de son gang (tableau `GANGS`) | 2 | Son arme et 20 à 99 $ |
 
 Les corps disparaissent au bout de 15 s. Le chien est un berger allemand, fauve au dos noir, oreilles dressées ; mort, il tombe sur le côté. Le policier d'élite porte un casque, une tenue noire et un gilet pare-balles.
 
@@ -300,7 +341,7 @@ Un personnage a un visage (yeux, sourcils, bouche, nez, oreilles), des coudes et
 
 ### Les ennemis
 
-Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat ou un vigile. Il tire toutes les 1 à 2 s, 0,6 à 1,2 s pour le Kommandant et 1,5 à 3 s pour Hitler. Les vigiles et les policiers d'élite armés d'une mitraillette ou d'un fusil d'assaut tirent en rafales : 3 à 5 balles à 0,13 s d'écart, puis une pause de 1,2 à 2 s. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
+Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 70 m pour un policier et 45 m pour un soldat, un vigile ou un membre de gang. Il tire toutes les 1 à 2 s, 0,6 à 1,2 s pour le Kommandant et 1,5 à 3 s pour Hitler. Les vigiles et les policiers d'élite armés d'une mitraillette ou d'un fusil d'assaut tirent en rafales : 3 à 5 balles à 0,13 s d'écart, puis une pause de 1,2 à 2 s. Il avance si le joueur est à plus de 22 m et recule s'il est à moins de 6 m.
 
 | Ennemi | Dégâts par balle |
 | --- | --- |
@@ -313,12 +354,13 @@ Un ennemi ne tire que s'il voit le joueur : ligne de vue dégagée, à moins de 
 | Chien de garde | 12 par morsure, toutes les 0,9 s (`degatsChien`) |
 | Heavy robot | 10 par balle de mitrailleuse, 40 par roquette (`degatsRobot`, `degatsRoquetteRobot`) |
 | Mitrailleuses de la banque | 5 par balle (`degatsMitrailleuse`) |
+| Membre de gang | 6, le double au fusil à pompe à moins de 15 m (`degatsGang`) |
 
-Avec le code de triche `Z6PO`, les balles font moitié moins mal (2,5 pour un policier), même celles des mitrailleuses de la banque et du heavy robot ; pas les roquettes ni les morsures de chien.
+Avec le code de triche `Z6PO`, les balles font moitié moins mal (2,5 pour un policier), même celles des mitrailleuses de la banque, du heavy robot et des gangs ; pas les roquettes ni les morsures de chien.
 
 La chance de toucher vaut 35 % à courte distance (`precisionEnnemis`) et baisse avec l'éloignement : environ 25 % à 25 m et 7 % au-delà de 50 m. Les vigiles, les policiers d'élite et le heavy robot visent mieux : 50 % de près (`precisionPros`) ; les mitrailleuses de la banque, 30 %. Elle est divisée par 2 si on est accroupi, et multipliée par 0,6 si on court. En voiture, elle est multipliée par 0,7 et on ne prend que 40 % des dégâts ; dans une voiture blindée, rien ne passe ; dans le heavy robot, on ne prend que 30 % des dégâts (`protectionRobot`).
 
-Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. Elle laisse une traînée de fumée grise, qui aide à la voir venir. À 20 m, elle met 1 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle explose aussi sur les soldats, policiers ou passants qui se trouvent sur son chemin, et les blesse comme le bazooka de B.J. (jusqu'à 250) : on peut se cacher derrière eux. Un piéton ou un policier tué par Hitler ne donne pas d'étoile à B.J. Hitler n'est jamais blessé par sa propre roquette. Elle fait exploser la voiture de B.J. s'il est dedans.
+Hitler tire au bazooka. Sa roquette vole comme celle du joueur : il vise B.J. là où il est au moment du tir (il ne prévoit pas où il va). Elle explose si elle passe à moins de 1 m de lui, sur un mur ou une voiture, ou par terre. Elle laisse une traînée de fumée grise, qui aide à la voir venir. À 20 m, elle met 0,8 s à arriver : en courant sur le côté dès qu'on voit la flamme, on l'esquive encore, de justesse. Une roquette ratée vise le sol à 3 à 6 m de B.J. et peut encore le blesser (rayon de 5 m). Elle explose aussi sur les soldats, policiers ou passants qui se trouvent sur son chemin, et les blesse comme le bazooka de B.J. (jusqu'à 250) : on peut se cacher derrière eux. Un piéton ou un policier tué par Hitler ne donne pas d'étoile à B.J. Hitler n'est jamais blessé par sa propre roquette. Elle fait exploser la voiture de B.J. s'il est dedans.
 
 **Temps de survie estimé, sans bouger ni se soigner** :
 
@@ -386,7 +428,7 @@ Tous les véhicules se volent, garés ou en circulation, police comprise. Il suf
 
 ### Les types de véhicules
 
-Il y a 6 types de voitures, la voiture et le fourgon blindé de la police, et 2 bateaux. Ils sont décrits dans le tableau `VOITURES`, en haut de `index.html`.
+Il y a 6 types de voitures, la voiture et le fourgon blindé de la police, 2 bateaux, un avion et un hélicoptère. Ils sont décrits dans le tableau `VOITURES`, en haut de `index.html`.
 
 | Type | Vitesse maximale | 0 à 100 km/h | Virage | Chance | Taille (long. × larg. × haut.) | Couleurs | Signes particuliers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -400,12 +442,28 @@ Il y a 6 types de voitures, la voiture et le fourgon blindé de la police, et 2 
 | Fourgon blindé | 137 km/h (38 m/s) | 2,3 s (calculé) | 0,8 | 0 | 5,8 × 2,3 × 2,55 m | noir | Caisse d'acier, petites vitres, grosses roues, pare-buffle, marchepieds, « POLICE » sur les flancs, gyrophares, projecteurs. Blindé : les balles ricochent, il tient 3 roquettes |
 | Hors-bord | 108 km/h (30 m/s) | pas mesuré | 0,8 | 0 | 5,5 × 2,1 × 1,4 m | blanc, rouge, bleu, noir | Coque en V, pare-brise, moteur à l'arrière ; on voit le pilote |
 | Jet-ski | 86 km/h (24 m/s) | pas mesuré | 1,5 | 0 | 3 × 1,15 × 1,1 m | jaune, bleu, rouge, vert | Petite coque, selle, guidon ; on voit le pilote |
+| Avion | 252 km/h (70 m/s) | décolle à 115 km/h, en 5,3 s | — | 0 | 16 × 20 (ailes) × 5,2 m | le dessus blanc ; rouge, bleu, vert, orange | Petit avion de ligne à deux moteurs sous les ailes, train d'atterrissage, hublots, cockpit |
+| Hélicoptère | 144 km/h (40 m/s) | 115 km/h en 4 s (mesuré) | — | 0 | 11,5 × 2,4 × 3,4 m | bleu, rouge, noir, jaune | Cabine en bulle vitrée, longue queue, deux patins, un grand rotor et un petit à l'arrière, qui tournent |
 
 - **Chance** : sur 15 véhicules tirés au sort, il y a en moyenne 6 classiques, 3 minibus, 2 Porsche, 2 4x4, 1 limousine et 1 tricycle. La voiture et le fourgon de police ne sont jamais tirés au sort : ils n'arrivent que quand on est recherché.
 - **Virage** : 1 = comme la classique. Le tricycle tourne sec, la limousine très large.
 - Les vitesses et les temps du tableau ont été mesurés en ligne droite, pied au plancher.
 - En circulation, tout le monde roule à 40 km/h.
+- **Avions et hélicoptères** (`vole: 'avion'` ou `'helico'`) : voir plus bas.
 - **Bateaux** (`bateau: true`) : on ne les croise pas en circulation, ils attendent aux pontons. Ils flottent, n'avancent que là où il y a au moins 50 cm d'eau, et s'arrêtent net contre la plage, un ponton ou un pilier de pont. Leur nez se lève quand ils foncent. Comme sur le tricycle, rien ne protège le pilote. En descendant au large, on nage.
+
+### Avions et hélicoptères
+
+Il y a 8 avions : un dans chaque hangar (`N`, 5 à l'aéroport de Los Santos et 1 à Fort Zancudo), un sur la piste de Los Santos et un sur l'aérodrome de Sandy Shores (`^`). Il y a 2 hélicoptères, sur les hélistations de l'aéroport de Los Santos (`@`). On les vole avec E, comme une voiture ; une annonce rappelle les commandes. Ils ne s'abîment pas (ni bosses, ni vitres, ni accidents), mais une roquette les fait exploser, même en vol.
+
+- **La caméra** : dedans, la souris ne tourne plus la caméra autour de l'appareil, elle vise, comme à pied. L'avion et l'hélicoptère se tournent vers là où l'on regarde. La mini-carte dézoome deux fois plus qu'en voiture. En vol, le compteur donne aussi la hauteur au-dessus du sol ou de l'eau (« 216 km/h · 85 m »).
+- **L'avion au sol** : il roule comme une voiture (Z : plus vite, jusqu'à 70 m/s en l'air ; S : il freine fort), tourne vers où l'on regarde quand il roule, et cogne les murs et les voitures avec son fuselage (pas avec ses ailes). À 115 km/h (`decollage`, 32 m/s), une annonce dit de regarder vers le haut ; dès qu'on lève le nez (souris ou Espace), il décolle. Il lui faut environ 85 m de piste.
+- **L'avion en l'air** : il tourne vers où l'on regarde (au plus 0,7 radian par seconde), en penchant dans le virage, et son nez suit le regard, vers le haut ou le bas (au plus 0,6 radian, soit 34°). Il ralentit en montant et accélère en piquant. Sans gaz, il garde sa vitesse. Sous 115 km/h, il décroche : il tombe, de plus en plus vite, et pique du nez. On ne monte pas au-dessus de 600 m (`PLAFOND`).
+- **Se poser** : l'avion se pose quand il touche le sol (ou un toit) en descendant de moins de 5 m/s, à peu près à plat (penché de moins de 20°, le nez pas plus bas que 9°). Sinon, il s'écrase et explose. Il explose aussi si son nez, le bout de ses ailes ou sa queue touche un bâtiment, un arbre ou une colline. Sur l'eau, il coule, et B.J. en sort à la nage.
+- **L'hélicoptère** : son rotor met 2 s à tourner à fond ; ensuite, Espace le fait monter et C descendre, à 8 m/s (`montee`), et il tient en l'air tout seul. En l'air, Z Q S D le font avancer, reculer ou glisser sur le côté (jusqu'à 144 km/h devant, 60 % de côté), en accélérant de 8 m/s par seconde ; il penche le nez en avant quand il avance. Il se pose sur le sol ou sur un toit. Il bute contre les murs, et s'y écrase s'il y fonce à plus de 54 km/h ; il s'écrase aussi s'il tombe à plus de 9 m/s.
+- **Descendre** : on ne descend qu'une fois posé (« Pose-toi d'abord ! »). Si l'appareil explose en vol, B.J. est éjecté et tombe (on ne se fait pas mal en tombant).
+- **Sans pilote** : un avion ou un hélicoptère abandonné en l'air (B.J. est mort aux commandes) tombe et s'écrase ; posé, il reste où il est.
+- Dedans, on est protégé comme dans une voiture : 40 % des dégâts, et on ne peut pas tirer.
 
 ### Conduite
 
@@ -419,8 +477,9 @@ Il y a 6 types de voitures, la voiture et le fourgon blindé de la police, et 2 
 - Le frein à main (Espace) freine fort et serre le virage.
 - Contre un mur ou une autre voiture, au-dessus de 22 km/h, il y a un bruit de choc et la voiture perd 65 % de sa vitesse. Au-dessus de 11 km/h (vers le mur), elle s'abîme (voir « Dégâts ») ; au-dessus de 40 km/h, c'est l'accident (voir « Accidents »).
 - **Lampadaires** : au-dessus de 11 km/h, la voiture les renverse. Chacun lui fait perdre 15 % de sa vitesse et un petit creux étroit (0,12). Il tombe dans le sens où elle roule, reste par terre, et se relève quand B.J. est à plus de 300 m. Plus doucement, il arrête la voiture comme un mur.
-- **Bornes en béton** (voir « Les signes de la carte ») : hautes de 45 cm (`hauteurBornes`), elles tapent dans le bas de caisse. Sous 14 km/h, elles arrêtent la voiture. Plus vite, elles abîment le dessous et le bas du pare-chocs (0,025 par m/s) et la font sauter : elle monte à 25 % de sa vitesse et en perd 25 % (30 % sous 31 km/h, pour un petit saut). Au-dessus de 8,5 m/s (31 km/h), c'est un accident : elle décolle le nez en l'air (0,06 × sa vitesse, en radians par seconde), et si la borne tape d'un côté, elle se renverse de l'autre (jusqu'à 0,12 × sa vitesse). Le 4x4 et le fourgon, 50 cm sous la caisse, passent au-dessus sans rien sentir.
+- **Bornes en béton** (voir « Les signes de la carte ») : hautes de 45 cm (`hauteurBornes`), elles tapent dans le bas de caisse. Sous 14 km/h, elles arrêtent la voiture, quand le pare-chocs qui avance arrive contre elles. Une borne qui est déjà sous la voiture (après un accident, ou arrivée par le côté) ne la retient pas : elle repart. Plus vite, elles abîment le dessous et le bas du pare-chocs (0,025 par m/s) et la font sauter : elle monte à 25 % de sa vitesse et en perd 25 % (30 % sous 31 km/h, pour un petit saut). Au-dessus de 8,5 m/s (31 km/h), c'est un accident : elle décolle le nez en l'air (0,06 × sa vitesse, en radians par seconde), et si la borne tape d'un côté, elle se renverse de l'autre (jusqu'à 0,12 × sa vitesse). Le 4x4 et le fourgon, 50 cm sous la caisse, passent au-dessus sans rien sentir.
 - En descendant, le joueur sort du côté qui n'est pas contre un mur. La voiture continue sur son élan puis s'arrête.
+- **Dos d'âne** : la voiture monte et descend avec la bosse. Prise vite, elle garde l'élan de la montée en passant le sommet, et saute : à 100 km/h, elle monte à 39 cm et reste environ une demi-seconde en l'air, sur une quinzaine de mètres ; à 30 km/h, elle ne fait que passer dessus.
 - **Pentes** : la voiture suit le sol et penche avec lui, en avant et sur le côté. La pente la freine en montée et la pousse en descente (`graviteVoiture`, 9,8 m/s², × le sinus de la pente) : une classique monte la route du château sans peine.
 - **Sauts** : la voiture tombe avec la vraie gravité (9,8 m/s², `graviteVoiture`). Elle décolle quand le sol descend plus vite qu'elle ne tombe : au bout d'un tremplin, en haut d'une bosse ou d'une côte prise vite, un peu en montant sur un trottoir. Au bout d'un tremplin, elle garde tout l'élan de la rampe, même quand ses roues avant sont déjà dans le vide. En l'air, ni gaz, ni frein, ni volant, et son nez suit peu à peu la trajectoire. Un saut de moins de 30 cm ne compte pas : les amortisseurs le prennent, et on garde la main.
 - **Retomber** : elle rebondit un peu (20 % de la vitesse du choc, au-dessus de 3 m/s). Au-dessus de 7 m/s (une chute de 2,5 m sur du plat), elle s'abîme : ses roues se tordent, et l'avant ou l'arrière se cabosse si elle retombe sur le nez ou sur l'arrière (penchée de plus de 17° par rapport au sol). Retomber sur une rampe dans le sens de la pente ne fait presque rien. Après plus de 0,8 s en l'air, « SAUT ! » annonce la longueur du saut.
@@ -493,7 +552,8 @@ Un gros choc, un souffle d'explosion, une borne prise vite, un pneu qui crève �
 | Classique | 0/5 | 1/5 | 2/5 | 4/5 | 4/5 |
 | Porsche | 0/5 | 0/5 | 1/5 | 3/5 | 3/5 |
 
-- **Ce qui touche** : le bas de ses 4 roues (3 pour le tricycle), les 8 coins de sa caisse et les 4 coins de son toit. Ils rebondissent un peu (25 %) sur le sol. Les roues frottent fort de côté (0,75) et presque pas dans le sens où elles roulent (0,03) ; la tôle frotte moyennement (0,5). Vue du ciel, elle garde sa file de cercles contre les murs, les lampadaires et les autres voitures, qu'elle pousse (et peut faire partir en accident à leur tour : carambolage).
+- **Ce qui touche** : le bas de ses 4 roues (3 pour le tricycle), les 8 coins de sa caisse et les 4 coins de son toit. Ils rebondissent un peu (25 %) sur le sol. Les roues frottent fort de côté (0,75) et presque pas dans le sens où elles roulent (0,03) ; la tôle frotte moyennement (0,5). Vue du ciel, elle garde sa file de cercles contre les murs, les lampadaires et les autres voitures, qu'elle pousse (et peut faire partir en accident à leur tour : carambolage). Contre une voiture, c'est la vitesse du point qui tape qui compte, rotation comprise : une voiture qui tourne en toupie, même presque sur place, frappe avec ses bouts, et même un petit coup pousse une voiture déjà accidentée. Quand deux voitures se touchent en plusieurs points (un choc en plein flanc touche les deux cercles de l'autre), le coup est donné au milieu de ces points, dans leur direction moyenne, avant comme pendant un accident : sinon, il partirait d'un bout, et la voiture touchée tournerait sur elle-même pour rien, puis reviendrait taper l'autre.
+- **Les piétons** : une voiture accidentée renverse les personnages que touche sa file de cercles, là où elle va à plus de 4 m/s (rotation comprise) : 200 dégâts, comme une voiture qui roule. C'est un crime (une étoile) seulement si c'est la voiture de B.J.
 - **Les dégâts** : chaque image, le coup le plus fort contre le sol (au-dessus de 3 m/s) cabosse la carrosserie là où il a tapé : le toit quand elle retombe à l'envers, un flanc quand elle roule sur le côté.
 - **La fin** : dès qu'elle est droite sur ses roues, sans tourner ni glisser de côté, depuis 0,3 s, on reprend la main, même si elle roule encore. Sinon, il faut qu'elle soit arrêtée (ou que l'accident dure depuis 12 s). Le conducteur d'une autre voiture en sort alors, secoué : un civil s'enfuit, un policier attaque.
 - **Couchée sur le côté ou sur le toit** : elle prend feu (« AU FEU ! », de la fumée noire), et explose au bout de 5 s (`dureeFeu`). Il faut en sortir avant (E). On ne monte pas dans une voiture en plein accident ni couchée. Si un autre choc la remet sur ses roues avant, le feu s'éteint, sauf si elle est trop abîmée (voir « Dégâts »).
@@ -655,18 +715,18 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 
 | Emplacement | Élément | Détail |
 | --- | --- | --- |
-| Bas gauche | Mini-carte | Ronde, elle tourne avec la caméra. Elle dézoome en voiture ou en bateau. |
+| Bas gauche | Mini-carte | Ronde, elle tourne avec la caméra. Elle dézoome en voiture ou en bateau, deux fois plus en avion ou en hélicoptère. |
 | Bas gauche | Barre de vie | Verte, rouge sous 30 points |
 | Bas gauche | Barre du gilet | Bleue, sous la barre de vie, seulement quand on porte un gilet |
 | Haut droite | Argent | En gros chiffres verts, les milliers séparés (« 250 000 $ ») |
 | Haut droite | Étoiles | 5 étoiles, qui clignotent en bleu quand la police voit le joueur |
 | Haut droite | Arme et munitions | Nom de l'arme, nombre de balles ou de roquettes. Dans le heavy robot : « Heavy robot », ses balles et ses roquettes |
-| Haut gauche | Aide | « Appuie sur E pour… » près d'un stand, d'un ascenseur, d'un véhicule (avec son nom : « monter : Porsche »), du garagiste, du butin, de la porte du coffre, de la grille ou du heavy robot. Pendant le perçage du coffre, à moins de 40 m : « Perceuse thermique : 63 % » |
+| Haut gauche | Aide | « Appuie sur E pour… » près d'un stand, d'un ascenseur, d'un véhicule (avec son nom : « monter : Porsche », « monter : Hélicoptère »), du garagiste, du butin, de la porte du coffre, de la grille ou du heavy robot. Pendant le perçage du coffre, à moins de 40 m : « Perceuse thermique : 63 % ». Au pied d'une échelle : « Avance contre l'échelle pour grimper » |
 | Bas centre | Objectif | Texte de l'étape de mission en cours |
 | Centre | Viseur | Un point blanc, avec une arme à feu, en visant, en 1re personne ou dans le heavy robot. Caché dans la lunette et en nageant |
 | Plein écran | Lunette | Un rond avec deux traits en croix et du noir autour, en visant avec le fusil de sniper. Le reste de l'écran (mini-carte, argent) s'affiche par-dessus |
-| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? », « SAUT ! 35 m », « LOOPING ! », « Pas assez d'élan ! », « AU FEU ! » (voiture en feu), « Voiture réparée ! », « MAD MAX ! », « ALARME ! », « BUTIN ! », « LASER TOUCHÉ ! », « COFFRE-FORT PERCÉ ! », « BOUM ! », « HEAVY ROBOT ! », « MISSION 8 », ce que dit le garagiste |
-| Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
+| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? », « SAUT ! 35 m », « LOOPING ! », « Pas assez d'élan ! », « AU FEU ! » (voiture en feu), « Voiture réparée ! », « MAD MAX ! », « ALARME ! », « BUTIN ! », « LASER TOUCHÉ ! », « COFFRE-FORT PERCÉ ! », « BOUM ! », « HEAVY ROBOT ! », « MISSION 8 », « AVION » et « HÉLICOPTÈRE » avec leurs commandes, « Pose-toi d'abord ! », ce que dit le garagiste |
+| Bas droite | Compteur | Vitesse en km/h, en voiture seulement ; en vol, la hauteur en plus (« 216 km/h · 85 m ») |
 | Plein écran | Bords rouges | Quand le joueur est touché |
 | Plein écran | Fumée | Un voile vert-gris dans la fumée toxique de la bijouterie, léger avec le masque à gaz |
 | Plein écran | WASTED | Noir et blanc à la mort |
@@ -687,7 +747,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | C orange | Départ d'une piste de cascades | U brun | Musée d'art |
 | V doré | Bijouterie Vangelico | Q vert foncé | Banque Pacific Standard |
 
- Les pistes de cascades sont des traits orange. Les ennemis en alerte (dont les vigiles et les chiens) sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. Le heavy robot est un gros point, rouge et bleu avec son pilote, gris sans. La flèche blanche du joueur est au centre.
+ Les pistes de cascades sont des traits orange. Le quartier de chaque gang (son pâté et la moitié des rues autour) est colorié de sa couleur. Les ennemis en alerte (dont les vigiles et les chiens) sont des points rouges ; les policiers et voitures de police clignotent en rouge et bleu. Le heavy robot est un gros point, rouge et bleu avec son pilote, gris sans. La flèche blanche du joueur est au centre.
 
 **La grande carte** s'ouvre et se ferme avec la touche M. Elle couvre tout l'écran et met le jeu en pause : rien ne bouge tant qu'elle est ouverte.
 
@@ -695,7 +755,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 - À l'ouverture, on voit tout le pays. La molette zoome jusqu'à 6 pixels par mètre, et le zoom avant amène sur le joueur.
 - La souris, les flèches ou Z Q S D déplacent la vue, sans sortir de la carte.
 - Elle montre les mêmes choses que la mini-carte. Tant qu'on n'a pas trop zoomé, elle écrit le nom des villes et des régions (tableau `NOMS_LIEUX`) ; en zoomant, elle écrit aussi le nom de chaque rond.
-- **La légende**, à gauche, dans un cadre sombre : chaque sorte de rond (armurerie, hôpital... jusqu'au départ des pistes de cascades), avec son nom, puis le point jaune de l'objectif, la flèche du joueur (« Toi »), les points de la police (rouge et bleu) et des ennemis (rouge). Elle reste affichée quel que soit le zoom. Ses ronds viennent du tableau `ICONES` : un nouveau rond y apparaît tout seul. Si la fenêtre est basse, ses lignes se serrent.
+- **La légende**, à gauche, dans un cadre sombre : chaque sorte de rond (armurerie, hôpital... jusqu'au départ des pistes de cascades), avec son nom, puis le point jaune de l'objectif, la flèche du joueur (« Toi »), les points de la police (rouge et bleu) et des ennemis (rouge), et un carré de la couleur de chaque gang (« Gang Ballas »). Elle reste affichée quel que soit le zoom. Ses ronds viennent du tableau `ICONES` : un nouveau rond y apparaît tout seul. Si la fenêtre est basse, ses lignes se serrent.
 - En haut à droite, elle dit dans quelle colonne et quelle ligne du tableau `CARTE` se trouve le joueur : pratique pour modifier la carte à cet endroit.
 - La flèche blanche indique où regarde le joueur, ou dans quel sens roule sa voiture. L'objectif est un point jaune entouré d'un anneau qui bat, et son texte est rappelé en haut à gauche.
 - Échap ferme la carte et affiche le menu de pause.
@@ -741,44 +801,47 @@ Le jeu parle 4 langues : français, allemand (Deutsch), anglais (English) et zü
 | Fourgon blindé | 28 Hz | 120 Hz | 5 | 0,8 | 0,07 | Très grave, rauque et fort |
 | Hors-bord | 40 Hz | 150 Hz | 1 | 0,6 | 0,06 | Grave, sans changer de rapport |
 | Jet-ski | 60 Hz | 280 Hz | 1 | 0,9 | 0,05 | Aigu, il pétarade |
+| Avion | 110 Hz | 320 Hz | 1 | 0,4 | 0,07 | Il siffle de plus en plus aigu avec la vitesse |
+| Hélicoptère | 14 Hz | 24 Hz | 1 | 1 | 0,09 | Un battement grave (« tchop tchop »), qui suit le rotor et non la vitesse |
 
 Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed pour le texte (Google Fonts).
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 5 400 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 5 800 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–106 | HTML et CSS | Interface et menu, avec les boutons des langues et de la foule |
-| 107–402 | **Foule et langues** (zones à modifier) | `FOULES` et le choix de la foule (`foule`) ; `LANGUES`, `TRADUCTIONS` ; `tr`, les boutons du menu (`traduireMenu`, `etat`). Un script à part, qui tourne avant le module du jeu |
-| 403–416 | Chargement | Three.js et ses modules |
-| 417–821 | **Zones à modifier** | `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
-| 822–1182 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
-| 1183–1456 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, vitres brisées, panneaux, visages, marbre, tableaux, coffres, billets, tôle rouillée dessinés par le programme ; enseignes dans la langue choisie (`enseigne`, `majEnseignes`) ; matières |
-| 1457–2320 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`, dont les trois pâtés à braquer, le garagiste et les bornes des places), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion ; bornes (`bornesSous`) et lampadaires qui tombent (`faucher`, `renverserLampadaire`, `majLampadaires`) |
-| 2321–2376 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
-| 2377–2532 | Personnages | Corps articulés, pièces des codes de triche (`accessoire`), animations (dont la nage, les trois pas de la danse et la marche raide de Z6PO), armes en 3D |
-| 2533–2871 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 9 modèles (`MODELES`, dont le fourgon blindé), pièces qui partent, carrosserie, cabine, roues, blindage Mad Max (`formesBlindage`, `estBlindee`), `habillerVoiture` |
-| 2872–3057 | Dégâts des voitures | `abimer` (et le feu quand c'est trop : `pireDegat`), formes découpées fin (`copieCabossable`), bosses (`bosseler`, `pli`), vitres, pièces qui partent (`detacher`), roues tordues, pneus crevés (`crever`), morceaux qui volent (`debris`) |
-| 3058–3245 | Accidents | Forme pour les accidents (`coqueAccident`), poids (`masse`), départ (`commencerAccident`), coups (`pousser`, `toucher`, `heurter`, `souffler`), chaque image (`majAccident`), retour sur les roues (`finirAccident`) ; le feu (`allumer`, `eteindre`) |
-| 3246–3337 | Sons | Moteurs, roulement, sirène, sonnerie d'alarme, bruits et bips synthétisés, cri de la danse (`criMJ`) |
-| 3338–3606 | Joueur, personnages, objets | Tenues, chapeau de la danse, aura de Goku ; vigiles, policiers d'élite (`creerElite`), chiens (`creerChien`, `animerChien`) ; objets, explosions (la voiture blindée encaisse, le conducteur est tué), roquettes, étincelles, éclats de verre ; prix des stands dans la langue choisie (`etiqueter`) |
-| 3607–3906 | Braquages | Masque à gaz, sac du butin, butin (`creerButin`), pièces qui bougent (`construireBraquage`), alarme (`declencherAlarme`), vol (`voler`), perceuse, explosif, fumée, lasers, mitrailleuses, coffre-fort (`majBraquages`) |
-| 3907–4135 | Heavy robot | Le robot (`creerRobot`), sa marche, son chemin par les rues (`cheminRobot`), ses tirs, sa vitre et son pilote (`toucherRobot`), monter, descendre, piloter (`piloterRobot`), apparition |
-| 4136–4483 | État, clavier, actions | État du jeu, clavier et souris, suite de touches de la danse, triches (`validerTriche`, `rhabillerBJ`, `parTriche`), danse (`danser`, `pasDeDanse`), ascenseur, garagiste (`payerBlindage`), achat, tir (`tirer`, aussi depuis le robot), blessures (dont celles du conducteur d'une voiture : `blesserConducteur`), mort |
-| 4484–4738 | Mise à jour du joueur | Marche (et vitesse des codes de triche), nage, moonwalk, conduite (plus lourde en voiture blindée, qui tire avec un pneu crevé), chocs (contre le robot aussi, et ceux qui font partir en accident), lampadaires, bornes, pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
-| 4739–5042 | Intelligence | Piétons, nazis, vigiles, chiens (`majChien`), circulation sur le réseau des routes, voitures qui fument et brûlent (`majVoiture`), chemin de la police, apparitions (`peupler`, autant que la foule choisie), police à 4 et 5 étoiles (fourgons blindés, heavy robot) |
-| 5043–5144 | Missions, caméra | Enchaînement des étapes, saut de mission (`sauterMission`), vues (dont le robot), tremblement des pas du robot, zoom de la lunette |
-| 5145–5328 | Écran | Repères, image du terrain, plan, mini-carte, grande carte et sa légende (`legendeCarte`), infos, aides et voile de fumée |
-| 5329–5447 | Boucle principale | Mise à jour et affichage de chaque image, lampadaires qui tombent et se relèvent, garage qui répare, sonnerie d'alarme, aura qui tremble |
+| 107–411 | **Foule et langues** (zones à modifier) | `FOULES` et le choix de la foule (`foule`) ; `LANGUES`, `TRADUCTIONS` ; `tr`, les boutons du menu (`traduireMenu`, `etat`). Un script à part, qui tourne avant le module du jeu |
+| 412–424 | Chargement | Three.js et ses modules |
+| 425–855 | **Zones à modifier** | `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `GANGS`, `MISSIONS`, `CASCADES`, `TRICHES` |
+| 856–1239 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`), dos d'âne (`dosH`, `dosV`, `dosRoute`, `dosDAneEn`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
+| 1240–1517 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, vitres brisées, panneaux, visages, marbre, tableaux, coffres, billets, tôle rouillée, dos d'âne dessinés par le programme ; enseignes dans la langue choisie (`enseigne`, `majEnseignes`) ; matières |
+| 1518–2461 | Construction du pays | Morceaux, intérieurs (`interieurs`), boîtes, bâtiments visitables (`batiment`), immeubles où l'on entre (`immeubleI`, `meubler`, `echelle`, `escalierDehors`), pâtés (`genererBloc`, dont les trois pâtés à braquer, le garagiste et les bornes des places), rues et dos d'âne, routes et ponts, pontons, pistes d'aéroport (avions et hélistations), pistes de cascades, terrain et végétation, eau, fusion (`fusionner`) ; bornes (`bornesSous`) et lampadaires qui tombent (`faucher`, `renverserLampadaire`, `majLampadaires`) ; ce qu'on dessine (`majMorceaux`) |
+| 2462–2518 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
+| 2519–2674 | Personnages | Corps articulés, pièces des codes de triche (`accessoire`), animations (dont la nage, les trois pas de la danse et la marche raide de Z6PO), armes en 3D |
+| 2675–3049 | Voitures, bateaux, avions | Outils pour fabriquer les pièces, coque des bateaux, forme des 11 modèles (`MODELES`, dont le fourgon blindé, l'avion et l'hélicoptère), pièces qui partent, carrosserie, cabine, roues, pales (`rotors`), blindage Mad Max (`formesBlindage`, `estBlindee`), `pasDeTole`, `habillerVoiture` |
+| 3050–3235 | Dégâts des voitures | `abimer` (et le feu quand c'est trop : `pireDegat`), formes découpées fin (`copieCabossable`), bosses (`bosseler`, `pli`), vitres, pièces qui partent (`detacher`), roues tordues, pneus crevés (`crever`), morceaux qui volent (`debris`) |
+| 3236–3441 | Accidents | Forme pour les accidents (`coqueAccident`), poids (`masse`), départ (`commencerAccident`), coups (`vitesseEn`, `souple`, `pousser`, `toucher`, `heurter`, `souffler`), chaque image (`majAccident` : sol, murs, autres voitures, piétons), retour sur les roues (`finirAccident`) ; le feu (`allumer`, `eteindre`) |
+| 3442–3533 | Sons | Moteurs, roulement, sirène, sonnerie d'alarme, bruits et bips synthétisés, cri de la danse (`criMJ`) |
+| 3534–3813 | Joueur, personnages, objets | Tenues, chapeau de la danse, aura de Goku ; vigiles, policiers d'élite (`creerElite`), gangs (`creerGang`), chiens (`creerChien`, `animerChien`) ; objets, explosions (la voiture blindée encaisse, le conducteur est tué), roquettes, étincelles, éclats de verre ; prix des stands dans la langue choisie (`etiqueter`) |
+| 3814–4113 | Braquages | Masque à gaz, sac du butin, butin (`creerButin`), pièces qui bougent (`construireBraquage`), alarme (`declencherAlarme`), vol (`voler`), perceuse, explosif, fumée, lasers, mitrailleuses, coffre-fort (`majBraquages`) |
+| 4114–4342 | Heavy robot | Le robot (`creerRobot`), sa marche, son chemin par les rues (`cheminRobot`), ses tirs, sa vitre et son pilote (`toucherRobot`), monter, descendre, piloter (`piloterRobot`), apparition |
+| 4343–4702 | État, clavier, actions | État du jeu, clavier et souris, suite de touches de la danse, triches (`validerTriche`, `rhabillerBJ`, `parTriche`), danse (`danser`, `pasDeDanse`), ascenseur, garagiste (`payerBlindage`), achat, monter et descendre (`entrerVoiture`, `sortirVoiture`), tir (`tirer`, aussi depuis le robot), blessures (`alerter`, `blesser`, et celles du conducteur d'une voiture : `blesserConducteur`), mort |
+| 4703–4995 | Mise à jour du joueur | Marche (et vitesse des codes de triche), échelles (`echelleProche`, `grimper`), nage, moonwalk, conduite (plus lourde en voiture blindée, qui tire avec un pneu crevé), chocs (contre le robot aussi, et ceux qui font partir en accident), lampadaires, bornes, dos d'âne, pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
+| 4996–5086 | Avions et hélicoptères | `piloterAeronef`, `pilotageAvion` (rouler, décoller, voler, se poser ou s'écraser), `pilotageHelico` (rotor, monter, avancer, se poser) |
+| 5087–5400 | Intelligence | Piétons, nazis, vigiles et gangs, chiens (`majChien`), circulation sur le réseau des routes (qui ralentit aux dos d'âne), voitures qui fument et brûlent, avions sans pilote, pales qui tournent (`majVoiture`), chemin de la police, apparitions (`peupler`, autant que la foule choisie, et les gangs qui reviennent), police à 4 et 5 étoiles (fourgons blindés, heavy robot) |
+| 5401–5502 | Missions, caméra | Enchaînement des étapes, saut de mission (`sauterMission`), vues (dont le robot, et en avion la souris qui vise), tremblement des pas du robot, zoom de la lunette |
+| 5503–5689 | Écran | Repères, image du terrain, plan (avec le quartier des gangs), mini-carte, grande carte et sa légende (`legendeCarte`), infos (vitesse et hauteur en vol), aides et voile de fumée |
+| 5690–5808 | Boucle principale | Mise à jour et affichage de chaque image, lampadaires qui tombent et se relèvent, garage qui répare, sonnerie d'alarme, aura qui tremble |
 
 ### À chaque image
 
-1. Déplacer le joueur, à pied, à la nage, en voiture, en bateau ou dans le heavy robot, et tirer si le bouton est enfoncé.
-2. Faire réfléchir et bouger chaque personnage, puis chaque voiture (en accident, elle vole et tourne toute seule), et la poser sur le sol (ou sur l'eau), puis chaque heavy robot. Faire vivre les braquages : alarme, fumée, lasers, mitrailleuses, perceuse et explosif.
+1. Déplacer le joueur, à pied, sur une échelle, à la nage, en voiture, en bateau, en avion, en hélicoptère ou dans le heavy robot, et tirer si le bouton est enfoncé.
+2. Faire réfléchir et bouger chaque personnage, puis chaque voiture (en accident, elle vole et tourne toute seule ; un avion ou un hélicoptère sans pilote tombe), et la poser sur le sol (ou sur l'eau), puis chaque heavy robot. Faire vivre les braquages : alarme, fumée, lasers, mitrailleuses, perceuse et explosif.
 3. Ramasser les objets touchés par le joueur.
 4. Gérer la police, repeupler autour du joueur, vérifier la mission.
 5. Placer la caméra, mettre à jour l'écran, choisir les morceaux du pays à dessiner, dessiner la scène.
@@ -802,8 +865,12 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Terrain** : une grille de points tous les 9,25 m (8 par case), dont la hauteur est calculée une fois au chargement (`HT`), puis creusée sous les routes. Chaque carré est fait de deux triangles ; `hauteurTerrain` retrouve la hauteur exacte du triangle dessiné, pour que personne ne flotte ni ne s'enfonce. Les couleurs du sol sont posées sur chaque point, puis teintent un grain gris.
 - **Hauteur du sol** : `hauteurSol(x, z, y)` prend la plus haute de ces surfaces : terrain, trottoir d'un pâté, rue, route ou pont de campagne. Si on lui donne la hauteur des pieds (`y`), elle compte aussi les planchers, marches, toits et meubles qui ne dépassent pas de plus de 60 cm : c'est ce qui fait marcher les escaliers. Un pont ne compte que si on est dessus, pas si on nage dessous.
 - **Routes de campagne** : chaque suite de cases `=` ou `#` devient une ligne de points, arrondie trois fois (on coupe chaque coin au quart et aux trois quarts). Les routes et les rues forment un seul réseau de points reliés (`NOEUDS`) : les voitures qui roulent seules le suivent, et la police y cherche le chemin le plus court vers le joueur (algorithme de Dijkstra). Les morceaux de route sont rangés dans une grille de 25 m, pour trouver vite la route sous une voiture.
-- **Bâtiments visitables** : une seule fonction, `batiment`, fabrique les murs, la porte, les planchers, l'escalier, le toit et les lampes. Les meubles se placent comme si la porte était au sud ; la fonction tourne le tout selon le côté de la porte. Tout est fait de boîtes, rangées avec les autres.
-- **Performance** : le pays est découpé en morceaux de 8 × 8 cases (592 m). Dans chaque morceau, les bâtiments sont fusionnés en un objet par matière, et chaque sorte d'arbre et les lampadaires sont dessinés en un seul lot. Seuls les morceaux à moins de `distanceVue` (plus leur demi-diagonale) sont dessinés. Les arbres de la campagne ont moins de facettes que ceux de la ville. Résultat mesuré en rendu logiciel : 150 à 450 appels de dessin et 250 000 à 550 000 triangles par image, ombres comprises. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures au-delà de 350 m.
+- **Bâtiments visitables** : une seule fonction, `batiment`, fabrique les murs, la porte, les planchers, l'escalier, le toit et les lampes. Les meubles se placent comme si la porte était au sud ; la fonction tourne le tout selon le côté de la porte. Tout est fait de boîtes, rangées avec les autres. `bas` pose un bâtiment sur un autre (le haut d'une terrasse) ; `toit: 'dehors'` donne un toit avec garde-fou mais sans trou d'escalier. Ce qui est dedans (murs intérieurs, planchers, escalier, meubles, lampes : `dedans`, et `meuble`) est rangé à part, un groupe par bâtiment (`interieurs`), dessiné seulement à moins de 100 m de la caméra (`majMorceaux`) ; les murs, la dalle du toit et le toit restent dans les morceaux du pays. Les planchers, les marches et les meubles (plâtre, bois clair, parquet, carrelage, moquette, cuir) ne font pas d'ombre ; la dalle du toit, si (`dalle`, le même plâtre sous un autre nom).
+- **Immeubles où l'on entre** : `immeubleI` tire au hasard (le hasard du pâté) si un immeuble se visite, puis sa sorte. `meubler` met un canapé, une table basse et une lampe à chaque étage. `echelle` pose les montants et les barreaux et note l'échelle dans `echelles` (où l'on se tient, vers le mur, le bas, le haut, où l'on arrive sur le toit) ; `grimper` fait monter B.J. sans gravité tant qu'il y est. `escalierDehors` pose des volées de 12 marches fines (des boîtes de 25 cm d'épaisseur, pas des blocs pleins, pour qu'on passe dessous), en zigzag sur deux bandes, un palier à chaque étage, puis une petite volée jusqu'au garde-fou.
+- **Avions et hélicoptères** : ce sont des voitures du tableau `VOITURES` avec `vole`, comme les bateaux avec `bateau` : on les vole, on les voit, on les entend et on les fait exploser de la même façon. `pasDeTole` les tient à l'écart des bosses, des accidents et des bornes. `piloterAeronef` les fait voler, avec ou sans pilote (`pilotageAvion`, `pilotageHelico`) ; au sol, l'avion roule avec `bougerVoiture`. En l'air, rien ne les pose sur le sol (`poserVoiture` les laisse) ; `v.enVol` dit s'ils volent. Les pales de l'hélicoptère sont des groupes à part (`rotors`), qui tournent avec `v.rotor`. L'avion vérifie 4 points (le nez, le bout des ailes, la queue) contre les bâtiments et le terrain ; l'hélicoptère est un cercle de 2 m contre les murs (`resoudre`).
+- **Dos d'âne** : `dosH` et `dosV` gardent les rues qui en ont un, tirées au hasard à partir de leur place ; `dosRoute`, les mêmes morceaux du réseau des routes (la circulation y ralentit). `dosDAneEn` donne la hauteur de la bosse en un point, ajoutée par `hauteurSol`. Pour le saut, `poserVoiture` prend la pente de la bosse sous le milieu de la voiture, et garde l'élan de la montée (`v.elanDos`) pour le lui rendre au sommet, même si elle a décollé un peu avant.
+- **Gangs** : ce sont des personnages comme les vigiles (`VIGILES`) : ils restent dans leur pâté et n'attaquent que si on les provoque. `alerter` rend hostile un personnage, et tout son gang avec lui. `creerGang` les place en rond ; `peupler` refait un gang loin de B.J.
+- **Performance** : le pays est découpé en morceaux de 8 × 8 cases (592 m). Dans chaque morceau, les bâtiments sont fusionnés en un objet par matière (`fusionner`), et chaque sorte d'arbre et les lampadaires sont dessinés en un seul lot. Seuls les morceaux à moins de `distanceVue` (plus leur demi-diagonale) sont dessinés, et l'intérieur des bâtiments à moins de 100 m. Les arbres de la campagne ont moins de facettes que ceux de la ville. Résultat mesuré en rendu logiciel : 150 à 450 appels de dessin et 250 000 à 550 000 triangles par image, ombres comprises. Mesuré sans la foule, à 4 endroits de Los Santos, les immeubles où l'on entre ont ajouté 6 à 14 % de triangles (de 420 000–550 000 à 447 000–628 000) et 1 à 6 % d'appels de dessin. Les personnages ne sont plus dessinés au-delà de 220 m, les voitures (et les avions) au-delà de 350 m.
 - **Chargement** : la construction du pays prend environ 2 s en rendu logiciel (relief 0,4 s, pâtés 0,2 s, terrain 0,9 s). Le plus long reste le dessin des textures et du ciel.
 - **Collisions** : chaque mur, plancher, marche ou meuble est une boîte avec un bas et un haut, rangée dans une grille de cases de 25 m. On passe sous une boîte dont le bas est au-dessus de la tête, et on monte sur une boîte assez basse, sauf sur les murs des loopings (`mur`). Joueur et piétons sont des cercles repoussés hors des boîtes. Une voiture est une file de 2 à 4 cercles posés le long de son axe (2 pour la classique, 4 pour la limousine), un peu plus larges qu'elle. La même grille, et le terrain, servent à savoir si un ennemi voit le joueur : une colline cache aussi.
 - **Tir** : un rayon part de la caméra à travers le viseur et s'arrête sur le premier bâtiment, personnage ou voiture, ou sur le terrain (on avance le long du rayon mètre par mètre, sans regarder les triangles). La roquette du bazooka, elle, est un vrai objet qui vole (`lancerRoquette`, `majRoquettes`) : à chaque image, elle avance, laisse une bouffée de fumée qui grossit et s'efface en 1,2 s, et un petit rayon de la longueur de son pas cherche un mur ou une voiture devant elle. Les personnages sont faits de pièces fines : pour eux, on regarde plutôt si la roquette passe à moins de 1 m du milieu de leur corps. Une explosion est une boule de feu qui grossit et s'efface en 0,6 s, avec une lumière orange.
@@ -818,8 +885,8 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Voiture blindée** : `v.blindee` ajoute deux pièces au modèle, la tôle rouillée et l'acier (`formesBlindage`, calculées une fois par modèle à partir de sa forme : profil, cabine, longueur). Elles se cabossent comme le reste. `estBlindee` dit si une voiture est blindée, par le garagiste ou parce que c'est un fourgon de police.
 - **Heavy robot** : un modèle articulé (bassin, torse, bras, hanches, genoux, pieds), comme les personnages, avec un policier assis dedans. Il est rangé à part (`robots`), avec sa propre marche, ses tirs et ses dégâts. Pour tirer depuis le robot, `tirer` reçoit l'arme du robot (`ARMES_ROBOT`) au lieu de celle de B.J. ; les balles partent de ses canons, et le rayon ignore le robot lui-même. Une roquette ignore le robot qui l'a tirée.
 - **Langues** : le code du jeu est écrit en français, et la phrase française sert de clé : `tr('Il te faut {prix} $', { prix })` cherche la phrase dans `TRADUCTIONS`, prend la traduction dans la langue choisie (sinon le français), puis met les valeurs à la place des `{...}`. Les tableaux (`ARMES`, `VOITURES`, `MISSIONS`, `TRICHES`, `NOMS_LIEUX`...) gardent leurs noms français, qui servent aussi à les retrouver (`indexArme`, `typeNomme`) ; on ne les traduit qu'au moment de les afficher. Le menu est du HTML : chaque texte garde sa version française dans `data-fr` (`traduireMenu`). `LANGUES`, `TRADUCTIONS`, `tr` et les boutons sont dans un petit script à part, avant le module du jeu : il tourne tout de suite, sans attendre Three.js, et le module s'en sert. Les boutons de la foule y sont aussi, avec `FOULES` et le choix `foule`, que `peupler` relit toutes les demi-secondes ; le choix est gardé dans le `localStorage` (`foule-pietons`, `foule-voitures`). Un choix du premier lancement renommé ou enlevé de `FOULES` est remplacé par le premier du tableau. L'écran est réécrit à chaque image, donc il suit la langue tout seul ; les prix des stands et les enseignes sont dessinés dans des images, redessinées dans la nouvelle langue quand on quitte le menu (`etiqueter`, et `majEnseignes` : chaque enseigne est redessinée sur sa propre image, qui garde sa place dans les bâtiments fusionnés). La langue est gardée dans le `localStorage` du navigateur.
-- **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, si une voiture demande un modèle qui n'existe pas, ou si une piste de cascades a un morceau inconnu. Une erreur pendant une image arrête la boucle du jeu : l'image se fige, et la console du navigateur (F12, onglet Console, sans recharger la page) la montre en rouge, avec la ligne fautive. Deux erreurs sont évitées d'avance : `bruit` et `bip` ignorent un volume impossible (`NaN`, quand une position est mal calculée), que le son du navigateur refuse en levant une erreur ; `lancerRoquette` ne tire pas une roquette qui part d'un point impossible, ou qui y va, et l'écrit en rouge dans la console, avec la liste des fonctions appelées, pour retrouver qui a tiré.
-- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, les accidents (choc de côté à 72 km/h contre une Porsche garée, mur à 100 km/h, explosion, pneu crevé à 90 km/h, voiture lâchée sur le toit qui brûle puis explose, lampadaire, rangée de bornes), le conducteur tué par balle (passant, policier, rien à travers un fourgon blindé, en plein accident) ou par une explosion (avec et sans étoile), la voiture trop abîmée qui brûle puis explose (vide, avec B.J. dedans, éteinte au garage) et le nombre de balles qu'il faut et des photos des dégâts, les codes `IDKFA`, `MISSION` et `RICHE`, les codes `GOKU` et `Z6PO` (vitesse du robot, balles, alias `C3PO`, annulation), le blindage chez le garagiste (sans et avec assez d'argent), la voiture blindée sous les balles et les roquettes, les trois braquages de bout en bout (butin, alarme, vigiles et chiens, fumée avec et sans masque, lasers et mitrailleuses, perceuse, explosif, planque avec et sans police), les fourgons blindés à 4 étoiles, le heavy robot à 5 étoiles (il tire, sa vitre casse, on éjecte le pilote, on le pilote, on tire, on descend), la foule (boutons, choix gardé après un rechargement, nombre de piétons et de voitures pour chaque choix, à l'arrêt et en traversant la ville à 90 km/h), les langues (boutons pendant le chargement, menu, objectif, arme, aide devant un stand, codes de triche, garagiste, argent, prix des stands, enseignes redessinées en quittant le menu, grande carte et sa légende, langue gardée après un rechargement ; et une vérification du tableau `TRADUCTIONS` : chaque `tr(...)` a sa ligne, chaque ligne a ses trois langues), et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
+- **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, si une voiture demande un modèle qui n'existe pas, si une piste de cascades a un morceau inconnu, ou si un gang est posé ailleurs que sur un pâté, ou avec une arme qui n'existe pas. Une erreur pendant une image arrête la boucle du jeu : l'image se fige, et la console du navigateur (F12, onglet Console, sans recharger la page) la montre en rouge, avec la ligne fautive. Deux erreurs sont évitées d'avance : `bruit` et `bip` ignorent un volume impossible (`NaN`, quand une position est mal calculée), que le son du navigateur refuse en levant une erreur ; `lancerRoquette` ne tire pas une roquette qui part d'un point impossible, ou qui y va, et l'écrit en rouge dans la console, avec la liste des fonctions appelées, pour retrouver qui a tiré.
+- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, les accidents (choc de côté à 72 km/h contre une Porsche garée, mur à 100 km/h, explosion, pneu crevé à 90 km/h, voiture lâchée sur le toit qui brûle puis explose, lampadaire, rangée de bornes), le conducteur tué par balle (passant, policier, rien à travers un fourgon blindé, en plein accident) ou par une explosion (avec et sans étoile), la voiture trop abîmée qui brûle puis explose (vide, avec B.J. dedans, éteinte au garage) et le nombre de balles qu'il faut et des photos des dégâts, les codes `IDKFA`, `MISSION` et `RICHE`, les codes `GOKU` et `Z6PO` (vitesse du robot, balles, alias `C3PO`, annulation), le blindage chez le garagiste (sans et avec assez d'argent), la voiture blindée sous les balles et les roquettes, les trois braquages de bout en bout (butin, alarme, vigiles et chiens, fumée avec et sans masque, lasers et mitrailleuses, perceuse, explosif, planque avec et sans police), les fourgons blindés à 4 étoiles, le heavy robot à 5 étoiles (il tire, sa vitre casse, on éjecte le pilote, on le pilote, on tire, on descend), la foule (boutons, choix gardé après un rechargement, nombre de piétons et de voitures pour chaque choix, à l'arrêt et en traversant la ville à 90 km/h), les langues (boutons pendant le chargement, menu, objectif, arme, aide devant un stand, codes de triche, garagiste, argent, prix des stands, enseignes redessinées en quittant le menu, grande carte et sa légende, langue gardée après un rechargement ; et une vérification du tableau `TRADUCTIONS` : chaque `tr(...)` a sa ligne, chaque ligne a ses trois langues), la voiture en toupie contre une voiture garée et un piéton (avant la correction, ni l'une ni l'autre ne bougeait), le choc de côté à 72 km/h tracé image par image (0,49 de dégâts de chaque côté, sans tourner pour rien), la voiture posée sur une borne qui repart et celle qui bute doucement puis recule, les dos d'âne (combien, profil, saut à 30, 60 et 100 km/h, la circulation qui ralentit), l'avion (décollage, virage, atterrissage sur la piste, descendre, crash en piqué), l'hélicoptère (rotor, montée, avancer, se poser, descendre ; lâché sans pilote), les gangs (calmes devant les poings, attaque au pistolet, butin sans étoile, calmes de loin, retour au complet), les immeubles (B.J. monte à pied, touche par touche, sur le toit ou la terrasse de chaque sorte, et redescend l'échelle), le coût du rendu avant et après, et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
 
 ## Limites connues et pistes
 
@@ -828,12 +895,16 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 ### Limites actuelles
 
 - Il n'y a pas de sauvegarde : recharger la page fait tout recommencer.
-- Seuls les pâtés spéciaux ont un bâtiment où entrer ; tours, immeubles et maisons restent pleins. Les intérieurs sont faits de boîtes, sans fenêtres percées : la lumière vient du ciel et des lampes du plafond, qui brillent sans éclairer.
+- Les tours, les maisons et 4 immeubles sur 5 restent pleins. Les intérieurs sont faits de boîtes, sans fenêtres percées : la lumière vient du ciel et des lampes du plafond, qui brillent sans éclairer. Un étage d'immeuble est un grand plateau (un canapé, une table basse), sans cloisons, sans appartements ni portes à l'intérieur. De plus de 100 m, on ne voit plus l'intérieur des bâtiments (même par une grande porte, comme celle d'un hangar).
+- Les échelles n'ont pas d'arceaux, et on ne peut pas tirer en grimpant. La police et les gangs ne savent pas suivre B.J. dans les escaliers : ils vont tout droit vers lui et butent contre les murs.
 - En 3e personne, la caméra est à l'étroit dans les petites pièces (la caravane de Trevor) : la vue à la 1re personne (V) y est plus confortable.
 - La route du château est raide (environ 30 %) : la carte n'a pas la place pour des lacets. Les pentes autour des villes perchées sont des falaises de roche.
-- Les rambardes des ponts de campagne ne retiennent pas les voitures. On ne se fait pas mal en tombant, même du haut du gratte-ciel, et B.J. ne prend rien quand sa voiture s'écrase.
+- Les rambardes des ponts de campagne ne retiennent pas les voitures. On ne se fait pas mal en tombant, même du haut du gratte-ciel ou d'un avion qui explose, et B.J. ne prend rien quand sa voiture s'écrase.
+- Avions et hélicoptères : seul le fuselage cogne (les ailes, la queue et les pales traversent les murs, les arbres et les gens). Les balles ne leur font rien, seules les roquettes. On ne descend qu'une fois posé : pas de parachute. L'avion ne recule pas, et peut décoller de n'importe quelle route assez longue. Personne d'autre ne vole, la police ne les poursuit pas, et un appareil détruit ne revient pas. Le bord du monde est à 300 m de la carte ; on y glisse le long d'un mur invisible.
+- Gangs : ils restent en rond à leur place tant qu'on ne les provoque pas (pas de balade, pas de voitures), ne quittent jamais leur pâté et ne se battent pas entre eux. La police ne s'en mêle pas.
+- Dos d'âne : seulement en ville. La police ne ralentit pas devant, et ils ne gênent ni les piétons ni le heavy robot.
 - Les voitures ne dérapent pas : elles tournent aussi bien à toute vitesse. Un virage relevé penche, mais ne permet pas d'aller plus vite. Elles ne glissent de côté que pendant un accident.
-- Accidents : vue du ciel, une voiture accidentée reste une file de cercles le long de son axe, même dressée sur le nez ; contre un mur, elle ne se renverse donc pas par-dessus. Elle ne voit pas les bornes, et les voitures qui roulent toutes seules ne la voient pas non plus (elles s'arrêtent derrière, puis font demi-tour). Pendant l'accident, la souris ne tourne pas la caméra. Rien ne blesse B.J. dans les tonneaux : seule l'explosion d'une voiture retournée le touche.
+- Accidents : vue du ciel, une voiture accidentée reste une file de cercles le long de son axe, même dressée sur le nez ; contre un mur, elle ne se renverse donc pas par-dessus. Elle ne voit pas les bornes, et les voitures qui roulent toutes seules ne la voient pas non plus (elles s'arrêtent derrière, puis font demi-tour). Elle pousse B.J. à pied sans le blesser, et traverse le heavy robot. Pendant l'accident, la souris ne tourne pas la caméra. Rien ne blesse B.J. dans les tonneaux : seule l'explosion d'une voiture retournée le touche.
 - Les piétons et B.J. traversent les bornes en béton. Un lampadaire tombé ne gêne personne, et les voitures qui roulent toutes seules ne renversent pas les lampadaires.
 - Dans un looping ou un tire-bouchon, la voiture ne peut ni accélérer ni tourner, et reste à la même place dans la largeur de la piste.
 - Une piste de cascades est à une seule hauteur : sur un terrain en pente, elle creuse ou remblaie beaucoup. Rien n'empêche deux morceaux de se croiser, et une piste peut passer dans une ville ou dans l'eau.
@@ -872,8 +943,9 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
 - Des missions qui utilisent la grande carte : courses de bateau, livraisons à Paleto Bay.
 - Des braquages à refaire, avec un receleur qui rachète le butin, et des coéquipiers (un chauffeur, un pirate informatique) ; la police qui barre les routes et fonce dans la voiture du joueur.
-- Des étages visitables dans les tours et les immeubles, des fenêtres percées.
-- Un parachute pour sauter du gratte-ciel, des hélicoptères sur l'hélistation.
+- Des étages visitables dans les tours, des appartements (cloisons, portes, cuisines) dans les immeubles, des fenêtres percées.
+- Un parachute pour sauter du gratte-ciel ou d'un avion, un hélicoptère sur l'hélistation du gratte-ciel Maze Bank, des missions en avion (une livraison à Sandy Shores) et une course d'hélicoptère.
+- Des guerres de gangs, des gangs en voiture, une mission pour nettoyer un quartier.
 - La grande roue de Del Perro et le panneau Vinewood.
 - Cycle jour et nuit, avec les lampadaires allumés.
 - Effets d'image (halo autour des lumières, coins assombris) : essayés puis retirés. En plein jour, le halo délave toute l'image et les coins assombris ne se voient presque pas, pour un coût élevé. À retenter avec la nuit.
