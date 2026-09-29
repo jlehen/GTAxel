@@ -324,6 +324,18 @@ const TRADUCTIONS = {
   'Banque Pacific Standard': { de: 'Pacific Standard Bank', en: 'Pacific Standard Bank', gsw: 'Pacific Standard Bank' },
   'Stunt Park de Palomino': { de: 'Stuntpark Palomino', en: 'Palomino Stunt Park', gsw: 'Stuntpark Palomino' },
   'Sauts de Grand Senora': { de: 'Grand-Senora-Sprünge', en: 'Grand Senora Jumps', gsw: 'Grand-Senora-Gümp' },
+  'Légende':          { de: 'Legende', en: 'Legend', gsw: 'Legände' },
+  'Piste de cascades': { de: 'Stuntstrecke', en: 'Stunt track', gsw: 'Stuntstrecki' },
+  'Objectif':         { de: 'Ziel', en: 'Objective', gsw: 'Ziil' },
+  'Toi':              { de: 'Du', en: 'You', gsw: 'Du' },
+  'Police':           { de: 'Polizei', en: 'Police', gsw: 'Polizei' },
+  'Ennemi':           { de: 'Feind', en: 'Enemy', gsw: 'Feind' },
+  // les enseignes sur les bâtiments (et « POLICE » sur les fourgons et le heavy robot)
+  'ARMURERIE':        { de: 'WAFFENLADEN', en: 'GUN SHOP', gsw: 'WAFFELADE' },
+  'POLICE':           { de: 'POLIZEI', en: 'POLICE', gsw: 'POLIZEI' },
+  'BANQUE':           { de: 'BANK', en: 'BANK', gsw: 'BANK' },
+  'ESSENCE':          { de: 'TANKSTELLE', en: 'GAS', gsw: 'TANKSTELL' },
+  "MUSÉE D'ART DE LOS SANTOS": { de: 'KUNSTMUSEUM LOS SANTOS', en: 'LOS SANTOS ART MUSEUM', gsw: 'KUNSCHTMUSEUM LOS SANTOS' },
 };
 
 // la langue choisie : le navigateur s'en souvient pour la prochaine fois
@@ -1226,7 +1238,6 @@ const TEX = {
   pierres: toile(256, 256, (g, l, h) => { g.fillStyle = '#4a4744'; g.fillRect(0, 0, l, h); for (let y = 0; y < 8; y++) for (let x = 0; x < 5; x++) { g.fillStyle = `hsl(30,${entre(3, 8)}%,${entre(38, 52)}%)`; g.fillRect(x * 64 + (y % 2) * 32 - 32 + 2, y * 32 + 2, 60, 28); } grain(g, l, h, 5000, 0.08); }),
   banniere: toile(128, 256, (g) => { g.fillStyle = '#a01010'; g.fillRect(0, 0, 128, 256); g.fillStyle = '#eee'; g.beginPath(); g.arc(64, 100, 44, 0, 7); g.fill(); g.fillStyle = '#111'; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText('W', 64, 123); }),
   croix: toile(128, 128, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#d42020'; g.fillRect(44, 14, 40, 100); g.fillRect(14, 44, 100, 40); }),
-  enseigne: toile(512, 96, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 512, 96); g.fillStyle = '#ff7a1a'; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText('ARMURERIE', 256, 72); }),
   flash: toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,230,1)'); r.addColorStop(0.3, 'rgba(255,200,80,.8)'); r.addColorStop(1, 'rgba(255,120,0,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }),
   fumee: toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }),
   // une jante vue de face : 5 branches, un moyeu et 5 écrous
@@ -1308,10 +1319,17 @@ const TEX = {
     g.strokeStyle = 'rgba(25,22,20,.7)'; g.lineWidth = 2; for (const x of [l / 3, l * 2 / 3]) { g.beginPath(); g.moveTo(x + entre(-6, 6), 0); g.lineTo(x + entre(-6, 6), h); g.stroke(); }
     g.fillStyle = '#26221e'; for (let k = 5; k < l; k += 16) for (const y of [4, h - 4]) { g.beginPath(); g.arc(k, y, 1.6, 0, 7); g.fill(); } }),
 };
-// un panneau : du texte en couleur sur un fond sombre
+// un panneau : du texte en couleur sur un fond sombre, dans la langue choisie.
+// ENSEIGNES les garde toutes, pour les redessiner quand on change de langue (majEnseignes)
+const ENSEIGNES = [];
 function enseigne(texte, couleur, fond = '#111') {
-  const t = toile(512, 96, (g) => { g.fillStyle = fond; g.fillRect(0, 0, 512, 96); g.fillStyle = couleur; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText(texte, 256, 72, 490); });
+  const dessin = (g) => { g.fillStyle = fond; g.fillRect(0, 0, 512, 96); g.fillStyle = couleur; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText(tr(texte), 256, 72, 490); };
+  const t = toile(512, 96, dessin);
+  ENSEIGNES.push({ t, dessin, langue });
   return std(t, { emissive: '#fff', emissiveMap: t, emissiveIntensity: 0.8 });
+}
+function majEnseignes() {
+  for (const e of ENSEIGNES) if (e.langue !== langue) { e.dessin(e.t.image.getContext('2d')); e.t.needsUpdate = true; e.langue = langue; }
 }
 // le visage est dessiné sur la tête : le devant de la tête est au quart de l'image
 const cacheVisage = {};
@@ -1344,7 +1362,7 @@ const MAT = {
   porte: std(null, { color: '#222', roughness: 0.6 }),
   chateau: std(TEX.pierres, { roughness: 0.95 }), banniere: std(TEX.banniere, { side: THREE.DoubleSide }),
   croix: std(TEX.croix, { emissive: '#fff', emissiveMap: TEX.croix, emissiveIntensity: 0.3 }),
-  enseigne: std(TEX.enseigne, { emissive: '#fff', emissiveMap: TEX.enseigne, emissiveIntensity: 0.8 }),
+  enseigne: enseigne('ARMURERIE', '#ff7a1a'),
   terrain: std(TEX.sol, { vertexColors: true, roughness: 1, bumpScale: 0.4 }),
   routeCampagne: std(TEX.routeCampagne, { roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1 }),
   piste: std(TEX.piste, { roughness: 0.9, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 }),
@@ -3841,6 +3859,7 @@ addEventListener('mousemove', e => {
 $('menu').addEventListener('click', () => {
   enJeu = true; $('menu').style.display = 'none';
   for (const o of objets) if (o.etiquette && o.langue !== langue) etiqueter(o);   // on a peut-être changé de langue dans le menu
+  majEnseignes();
   initAudio(); audio.resume();
   renderer.domElement.requestPointerLock?.();
 });
@@ -4722,6 +4741,7 @@ const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital
   L: ['#2a9a2a', 'F', 'Maison de Franklin'], O: ['#2a6ad8', 'M', 'Villa de Michael'], R: ['#e07a10', 'T', 'Caravane de Trevor'], J: ['#b89a10', 'Y', 'Yellow Jack'],
   B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'],
   U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'] };
+const LEGENDE = [...Object.values(ICONES), ['#d8501a', 'C', 'Piste de cascades']];   // les ronds de la légende de la grande carte
 const REPERES = [];   // [lieu, couleur, lettre, nom]
 for (const [c, [fond, lettre, nom]] of Object.entries(ICONES)) for (const p of lieux[c] || []) REPERES.push([p, fond, lettre, nom]);
 for (const c of CASCADES) REPERES.push([c.depart, '#d8501a', 'C', c.nom]);   // le départ des pistes de cascades
@@ -4817,6 +4837,21 @@ function texteCarte(g, texte, x, y, taille, alignement = 'center') {
   g.lineJoin = 'round'; g.lineWidth = 4; g.strokeStyle = 'rgba(0,0,0,.8)'; g.strokeText(texte, x, y);
   g.fillStyle = '#fff'; g.fillText(texte, x, y);
 }
+// la légende de la grande carte, à gauche : les ronds, puis l'objectif, le joueur, la police et les ennemis
+function legendeCarte(g, h) {
+  const rond = (couleur, x, y) => { g.fillStyle = couleur; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill(); };
+  const lignes = [...LEGENDE.map(([fond, lettre, nom]) => [nom, (x, y) => icone(g, x, y, fond, lettre, 8)]),
+    ['Objectif', (x, y) => { g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); g.stroke(); }],
+    ['Toi', (x, y) => flecheJoueur(g, x, y, 0, 0.9)],
+    ['Police', (x, y) => { rond('#f33', x - 3, y); rond('#39f', x + 3, y); }],
+    ['Ennemi', (x, y) => rond('#e33', x, y)]];
+  const haut = 76, pas = Math.min(21, (h - 52 - 12 - haut - 40) / lignes.length);   // plus serré si la fenêtre est petite
+  g.font = `bold 15px 'Roboto Condensed', Arial, sans-serif`;
+  const largeur = 54 + Math.max(...lignes.map(([nom]) => g.measureText(tr(nom)).width));
+  g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(12, haut, largeur, 40 + lignes.length * pas);
+  texteCarte(g, tr('Légende'), 24, haut + 24, 17, 'left');
+  lignes.forEach(([nom, dessin], k) => { const y = haut + 46 + k * pas; dessin(34, y); texteCarte(g, tr(nom), 50, y + 5, 15, 'left'); });
+}
 function dessinerGrandeCarte(dt) {
   const c = $('grande-carte'), l = innerWidth, h = innerHeight, r = Math.min(devicePixelRatio, 2), g = gctx;
   if (c.width !== Math.round(l * r) || c.height !== Math.round(h * r)) { c.width = Math.round(l * r); c.height = Math.round(h * r); }
@@ -4839,6 +4874,7 @@ function dessinerGrandeCarte(dt) {
   }
   flecheJoueur(g, ...ecran(J.x, J.z), Math.PI - (J.voiture ? J.voiture.angle : J.lacet), 2);
   g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(0, 0, l, 64); g.fillRect(0, h - 52, l, 52); // bandeaux pour lire les textes
+  legendeCarte(g, h);
   if (cible) { g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(36, 32, 8, 0, 7); g.fill(); g.stroke(); }
   texteCarte(g, $('objectif').textContent, cible ? 54 : 28, 40, 22, 'left');
   const [ci, cj] = blocEn(J.x, J.z);   // pour retrouver sa place dans le tableau CARTE
@@ -4992,7 +5028,7 @@ window.jeu = { J, joueurH, criMJ, carte, VOITURES, MODELES, ouvrirCarte, centreC
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
-  exploser, blesserJoueur, cibleMission, V3, ARMES_ROBOT, robotProche,
+  exploser, blesserJoueur, cibleMission, V3, ARMES_ROBOT, robotProche, ENSEIGNES,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };

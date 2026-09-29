@@ -8,7 +8,7 @@ Un jeu d'action en 3D dans un grand pays inspiré de celui de **GTA 5**, mélang
 
 Ou ouvre `index.html` dans un navigateur (double-clic). Il faut une connexion Internet : le moteur 3D ([Three.js](https://threejs.org)) est chargé en ligne.
 
-Dans le menu, choisis ta langue : **Français**, **Deutsch**, **English** ou **Züritüütsch**. Le navigateur s'en souvient pour la prochaine fois. En allemand et en anglais, les touches pour se déplacer sont W A S D.
+Dans le menu, choisis ta langue : **Français**, **Deutsch**, **English** ou **Züritüütsch**. Le navigateur s'en souvient pour la prochaine fois. Même les enseignes des magasins changent de langue. En allemand et en anglais, les touches pour se déplacer sont W A S D.
 
 | Touche | Action |
 |---|---|
@@ -51,7 +51,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
   - la **banque Pacific Standard** (Q) : passe les lasers rouges sans les toucher (sinon, des mitrailleuses tirent pendant 5 secondes), perce la porte du coffre-fort (40 secondes à tenir), fais sauter la grille à l'explosif, et prends le pactole.
 
   Chaque fois, beaucoup de police arrive, et vite. Sème-la, puis rapporte le butin à la planque, la caravane de Trevor à Sandy Shores, dans ta voiture blindée.
-- **Carte** : la touche M affiche tout le pays en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants. Elle te dit aussi dans quelle colonne et quelle ligne du tableau `CARTE` tu es.
+- **Carte** : la touche M affiche tout le pays en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants. La légende, à gauche, dit ce que veut dire chaque rond. Elle te dit aussi dans quelle colonne et quelle ligne du tableau `CARTE` tu es.
 - **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`, `GOKU`, `Z6PO` (ou `C3PO`)… à toi de voir ce qu'ils font ! Retape un code pour l'annuler. Et pour tester : `IDKFA` donne toutes les armes et plein de munitions, comme dans *Doom* ; `MISSION` suivi d'un numéro saute directement à cette mission (`MISSION8` : le musée), avec une voiture blindée à côté s'il en faut une.
 - **Danse** : tape Q S D trois fois de suite (A S D sur un clavier QWERTY) : B.J. met son chapeau et fait le moonwalk, tourne sur lui-même en poussant son petit cri, puis prend la pose de Michael Jackson, la main entre les jambes : « Who's bad ? ». Bouge pour l'arrêter.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital le plus proche (+ rouge sur la mini-carte) et tu perds 100 $.
