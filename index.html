@@ -38,7 +38,7 @@
   #grande-carte { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
   #triche { position: absolute; top: 60%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.75); padding: 8px 18px; font-size: 26px; display: none; }
   #vitesse { position: absolute; right: 32px; bottom: 28px; font: 44px 'Anton', Impact, sans-serif; display: none; }
-  #menu { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  #menu { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: safe center; overflow-y: auto; /* un petit écran fait défiler le menu */
           background: rgba(0,0,0,.72); color: #fff; cursor: pointer; text-align: center; }
   #menu h1 { font: 120px 'Anton', Impact, sans-serif; margin: 0; letter-spacing: 4px;
              background: linear-gradient(#fff 40%, #f0c850); -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -48,6 +48,11 @@
   #menu table { border-collapse: collapse; font-size: 18px; }
   #menu td { padding: 3px 14px; }
   #menu td:first-child { text-align: right; color: #f0c850; font-weight: 700; }
+  #langues { margin: 2px 0 10px; }
+  #langues button { font: 700 18px 'Roboto Condensed', Arial, sans-serif; color: #fff; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35);
+                    border-radius: 18px; padding: 4px 16px; margin: 3px; cursor: pointer; }
+  #langues button:hover { border-color: #f0c850; }
+  #langues button.on { background: #f0c850; border-color: #f0c850; color: #000; }
 </style>
 </head>
 <body>
@@ -75,6 +80,7 @@
 </div>
 <div id="menu">
   <h1>GTAxel</h1>
+  <div id="langues"></div>
   <div id="histoire">Tu es B.J. Blazkowicz. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !</div>
   <div id="etat">Chargement… (il faut une connexion Internet)</div>
   <table>
@@ -93,6 +99,255 @@
     <tr><td>Échap</td><td>pause</td></tr>
   </table>
 </div>
+
+<script>
+// =====================================================================
+//  LES LANGUES : le jeu est écrit en français, et TRADUCTIONS donne chaque phrase dans les autres langues.
+//  Une phrase qui n'est pas dans le tableau (ou pas dans cette langue) reste en français.
+//  {prix}, {n}... : le jeu met un nombre ou un nom à cet endroit. Garde-les dans la traduction (tu peux les déplacer).
+//  Pour ajouter une langue : ajoute-la dans LANGUES (it: 'Italiano'), puis sa traduction sur chaque ligne.
+//  Les codes de triche (SLIP, GOKU...) restent les mêmes dans toutes les langues.
+// =====================================================================
+const LANGUES = { fr: 'Français', de: 'Deutsch', en: 'English', gsw: 'Züritüütsch' };
+const TRADUCTIONS = {
+  // le menu
+  'Tu es B.J. Blazkowicz. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !': {
+    de: 'Du bist B.J. Blazkowicz. Streif durch Los Santos und Umgebung, jag die Nazis und erledige Hitler im Schloss Wolfenstein auf dem Mount Chiliad!',
+    en: 'You are B.J. Blazkowicz. Roam Los Santos and the countryside, hunt the Nazis and take out Hitler in Castle Wolfenstein, on top of Mount Chiliad!',
+    gsw: 'Du bisch de B.J. Blazkowicz. Streif dur Los Santos und d Umgäbig, jag d Nazis und mach de Hitler im Schloss Wolfenstein uf em Mount Chiliad fertig!' },
+  'Chargement… (il faut une connexion Internet)': { de: 'Lädt… (braucht eine Internetverbindung)', en: 'Loading… (needs an Internet connection)', gsw: 'Am Lade… (es bruucht Internet)' },
+  'Clique pour jouer':             { de: 'Klicke zum Spielen', en: 'Click to play', gsw: 'Klick zum Spile' },
+  'Pause — clique pour continuer': { de: 'Pause — klicke zum Weiterspielen', en: 'Paused — click to continue', gsw: 'Pause — klick zum Wiiterspile' },
+  'Z Q S D':                  { de: 'W A S D', en: 'W A S D', gsw: 'W A S D' },   // les mêmes touches, sur un clavier allemand ou anglais
+  'se déplacer / conduire':   { de: 'laufen / fahren', en: 'move / drive', gsw: 'laufe / fahre' },
+  'Souris':                   { de: 'Maus', en: 'Mouse', gsw: 'Muus' },
+  'regarder':                 { de: 'umschauen', en: 'look around', gsw: 'umeluege' },
+  'Clic gauche':              { de: 'Linksklick', en: 'Left click', gsw: 'Linksklick' },
+  'tirer / frapper':          { de: 'schießen / schlagen', en: 'shoot / punch', gsw: 'schüüsse / haue' },
+  'Clic droit':               { de: 'Rechtsklick', en: 'Right click', gsw: 'Rächtsklick' },
+  'viser (lunette du sniper)': { de: 'zielen (Zielfernrohr)', en: 'aim (sniper scope)', gsw: 'ziele (Zielfernrohr)' },
+  'Maj':                      { de: 'Shift', en: 'Shift', gsw: 'Shift' },
+  'courir':                   { de: 'rennen', en: 'run', gsw: 'seckle' },
+  'Espace':                   { de: 'Leertaste', en: 'Space', gsw: 'Läärtaschte' },
+  'sauter (frein à main en voiture)': { de: 'springen (im Auto: Handbremse)', en: 'jump (in a car: handbrake)', gsw: 'gumpe (im Auto: Handbremse)' },
+  'Ctrl ou C':                { de: 'Strg oder C', en: 'Ctrl or C', gsw: 'Strg oder C' },
+  "s'accroupir":              { de: 'ducken', en: 'crouch', gsw: 'sich ducke' },
+  'monter / descendre (voiture, bateau), acheter, ascenseur': { de: 'einsteigen / aussteigen (Auto, Boot), kaufen, Aufzug', en: 'get in / out (car, boat), buy, elevator', gsw: 'iistiige / uusstiige (Auto, Boot), chaufe, Lift' },
+  'vue 1re / 3e personne':    { de: 'Ansicht 1. / 3. Person', en: '1st / 3rd person view', gsw: 'Aasicht 1. / 3. Person' },
+  '1 à 8 ou molette':         { de: '1 bis 8 oder Mausrad', en: '1 to 8 or wheel', gsw: '1 bis 8 oder Muusrad' },
+  "changer d'arme":           { de: 'Waffe wechseln', en: 'switch weapon', gsw: 'Waffe wächsle' },
+  'carte du pays (molette : zoom)': { de: 'Landkarte (Mausrad: Zoom)', en: 'map (wheel: zoom)', gsw: 'Charte (Muusrad: Zoom)' },
+  'Entrée':                   { de: 'Enter', en: 'Enter', gsw: 'Enter' },
+  'code de triche':           { de: 'Cheatcode', en: 'cheat code', gsw: 'Cheatcode' },
+  'Échap':                    { de: 'Esc', en: 'Esc', gsw: 'Esc' },
+  'pause':                    { de: 'Pause', en: 'pause', gsw: 'Pause' },
+  // les armes, les véhicules, le butin
+  'Poings':           { de: 'Fäuste', en: 'Fists', gsw: 'Füüscht' },
+  'Couteau':          { de: 'Messer', en: 'Knife', gsw: 'Mässer' },
+  'Pistolet':         { de: 'Pistole', en: 'Pistol', gsw: 'Pistole' },
+  'Mitraillette':     { de: 'Maschinenpistole', en: 'SMG', gsw: 'Maschinepistole' },
+  'Fusil à pompe':    { de: 'Schrotflinte', en: 'Shotgun', gsw: 'Schrotflinte' },
+  "Fusil d'assaut":   { de: 'Sturmgewehr', en: 'Assault rifle', gsw: 'Sturmgwehr' },
+  'Fusil de sniper':  { de: 'Scharfschützengewehr', en: 'Sniper rifle', gsw: 'Scharfschützegwehr' },
+  'Masque à gaz':     { de: 'Gasmaske', en: 'Gas mask', gsw: 'Gasmaske' },
+  '{n} balles':       { de: '{n} Kugeln', en: '{n} bullets', gsw: '{n} Kugle' },
+  '{n} roquettes':    { de: '{n} Raketen', en: '{n} rockets', gsw: '{n} Rakete' },
+  'Classique':        { de: 'Klassiker', en: 'Sedan', gsw: 'Klassiker' },
+  '4x4 du désert':    { de: 'Wüsten-Geländewagen', en: 'Desert 4x4', gsw: 'Wüeschte-4x4' },
+  'Limousine':        { de: 'Stretch-Limousine', en: 'Limousine', gsw: 'Stretch-Limo' },
+  'Tricycle':         { de: 'Trike', en: 'Trike', gsw: 'Trike' },
+  'Voiture de police': { de: 'Polizeiauto', en: 'Police car', gsw: 'Polizeiauto' },
+  'Fourgon blindé':   { de: 'Panzerwagen', en: 'Armored van', gsw: 'Panzerwage' },
+  'Hors-bord':        { de: 'Motorboot', en: 'Speedboat', gsw: 'Motorboot' },
+  'Jet-ski':          { de: 'Jetski', en: 'Jet ski', gsw: 'Jetski' },
+  'le grand tableau': { de: 'das große Gemälde', en: 'the big painting', gsw: 's grosse Gmäld' },
+  'la couronne':      { de: 'die Krone', en: 'the crown', gsw: 'd Chrone' },
+  'le collier de rubis': { de: 'die Rubinkette', en: 'the ruby necklace', gsw: 'd Rubinchetti' },
+  'les bagues en diamant': { de: 'die Diamantringe', en: 'the diamond rings', gsw: 'd Diamantring' },
+  'la statue grecque en marbre': { de: 'die griechische Marmorstatue', en: 'the Greek marble statue', gsw: 'di griechisch Marmorstatue' },
+  'le chat égyptien en or': { de: 'die ägyptische Goldkatze', en: 'the Egyptian gold cat', gsw: 'di ägyptisch Goldchatz' },
+  'le gros diamant':  { de: 'der große Diamant', en: 'the big diamond', gsw: 'de gross Diamant' },
+  'le pactole':       { de: 'die Kohle', en: 'the jackpot', gsw: 's Gäld' },
+  // les missions
+  'Le colis':         { de: 'Das Paket', en: 'The package', gsw: 'S Päckli' },
+  'Récupère le colis au point jaune': { de: 'Hol das Paket beim gelben Punkt ab', en: 'Pick up the package at the yellow marker', gsw: 'Hol s Päckli bim gäle Punkt ab' },
+  'Livre le colis dans le centre de Los Santos': { de: 'Liefere das Paket im Zentrum von Los Santos ab', en: 'Deliver the package to downtown Los Santos', gsw: 'Bring s Päckli is Zentrum vo Los Santos' },
+  "Armé jusqu'aux dents": { de: 'Bis an die Zähne bewaffnet', en: 'Armed to the teeth', gsw: 'Bis a d Zää bewaffnet' },
+  "Achète un pistolet à l'armurerie (A sur la carte)": { de: 'Kauf eine Pistole im Waffenladen (A auf der Karte)', en: 'Buy a pistol at the gun shop (A on the map)', gsw: 'Chauf e Pistole im Waffelade (A uf de Charte)' },
+  'Voleur de voitures': { de: 'Autodieb', en: 'Car thief', gsw: 'Autodieb' },
+  'Vole une voiture (touche E) et amène-la dans le garage LS Customs': { de: 'Klau ein Auto (Taste E) und bring es in die Werkstatt LS Customs', en: 'Steal a car (E key) and bring it to the LS Customs garage', gsw: 'Klau es Auto (Taschte E) und bring s i d Garage LS Customs' },
+  'Course-poursuite': { de: 'Verfolgungsjagd', en: 'Car chase', gsw: 'Verfolgigsjagd' },
+  'Fais monter la police à 3 étoiles': { de: 'Bring die Polizei auf 3 Sterne', en: 'Get the police up to 3 stars', gsw: 'Bring d Polizei uf 3 Stärn' },
+  'Sème la police !': { de: 'Häng die Polizei ab!', en: 'Lose the cops!', gsw: 'Häng d Polizei ab!' },
+  'Opération bunker': { de: 'Operation Bunker', en: 'Operation Bunker', gsw: 'Operation Bunker' },
+  "Va au bunker nazi de Fort Zancudo, tout à l'ouest": { de: 'Geh zum Nazi-Bunker in Fort Zancudo, ganz im Westen', en: 'Go to the Nazi bunker at Fort Zancudo, far to the west', gsw: 'Gang zum Nazi-Bunker z Fort Zancudo, ganz im Weschte' },
+  'Élimine le Kommandant dans le bunker': { de: 'Erledige den Kommandanten im Bunker', en: 'Take out the Kommandant in the bunker', gsw: 'Mach de Kommandant im Bunker fertig' },
+  'Le château Wolfenstein': { de: 'Schloss Wolfenstein', en: 'Castle Wolfenstein', gsw: 'S Schloss Wolfenstein' },
+  'Boss final : élimine Hitler dans le château Wolfenstein, sur le mont Chiliad (W sur la carte)': { de: 'Endboss: Erledige Hitler im Schloss Wolfenstein auf dem Mount Chiliad (W auf der Karte)',
+    en: 'Final boss: take out Hitler in Castle Wolfenstein, on Mount Chiliad (W on the map)', gsw: 'Ändboss: Mach de Hitler im Schloss Wolfenstein uf em Mount Chiliad fertig (W uf de Charte)' },
+  'Vole une voiture rapide (une Porsche) et amène-la au garage LS Customs': { de: 'Klau ein schnelles Auto (einen Porsche) und bring es in die Werkstatt LS Customs',
+    en: 'Steal a fast car (a Porsche) and bring it to the LS Customs garage', gsw: 'Klau es schnälls Auto (en Porsche) und bring s i d Garage LS Customs' },
+  'Descends et paie le garagiste (touche E) : 5 000 $ pour blinder ta Porsche façon Mad Max': { de: 'Steig aus und bezahl den Mechaniker (Taste E): 5.000 $, damit er deinen Porsche im Mad-Max-Stil panzert',
+    en: 'Get out and pay the mechanic (E key): $5,000 to armor your Porsche Mad Max style', gsw: 'Stiig uus und zahl em Mech (Taschte E): 5000 $, dänn panzeret er din Porsche im Mad-Max-Stil' },
+  "Le musée d'art":   { de: 'Das Kunstmuseum', en: 'The art museum', gsw: 'S Kunschtmuseum' },
+  "Gare ta voiture blindée devant le musée d'art (U sur la carte)": { de: 'Park dein gepanzertes Auto vor dem Kunstmuseum (U auf der Karte)', en: 'Park your armored car in front of the art museum (U on the map)', gsw: 'Parkier dis panzerete Auto vor em Kunschtmuseum (U uf de Charte)' },
+  'Vole le grand tableau, les bijoux, la couronne et les statues (touche E). Attention aux vigiles et aux chiens !': { de: 'Klau das große Gemälde, den Schmuck, die Krone und die Statuen (Taste E). Vorsicht vor den Wachleuten und den Hunden!',
+    en: 'Steal the big painting, the jewels, the crown and the statues (E key). Watch out for the guards and the dogs!', gsw: 'Klau s grosse Gmäld, de Schmuck, d Chrone und d Statue (Taschte E). Pass uf d Wächter und d Hünd uf!' },
+  'Sème la police, puis rapporte le butin à la planque (la caravane de Trevor, à Sandy Shores) dans ta voiture blindée': { de: 'Häng die Polizei ab und bring die Beute in deinem gepanzerten Auto zum Versteck (Trevors Wohnwagen in Sandy Shores)',
+    en: "Lose the cops, then bring the loot to the hideout (Trevor's trailer in Sandy Shores) in your armored car", gsw: 'Häng d Polizei ab und bring d Büüti mit dim panzerete Auto is Versteck (em Trevor sin Wohnwage z Sandy Shores)' },
+  'La bijouterie Vangelico': { de: 'Juwelier Vangelico', en: 'Vangelico jewelry store', gsw: 'De Juwelier Vangelico' },
+  "Gare ta voiture blindée devant la bijouterie Vangelico (V sur la carte). Un masque à gaz s'achète à l'armurerie": { de: 'Park dein gepanzertes Auto vor dem Juwelier Vangelico (V auf der Karte). Eine Gasmaske gibt es im Waffenladen',
+    en: 'Park your armored car in front of the Vangelico jewelry store (V on the map). You can buy a gas mask at the gun shop', gsw: 'Parkier dis panzerete Auto vor em Juwelier Vangelico (V uf de Charte). E Gasmaske chasch im Waffelade chaufe' },
+  "Vole le gros diamant (touche E). L'alarme lâche une fumée toxique : fais vite !": { de: 'Klau den großen Diamanten (Taste E). Der Alarm lässt giftigen Rauch los: beeil dich!',
+    en: 'Steal the big diamond (E key). The alarm lets out toxic smoke: be quick!', gsw: 'Klau de gross Diamant (Taschte E). De Alarm laat giftige Rauch uus: mach vorwärts!' },
+  'Sème la police, puis rapporte le diamant à la planque (la caravane de Trevor) dans ta voiture blindée': { de: 'Häng die Polizei ab und bring den Diamanten in deinem gepanzerten Auto zum Versteck (Trevors Wohnwagen)',
+    en: "Lose the cops, then bring the diamond to the hideout (Trevor's trailer) in your armored car", gsw: 'Häng d Polizei ab und bring de Diamant mit dim panzerete Auto is Versteck (em Trevor sin Wohnwage)' },
+  'Le casse de la Pacific Standard': { de: 'Der Pacific-Standard-Coup', en: 'The Pacific Standard heist', gsw: 'De Pacific-Standard-Coup' },
+  'Gare ta voiture blindée devant la banque Pacific Standard (Q sur la carte)': { de: 'Park dein gepanzertes Auto vor der Pacific Standard Bank (Q auf der Karte)', en: 'Park your armored car in front of the Pacific Standard bank (Q on the map)', gsw: 'Parkier dis panzerete Auto vor de Pacific Standard Bank (Q uf de Charte)' },
+  'Passe les lasers sans les toucher, perce le coffre-fort, fais sauter la grille et prends le pactole (touche E)': { de: 'Komm an den Lasern vorbei, ohne sie zu berühren, bohr den Tresor auf, spreng das Gitter und schnapp dir die Kohle (Taste E)',
+    en: 'Get past the lasers without touching them, drill the vault, blow up the gate and grab the jackpot (E key)', gsw: 'Chum a de Laser verbii ohni s z berüere, bohr de Tresor uf, spräng s Gitter und schnapp der s Gäld (Taschte E)' },
+  'Sème la police, puis rapporte le pactole à la planque (la caravane de Trevor) dans ta voiture blindée': { de: 'Häng die Polizei ab und bring die Kohle in deinem gepanzerten Auto zum Versteck (Trevors Wohnwagen)',
+    en: "Lose the cops, then bring the jackpot to the hideout (Trevor's trailer) in your armored car", gsw: 'Häng d Polizei ab und bring s Gäld mit dim panzerete Auto is Versteck (em Trevor sin Wohnwage)' },
+  'Pays libre':       { de: 'Freies Land', en: 'Free country', gsw: 'Freis Land' },
+  'Pays libre : fais ce que tu veux !': { de: 'Freies Land: mach, was du willst!', en: 'Free country: do whatever you want!', gsw: 'Freis Land: mach, was d wotsch!' },
+  'MISSION RÉUSSIE':  { de: 'MISSION ERFÜLLT', en: 'MISSION PASSED', gsw: 'MISSION GSCHAFFT' },
+  '{mission} : +{argent}': { de: '{mission}: +{argent}', en: '{mission}: +{argent}', gsw: '{mission}: +{argent}' },
+  'BRAVO !':          { de: 'BRAVO!', en: 'WELL DONE!', gsw: 'BRAVO!' },
+  'Toutes les missions sont finies !': { de: 'Alle Missionen erledigt!', en: 'All missions complete!', gsw: 'Alli Missione sind fertig!' },
+  // les codes de triche
+  'Code : {code}_':   { de: 'Code: {code}_', en: 'Code: {code}_', gsw: 'Code: {code}_' },
+  'Code inconnu':     { de: 'Unbekannter Code', en: 'Unknown code', gsw: 'Unbekannte Code' },
+  '{effet} (annulé)': { de: '{effet} (aufgehoben)', en: '{effet} (cancelled)', gsw: '{effet} (abgstellt)' },
+  'En slip !':        { de: 'In Unterhosen!', en: 'In your underpants!', gsw: 'I de Unterhose!' },
+  'Une chaussure perdue': { de: 'Einen Schuh verloren', en: 'Lost a shoe', gsw: 'En Schue verlore' },
+  'Torse nu en soutien-gorge': { de: 'Oben ohne, im BH', en: 'Topless, in a bra', gsw: 'Obe ohni, im BH' },
+  'Jambe de bois':    { de: 'Holzbein', en: 'Wooden leg', gsw: 'Holzbei' },
+  'Maillot du Barça': { de: 'Barça-Trikot', en: 'Barça shirt', gsw: 'Barça-Trikot' },
+  'Bébé !':           { de: 'Baby!', en: 'Baby!', gsw: 'Bébé!' },
+  'San Goku, Super Saiyan !': { de: 'Son Goku, Super-Saiyajin!', en: 'Goku, Super Saiyan!', gsw: 'Son Goku, Super-Saiyajin!' },
+  'Z6PO, le robot doré': { de: 'C-3PO, der goldene Roboter', en: 'C-3PO, the golden robot', gsw: 'C-3PO, de goldig Roboter' },
+  'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
+  // les annonces
+  'Moonwalk !':       { de: 'Moonwalk!', en: 'Moonwalk!', gsw: 'Moonwalk!' },
+  "WHO'S BAD ?":      { de: "WHO'S BAD?", en: "WHO'S BAD?", gsw: "WHO'S BAD?" },
+  'SAUT !':           { de: 'SPRUNG!', en: 'JUMP!', gsw: 'GUMP!' },
+  'looping':          { de: 'Looping', en: 'loop', gsw: 'Looping' },
+  'tire-bouchon':     { de: 'Korkenzieher', en: 'corkscrew', gsw: 'Zapfezieher' },
+  '{figure} !':       { de: '{figure}!', en: '{figure}!', gsw: '{figure}!' },
+  "Pas assez d'élan !": { de: 'Nicht genug Schwung!', en: 'Not enough speed!', gsw: 'Nöd gnueg Schwung!' },
+  'Voiture réparée !': { de: 'Auto repariert!', en: 'Car repaired!', gsw: 'Auto repariert!' },
+  '+50 vie':          { de: '+50 Leben', en: '+50 health', gsw: '+50 Läbe' },
+  'Gilet pare-balles !': { de: 'Schutzweste!', en: 'Body armor!', gsw: 'Schutzweschte!' },
+  '{arme} ramassé !': { de: '{arme} aufgehoben!', en: '{arme} picked up!', gsw: '{arme} ufgläse!' },
+  '+ munitions ({arme})': { de: '+ Munition ({arme})', en: '+ ammo ({arme})', gsw: '+ Munition ({arme})' },
+  'Plus de munitions': { de: 'Keine Munition mehr', en: 'Out of ammo', gsw: 'Kei Munition me' },
+  "Pas assez d'argent": { de: 'Nicht genug Geld', en: 'Not enough money', gsw: 'Nöd gnueg Gäld' },
+  'Il te faut {prix} $': { de: 'Du brauchst {prix} $', en: 'You need {prix} $', gsw: 'Du bruuchsch {prix} $' },
+  'Munitions achetées': { de: 'Munition gekauft', en: 'Ammo bought', gsw: 'Munition gchauft' },
+  '{arme} acheté !':  { de: '{arme} gekauft!', en: '{arme} bought!', gsw: '{arme} gchauft!' },
+  'Masque à gaz acheté !': { de: 'Gasmaske gekauft!', en: 'Gas mask bought!', gsw: 'Gasmaske gchauft!' },
+  'Il te protège de la fumée toxique': { de: 'Sie schützt dich vor giftigem Rauch', en: 'It protects you from toxic smoke', gsw: 'Si schützt di vor giftigem Rauch' },
+  'Tu as déjà un masque à gaz': { de: 'Du hast schon eine Gasmaske', en: 'You already have a gas mask', gsw: 'Du häsch scho e Gasmaske' },
+  "Tu te réveilles à l'hôpital le plus proche (-100 $)": { de: 'Du wachst im nächsten Krankenhaus auf (-100 $)', en: 'You wake up at the nearest hospital (-100 $)', gsw: 'Du wachsch im nöchschte Spital uf (-100 $)' },
+  'Tu as semé la police !': { de: 'Du hast die Polizei abgehängt!', en: 'You lost the cops!', gsw: 'Du häsch d Polizei abghängt!' },
+  'BRAQUAGE !':       { de: 'ÜBERFALL!', en: 'ROBBERY!', gsw: 'ÜBERFALL!' },
+  '+{n} $ : la police arrive !': { de: '+{n} $: die Polizei kommt!', en: '+{n} $: the cops are coming!', gsw: '+{n} $: d Polizei chunnt!' },
+  'Le garagiste : « {texte} »': { de: 'Der Mechaniker: „{texte}“', en: 'The mechanic: “{texte}”', gsw: 'De Mech: «{texte}»' },
+  'Amène-moi une voiture rapide dans le garage, et je te la blinde.': { de: 'Bring mir ein schnelles Auto in die Werkstatt, und ich panzere es dir.', en: "Bring me a fast car in the garage, and I'll armor it for you.", gsw: 'Bring mer es schnälls Auto i d Garage, dänn panzer ich der s.' },
+  'Elle est déjà blindée !': { de: 'Das ist schon gepanzert!', en: "It's already armored!", gsw: 'Das isch scho panzeret!' },
+  "Ta {voiture} n'est pas assez rapide. Il me faut une voiture rapide, comme une Porsche.": { de: '{voiture}? Zu langsam. Ich brauche ein schnelles Auto, wie einen Porsche.',
+    en: "Your {voiture} isn't fast enough. I need a fast car, like a Porsche.", gsw: '{voiture}? Z langsam. Ich bruuch es schnälls Auto, wie en Porsche.' },
+  "Le blindage, c'est {prix} $. Reviens quand tu les auras.": { de: 'Die Panzerung kostet {prix} $. Komm wieder, wenn du das Geld hast.', en: 'Armor costs {prix} $. Come back when you have it.', gsw: 'D Panzerig choschtet {prix} $. Chum wieder, wänn d s Gäld häsch.' },
+  'MAD MAX !':        { de: 'MAD MAX!', en: 'MAD MAX!', gsw: 'MAD MAX!' },
+  'Ta {voiture} est blindée : les balles ne passent plus, et elle tient {n} roquettes': { de: 'Dein Auto ist gepanzert: keine Kugel kommt mehr durch, und es hält {n} Raketen aus',
+    en: 'Your {voiture} is armored: bullets bounce off, and it can take {n} rockets', gsw: 'Dis Auto isch panzeret: kei Kugle chunnt me dure, und s hebt {n} Rakete uus' },
+  'Le blindage tient ! (encore {n} roquettes)': { de: 'Die Panzerung hält! (noch {n} Raketen)', en: 'The armor holds! ({n} more rockets)', gsw: 'D Panzerig hebt! (no {n} Rakete)' },
+  'Le blindage est à bout : la prochaine roquette la fait sauter !': { de: 'Die Panzerung ist am Ende: die nächste Rakete sprengt das Auto!', en: 'The armor is done for: the next rocket blows it up!', gsw: 'D Panzerig isch kaputt: di nächscht Rakete sprängt s Auto!' },
+  'ALARME !':         { de: 'ALARM!', en: 'ALARM!', gsw: 'ALARM!' },
+  'La police arrive, et en force !': { de: 'Die Polizei kommt, und zwar mit allem!', en: 'The police are coming, in force!', gsw: 'D Polizei chunnt, und zwar mit allem!' },
+  'BUTIN !':          { de: 'BEUTE!', en: 'LOOT!', gsw: 'BÜÜTI!' },
+  '{objet} : dans le sac': { de: '{objet}: im Sack', en: '{objet}: in the bag', gsw: '{objet}: im Sack' },
+  'La perceuse thermique attaque la porte : {n} secondes. Défends-toi !': { de: 'Der Thermobohrer frisst sich durch die Tür: {n} Sekunden. Verteidige dich!', en: 'The thermal drill is eating through the door: {n} seconds. Defend yourself!', gsw: 'De Thermobohrer frisst sich dur d Tür: {n} Sekunde. Wehr di!' },
+  'Explosif posé : éloigne-toi ! ({n} s)': { de: 'Sprengstoff angebracht: geh weg! ({n} s)', en: 'Explosive planted: get away! ({n} s)', gsw: 'Sprängstoff isch dra: gang wäg! ({n} s)' },
+  'BOUM !':           { de: 'BUMM!', en: 'BOOM!', gsw: 'BUMM!' },
+  'La grille a sauté : prends le pactole !': { de: 'Das Gitter ist weg: schnapp dir die Kohle!', en: 'The gate is blown: grab the jackpot!', gsw: 'S Gitter isch wäg: schnapp der s Gäld!' },
+  'LASER TOUCHÉ !':   { de: 'LASER BERÜHRT!', en: 'LASER TRIPPED!', gsw: 'LASER BERÜERT!' },
+  'Les mitrailleuses tirent pendant {n} secondes : cache-toi !': { de: 'Die Maschinengewehre schießen {n} Sekunden lang: versteck dich!', en: 'The machine guns fire for {n} seconds: take cover!', gsw: 'D Maschinegwehr schüüssed {n} Sekunde lang: versteck di!' },
+  'COFFRE-FORT PERCÉ !': { de: 'TRESOR GEKNACKT!', en: 'VAULT DRILLED!', gsw: 'TRESOR GCHNACKT!' },
+  "La porte s'ouvre : fais sauter la grille": { de: 'Die Tür geht auf: spreng das Gitter', en: 'The door opens: blow up the gate', gsw: 'D Tür gaht uf: spräng s Gitter' },
+  'HEAVY ROBOT !':    { de: 'HEAVY ROBOT!', en: 'HEAVY ROBOT!', gsw: 'HEAVY ROBOT!' },
+  'Clic gauche : mitrailleuse · clic droit : roquettes · E : descendre': { de: 'Linksklick: Maschinengewehr · Rechtsklick: Raketen · E: aussteigen', en: 'Left click: machine gun · right click: rockets · E: get out', gsw: 'Linksklick: Maschinegwehr · Rächtsklick: Rakete · E: uusstiige' },
+  'Le heavy robot de la police arrive !': { de: 'Der Heavy Robot der Polizei kommt!', en: 'The police heavy robot is coming!', gsw: 'De Heavy Robot vo de Polizei chunnt!' },
+  'Pilote abattu : monte dans le robot (touche E) !': { de: 'Pilot erledigt: steig in den Roboter (Taste E)!', en: 'Pilot down: climb into the robot (E key)!', gsw: 'Pilot erledigt: stiig in Roboter ii (Taschte E)!' },
+  'La vitre du robot est cassée : vise le pilote, ou éjecte-le (touche E) !': { de: 'Die Scheibe des Roboters ist kaputt: ziel auf den Piloten oder wirf ihn raus (Taste E)!',
+    en: "The robot's window is broken: aim at the pilot, or throw him out (E key)!", gsw: 'D Schiibe vom Roboter isch kaputt: ziel uf de Pilot oder rüer en use (Taschte E)!' },
+  'Pilote éjecté ! Monte dans le robot (touche E)': { de: 'Pilot rausgeworfen! Steig in den Roboter (Taste E)', en: 'Pilot thrown out! Climb into the robot (E key)', gsw: 'Pilot usegrüert! Stiig in Roboter ii (Taschte E)' },
+  // l'aide en haut à gauche
+  'Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)': { de: 'Drücke <b>E</b> zum Kaufen: {arme} ({prix} $)', en: 'Press <b>E</b> to buy: {arme} ({prix} $)', gsw: 'Drück <b>E</b> zum Chaufe: {arme} ({prix} $)' },
+  'Appuie sur <b>E</b> pour acheter : {arme} (munitions {prix} $)': { de: 'Drücke <b>E</b> zum Kaufen: {arme} (Munition {prix} $)', en: 'Press <b>E</b> to buy: {arme} (ammo {prix} $)', gsw: 'Drück <b>E</b> zum Chaufe: {arme} (Munition {prix} $)' },
+  'Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max ({prix})': { de: 'Drücke <b>E</b>, um mit dem Mechaniker zu reden: Panzerung im Mad-Max-Stil ({prix})',
+    en: 'Press <b>E</b> to talk to the mechanic: Mad Max armor ({prix})', gsw: 'Drück <b>E</b>, zum mit em Mech rede: Panzerig im Mad-Max-Stil ({prix})' },
+  'Appuie sur <b>E</b> pour poser la perceuse thermique sur la porte du coffre-fort': { de: 'Drücke <b>E</b>, um den Thermobohrer an die Tresortür zu setzen', en: 'Press <b>E</b> to put the thermal drill on the vault door', gsw: 'Drück <b>E</b>, zum de Thermobohrer a d Tresortür mache' },
+  "Appuie sur <b>E</b> pour coller l'explosif sur la grille": { de: 'Drücke <b>E</b>, um den Sprengstoff ans Gitter zu kleben', en: 'Press <b>E</b> to stick the explosive on the gate', gsw: 'Drück <b>E</b>, zum de Sprängstoff as Gitter chläbe' },
+  'Appuie sur <b>E</b> pour voler {objet}': { de: 'Drücke <b>E</b> zum Klauen: {objet}', en: 'Press <b>E</b> to steal {objet}', gsw: 'Drück <b>E</b> zum Klaue: {objet}' },
+  'Appuie sur <b>E</b> pour éjecter le pilote du robot': { de: 'Drücke <b>E</b>, um den Piloten aus dem Roboter zu werfen', en: 'Press <b>E</b> to throw the pilot out of the robot', gsw: 'Drück <b>E</b>, zum de Pilot us em Roboter rüere' },
+  'Appuie sur <b>E</b> pour monter dans le heavy robot': { de: 'Drücke <b>E</b>, um in den Heavy Robot zu steigen', en: 'Press <b>E</b> to climb into the heavy robot', gsw: 'Drück <b>E</b>, zum in Heavy Robot iistiige' },
+  "Appuie sur <b>E</b> pour prendre l'ascenseur (monter sur le toit)": { de: 'Drücke <b>E</b> für den Aufzug (aufs Dach)', en: 'Press <b>E</b> to take the elevator (up to the roof)', gsw: 'Drück <b>E</b> für de Lift (ufs Dach)' },
+  "Appuie sur <b>E</b> pour prendre l'ascenseur (redescendre)": { de: 'Drücke <b>E</b> für den Aufzug (nach unten)', en: 'Press <b>E</b> to take the elevator (back down)', gsw: 'Drück <b>E</b> für de Lift (abe)' },
+  'Appuie sur <b>E</b> pour monter : {vehicule}': { de: 'Drücke <b>E</b> zum Einsteigen: {vehicule}', en: 'Press <b>E</b> to get in: {vehicule}', gsw: 'Drück <b>E</b> zum Iistiige: {vehicule}' },
+  'Perceuse thermique : {n} %. Tiens bon !': { de: 'Thermobohrer: {n} %. Halte durch!', en: 'Thermal drill: {n}%. Hang in there!', gsw: 'Thermobohrer: {n} %. Heb dure!' },
+  // les cartes
+  'Tu es dans la colonne {col}, ligne {ligne} de la CARTE': { de: 'Du bist in Spalte {col}, Zeile {ligne} der CARTE', en: 'You are in column {col}, row {ligne} of the CARTE', gsw: 'Du bisch i de Spalte {col}, Ziile {ligne} vo de CARTE' },
+  'Molette : zoom   ·   Souris ou flèches : se déplacer   ·   M : fermer': { de: 'Mausrad: Zoom   ·   Maus oder Pfeiltasten: bewegen   ·   M: schließen',
+    en: 'Wheel: zoom   ·   Mouse or arrows: move   ·   M: close', gsw: 'Muusrad: Zoom   ·   Muus oder Pfiiltaschte: verschiebe   ·   M: zuemache' },
+  'Aéroport':         { de: 'Flughafen', en: 'Airport', gsw: 'Flughafe' },
+  'Port':             { de: 'Hafen', en: 'Port', gsw: 'Hafe' },
+  'Collines de Vinewood': { de: 'Vinewood Hills', en: 'Vinewood Hills', gsw: 'Vinewood Hills' },
+  'Désert de Grand Senora': { de: 'Grand-Senora-Wüste', en: 'Grand Senora Desert', gsw: 'Grand-Senora-Wüeschti' },
+  'Mont Josiah':      { de: 'Mount Josiah', en: 'Mount Josiah', gsw: 'Mount Josiah' },
+  'Mont Chiliad':     { de: 'Mount Chiliad', en: 'Mount Chiliad', gsw: 'Mount Chiliad' },
+  'Mont Gordo':       { de: 'Mount Gordo', en: 'Mount Gordo', gsw: 'Mount Gordo' },
+  'Réservoir Land Act': { de: 'Land-Act-Stausee', en: 'Land Act Reservoir', gsw: 'Land-Act-Stausee' },
+  'Armurerie':        { de: 'Waffenladen', en: 'Gun shop', gsw: 'Waffelade' },
+  'Hôpital':          { de: 'Krankenhaus', en: 'Hospital', gsw: 'Spital' },
+  'Commissariat':     { de: 'Polizeiwache', en: 'Police station', gsw: 'Polizeiposchte' },
+  'Banque':           { de: 'Bank', en: 'Bank', gsw: 'Bank' },
+  'Supérette':        { de: 'Laden', en: 'Convenience store', gsw: 'Lädeli' },
+  'Station-service':  { de: 'Tankstelle', en: 'Gas station', gsw: 'Tankstell' },
+  'Tour Maze Bank':   { de: 'Maze Bank Tower', en: 'Maze Bank Tower', gsw: 'Maze Bank Tower' },
+  'Maison de Franklin': { de: 'Franklins Haus', en: "Franklin's house", gsw: 'Em Franklin sis Huus' },
+  'Villa de Michael': { de: 'Michaels Villa', en: "Michael's villa", gsw: 'Em Michael sini Villa' },
+  'Caravane de Trevor': { de: 'Trevors Wohnwagen', en: "Trevor's trailer", gsw: 'Em Trevor sin Wohnwage' },
+  'Château Wolfenstein': { de: 'Schloss Wolfenstein', en: 'Castle Wolfenstein', gsw: 'Schloss Wolfenstein' },
+  "Musée d'art":      { de: 'Kunstmuseum', en: 'Art museum', gsw: 'Kunschtmuseum' },
+  'Bijouterie Vangelico': { de: 'Juwelier Vangelico', en: 'Vangelico jewelry store', gsw: 'Juwelier Vangelico' },
+  'Banque Pacific Standard': { de: 'Pacific Standard Bank', en: 'Pacific Standard Bank', gsw: 'Pacific Standard Bank' },
+  'Stunt Park de Palomino': { de: 'Stuntpark Palomino', en: 'Palomino Stunt Park', gsw: 'Stuntpark Palomino' },
+  'Sauts de Grand Senora': { de: 'Grand-Senora-Sprünge', en: 'Grand Senora Jumps', gsw: 'Grand-Senora-Gümp' },
+};
+
+// la langue choisie : le navigateur s'en souvient pour la prochaine fois
+let langue = 'fr';
+try { if (LANGUES[localStorage.langue]) langue = localStorage.langue; } catch {}
+// traduit une phrase dans la langue choisie : tr('Il te faut {prix} $', { prix: 500 })
+function tr(texte, valeurs = {}) {
+  return ((TRADUCTIONS[texte] || {})[langue] || texte).replace(/\{(\w+)\}/g, (_, k) => valeurs[k]);
+}
+// le menu : ses textes en français sont gardés dans data-fr, pour pouvoir changer de langue autant qu'on veut
+function traduireMenu() {
+  for (const el of document.querySelectorAll('#histoire, #etat, #menu td')) el.textContent = tr(el.dataset.fr ??= el.textContent);
+  for (const b of document.querySelectorAll('#langues button')) b.classList.toggle('on', b.dataset.langue === langue);
+  document.documentElement.lang = langue;
+}
+function etat(texte) { document.getElementById('etat').dataset.fr = texte; traduireMenu(); }   // la ligne jaune du menu
+for (const [l, nom] of Object.entries(LANGUES)) {
+  const b = document.createElement('button');
+  b.textContent = nom; b.dataset.langue = l;
+  b.onclick = e => { e.stopPropagation(); langue = l; try { localStorage.langue = l; } catch {} traduireMenu(); };   // stopPropagation : ne lance pas le jeu
+  document.getElementById('langues').append(b);
+}
+traduireMenu();
+</script>
 
 <script type="importmap">
 { "imports": {
@@ -2884,14 +3139,19 @@ function creerObjet(o) {
   if (o.type === 'stand') {
     const piedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal); piedestal.position.y = -0.6; piedestal.castShadow = true; g.add(piedestal);
     anneau.position.y = -1.08;
-    const texte = o.masque ? `Masque à gaz ${R_.prixMasque} $` : `${ARMES[o.arme].nom} ${ARMES[o.arme].prix} $`;
-    const prix = new THREE.Sprite(new THREE.SpriteMaterial({ map: toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(texte, 128, 42, 248); }) }));
-    prix.scale.set(2.4, 0.6, 1); prix.position.y = 1; g.add(prix);
+    o.etiquette = new THREE.Sprite(new THREE.SpriteMaterial()); etiqueter(o);
+    o.etiquette.scale.set(2.4, 0.6, 1); o.etiquette.position.y = 1; g.add(o.etiquette);
   }
   o.m = g; o.base = (o.type === 'stand' ? 1.1 : 0.85) + (o.y ?? hauteurSol(o.x, o.z));
   g.position.set(o.x, o.base, o.z);
   scene.add(g); objets.push(o);
   return o;
+}
+// le prix au-dessus d'un stand de l'armurerie, dans la langue choisie
+function etiqueter(o) {
+  const texte = o.masque ? `${tr('Masque à gaz')} ${R_.prixMasque} $` : `${tr(ARMES[o.arme].nom)} ${ARMES[o.arme].prix} $`;
+  o.etiquette.material.map?.dispose(); o.langue = langue;
+  o.etiquette.material.map = toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(texte, 128, 42, 248); });
 }
 soins.forEach(s => creerObjet({ type: 'soin', x: s.x, z: s.z, reapparait: true }));
 stands.forEach(s => creerObjet({ type: 'stand', arme: s.arme, masque: s.masque, x: s.x, z: s.z }));
@@ -2929,7 +3189,7 @@ function exploserVoiture(v, pos = v) {
   if (estBlindee(v) && ++v.roquettes <= R_.roquettesBlindage) { // le blindage encaisse : ça cabosse, mais ça tient
     const P = versLocal(v, pos.x - v.x, pos.z - v.z), l = Math.hypot(P.x, P.z) || 1;
     abimer(v, V3(P.x / l * v.forme.largeur / 2, v.forme.hauteur * 0.5, P.z / l * v.forme.longueur / 2), V3(-P.x / l, -0.2, -P.z / l), 0.6);
-    if (v === J.voiture) annonce('', R_.roquettesBlindage - v.roquettes > 0 ? `Le blindage tient ! (encore ${R_.roquettesBlindage - v.roquettes} roquettes)` : 'Le blindage est à bout : la prochaine roquette la fait sauter !', 2.5);
+    if (v === J.voiture) annonce('', R_.roquettesBlindage - v.roquettes > 0 ? tr('Le blindage tient ! (encore {n} roquettes)', { n: R_.roquettesBlindage - v.roquettes }) : tr('Le blindage est à bout : la prochaine roquette la fait sauter !'), 2.5);
     return;
   }
   toutCasser(v);   // les vitres volent en éclats et les pièces partent
@@ -3140,7 +3400,7 @@ function declencherAlarme(B) {
   B.alarme = true; renfortsRapides = 60;
   etoiles = Math.max(etoiles, B.etoiles); tempsCalme = 0;
   for (const p of personnes) if (p.braquage === B) p.alerte = true;
-  annonce('ALARME !', 'La police arrive, et en force !', 3);
+  annonce(tr('ALARME !'), tr('La police arrive, et en force !'), 3);
 }
 function butinProche() {
   let best = null, bd = 2;
@@ -3151,12 +3411,13 @@ function butinProche() {
 function voler(o) {
   const B = o.B;
   o.pris = true;
-  if (o.outil === 'perceuse') { B.perceuse = 0.001; poserPerceuse(B); declencherAlarme(B); annonce('', `La perceuse thermique attaque la porte : ${R_.dureePerceuse} secondes. Défends-toi !`, 3.5); return; }
-  if (o.outil === 'charge') { B.charge = R_.dureeCharge; poserCharge(B); annonce('', `Explosif posé : éloigne-toi ! (${R_.dureeCharge} s)`, 2.5); return; }
+  if (o.outil === 'perceuse') { B.perceuse = 0.001; poserPerceuse(B); declencherAlarme(B); annonce('', tr('La perceuse thermique attaque la porte : {n} secondes. Défends-toi !', { n: R_.dureePerceuse }), 3.5); return; }
+  if (o.outil === 'charge') { B.charge = R_.dureeCharge; poserCharge(B); annonce('', tr('Explosif posé : éloigne-toi ! ({n} s)', { n: R_.dureeCharge }), 2.5); return; }
   if (o.vitre) { eclats(o.vitre); bruit(0.5, 9000, 0.4); bip(2800, 2000, 0.2, 'triangle', 0.1); }   // la vitrine vole en éclats
   o.g.visible = false; J.sac++;
   bip(600, 1200, 0.15, 'sine', 0.3);
-  annonce('BUTIN !', `${o.nom[0].toUpperCase()}${o.nom.slice(1)} : dans le sac`, 2.5);
+  const nom = tr(o.nom);
+  annonce(tr('BUTIN !'), tr('{objet} : dans le sac', { objet: nom[0].toUpperCase() + nom.slice(1) }), 2.5);
   declencherAlarme(B);
 }
 // la perceuse thermique, sur son pied magnétique, collée à la porte (elle tourne avec la porte)
@@ -3181,7 +3442,7 @@ function sauterGrille(B) {
   B.groupe.remove(B.chargeM); B.sautee = true; B.bouchonGrille.h = -Infinity;
   exploser(V3(p.x, p.y + 1.25, p.z), 5, 200, 70);
   for (const g of B.panneaux) { lancerDebris(g, V3(entre(-2, 2), entre(2, 4), entre(-5, -2)), 30); debris.at(-1).tourne.multiplyScalar(0.25); }
-  annonce('BOUM !', 'La grille a sauté : prends le pactole !', 3);
+  annonce(tr('BOUM !'), tr('La grille a sauté : prends le pactole !'), 3);
 }
 function tousser() { bruit(0.3, 1800, 0.18); setTimeout(() => bruit(0.25, 1500, 0.2), 250); }
 function majBraquages(dt) {
@@ -3232,7 +3493,7 @@ function majLasers(B) {
   }
   if (touche && !J.mort && !J.voiture && !J.robot && !(B.tir > 0)) {
     B.tir = R_.dureeMitrailleuses; declencherAlarme(B);
-    annonce('LASER TOUCHÉ !', `Les mitrailleuses tirent pendant ${R_.dureeMitrailleuses} secondes : cache-toi !`, 2.5); bip(1800, 1800, 0.5, 'square', 0.15);
+    annonce(tr('LASER TOUCHÉ !'), tr('Les mitrailleuses tirent pendant {n} secondes : cache-toi !', { n: R_.dureeMitrailleuses }), 2.5); bip(1800, 1800, 0.5, 'square', 0.15);
   }
 }
 function majTourelles(B, dt) {
@@ -3267,7 +3528,7 @@ function majCoffre(B, dt, d) {
     if ((B.tBruit = (B.tBruit || 0) - dt) <= 0) { B.tBruit = 0.1; bruit(0.2 * fort, 5000, 0.1); bip(1900 + Math.random() * 200, 1700, 0.1, 'sawtooth', 0.03 * fort); }
     if (B.perceuse >= R_.dureePerceuse) { // percée : la porte s'ouvre
       B.ouvert = true; B.bouchonOuvert.h = B.bouchonPorte.h; B.bouchonPorte.h = -Infinity;
-      annonce('COFFRE-FORT PERCÉ !', 'La porte s\'ouvre : fais sauter la grille', 3); bip(160, 60, 2.5, 'sawtooth', 0.3 * fort);
+      annonce(tr('COFFRE-FORT PERCÉ !'), tr("La porte s'ouvre : fais sauter la grille"), 3); bip(160, 60, 2.5, 'sawtooth', 0.3 * fort);
     }
   }
   if (B.ouvert && B.ouverture < 1) { B.ouverture = Math.min(1, B.ouverture + dt / 3); B.pivotPorte.rotation.y = -Math.PI / 2 * (1 - (1 - B.ouverture) ** 2); }
@@ -3447,26 +3708,26 @@ function toucherRobot(r, degats, objet = null, parJoueur = true) {
   if (r.vieP > 0) return;
   r.pilote = null; r.piloteMort = true; r.m.pilote.g.rotation.x = 0.5;   // il s'effondre sur les commandes
   if (parJoueur) crime(1);
-  if (dist(r, J) < 100) annonce('', 'Pilote abattu : monte dans le robot (touche E) !', 3);
+  if (dist(r, J) < 100) annonce('', tr('Pilote abattu : monte dans le robot (touche E) !'), 3);
 }
 function casserVitreRobot(r) {
   const v = r.m.vitre;
   r.vieVitre = 0; r.m.g.updateMatrixWorld(true); eclats(v, 24); v.parent.remove(v);
   bruit(0.6, 9000, 0.5); bip(2800, 1800, 0.3, 'triangle', 0.1);
-  if (dist(r, J) < 100) annonce('', 'La vitre du robot est cassée : vise le pilote, ou éjecte-le (touche E) !', 3);
+  if (dist(r, J) < 100) annonce('', tr('La vitre du robot est cassée : vise le pilote, ou éjecte-le (touche E) !'), 3);
 }
 const robotProche = () => robots.find(r => r !== J.robot && dist(r, J) < 3.8 && Math.abs(r.y - J.y) < 2);
 function ejecterPilote(r) {
   r.pilote = null; r.m.torse.remove(r.m.pilote.g);
   const f = creerPersonne('flic', r.x + Math.cos(r.angle) * 2.6, r.z - Math.sin(r.angle) * 2.6);
   f.alerte = true; f.renfort = true; f.vie = r.vieP; resoudre(f, 0.35);
-  annonce('', 'Pilote éjecté ! Monte dans le robot (touche E)', 3);
+  annonce('', tr('Pilote éjecté ! Monte dans le robot (touche E)'), 3);
 }
 function monterRobot(r) {
   if (r.m.pilote.g.parent) r.m.torse.remove(r.m.pilote.g);   // le pilote abattu sort de la cabine
   J.robot = r; r.pilote = 'joueur'; J.accroupi = false; J.danse = 0; J.lacet = r.angle; J.tangage = 0;
   joueurH.jambeD.visible = joueurH.jambeG.visible = false;   // assis dans la cabine : ses jambes sont dans la caisse
-  annonce('HEAVY ROBOT !', 'Clic gauche : mitrailleuse · clic droit : roquettes · E : descendre', 4);
+  annonce(tr('HEAVY ROBOT !'), tr('Clic gauche : mitrailleuse · clic droit : roquettes · E : descendre'), 4);
 }
 function sortirRobot() {
   const r = J.robot;
@@ -3497,7 +3758,7 @@ function apparaitreRobot() {
     const n = hasard(proches);
     if (voit({ x: n.x, z: n.z, y: n.y + 2 }, J) || robots.some(o => dist(o, n) < 10)) continue;
     creerRobot(n.x, n.z, angleVers(n, J));
-    annonce('', 'Le heavy robot de la police arrive !', 3); bruit(0.6, 120, 1.2);
+    annonce('', tr('Le heavy robot de la police arrive !'), 3); bruit(0.6, 120, 1.2);
     return;
   }
 }
@@ -3543,7 +3804,7 @@ addEventListener('keydown', e => {
     const c = /^(Digit|Numpad)\d$/.test(e.code) ? e.code.slice(-1) : e.key;   // un chiffre, même sans Maj sur un clavier français
     if (e.code === 'Backspace') saisie = saisie.slice(0, -1);
     else if (/^[a-z0-9]$/i.test(c) && saisie.length < 20) saisie += c.toUpperCase();
-    $('triche').textContent = `Code : ${saisie}_`;
+    $('triche').textContent = tr('Code : {code}_', { code: saisie });
     return;
   }
   if (!e.repeat || !J.danse) touches[e.code] = true;   // pendant la danse, une touche restée enfoncée ne compte pas
@@ -3579,24 +3840,25 @@ addEventListener('mousemove', e => {
 });
 $('menu').addEventListener('click', () => {
   enJeu = true; $('menu').style.display = 'none';
+  for (const o of objets) if (o.etiquette && o.langue !== langue) etiqueter(o);   // on a peut-être changé de langue dans le menu
   initAudio(); audio.resume();
   renderer.domElement.requestPointerLock?.();
 });
 function validerTriche() {
   if (saisie === null) { // on ouvre la saisie
     saisie = ''; for (const k in touches) touches[k] = false;
-    $('triche').textContent = 'Code : _'; $('triche').style.display = 'block';
+    $('triche').textContent = tr('Code : {code}_', { code: '' }); $('triche').style.display = 'block';
     return;
   }
   // un code (ou son alias), ou un code avec une action suivi d'un nombre (MISSION8)
   const t = TRICHES.find(t => [t.code, t.alias].some(c => c?.toUpperCase() === saisie)) || TRICHES.find(t => t.action && /^\d+$/.test(saisie.slice(t.code.length)) && saisie.startsWith(t.code.toUpperCase()));
   const n = t && +saisie.slice(t.code.length);
   saisie = null; $('triche').style.display = 'none';
-  if (!t) { annonce('', 'Code inconnu', 1.5); return; }
-  if (t.action) { t.action(n); if (t.code !== 'MISSION') annonce('', t.texte, 2.5); return; }
+  if (!t) { annonce('', tr('Code inconnu'), 1.5); return; }
+  if (t.action) { t.action(n); if (t.code !== 'MISSION') annonce('', tr(t.texte), 2.5); return; }
   t.actif = !t.actif; // retaper un code annule son effet
   rhabillerBJ();
-  annonce('', t.actif ? t.texte : `${t.texte} (annulé)`, 2);
+  annonce('', t.actif ? tr(t.texte) : tr('{effet} (annulé)', { effet: tr(t.texte) }), 2);
 }
 // remet B.J. dans sa tenue normale (sans accessoires), puis applique les codes actifs
 function rhabillerBJ() {
@@ -3616,7 +3878,7 @@ function danser() {
   if (J.voiture || J.robot || J.nage || J.mort) return;   // on ne danse qu'à pied
   for (const k in touches) touches[k] = false;  // la dernière touche est encore enfoncée : on l'oublie, sinon elle arrêterait la danse
   J.danse = 0.001; J.angleDanse = J.lacet + Math.PI / 2; J.vue = 3; J.accroupi = false;
-  annonce('', 'Moonwalk !', 2);
+  annonce('', tr('Moonwalk !'), 2);
 }
 // un pas de danse par image : B.J. recule de profil en moonwalk, fait la toupie (2 tours et quart), puis prend la pose face à la caméra
 // renvoie le pas en cours, et où il en est de 0 à 1, pour animerHumain
@@ -3624,7 +3886,7 @@ function pasDeDanse(dt) {
   const [moon, toupie, pose] = R_.moonwalk, t = J.danse, passe = x => t < x && t + dt >= x;
   J.danse += dt;
   if (passe(moon)) criMJ();
-  if (passe(moon + toupie)) { annonce('WHO\'S BAD ?', '', pose); bruit(0.6, 2500, 0.15); }
+  if (passe(moon + toupie)) { annonce(tr("WHO'S BAD ?"), '', pose); bruit(0.6, 2500, 0.15); }
   if (t < moon) { J.angleCorps = lerpAngle(J.angleCorps, J.angleDanse, 10 * dt); return { pas: 'moonwalk', k: t / moon }; }
   if (t < moon + toupie) { const k = (t - moon) / toupie; J.angleCorps = J.angleDanse + 4.5 * Math.PI * (1 - (1 - k) ** 2); return { pas: 'toupie', k }; }
   if (t > moon + toupie + pose) J.danse = 0;
@@ -3634,7 +3896,7 @@ function pasDeDanse(dt) {
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
   saisie = null; $('triche').style.display = 'none';
-  enJeu = false; $('menu').style.display = 'flex'; $('etat').textContent = 'Pause — clique pour continuer';
+  enJeu = false; $('menu').style.display = 'flex'; etat('Pause — clique pour continuer');
   ouvrirCarte(false); audio?.suspend();
   for (const k in touches) touches[k] = false;
   sourisG = visee = false;
@@ -3680,29 +3942,29 @@ function payerBlindage(g) {
   // la voiture du garage : de préférence une voiture rapide pas encore blindée, sinon la plus proche
   const proches = voitures.filter(o => dist(o, g) < 14 && !o.detruite && !o.coule && !o.type.bateau).sort((a, b) => dist(a, g) - dist(b, g));
   const v = proches.find(o => o.type.vitesse >= R_.vitesseBlindable && !o.forme.ouvert && !estBlindee(o)) || proches[0];
-  const dit = texte => annonce('', `Le garagiste : « ${texte} »`, 4);
-  if (!v) return dit('Amène-moi une voiture rapide dans le garage, et je te la blinde.');
-  if (estBlindee(v)) return dit('Elle est déjà blindée !');
-  if (v.type.vitesse < R_.vitesseBlindable || v.forme.ouvert) return dit(`Ta ${v.type.nom} n'est pas assez rapide. Il me faut une voiture rapide, comme une Porsche.`);
-  if (J.argent < R_.prixBlindage) return dit(`Le blindage, c'est ${R_.prixBlindage} $. Reviens quand tu les auras.`);
+  const dit = texte => annonce('', tr('Le garagiste : « {texte} »', { texte }), 4);
+  if (!v) return dit(tr('Amène-moi une voiture rapide dans le garage, et je te la blinde.'));
+  if (estBlindee(v)) return dit(tr('Elle est déjà blindée !'));
+  if (v.type.vitesse < R_.vitesseBlindable || v.forme.ouvert) return dit(tr("Ta {voiture} n'est pas assez rapide. Il me faut une voiture rapide, comme une Porsche.", { voiture: tr(v.type.nom) }));
+  if (J.argent < R_.prixBlindage) return dit(tr("Le blindage, c'est {prix} $. Reviens quand tu les auras.", { prix: R_.prixBlindage }));
   J.argent -= R_.prixBlindage; v.blindee = true; habillerVoiture(v);
   for (let k = 0; k < 12; k++) { const p = local(v, entre(-1, 1) * v.forme.largeur / 2, entre(-1, 1) * v.forme.longueur / 2); etincelles(V3(p.x, v.y + entre(0.3, 1.1), p.z), 5); }   // la soudure
   bruit(0.5, 5000, 0.8); bip(700, 1400, 0.3, 'sine', 0.3);
-  annonce('MAD MAX !', `Ta ${v.type.nom} est blindée : les balles ne passent plus, et elle tient ${R_.roquettesBlindage} roquettes`, 4);
+  annonce(tr('MAD MAX !'), tr('Ta {voiture} est blindée : les balles ne passent plus, et elle tient {n} roquettes', { voiture: tr(v.type.nom), n: R_.roquettesBlindage }), 4);
 }
 function acheter(s) {
   if (s.masque) { // le masque à gaz : on n'en a besoin que d'un
-    if (J.masque) { annonce('', 'Tu as déjà un masque à gaz', 2); return; }
-    if (J.argent < R_.prixMasque) { annonce('Pas assez d\'argent', `Il te faut ${R_.prixMasque} $`, 2); bip(300, 200, 0.2, 'square', 0.2); return; }
+    if (J.masque) { annonce('', tr('Tu as déjà un masque à gaz'), 2); return; }
+    if (J.argent < R_.prixMasque) { annonce(tr("Pas assez d'argent"), tr('Il te faut {prix} $', { prix: R_.prixMasque }), 2); bip(300, 200, 0.2, 'square', 0.2); return; }
     J.argent -= R_.prixMasque; J.masque = true; bip(700, 1400, 0.2, 'sine', 0.3);
-    annonce('Masque à gaz acheté !', 'Il te protège de la fumée toxique', 2.5);
+    annonce(tr('Masque à gaz acheté !'), tr('Il te protège de la fumée toxique'), 2.5);
     return;
   }
   const a = ARMES[s.arme], possede = J.possede[s.arme], prix = possede ? Math.round(a.prix / 2) : a.prix;
-  if (J.argent < prix) { annonce('Pas assez d\'argent', `Il te faut ${prix} $`, 2); bip(300, 200, 0.2, 'square', 0.2); return; }
+  if (J.argent < prix) { annonce(tr("Pas assez d'argent"), tr('Il te faut {prix} $', { prix }), 2); bip(300, 200, 0.2, 'square', 0.2); return; }
   J.argent -= prix; J.possede[s.arme] = true; J.balles[s.arme] += a.munitions;
   bip(700, 1400, 0.2, 'sine', 0.3);
-  annonce(possede ? 'Munitions achetées' : `${a.nom} acheté !`, '', 2);
+  annonce(possede ? tr('Munitions achetées') : tr('{arme} acheté !', { arme: tr(a.nom) }), '', 2);
   changerArme(s.arme);
 }
 function entrerVoiture(v) {
@@ -3736,7 +3998,7 @@ function tirer(a = ARMES[J.arme]) {
   const rb = J.robot, stock = rb ? rb.munitions : J.balles, k = rb ? a.modele : J.arme;
   if (rb) rb.cdJ[a.modele] = a.cadence; else { J.cooldown = a.cadence; J.angleCorps = J.lacet; }
   if (a.corps) { frapper(a); return; }
-  if (stock[k] <= 0) { bip(1000, 900, 0.05, 'square', 0.15); annonce('', 'Plus de munitions', 1); if (!rb) J.cooldown = 0.3; return; }
+  if (stock[k] <= 0) { bip(1000, 900, 0.05, 'square', 0.15); annonce('', tr('Plus de munitions'), 1); if (!rb) J.cooldown = 0.3; return; }
   stock[k]--; J.recul = 1;
   bruit(...SON_ARME[a.modele]);
   const depart = rb ? boutRobot(rb, a.explosion) : positionTir().clone();
@@ -3768,7 +4030,7 @@ function tirer(a = ARMES[J.arme]) {
       }
       if (!p && !vc && u.robot) toucherRobot(u.robot, a.degats, hit.object);   // le heavy robot : la vitre, puis le pilote
       if (!p && !vc && u.tourelle && (u.tourelle.vie -= a.degats) <= 0) { // une mitrailleuse de la banque, détruite
-        const tr = u.tourelle; tr.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
+        u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
       }
       flash(point, 0.3);
     }
@@ -3836,7 +4098,7 @@ function reapparaitre() {
   for (const v of voitures) if (v.police && v.renfort) v.supprimer = true;
   for (const r of robots) if (r.pilote === 'police') r.supprimer = true;
   $('wasted').style.display = 'none'; renderer.domElement.style.filter = '';
-  annonce('', 'Tu te réveilles à l\'hôpital le plus proche (-100 $)', 3);
+  annonce('', tr("Tu te réveilles à l'hôpital le plus proche (-100 $)"), 3);
 }
 
 // =====================================================================
@@ -4018,7 +4280,7 @@ function atterrir(v, impact, pente) {
     v.vitesse *= 1 - Math.min(0.5, f);
     bruit(Math.min(0.8, impact / 20), 250, 0.4);
   }
-  if (v === J.voiture && v.decollage && temps - v.decollage.t > 0.8) annonce('SAUT !', `${Math.round(dist(v, v.decollage))} m`, 2);
+  if (v === J.voiture && v.decollage && temps - v.decollage.t > 0.8) annonce(tr('SAUT !'), `${Math.round(dist(v, v.decollage))} m`, 2);
   return rebond;
 }
 // loopings et tire-bouchons : la voiture y roule « sur des rails ». Elle n'avance que sur son élan (la pente la freine en montée),
@@ -4051,7 +4313,7 @@ function roulerRail(v, dt) {
   if (R.s <= 0 || R.s >= r.long) { // au bout : elle repart sur la piste
     const fin = R.s >= r.long, q = pointRail(r, fin ? r.long : 0), devant = q.t.clone().multiplyScalar(R.sens), p = q.p.addScaledVector(q.l, R.u);
     Object.assign(v, { rail: null, quat: null, x: p.x, y: p.y, z: p.z, vy: 0, tangage: 0, roulis: 0, angle: Math.atan2(devant.x, devant.z) });
-    if (fin !== R.depart) annonce(r.nom.toUpperCase() + ' !', '', 1.5);   // réussi : on est sorti de l'autre côté
+    if (fin !== R.depart) annonce(tr('{figure} !', { figure: tr(r.nom).toUpperCase() }), '', 1.5);   // réussi : on est sorti de l'autre côté
     return;
   }
   const q = pointRail(r, R.s), devant = q.t.clone().multiplyScalar(R.sens);
@@ -4059,7 +4321,7 @@ function roulerRail(v, dt) {
     const f = V3(Math.sin(v.angle), 0, Math.cos(v.angle)), vit = devant.multiplyScalar(v.vitesse);
     v.rail = null; v.vol = v.enAir = true; v.decollage = null;
     v.vitesse = vit.x * f.x + vit.z * f.z; v.vy = vit.y;   // elle garde son élan, et tombe comme elle est (peut-être à l'envers)
-    annonce('', "Pas assez d'élan !", 2);
+    annonce('', tr("Pas assez d'élan !"), 2);
     return;
   }
   const p = q.p.addScaledVector(q.l, R.u);
@@ -4323,7 +4585,7 @@ function police(dt) {
   if (tempsCalme > R_.delaiPerteEtoile) {
     etoiles--; tempsCalme = 0;
     if (etoiles === 0) {
-      annonce('', 'Tu as semé la police !', 2.5); renfortsRapides = 0;
+      annonce('', tr('Tu as semé la police !'), 2.5); renfortsRapides = 0;
       for (const p of personnes) if (p.renfort && dist(p, J) > 50) p.supprimer = true;
       for (const v of voitures) if (v.police && v.renfort && v !== J.voiture && dist(v, J) > 50) v.supprimer = true;
       for (const r of robots) if (r.pilote === 'police' && dist(r, J) > 50) r.supprimer = true;
@@ -4387,9 +4649,11 @@ function missions() {
   if (++etapeIndex < m.etapes.length) return;
   J.argent += m.recompense; J.sac = 0;   // le butin est livré à la planque
   missionIndex++; etapeIndex = 0;
-  annonce(missionIndex < MISSIONS.length ? 'MISSION RÉUSSIE' : 'BRAVO !', missionIndex < MISSIONS.length ? `${m.nom}${m.recompense ? ` : +${montant(m.recompense)}` : ''}` : 'Toutes les missions sont finies !', 4);
+  const fini = missionIndex >= MISSIONS.length;
+  annonce(tr(fini ? 'BRAVO !' : 'MISSION RÉUSSIE'), fini ? tr('Toutes les missions sont finies !') : m.recompense ? tr('{mission} : +{argent}', { mission: tr(m.nom), argent: montant(m.recompense) }) : tr(m.nom), 4);
 }
-const montant = n => `${n.toLocaleString('fr-FR')} $`;   // 250000 → « 250 000 $ »
+// 250000 → « 250 000 $ » en français, « 250.000 $ » en allemand. Chrome ne connaît pas les nombres en züritüütsch (gsw) : on prend ceux de la Suisse
+const montant = n => `${n.toLocaleString(langue === 'gsw' ? 'de-CH' : langue)} $`;
 // le code de triche MISSION8 : on saute à la mission 8. Si elle a besoin d'une voiture blindée, il y en a une à côté
 function sauterMission(n) {
   missionIndex = clamp(Math.round(n) - 1, 0, MISSIONS.length); etapeIndex = 0; J.sac = 0;
@@ -4402,7 +4666,7 @@ function sauterMission(n) {
       break;
     }
   }
-  annonce(`MISSION ${missionIndex + 1}`, m ? m.nom : 'Pays libre', 3);
+  annonce(`MISSION ${missionIndex + 1}`, tr(m ? m.nom : 'Pays libre'), 3);
 }
 
 // =====================================================================
@@ -4564,8 +4828,8 @@ function dessinerGrandeCarte(dt) {
   g.setTransform(r, 0, 0, r, 0, 0);
   g.fillStyle = COULEUR_MER; g.fillRect(0, 0, l, h);
   g.save(); g.translate(l / 2, h / 2); g.scale(z, z); g.translate(-m.x, -m.z); g.imageSmoothingEnabled = true; g.drawImage(terrainImg, 0, 0, NXT * PT, NZT * PT); dessinerPlan(g); g.restore();
-  if (z < 1.5) for (const [nom, i, j] of NOMS_LIEUX) { const c = centre(i, j), [a, b] = ecran(c.x, c.z); texteCarte(g, nom, a, b, nom === nom.toUpperCase() ? 22 : 16); }
-  for (const [p, fond, lettre, nom] of REPERES) { const [a, b] = ecran(p.x, p.z); icone(g, a, b, fond, lettre, z < 0.4 ? 8 : 13); if (z >= 0.6) texteCarte(g, nom, a, b + 31, 16); }
+  if (z < 1.5) for (const [nom, i, j] of NOMS_LIEUX) { const c = centre(i, j), [a, b] = ecran(c.x, c.z); texteCarte(g, tr(nom), a, b, nom === nom.toUpperCase() ? 22 : 16); }
+  for (const [p, fond, lettre, nom] of REPERES) { const [a, b] = ecran(p.x, p.z); icone(g, a, b, fond, lettre, z < 0.4 ? 8 : 13); if (z >= 0.6) texteCarte(g, tr(nom), a, b + 31, 16); }
   pointsCarte((x, y, couleur, rayon = 3) => { const [a, b] = ecran(x, y); g.fillStyle = couleur; g.beginPath(); g.arc(a, b, rayon + 2, 0, 7); g.fill(); });
   const cible = cibleMission();
   if (cible) { // l'objectif : un point jaune entouré d'un anneau qui bat
@@ -4578,8 +4842,8 @@ function dessinerGrandeCarte(dt) {
   if (cible) { g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(36, 32, 8, 0, 7); g.fill(); g.stroke(); }
   texteCarte(g, $('objectif').textContent, cible ? 54 : 28, 40, 22, 'left');
   const [ci, cj] = blocEn(J.x, J.z);   // pour retrouver sa place dans le tableau CARTE
-  texteCarte(g, `Tu es dans la colonne ${ci}, ligne ${cj} de la CARTE`, l - 24, 40, 17, 'right');
-  texteCarte(g, 'Molette : zoom   ·   Souris ou flèches : se déplacer   ·   M : fermer', l / 2, h - 19, 19);
+  texteCarte(g, tr('Tu es dans la colonne {col}, ligne {ligne} de la CARTE', { col: ci, ligne: cj }), l - 24, 40, 17, 'right');
+  texteCarte(g, tr('Molette : zoom   ·   Souris ou flèches : se déplacer   ·   M : fermer'), l / 2, h - 19, 19);
 }
 function majHUD(dt) {
   $('barre-vie').firstChild.style.width = `${J.vie / R_.viesJoueur * 100}%`;
@@ -4590,10 +4854,10 @@ function majHUD(dt) {
   [...$('etoiles').children].forEach((e, i) => e.classList.toggle('on', i < etoiles));
   $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
   const a = ARMES[J.arme], rb = J.robot;
-  $('arme').textContent = rb ? 'Heavy robot' : a.nom;
-  $('munitions').textContent = rb ? `${rb.munitions.lourde} balles · ${rb.munitions.roquettes} roquettes` : a.corps ? '' : `${J.balles[J.arme]} ${a.explosion ? 'roquettes' : 'balles'}`;
+  $('arme').textContent = rb ? 'Heavy robot' : tr(a.nom);
+  $('munitions').textContent = rb ? `${tr('{n} balles', { n: rb.munitions.lourde })} · ${tr('{n} roquettes', { n: rb.munitions.roquettes })}` : a.corps ? '' : tr(a.explosion ? '{n} roquettes' : '{n} balles', { n: J.balles[J.arme] });
   const m = MISSIONS[missionIndex];
-  $('objectif').textContent = m ? m.etapes[etapeIndex].texte : 'Pays libre : fais ce que tu veux !';
+  $('objectif').textContent = tr(m ? m.etapes[etapeIndex].texte : 'Pays libre : fais ce que tu veux !');
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
   $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !dansLunette() && (J.vue === 1 || visee || !a.corps || rb) ? 'block' : 'none';
   $('fumee').style.opacity = J.fumee * (J.masque ? 0.25 : 0.8);   // la fumée toxique brouille la vue (moins avec le masque)
@@ -4601,12 +4865,14 @@ function majHUD(dt) {
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h`;
   const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
   const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40);
-  const aide = !aPied ? '' : s ? (s.masque ? `Appuie sur <b>E</b> pour acheter : masque à gaz (${R_.prixMasque} $)` : `Appuie sur <b>E</b> pour acheter : ${ARMES[s.arme].nom} (${J.possede[s.arme] ? `munitions ${Math.round(ARMES[s.arme].prix / 2)}` : ARMES[s.arme].prix} $)`)
-    : g ? `Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max (${montant(R_.prixBlindage)})`
-    : o ? (o.outil === 'perceuse' ? 'Appuie sur <b>E</b> pour poser la perceuse thermique sur la porte du coffre-fort' : o.outil === 'charge' ? 'Appuie sur <b>E</b> pour coller l\'explosif sur la grille' : `Appuie sur <b>E</b> pour voler ${o.nom}`)
-    : r && r.pilote === 'police' && r.vieVitre <= 0 ? 'Appuie sur <b>E</b> pour éjecter le pilote du robot' : r && !r.pilote ? 'Appuie sur <b>E</b> pour monter dans le heavy robot'
-    : asc ? `Appuie sur <b>E</b> pour prendre l'ascenseur (${asc.monte ? 'monter sur le toit' : 'redescendre'})` : v ? `Appuie sur <b>E</b> pour monter : ${v.type.nom}`
-    : perce ? `Perceuse thermique : ${Math.floor(perce.perceuse / R_.dureePerceuse * 100)} %. Tiens bon !` : '';
+  const aide = !aPied ? '' : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
+      : J.possede[s.arme] ? tr('Appuie sur <b>E</b> pour acheter : {arme} (munitions {prix} $)', { arme: tr(ARMES[s.arme].nom), prix: Math.round(ARMES[s.arme].prix / 2) })
+      : tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr(ARMES[s.arme].nom), prix: ARMES[s.arme].prix }))
+    : g ? tr('Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max ({prix})', { prix: montant(R_.prixBlindage) })
+    : o ? (o.outil === 'perceuse' ? tr('Appuie sur <b>E</b> pour poser la perceuse thermique sur la porte du coffre-fort') : o.outil === 'charge' ? tr("Appuie sur <b>E</b> pour coller l'explosif sur la grille") : tr('Appuie sur <b>E</b> pour voler {objet}', { objet: tr(o.nom) }))
+    : r && r.pilote === 'police' && r.vieVitre <= 0 ? tr('Appuie sur <b>E</b> pour éjecter le pilote du robot') : r && !r.pilote ? tr('Appuie sur <b>E</b> pour monter dans le heavy robot')
+    : asc ? tr(asc.monte ? "Appuie sur <b>E</b> pour prendre l'ascenseur (monter sur le toit)" : "Appuie sur <b>E</b> pour prendre l'ascenseur (redescendre)") : v ? tr('Appuie sur <b>E</b> pour monter : {vehicule}', { vehicule: tr(v.type.nom) })
+    : perce ? tr('Perceuse thermique : {n} %. Tiens bon !', { n: Math.floor(perce.perceuse / R_.dureePerceuse * 100) }) : '';
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
@@ -4641,13 +4907,13 @@ function mettreAJour(dt) {
     if (o.cache) { o.cache -= dt; if (o.cache <= 0) { o.cache = 0; o.m.visible = true; } continue; }
     o.m.rotation.y += dt * 1.5; o.m.position.y = o.base + Math.sin(temps * 2 + o.x) * 0.1;
     if (o.type === 'stand' || J.mort || dist(o, J) > 1.6 || Math.abs(o.base - 0.85 - J.y) > 1.6) continue;
-    if (o.type === 'soin') { if (J.vie >= R_.viesJoueur) continue; J.vie = Math.min(R_.viesJoueur, J.vie + 50); annonce('', '+50 vie', 1.5); }
-    if (o.type === 'gilet') { if (J.gilet >= R_.giletMax) continue; J.gilet = R_.giletMax; annonce('', 'Gilet pare-balles !', 1.5); }
-    if (o.type === 'argent') { J.argent += o.montant; if (o.crime) { crime(o.crime); annonce('BRAQUAGE !', `+${o.montant} $ : la police arrive !`, 3); } else annonce('', `+${o.montant} $`, 1.5); }
+    if (o.type === 'soin') { if (J.vie >= R_.viesJoueur) continue; J.vie = Math.min(R_.viesJoueur, J.vie + 50); annonce('', tr('+50 vie'), 1.5); }
+    if (o.type === 'gilet') { if (J.gilet >= R_.giletMax) continue; J.gilet = R_.giletMax; annonce('', tr('Gilet pare-balles !'), 1.5); }
+    if (o.type === 'argent') { J.argent += o.montant; if (o.crime) { crime(o.crime); annonce(tr('BRAQUAGE !'), tr('+{n} $ : la police arrive !', { n: o.montant }), 3); } else annonce('', `+${o.montant} $`, 1.5); }
     if (o.type === 'arme') {
       const a = ARMES[o.arme], nouveau = !J.possede[o.arme];
       J.possede[o.arme] = true; J.balles[o.arme] += nouveau ? a.munitions / 2 : Math.ceil(a.munitions / 4);
-      annonce('', nouveau ? `${a.nom} ramassé !` : `+ munitions (${a.nom})`, 2);
+      annonce('', tr(nouveau ? '{arme} ramassé !' : '+ munitions ({arme})', { arme: tr(a.nom) }), 2);
       if (nouveau && ARMES[J.arme].corps) changerArme(o.arme);
     }
     bip(600, 1200, 0.15, 'sine', 0.3);
@@ -4655,7 +4921,7 @@ function mettreAJour(dt) {
   }
   majRoquettes(dt); majDebris(dt);
   // au garage LS Customs, une voiture abîmée est réparée (gratuitement)
-  if (J.voiture?.abimee && lieux.G && dist(J.voiture, lieuProche('G', J)) < 9) { habillerVoiture(J.voiture); annonce('LS CUSTOMS', 'Voiture réparée !', 2.5); bip(600, 1200, 0.3, 'sine', 0.3); }
+  if (J.voiture?.abimee && lieux.G && dist(J.voiture, lieuProche('G', J)) < 9) { habillerVoiture(J.voiture); annonce('LS CUSTOMS', tr('Voiture réparée !'), 2.5); bip(600, 1200, 0.3, 'sine', 0.3); }
   for (const e of effets) {
     e.vie -= dt;
     if (e.boule) { e.o.scale.setScalar(e.boule * (2.6 - e.vie * 2)); e.o.material.opacity = e.vie / 0.6; } // boule de feu
@@ -4720,7 +4986,7 @@ function boucle(t) {
 // premier placement du joueur
 majJoueur(0);
 requestAnimationFrame(boucle);
-$('etat').textContent = 'Clique pour jouer';
+etat('Clique pour jouer');
 // pour les tests automatiques
 window.jeu = { J, joueurH, criMJ, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,

@@ -8,6 +8,8 @@ Un jeu d'action en 3D dans un grand pays inspiré de celui de **GTA 5**, mélang
 
 Ou ouvre `index.html` dans un navigateur (double-clic). Il faut une connexion Internet : le moteur 3D ([Three.js](https://threejs.org)) est chargé en ligne.
 
+Dans le menu, choisis ta langue : **Français**, **Deutsch**, **English** ou **Züritüütsch**. Le navigateur s'en souvient pour la prochaine fois. En allemand et en anglais, les touches pour se déplacer sont W A S D.
+
 | Touche | Action |
 |---|---|
 | Z Q S D ou flèches | Se déplacer / conduire |
@@ -98,5 +100,6 @@ Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier
 5. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture` (avec `rapide`, `blindee` ou `sansPolice` si tu veux), `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`, `blindage`, `voler`. Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ». Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
 6. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
 7. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`) ou plus solide (`balles: 0.5`).
+8. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).
