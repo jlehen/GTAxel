@@ -10,6 +10,8 @@ Ou ouvre `index.html` dans un navigateur (double-clic). Il faut une connexion In
 
 Dans le menu, choisis ta langue : **Français**, **Deutsch**, **English** ou **Züritüütsch**. Le navigateur s'en souvient pour la prochaine fois. Même les enseignes des magasins changent de langue. En allemand et en anglais, les touches pour se déplacer sont W A S D.
 
+Choisis aussi combien de **piétons** et de **voitures** vivent autour de toi : **Peu**, **Normal**, **Beaucoup** ou **Énorme**. Au départ, c'est Beaucoup. Si le jeu rame, prends moins de monde.
+
 | Touche | Action |
 |---|---|
 | Z Q S D ou flèches | Se déplacer / conduire |
@@ -60,7 +62,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 
 Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier :
 
-1. **`REGLAGES`** : vitesses à pied et à la nage, vie, dégâts des ennemis, nombre de voitures, de piétons et de policiers, hauteur des montagnes, touches et durée de la danse, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses, la vitre du heavy robot… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
+1. **`REGLAGES`** : vitesses à pied et à la nage, vie, dégâts des ennemis, nombre de policiers, hauteur des montagnes, touches et durée de la danse, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses, la vitre du heavy robot… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
 2. **`ARMES`** : dégâts, cadence de tir, prix, munitions de chaque arme, rayon d'explosion du bazooka, zoom de la lunette du fusil de sniper. Et **`ARMES_ROBOT`** : la mitrailleuse et les roquettes du heavy robot.
 3. **`VOITURES`** : vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de voiture ou de bateau, et la chance de la croiser. Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
 4. **`CARTE`** : tout le pays vu du ciel, le nord en haut. Chaque signe est une case de 74 m. Toutes les lignes doivent avoir la même longueur.
@@ -101,5 +103,6 @@ Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier
 6. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
 7. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`) ou plus solide (`balles: 0.5`).
 8. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
+9. **`FOULES`** (tout en haut) : le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).

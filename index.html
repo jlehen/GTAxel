@@ -49,10 +49,12 @@
   #menu td { padding: 3px 14px; }
   #menu td:first-child { text-align: right; color: #f0c850; font-weight: 700; }
   #langues { margin: 2px 0 10px; }
-  #langues button { font: 700 18px 'Roboto Condensed', Arial, sans-serif; color: #fff; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35);
-                    border-radius: 18px; padding: 4px 16px; margin: 3px; cursor: pointer; }
-  #langues button:hover { border-color: #f0c850; }
-  #langues button.on { background: #f0c850; border-color: #f0c850; color: #000; }
+  .foule { font-size: 18px; margin-bottom: 4px; }
+  .foule span { display: inline-block; min-width: 100px; text-align: right; margin-right: 4px; color: #f0c850; font-weight: 700; }
+  #menu button { font: 700 18px 'Roboto Condensed', Arial, sans-serif; color: #fff; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35);
+                border-radius: 18px; padding: 4px 16px; margin: 3px; cursor: pointer; }
+  #menu button:hover { border-color: #f0c850; }
+  #menu button.on { background: #f0c850; border-color: #f0c850; color: #000; }
 </style>
 </head>
 <body>
@@ -81,6 +83,8 @@
 <div id="menu">
   <h1>GTAxel</h1>
   <div id="langues"></div>
+  <div class="foule" data-foule="pietons"><span>Piétons :</span></div>
+  <div class="foule" data-foule="voitures"><span>Voitures :</span></div>
   <div id="histoire">Tu es B.J. Blazkowicz. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !</div>
   <div id="etat">Chargement… (il faut une connexion Internet)</div>
   <table>
@@ -102,6 +106,24 @@
 
 <script>
 // =====================================================================
+//  LA FOULE : combien de piétons et de voitures vivent autour de toi. On le choisit dans le menu.
+//  Change les nombres, ou ajoute un choix (par exemple 'Personne': { pietons: 0, voitures: 0 }) !
+//  Beaucoup de monde peut faire ramer le jeu, sur un vieil ordinateur.
+// =====================================================================
+const FOULES = {
+  'Peu':      { pietons: 15,  voitures: 8 },
+  'Normal':   { pietons: 30,  voitures: 16 },
+  'Beaucoup': { pietons: 60,  voitures: 32 },
+  'Énorme':   { pietons: 120, voitures: 60 },
+};
+// le choix au tout premier lancement ; ensuite, le navigateur se souvient de ce qu'on a choisi
+const foule = { pietons: 'Beaucoup', voitures: 'Beaucoup' };
+for (const k in foule) {
+  try { if (FOULES[localStorage['foule-' + k]]) foule[k] = localStorage['foule-' + k]; } catch {}
+  if (!FOULES[foule[k]]) foule[k] = Object.keys(FOULES)[0];   // si tu as renommé ou enlevé le choix du premier lancement
+}
+
+// =====================================================================
 //  LES LANGUES : le jeu est écrit en français, et TRADUCTIONS donne chaque phrase dans les autres langues.
 //  Une phrase qui n'est pas dans le tableau (ou pas dans cette langue) reste en français.
 //  {prix}, {n}... : le jeu met un nombre ou un nom à cet endroit. Garde-les dans la traduction (tu peux les déplacer).
@@ -117,6 +139,12 @@ const TRADUCTIONS = {
     gsw: 'Du bisch de B.J. Blazkowicz. Streif dur Los Santos und d Umgäbig, jag d Nazis und mach de Hitler im Schloss Wolfenstein uf em Mount Chiliad fertig!' },
   'Chargement… (il faut une connexion Internet)': { de: 'Lädt… (braucht eine Internetverbindung)', en: 'Loading… (needs an Internet connection)', gsw: 'Am Lade… (es bruucht Internet)' },
   'Clique pour jouer':             { de: 'Klicke zum Spielen', en: 'Click to play', gsw: 'Klick zum Spile' },
+  'Piétons :':        { de: 'Fußgänger:', en: 'Pedestrians:', gsw: 'Fuessgänger:' },
+  'Voitures :':       { de: 'Autos:', en: 'Cars:', gsw: 'Autos:' },
+  'Peu':              { de: 'Wenige', en: 'Few', gsw: 'Wenig' },
+  'Normal':           { de: 'Normal', en: 'Normal', gsw: 'Normal' },
+  'Beaucoup':         { de: 'Viele', en: 'Lots', gsw: 'Vill' },
+  'Énorme':           { de: 'Riesig viele', en: 'Tons', gsw: 'Mega vill' },
   'Pause — clique pour continuer': { de: 'Pause — klicke zum Weiterspielen', en: 'Paused — click to continue', gsw: 'Pause — klick zum Wiiterspile' },
   'Z Q S D':                  { de: 'W A S D', en: 'W A S D', gsw: 'W A S D' },   // les mêmes touches, sur un clavier allemand ou anglais
   'se déplacer / conduire':   { de: 'laufen / fahren', en: 'move / drive', gsw: 'laufe / fahre' },
@@ -347,8 +375,9 @@ function tr(texte, valeurs = {}) {
 }
 // le menu : ses textes en français sont gardés dans data-fr, pour pouvoir changer de langue autant qu'on veut
 function traduireMenu() {
-  for (const el of document.querySelectorAll('#histoire, #etat, #menu td')) el.textContent = tr(el.dataset.fr ??= el.textContent);
+  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button')) el.textContent = tr(el.dataset.fr ??= el.textContent);
   for (const b of document.querySelectorAll('#langues button')) b.classList.toggle('on', b.dataset.langue === langue);
+  for (const b of document.querySelectorAll('.foule button')) b.classList.toggle('on', foule[b.parentNode.dataset.foule] === b.dataset.fr);
   document.documentElement.lang = langue;
 }
 function etat(texte) { document.getElementById('etat').dataset.fr = texte; traduireMenu(); }   // la ligne jaune du menu
@@ -357,6 +386,13 @@ for (const [l, nom] of Object.entries(LANGUES)) {
   b.textContent = nom; b.dataset.langue = l;
   b.onclick = e => { e.stopPropagation(); langue = l; try { localStorage.langue = l; } catch {} traduireMenu(); };   // stopPropagation : ne lance pas le jeu
   document.getElementById('langues').append(b);
+}
+// les boutons de la foule : une ligne pour les piétons, une pour les voitures. Le jeu en tient compte tout de suite
+for (const ligne of document.querySelectorAll('.foule')) for (const nom in FOULES) {
+  const b = document.createElement('button'), k = ligne.dataset.foule;
+  b.textContent = nom;
+  b.onclick = e => { e.stopPropagation(); foule[k] = nom; try { localStorage['foule-' + k] = nom; } catch {} traduireMenu(); };
+  ligne.append(b);
 }
 traduireMenu();
 </script>
@@ -391,8 +427,7 @@ const REGLAGES = {
   giletMax: 100,             // points du gilet pare-balles : il prend les dégâts à la place de ta vie
   degatsExplosion: 40,       // ce que te fait une explosion (ta roquette, une voiture) si tu es collé dessus
   vitesseRoquette: 20,       // m/s : plus vite que toi quand tu cours, mais on peut encore l'esquiver de loin
-  nombrePietons: 30,
-  nombreVoitures: 16,        // voitures qui circulent autour de toi
+  // le nombre de piétons et de voitures qui circulent autour de toi se choisit dans le menu : voir FOULES, tout en haut
   vitesseCirculation: 11,
   vitessePolice: 18,
   delaiPerteEtoile: 12,      // secondes sans être vu par la police pour perdre une étoile
@@ -4593,8 +4628,11 @@ function peupler(dt) {
   if (tPeupler > 0) return;
   tPeupler = 0.5;
   for (const p of personnes) if (p.type === 'pieton' && dist(p, J) > 200) p.supprimer = true;
-  if (personnes.filter(p => p.type === 'pieton').length < R_.nombrePietons) apparaitrePersonne('pieton');
-  if (voitures.filter(v => v.conducteur === 'civil').length < R_.nombreVoitures) apparaitreVoiture(false);
+  // autant que choisi dans le menu (FOULES) ; plus on en veut, plus il en apparaît à la fois, pour que la ville se remplisse aussi vite
+  const pietons = personnes.filter(p => p.type === 'pieton').length, civiles = voitures.filter(v => v.conducteur === 'civil').length;
+  const { pietons: voulus } = FOULES[foule.pietons], { voitures: voulues } = FOULES[foule.voitures];
+  for (let k = pietons; k < Math.min(voulus, pietons + Math.ceil(voulus / 30)); k++) apparaitrePersonne('pieton');
+  for (let k = civiles; k < Math.min(voulues, civiles + Math.ceil(voulues / 16)); k++) apparaitreVoiture(false);
 }
 function police(dt) {
   if (etoiles === 0) return;
