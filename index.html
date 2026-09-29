@@ -263,6 +263,9 @@ const TRADUCTIONS = {
   'tire-bouchon':     { de: 'Korkenzieher', en: 'corkscrew', gsw: 'Zapfezieher' },
   '{figure} !':       { de: '{figure}!', en: '{figure}!', gsw: '{figure}!' },
   "Pas assez d'élan !": { de: 'Nicht genug Schwung!', en: 'Not enough speed!', gsw: 'Nöd gnueg Schwung!' },
+  'AU FEU !':         { de: 'FEUER!', en: 'FIRE!', gsw: 'FÜÜR!' },
+  "Ta voiture est retournée : sors vite (touche E) avant qu'elle explose !": { de: 'Dein Auto liegt auf dem Dach: steig schnell aus (Taste E), bevor es explodiert!',
+    en: 'Your car has flipped over: get out fast (E key) before it explodes!', gsw: 'Dis Auto isch überschlage: stiig schnäll uus (Taschte E), bevor s explodiert!' },
   'Voiture réparée !': { de: 'Auto repariert!', en: 'Car repaired!', gsw: 'Auto repariert!' },
   '+50 vie':          { de: '+50 Leben', en: '+50 health', gsw: '+50 Läbe' },
   'Gilet pare-balles !': { de: 'Schutzweste!', en: 'Body armor!', gsw: 'Schutzweschte!' },
@@ -408,6 +411,7 @@ import * as THREE from 'three';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { mergeGeometries, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { TessellateModifier } from 'three/addons/modifiers/TessellateModifier.js';
 
 // =====================================================================
 //  RÉGLAGES : change ces nombres pour modifier le jeu !
@@ -463,6 +467,12 @@ const REGLAGES = {
   vitesseMoonwalk: 1.5,      // m/s, à reculons
   graviteVoiture: 9.8,       // la vraie gravité de la Terre pour les voitures qui sautent (mets 1.6 pour rouler sur la Lune !)
   degatsVoitures: 1,         // 1 = normal, 2 = les voitures s'abîment deux fois plus vite, 0 = jamais
+  // les accidents
+  seuilAccident: 11,         // m/s (40 km/h) : un choc plus fort que ça, et la voiture part en tête-à-queue, en l'air ou en tonneaux
+  forceTonneaux: 1,          // 2 = les voitures se retournent deux fois plus fort, 0 = elles glissent sans jamais se retourner
+  feuRetournee: 5,           // secondes : une voiture couchée sur le côté ou sur le toit brûle, puis explose. Sors vite !
+  vitesseCrevaison: 14,      // m/s (50 km/h) : un pneu crevé plus vite que ça, et la voiture part en tête-à-queue (parfois en tonneaux)
+  hauteurBornes: 0.45,       // mètres : les bornes en béton autour des places. Les 4x4 et les fourgons passent au-dessus
   // les braquages
   prixBlindage: 5000,        // ce que le garagiste de LS Customs demande pour blinder une voiture façon Mad Max
   vitesseBlindable: 40,      // m/s : il ne blinde que les voitures rapides (la Porsche va à 50)
@@ -536,7 +546,7 @@ const VOITURES = [
 //  la grande carte (touche M) te dit dans quelle colonne et quelle ligne tu es.
 //
 //  Les lettres sont des pâtés de maisons : les rues sont ajoutées toutes seules autour.
-//    T tours          I immeubles       M maisons         P parc            . place
+//    T tours          I immeubles       M maisons         P parc            . place (entourée de bornes en béton)
 //    X départ du joueur                 a b c d ... lieux de mission (des places)
 //  Les pâtés où l'on peut entrer (* = avec un étage ou un toit où monter) :
 //    A armurerie      H hôpital         C commissariat*   S supérette       G garage LS Customs
@@ -1297,6 +1307,16 @@ const TEX = {
     for (let k = 0; k < 14; k++) { let x = cx, y = cy, a = k * 0.45 + entre(0, 0.3); g.beginPath(); g.moveTo(x, y);
       for (let s = 0; s < 8; s++) { a += entre(-0.35, 0.35); x += Math.cos(a) * 14; y += Math.sin(a) * 14; g.lineTo(x, y); } g.stroke(); }
     for (const r of [10, 22, 38]) { g.beginPath(); for (let k = 0; k <= 16; k++) { const a = k * Math.PI / 8, rr = r * entre(0.8, 1.2); g.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); } g.stroke(); } }),
+  // une vitre brisée : le trou sombre de l'habitacle, et des bouts de verre pointus restés coincés dans le cadre
+  brisee: toile(128, 128, (g, l, h) => {
+    const d = g.createLinearGradient(0, 0, 0, h); d.addColorStop(0, '#07080a'); d.addColorStop(1, '#1d2126'); g.fillStyle = d; g.fillRect(0, 0, l, h);
+    g.fillStyle = 'rgba(165,195,210,.8)'; g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 0.6;
+    for (let k = 0; k < 4; k++) { // les 4 bords, l'un après l'autre : on tourne l'image d'un quart de tour
+      g.save(); g.translate(l / 2, h / 2); g.rotate(k * Math.PI / 2); g.translate(-l / 2, -h / 2);
+      g.beginPath(); g.moveTo(0, 0);
+      for (let x = 0; x < l;) { x += entre(2, 9); g.lineTo(x, Math.random() < 0.2 ? entre(12, 26) : entre(2, 10)); x += entre(2, 9); g.lineTo(Math.min(x, l), entre(0, 3)); }   // un bout de verre (parfois long), puis un creux
+      g.lineTo(l, 0); g.closePath(); g.fill(); g.stroke(); g.restore();
+    } }),
   carrelage: toile(128, 128, (g) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) { g.fillStyle = (x + y) % 2 ? '#e8e4dc' : '#cfc9bc'; g.fillRect(x * 32, y * 32, 32, 32); } g.fillStyle = 'rgba(0,0,0,.25)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 32, 0, 1, 128); g.fillRect(0, k * 32, 128, 1); } }),
   parquet: toile(128, 128, (g) => { for (let y = 0; y < 8; y++) for (let x = 0; x < 3; x++) { g.fillStyle = `hsl(28,${entre(35, 50)}%,${entre(30, 42)}%)`; g.fillRect(x * 48 + (y % 2) * 24 - 24, y * 16, 47, 15); } }),
   vagues: toile(128, 128, (g, l, h) => { g.fillStyle = '#808080'; g.fillRect(0, 0, l, h); for (let i = 0; i < 600; i++) { const v = Math.random() * 255 | 0; g.fillStyle = `rgba(${v},${v},${v},.25)`; g.beginPath(); g.ellipse(Math.random() * l, Math.random() * h, entre(4, 14), entre(1, 3), 0, 0, 7); g.fill(); } }),
@@ -1438,7 +1458,7 @@ const MORCEAU = 8 * PAS;
 const morceaux = new Map();
 function morceauEn(x, z) {
   const cx = Math.floor(x / MORCEAU), cz = Math.floor(z / MORCEAU), k = cx * 100 + cz;
-  if (!morceaux.has(k)) { const g = new THREE.Group(); scene.add(g); morceaux.set(k, { g, x: (cx + 0.5) * MORCEAU, z: (cz + 0.5) * MORCEAU, geos: {}, arbres: [], lampadaires: [] }); }
+  if (!morceaux.has(k)) { const g = new THREE.Group(); scene.add(g); morceaux.set(k, { g, x: (cx + 0.5) * MORCEAU, z: (cz + 0.5) * MORCEAU, geos: {}, arbres: [], lampadaires: [], bornes: [] }); }
   return morceaux.get(k);
 }
 const empreintes = [];         // bâtiments pour la mini-carte
@@ -1925,6 +1945,8 @@ function genererBloc(i, j) {
     sol('paves', X(30), 0.21, Z(30), S - 8, S - 8);
     for (const [a, b] of [[10, 10], [50, 10], [10, 50], [50, 50]]) { boite('pierre', X(a), 0.2, Z(b), 2.4, 0.6, 2.4); arbre(X(a), Z(b), 1); }
     voituresGarees.push({ x: X(20), z: Z(14), a: Math.PI / 2 }, { x: X(40), z: Z(46), a: -Math.PI / 2 });
+    // des bornes en béton tout autour, tous les 3 m, sauf au milieu de chaque côté : c'est par là qu'on entre en voiture
+    for (let k = 6; k <= 54; k += 3) if (k < 24 || k > 36) for (const [x, z] of [[k, 3], [k, 57], [3, k], [57, k]]) morceauEn(X(x), Z(z)).bornes.push({ x: X(x), z: Z(z), y: Y0 + 0.2 });
   }
   Y0 = 0;
 }
@@ -2215,7 +2237,11 @@ function instances(dans, geo, mat, liste, placer) {
   const m = new THREE.InstancedMesh(geo, mat, liste.length), o = new THREE.Object3D();
   liste.forEach((e, k) => { o.rotation.set(0, 0, 0); o.scale.setScalar(1); placer(o, e); o.updateMatrix(); m.setMatrixAt(k, o.matrix); });
   m.computeBoundingSphere(); m.castShadow = true; m.receiveShadow = true; dans.add(m);
+  return m;
 }
+// les bornes en béton : un plot arrondi, de la hauteur des réglages
+const GEO_BORNE = new THREE.LatheGeometry([[0.2, 0], [0.2, 0.3], [0.16, 0.4], [0.08, 0.45], [0, 0.46]].map(([r, y]) => new THREE.Vector2(r, y * R_.hauteurBornes / 0.45)), 12);
+const MAT_BORNE = std(null, { color: '#b8b4aa', roughness: 0.9 });
 for (const m of morceaux.values()) {
   for (const [nom, liste] of Object.entries(m.geos)) {
     const mesh = new THREE.Mesh(mergeGeometries(liste), MAT[nom]);
@@ -2232,9 +2258,56 @@ for (const m of morceaux.values()) {
     instances(m.g, feuilles, sorte === 'sapin' ? MAT_ARBRE.sapin : MAT_ARBRE.feuilles, l, placer);
   }
   const placer = (o, e) => { o.position.set(e.x, e.y, e.z); o.rotation.y = e.a; };
-  instances(m.g, GEO_POTEAU, MAT_POTEAU, m.lampadaires, placer);
-  instances(m.g, GEO_LAMPE, MAT_LAMPE, m.lampadaires, placer);
-  m.lampadaires.forEach(e => ajouterCollision(e.x - 0.15, e.z - 0.15, e.x + 0.15, e.z + 0.15, e.y + 7, e.y));
+  const dessins = [instances(m.g, GEO_POTEAU, MAT_POTEAU, m.lampadaires, placer), instances(m.g, GEO_LAMPE, MAT_LAMPE, m.lampadaires, placer)];
+  m.lampadaires.forEach((e, k) => { Object.assign(e, { k, dessins, boite: ajouterCollision(e.x - 0.15, e.z - 0.15, e.x + 0.15, e.z + 0.15, e.y + 7, e.y) }); e.boite.lampadaire = e; });
+  // une borne n'est pas un mur (on passe par-dessus, en s'abîmant) ni un sol : c'est bornesSous qui la trouve
+  instances(m.g, GEO_BORNE, MAT_BORNE, m.bornes, (o, e) => o.position.set(e.x, e.y, e.z));
+  m.bornes.forEach(e => Object.assign(ajouterCollision(e.x - 0.2, e.z - 0.2, e.x + 0.2, e.z + 0.2, e.y + R_.hauteurBornes, e.y, true), { borne: true, bx: e.x, bz: e.z }));
+}
+// les bornes sous la voiture v : dans son empreinte, et plus hautes que le dessous de sa caisse
+function bornesSous(v) {
+  const L = v.forme.longueur / 2 + 0.2, W = v.forme.largeur / 2 + 0.2, res = [];
+  if (v.type.bateau) return res;
+  pourBoites(v.x - L, v.z - L, v.x + L, v.z + L, b => {
+    if (!b.borne || res.includes(b) || b.h < v.y + (v.forme.garde ?? 0.3)) return;
+    const p = versLocal(v, b.bx - v.x, b.bz - v.z);
+    if (Math.abs(p.x) < W && Math.abs(p.z) < L) res.push(b);
+  });
+  return res;
+}
+// les lampadaires : une voiture lancée (plus de 3 m/s) renverse ceux que touche son cercle c. Renvoie ceux qui tombent
+const lampadairesTombes = [];
+function faucher(v, c, vx, vz) {
+  const r = v.rayon + 0.15, res = [];
+  if (Math.hypot(vx, vz) < 3) return res;
+  pourBoites(c.x - r, c.z - r, c.x + r, c.z + r, b => {
+    const e = b.lampadaire;
+    if (e && b.h > -Infinity && Math.hypot(e.x - c.x, e.z - c.z) < r) { renverserLampadaire(e, vx, vz); res.push(e); }
+  });
+  return res;
+}
+// il tombe dans le sens où va la voiture (vx, vz)
+function renverserLampadaire(e, vx, vz) {
+  e.boite.h = -Infinity;   // plus d'obstacle
+  for (const im of e.dessins) { im.setMatrixAt(e.k, new THREE.Matrix4().makeScale(0, 0, 0)); im.instanceMatrix.needsUpdate = true; }   // on cache celui qui était debout
+  const g = new THREE.Group(), tige = new THREE.Group();   // g : au pied, tourné vers où il tombe ; tige : ce qui bascule
+  g.position.set(e.x, e.y, e.z); g.rotation.y = Math.atan2(vx, vz); g.add(tige); scene.add(g);
+  for (const [geo, m] of [[GEO_POTEAU, MAT_POTEAU], [GEO_LAMPE, MAT_LAMPE]]) { const p = new THREE.Mesh(geo, m); p.rotation.y = e.a - g.rotation.y; p.castShadow = true; tige.add(p); }
+  lampadairesTombes.push({ e, g, tige, vitesse: Math.hypot(vx, vz) / 8 });
+  const fort = clamp(1.3 - dist(e, J) / 60, 0, 1);
+  bruit(0.5 * fort, 1500, 0.4); bip(420, 260, 0.5, 'triangle', 0.12 * fort);   // clang !
+}
+// ils basculent de plus en plus vite jusqu'au sol, et se relèvent quand on est à plus de 300 m
+function majLampadaires(dt) {
+  for (const t of lampadairesTombes) {
+    const r = t.tige.rotation;
+    if (r.x < 1.52) { t.vitesse += 2.1 * Math.sin(r.x + 0.05) * dt; r.x = Math.min(1.52, r.x + t.vitesse * dt); }
+    if (dist(t.e, J) < 300) continue;
+    scene.remove(t.g); t.e.boite.h = t.e.y + 7; t.fini = true;
+    const o = new THREE.Object3D(); o.position.set(t.e.x, t.e.y, t.e.z); o.rotation.y = t.e.a; o.updateMatrix();
+    for (const im of t.e.dessins) { im.setMatrixAt(t.e.k, o.matrix); im.instanceMatrix.needsUpdate = true; }
+  }
+  for (let k = lampadairesTombes.length - 1; k >= 0; k--) if (lampadairesTombes[k].fini) lampadairesTombes.splice(k, 1);
 }
 // on ne dessine que les morceaux qui ne sont pas cachés par le brouillard
 function majMorceaux() {
@@ -2796,6 +2869,7 @@ const versLocal = (v, dx, dz) => ({ x: dx * Math.cos(v.angle) - dz * Math.sin(v.
 //  Dégâts des voitures : bosses, vitres fêlées puis brisées, pièces qui partent, roues tordues, fumée
 // =====================================================================
 const M_VITRE_FELEE = new THREE.MeshStandardMaterial({ color: '#4a5560', metalness: 0.6, roughness: 0.25, emissive: '#fff', emissiveMap: TEX.felure, emissiveIntensity: 0.45 });
+const M_VITRE_BRISEE = new THREE.MeshStandardMaterial({ map: TEX.brisee, metalness: 0.3, roughness: 0.35 });
 const M_PHARE_CASSE = mat('#2a2a28', { roughness: 0.4 }), M_FEU_CASSE = mat('#301010', { roughness: 0.4 });
 const M_ECLAT = new THREE.MeshStandardMaterial({ color: '#b8d4e0', metalness: 0.5, roughness: 0.1, side: THREE.DoubleSide });
 const GEO_ECLAT = new THREE.BufferGeometry().setFromPoints([V3(0, 0, 0), V3(0.12, 0, 0.03), V3(0.04, 0.1, 0)]);
@@ -2806,9 +2880,11 @@ function zoneDe(m, P, D) {
   const fz = P.z / (m.longueur / 2), fx = P.x / (m.largeur / 2);
   return Math.abs(fz) > Math.abs(fx) ? (fz > 0 ? 'avant' : 'arriere') : (fx > 0 ? 'gauche' : 'droite');
 }
-// une copie de la forme, qu'on pourra cabosser ; on garde la position de départ de chaque point
+// une copie de la forme, qu'on pourra cabosser, découpée en triangles de 25 cm au plus : sinon une grande face plate,
+// comme une portière, n'a des points qu'à ses bords et ne peut pas se creuser au milieu. On garde la place de départ de chaque point
+const DECOUPE = new TessellateModifier(0.25, 30);
 function copieCabossable(g) {
-  const c = g.index ? g.toNonIndexed() : g.clone();
+  const c = DECOUPE.modify(g);
   c.userData = { origine: c.attributes.position.array.slice() };
   return c;
 }
@@ -2831,26 +2907,45 @@ function preparerDegats(v) {
     return { g, zone: p.zone, seuil: p.seuil + Math.random() * 0.2 };
   });
 }
-// un nombre au hasard entre 0 et 1, toujours le même pour le même point : la tôle se froisse sans se déchirer
-const alea = (x, y, z) => { const s = Math.sin(x * 12.9898 + y * 78.233 + z * 37.719) * 43758.5453; return s - Math.floor(s); };
-// enfonce la carrosserie autour du point P (repère de la voiture), dans la direction D, de « prof » mètres au plus
-function bosseler(v, P, D, prof, rayon) {
-  const A = V3(), B = V3(), C = V3();
-  for (const mesh of v.deformables) {
-    const g = mesh.geometry, a = g.attributes.position.array, o = g.userData.origine, n = g.attributes.normal.array;
-    const c = mesh.parent === v.corps ? A.set(0, 0, 0) : A.copy(mesh.parent.position), px = P.x - c.x, py = P.y - c.y, pz = P.z - c.z;
-    let bouge = false;
+// des plis dans la tôle : une ondulation de -1 à 1, qui revient tous les 70 cm environ. Toujours la même pour le même point,
+// et presque la même pour deux points voisins : la tôle se plie sans se déchirer
+const pli = (x, y, z) => Math.sin(x * 8.3 + z * 3.1) * Math.sin(y * 9.7 - z * 5.3 + x * 2.1);
+// enfonce la carrosserie au point P (repère de la voiture), dans la direction D, comme un bélier arrondi de « rayon » mètres
+// qui la pousse de « prof » mètres : ce qui dépasse devant lui est aplati, et la tôle se froisse. On compte depuis la tôle
+// telle qu'elle est : un deuxième choc au même endroit enfonce encore plus loin. Un point ne bouge jamais de plus de « maxi »
+function bosseler(v, P, D, prof, rayon, maxi = 0.45) {
+  const A = V3(), B = V3(), C = V3(), r2 = rayon * rayon;
+  // la tôle gondole vers le haut (le capot se soulève en accordéon), sauf si le choc vient d'en haut ; T : l'autre direction de côté
+  const G = V3(0, 1, 0).addScaledVector(D, -D.y);
+  if (G.length() < 0.3) G.set(1, 0, 0).addScaledVector(D, -D.x);
+  G.normalize();
+  const T = V3().crossVectors(D, G), haut = D.y > -0.7;
+  // pour chaque point près de l'axe du choc : s = sa profondeur, depuis P dans la direction D ; l2 = le carré de sa distance à l'axe
+  const pour = f => { for (const mesh of v.deformables) {
+    const a = mesh.geometry.attributes.position.array, c = mesh.parent === v.corps ? A.set(0, 0, 0) : A.copy(mesh.parent.position);
     for (let i = 0; i < a.length; i += 3) {
-      const dx = a[i] - px, dy = a[i + 1] - py, dz = a[i + 2] - pz, d2 = dx * dx + dy * dy + dz * dz;
-      if (d2 >= rayon * rayon) continue;
-      const k = (1 - Math.sqrt(d2) / rayon) ** 2 * prof, x = o[i], y = o[i + 1], z = o[i + 2], f = 0.3 + 1.4 * alea(x, y, z);
-      // enfoncée dans le sens du choc, et froissée un peu dans tous les sens
-      a[i] += (D.x * f + (alea(y, z, x) - 0.5) * 0.8) * k; a[i + 1] += (D.y * f + (alea(z, x, y) - 0.5) * 0.8) * k; a[i + 2] += (D.z * f + (alea(x, z, y) - 0.5) * 0.8) * k;
-      const ex = a[i] - o[i], ey = a[i + 1] - o[i + 1], ez = a[i + 2] - o[i + 2], e = Math.hypot(ex, ey, ez);
-      if (e > 0.45) { a[i] = o[i] + ex * 0.45 / e; a[i + 1] = o[i + 1] + ey * 0.45 / e; a[i + 2] = o[i + 2] + ez * 0.45 / e; }   // pas plus de 45 cm
-      bouge = true;
+      const dx = a[i] + c.x - P.x, dy = a[i + 1] + c.y - P.y, dz = a[i + 2] + c.z - P.z, s = dx * D.x + dy * D.y + dz * D.z, l2 = dx * dx + dy * dy + dz * dz - s * s;
+      if (l2 < r2) f(mesh, a, i, s, l2);
     }
-    if (!bouge) continue;
+  } };
+  let s0 = Infinity;   // la tôle la plus avancée face au choc : c'est là que le bélier la touche en premier
+  pour((mesh, a, i, s) => { s0 = Math.min(s0, s); });
+  if (s0 === Infinity) return;
+  const bouges = new Set();
+  pour((mesh, a, i, s, l2) => {
+    const t = s0 + prof * (1 - l2 / r2);   // le bout du bélier, à cet endroit : plus profond au milieu
+    if (s >= t) return;
+    const o = mesh.geometry.userData.origine, x = o[i], y = o[i + 1], z = o[i + 2], d = t - s;
+    // aplatie contre le bélier, et pliée en vagues régulières (du bruit au hasard la ferait ressembler à du verre brisé) :
+    // plus ou moins enfoncée, gondolée vers le haut, et poussée un peu de côté
+    const creux = 1 + 0.2 * pli(x, y, z), g = (haut ? 0.35 : 0.1) * (0.6 + 0.4 * pli(y, z, x)), c = 0.15 * pli(z, x, y);
+    a[i] += (D.x * creux + G.x * g + T.x * c) * d; a[i + 1] += (D.y * creux + G.y * g + T.y * c) * d; a[i + 2] += (D.z * creux + G.z * g + T.z * c) * d;
+    const ex = a[i] - x, ey = a[i + 1] - y, ez = a[i + 2] - z, e = Math.hypot(ex, ey, ez);
+    if (e > maxi) { a[i] = x + ex * maxi / e; a[i + 1] = y + ey * maxi / e; a[i + 2] = z + ez * maxi / e; }
+    bouges.add(mesh);
+  });
+  for (const mesh of bouges) {
+    const g = mesh.geometry, a = g.attributes.position.array, o = g.userData.origine, n = g.attributes.normal.array;
     // la tôle froissée : chaque triangle qui a bougé renvoie la lumière à sa façon
     for (let i = 0; i < a.length; i += 9) {
       let j = i; while (j < i + 9 && Math.abs(a[j] - o[j]) < 0.01) j++;
@@ -2862,15 +2957,17 @@ function bosseler(v, P, D, prof, rayon) {
   }
 }
 // la voiture v prend un choc au point P (dans son repère : x à gauche, y en haut, z devant), poussé dans la direction D.
-// force : de 0 (rien) à 1 (très fort). balle : un tir, qui fait un petit trou et fêle la vitre la plus proche
-function abimer(v, P, D, force, balle = false) {
+// force : de 0 (rien) à 1 (très fort). balle : un tir, qui fait un petit trou et fêle la vitre la plus proche.
+// largeur : la taille de ce qui tape, en mètres (un poteau est étroit ; un mur, une voiture ou le sol, larges)
+function abimer(v, P, D, force, balle = false, largeur = 0.5 + force * 0.7) {
   if (balle && estBlindee(v)) { bip(2600, 900, 0.1, 'sawtooth', 0.04 * clamp(1.3 - dist(v, J) / 60, 0, 1)); return; }   // les balles ricochent sur le blindage
   force *= R_.degatsVoitures * (estBlindee(v) ? 0.35 : 1);
   if (v.type.bateau || v.detruite || force <= 0.005) return;
   if (!v.abimee) preparerDegats(v);
   const zone = zoneDe(v.forme, P, D);
   v.degats[zone] = Math.min(1, v.degats[zone] + (balle ? force * 0.2 : force));
-  bosseler(v, P, D, balle ? 0.03 : Math.min(0.4, force * 0.6), balle ? 0.25 : 0.5 + force * 0.7);
+  // la tôle s'enfonce de 8 cm par dixième de force, et au plus de 90 cm à l'avant et à l'arrière (le capot, le coffre), de 50 cm ailleurs
+  bosseler(v, P, D, balle ? 0.03 : force * 0.8, balle ? 0.25 : largeur, zone === 'avant' || zone === 'arriere' ? 0.9 : 0.5);
   // les vitres : celles près du choc se fêlent, puis se brisent ; toutes celles d'un côté très abîmé se brisent
   const vitres = v.fenetres.filter(f => f.etat < 2);
   if (balle) { const f = vitres.reduce((m, f) => !m || f.centre.distanceTo(P) < m.centre.distanceTo(P) ? f : m, null); if (f && f.centre.distanceTo(P) < 0.8) briserVitre(v, f); }
@@ -2892,10 +2989,22 @@ function tordreRoue(r, force) {
   r.carrossage = clamp((r.carrossage || 0) + entre(-1, 1) * force * 0.25, -0.2, 0.2);
   r.voile = Math.min(0.12, (r.voile || 0) + force * 0.1);
 }
+// une balle dans un pneu : pan ! Il s'aplatit, la voiture s'affaisse de ce côté et tire de travers. Lancée à plus de
+// vitesseCrevaison, elle part en tête-à-queue du côté du pneu crevé, et parfois en tonneaux. Les pneus blindés ne crèvent pas
+function crever(v, r) {
+  if (r.crevee || v.type.bateau || estBlindee(v)) return;
+  r.crevee = true; r.pivot.scale.y = 0.75; r.pivot.position.y = v.forme.roue * 0.75;
+  bruit(0.7 * clamp(1.3 - dist(v, J) / 60, 0, 1), 2500, 0.25);
+  const s = Math.abs(v.vitesse), gauche = Math.sign(r.pivot.position.x);   // (la roue avant du tricycle, au milieu, ne tire d'aucun côté)
+  if (s < R_.vitesseCrevaison || v.accident || v.rail || !gauche) return;
+  const a = commencerAccident(v);
+  a.rot.y += gauche * Math.sign(v.vitesse) * s * 0.08;
+  a.rot.addScaledVector(V3(0, 0, 1).applyQuaternion(v.quat), -gauche * s * 0.12 * Math.random() * R_.forceTonneaux);
+}
 function briserVitre(v, f) {
   f.etat++;
   if (f.etat === 1) { f.mesh.material = M_VITRE_FELEE; bip(3200, 2600, 0.06, 'sine', 0.05); return; }
-  f.mesh.visible = false;   // brisée : il n'y a plus de vitre, juste des éclats qui tombent
+  f.mesh.material = M_VITRE_BRISEE;   // brisée : on voit le trou sombre de l'habitacle, avec des bouts de verre restés dans le cadre
   v.m.updateMatrixWorld(true);
   const c = v.m.localToWorld(f.centre.clone());
   for (let k = 0; k < 10; k++) {
@@ -2937,6 +3046,194 @@ function majDebris(dt) {
     if (d.vie <= 0) { scene.remove(d.o); if (d.jeter) d.o.traverse(o => o.geometry?.dispose()); }
   }
   for (let k = debris.length - 1; k >= 0; k--) if (debris[k].vie <= 0) debris.splice(k, 1);
+}
+
+// =====================================================================
+//  Accidents : la voiture n'est plus tenue par ses roues. Elle vole, tourne, rebondit et glisse comme une vraie boîte,
+//  jusqu'à s'arrêter. Sur ses roues, on repart ; sur le côté ou sur le toit, elle prend feu, puis explose
+// =====================================================================
+const HAUT = V3(0, 1, 0), Q_ = new THREE.Quaternion();
+// la forme d'un modèle pour les accidents (dans son repère) : le bas de ses roues, les coins de sa caisse et de son toit,
+// la hauteur de son centre de gravité, et son inertie : plus elle est grande autour d'un axe, plus la voiture a du mal à tourner autour
+const cacheCoques = {};
+function coqueAccident(nom) {
+  if (cacheCoques[nom]) return cacheCoques[nom];
+  const m = MODELES[nom], L = m.longueur / 2, W = m.largeur / 2, c = m.cabine, e = 0.12 * m.roue / 0.34;
+  const garde = m.garde ?? m.roue * 0.8, haut = m.profil ? Math.max(...m.profil.map(p => p[1])) : m.hauteur * 0.75;
+  const coins = [];
+  for (const x of [-W, W]) for (const z of [-L, L]) coins.push(V3(x, garde, z), V3(x, haut, z));   // la caisse
+  if (c) for (const x of [-1, 1]) for (const z of c.haut) coins.push(V3(x * c.largeur[1] / 2, c.y[1], z));   // le toit
+  else coins.push(V3(0, m.hauteur, 0));   // le tricycle : la tête du pilote
+  const roues = (m.roues || m.essieux.flatMap(z => [[e + 0.005 - W, z], [W - e - 0.005, z]])).map(([x, z]) => V3(x, 0, z));   // dans l'ordre de v.roues
+  const [h, l, w] = [m.hauteur, m.longueur, m.largeur];
+  return cacheCoques[nom] = { coins, roues, cg: (garde + haut) / 2, inertie: V3((h * h + l * l) / 12, (w * w + l * l) / 12, (w * w + h * h) / 12) };
+}
+const masse = v => v.forme.longueur * v.forme.largeur * v.forme.hauteur * (estBlindee(v) ? 1.5 : 1);   // en gros, son volume : un fourgon pèse 3 Porsche
+const vitesseDe = o => o.accident ? o.accident.vel : V3(Math.sin(o.angle) * o.vitesse, 0, Math.cos(o.angle) * o.vitesse);
+// un point (ou une direction) du monde, dans le repère de la voiture (x à sa gauche, y en haut, z devant)
+function versVoiture(v, W, direction = false) {
+  const p = W.clone();
+  if (!v.accident) { const l = direction ? versLocal(v, p.x, p.z) : versLocal(v, p.x - v.x, p.z - v.z); return p.set(l.x, direction ? p.y : p.y - v.y, l.z); }
+  if (!direction) p.sub(v.accident.c);
+  p.applyQuaternion(Q_.copy(v.quat).invert());
+  if (!direction) p.y += coqueAccident(v.type.modele).cg;
+  return p;
+}
+// la voiture part en accident (si ce n'est pas déjà fait), avec son élan. Renvoie son état d'accident (rien pour un bateau)
+function commencerAccident(v) {
+  if (v.type.bateau || v.coule) return null;
+  if (v.accident) { v.accident.dort = false; v.accident.calme = 0; return v.accident; }
+  const k = coqueAccident(v.type.modele);
+  const vel = v.rail ? pointRail(v.rail.r, v.rail.s).t.multiplyScalar(v.rail.sens * v.vitesse) : V3(Math.sin(v.angle) * v.vitesse, v.vy || 0, Math.cos(v.angle) * v.vitesse);
+  v.quat ||= new THREE.Quaternion().setFromEuler(new THREE.Euler(-v.tangage, v.angle, v.roulis, 'YXZ'));
+  // c : le centre de gravité (dans le monde), vel : sa vitesse, rot : comment elle tourne (un axe, et sa longueur : des tours en 2π s)
+  v.accident = { c: V3(0, k.cg, 0).applyQuaternion(v.quat).add(V3(v.x, v.y, v.z)), vel, rot: V3(), calme: 0, duree: 0, feu: 0, conducteur: v.conducteur };
+  if (v.conducteur === 'civil') v.epave = true;   // une voiture de la circulation : son épave disparaîtra quand on sera loin
+  Object.assign(v, { rail: null, enAir: true, vol: true, decollage: null, conducteur: null });   // son conducteur sortira quand elle s'arrêtera
+  return v.accident;
+}
+// ce que donne un couple T (dans le monde) sur la rotation de la voiture : elle tourne moins bien autour de ses grands axes
+function selonInertie(v, T) {
+  const I = coqueAccident(v.type.modele).inertie;
+  T.applyQuaternion(Q_.copy(v.quat).invert());
+  return T.set(T.x / I.x, T.y / I.y, T.z / I.z).applyQuaternion(v.quat);
+}
+// un coup au point P du monde, qui change la vitesse de dv (m/s) : la voiture avance, et tourne si le coup n'est pas en son centre
+function pousser(v, P, dv) {
+  const a = v.accident;
+  a.vel.add(dv);
+  a.rot.add(selonInertie(v, P.clone().sub(a.c).cross(dv)));
+}
+// un point P de la voiture touche le sol ou un mur, de direction n (vers la voiture) : il rebondit (e) et frotte (mu).
+// Une roue (roule : l'axe où elle roule) ne frotte presque pas dans ce sens-là. Renvoie la vitesse du choc (m/s)
+function toucher(v, P, n, e, mu, roule = null) {
+  const a = v.accident, r = P.clone().sub(a.c);
+  const vitesseEn = () => a.rot.clone().cross(r).add(a.vel);
+  const vn = vitesseEn().dot(n);
+  if (vn >= 0) return 0;
+  const souple = d => 1 + selonInertie(v, r.clone().cross(d)).cross(r).dot(d);   // plus c'est grand, plus ce point bouge facilement dans la direction d
+  const j = -(1 + (vn < -2 ? e : 0)) * vn / souple(n);
+  pousser(v, P, n.clone().multiplyScalar(j));
+  // le frottement freine le glissement, au plus de mu fois la force du choc
+  const t = vitesseEn(); t.addScaledVector(n, -t.dot(n));
+  const frotter = (d, m) => { const s = t.dot(d); if (Math.abs(s) > 1e-4) pousser(v, P, d.clone().multiplyScalar(-Math.sign(s) * Math.min(Math.abs(s) / souple(d), m * j))); };
+  if (roule) { const f = roule.addScaledVector(n, -roule.dot(n)).normalize(); frotter(f, 0.03); frotter(n.clone().cross(f), mu); }
+  else if (t.length() > 1e-4) frotter(t.clone().normalize(), mu);
+  return -vn;
+}
+// la voiture w prend un coup au point P du monde, qui change sa vitesse de dv (m/s). Un petit coup ne fait rien (renvoie false) ;
+// un gros la fait partir en accident. Poussée de côté, elle se renverse : ses pneus accrochent la route, et le haut continue
+function heurter(w, P, dv) {
+  if (w.type.bateau || w.coule || dv.length() < 3) return false;
+  const neuf = !w.accident, a = commencerAccident(w);
+  pousser(w, P, dv);
+  if (neuf) {
+    const gauche = V3(1, 0, 0).applyQuaternion(w.quat), cote = gauche.multiplyScalar(dv.dot(gauche)).setY(0);
+    a.rot.add(HAUT.clone().cross(cote).multiplyScalar(0.15 * R_.forceTonneaux * entre(0.6, 1.4)));
+  }
+  return true;
+}
+// le souffle d'une explosion en pos soulève la voiture et la fait tournoyer. force : 1 pour une voiture qui explose
+function souffler(v, pos, force) {
+  const a = commencerAccident(v);
+  if (!a) return;
+  const dx = v.x - pos.x, dz = v.z - pos.z, d = Math.hypot(dx, dz) || 1, k = force * Math.min(1.3, Math.sqrt(12 / masse(v)));   // les lourdes volent moins haut
+  a.vel.add(V3(dx / d * 4 * k, entre(7, 10) * k, dz / d * 4 * k));
+  a.rot.add(V3(entre(-3, 3), entre(-1.5, 1.5), entre(-3, 3)).multiplyScalar(k * R_.forceTonneaux));
+}
+// chaque image : la voiture accidentée tombe et tourne, touche le sol, les murs et les autres voitures, et finit par s'arrêter
+function majAccident(v, dt) {
+  const a = v.accident, k = coqueAccident(v.type.modele), q = v.quat;
+  if (a.feu > 0) { // retournée, elle brûle... puis explose
+    v.feu.scale.setScalar(entre(1.2, 1.8));
+    if ((a.feu -= dt) <= 0) { v.roquettes = Infinity; exploserVoiture(v); }
+  }
+  if (a.dort) return;
+  a.duree += dt;
+  let pire = null, touche = false;   // pire : le choc le plus fort contre le sol [vitesse, point et direction dans le repère de la voiture, largeur, roue]
+  const noter = (choc, P, D, largeur, roue = null) => { if (choc > 3 && (!pire || choc > pire[0])) pire = [choc, P, D, largeur, roue]; };
+  const n = 4, h = dt / n, P = V3();
+  for (let s = 0; s < n; s++) {
+    a.vel.y -= R_.graviteVoiture * h;
+    a.c.addScaledVector(a.vel, h);
+    Q_.set(a.rot.x * h / 2, a.rot.y * h / 2, a.rot.z * h / 2, 0).multiply(q);   // elle tourne un peu
+    q.set(q.x + Q_.x, q.y + Q_.y, q.z + Q_.z, q.w + Q_.w).normalize();
+    // le sol, sous chaque roue et chaque coin
+    let monte = 0;
+    [...k.roues, ...k.coins].forEach((p, i) => {
+      const roue = i < k.roues.length ? v.roues[i] : null;
+      P.copy(p).setY(p.y + (roue?.crevee ? v.forme.roue * 0.2 : 0) - k.cg).applyQuaternion(q).add(a.c);
+      const dedans = hauteurSol(P.x, P.z, P.y) - P.y;
+      if (dedans <= 0) return;
+      touche = true; monte = Math.max(monte, dedans);
+      const choc = toucher(v, P, HAUT, 0.25, roue ? 0.75 : 0.5, roue ? V3(0, 0, 1).applyQuaternion(q) : null);
+      noter(choc, p, versVoiture(v, HAUT, true), 1.2, roue);
+    });
+    a.c.y += monte;
+  }
+  // vue du ciel, elle garde sa file de cercles, le long de son axe : pour les murs, les lampadaires et les autres voitures
+  const f = V3(0, 0, 1).applyQuaternion(q);
+  if (Math.hypot(f.x, f.z) > 0.2) v.angle = Math.atan2(f.x, f.z);
+  const cercle = lz => ({ x: a.c.x + Math.sin(v.angle) * lz, z: a.c.z + Math.cos(v.angle) * lz, y: a.c.y - k.cg });
+  for (const lz of v.cercles) {
+    const c = cercle(lz), avant = { ...c };
+    faucher(v, c, a.vel.x, a.vel.z);
+    if (!resoudre(c, v.rayon)) continue;
+    const px = c.x - avant.x, pz = c.z - avant.z, l = Math.hypot(px, pz) || 1, N = V3(px / l, 0, pz / l);
+    a.c.x += px; a.c.z += pz;
+    const choc = toucher(v, P.set(avant.x, a.c.y, avant.z), N, 0.3, 0.4);
+    if (choc > 3) abimer(v, versVoiture(v, V3(avant.x - N.x * v.rayon, a.c.y, avant.z - N.z * v.rayon)), versVoiture(v, N, true), (choc - 3) * 0.03);   // comme un choc sur la route
+  }
+  for (const o of voitures) {
+    if (o === v || o.coule || dist(o, a.c) > (v.forme.longueur + o.forme.longueur) / 2 + 1 || Math.abs(o.y - v.y) > 2.5) continue;
+    for (const lz of v.cercles) for (const oz of o.cercles) {
+      const A = cercle(lz), B = o.accident ? { x: o.accident.c.x + Math.sin(o.angle) * oz, z: o.accident.c.z + Math.cos(o.angle) * oz } : local(o, 0, oz);
+      const d = dist(A, B), r = v.rayon + o.rayon;
+      if (d >= r || d === 0) continue;
+      const N = V3((A.x - B.x) / d, 0, (A.z - B.z) / d), rel = a.vel.clone().sub(vitesseDe(o)).dot(N);
+      a.c.addScaledVector(N, r - d);
+      if (rel >= 0) continue;
+      const mv = masse(v), mo = masse(o), j = -1.3 * rel, C = V3((A.x + B.x) / 2, a.c.y, (A.z + B.z) / 2);
+      pousser(v, C, N.clone().multiplyScalar(j * mo / (mv + mo)));
+      heurter(o, C, N.clone().multiplyScalar(-j * mv / (mv + mo)));
+      if (-rel > 3) { // les deux carrosseries s'enfoncent
+        abimer(v, versVoiture(v, C), versVoiture(v, N, true), (-rel - 3) * 0.03);
+        abimer(o, versVoiture(o, C.setY(o.y + o.forme.garde + 0.3)), versVoiture(o, N.clone().negate(), true), (-rel - 3) * 0.03);
+      }
+    }
+  }
+  if (pire) { // le choc le plus fort cabosse la carrosserie là où il a tapé, ou tord la roue
+    const [choc, Pl, D, largeur, roue] = pire;
+    if (roue) tordreRoue(roue, (choc - 3) * 0.03); else abimer(v, Pl, D, (choc - 3) * 0.08, false, largeur);
+  }
+  // la voiture pour le reste du jeu : où elle est (le bas de ses roues), et à quelle vitesse elle avance
+  const o = V3(0, -k.cg, 0).applyQuaternion(q).add(a.c);
+  v.x = o.x; v.y = o.y; v.z = o.z; v.vitesse = a.vel.x * Math.sin(v.angle) + a.vel.z * Math.cos(v.angle);
+  if (a.c.y < EAU && profondeur(a.c.x, a.c.z) > 1.1) { finirAccident(v); return; }   // dans l'eau profonde : elle coule
+  // calmée : arrêtée, ou bien droite sur ses roues, sans tourner ni glisser de côté (on reprend alors la main, même si elle roule)
+  const haut = V3(0, 1, 0).applyQuaternion(q).y, glisse = Math.abs(a.vel.dot(V3(1, 0, 0).applyQuaternion(q)));
+  const stable = haut > 0.9 && a.rot.length() < 0.8 && glisse < 2 && Math.abs(a.vel.y) < 1;
+  a.calme = touche && (stable || (a.vel.length() < 0.7 && a.rot.length() < 0.7)) ? a.calme + dt : 0;
+  if (a.calme < 0.3 && a.duree < 12) return;
+  // arrêtée : le conducteur sort, secoué (un civil s'enfuit, un policier attaque)
+  if (a.conducteur) {
+    const p = local(v, v.rayon + 0.8, 0), c = creerPersonne(v.police ? 'flic' : 'pieton', p.x, p.z);
+    resoudre(c, 0.35); if (v.police) c.alerte = true; else c.peur = 8;
+    a.conducteur = null;
+  }
+  if (haut > 0.75) { finirAccident(v); return; }   // sur ses roues : on repart
+  a.dort = true;
+  if (v.detruite || a.feu) return;
+  // sur le côté ou sur le toit : elle prend feu
+  a.feu = R_.feuRetournee;
+  v.feu = new THREE.Sprite(M_FLASH); v.feu.position.set(0, v.forme.garde ?? 0.3, v.forme.longueur * 0.3); v.m.add(v.feu);
+  if (v === J.voiture) annonce(tr('AU FEU !'), tr('Ta voiture est retournée : sors vite (touche E) avant qu\'elle explose !'), 3);
+}
+// la voiture retombe sur ses roues : elle redevient une voiture normale, qui roule (et s'éteint si elle brûlait)
+function finirAccident(v) {
+  const a = v.accident, f = V3(0, 0, 1).applyQuaternion(v.quat), g = V3(1, 0, 0).applyQuaternion(v.quat);
+  if (a.feu > 0) { v.m.remove(v.feu); v.feu = null; }
+  Object.assign(v, { angle: Math.atan2(f.x, f.z), tangage: Math.asin(clamp(f.y, -1, 1)), roulis: Math.asin(clamp(g.y, -1, 1)), vy: 0, quat: null, accident: null, vol: false, enAir: false });
 }
 
 // =====================================================================
@@ -3242,14 +3539,17 @@ function exploserVoiture(v, pos = v) {
   if (estBlindee(v) && ++v.roquettes <= R_.roquettesBlindage) { // le blindage encaisse : ça cabosse, mais ça tient
     const P = versLocal(v, pos.x - v.x, pos.z - v.z), l = Math.hypot(P.x, P.z) || 1;
     abimer(v, V3(P.x / l * v.forme.largeur / 2, v.forme.hauteur * 0.5, P.z / l * v.forme.longueur / 2), V3(-P.x / l, -0.2, -P.z / l), 0.6);
+    souffler(v, pos, 0.35);   // soulevée, secouée, mais elle retombe presque toujours sur ses roues
     if (v === J.voiture) annonce('', R_.roquettesBlindage - v.roquettes > 0 ? tr('Le blindage tient ! (encore {n} roquettes)', { n: R_.roquettesBlindage - v.roquettes }) : tr('Le blindage est à bout : la prochaine roquette la fait sauter !'), 2.5);
     return;
   }
   toutCasser(v);   // les vitres volent en éclats et les pièces partent
+  if (v === J.voiture) sortirVoiture();
   v.detruite = 0.001; v.conducteur = null; v.vitesse = 0; v.gyro = null;
   v.m.traverse(o => { if (o.isMesh) o.material = mat('#1c1a18', { roughness: 1 }); }); // carcasse brûlée
+  if (v.feu) v.m.remove(v.feu);   // elle brûlait déjà (retournée) : le grand feu prend la place du petit
   v.feu = new THREE.Sprite(M_FLASH); v.feu.position.y = 1.3; v.m.add(v.feu);
-  if (v === J.voiture) sortirVoiture();
+  souffler(v, pos, 1);   // la carcasse vole en tournoyant
   exploser(new THREE.Vector3(v.x, v.y + 1, v.z), 7, 150, R_.degatsExplosion);
 }
 // roquettes : elles volent tout droit et explosent sur le premier mur, voiture ou personnage touché, ou par terre
@@ -3969,7 +4269,7 @@ function ascenseurProche() {
 }
 function action() {
   if (J.mort) return;
-  if (J.voiture) { if (!J.voiture.rail) sortirVoiture(); return; }   // pas en plein looping !
+  if (J.voiture) { if (!J.voiture.rail && !(J.voiture.accident && !J.voiture.accident.dort)) sortirVoiture(); return; }   // pas en plein looping, ni pendant les tonneaux !
   if (J.robot) { sortirRobot(); return; }
   const s = standProche();
   if (s) { acheter(s); return; }
@@ -3988,7 +4288,7 @@ function action() {
 // la voiture dans laquelle on peut monter : la plus proche, si on est à moins de 1,30 m de son bout
 function voitureProche() {
   let v = null, best = Infinity;
-  for (const o of voitures) { const d = dist(o, J); if (d < best && d < o.forme.longueur / 2 + 1.3 && !o.detruite && !o.coule && Math.abs(o.y - J.y) < 2.5) { best = d; v = o; } }
+  for (const o of voitures) { const d = dist(o, J); if (d < best && d < o.forme.longueur / 2 + 1.3 && !o.detruite && !o.coule && !o.accident && Math.abs(o.y - J.y) < 2.5) { best = d; v = o; } }
   return v;
 }
 const garagisteProche = () => garagistes.find(g => dist(g, J) < 2.5 && Math.abs(g.y - J.y) < 1.5);
@@ -4034,7 +4334,7 @@ function entrerVoiture(v) {
 }
 function sortirVoiture() {
   const v = J.voiture;
-  if (v.rail) { v.rail = null; v.vol = true; }   // en plein looping (une explosion, la mort) : la voiture tombe
+  if (v.rail) commencerAccident(v);   // en plein looping (une explosion, la mort) : la voiture tombe
   for (const lx of [v.rayon + 0.85, -v.rayon - 0.85]) {
     const p = local(v, lx, 0);
     if (!dansBatiment(p.x, v.y + 1, p.z)) { J.x = p.x; J.z = p.z; break; }
@@ -4078,8 +4378,9 @@ function tirer(a = ARMES[J.arme]) {
     if (hit || t < Infinity) {
       const u = hit?.object.userData || {}, p = u.personne;
       if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
-      const vc = !p && u.voiture;
-      if (vc) { // une voiture : un petit trou dans la tôle, et la vitre touchée se fêle (puis se brise)
+      const vc = !p && u.voiture, roue = vc && vc.roues.find(r => r.tourne === hit.object.parent);
+      if (roue) crever(vc, roue);   // un pneu : il éclate
+      else if (vc) { // une voiture : un petit trou dans la tôle, et la vitre touchée se fêle (puis se brise)
         const q = vc.m.quaternion.clone().invert();
         abimer(vc, vc.m.worldToLocal(hit.point.clone()), raycaster.ray.direction.clone().applyQuaternion(q), a.degats / 400, true);
       }
@@ -4208,15 +4509,18 @@ function conduire(v, dt) {
     if (touches.Space) v.vitesse *= Math.pow(0.05, dt); // frein à main
     if (!t.bateau) v.vitesse -= R_.graviteVoiture * Math.sin(v.tangage) * dt;   // la pente freine en montée et pousse en descente
   }
-  // un moteur abîmé (l'avant) ne pousse plus aussi vite
-  if (!v.rail) v.vitesse = clamp(v.vitesse, -10, t.vitesse * lourd * (1 - 0.45 * v.degats.avant));
+  // un moteur abîmé (l'avant) ne pousse plus aussi vite, et chaque pneu crevé freine
+  const crevees = v.roues.filter(r => r.crevee);
+  if (!v.rail) v.vitesse = clamp(v.vitesse, -10, t.vitesse * lourd * (1 - 0.45 * v.degats.avant) * (1 - 0.15 * crevees.length));
   v.gaz = gaz * Math.sign(v.vitesse || gaz) > 0 ? 1 : 0;   // on accélère (pour le bruit du moteur) : pas quand on freine
   const braquage = clamp(Math.abs(v.vitesse) / 6, 0, 1) * (1 - Math.abs(v.vitesse) / t.vitesse * 0.5) * Math.sign(v.vitesse) * (auSol ? 1 : 0);
-  // des roues avant tordues tirent la voiture d'un côté : il faut tenir le volant
-  const avant = v.roues.filter(r => r.avant), tire = avant.reduce((s, r) => s + (r.pince || 0), 0) / (avant.length || 1) / 0.45 * 0.6;
+  // des roues avant tordues, ou un pneu crevé, tirent la voiture d'un côté : il faut tenir le volant
+  const avant = v.roues.filter(r => r.avant), tire = avant.reduce((s, r) => s + (r.pince || 0), 0) / (avant.length || 1) / 0.45 * 0.6
+    + crevees.reduce((s, r) => s + Math.sign(r.pivot.position.x) * 0.25, 0);
   v.angle -= (volant - tire) * 1.9 * t.virage * braquage * dt * (touches.Space ? 1.6 : 1);
   v.braque = -volant * 0.45;
-  if (v.rail || entrerRail(v)) roulerRail(v, dt); else bougerVoiture(v, dt, true);
+  if (v.accident) majAccident(v, dt);   // en plein accident : plus rien ne répond
+  else if (v.rail || entrerRail(v)) roulerRail(v, dt); else bougerVoiture(v, dt, true);
   J.x = v.x; J.z = v.z; J.y = v.y; J.vitesse = Math.abs(v.vitesse);
   if (v.forme.siege) { // sur un tricycle ou un bateau, on voit B.J. assis
     if (v.quat) { v.m.updateMatrixWorld(); joueurH.g.position.copy(v.m.localToWorld(V3(0, v.forme.siege[0] - 0.95, v.forme.siege[1]))); joueurH.g.quaternion.copy(v.quat); }
@@ -4238,6 +4542,10 @@ function bougerVoiture(v, dt, parJoueur) {
     const c = local(v, 0, lz), avant = { ...c };
     // la hauteur du cercle : un bateau est plus bas (il se cogne aux pontons et aux piliers des ponts) ; sur une rampe, l'avant est plus haut
     c.y = v.type.bateau ? v.y - 1 : Math.max(v.y + lz * Math.sin(v.tangage), pisteSous(c.x, c.z, v.y + 1.2));
+    for (const e of faucher(v, c, vx, vz)) { // un lampadaire renversé : il freine un peu, et fait un petit creux étroit
+      const P = versVoiture(v, V3(e.x, v.y + 0.7, e.z));
+      v.vitesse *= 0.85; abimer(v, P, V3(-P.x, 0, -P.z).normalize(), 0.12, false, 0.3);
+    }
     if (resoudre(c, v.rayon)) {
       const px = c.x - avant.x, pz = c.z - avant.z, l = Math.hypot(px, pz) || 1;
       v.x += px; v.z += pz; choc = true;
@@ -4251,9 +4559,27 @@ function bougerVoiture(v, dt, parJoueur) {
       if (d < r && d > 0) {
         const nx = (a.x - b.x) / d, nz = (a.z - b.z) / d;
         v.x += nx * (r - d); v.z += nz * (r - d); choc = true;
-        noter((a.x + b.x) / 2, (a.z + b.z) / 2, nx, nz, -((vx - Math.sin(o.angle) * o.vitesse) * nx + (vz - Math.cos(o.angle) * o.vitesse) * nz), o);
+        const w = vitesseDe(o);
+        noter((a.x + b.x) / 2, (a.z + b.z) / 2, nx, nz, -((vx - w.x) * nx + (vz - w.z) * nz), o);
       }
     }
+  }
+  // les bornes en béton : trop basses pour arrêter la voiture comme un mur, elles tapent dans le bas de caisse
+  const sous = bornesSous(v);
+  if (!sous.length) v.borne = null;
+  for (const b of sous) {
+    if (b === v.borne) continue;   // déjà passée dessus
+    const s = Math.abs(v.vitesse), sg = Math.sign(v.vitesse) || 1;
+    if (s < 4) { v.x = ax; v.z = az; v.vitesse = 0; break; }   // tout doucement : on bute contre
+    v.borne = b;
+    const P = versVoiture(v, V3(b.bx, b.h, b.bz)), L = v.forme.longueur / 2;
+    abimer(v, V3(P.x, v.forme.garde, clamp(P.z, -L, L)), V3(0, 0.6, -sg * 0.8), s * 0.025, false, 0.4);   // le dessous et le bas du pare-chocs
+    // ça la fait décoller : plus elle va vite, plus elle monte, le nez en l'air. Si la borne tape d'un côté, elle se renverse de l'autre
+    const dv = V3(-Math.sin(v.angle) * sg * s * 0.25, s * 0.25, -Math.cos(v.angle) * sg * s * 0.25);
+    if (!heurter(v, V3(v.x, v.y + coqueAccident(v.type.modele).cg, v.z), dv)) { v.vy += dv.y; v.vitesse *= 0.7; continue; }   // doucement : un petit saut
+    const q = v.quat;
+    v.accident.rot.addScaledVector(V3(1, 0, 0).applyQuaternion(q), -sg * s * 0.06).addScaledVector(V3(0, 0, 1).applyQuaternion(q), clamp(P.x / (v.forme.largeur / 2), -1, 1) * s * 0.12 * R_.forceTonneaux);
+    return;
   }
   for (const o of robots) { // le heavy robot : aussi solide qu'un mur
     if (Math.abs(o.y - v.y) > 3) continue;
@@ -4264,12 +4590,21 @@ function bougerVoiture(v, dt, parJoueur) {
   }
   if (choc) {
     // au moment du choc, la carrosserie s'enfonce là où ça a tapé (et celle de l'autre voiture aussi)
+    // à la hauteur du pare-chocs de l'autre voiture : un fourgon enfonce une Porsche au niveau des vitres
     if (!v.choc && pire && pire[4] > 3) {
       const [x, z, nx, nz, vn, o] = pire, f = (vn - 3) * 0.03;
-      for (const [w, sg] of o ? [[v, 1], [o, -1]] : [[v, 1]]) {
-        const P = versLocal(w, x - w.x, z - w.z), D = versLocal(w, nx * sg, nz * sg);
-        abimer(w, V3(P.x, w.forme.garde + 0.35, P.z), V3(D.x, 0, D.z), f);
+      for (const [w, sg, autre] of o ? [[v, 1, o], [o, -1, v]] : [[v, 1, v]]) {
+        const h = clamp(autre.forme.garde + 0.35, w.forme.garde + 0.1, w.forme.hauteur - 0.4);
+        abimer(w, versVoiture(w, V3(x, w.y + h, z)), versVoiture(w, V3(nx * sg, 0, nz * sg), true), f);
       }
+    }
+    // un gros choc : les deux voitures partent en accident. La plus légère prend le plus gros coup. Le coup est donné à la hauteur
+    // du centre de gravité : il la fait tourner sur elle-même s'il tape un bout, et c'est heurter qui la renverse
+    if (!v.choc && pire && pire[4] > R_.seuilAccident) {
+      const [x, z, nx, nz, vn, o] = pire, N = V3(nx, 0, nz), part = o ? masse(o) / (masse(v) + masse(o)) : 1;
+      const P = w => V3(x, w.y + coqueAccident(w.type.modele).cg, z);
+      if (o) heurter(o, P(o), N.clone().multiplyScalar(-1.3 * vn * (1 - part)));
+      if (heurter(v, P(v), N.multiplyScalar(1.3 * vn * part))) { v.choc = true; return; }
     }
     if (!v.choc && Math.abs(v.vitesse) > 6) { bruit(Math.min(0.8, Math.abs(v.vitesse) / 30), 500, 0.35); v.vitesse *= 0.35; }
     v.vitesse *= Math.pow(0.2, dt);
@@ -4290,7 +4625,7 @@ function poserVoiture(v, dt) {
   } else if (v.coule) {
     v.coule += dt; v.vitesse *= Math.pow(0.1, dt);
     v.y = Math.max(hauteurSol(v.x, v.z), v.y - dt * 0.6);
-  } else if (!v.rail) {
+  } else if (!v.rail && !v.accident) { // (en accident, majAccident la déplace)
     const L = v.forme.longueur * 0.4, W = v.forme.largeur * 0.4, y = v.y + PASMAX;
     const h = (lx, lz) => { const p = local(v, lx, lz); return hauteurSol(p.x, p.z, y); };
     const av = h(0, L), ar = h(0, -L), ga = h(W, 0), dr = h(-W, 0), hc = hauteurSol(v.x, v.z, y), sol = Math.max(hc, (av + ar) / 2);
@@ -4323,11 +4658,6 @@ function poserVoiture(v, dt) {
 function atterrir(v, impact, pente) {
   let rebond = impact > 3 ? impact * 0.2 : 0;
   const m = v.forme, d = v.tangage - pente;   // d < 0 : le nez tape en premier
-  if (v.quat) { // elle retombe à l'envers ou sur le côté : le toit s'écrase, puis elle se remet sur ses roues
-    const haut = V3(0, 1, 0).applyQuaternion(v.quat);
-    v.quat = null; v.tangage = pente; v.roulis = 0;
-    if (haut.y < 0.5) { abimer(v, V3(0, m.hauteur, 0), V3(0, -1, 0), 0.3 + impact * 0.03); v.vitesse *= 0.3; rebond = 3; }
-  }
   if (impact > 7) { // trop fort : ça cogne
     const f = (impact - 7) * 0.05;
     if (Math.abs(d) > 0.3) abimer(v, V3(0, m.garde + 0.2, Math.sign(-d) * m.longueur / 2), V3(0, 0.5, Math.sign(d)).normalize(), f);
@@ -4373,9 +4703,7 @@ function roulerRail(v, dt) {
   }
   const q = pointRail(r, R.s), devant = q.t.clone().multiplyScalar(R.sens);
   if (v.vitesse ** 2 * q.kn + g * q.n.y < 0) { // pas assez vite : la piste ne la retient plus, elle tombe
-    const f = V3(Math.sin(v.angle), 0, Math.cos(v.angle)), vit = devant.multiplyScalar(v.vitesse);
-    v.rail = null; v.vol = v.enAir = true; v.decollage = null;
-    v.vitesse = vit.x * f.x + vit.z * f.z; v.vy = vit.y;   // elle garde son élan, et tombe comme elle est (peut-être à l'envers)
+    commencerAccident(v);   // elle garde son élan, et tombe comme elle est (peut-être à l'envers)
     annonce('', tr("Pas assez d'élan !"), 2);
     return;
   }
@@ -4562,25 +4890,28 @@ function majVoiture(v, dt) {
   v.m.visible = d < 350;
   if (v.gyro) { const on = Math.sin(temps * 14) > 0; v.gyro[0].material.emissiveIntensity = on ? 4 : 0.1; v.gyro[1].material.emissiveIntensity = on ? 0.1 : 4; }
   if (v === J.voiture) {}
+  else if (v.accident) majAccident(v, dt);
   else if (v.conducteur) majVoitureIA(v, dt);
   else if (Math.abs(v.vitesse) > 0.05) { v.vitesse *= Math.pow(0.3, dt); bougerVoiture(v, dt, false); }
   if (!v.conducteur && v !== J.voiture) v.braque = 0;
+  let affaisse = 0, penche = 0;   // les pneus crevés : la voiture s'affaisse de leur côté
   for (const r of v.roues) { // elle roule, braque (à l'avant), et si elle est tordue : elle penche, elle part de travers, elle se dandine
     r.tourne.rotation.x += v.vitesse * dt / v.forme.roue; r.tourne.rotation.z = r.voile || 0;
     if (r.avant) r.b = (r.b || 0) + (v.braque - (r.b || 0)) * Math.min(1, dt * 8);
     r.pivot.rotation.y = (r.b || 0) + (r.pince || 0); r.pivot.rotation.z = r.carrossage || 0;
+    if (r.crevee) { affaisse += Math.sign(r.pivot.position.z) * 0.03; penche -= Math.sign(r.pivot.position.x) * 0.04; }
   }
-  // un moteur très abîmé fume : gris, puis noir
-  if (v.degats.avant > 0.5 && !v.detruite && !v.coule && d < 150 && (v.tFumee = (v.tFumee || 0) - dt) <= 0) {
+  // un moteur très abîmé fume : gris, puis noir (noir aussi quand elle brûle, retournée)
+  if ((v.degats.avant > 0.5 || v.accident?.feu > 0) && !v.detruite && !v.coule && d < 150 && (v.tFumee = (v.tFumee || 0) - dt) <= 0) {
     v.tFumee = 0.12; v.m.updateMatrixWorld();
-    const f = new THREE.Sprite(M_FUMEE.clone()); f.material.color.set(v.degats.avant > 0.8 ? '#2a2a2a' : '#b0b0b0');
+    const f = new THREE.Sprite(M_FUMEE.clone()); f.material.color.set(v.degats.avant > 0.8 || v.accident?.feu > 0 ? '#2a2a2a' : '#b0b0b0');
     f.position.copy(v.m.localToWorld(V3(entre(-0.3, 0.3), v.forme.garde + 0.75, v.forme.longueur * 0.32))); scene.add(f); effets.push({ o: f, vie: 1.2, fumee: 1.2 });
   }
   // la carrosserie pique du nez quand on freine, se cabre quand on accélère et penche dans les virages
   if (dt > 0) {
     const k = Math.min(1, dt * 6), pousse = (v.vitesse - v.avant.vitesse) / dt, virage = diffAngle(v.avant.angle, v.angle) / dt * v.vitesse;
-    v.corps.rotation.x += (clamp(-pousse * 0.003, -0.05, 0.05) - v.corps.rotation.x) * k;
-    v.corps.rotation.z += (clamp(virage * 0.004, -0.07, 0.07) - v.corps.rotation.z) * k;
+    v.corps.rotation.x += (clamp(-pousse * 0.003, -0.05, 0.05) + affaisse - v.corps.rotation.x) * k;
+    v.corps.rotation.z += (clamp(virage * 0.004, -0.07, 0.07) + penche - v.corps.rotation.z) * k;
   }
   v.avant = { vitesse: v.vitesse, angle: v.angle };
   if (v.forme.siege && !v.pilote !== !v.conducteur) { // un tricycle qui roule tout seul montre son pilote
@@ -4591,7 +4922,7 @@ function majVoiture(v, dt) {
     } else { v.corps.remove(v.pilote.g); v.pilote = null; }
   }
   poserVoiture(v, dt);
-  if (v.conducteur === 'civil' && (d > 280 || (d > 120 && derriere(v)))) v.supprimer = true;
+  if ((v.conducteur === 'civil' || v.epave) && (d > 280 || (d > 120 && derriere(v)))) v.supprimer = true;
   if (v.coule > 25 && d > 60) v.supprimer = true;
   if (v.police && v.renfort && !v.conducteur && v !== J.voiture && d > 150) v.supprimer = true;
   if (v.detruite) { // elle brûle 12 s, et la carcasse disparaît au bout de 40 s quand on ne la voit plus
@@ -4750,6 +5081,7 @@ function placerCamera(pivot, direction, distance, epaule) {
 const DEMI_TOUR = new THREE.Quaternion().setFromAxisAngle(V3(0, 1, 0), Math.PI);   // la caméra regarde vers -z, la voiture vers +z
 function majCamera(dt) {
   const v = J.voiture;
+  if (v?.accident) J.decalage = diffAngle(v.angle, J.lacetCam);   // la voiture tourne sur elle-même : la caméra, elle, ne tourne pas avec
   J.lacetCam = v ? v.angle + J.decalage : J.lacet;
   const dir = new THREE.Vector3(Math.sin(J.lacetCam) * Math.cos(J.tangage), Math.sin(J.tangage), Math.cos(J.lacetCam) * Math.cos(J.tangage));
   joueurH.g.visible = (!v || !!v.forme.siege) && J.vue !== 1;   // en voiture on ne voit pas B.J., sauf sur un tricycle
@@ -5000,7 +5332,7 @@ function mettreAJour(dt) {
     bip(600, 1200, 0.15, 'sine', 0.3);
     if (o.reapparait) { o.cache = o.delai || 60; o.m.visible = false; } else o.supprimer = true;
   }
-  majRoquettes(dt); majDebris(dt);
+  majRoquettes(dt); majDebris(dt); majLampadaires(dt);
   // au garage LS Customs, une voiture abîmée est réparée (gratuitement)
   if (J.voiture?.abimee && lieux.G && dist(J.voiture, lieuProche('G', J)) < 9) { habillerVoiture(J.voiture); annonce('LS CUSTOMS', tr('Voiture réparée !'), 2.5); bip(600, 1200, 0.3, 'sine', 0.3); }
   for (const e of effets) {
@@ -5071,7 +5403,7 @@ etat('Clique pour jouer');
 // pour les tests automatiques
 window.jeu = { J, joueurH, criMJ, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
-  CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris,
+  CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
   exploser, blesserJoueur, cibleMission, V3, ARMES_ROBOT, robotProche, ENSEIGNES,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },

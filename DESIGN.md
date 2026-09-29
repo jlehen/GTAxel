@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 29 septembre 2026 (braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard ; police en force à 4 et 5 étoiles, heavy robot pilotable ; codes de triche `IDKFA`, `MISSION` + numéro, `GOKU`, Super Saiyan, et `Z6PO` ou `C3PO`, un robot doré plus lent et plus solide ; menu des langues : français, allemand, anglais et züritüütsch, enseignes comprises ; légende de la grande carte ; foule au choix dans le menu, piétons et voitures : Peu, Normal, Beaucoup ou Énorme, Beaucoup au départ).
+Mis à jour le 29 septembre 2026 (braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard ; police en force à 4 et 5 étoiles, heavy robot pilotable ; codes de triche `IDKFA`, `MISSION` + numéro, `GOKU`, Super Saiyan, et `Z6PO` ou `C3PO`, un robot doré plus lent et plus solide ; menu des langues : français, allemand, anglais et züritüütsch, enseignes comprises ; légende de la grande carte ; foule au choix dans le menu, piétons et voitures : Peu, Normal, Beaucoup ou Énorme, Beaucoup au départ ; accidents : tonneaux, tête-à-queue et voitures qui décollent selon la force du choc, voiture couchée qui brûle puis explose, carrosserie qui s'écrase là où ça tape et d'autant plus que c'est fort, vitres brisées sombres avec des éclats, lampadaires qui tombent, bornes en béton autour des places, pneus qui crèvent sous les balles).
 
 ## Vision
 
@@ -115,7 +115,7 @@ La carte compte 314 pâtés, dont 155 d'immeubles, 55 de maisons, 25 de tours et
 | `I` | 2 ou 4 immeubles de 3 à 10 étages, en brique, béton ou modernes |
 | `M` | 4 maisons avec pelouse et arbres, 1 voiture garée |
 | `P` | Pelouse, allées pavées, fontaine, jusqu'à 14 arbres, 1 trousse de soin |
-| `.` `X` `a`–`z` | Place pavée avec 4 arbres et 2 voitures garées. `X` est le départ, les minuscules sont les lieux de mission |
+| `.` `X` `a`–`z` | Place pavée avec 4 arbres et 2 voitures garées, entourée de bornes en béton (une tous les 3 m, à 3 m du bord, sauf sur 12 m au milieu de chaque côté pour entrer en voiture). `X` est le départ, les minuscules sont les lieux de mission |
 | `A` `H` `C` `S` `G` `K` `Z` `E` `L` `O` `R` `J` `F` `D` `N` `B` `W` | Pâtés où l'on peut entrer (tableau plus bas) |
 | `U` `V` `Q` | Pâtés à braquer, où l'on entre aussi : musée, bijouterie, grande banque (voir « Braquages ») |
 | `~` | Eau : mer, lac ou rivière |
@@ -156,7 +156,7 @@ Deux stations-service isolées bordent les grandes routes, et la maison de Frank
 
 ### Les routes
 
-- **En ville**, les rues longent chaque pâté, avec trottoirs de 20 cm, lampadaires tous les 18 m et passages piétons à chaque carrefour. Une rue qui traverse l'eau (`+`) est un pont avec des garde-fous.
+- **En ville**, les rues longent chaque pâté, avec trottoirs de 20 cm, lampadaires tous les 18 m (une voiture lancée les renverse) et passages piétons à chaque carrefour. Une rue qui traverse l'eau (`+`) est un pont avec des garde-fous.
 - **À la campagne**, les cases `=` et `#` qui se touchent (même en diagonale) forment des routes de 10 m de large, arrondies dans les virages. Le bout d'une route se branche sur le coin de pâté le plus proche, dans son prolongement. Les grandes routes :
   - la **Great Ocean Highway**, qui longe la côte ouest de Los Santos à Paleto Bay, avec deux ponts ;
   - la **Senora Freeway**, qui monte de Los Santos à Sandy Shores, puis à Grapeseed et Paleto Bay par la côte nord ;
@@ -270,6 +270,7 @@ Il y a 8 armes, dont 2 au départ (poings et couteau). Le pistolet, la mitraille
 - Les coups de poing et de couteau touchent l'ennemi le plus proche devant soi, jusqu'à 50° de côté.
 - La dispersion est divisée par 2 en visant et doublée en courant.
 - Renverser quelqu'un avec une voiture à plus de 14 km/h fait 200 dégâts.
+- **Pneus** : une balle dans un pneu le crève (pas sur une voiture blindée). À plus de 50 km/h, la voiture part en tête-à-queue : de quoi arrêter une voiture de police (voir « Accidents »).
 - **Fusil de sniper** : une balle suffit pour un piéton, un policier ou un soldat. Il en faut 3 pour le Kommandant (2 à la tête) et 6 pour Hitler (3 à la tête). Dans la lunette, la balle s'écarte d'au plus 13 cm à 200 m ; sans viser, d'au plus 37 cm à 50 m. Un nazi touché de loin est alerté, mais il ne tire que s'il voit B.J. à moins de 45 m : on peut l'abattre sans risque, par l'entrée du bunker ou la porte du château.
 - **Bazooka** : la roquette part du canon vers le viseur et vole tout droit à 20 m/s (`vitesseRoquette`), plus vite que B.J. qui court (8 m/s). Elle explose sur le premier mur ou voiture qu'elle touche, si elle passe à moins de 1 m du milieu du corps d'un personnage, par terre si on vise le sol, ou au bout de 150 m. Les dégâts baissent avec la distance à l'explosion, jusqu'à 0 à 6 m ; il n'y a pas de bonus à la tête. L'explosion blesse aussi B.J. s'il est trop près (jusqu'à 40 points s'il est collé) et fait exploser les voitures à moins de 6 m. Un personnage tué par une explosion compte comme s'il avait été abattu : un piéton ou un policier donne une étoile.
 
@@ -415,12 +416,14 @@ Il y a 6 types de voitures, la voiture et le fourgon blindé de la police, et 2 
 - La direction ne répond pas à l'arrêt. Elle est la plus vive vers 20 km/h, puis deux fois moins à pleine vitesse.
 - Les roues avant braquent quand on tourne. La carrosserie pique du nez au freinage, se cabre à l'accélération et penche dans les virages (4° au plus).
 - Le frein à main (Espace) freine fort et serre le virage.
-- Contre un mur ou une autre voiture, au-dessus de 22 km/h, il y a un bruit de choc et la voiture perd 65 % de sa vitesse. Au-dessus de 11 km/h (vers le mur), elle s'abîme (voir « Dégâts »).
+- Contre un mur ou une autre voiture, au-dessus de 22 km/h, il y a un bruit de choc et la voiture perd 65 % de sa vitesse. Au-dessus de 11 km/h (vers le mur), elle s'abîme (voir « Dégâts ») ; au-dessus de 40 km/h, c'est l'accident (voir « Accidents »).
+- **Lampadaires** : au-dessus de 11 km/h, la voiture les renverse. Chacun lui fait perdre 15 % de sa vitesse et un petit creux étroit (0,12). Il tombe dans le sens où elle roule, reste par terre, et se relève quand B.J. est à plus de 300 m. Plus doucement, il arrête la voiture comme un mur.
+- **Bornes en béton** (voir « Les signes de la carte ») : hautes de 45 cm (`hauteurBornes`), elles tapent dans le bas de caisse. Sous 14 km/h, elles arrêtent la voiture. Plus vite, elles abîment le dessous et le bas du pare-chocs (0,025 par m/s) et la font sauter : elle monte à 25 % de sa vitesse et en perd 25 % (30 % sous 31 km/h, pour un petit saut). Au-dessus de 8,5 m/s (31 km/h), c'est un accident : elle décolle le nez en l'air (0,06 × sa vitesse, en radians par seconde), et si la borne tape d'un côté, elle se renverse de l'autre (jusqu'à 0,12 × sa vitesse). Le 4x4 et le fourgon, 50 cm sous la caisse, passent au-dessus sans rien sentir.
 - En descendant, le joueur sort du côté qui n'est pas contre un mur. La voiture continue sur son élan puis s'arrête.
 - **Pentes** : la voiture suit le sol et penche avec lui, en avant et sur le côté. La pente la freine en montée et la pousse en descente (`graviteVoiture`, 9,8 m/s², × le sinus de la pente) : une classique monte la route du château sans peine.
 - **Sauts** : la voiture tombe avec la vraie gravité (9,8 m/s², `graviteVoiture`). Elle décolle quand le sol descend plus vite qu'elle ne tombe : au bout d'un tremplin, en haut d'une bosse ou d'une côte prise vite, un peu en montant sur un trottoir. Au bout d'un tremplin, elle garde tout l'élan de la rampe, même quand ses roues avant sont déjà dans le vide. En l'air, ni gaz, ni frein, ni volant, et son nez suit peu à peu la trajectoire. Un saut de moins de 30 cm ne compte pas : les amortisseurs le prennent, et on garde la main.
 - **Retomber** : elle rebondit un peu (20 % de la vitesse du choc, au-dessus de 3 m/s). Au-dessus de 7 m/s (une chute de 2,5 m sur du plat), elle s'abîme : ses roues se tordent, et l'avant ou l'arrière se cabosse si elle retombe sur le nez ou sur l'arrière (penchée de plus de 17° par rapport au sol). Retomber sur une rampe dans le sens de la pente ne fait presque rien. Après plus de 0,8 s en l'air, « SAUT ! » annonce la longueur du saut.
-- **Loopings et tire-bouchons** : la voiture y roule comme sur des rails, sur son élan : ni moteur, ni frein, ni volant, et la pente la ralentit en montant. Elle reste plaquée tant que (vitesse² × courbure) + (9,8 × la part de la piste tournée vers le haut) reste positif. En haut d'un looping de 9 m, il faut 9,4 m/s, donc au moins 76 km/h en bas ; en haut du tire-bouchon, 9,2 m/s, soit environ 60 km/h en bas. Sinon, elle tombe (« Pas assez d'élan ! ») comme elle est, souvent sur le toit : le toit s'écrase, les vitres éclatent, puis elle se remet d'un coup sur ses roues. Trop lente avant d'être à la verticale, elle redescend en arrière. À la sortie, « LOOPING ! » ou « TIRE-BOUCHON ! » s'affiche. On y entre par un bout ou par l'autre, en avant ou en marche arrière. En vue intérieure (V), la caméra tourne avec la voiture.
+- **Loopings et tire-bouchons** : la voiture y roule comme sur des rails, sur son élan : ni moteur, ni frein, ni volant, et la pente la ralentit en montant. Elle reste plaquée tant que (vitesse² × courbure) + (9,8 × la part de la piste tournée vers le haut) reste positif. En haut d'un looping de 9 m, il faut 9,4 m/s, donc au moins 76 km/h en bas ; en haut du tire-bouchon, 9,2 m/s, soit environ 60 km/h en bas. Sinon, elle tombe (« Pas assez d'élan ! ») comme elle est, souvent sur le toit : c'est un accident (voir « Accidents »). Le toit s'écrase, et si elle reste sur le toit, elle prend feu puis explose. Trop lente avant d'être à la verticale, elle redescend en arrière. À la sortie, « LOOPING ! » ou « TIRE-BOUCHON ! » s'affiche. On y entre par un bout ou par l'autre, en avant ou en marche arrière. En vue intérieure (V), la caméra tourne avec la voiture.
 - **Dans l'eau** : à plus de 40 cm d'eau, la voiture freine fort. À plus de 1,10 m, elle coule : B.J. en sort à la nage, et on ne peut plus y remonter. Elle disparaît au bout de 25 s, quand le joueur est à plus de 60 m.
 
 ### Protection
@@ -446,20 +449,54 @@ Une voiture a cinq côtés, qui s'abîment de 0 (neuve) à 1 (épave) : l'avant,
 | --- | --- |
 | Choc contre un mur, un pilier, une voiture | (vitesse vers l'obstacle − 3 m/s) × 0,03 : 0,2 à 36 km/h, 0,5 à 72 km/h, 0,8 à 108 km/h. Frotter un mur en biais abîme peu. L'autre voiture prend autant, de son côté |
 | Retomber à plus de 7 m/s | (vitesse − 7) × 0,05 à l'avant ou à l'arrière si elle tombe sur le nez ou l'arrière ; la moitié aux roues |
-| Retomber sur le toit | 0,3 + 0,03 par m/s au toit |
-| Une balle | Dégâts de l'arme ÷ 2 000 (0,02 au pistolet), un petit creux de 3 cm, et la vitre la plus proche (à moins de 80 cm) se fêle, puis se brise. Rien sur une voiture blindée |
+| Pendant un accident, taper le sol à plus de 3 m/s | (vitesse − 3) × 0,08, là où elle a tapé : le toit, un flanc, un coin (le coup le plus fort de chaque image). Une roue qui tape se tord. Contre un mur ou une voiture, c'est comme sur la route |
+| Un lampadaire renversé | 0,12, sur 30 cm de large |
+| Une borne en béton | 0,025 par m/s, au dessous et au bas du pare-chocs |
+| Une balle | Dégâts de l'arme ÷ 2 000 (0,02 au pistolet), un petit creux de 3 cm, et la vitre la plus proche (à moins de 80 cm) se fêle, puis se brise. Rien sur une voiture blindée. Une balle dans un pneu le crève (voir « Accidents ») |
 | Une roquette | Tout casse, et la voiture explose (voir plus bas) |
 
 Ce qui se voit :
 
-- **Tôle** : la carrosserie s'enfonce autour du choc, sur 0,5 à 1,2 m, de 60 % de la force en mètres (40 cm au plus d'un coup, 45 cm en tout), et elle se froisse. Chaque choc fait sa bosse : une voiture peut être cabossée à plusieurs endroits.
-- **Vitres** : un choc de plus de 0,08 près d'une vitre la fêle (des fissures blanches) ; une vitre déjà fêlée, ou un choc de plus de 0,3, la brise : elle tombe en éclats. Un côté abîmé à plus de 0,7 brise toutes ses vitres, et un toit à plus de 0,4 les brise toutes.
+- **Tôle** : ce qui tape pousse la carrosserie comme un bélier arrondi, de 80 % de la force en mètres (19 cm à 40 km/h, 41 cm à 72 km/h, 65 cm à 108 km/h contre un mur). Ce qui dépasse devant lui est aplati, le reste se froisse, et le capot ou le coffre gondole vers le haut. Le bélier est large de 0,5 m + 0,7 m par point de force pour un mur ou une voiture, de 30 cm pour un lampadaire, de 1,2 m pour le sol. On compte depuis la tôle telle qu'elle est : un deuxième choc au même endroit enfonce plus loin, jusqu'à 90 cm à l'avant et à l'arrière (le capot, le coffre) et 50 cm sur les flancs et le toit. Chaque choc fait sa bosse : une voiture peut être cabossée à plusieurs endroits.
+- **Hauteur du choc** : contre un mur, la voiture tape à 35 cm au-dessus du bas de sa caisse. Contre une autre voiture, chacune tape à la hauteur du pare-chocs de l'autre : un fourgon ou un 4x4 enfonce une Porsche au niveau des vitres, une Porsche enfonce le bas d'un fourgon.
+- **Vitres** : un choc de plus de 0,08 près d'une vitre la fêle (des fissures blanches) ; une vitre déjà fêlée, ou un choc de plus de 0,3, la brise : elle tombe en éclats, et à sa place on voit le trou sombre de l'habitacle, avec des bouts de verre pointus restés coincés dans le cadre. Un côté abîmé à plus de 0,7 brise toutes ses vitres, et un toit à plus de 0,4 les brise toutes.
 - **Pièces qui partent** : les pare-chocs et leur plaque (avant ou arrière, à partir de 0,45 à 0,65), les rétroviseurs (sur le côté, 0,25 à 0,45), l'aileron de la Porsche, et sur le 4x4 le pare-buffle, la roue de secours et la galerie du toit. Elles volent, rebondissent, puis restent 30 s par terre.
 - **Phares** : ils s'éteignent quand l'avant passe 0,35 ; les feux arrière, quand l'arrière passe 0,35.
 - **Roues** : un choc à moins de 1,5 m d'une roue la tord : elle part de travers (jusqu'à 11°), penche et se dandine en tournant. Des roues avant tordues tirent la voiture d'un côté : il faut tenir le volant. Une chute trop dure tord les quatre.
 - **Moteur** : quand l'avant est abîmé, la vitesse maximale baisse (−45 % pour une épave). Au-dessus de 0,5, le moteur fume gris ; au-dessus de 0,8, noir.
-- **Réparer** : entrer en voiture dans un garage LS Customs la répare, gratuitement (« Voiture réparée ! »).
-- Une voiture n'explose jamais à force de chocs : on peut rouler avec une épave.
+- **Pneus crevés** : la roue s'aplatit, la voiture s'affaisse de ce côté, tire de ce côté (il faut tenir le volant) et perd 15 % de sa vitesse maximale par pneu crevé.
+- **Réparer** : entrer en voiture dans un garage LS Customs la répare, gratuitement (« Voiture réparée ! »), pneus compris.
+- Une voiture n'explose jamais à force de chocs : on peut rouler avec une épave. Seule une voiture couchée sur le côté ou sur le toit prend feu, puis explose.
+
+### Accidents
+
+Un gros choc, un souffle d'explosion, une borne prise vite, un pneu qui crève à grande vitesse ou une chute de looping : la voiture n'est plus tenue par ses roues. Elle vole, tourne, rebondit et glisse comme une vraie boîte, avec son poids et sa forme, puis s'arrête. Pendant ce temps, ni gaz, ni frein, ni volant, et on ne peut pas descendre. Toutes les voitures, celle de B.J. comprise, font des accidents de la même façon.
+
+| Ce qui arrive | Quand | Ce que ça fait |
+| --- | --- | --- |
+| Choc contre une voiture | À plus de 40 km/h l'une vers l'autre (`seuilAccident`, 11 m/s) | Les deux voitures sont repoussées : chacune change de vitesse de 1,3 × la vitesse du choc, partagée selon leur poids (la plus légère prend le plus gros coup). Le coup, donné à la hauteur du centre de gravité, la fait tourner sur elle-même s'il tape un bout. La voiture tapée de côté se renverse dans le sens du coup : ses pneus accrochent la route, le haut continue |
+| Choc contre un mur | À plus de 40 km/h vers le mur | Elle rebondit (30 % de sa vitesse vers le mur), pivote si elle tape d'un coin, se renverse si elle tape de biais |
+| Explosion à côté | Toujours | La carcasse monte à 7 à 10 m/s en tournoyant, poussée à 4 m/s loin de l'explosion (moins haut pour une voiture lourde). Une voiture blindée qui encaisse est soulevée 3 fois moins fort, et retombe presque toujours sur ses roues |
+| Borne en béton | À plus de 31 km/h | Elle décolle, le nez en l'air, et se renverse si la borne tape d'un côté |
+| Balle dans un pneu | À plus de 50 km/h (`vitesseCrevaison`, 14 m/s) | Tête-à-queue du côté du pneu crevé (au départ, un tour en 3 s à 90 km/h), et un coup de côté pris au hasard : parfois, elle se renverse |
+| Chute de looping ou de tire-bouchon | Pas assez d'élan | Elle tombe comme elle est, avec sa vitesse |
+
+- **Le poids** : en gros, le volume de la voiture (longueur × largeur × hauteur), une fois et demie plus pour une voiture blindée. Un fourgon pèse 3 Porsche : il renverse une Porsche, une Porsche rebondit sur lui.
+- **Ce qui la fait tourner** : un coup qui ne passe pas par son milieu. Elle tourne facilement autour de sa longueur (les tonneaux), moins bien sur elle-même ou d'avant en arrière. Un coup de côté la fait en plus basculer dans le sens du coup, de 0,15 radian par seconde par m/s de coup (plus ou moins 40 %, au hasard), fois `forceTonneaux` (1) : 0 = elle glisse sans jamais se retourner, 2 = deux fois plus fort. Une voiture haute et étroite (le minibus) se renverse bien plus facilement qu'une voiture basse et large (la Porsche).
+- **Mesuré** : une voiture garée prend un coup de côté (5 essais par case, le hasard du coup change à chaque fois). « 2/5 » : elle a basculé (sur le côté ou plus loin) 2 fois sur 5 ; souvent, elle fait un tour complet et retombe sur ses roues. Une voiture qui en tape une autre pareille de côté à 72 km/h lui donne un coup d'environ 13 m/s, à 100 km/h d'environ 18 m/s.
+
+| Coup de côté | 7 m/s | 10 m/s | 13 m/s | 17 m/s | 21 m/s |
+| --- | --- | --- | --- | --- | --- |
+| Minibus | 3/5 | 5/5 | 5/5 | 5/5 | 5/5 |
+| Classique | 0/5 | 1/5 | 2/5 | 4/5 | 4/5 |
+| Porsche | 0/5 | 0/5 | 1/5 | 3/5 | 3/5 |
+
+- **Ce qui touche** : le bas de ses 4 roues (3 pour le tricycle), les 8 coins de sa caisse et les 4 coins de son toit. Ils rebondissent un peu (25 %) sur le sol. Les roues frottent fort de côté (0,75) et presque pas dans le sens où elles roulent (0,03) ; la tôle frotte moyennement (0,5). Vue du ciel, elle garde sa file de cercles contre les murs, les lampadaires et les autres voitures, qu'elle pousse (et peut faire partir en accident à leur tour : carambolage).
+- **Les dégâts** : chaque image, le coup le plus fort contre le sol (au-dessus de 3 m/s) cabosse la carrosserie là où il a tapé : le toit quand elle retombe à l'envers, un flanc quand elle roule sur le côté.
+- **La fin** : dès qu'elle est droite sur ses roues, sans tourner ni glisser de côté, depuis 0,3 s, on reprend la main, même si elle roule encore. Sinon, il faut qu'elle soit arrêtée (ou que l'accident dure depuis 12 s). Le conducteur d'une autre voiture en sort alors, secoué : un civil s'enfuit, un policier attaque.
+- **Couchée sur le côté ou sur le toit** : elle prend feu (« AU FEU ! », de la fumée noire), et explose au bout de 5 s (`feuRetournee`). Il faut en sortir avant (E). On ne monte pas dans une voiture en plein accident ni couchée. Si un autre choc la remet sur ses roues avant, le feu s'éteint.
+- **La caméra** ne tourne pas avec la voiture pendant l'accident ; en vue intérieure (V), on tourne avec elle.
+- Dans l'eau profonde, l'accident s'arrête : la voiture coule, comme d'habitude. Une épave de la circulation disparaît quand B.J. est loin, comme les voitures qui circulent.
 
 ### Explosions
 
@@ -469,11 +506,12 @@ Une voiture explose quand une roquette explose à côté d'elle (6 m pour celle 
 - Les voitures à moins de 7 m explosent à leur tour : on peut faire sauter toute une file.
 - Si B.J. est dedans, il est éjecté avant l'explosion.
 - Toutes ses vitres volent en éclats, ses pièces partent en l'air et sa tôle s'enfonce des quatre côtés.
-- Il reste une carcasse noire, qui brûle 12 s. On ne peut plus monter dedans. Elle disparaît au bout de 40 s, quand le joueur est à plus de 60 m.
+- Il reste une carcasse noire, qui brûle 12 s. Le souffle la fait voler en tournoyant (voir « Accidents »). On ne peut plus monter dedans. Elle disparaît au bout de 40 s, quand le joueur est à plus de 60 m.
+- Une voiture couchée sur le côté ou sur le toit explose d'elle-même au bout de 5 s, blindée ou pas.
 
 ### Ce que les voitures ne font pas (encore)
 
-Les balles les cabossent et cassent leurs vitres, mais ne les font pas exploser. Elles ne font pas de tonneaux et ne dérapent pas. Les portes ne s'ouvrent pas. On ne voit personne dans les voitures fermées : seul le pilote d'un tricycle est visible. Il n'y a pas de klaxon, et les feux arrière ne s'allument pas plus fort au freinage.
+Les balles les cabossent, cassent leurs vitres et crèvent leurs pneus, mais ne les font pas exploser. Elles ne dérapent pas dans les virages. Les portes ne s'ouvrent pas. On ne voit personne dans les voitures fermées : seul le pilote d'un tricycle est visible. Il n'y a pas de klaxon, et les feux arrière ne s'allument pas plus fort au freinage.
 
 ## Missions et progression
 
@@ -623,7 +661,7 @@ L'écran reprend la disposition de GTA 5 : mini-carte ronde en bas à gauche, ar
 | Bas centre | Objectif | Texte de l'étape de mission en cours |
 | Centre | Viseur | Un point blanc, avec une arme à feu, en visant, en 1re personne ou dans le heavy robot. Caché dans la lunette et en nageant |
 | Plein écran | Lunette | Un rond avec deux traits en croix et du noir autour, en visant avec le fusil de sniper. Le reste de l'écran (mini-carte, argent) s'affiche par-dessus |
-| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? », « SAUT ! 35 m », « LOOPING ! », « Pas assez d'élan ! », « Voiture réparée ! », « MAD MAX ! », « ALARME ! », « BUTIN ! », « LASER TOUCHÉ ! », « COFFRE-FORT PERCÉ ! », « BOUM ! », « HEAVY ROBOT ! », « MISSION 8 », ce que dit le garagiste |
+| Haut centre | Annonces | « MISSION RÉUSSIE », « +50 vie », « Gilet pare-balles ! », « Tu as semé la police ! », « BRAQUAGE ! », « WHO'S BAD ? », « SAUT ! 35 m », « LOOPING ! », « Pas assez d'élan ! », « AU FEU ! » (voiture retournée), « Voiture réparée ! », « MAD MAX ! », « ALARME ! », « BUTIN ! », « LASER TOUCHÉ ! », « COFFRE-FORT PERCÉ ! », « BOUM ! », « HEAVY ROBOT ! », « MISSION 8 », ce que dit le garagiste |
 | Bas droite | Compteur | Vitesse en km/h, en voiture seulement |
 | Plein écran | Bords rouges | Quand le joueur est touché |
 | Plein écran | Fumée | Un voile vert-gris dans la fumée toxique de la bijouterie, léger avec le masque à gaz |
@@ -676,7 +714,8 @@ Le jeu parle 4 langues : français, allemand (Deutsch), anglais (English) et zü
 - **Explosions** : un gros boum grave, plus faible de loin.
 - **Moteur** : chaque type de véhicule a le sien (tableau ci-dessous). Le son monte dans chaque rapport, puis retombe quand on passe le suivant. Il est plus fort et plus clair quand on accélère que quand on lève le pied.
 - **Voitures des autres** : on entend le moteur de la voiture qui roule le plus près, à moins de 40 m.
-- **Roulement et pneus** : un souffle grave qui monte avec la vitesse, un crissement au frein à main au-dessus de 22 km/h, un bruit de choc.
+- **Roulement et pneus** : un souffle grave qui monte avec la vitesse, un crissement au frein à main au-dessus de 22 km/h, un bruit de choc, un « pan » quand un pneu crève.
+- **Lampadaire renversé** : un choc métallique qui descend (« clang »).
 - **Dégâts** : un bruit de tôle, d'autant plus fort que le choc est fort ; un tintement quand une vitre se fêle, un bruit de verre quand elle se brise ; un choc sourd quand la voiture retombe trop fort.
 - **Pause** : le menu et la grande carte coupent tous les sons.
 - **Police** : sirène à deux tons, plus forte quand la voiture approche.
@@ -703,38 +742,39 @@ Polices de caractères : Anton pour les titres et les chiffres, Roboto Condensed
 
 ## Architecture technique
 
-Tout le jeu tient dans `index.html`, environ 5 000 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
+Tout le jeu tient dans `index.html`, environ 5 400 lignes. Il n'y a ni installation, ni compilation, ni fichier image ou son. Le moteur 3D [Three.js](https://threejs.org) 0.186 est chargé depuis Internet (jsDelivr). Le site est publié par GitHub Pages depuis la branche `main`.
 
 ### Plan du fichier
 
 | Lignes | Partie | Rôle |
 | --- | --- | --- |
 | 1–106 | HTML et CSS | Interface et menu, avec les boutons des langues et de la foule |
-| 107–398 | **Foule et langues** (zones à modifier) | `FOULES` et le choix de la foule (`foule`) ; `LANGUES`, `TRADUCTIONS` ; `tr`, les boutons du menu (`traduireMenu`, `etat`). Un script à part, qui tourne avant le module du jeu |
-| 399–411 | Chargement | Three.js et ses modules |
-| 412–807 | **Zones à modifier** | `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
-| 808–1168 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
-| 1169–1432 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, panneaux, visages, marbre, tableaux, coffres, billets, tôle rouillée dessinés par le programme ; enseignes dans la langue choisie (`enseigne`, `majEnseignes`) ; matières |
-| 1433–2243 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`, dont les trois pâtés à braquer et le garagiste), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion |
-| 2244–2299 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
-| 2300–2455 | Personnages | Corps articulés, pièces des codes de triche (`accessoire`), animations (dont la nage, les trois pas de la danse et la marche raide de Z6PO), armes en 3D |
-| 2456–2794 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 9 modèles (`MODELES`, dont le fourgon blindé), pièces qui partent, carrosserie, cabine, roues, blindage Mad Max (`formesBlindage`, `estBlindee`), `habillerVoiture` |
-| 2795–2941 | Dégâts des voitures | `abimer`, bosses (`bosseler`), vitres, pièces qui partent (`detacher`), roues tordues, morceaux qui volent (`debris`) |
-| 2942–3033 | Sons | Moteurs, roulement, sirène, sonnerie d'alarme, bruits et bips synthétisés, cri de la danse (`criMJ`) |
-| 3034–3296 | Joueur, personnages, objets | Tenues, chapeau de la danse, aura de Goku ; vigiles, policiers d'élite (`creerElite`), chiens (`creerChien`, `animerChien`) ; objets, explosions (la voiture blindée encaisse), roquettes, étincelles, éclats de verre ; prix des stands dans la langue choisie (`etiqueter`) |
-| 3297–3596 | Braquages | Masque à gaz, sac du butin, butin (`creerButin`), pièces qui bougent (`construireBraquage`), alarme (`declencherAlarme`), vol (`voler`), perceuse, explosif, fumée, lasers, mitrailleuses, coffre-fort (`majBraquages`) |
-| 3597–3825 | Heavy robot | Le robot (`creerRobot`), sa marche, son chemin par les rues (`cheminRobot`), ses tirs, sa vitre et son pilote (`toucherRobot`), monter, descendre, piloter (`piloterRobot`), apparition |
-| 3826–4158 | État, clavier, actions | État du jeu, clavier et souris, suite de touches de la danse, triches (`validerTriche`, `rhabillerBJ`, `parTriche`), danse (`danser`, `pasDeDanse`), ascenseur, garagiste (`payerBlindage`), achat, tir (`tirer`, aussi depuis le robot), blessures, mort |
-| 4159–4386 | Mise à jour du joueur | Marche (et vitesse des codes de triche), nage, moonwalk, conduite (plus lourde en voiture blindée), chocs (contre le robot aussi), pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
-| 4387–4678 | Intelligence | Piétons, nazis, vigiles, chiens (`majChien`), circulation sur le réseau des routes, chemin de la police, apparitions (`peupler`, autant que la foule choisie), police à 4 et 5 étoiles (fourgons blindés, heavy robot) |
-| 4679–4779 | Missions, caméra | Enchaînement des étapes, saut de mission (`sauterMission`), vues (dont le robot), tremblement des pas du robot, zoom de la lunette |
-| 4780–4963 | Écran | Repères, image du terrain, plan, mini-carte, grande carte et sa légende (`legendeCarte`), infos, aides et voile de fumée |
-| 4964–5082 | Boucle principale | Mise à jour et affichage de chaque image, garage qui répare, sonnerie d'alarme, aura qui tremble |
+| 107–401 | **Foule et langues** (zones à modifier) | `FOULES` et le choix de la foule (`foule`) ; `LANGUES`, `TRADUCTIONS` ; `tr`, les boutons du menu (`traduireMenu`, `etat`). Un script à part, qui tourne avant le module du jeu |
+| 402–415 | Chargement | Three.js et ses modules |
+| 416–817 | **Zones à modifier** | `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `CARTE`, `NOMS_LIEUX`, `MISSIONS`, `CASCADES`, `TRICHES` |
+| 818–1178 | Outils, géographie | Calculs ; hauteur des cases et des villes, relief (`terrainNaturel`, `hauteurTerrain`), lieux, rues, réseau des routes (`NOEUDS`, `ROUTES`) ; pistes de cascades (`PISTES`, `RAILS`, `pisteSous`) |
+| 1179–1452 | Moteur 3D, textures | Scène, lumières, ciel ; façades, sols, routes, pistes, fêlures, vitres brisées, panneaux, visages, marbre, tableaux, coffres, billets, tôle rouillée dessinés par le programme ; enseignes dans la langue choisie (`enseigne`, `majEnseignes`) ; matières |
+| 1453–2316 | Construction du pays | Morceaux, boîtes, bâtiments visitables (`batiment`), avions, pâtés (`genererBloc`, dont les trois pâtés à braquer, le garagiste et les bornes des places), rues, routes et ponts, pontons, pistes d'aéroport, pistes de cascades, terrain et végétation, eau, fusion ; bornes (`bornesSous`) et lampadaires qui tombent (`faucher`, `renverserLampadaire`, `majLampadaires`) |
+| 2317–2372 | Collisions et sol | `resoudre`, `hauteurSol`, ligne de vue, rayons contre le terrain |
+| 2373–2528 | Personnages | Corps articulés, pièces des codes de triche (`accessoire`), animations (dont la nage, les trois pas de la danse et la marche raide de Z6PO), armes en 3D |
+| 2529–2867 | Voitures et bateaux | Outils pour fabriquer les pièces, coque des bateaux, forme des 9 modèles (`MODELES`, dont le fourgon blindé), pièces qui partent, carrosserie, cabine, roues, blindage Mad Max (`formesBlindage`, `estBlindee`), `habillerVoiture` |
+| 2868–3050 | Dégâts des voitures | `abimer`, formes découpées fin (`copieCabossable`), bosses (`bosseler`, `pli`), vitres, pièces qui partent (`detacher`), roues tordues, pneus crevés (`crever`), morceaux qui volent (`debris`) |
+| 3051–3238 | Accidents | Forme pour les accidents (`coqueAccident`), poids (`masse`), départ (`commencerAccident`), coups (`pousser`, `toucher`, `heurter`, `souffler`), chaque image (`majAccident`), retour sur les roues (`finirAccident`) |
+| 3239–3330 | Sons | Moteurs, roulement, sirène, sonnerie d'alarme, bruits et bips synthétisés, cri de la danse (`criMJ`) |
+| 3331–3596 | Joueur, personnages, objets | Tenues, chapeau de la danse, aura de Goku ; vigiles, policiers d'élite (`creerElite`), chiens (`creerChien`, `animerChien`) ; objets, explosions (la voiture blindée encaisse), roquettes, étincelles, éclats de verre ; prix des stands dans la langue choisie (`etiqueter`) |
+| 3597–3896 | Braquages | Masque à gaz, sac du butin, butin (`creerButin`), pièces qui bougent (`construireBraquage`), alarme (`declencherAlarme`), vol (`voler`), perceuse, explosif, fumée, lasers, mitrailleuses, coffre-fort (`majBraquages`) |
+| 3897–4125 | Heavy robot | Le robot (`creerRobot`), sa marche, son chemin par les rues (`cheminRobot`), ses tirs, sa vitre et son pilote (`toucherRobot`), monter, descendre, piloter (`piloterRobot`), apparition |
+| 4126–4459 | État, clavier, actions | État du jeu, clavier et souris, suite de touches de la danse, triches (`validerTriche`, `rhabillerBJ`, `parTriche`), danse (`danser`, `pasDeDanse`), ascenseur, garagiste (`payerBlindage`), achat, tir (`tirer`, aussi depuis le robot), blessures, mort |
+| 4460–4714 | Mise à jour du joueur | Marche (et vitesse des codes de triche), nage, moonwalk, conduite (plus lourde en voiture blindée, qui tire avec un pneu crevé), chocs (contre le robot aussi, et ceux qui font partir en accident), lampadaires, bornes, pentes, sauts et atterrissages, voitures qui coulent, bateaux, loopings (`entrerRail`, `roulerRail`) |
+| 4715–5009 | Intelligence | Piétons, nazis, vigiles, chiens (`majChien`), circulation sur le réseau des routes, chemin de la police, apparitions (`peupler`, autant que la foule choisie), police à 4 et 5 étoiles (fourgons blindés, heavy robot) |
+| 5010–5111 | Missions, caméra | Enchaînement des étapes, saut de mission (`sauterMission`), vues (dont le robot), tremblement des pas du robot, zoom de la lunette |
+| 5112–5295 | Écran | Repères, image du terrain, plan, mini-carte, grande carte et sa légende (`legendeCarte`), infos, aides et voile de fumée |
+| 5296–5414 | Boucle principale | Mise à jour et affichage de chaque image, lampadaires qui tombent et se relèvent, garage qui répare, sonnerie d'alarme, aura qui tremble |
 
 ### À chaque image
 
 1. Déplacer le joueur, à pied, à la nage, en voiture, en bateau ou dans le heavy robot, et tirer si le bouton est enfoncé.
-2. Faire réfléchir et bouger chaque personnage, puis chaque voiture, et la poser sur le sol (ou sur l'eau), puis chaque heavy robot. Faire vivre les braquages : alarme, fumée, lasers, mitrailleuses, perceuse et explosif.
+2. Faire réfléchir et bouger chaque personnage, puis chaque voiture (en accident, elle vole et tourne toute seule), et la poser sur le sol (ou sur l'eau), puis chaque heavy robot. Faire vivre les braquages : alarme, fumée, lasers, mitrailleuses, perceuse et explosif.
 3. Ramasser les objets touchés par le joueur.
 4. Gérer la police, repeupler autour du joueur, vérifier la mission.
 5. Placer la caméra, mettre à jour l'écran, choisir les morceaux du pays à dessiner, dessiner la scène.
@@ -752,7 +792,9 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Codes de triche** : au chargement, le jeu retient la matière de chaque pièce de B.J. (`userData.habit`). `rhabillerBJ` la lui remet, rend visibles les pièces cachées, remet les tailles à 1 et enlève les pièces ajoutées par les codes (faites avec `accessoire`, reconnues à leur nom), puis applique les codes actifs. Un nouveau code n'a donc qu'à décrire son effet. Les cheveux de Goku sont 13 cônes dorés posés sur la tête, penchés vers le ciel. L'aura est une forme faite au tour, de 2,5 m de haut, dont la lumière s'ajoute à l'image : son dessin, des traits clairs en bas et effacés en haut, glisse vers le haut à chaque image, et sa force tremble au hasard. Le robot arrondit l'avancée de la marche au huitième de pas, et l'angle de son corps à 0,2 radian près : c'est ce qui le fait bouger par à-coups.
 - **Cri de la danse** : il est fabriqué par le programme, comme tous les sons, et non pris sur un disque : la voix de Michael Jackson appartient à ses ayants droit, et le jeu est publié sur Internet. La voix est une note avec ses harmoniques (la 3e, vers 3 000 Hz, donne le son « i »), et le souffle est un bruit filtré autour de 3 000 Hz.
 - **Voitures** : la carrosserie est un profil vu de côté, avec un creux rond au-dessus de chaque roue, étiré sur toute la largeur. Tous ses bords sont arrondis. La cabine est une boîte arrondie, plus étroite et plus courte en haut ; les vitres sont des plaques posées dessus, visibles seulement de dehors, pour qu'on voie à travers en vue intérieure. Les pièces d'un modèle sont fabriquées une seule fois, puis fusionnées par matière : une voiture neuve compte 8 objets pour le corps et 2 par roue. Le tricycle est fait de pièces simples, sans profil ni cabine.
-- **Dégâts** : au premier choc, la voiture reçoit sa propre copie des formes (sans les pièces qui peuvent partir), ses vitres une par une et ses pièces à part : elle passe à une vingtaine d'objets. Une bosse déplace les points de la tôle autour du choc ; chaque point bouge selon sa place de départ, donc deux points collés bougent pareil et la tôle ne se déchire pas. Les triangles qui ont bougé renvoient la lumière chacun à sa façon : c'est ce qui donne l'air froissé. Une pièce qui part est accrochée au monde, là où elle était, et tombe comme un débris. Le garage refait la voiture toute neuve (`habillerVoiture`).
+- **Dégâts** : au premier choc, la voiture reçoit sa propre copie des formes (sans les pièces qui peuvent partir), ses vitres une par une et ses pièces à part : elle passe à une vingtaine d'objets. Ces copies sont découpées en triangles de 25 cm au plus (`TessellateModifier` de Three.js) : une portière ou un capot, qui n'avaient des points qu'à leurs bords, peuvent alors se creuser au milieu. Une bosse (`bosseler`) est un bélier arrondi : on cherche d'abord le point de la tôle le plus avancé face au choc, puis chaque point qui dépasse du bout du bélier y est ramené, gondolé et plié (`pli` : des vagues régulières d'environ 70 cm, pas du bruit au hasard, qui donnait l'air de verre brisé). Les plis dépendent de la place de départ du point, donc deux points collés bougent pareil et la tôle ne se déchire pas. Une vitre brisée garde sa place, avec une image du trou sombre et des éclats restés dans le cadre (`TEX.brisee`). Les triangles qui ont bougé renvoient la lumière chacun à sa façon : c'est ce qui donne l'air froissé. Une pièce qui part est accrochée au monde, là où elle était, et tombe comme un débris. Le garage refait la voiture toute neuve (`habillerVoiture`).
+- **Accidents** : `v.accident` garde le centre de gravité de la voiture (`c`), sa vitesse (`vel`) et sa rotation (`rot`, un axe dont la longueur dit combien de radians par seconde) ; `v.quat` dit comment elle est tournée. `majAccident` avance en 4 petits pas par image : la gravité, puis chaque point de `coqueAccident` (roues, coins de la caisse et du toit) qui est sous le sol reçoit une poussée vers le haut à cet endroit (`toucher`), avec rebond et frottement, calculée avec l'inertie d'une boîte de la taille de la voiture (`selonInertie`) : c'est ce qui la fait tourner. Les murs et les autres voitures sont vus du ciel, avec sa file de cercles. `heurter` donne un coup à n'importe quelle voiture et la fait partir en accident s'il dépasse 3 m/s ; `souffler`, le souffle d'une explosion. `finirAccident` la rend à la conduite normale (angle, pente et penchant tirés de `v.quat`).
+- **Lampadaires et bornes** : ils sont dessinés en lots (un objet pour tous ceux d'un morceau). Un lampadaire renversé est caché dans son lot (taille 0), sa boîte de collision coupée, et une copie bascule autour de son pied. Une borne a une boîte de collision marquée `borne`, qui n'est ni un mur ni un sol : seule `bornesSous` la voit.
 - **Terrain** : une grille de points tous les 9,25 m (8 par case), dont la hauteur est calculée une fois au chargement (`HT`), puis creusée sous les routes. Chaque carré est fait de deux triangles ; `hauteurTerrain` retrouve la hauteur exacte du triangle dessiné, pour que personne ne flotte ni ne s'enfonce. Les couleurs du sol sont posées sur chaque point, puis teintent un grain gris.
 - **Hauteur du sol** : `hauteurSol(x, z, y)` prend la plus haute de ces surfaces : terrain, trottoir d'un pâté, rue, route ou pont de campagne. Si on lui donne la hauteur des pieds (`y`), elle compte aussi les planchers, marches, toits et meubles qui ne dépassent pas de plus de 60 cm : c'est ce qui fait marcher les escaliers. Un pont ne compte que si on est dessus, pas si on nage dessous.
 - **Routes de campagne** : chaque suite de cases `=` ou `#` devient une ligne de points, arrondie trois fois (on coupe chaque coin au quart et aux trois quarts). Les routes et les rues forment un seul réseau de points reliés (`NOEUDS`) : les voitures qui roulent seules le suivent, et la police y cherche le chemin le plus court vers le joueur (algorithme de Dijkstra). Les morceaux de route sont rangés dans une grille de 25 m, pour trouver vite la route sous une voiture.
@@ -773,7 +815,7 @@ Quand la grande carte est ouverte, ces étapes sont sautées : seule la carte es
 - **Heavy robot** : un modèle articulé (bassin, torse, bras, hanches, genoux, pieds), comme les personnages, avec un policier assis dedans. Il est rangé à part (`robots`), avec sa propre marche, ses tirs et ses dégâts. Pour tirer depuis le robot, `tirer` reçoit l'arme du robot (`ARMES_ROBOT`) au lieu de celle de B.J. ; les balles partent de ses canons, et le rayon ignore le robot lui-même. Une roquette ignore le robot qui l'a tirée.
 - **Langues** : le code du jeu est écrit en français, et la phrase française sert de clé : `tr('Il te faut {prix} $', { prix })` cherche la phrase dans `TRADUCTIONS`, prend la traduction dans la langue choisie (sinon le français), puis met les valeurs à la place des `{...}`. Les tableaux (`ARMES`, `VOITURES`, `MISSIONS`, `TRICHES`, `NOMS_LIEUX`...) gardent leurs noms français, qui servent aussi à les retrouver (`indexArme`, `typeNomme`) ; on ne les traduit qu'au moment de les afficher. Le menu est du HTML : chaque texte garde sa version française dans `data-fr` (`traduireMenu`). `LANGUES`, `TRADUCTIONS`, `tr` et les boutons sont dans un petit script à part, avant le module du jeu : il tourne tout de suite, sans attendre Three.js, et le module s'en sert. Les boutons de la foule y sont aussi, avec `FOULES` et le choix `foule`, que `peupler` relit toutes les demi-secondes ; le choix est gardé dans le `localStorage` (`foule-pietons`, `foule-voitures`). Un choix du premier lancement renommé ou enlevé de `FOULES` est remplacé par le premier du tableau. L'écran est réécrit à chaque image, donc il suit la langue tout seul ; les prix des stands et les enseignes sont dessinés dans des images, redessinées dans la nouvelle langue quand on quitte le menu (`etiqueter`, et `majEnseignes` : chaque enseigne est redessinée sur sa propre image, qui garde sa place dans les bâtiments fusionnés). La langue est gardée dans le `localStorage` du navigateur.
 - **Garde-fous pour le bidouilleur** : une alerte s'affiche si une ligne de `CARTE` n'a pas la bonne longueur, si une mission vise un lieu absent de la carte, si une voiture demande un modèle qui n'existe pas, ou si une piste de cascades a un morceau inconnu.
-- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, les codes `IDKFA` et `MISSION`, les codes `GOKU` et `Z6PO` (vitesse du robot, balles, alias `C3PO`, annulation), le blindage chez le garagiste (sans et avec assez d'argent), la voiture blindée sous les balles et les roquettes, les trois braquages de bout en bout (butin, alarme, vigiles et chiens, fumée avec et sans masque, lasers et mitrailleuses, perceuse, explosif, planque avec et sans police), les fourgons blindés à 4 étoiles, le heavy robot à 5 étoiles (il tire, sa vitre casse, on éjecte le pilote, on le pilote, on tire, on descend), la foule (boutons, choix gardé après un rechargement, nombre de piétons et de voitures pour chaque choix, à l'arrêt et en traversant la ville à 90 km/h), les langues (boutons pendant le chargement, menu, objectif, arme, aide devant un stand, codes de triche, garagiste, argent, prix des stands, enseignes redessinées en quittant le menu, grande carte et sa légende, langue gardée après un rechargement ; et une vérification du tableau `TRADUCTIONS` : chaque `tr(...)` a sa ligne, chaque ligne a ses trois langues), et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
+- **Tests** : `window.jeu` donne accès à l'état du jeu. Des scripts hors dépôt pilotent Chromium sans écran pour vérifier la conduite de chaque véhicule, la circulation (en ville et à la campagne), les tirs, les explosions, la police, les triches, la mort, les escaliers, l'ascenseur, la nage, la voiture qui coule, le bateau, les pentes, le braquage, l'enchaînement des premières missions, le looping (réussi à 90 km/h, raté à 50 km/h), le tire-bouchon, le premier tremplin, un choc contre un immeuble, une balle dans le pare-brise et la réparation au garage, les accidents (choc de côté à 72 km/h contre une Porsche garée, mur à 100 km/h, explosion, pneu crevé à 90 km/h, voiture lâchée sur le toit qui brûle puis explose, lampadaire, rangée de bornes) et des photos des dégâts, les codes `IDKFA` et `MISSION`, les codes `GOKU` et `Z6PO` (vitesse du robot, balles, alias `C3PO`, annulation), le blindage chez le garagiste (sans et avec assez d'argent), la voiture blindée sous les balles et les roquettes, les trois braquages de bout en bout (butin, alarme, vigiles et chiens, fumée avec et sans masque, lasers et mitrailleuses, perceuse, explosif, planque avec et sans police), les fourgons blindés à 4 étoiles, le heavy robot à 5 étoiles (il tire, sa vitre casse, on éjecte le pilote, on le pilote, on tire, on descend), la foule (boutons, choix gardé après un rechargement, nombre de piétons et de voitures pour chaque choix, à l'arrêt et en traversant la ville à 90 km/h), les langues (boutons pendant le chargement, menu, objectif, arme, aide devant un stand, codes de triche, garagiste, argent, prix des stands, enseignes redessinées en quittant le menu, grande carte et sa légende, langue gardée après un rechargement ; et une vérification du tableau `TRADUCTIONS` : chaque `tr(...)` a sa ligne, chaque ligne a ses trois langues), et pour prendre des vues du pays avec une caméra libre. Les sons de moteur sont fabriqués hors ligne puis mesurés (note, volume).
 
 ## Limites connues et pistes
 
@@ -786,7 +828,9 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - En 3e personne, la caméra est à l'étroit dans les petites pièces (la caravane de Trevor) : la vue à la 1re personne (V) y est plus confortable.
 - La route du château est raide (environ 30 %) : la carte n'a pas la place pour des lacets. Les pentes autour des villes perchées sont des falaises de roche.
 - Les rambardes des ponts de campagne ne retiennent pas les voitures. On ne se fait pas mal en tombant, même du haut du gratte-ciel, et B.J. ne prend rien quand sa voiture s'écrase.
-- Les voitures ne dérapent pas : elles tournent aussi bien à toute vitesse. Un virage relevé penche, mais ne permet pas d'aller plus vite. Elles ne font pas de tonneaux : retombée sur le toit, une voiture se remet d'un coup sur ses roues.
+- Les voitures ne dérapent pas : elles tournent aussi bien à toute vitesse. Un virage relevé penche, mais ne permet pas d'aller plus vite. Elles ne glissent de côté que pendant un accident.
+- Accidents : vue du ciel, une voiture accidentée reste une file de cercles le long de son axe, même dressée sur le nez ; contre un mur, elle ne se renverse donc pas par-dessus. Elle ne voit pas les bornes, et les voitures qui roulent toutes seules ne la voient pas non plus (elles s'arrêtent derrière, puis font demi-tour). Pendant l'accident, la souris ne tourne pas la caméra. Rien ne blesse B.J. dans les tonneaux : seule l'explosion d'une voiture retournée le touche.
+- Les piétons et B.J. traversent les bornes en béton. Un lampadaire tombé ne gêne personne, et les voitures qui roulent toutes seules ne renversent pas les lampadaires.
 - Dans un looping ou un tire-bouchon, la voiture ne peut ni accélérer ni tourner, et reste à la même place dans la largeur de la piste.
 - Une piste de cascades est à une seule hauteur : sur un terrain en pente, elle creuse ou remblaie beaucoup. Rien n'empêche deux morceaux de se croiser, et une piste peut passer dans une ville ou dans l'eau.
 - Les pièces tombées et les éclats de vitre traversent les voitures. Les voitures qui roulent toutes seules ne vont pas sur les pistes, et ne s'abîment que si on les tape.
@@ -795,7 +839,7 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Foule : baisser la foule pendant une pause n'enlève personne d'un coup : les piétons et les voitures en trop disparaissent en s'éloignant (200 m et 280 m). Après avoir roulé vite, un demi-tour montre une rue vide : ceux qui étaient derrière ont disparu. Avec Énorme, un vieil ordinateur peut ramer : chaque piéton est fait d'une vingtaine de pièces.
 - Les bateaux ne circulent pas tout seuls, et la police ne va pas sur l'eau : en bateau, on la sème facilement.
 - Le soleil est fixe : il n'y a ni nuit ni météo.
-- Seules les explosions détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture ou un bateau, et la police (65 km/h) ne rattrape aucun véhicule lancé à fond, pas même le tricycle (72 km/h). Seuls les fourgons blindés (122 km/h, à partir de 4 étoiles) rattrapent les voitures lentes ; ils ne foncent pas dans la voiture de B.J. pour l'arrêter, et il n'y a pas de barrages.
+- Seules les explosions et le feu d'une voiture retournée détruisent les voitures (pas les balles), on ne peut pas tirer depuis une voiture ou un bateau, et la police (65 km/h) ne rattrape aucun véhicule lancé à fond, pas même le tricycle (72 km/h). Seuls les fourgons blindés (122 km/h, à partir de 4 étoiles) rattrapent les voitures lentes ; ils ne foncent pas dans la voiture de B.J. pour l'arrêter, et il n'y a pas de barrages.
 - Les voitures qui roulent toutes seules ne regardent que le milieu des autres : une limousine peut couper un virage et mordre sur le trottoir.
 - Sur un tricycle ou un bateau, B.J. garde son arme à la main.
 - Codes de triche : Goku garde les yeux et les sourcils de B.J. (pas les yeux verts du Super Saiyan), et le chapeau de la danse passe à travers ses cheveux. Z6PO nage, alors que le vrai robot coulerait.
@@ -817,7 +861,8 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 
 - Tir par la fenêtre, klaxon.
 - Chrono et records sur les pistes de cascades, une mission de cascades.
-- Une voiture trop abîmée qui prend feu puis explose, comme dans GTA.
+- Une voiture trop abîmée (pas seulement retournée) qui prend feu puis explose, comme dans GTA.
+- Des blessures pour B.J. dans les gros accidents, un pare-brise qu'on traverse.
 - Des dérapages dans les virages pris trop vite : les virages relevés serviraient alors vraiment.
 - Roquettes à acheter à l'armurerie.
 - Sauvegarde de l'argent, des armes et des missions dans le navigateur.
