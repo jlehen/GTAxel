@@ -256,6 +256,7 @@ const TRADUCTIONS = {
   'Bébé !':           { de: 'Baby!', en: 'Baby!', gsw: 'Bébé!' },
   'San Goku, Super Saiyan !': { de: 'Son Goku, Super-Saiyajin!', en: 'Goku, Super Saiyan!', gsw: 'Son Goku, Super-Saiyajin!' },
   'Z6PO, le robot doré': { de: 'C-3PO, der goldene Roboter', en: 'C-3PO, the golden robot', gsw: 'C-3PO, de goldig Roboter' },
+  'Invincible !':     { de: 'Unbesiegbar!', en: 'Invincible!', gsw: 'Unbsiegbar!' },
   'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
   'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
   // les annonces
@@ -784,9 +785,9 @@ const CASCADES = [
 //  CODES DE TRICHE : appuie sur Entrée, tape le code, puis Entrée
 //  Ceux qui ont un « effet » changent l'apparence de B.J. (b) : retape le code pour annuler l'effet.
 //  Ceux qui ont une « action » la font tout de suite. Un nombre tapé après le code est donné à l'action (MISSION8 → 8).
-//  alias : un autre code qui fait la même chose.
+//  alias : un autre code qui fait la même chose (ou une liste : ['ARMES', 'WAFFEN']).
 //  Ils peuvent aussi changer le jeu : vitesse (0.5 = deux fois plus lent), balles (0.5 = les balles
-//  font moitié moins mal), robot (il bouge par à-coups).
+//  font moitié moins mal), robot (il bouge par à-coups), invincible (plus rien ne fait mal).
 // =====================================================================
 //  Un bras ou une jambe est en deux morceaux (haut et bas) : habillerMembre les colorie ensemble.
 //  Au bout, il y a b.brasD.main ou b.jambeD.chaussure.
@@ -844,9 +845,11 @@ const TRICHES = [
       accessoire(GEO.moustache, '#2a2a2a', b.tete, 0, -0.058, 0.11);   // la bouche : une fente
     } },
   // comme dans Doom : toutes les armes, plein de munitions, le gilet et le masque à gaz
-  { code: 'IDKFA',       texte: 'Toutes les armes, plein de munitions, gilet et masque à gaz !', action: () => {
+  { code: 'IDKFA', alias: ['ARMES', 'WAFFEN', 'WEAPONS'], texte: 'Toutes les armes, plein de munitions, gilet et masque à gaz !', action: () => {
       ARMES.forEach((a, i) => { J.possede[i] = true; if (!a.corps) J.balles[i] = Math.max(J.balles[i], a.munitions * 3); });
       J.gilet = R_.giletMax; J.masque = true; } },
+  // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel
+  { code: 'DIEU', alias: ['GOD', 'GOTT'], texte: 'Invincible !', invincible: true, effet: () => {} },
   // pour tester ce qui coûte cher : 100 000 $ d'un coup (change le nombre pour en avoir plus ou moins)
   { code: 'RICHE',       texte: 'Riche ! +100 000 $',   action: () => { J.argent += 100000; } },
   // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
@@ -4047,7 +4050,7 @@ function majFumee(B, dt) {
   const dedans = J.x > f.x1 && J.x < f.x2 && J.z > f.z1 && J.z < f.z2 && J.y > f.y1 - 0.5 && J.y < f.y2 && !J.voiture;
   if (!dedans || B.densite < 0.15 || J.mort) return;
   J.fumee = Math.max(J.fumee, B.densite);
-  if (J.masque) return;
+  if (J.masque || invincible()) return;
   J.vie -= R_.degatsFumee * B.densite * dt; J.dernierDegat = temps;
   if ((J.toux = (J.toux || 0) - dt) <= 0) { J.toux = 1.2; tousser(); }
   if (J.vie <= 0) mourir();
@@ -4424,7 +4427,7 @@ function validerTriche() {
     return;
   }
   // un code (ou son alias), ou un code avec une action suivi d'un nombre (MISSION8)
-  const t = TRICHES.find(t => [t.code, t.alias].some(c => c?.toUpperCase() === saisie)) || TRICHES.find(t => t.action && /^\d+$/.test(saisie.slice(t.code.length)) && saisie.startsWith(t.code.toUpperCase()));
+  const t = TRICHES.find(t => [t.code, t.alias].flat().some(c => c?.toUpperCase() === saisie)) || TRICHES.find(t => t.action && /^\d+$/.test(saisie.slice(t.code.length)) && saisie.startsWith(t.code.toUpperCase()));
   const n = t && +saisie.slice(t.code.length);
   saisie = null; $('triche').style.display = 'none';
   if (!t) { annonce('', tr('Code inconnu'), 1.5); return; }
@@ -4444,6 +4447,7 @@ function rhabillerBJ() {
 }
 // ce que les codes actifs changent au jeu : leurs nombres se multiplient (1 = rien ne change)
 const parTriche = cle => TRICHES.reduce((k, t) => t.actif && t[cle] !== undefined ? k * t[cle] : k, 1);
+const invincible = () => TRICHES.some(t => t.actif && t.invincible);   // le code DIEU
 // la danse (gauche, arrière, droite, 3 fois de suite) : B.J. se met de profil, pour qu'on voie bien le moonwalk
 const SUITE_DANSE = (R_.touchesDanse.join(' ') + ' ').repeat(3);
 let suite = '';   // les dernières touches tapées
@@ -4677,7 +4681,7 @@ function blesserConducteur(v, degats, parJoueur = true) {
 }
 const abrite = () => J.voiture && !J.voiture.forme.ouvert;   // une carrosserie protège, pas un tricycle
 function blesserJoueur(degats) {
-  if (J.mort || estBlindee(J.voiture)) return;   // dans une voiture blindée, rien ne passe
+  if (J.mort || estBlindee(J.voiture) || invincible()) return;   // dans une voiture blindée, rien ne passe
   const d = degats * (abrite() ? R_.protectionVoiture : J.robot ? R_.protectionRobot : 1), g = Math.min(J.gilet, d); // le gilet prend les dégâts en premier
   J.gilet -= g; J.vie -= d - g;
   J.dernierDegat = temps;
