@@ -3918,7 +3918,7 @@ function souffler(v, pos, force) {
   const a = commencerAccident(v);
   if (!a) return;
   const dx = v.x - pos.x, dz = v.z - pos.z, d = Math.hypot(dx, dz) || 1, k = force * Math.min(1.3, Math.sqrt(12 / masse(v)));   // les lourdes volent moins haut
-  a.vel.add(V3(dx / d * 4 * k, entre(7, 10) * k, dz / d * 4 * k));
+  a.vel.add(V3(dx / d * 4 * k, entre(7, 10) * k, dz / d * 4 * k)); a.duree = 0;   // un nouveau vol : elle a de nouveau 12 s pour se calmer
   a.rot.add(V3(entre(-3, 3), entre(-1.5, 1.5), entre(-3, 3)).multiplyScalar(k * R_.forceTonneaux));
 }
 // chaque image : la voiture accidentée tombe et tourne, touche le sol, les murs et les autres voitures, et finit par s'arrêter
@@ -4005,7 +4005,8 @@ function majAccident(v, dt) {
   const haut = V3(0, 1, 0).applyQuaternion(q).y, glisse = Math.abs(a.vel.dot(V3(1, 0, 0).applyQuaternion(q)));
   const stable = haut > 0.9 && a.rot.length() < 0.8 && glisse < 2 && Math.abs(a.vel.y) < 1;
   a.calme = touche && (stable || (a.vel.length() < 0.7 && a.rot.length() < 0.7)) ? a.calme + dt : 0;
-  if (a.calme < 0.3 && a.duree < 12) return;
+  // au bout de 12 s, on l'arrête comme elle est, si elle est posée et presque arrêtée : jamais en l'air, ni en pleine culbute
+  if (a.calme < 0.3 && (a.duree < 12 || !touche || a.vel.length() > 3 || a.rot.length() > 3)) return;
   // arrêtée : le conducteur sort, secoué (un civil s'enfuit, un policier attaque)
   if (a.conducteur) {
     const p = local(v, v.rayon + 0.8, 0), c = creerPersonne(v.police ? 'flic' : 'pieton', p.x, p.z);
@@ -4847,12 +4848,27 @@ function pasRobot(r) {
   bruit(0.7 * clamp(1 - d / 120, 0, 1), 150, 0.35);
   J.secousse = Math.max(J.secousse || 0, 0.25 * clamp(1 - d / 40, 0, 1));   // la caméra tremble quand il est tout près
 }
-// il bute contre les murs et les voitures, et ne va pas dans l'eau profonde
+// il bute contre les murs et les autres robots, et ne va pas dans l'eau profonde. Il écrase les gens et les voitures sur son chemin
 function bougerRobot(r, ax, az) {
   resoudre(r, 1.3, 4.5);
+  const parJoueur = r === J.robot;   // c'est toi qui le pilotes : ce qu'il écrase compte comme tes crimes
   for (const o of voitures) for (const lz of o.cercles) {
     const c = local(o, 0, lz), d = dist(c, r), rr = o.rayon + 1.3;
-    if (d < rr && d > 0 && Math.abs(o.y - r.y) < 3) { r.x = c.x + (r.x - c.x) / d * rr; r.z = c.z + (r.z - c.z) / d * rr; }
+    if (d >= rr || d === 0 || Math.abs(o.y - r.y) >= 3 || o.ecrasee) continue;
+    // un bateau, un avion, un blindé, une carcasse brûlée ou ta voiture : ils l'arrêtent, comme un mur
+    if (pasDeTole(o) || estBlindee(o) || o.detruite || o === J.voiture) { r.x = c.x + (r.x - c.x) / d * rr; r.z = c.z + (r.z - c.z) / d * rr; continue; }
+    // les autres, il leur marche dessus : le toit s'aplatit d'un bout à l'autre, les vitres éclatent, le conducteur est tué, puis elle prend feu
+    o.ecrasee = true; o.vitesse = 0;
+    blesserConducteur(o, Infinity, parJoueur);
+    for (const z of o.cercles) abimer(o, V3(0, o.forme.hauteur, z), V3(0, -1, 0), 1);
+  }
+  for (const p of personnes) { // les gens sous ses pieds : écrasés, ils volent de côté
+    const dx = p.x - r.x, dz = p.z - r.z, l = Math.hypot(dx, dz) || 1;
+    if (p.vie > 0 && !p.vol && l < 1.7 && Math.abs(p.y - r.y) < 2) { blesser(p, 1000, parJoueur); projeter(p, dx / l * 5, 3, dz / l * 5, 6); }
+  }
+  for (const o of robots) { // deux robots ne passent pas l'un à travers l'autre
+    const d = dist(o, r);
+    if (o !== r && d < 2.6 && d > 0 && Math.abs(o.y - r.y) < 3) { r.x = o.x + (r.x - o.x) / d * 2.6; r.z = o.z + (r.z - o.z) / d * 2.6; }
   }
   if (profondeur(r.x, r.z) > 2) { r.x = ax; r.z = az; }
   r.y = hauteurSol(r.x, r.z, r.y);

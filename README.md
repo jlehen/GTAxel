@@ -34,7 +34,7 @@ Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le j
 
 En **Superman** : Z Q S D pour voler là où tu regardes, Espace pour monter, C ou Ctrl pour descendre, Maj pour aller plus vite. Descends jusqu'au sol, sur un toit ou dans l'eau pour te poser en douceur.
 
-Dans le **heavy robot** : Z Q S D pour marcher (Maj : plus vite), la souris pour viser, clic gauche : mitrailleuse, clic droit : roquettes, E : descendre.
+Dans le **heavy robot** : Z Q S D pour marcher (Maj : plus vite), la souris pour viser, clic gauche : mitrailleuse, clic droit : roquettes, E : descendre. Il écrase les gens et les voitures sur son chemin !
 
 En **avion** : Z pour accélérer, S pour ralentir (et freiner au sol). L'avion va là où tu regardes avec la souris (ou Q D pour tourner, Espace et C pour monter et descendre). Quand il va assez vite sur la piste, regarde vers le haut : il décolle ! Pour te poser, descends doucement, bien à plat.
 
