@@ -12,6 +12,8 @@ Dans le menu, choisis ta langue : **Français**, **Deutsch**, **English** ou **Z
 
 Choisis aussi combien de **piétons** et de **voitures** vivent autour de toi : **Peu**, **Normal**, **Beaucoup** ou **Énorme**. Au départ, c'est Beaucoup. Si le jeu rame, prends moins de monde.
 
+Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le jeu ») : change-les sans toucher au code.
+
 | Touche | Action |
 |---|---|
 | Z Q S D ou flèches | Se déplacer / conduire |
@@ -70,12 +72,18 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 
 ## Modifier le jeu
 
-Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier :
+Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier.
 
-1. **`REGLAGES`** : vitesses à pied et à la nage, vitesse des roquettes, vie, dégâts des ennemis (et des gangs), nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, hauteur des montagnes, touches et durée de la danse, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, accidents (à partir de quelle vitesse, force des tonneaux, temps avant qu'une voiture en feu explose, à partir de quand une voiture abîmée prend feu, hauteur des bornes), prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses, la vitre du heavy robot… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
+Pour les tableaux `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES` et `ENNEMIS`, pas besoin d'ouvrir le code : dans le menu, le bouton **⚙ Réglages** montre tous leurs nombres. Le jeu en tient compte tout de suite (pour la carte, les ombres ou les ennemis déjà là, appuie sur F5). Les cases changées sont en jaune et le navigateur s'en souvient ; **Tout remettre** revient aux nombres du code. Si tu changes le même nombre dans le code, c'est le code qui gagne.
+
+Dans le code :
+
+
+1. **`REGLAGES`** : vitesses à pied et à la nage, vitesse des roquettes, vie, nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, hauteur des montagnes, touches et durée de la danse, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, accidents (à partir de quelle vitesse, force des tonneaux, temps avant qu'une voiture en feu explose, à partir de quand une voiture abîmée prend feu, hauteur des bornes), prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
 2. **`ARMES`** : dégâts, cadence de tir, prix, munitions de chaque arme, rayon d'explosion du bazooka, zoom de la lunette du fusil de sniper. Et **`ARMES_ROBOT`** : la mitrailleuse et les roquettes du heavy robot.
 3. **`VOITURES`** : vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de voiture, de bateau, d'avion ou d'hélicoptère, et la chance de la croiser. Pour l'avion, la vitesse pour décoller ; pour l'hélicoptère, la vitesse à laquelle il monte. Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
-4. **`CARTE`** : tout le pays vu du ciel, le nord en haut. Chaque signe est une case de 74 m. Toutes les lignes doivent avoir la même longueur.
+4. **`ENNEMIS`** : la vie, l'arme, les dégâts, la précision, jusqu'où ils te voient, le temps entre deux tirs et la vitesse de chaque ennemi : policiers, policiers d'élite, soldats nazis, Kommandant, Hitler, vigiles, membres de gang, chiens de garde, et la vitre, les dégâts et la vitesse du heavy robot. Donne un bazooka aux policiers (`arme: 6`), ou 5 000 points de vie à Hitler !
+5. **`CARTE`** : tout le pays vu du ciel, le nord en haut. Chaque signe est une case de 74 m. Toutes les lignes doivent avoir la même longueur.
 
    Les lettres sont des pâtés de maisons : les rues sont ajoutées toutes seules autour.
 
@@ -110,11 +118,11 @@ Tout est dans `index.html`, avec des zones faciles à changer en haut du fichier
 
    Une route (`=`) doit toucher le coin d'un pâté pour se brancher sur les rues d'une ville.
 
-5. **`GANGS`** : le nom, la couleur, le pâté (colonne et ligne de la carte), le nombre de membres et l'arme de chaque gang. Invente le tien !
-6. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture` (avec `rapide`, `blindee` ou `sansPolice` si tu veux), `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`, `blindage`, `voler`. Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ». Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
-7. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
-8. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`), plus solide (`balles: 0.5`) ou invincible (`invincible: true`), et avoir plusieurs noms (`alias: ['ARMES', 'WAFFEN']`).
-9. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
-10. **`FOULES`** (tout en haut) : le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
+6. **`GANGS`** : le nom, la couleur, le pâté (colonne et ligne de la carte), le nombre de membres et l'arme de chaque gang. Invente le tien !
+7. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture` (avec `rapide`, `blindee` ou `sansPolice` si tu veux), `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`, `blindage`, `voler`. Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ». Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
+8. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
+9. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`), plus solide (`balles: 0.5`) ou invincible (`invincible: true`), et avoir plusieurs noms (`alias: ['ARMES', 'WAFFEN']`).
+10. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
+11. **`FOULES`** (tout en haut) : le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).

@@ -55,6 +55,23 @@
                 border-radius: 18px; padding: 4px 16px; margin: 3px; cursor: pointer; }
   #menu button:hover { border-color: #f0c850; }
   #menu button.on { background: #f0c850; border-color: #f0c850; color: #000; }
+  /* l'écran des réglages : il se déplie sous le bouton ⚙ */
+  #reglages { font-size: 16px; width: min(900px, calc(100% - 32px)); margin: 4px 0 6px; cursor: auto; }
+  #reglages summary { cursor: pointer; }
+  #reglages > summary { display: inline-block; list-style: none; font-weight: 700; font-size: 18px; background: rgba(255,255,255,.12);
+                        border: 2px solid rgba(255,255,255,.35); border-radius: 18px; padding: 4px 16px; }
+  #reglages[open] { background: rgba(12,12,12,.94); padding-bottom: 8px; }   /* presque opaque : le HUD derrière ne gêne pas la lecture */
+  #reglages p { max-width: 700px; margin: 8px auto; }
+  #reglages details { text-align: left; margin: 3px 0 3px 14px; }
+  #reglages details > summary { color: #f0c850; font-weight: 700; }
+  #reglages .champs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2px 16px; margin: 2px 0 4px 14px; }
+  #reglages label { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  #reglages input { width: 90px; font: inherit; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.3); }
+  #reglages input.liste { width: 130px; }
+  #reglages input[type=checkbox] { width: auto; }
+  #reglages.change > summary { border-color: #f0c850; }   /* au moins un réglage changé dans le menu */
+  #reglages input.change { background: rgba(240,200,80,.3); border-color: #f0c850; }   /* changé dans le menu : ne suit plus le code */
+  #reglages input.faux { border-color: #e04040; }   /* ce n'est pas un nombre : pas pris en compte */
 </style>
 </head>
 <body>
@@ -85,6 +102,11 @@
   <div id="langues"></div>
   <div class="foule" data-foule="pietons"><span>Piétons :</span></div>
   <div class="foule" data-foule="voitures"><span>Voitures :</span></div>
+  <details id="reglages">
+    <summary>⚙ <span class="tr">Réglages</span></summary>
+    <p class="tr">Les nombres des tableaux du haut de index.html. Le jeu en tient compte tout de suite, sauf pour ce qu'il construit au départ (la carte, les ombres, les ennemis déjà là…) : appuie alors sur F5. Le navigateur se souvient des cases en jaune ; si tu changes le même nombre dans le code, c'est le code qui gagne.</p>
+    <button id="remettre" class="tr">Tout remettre</button>
+  </details>
   <div id="histoire">Tu es B.J. Blazkowicz. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !</div>
   <div id="etat">Chargement… (il faut une connexion Internet)</div>
   <table>
@@ -145,6 +167,12 @@ const TRADUCTIONS = {
   'Normal':           { de: 'Normal', en: 'Normal', gsw: 'Normal' },
   'Beaucoup':         { de: 'Viele', en: 'Lots', gsw: 'Vill' },
   'Énorme':           { de: 'Riesig viele', en: 'Tons', gsw: 'Mega vill' },
+  'Réglages':         { de: 'Einstellungen', en: 'Settings', gsw: 'Iistellige' },
+  "Les nombres des tableaux du haut de index.html. Le jeu en tient compte tout de suite, sauf pour ce qu'il construit au départ (la carte, les ombres, les ennemis déjà là…) : appuie alors sur F5. Le navigateur se souvient des cases en jaune ; si tu changes le même nombre dans le code, c'est le code qui gagne.": {
+    de: 'Die Zahlen aus den Tabellen oben in index.html. Das Spiel übernimmt sie sofort, außer bei dem, was es am Anfang baut (die Karte, die Schatten, die Feinde, die schon da sind…): Drück dann F5. Der Browser merkt sich die gelben Felder; änderst du dieselbe Zahl im Code, gewinnt der Code.',
+    en: 'The numbers from the tables at the top of index.html. The game uses them right away, except for what it builds at the start (the map, the shadows, the enemies already there…): press F5 for those. The browser remembers the yellow boxes; if you change the same number in the code, the code wins.',
+    gsw: 'D Zahle us de Tabälle zoberst im index.html. S Spiil nimmt si grad, ussert für das, wo s am Aafang baut (d Charte, d Schätte, d Feind, wo scho da sind…): Druck dänn F5. De Browser merkt sich di gäle Fälder; wänn du di glichi Zahl im Code änderisch, gwünnt de Code.' },
+  'Tout remettre':    { de: 'Alles zurücksetzen', en: 'Reset everything', gsw: 'Alles zruggsetze' },
   'Pause — clique pour continuer': { de: 'Pause — klicke zum Weiterspielen', en: 'Paused — click to continue', gsw: 'Pause — klick zum Wiiterspile' },
   'Z Q S D':                  { de: 'W A S D', en: 'W A S D', gsw: 'W A S D' },   // les mêmes touches, sur un clavier allemand ou anglais
   'se déplacer / conduire':   { de: 'laufen / fahren', en: 'move / drive', gsw: 'laufe / fahre' },
@@ -190,6 +218,14 @@ const TRADUCTIONS = {
   'Jet-ski':          { de: 'Jetski', en: 'Jet ski', gsw: 'Jetski' },
   'Avion':            { de: 'Flugzeug', en: 'Plane', gsw: 'Flüüger' },
   'Hélicoptère':      { de: 'Hubschrauber', en: 'Helicopter', gsw: 'Heli' },
+  // les ennemis (dans le menu des réglages)
+  'Piéton':           { de: 'Fußgänger', en: 'Pedestrian', gsw: 'Fuessgänger' },
+  'Policier':         { de: 'Polizist', en: 'Police officer', gsw: 'Polizischt' },
+  "Policier d'élite": { de: 'Elitepolizist', en: 'Elite officer', gsw: 'Elitepolizischt' },
+  'Soldat nazi':      { de: 'Nazisoldat', en: 'Nazi soldier', gsw: 'Nazisoldat' },
+  'Vigile':           { de: 'Wachmann', en: 'Security guard', gsw: 'Wachmaa' },
+  'Membre de gang':   { de: 'Gangmitglied', en: 'Gang member', gsw: 'Gangmitglied' },
+  'Chien de garde':   { de: 'Wachhund', en: 'Guard dog', gsw: 'Wachhund' },
   'le grand tableau': { de: 'das große Gemälde', en: 'the big painting', gsw: 's grosse Gmäld' },
   'la couronne':      { de: 'die Krone', en: 'the crown', gsw: 'd Chrone' },
   'le collier de rubis': { de: 'die Rubinkette', en: 'the ruby necklace', gsw: 'd Rubinchetti' },
@@ -388,7 +424,7 @@ function tr(texte, valeurs = {}) {
 }
 // le menu : ses textes en français sont gardés dans data-fr, pour pouvoir changer de langue autant qu'on veut
 function traduireMenu() {
-  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button')) el.textContent = tr(el.dataset.fr ??= el.textContent);
+  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, #reglages .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent);
   for (const b of document.querySelectorAll('#langues button')) b.classList.toggle('on', b.dataset.langue === langue);
   for (const b of document.querySelectorAll('.foule button')) b.classList.toggle('on', foule[b.parentNode.dataset.foule] === b.dataset.fr);
   document.documentElement.lang = langue;
@@ -450,22 +486,8 @@ const REGLAGES = {
   voituresPolice: [0, 0, 1, 2, 4, 5],
   etoilesBlindes: 4,         // à partir de 4 étoiles : une voiture de police sur deux est un fourgon blindé, avec 4 policiers d'élite
   vitesseBlindes: 34,        // m/s (122 km/h) : les fourgons blindés roulent vite !
-  etoilesRobot: 5,           // à partir de 5 étoiles : le heavy robot de la police arrive
-  vitesseRobot: 4,           // m/s : il marche lentement, mais ses roquettes vont vite
-  vitreRobot: 350,           // la vitre blindée de sa cabine : il faut la casser pour atteindre le pilote
-  degatsPolicier: 5,
-  degatsSoldat: 7,
-  degatsBoss: 12,
-  degatsHitler: 35,          // une roquette de bazooka qui te touche en plein
-  degatsGarde: 9,            // les vigiles des braquages
-  degatsElite: 9,            // les policiers d'élite des fourgons blindés
-  degatsChien: 12,           // une morsure de chien de garde
-  degatsRobot: 10,           // une énorme balle de la mitrailleuse du heavy robot
-  degatsRoquetteRobot: 40,   // une roquette du heavy robot, en plein
-  degatsMitrailleuse: 5,     // une balle des mitrailleuses automatiques de la banque (5 par seconde)
-  degatsGang: 6,             // une balle d'un membre de gang (le double au fusil à pompe, de près)
-  precisionEnnemis: 0.35,    // 1 = ils ne ratent jamais
-  precisionPros: 0.5,        // les vigiles, les policiers d'élite, le robot et les mitrailleuses visent mieux
+  etoilesRobot: 5,           // à partir de 5 étoiles : le heavy robot de la police arrive (ses chiffres sont dans ENNEMIS)
+  // la vie, les dégâts et la précision des policiers, des nazis et des autres ennemis : voir ENNEMIS, après les voitures
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
   ombres: true,              // mets false si le jeu rame
@@ -498,6 +520,8 @@ const REGLAGES = {
   dureePerceuse: 40,         // secondes pour que la perceuse thermique perce la porte du coffre-fort
   dureeCharge: 5,            // secondes avant que l'explosif saute
   dureeMitrailleuses: 5,     // secondes de tir des mitrailleuses automatiques quand on touche un laser
+  degatsMitrailleuse: 5,     // une balle des mitrailleuses (5 par seconde)
+  precisionMitrailleuses: 0.3, // leur chance de te toucher de près (1 = elles ne ratent jamais)
 };
 
 // =====================================================================
@@ -561,6 +585,31 @@ const VOITURES = [
   { nom: 'Hélicoptère', modele: 'helico', vitesse: 40, acceleration: 8, virage: 1, chance: 0, vole: 'helico', montee: 8, couleurs: ['#1a3a8a', '#c81010', '#111', '#f0c020'],
     son: { grave: 14, aigu: 24, rapports: 1, rauque: 1, volume: 0.09, petarade: true } },
 ];
+
+// =====================================================================
+//  LES ENNEMIS (et les passants) : leur vie, leur arme, et ce qu'ils te font
+//  vie : ses points de vie (une balle de pistolet en enlève 40, deux fois et demie plus à la tête)
+//  arme : le numéro de son arme dans ARMES, en comptant depuis 0 (2 = pistolet, 4 = fusil à pompe, 5 = fusil d'assaut, 6 = bazooka)
+//  degats : ce que te fait une de ses balles (au fusil à pompe, le double de près ; au bazooka, sa roquette en plein)
+//  precision : sa chance de te toucher quand tu es près (1 = il ne rate jamais) ; elle baisse quand tu es loin
+//  vue : jusqu'où il te voit, en mètres     tir : les secondes entre deux tirs (au hasard entre les deux nombres)
+//  vitesse : en m/s, quand il te court après
+//  À la mitraillette ou au fusil d'assaut, les vigiles, les policiers d'élite et les gangs tirent en rafales de 3 à 5 balles.
+// =====================================================================
+const ENNEMIS = {
+  pieton: { nom: 'Piéton',           vie: 50 },
+  flic:   { nom: 'Policier',         vie: 70,  arme: 2, degats: 5,  precision: 0.35, vue: 70, tir: [1, 2],     vitesse: 4.5 },
+  elite:  { nom: "Policier d'élite", vie: 140, arme: 5, degats: 9,  precision: 0.5,  vue: 70, tir: [1, 2],     vitesse: 4.5 },   // dans les fourgons blindés
+  soldat: { nom: 'Soldat nazi',      vie: 90,  arme: 5, degats: 7,  precision: 0.35, vue: 45, tir: [1, 2],     vitesse: 4.5 },
+  boss:   { nom: 'Kommandant',       vie: 450, arme: 4, degats: 12, precision: 0.35, vue: 45, tir: [0.6, 1.2], vitesse: 4.5 },
+  hitler: { nom: 'Hitler',           vie: 900, arme: 6, degats: 35, precision: 0.35, vue: 45, tir: [1.5, 3],   vitesse: 4.5 },
+  garde:  { nom: 'Vigile',           vie: 100,          degats: 9,  precision: 0.5,  vue: 45, tir: [1, 2],     vitesse: 4.5 },   // son arme dépend du braquage
+  gang:   { nom: 'Membre de gang',   vie: 70,           degats: 6,  precision: 0.35, vue: 45, tir: [1, 2],     vitesse: 4.5 },   // l'arme de son gang : voir GANGS
+  chien:  { nom: 'Chien de garde',   vie: 45,           degats: 12,                           tir: [0.9, 0.9], vitesse: 9 },     // il mord, et court plus vite que toi !
+  // le heavy robot de la police : il faut casser sa vitre blindée pour atteindre le pilote. degats : une balle de sa mitrailleuse.
+  // Sa vitesse compte aussi quand c'est toi qui le pilotes
+  robot:  { nom: 'Heavy robot', vitre: 350, degats: 10, degatsRoquette: 40, precision: 0.5, vitesse: 4 },
+};
 
 // =====================================================================
 //  LA CARTE : tout le pays, vu du ciel, le nord en haut. Chaque signe est une case de 74 m.
@@ -855,6 +904,74 @@ const TRICHES = [
   // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
   { code: 'MISSION',     texte: 'Saut de mission',      action: n => sauterMission(n) },
 ];
+
+// =====================================================================
+//  L'écran des réglages (⚙ dans le menu) : il change REGLAGES, ARMES, ARMES_ROBOT, VOITURES et ENNEMIS sans toucher au code.
+//  Le navigateur se souvient de ce qu'on y change : "ARMES.3.degats": [22, 40] = la mitraillette, le nombre du code puis celui du menu.
+//  Si tu changes ce nombre dans le code, le menu l'oublie : c'est le code qui gagne.
+// =====================================================================
+const TABLEAUX = { REGLAGES, ARMES, ARMES_ROBOT, VOITURES, ENNEMIS };
+const DU_CODE = structuredClone(TABLEAUX);   // les nombres du code, avant ceux du menu
+const pareil = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+let changes = {};
+try { changes = JSON.parse(localStorage.reglages || '{}'); } catch {}
+for (const chemin in changes) {
+  const v = changes[chemin], cles = chemin.split('.'), k = cles.pop(), o = cles.reduce((o, c) => o?.[c], TABLEAUX);
+  if (Array.isArray(v) && o?.[k] !== undefined && pareil(o[k], v[0])) o[k] = v[1]; else delete changes[chemin];
+}
+function sauverReglages() {
+  try { localStorage.reglages = JSON.stringify(changes); } catch {}
+  document.getElementById('reglages').classList.toggle('change', Object.keys(changes).length > 0);
+}
+// un groupe qui se déplie : un tableau, une arme, une voiture, le son de son moteur...
+function groupeReglages(titre, obj, code, chemin) {
+  const d = document.createElement('details'), s = document.createElement('summary'), grille = document.createElement('div');
+  s.textContent = titre; grille.className = 'champs'; d.append(s, grille);
+  for (const k in obj) {
+    const v = obj[k];
+    if (typeof v === 'string' || v === null) continue;   // les noms et les modèles ne se changent que dans le code
+    if (typeof v === 'object' && !(Array.isArray(v) && typeof v[0] !== 'object')) {
+      const g = groupeReglages(v.nom ?? k, v, code[k], chemin + '.' + k);
+      if (v.nom) g.firstChild.className = 'tr';   // traduit avec le reste du menu
+      d.append(g);
+    } else grille.append(champReglage(obj, k, code[k], chemin + '.' + k));
+  }
+  return d;
+}
+// une case : un nombre, une case à cocher (true / false), ou une liste séparée par des virgules (0, 2, 6 ou #c81010, #111)
+function champReglage(obj, k, code, chemin) {
+  const l = document.createElement('label'), i = document.createElement('input');
+  l.append(k, i);
+  if (typeof code === 'boolean') i.type = 'checkbox';
+  else if (typeof code === 'number') { i.type = 'number'; i.step = 'any'; }
+  else i.className = 'liste';
+  const montrer = () => {
+    if (i.type === 'checkbox') i.checked = obj[k]; else i.value = Array.isArray(obj[k]) ? obj[k].join(', ') : obj[k];
+    i.classList.toggle('change', chemin in changes);
+    i.classList.remove('faux');
+  };
+  i.oninput = () => {
+    const v = i.type === 'checkbox' ? i.checked : i.type === 'number' ? i.valueAsNumber
+      : i.value.split(',').map(t => t.trim()).filter(t => t).map(t => typeof code[0] === 'number' ? Number(t) : t);
+    const faux = Array.isArray(v) ? !v.length || v.some(Number.isNaN) : Number.isNaN(v);
+    i.classList.toggle('faux', faux);
+    if (faux) return;   // pas (encore) un nombre : on garde l'ancien
+    obj[k] = v;
+    if (pareil(v, code)) delete changes[chemin]; else changes[chemin] = [code, v];
+    i.classList.toggle('change', chemin in changes);
+    sauverReglages();
+  };
+  i.remettre = () => { obj[k] = structuredClone(code); delete changes[chemin]; montrer(); };
+  montrer();
+  return l;
+}
+// construit tout de suite : si un réglage empêche le jeu de démarrer, « Tout remettre » marche quand même
+const boiteReglages = document.getElementById('reglages');
+boiteReglages.onclick = e => e.stopPropagation();   // ne lance pas le jeu
+for (const nom in TABLEAUX) boiteReglages.append(groupeReglages(nom, TABLEAUX[nom], DU_CODE[nom], nom));
+document.getElementById('remettre').onclick = () => { for (const i of boiteReglages.querySelectorAll('input.change')) i.remettre(); sauverReglages(); };
+sauverReglages();
+traduireMenu();
 
 // =====================================================================
 //  Outils
@@ -3609,15 +3726,14 @@ const TENUES = {
   // un membre de gang : le maillot et la casquette de la couleur de son gang
   gang: couleur => ({ peau: hasard(PEAUX), haut: couleur, bas: hasard(['#2a3a5a', '#222', '#4a4a4a']), chaussures: hasard(['#eee', '#222']), casquette: couleur, manchesCourtes: true }),
 };
-const VIE_PNJ = { pieton: 50, flic: 70, soldat: 90, boss: 450, hitler: 900, garde: 100, chien: 45, gang: 70 };
-const ARME_PNJ = { flic: 2, soldat: 5, boss: 4, hitler: 6 };
 const NAZIS = ['soldat', 'boss', 'hitler'], VIGILES = ['garde', 'chien', 'gang'];   // ils restent dans leur pâté
+const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
 const personnes = [];
 function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z)) {
   const h = type === 'chien' ? creerChien() : creerHumain(tenue);
   if (type === 'boss') h.g.scale.setScalar(1.15);
-  const p = { type, h, x, y, z, angle: Math.random() * 6.28, vie: VIE_PNJ[type], cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
-  if (ARME_PNJ[type] !== undefined) donnerArme(h, ARME_PNJ[type]);
+  const p = { type, h, x, y, z, angle: Math.random() * 6.28, vie: ENNEMIS[type]?.vie, cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
+  if (ENNEMIS[type]?.arme !== undefined) { p.armeIdx = ENNEMIS[type].arme; donnerArme(h, p.armeIdx); }
   h.g.traverse(o => o.userData.personne = p);
   h.g.position.set(x, y, z);
   scene.add(h.g); personnes.push(p);
@@ -3628,7 +3744,9 @@ function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z
 // un policier d'élite (des fourgons blindés) : un casque, un gilet, un fusil d'assaut, et il tire en rafales
 function creerElite(x, z) {
   const p = creerPersonne('flic', x, z, TENUES.elite());
-  p.elite = true; p.vie = 140; p.armeIdx = 5; p.rafale = 0; donnerArme(p.h, 5);
+  const E = ENNEMIS.elite;
+  p.elite = true; p.vie = E.vie; p.armeIdx = E.arme; donnerArme(p.h, E.arme);
+  if (ARMES[E.arme].auto) p.rafale = 0;   // à la mitraillette ou au fusil d'assaut, en rafales
   piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#2a2d33', p.h.haut, 0, 0.4, 0);   // son gilet pare-balles
   return p;
 }
@@ -4082,7 +4200,7 @@ function majTourelles(B, dt) {
     if ((t.cd -= dt) > 0) continue;
     t.cd = 0.2;
     if (!voit({ x: bout.x, z: bout.z, y: bout.y - 1.5 }, J)) continue;
-    const d = bout.distanceTo(cible), reussi = Math.random() < 0.6 * R_.precisionPros * clamp(1.2 - d / 40, 0.3, 1) * (J.accroupi ? 0.5 : 1) * (J.vitesse > 6 ? 0.6 : 1);
+    const d = bout.distanceTo(cible), reussi = Math.random() < R_.precisionMitrailleuses * clamp(1.2 - d / 40, 0.3, 1) * (J.accroupi ? 0.5 : 1) * (J.vitesse > 6 ? 0.6 : 1);
     if (!reussi) cible.add(V3(entre(-1, 1), entre(-0.8, 0.8), entre(-1, 1)));
     t.canon.updateMatrixWorld(true);
     const depart = t.canon.localToWorld(V3(0, 0.02, 0.78));
@@ -4172,7 +4290,7 @@ function creerRobot(x, z, angle) {
     caisse(0.9, 0.28, 1.4, M_ROBOT2, pied, 0, -0.01, 0.2);
     return { hanche, genou, pied };
   });
-  const r = { m: { g, bassin, torse, bras, jambes, canons, vitre, pilote, gyros }, x, z, y: hauteurSol(x, z), angle, vieVitre: R_.vitreRobot, pilote: 'police', vieP: 70,
+  const r = { m: { g, bassin, torse, bras, jambes, canons, vitre, pilote, gyros }, x, z, y: hauteurSol(x, z), angle, vieVitre: ENNEMIS.robot.vitre, pilote: 'police', vieP: 70,
     cd: 1, rafale: 10, cdRoq: entre(3, 5), phase: 0, vuTimer: 0, munitions: { lourde: ARMES_ROBOT.lourde.munitions, roquettes: ARMES_ROBOT.roquettes.munitions }, cdJ: { lourde: 0, roquettes: 0 } };
   g.traverse(e => e.userData.robot = r); pilote.g.traverse(e => e.userData.piloteRobot = true);
   g.position.set(r.x, r.y, r.z); g.rotation.y = angle;
@@ -4238,7 +4356,7 @@ function majRobot(r, dt) {
     if ((r.vuTimer -= dt) <= 0) { r.vuTimer = 0.3; r.voitJ = d < 110 && voit({ x: r.x, z: r.z, y: r.y + 2 }, J); if (r.voitJ) r.noeud = undefined; else r.cible = cheminRobot(r); }
     const cible = r.voitJ ? J : r.cible || J;
     r.angle = lerpAngle(r.angle, angleVers(r, cible), 1.5 * dt);
-    if (!r.voitJ || d > 20) vitesse = R_.vitesseRobot;
+    if (!r.voitJ || d > 20) vitesse = ENNEMIS.robot.vitesse;
     tangage = Math.atan2(J.y + 1 - (r.y + 3.4), d);
     if (r.voitJ && Math.abs(diffAngle(r.angle, angleVers(r, J))) < 0.35) {
       r.tire = r.rafale > 0;
@@ -4255,22 +4373,22 @@ function balleLourde(a, b) { const m = new THREE.Mesh(GEO_BALLE, M_BALLE_LOURDE)
 const boutRobot = (r, roquette) => { r.m.g.updateMatrixWorld(true); return roquette ? r.m.bras[1].arme.localToWorld(V3(0, 0, 0.9)) : r.m.canons.localToWorld(V3(0, 0, 1.15)); };
 function tirRobot(r, d) {
   const depart = boutRobot(r, false), arrivee = V3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
-  let chance = R_.precisionPros * clamp(1.2 - d / 60, 0.2, 1);
+  let chance = ENNEMIS.robot.precision * clamp(1.2 - d / 60, 0.2, 1);
   if (J.accroupi) chance *= 0.5; if (J.vitesse > 6) chance *= 0.6; if (abrite()) chance *= 0.7;
   const reussi = Math.random() < chance;
   if (!reussi) arrivee.add(V3(entre(-2.5, 2.5), entre(-1, 2), entre(-2.5, 2.5)));
   balleLourde(depart, arrivee); flash(depart, 1.1);
   bruit(0.6 * clamp(1 - d / 150, 0.1, 1), 1100, 0.2);
   if (!reussi) return;
-  blesserJoueur(R_.degatsRobot * parTriche('balles'));
+  blesserJoueur(ENNEMIS.robot.degats * parTriche('balles'));
   const v = J.voiture;   // la balle cabosse la voiture où tu es
-  if (v) { const D = versLocal(v, J.x - r.x, J.z - r.z), l = Math.hypot(D.x, D.z) || 1; abimer(v, V3(-D.x / l * v.forme.largeur / 2, 0.8, -D.z / l * v.forme.longueur / 2), V3(D.x / l, 0, D.z / l), R_.degatsRobot / 400, true); }
+  if (v) { const D = versLocal(v, J.x - r.x, J.z - r.z), l = Math.hypot(D.x, D.z) || 1; abimer(v, V3(-D.x / l * v.forme.largeur / 2, 0.8, -D.z / l * v.forme.longueur / 2), V3(D.x / l, 0, D.z / l), ENNEMIS.robot.degats / 400, true); }
 }
 function roquetteRobot(r, d) {
   const depart = boutRobot(r, true), arrivee = V3(J.x, J.y + 1, J.z);
-  if (Math.random() > R_.precisionPros * clamp(1.2 - d / 60, 0.3, 1)) { const a = entre(0, 6.3), e = entre(3, 6); arrivee.set(J.x + Math.sin(a) * e, 0, J.z + Math.cos(a) * e); arrivee.y = hauteurSol(arrivee.x, arrivee.z, J.y); }
+  if (Math.random() > ENNEMIS.robot.precision * clamp(1.2 - d / 60, 0.3, 1)) { const a = entre(0, 6.3), e = entre(3, 6); arrivee.set(J.x + Math.sin(a) * e, 0, J.z + Math.cos(a) * e); arrivee.y = hauteurSol(arrivee.x, arrivee.z, J.y); }
   flash(depart, 1.5); bruit(...SON_ARME.bazooka);
-  lancerRoquette(depart, arrivee, 150, 5, 250, R_.degatsRoquetteRobot, r);
+  lancerRoquette(depart, arrivee, 150, 5, 250, ENNEMIS.robot.degatsRoquette, r);
 }
 // une balle ou une explosion sur le robot : d'abord la vitre de la cabine, ensuite le pilote (le reste est blindé)
 function toucherRobot(r, degats, objet = null, parJoueur = true) {
@@ -4312,7 +4430,7 @@ function sortirRobot() {
 function piloterRobot(r, dt) {
   const av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
   const mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat, n = Math.hypot(mx, mz);
-  const v = touche('ShiftLeft', 'ShiftRight') ? 6 : R_.vitesseRobot;
+  const v = touche('ShiftLeft', 'ShiftRight') ? 6 : ENNEMIS.robot.vitesse;
   if (n) { const ax = r.x, az = r.z; r.x += mx / n * v * dt; r.z += mz / n * v * dt; bougerRobot(r, ax, az); }
   r.angle = lerpAngle(r.angle, J.lacet, 3 * dt);
   r.tire = sourisG && r.munitions.lourde > 0;
@@ -4659,7 +4777,7 @@ function blesser(p, degats, parJoueur = true) {
   // il tombe et lâche quelque chose
   p.mort = 0.001;
   if (p.type === 'pieton') { if (parJoueur) crime(1); if (Math.random() < 0.6) creerObjet({ type: 'argent', montant: 10 + Math.floor(Math.random() * 60), x: p.x, z: p.z , y: p.y }); }
-  if (p.type === 'flic') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.elite ? 5 : 2, x: p.x, z: p.z , y: p.y }); }
+  if (p.type === 'flic') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
   if (p.type === 'garde') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
   if (p.type === 'gang') { creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z, y: p.y }); creerObjet({ type: 'argent', montant: 20 + Math.floor(Math.random() * 80), x: p.x + 0.8, z: p.z, y: p.y }); }   // pas d'étoile
   if (p.type === 'soldat') creerObjet({ type: 'arme', arme: Math.random() < 0.5 ? 3 : 5, x: p.x, z: p.z , y: p.y });
@@ -4672,7 +4790,7 @@ function blesserConducteur(v, degats, parJoueur = true) {
   const a = v.accident;   // en plein accident, le conducteur attend dans a.conducteur
   if (!v.conducteur && !a?.conducteur) return;
   if (v.police && etoiles === 0 && parJoueur) crime(1);   // tirer sur un policier
-  v.vieConducteur = (v.vieConducteur ?? VIE_PNJ[v.police ? 'flic' : 'pieton']) - degats;
+  v.vieConducteur = (v.vieConducteur ?? ENNEMIS[v.police ? 'flic' : 'pieton'].vie) - degats;
   if (v.vieConducteur > 0) return;
   const p = local(v, v.rayon + 0.8, 0.3), c = creerPersonne(v.police ? 'flic' : 'pieton', p.x, p.z, v.pilote?.tenue);
   resoudre(c, 0.35);
@@ -5111,7 +5229,7 @@ function majPersonne(p, dt) {
   if (hostile && !J.mort) {
     p.vuTimer -= dt;
     if (p.vuTimer <= 0) { // un vigile n'attaque que s'il voit B.J. arme à la main, de près (ou si l'alarme sonne)
-      p.vuTimer = 0.3; p.voitJ = d < (p.type === 'flic' ? 70 : 45) && voit(p, J);
+      p.vuTimer = 0.3; p.voitJ = d < fiche(p).vue && voit(p, J);
       if (p.voitJ && !p.alerte && (!vigile || (d < 15 && armeEnMain()))) alerter(p);
     }
     if (p.type === 'flic') p.alerte = true;
@@ -5119,11 +5237,11 @@ function majPersonne(p, dt) {
       arme = true;
       const vise = angleVers(p, J);
       p.angle = lerpAngle(p.angle, vise, 8 * dt);
-      if (!p.voitJ || d > 22) vitesse = 4.5; else if (d < 6) vitesse = -2;
+      if (!p.voitJ || d > 22) vitesse = fiche(p).vitesse; else if (d < 6) vitesse = -2;
       if (p.voitJ && p.cooldown <= 0 && Math.abs(diffAngle(p.angle, vise)) < 0.3) {
         // les vigiles et les policiers d'élite à la mitraillette ou au fusil d'assaut tirent en rafales de 3 à 5 balles
         if (p.rafale !== undefined) p.cooldown = p.rafale-- > 0 ? 0.13 : (p.rafale = 2 + Math.floor(Math.random() * 3), entre(1.2, 2));
-        else p.cooldown = entre(1, 2) * ({ boss: 0.6, hitler: 1.5 }[p.type] || 1);
+        else p.cooldown = entre(...fiche(p).tir);
         tirEnnemi(p, d);
       }
     }
@@ -5161,8 +5279,8 @@ function majChien(p, dt, d) {
   if (p.alerte && !J.mort) {
     p.angle = lerpAngle(p.angle, angleVers(p, J), 10 * dt);
     const dedans = J.voiture || J.robot;   // il ne mord pas à travers la carrosserie
-    if (d > (dedans ? 3 : 1.1)) vitesse = 9;
-    else if (!dedans && p.cooldown <= 0) { p.cooldown = 0.9; blesserJoueur(R_.degatsChien); aboyer(p); }
+    if (d > (dedans ? 3 : 1.1)) vitesse = ENNEMIS.chien.vitesse;
+    else if (!dedans && p.cooldown <= 0) { p.cooldown = entre(...ENNEMIS.chien.tir); blesserJoueur(ENNEMIS.chien.degats); aboyer(p); }
     if ((p.tAboie = (p.tAboie ?? entre(0.3, 1)) - dt) <= 0) { p.tAboie = entre(0.6, 1.4); aboyer(p); }
   }
   if (vitesse) {
@@ -5175,10 +5293,10 @@ function majChien(p, dt, d) {
 }
 function aboyer(p) { const f = clamp(1 - dist(p, J) / 60, 0, 1) * 0.4; bruit(f, 1400, 0.09); bip(560, 330, 0.11, 'sawtooth', f * 0.25); }
 function tirEnnemi(p, d) {
-  const arme = ARMES[p.armeIdx ?? ARME_PNJ[p.type]], pro = p.elite || p.type === 'garde';
+  const arme = ARMES[p.armeIdx], E = fiche(p);
   // un fusil à pompe fait deux fois plus mal de près
-  const degats = (p.elite ? R_.degatsElite : { flic: R_.degatsPolicier, soldat: R_.degatsSoldat, boss: R_.degatsBoss, hitler: R_.degatsHitler, garde: R_.degatsGarde, gang: R_.degatsGang }[p.type]) * (arme.plombs && d < 15 ? 2 : 1);
-  let chance = (pro ? R_.precisionPros : R_.precisionEnnemis) * clamp(1.2 - d / 50, 0.2, 1);
+  const degats = E.degats * (arme.plombs && d < 15 ? 2 : 1);
+  let chance = E.precision * clamp(1.2 - d / 50, 0.2, 1);
   if (J.accroupi) chance *= 0.5;
   if (J.vitesse > 6) chance *= 0.6;
   if (abrite()) chance *= 0.7;
@@ -5803,7 +5921,7 @@ window.jeu = { J, joueurH, criMJ, carte, VOITURES, MODELES, ouvrirCarte, centreC
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
-  exploser, blesserJoueur, cibleMission, V3, ARMES_ROBOT, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
+  exploser, blesserJoueur, cibleMission, V3, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
