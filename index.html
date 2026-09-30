@@ -43,7 +43,7 @@
   #menu h1 { font: 120px 'Anton', Impact, sans-serif; margin: 0; letter-spacing: 4px;
              background: linear-gradient(#fff 40%, #f0c850); -webkit-background-clip: text; background-clip: text; color: transparent;
              filter: drop-shadow(5px 5px 0 #000); }
-  #version { font-size: 15px; opacity: .6; margin-bottom: 8px; }   /* le numéro de version, sous le titre */
+  #version { font-size: 15px; opacity: .6; margin-bottom: 8px; min-height: 18px; }   /* le numéro de version, sous le titre (vide le temps de le demander) */
   #histoire { font-size: 22px; max-width: 700px; margin-top: 6px; }
   #etat { font-size: 28px; margin: 10px 0 26px; color: #f0c850; }
   #menu table { border-collapse: collapse; font-size: 18px; }
@@ -100,7 +100,7 @@
 </div>
 <div id="menu">
   <h1>GTAxel</h1>
-  <div id="version">Version 1</div>   <!-- + 1 à chaque mise en ligne (push sur main) : voir AGENTS.md -->
+  <div id="version"></div>
   <div id="langues"></div>
   <div class="foule" data-foule="pietons"><span>Piétons :</span></div>
   <div class="foule" data-foule="voitures"><span>Voitures :</span></div>
@@ -468,6 +468,11 @@ for (const ligne of document.querySelectorAll('.foule')) for (const nom in FOULE
   ligne.append(b);
 }
 traduireMenu();
+// le numéro de version : le nombre de commits du jeu sur GitHub. Il augmente tout seul à chaque mise en ligne.
+// GitHub donne la liste des commits par pages (ici, d'un commit chacune) : le numéro de la dernière page, c'est leur nombre
+fetch('https://api.github.com/repos/jlehen/GTAxel/commits?sha=main&per_page=1')
+  .then(r => { const n = r.headers.get('Link')?.match(/page=(\d+)>; rel="last"/)?.[1]; if (n) document.getElementById('version').textContent = 'Version ' + n; })
+  .catch(() => {});   // GitHub ne répond pas : pas de numéro, le jeu marche quand même
 </script>
 
 <script type="importmap">

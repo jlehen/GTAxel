@@ -14,10 +14,3 @@ GTAxel est un jeu 3D dans le navigateur, entièrement contenu dans `index.html`.
 4. Si la modification change les touches, les armes, la carte ou les missions, mets aussi à jour `README.md`.
 
 Une modification n'est pas terminée tant que `DESIGN.md` ne correspond pas au code.
-
-## Mettre en ligne
-
-GitHub Pages publie la branche `main` : chaque push sur `main` met le jeu en ligne.
-
-1. **Numéro de version** : le commit poussé doit avoir, dans `<div id="version">` en haut de `index.html`, le numéro de `origin/main` + 1 (0 si `origin/main` n'en a pas encore). Change-le dans un des commits poussés, pas dans chacun. Pour vérifier : `git show origin/main:index.html | grep 'id="version"'`.
-2. Si un autre push est passé avant le tien (le fast-forward échoue), rebase sur `origin/main` et reprends son numéro + 1.
