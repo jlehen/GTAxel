@@ -223,6 +223,10 @@ const TRADUCTIONS = {
   'Jet-ski':          { de: 'Jetski', en: 'Jet ski', gsw: 'Jetski' },
   'Avion':            { de: 'Flugzeug', en: 'Plane', gsw: 'Flüüger' },
   'Hélicoptère':      { de: 'Hubschrauber', en: 'Helicopter', gsw: 'Heli' },
+  'Skis':             { de: 'Ski', en: 'Skis', gsw: 'Ski' },
+  'Snowboard':        { de: 'Snowboard', en: 'Snowboard', gsw: 'Snowboard' },
+  'Luge':             { de: 'Schlitten', en: 'Sled', gsw: 'Schlitte' },
+  'Z : pousser · S : freiner · Espace : sauter': { de: 'W: anschieben · S: bremsen · Leertaste: springen', en: 'W: push · S: brake · Space: jump', gsw: 'W: aaschiebe · S: brämse · Läärtaschte: gumpe' },
   // les ennemis (dans le menu des réglages)
   'Piéton':           { de: 'Fußgänger', en: 'Pedestrian', gsw: 'Fuessgänger' },
   'Policier':         { de: 'Polizist', en: 'Police officer', gsw: 'Polizischt' },
@@ -396,6 +400,8 @@ const TRADUCTIONS = {
   "Appuie sur <b>E</b> pour prendre l'ascenseur (monter sur le toit)": { de: 'Drücke <b>E</b> für den Aufzug (aufs Dach)', en: 'Press <b>E</b> to take the elevator (up to the roof)', gsw: 'Drück <b>E</b> für de Lift (ufs Dach)' },
   "Appuie sur <b>E</b> pour prendre l'ascenseur (redescendre)": { de: 'Drücke <b>E</b> für den Aufzug (nach unten)', en: 'Press <b>E</b> to take the elevator (back down)', gsw: 'Drück <b>E</b> für de Lift (abe)' },
   'Appuie sur <b>E</b> pour monter : {vehicule}': { de: 'Drücke <b>E</b> zum Einsteigen: {vehicule}', en: 'Press <b>E</b> to get in: {vehicule}', gsw: 'Drück <b>E</b> zum Iistiige: {vehicule}' },
+  'Appuie sur <b>E</b> pour prendre le télésiège': { de: 'Drücke <b>E</b> für den Sessellift', en: 'Press <b>E</b> to take the chairlift', gsw: 'Drück <b>E</b> für de Sesselilift' },
+  'Appuie sur <b>E</b> pour sauter du télésiège': { de: 'Drücke <b>E</b>, um vom Sessellift zu springen', en: 'Press <b>E</b> to jump off the chairlift', gsw: 'Drück <b>E</b>, zum vom Sesselilift abegumpe' },
   'Perceuse thermique : {n} %. Tiens bon !': { de: 'Thermobohrer: {n} %. Halte durch!', en: 'Thermal drill: {n}%. Hang in there!', gsw: 'Thermobohrer: {n} %. Heb dure!' },
   // les cartes
   'Tu es dans la colonne {col}, ligne {ligne} de la CARTE': { de: 'Du bist in Spalte {col}, Zeile {ligne} der CARTE', en: 'You are in column {col}, row {ligne} of the CARTE', gsw: 'Du bisch i de Spalte {col}, Ziile {ligne} vo de CARTE' },
@@ -408,6 +414,8 @@ const TRADUCTIONS = {
   'Mont Josiah':      { de: 'Mount Josiah', en: 'Mount Josiah', gsw: 'Mount Josiah' },
   'Mont Chiliad':     { de: 'Mount Chiliad', en: 'Mount Chiliad', gsw: 'Mount Chiliad' },
   'Mont Gordo':       { de: 'Mount Gordo', en: 'Mount Gordo', gsw: 'Mount Gordo' },
+  'San Chianski':     { de: 'San Chianski', en: 'San Chianski', gsw: 'San Chianski' },
+  'Station de ski':   { de: 'Skigebiet', en: 'Ski resort', gsw: 'Skigebiet' },
   'Réservoir Land Act': { de: 'Land-Act-Stausee', en: 'Land Act Reservoir', gsw: 'Land-Act-Stausee' },
   'Armurerie':        { de: 'Waffenladen', en: 'Gun shop', gsw: 'Waffelade' },
   'Hôpital':          { de: 'Krankenhaus', en: 'Hospital', gsw: 'Spital' },
@@ -527,7 +535,9 @@ const REGLAGES = {
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
   ombres: true,              // mets false si le jeu rame
   distanceVue: 900,          // mètres : au-delà, le brouillard cache tout (mets 500 si le jeu rame)
-  hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m
+  hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
+  vitesseTelesiege: 15,      // m/s : le télésiège des stations de ski (Y sur la carte). Mets 5 pour un vrai télésiège, tout lent
+  frottementNeige: 0.4,      // à ski, en snowboard ou en luge : ce que la neige freine (m/s par seconde). Hors de la neige, ça freine 15 fois plus
   vitesseNage: 2.2,          // dans l'eau
   vitesseNageRapide: 4,      // dans l'eau, avec Maj
   touchesDanse: ['KeyA', 'KeyS', 'KeyD'], // à taper 3 fois de suite pour danser : gauche, arrière, droite (Q S D sur un clavier français)
@@ -656,6 +666,12 @@ const VOITURES = [
     son: { grave: 40, aigu: 150, rapports: 1, rauque: 0.6, volume: 0.06 } },
   { nom: 'Jet-ski', modele: 'jetski', vitesse: 24, acceleration: 12, virage: 1.5, chance: 0, bateau: true, couleurs: ['#f0c020', '#1a5ad8', '#c81010', '#2a8a3a'],
     son: { grave: 60, aigu: 280, rapports: 1, rauque: 0.9, volume: 0.05, petarade: true } },
+  // la glisse (glisse: true) : pas de moteur, c'est la pente qui fait avancer, et on ne glisse que sur la neige (tableau SOMMETS).
+  // On les trouve aux stations de ski (Y sur la carte), en bas et en haut du télésiège. vitesse : le plus vite qu'on descend ;
+  // acceleration : quand on pousse (Z) sur le plat, sans dépasser 4 m/s
+  { nom: 'Skis', modele: 'skis', vitesse: 30, acceleration: 3, virage: 1.5, chance: 0, glisse: true, couleurs: ['#c81010', '#1a5ad8', '#f0c020', '#111', '#e8e8e8'] },
+  { nom: 'Snowboard', modele: 'snowboard', vitesse: 32, acceleration: 2.5, virage: 1.3, chance: 0, glisse: true, couleurs: ['#2a8a3a', '#e06010', '#6a1a8a', '#111', '#1a5ad8'] },
+  { nom: 'Luge', modele: 'luge', vitesse: 22, acceleration: 2, virage: 0.8, chance: 0, glisse: true, couleurs: ['#a0642a', '#8a4a1a', '#c81010'] },
   // ce qui vole (vole: 'avion' ou 'helico') : à l'aéroport (^ et @ sur la carte) et dans les hangars (N).
   // decollage : la vitesse (m/s) qu'il faut à l'avion pour s'envoler ; montee : à quelle vitesse (m/s) l'hélicoptère monte et descend
   { nom: 'Avion', modele: 'avion', vitesse: 70, acceleration: 6, virage: 1, chance: 0, vole: 'avion', decollage: 32, couleurs: ['#c81010', '#1a5ad8', '#0e5a2e', '#e06010'],
@@ -704,12 +720,15 @@ const ENNEMIS = {
 //    L maison de Franklin*              O villa de Michael*                   R caravane de Trevor
 //    J bar Yellow Jack                  F ferme*          D docks du port   N hangar d'avions
 //    B bunker nazi    W château Wolfenstein* (repaire d'Hitler)
+//    Y station de ski : un télésiège monte de là jusqu'en haut du sommet le plus proche (tableau SOMMETS, juste après la carte),
+//      avec des skis, des snowboards et des luges en bas et en haut
 //  Les pâtés à braquer (gardés, avec une alarme) :
 //    U musée d'art (vigiles et chiens)  V bijouterie Vangelico (fumée toxique)
 //    Q grande banque Pacific Standard (lasers, mitrailleuses, coffre-fort)
 //  Les autres signes sont le terrain, sans rues :
 //    ~ eau (mer, lac, rivière)          _ plage           , herbe           ; champs
 //    : désert         * forêt           1 à 9 collines et montagnes (plus le chiffre est grand, plus c'est haut)
+//    (les très hautes montagnes enneigées ne sont pas dans la carte : elles sont dans le tableau SOMMETS, juste après)
 //    = route          # pont (une route sur l'eau)        + pont en ville (les rues autour passent sur l'eau)
 //    & ponton avec deux bateaux         ! piste d'aéroport
 //    ^ piste avec un avion à piloter    @ hélistation avec un hélicoptère
@@ -717,84 +736,97 @@ const ENNEMIS = {
 //  Une route (=) doit toucher le coin d'un pâté pour se brancher sur les rues d'une ville.
 // =====================================================================
 const CARTE = [
-  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 0
-  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 1
-  "~~~~~~~~~~~~~~~~~~~~~_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 2
-  "~~~~~~~~~~~~~~~~~~~~_,,~~~~~~~~~~~~~~~~~~~~~~~~~",  // 3
-  "~~~~~~~~~~~~~~~~~~~~,,,,_~~~~~~~~~~~~~~~~~~~~~~~",  // 4
-  "~~~~~~~~~~~~~~~~~~~_,__,,,_~~~~~~~~~~~~~~~~~~~~~",  // 5
-  "~~~~~~~~~~~~~~~~~~&,MMSM_,,,_______~~~~~~~~~~~~~",  // 6
-  "~~~~~~~~~~~~~~~~~~_MIHAME=======,,,,___~~~~~~~~~",  // 7
-  "~~~~~~~~~~~~~~~~~~2MMIGM55431,,,===,,,,,~~~~~~~~",  // 8
-  "~~~~~~~~~~~~~~~~~1=44356776531,,,,,=,,233~~~~~~~",  // 9
-  "~~~~~~~~~~~~~~~~~=344567887652,,,,,,=24664~~~~~~",  // 10
-  "~~~~~~~~~~~~~~~~*=233678998763,,,,,,=367763~~~~~",  // 11
-  "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=67763~~~~~",  // 12
-  "~~~~~~~~~~~~~~3=2***3678998W=3,,,,,,,2=6642~~~~~",  // 13
-  "~~~~~~~~~~~~~3=432**256788765=,,,,,,,,=332,,~~~~",  // 14
-  "~~~~~~~~~~~~3=5543**1356776531====;;;;=,,,,,~~~~",  // 15
-  "~~~~~~~~~~~,=45543***13455431,,,;;MF;;=,,,,,~~~~",  // 16
-  "~~~~~~~~~~,=234432***,,1221,,,,,;;SF;;=,,,,,~~~~",  // 17
-  "~~~~~~~~~_=,,2332****,,,,,,,,~~~;;;;;;=,333,,~~~",  // 18
-  "~~~~~~~~~#~~~~~~****__,~~~,~~~~~~~;;;;=24542,~~~",  // 19
-  "~~~~~~~~=,,,,12~~~~~~~~~~~~~~~~~~~~,,,=24542,~~~",  // 20
-  "~~~~~~~=***,134431,,~~~~~~~~~~~~~~~,,,=,333,,~~~",  // 21
-  "~~~~~~=****,356653,,,~~~~~~~~~~~~~~::=:,,,,,,~~~",  // 22
-  "~~~~~#,,,,,,356653,,,,,~~~::~~~&~::::=:,,,,,,~~~",  // 23
-  "~~~~~=,,,,,,356653,,,,,::::::MRJSM::=::,1221,~~~",  // 24
-  "~~~~=,,,,,,2234431,,,,,::::::MHCAM::=2:135531~~~",  // 25
-  "~~~_=NIB,,2442221,,,,,,::::::::::=:=22:256652~~~",  // 26
-  "~~~_=!!!d,2442,,,,,,,,,::::::!^!!==::::256652~~~",  // 27
-  "~~~_=,,,,,,22,,,,,,,,,,::::::======::::13553~~~~",  // 28
-  "~~~_=,,,,,,,,,,,,,,,,,,::ES==:::::=::::,1221~~~~",  // 29
-  "~~~_=,,,,,,,,,,,,,,,,,===:::::::::=::::333,,~~~~",  // 30
-  "~~~~#~~~~~~~~~~~~~##==,:::::::::::=:::24542~~~~~",  // 31
-  "~~~_====,,,,,,23==,=,,,,,,,,1111,,=,,,2454~~~~~~",  // 32
-  "~~~_=,,,========431=1221,,,,1221,=,,,,,333~~~~~~",  // 33
-  "~~~_=,,,,,,**134431=2332,,,,1221,=,,,,,,,~~~~~~~",  // 34
-  "~~~_=,,,2332**2332,=2332,,,,1111==,,,,,,,~~~~~~~",  // 35
-  "~~~_=,,2=E432,,11,,=1221***,,,,,=,===E,,,~~~~~~~",  // 36
-  "~~~_=,,345543,,,,11=11,****,,,,=,,,,,121,~~~~~~~",  // 37
-  "~~~_=,,345543,,,,22=22,,,,,,,,,=,,,,,343,~~~~~~~",  // 38
-  "~~~_=,,234432,,,123=3~1221,,,,,=,,,,,343,~~~~~~~",  // 39
-  "~~~_M=,,2332,,,,123=322332,,,,,=,,111121,~~~~~~~",  // 40
-  "~~&_S=,,,,,,,,,,,22L222332,,,,,=,133331,,~~~~~~~",  // 41
-  "~~~_,=2,,,,,,,,,,11=111221,,,,=,13444431,~~~~~~~",  // 42
-  "~~~_,=2,,,,,,,,,,,,=,,,,,,,,,=,,13455431,~~~~~~~",  // 43
-  "~~~~,,=,,,,,_MMMOMMIIPIIMMMM=,,,1~~55431,~~~~~~~",  // 44
-  "~~~~~,=,,,,,_MMMMMIIIXITIIIMM,,,1~~44431,~~~~~~~",  // 45
-  "~~~~~~_=,,,,_IMPMIIHIIITIIUMMM,,,~~3331,,~~~~~~~",  // 46
-  "~~~~~~~~=====IIMIIIIITIIIII~~~~~~~~111,,,~~~~~~~",  // 47
-  "~~~~~~~~~,,_IIIIVIIIATTTIII~IIM,,,,,,,,,,~~~~~~~",  // 48
-  "~~~~~~~~~~,_IIIMIIIITTZKTTI~IIM,,,,,,,,,,~~~~~~~",  // 49
-  "~~~~~~~~~~~,_IIIIIaTTQTTCTT+IIM,,,,,,,,,~~~~~~~~",  // 50
-  "~~~~~~~~~~&__IIPIIIITTTbTTI~III,,,,121,,~~~~~~~~",  // 51
-  "~~~~~~~~~~~_,_IIIIIIITTTTII~IMM,,,23332,~~~~~~~~",  // 52
-  "~~~~~~~~~~~~,_IISIIIIIIPIII~IIP,,,24442~~~~~~~~~",  // 53
-  "~~~~~~~~~~~~___IIIIIMMMIIII+IIM,,,24442~~~~~~~~~",  // 54
-  "~~~~~~~~~~~~_,_IIMMMMIIIIII~IIM,,,23332~~~~~~~~~",  // 55
-  "~~~~~~~~~~~~_,_IPIIMMMMSIII~III,,,,121~~~~~~~~~~",  // 56
-  "~~~~~~~~~~~~_,_IIIIIGIIIIII~IIE,,,,,,,~~~~~~~~~~",  // 57
-  "~~~~~~~~~~~~_,NI!!!!!!IIIII~II,,,,,,,~~~~~~~~~~~",  // 58
-  "~~~~~~~~~~~~,,I!!!!!!!!.IDD~DD,,,,,,~~~~~~~~~~~~",  // 59
-  "~~~~~~~~~~~_,_INNNII!!!IIDD~D,,,,,,~~~~~~~~~~~~~",  // 60
-  "~~~~~~~~~~~_,_!!!!!!!!@.D~D~DD,,,,~~~~~~~~~~~~~~",  // 61
-  "~~~~~~~~~~~_,,!!!!^!!!!!.DD~DD,~~~~~~~~~~~~~~~~~",  // 62
-  "~~~~~~~~~~~_,,_!!!!!!!!@.D~~~D~~~~~~~~~~~~~~~~~~",  // 63
-  "~~~~~~~~~~~_,,,_IN!!!!!!.DD~DD&~~~~~~~~~~~~~~~~~",  // 64
-  "~~~~~~~~~~~~_,,,___!!!!!_DD~~~~~~~~~~~~~~~~~~~~~",  // 65
-  "~~~~~~~~~~~~~~________,,,~~~~~~~~~~~~~~~~~~~~~~~",  // 66
-  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 67
-  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 68
-  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 69
+  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 0
+  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 1
+  "~~~~~~~~~~~~~~~~~~~~~_~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 2
+  "~~~~~~~~~~~~~~~~~~~~_,,~~~~~~~~~~~~~~~~~~~~~~~~~~___________~~~~~~~~~~~~~~",  // 3
+  "~~~~~~~~~~~~~~~~~~~~,,,,_~~~~~~~~~~~~~~~~~~~~~~__***********__~~~~~~~~~~~~",  // 4
+  "~~~~~~~~~~~~~~~~~~~_,__,,,_~~~~~~~~~~~~~~~~~~__***************__~~~~~~~~~~",  // 5
+  "~~~~~~~~~~~~~~~~~~&,MMSM_,,,_______~~~~~~~~__,***,,,,,,,,,,,****__~~~~~~~~",  // 6
+  "~~~~~~~~~~~~~~~~~~_MIHAME=======,,,,___~~~_,,,*,,,,,,,,,,,,,,,****_~~~~~~~",  // 7
+  "~~~~~~~~~~~~~~~~~~2MMIGM55431,,,===,,,,,~_,,,,,,,,,,,,,,,,,,,,,****_~~~~~~",  // 8
+  "~~~~~~~~~~~~~~~~~1=44356776531,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,***_~~~~~",  // 9
+  "~~~~~~~~~~~~~~~~~=344567887652,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 10
+  "~~~~~~~~~~~~~~~~*=233678998763,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 11
+  "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 12
+  "~~~~~~~~~~~~~~3=2***3678998W=3,,,,,,,2=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 13
+  "~~~~~~~~~~~~~3=432**256788765=,,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 14
+  "~~~~~~~~~~~~3=5543**1356776531====;;;;==,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 15
+  "~~~~~~~~~~~,=45543***13455431,,,;;MF;;=Y,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 16
+  "~~~~~~~~~~,=234432***,,1221,,,,,;;SF;;=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 17
+  "~~~~~~~~~_=,,2332****,,,,,,,,~~~;;;;;;=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 18
+  "~~~~~~~~~#~~~~~~****__,~~~,~~~~~~~;;;;=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 19
+  "~~~~~~~~=,,,,12~~~~~~~~~~~~~~~~~~~~,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 20
+  "~~~~~~~=***,134431,,~~~~~~~~~~~~~~~,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 21
+  "~~~~~~=****,356653,,,~~~~~~~~~~~~~~::=:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 22
+  "~~~~~#,,,,,,356653,,,,,~~~::~~~&~::::=:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 23
+  "~~~~~=,,,,,,356653,,,,,::::::MRJSM::=::,1221,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 24
+  "~~~~=,,,,,,2234431,,,,,::::::MHCAM::=2:135531,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 25
+  "~~~_=NIB,,2442221,,,,,,::::::::::=:=22:256652,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 26
+  "~~~_=!!!d,2442,,,,,,,,,::::::!^!!==::::256652,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 27
+  "~~~_=,,,,,,22,,,,,,,,,,::::::======::::13553,,,,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 28
+  "~~~_=,,,,,,,,,,,,,,,,,,::ES==:::::=::::,1221,,,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 29
+  "~~~_=,,,,,,,,,,,,,,,,,===:::::::::=::::333,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 30
+  "~~~~#~~~~~~~~~~~~~##==,:::::::::::=:::24542,,,,,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 31
+  "~~~_====,,,,,,23==,=,,,,,,,,1111,,=,,,2454,,,,,,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 32
+  "~~~_=,,,========431=1221,,,,1221,=,,,,,333_,,,*,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 33
+  "~~~_=,,,,,,**134431=2332,,,,1221,=,,,,,,,~~__,**,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 34
+  "~~~_=,,,2332**2332,=2332,,,,1111==,,,,,,,~~~~_**,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 35
+  "~~~_=,,2=E432,,11,,=1221***,,,,,=,===E,,,~~~~~_*,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 36
+  "~~~_=,,345543,,,,11=11,****,,,,=,,,,,121,~~~~~_*,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 37
+  "~~~_=,,345543,,,,22=22,,,,,,,,,=,,,,,343,~~~~~~_*,,,,,,,,,,,,,,,,,*_~~~~~~",  // 38
+  "~~~_=,,234432,,,123=3~1221,,,,,=,,,,,343,~~~~~~_*,,,,,,,,,,,,,,,,,*_~~~~~~",  // 39
+  "~~~_M=,,2332,,,,123=322332,,,,,=,,111121,~~~~~~~_*,,,,,,,,,,,,,,,*_~~~~~~~",  // 40
+  "~~&_S=,,,,,,,,,,,22L222332,,,,,=,133331,,~~~~~~~_**,,,,,,,,,,,,,**_~~~~~~~",  // 41
+  "~~~_,=2,,,,,,,,,,11=111221,,,,=,13444431,~~~~~~~~_**,,,,,,,,,,,**_~~~~~~~~",  // 42
+  "~~~_,=2,,,,,,,,,,,,=,,,,,,,,,=,,13455431,~~~~~~~~~__**,,,,,,,**__~~~~~~~~~",  // 43
+  "~~~~,,=,,,,,_MMMOMMIIPIIMMMM=,,,1~~55431,~~~~~~~~~~~__*******__~~~~~~~~~~~",  // 44
+  "~~~~~,=,,,,,_MMMMMIIIXITIIIMM,,,1~~44431,~~~~~~~~~~~~~_______~~~~~~~~~~~~~",  // 45
+  "~~~~~~_=,,,,_IMPMIIHIIITIIUMMM,,,~~3331,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 46
+  "~~~~~~~~=====IIMIIIIITIIIII~~~~~~~~111,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 47
+  "~~~~~~~~~,,_IIIIVIIIATTTIII~IIM,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 48
+  "~~~~~~~~~~,_IIIMIIIITTZKTTI~IIM,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 49
+  "~~~~~~~~~~~,_IIIIIaTTQTTCTT+IIM,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 50
+  "~~~~~~~~~~&__IIPIIIITTTbTTI~III,,,,121,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 51
+  "~~~~~~~~~~~_,_IIIIIIITTTTII~IMM,,,23332,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 52
+  "~~~~~~~~~~~~,_IISIIIIIIPIII~IIP,,,24442~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 53
+  "~~~~~~~~~~~~___IIIIIMMMIIII+IIM,,,24442~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 54
+  "~~~~~~~~~~~~_,_IIMMMMIIIIII~IIM,,,23332~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 55
+  "~~~~~~~~~~~~_,_IPIIMMMMSIII~III,,,,121~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 56
+  "~~~~~~~~~~~~_,_IIIIIGIIIIII~IIE,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 57
+  "~~~~~~~~~~~~_,NI!!!!!!IIIII~II,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 58
+  "~~~~~~~~~~~~,,I!!!!!!!!.IDD~DD,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 59
+  "~~~~~~~~~~~_,_INNNII!!!IIDD~D,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 60
+  "~~~~~~~~~~~_,_!!!!!!!!@.D~D~DD,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 61
+  "~~~~~~~~~~~_,,!!!!^!!!!!.DD~DD,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 62
+  "~~~~~~~~~~~_,,_!!!!!!!!@.D~~~D~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 63
+  "~~~~~~~~~~~_,,,_IN!!!!!!.DD~DD&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 64
+  "~~~~~~~~~~~~_,,,___!!!!!_DD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 65
+  "~~~~~~~~~~~~~~________,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 66
+  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 67
+  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 68
+  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 69
+];
+// =====================================================================
+//  LES SOMMETS : les très hautes montagnes, couvertes de neige. On y fait du ski, du snowboard et de la luge !
+//  Chacun s'ajoute au terrain de la CARTE. Il faut de la terre dessous : dans l'eau, il ne monte pas (ça ferait un trou).
+//  col, ligne : où est le sommet dans la CARTE     hauteur : en mètres (le mont Chiliad, avec ses 9, fait 270 m)
+//  rayon : jusqu'où descend la montagne, en cases de 74 m. La neige la couvre jusqu'en bas.
+//  Pour la même hauteur, plus le rayon est petit, plus les pentes sont raides... et plus on descend vite !
+//  Le nom s'écrit sur la grande carte. Une station de ski (Y dans la CARTE) fait monter un télésiège au sommet le plus proche.
+// =====================================================================
+const SOMMETS = [
+  { nom: 'Mont Gordo',   col: 54, ligne: 20, hauteur: 900, rayon: 17 },
+  { nom: 'San Chianski', col: 57, ligne: 34, hauteur: 650, rayon: 11 },
 ];
 // les noms écrits sur la grande carte : [texte, colonne, ligne]
 const NOMS_LIEUX = [
   ['LOS SANTOS', 21, 55], ['Vinewood', 21, 44], ['Vespucci', 12, 53], ['Aéroport', 16, 63], ['Port', 27, 64],
   ['Collines de Vinewood', 20, 38], ['Chumash', 4, 40], ['Fort Zancudo', 7, 25], ['Harmony', 26, 30],
   ['Désert de Grand Senora', 30, 31], ['SANDY SHORES', 31, 26], ['Alamo Sea', 27, 21], ['Mont Josiah', 15, 24],
-  ['Grapeseed', 35, 19], ['Mont Chiliad', 23, 14], ['Mont Gordo', 40, 11], ['PALETO BAY', 21, 5],
+  ['Grapeseed', 35, 19], ['Mont Chiliad', 23, 14], ['PALETO BAY', 21, 5],
   ['Réservoir Land Act', 35, 48], ['Tataviam', 37, 42], ['Palomino', 37, 55],
+  ...SOMMETS.map(s => [s.nom, s.col, s.ligne + 1]),   // le nom de chaque sommet, juste en dessous
 ];
 
 // =====================================================================
@@ -1062,6 +1094,7 @@ const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const angleVers = (a, b) => Math.atan2(b.x - a.x, b.z - a.z);     // 0 = vers +Z
 function diffAngle(a, b) { let d = (b - a) % (2 * Math.PI); if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; return d; }
 const lerpAngle = (a, b, k) => a + diffAngle(a, b) * Math.min(1, k);
+const lerp = THREE.MathUtils.lerp;   // de a (k = 0) à b (k = 1)
 function graine(n) { return () => { n = (n + 0x6D2B79F5) | 0; let t = Math.imul(n ^ (n >>> 15), 1 | n); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const hasardR = (l, rnd) => l[Math.floor(rnd() * l.length)];
 const indexArme = nom => ARMES.findIndex(a => a.nom === nom);
@@ -1091,6 +1124,19 @@ const V8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]
 // la hauteur de chaque sorte de case, en mètres (les chiffres : REGLAGES.hauteurMontagnes par chiffre)
 const ALTITUDE = { '~': -9, '#': -9, '&': -9, '+': -9, '_': 0.3, ',': 1.5, ';': 1, ':': 3, '*': 4, '!': 0, '^': 0, '@': 0 };
 const alt = CARTE.map(l => [...l].map(c => /[0-9]/.test(c) ? +c * R_.hauteurMontagnes : ALTITUDE[c] ?? 1.5));
+// les très hautes montagnes (tableau SOMMETS) : ce qu'elles ajoutent au terrain en (x, z) (h, raide en haut et douce en bas),
+// et u : à quelle distance du sommet le plus proche on est (0 au sommet, 1 au pied). Il y a de la neige partout où u < 1
+function sommetEn(x, z) {
+  let h = 0, u = Infinity;
+  for (const s of SOMMETS) {
+    const c = centre(s.col, s.ligne), d = Math.hypot(x - c.x, z - c.z) / (s.rayon * PAS);
+    u = Math.min(u, d); if (d < 1) h = Math.max(h, s.hauteur * (1 - d) ** 2);
+  }
+  return { h, u };
+}
+const neigeEn = (x, z) => clamp((1 - sommetEn(x, z).u) / 0.06, 0, 1);   // de 0 (pas de neige) à 1 (toute blanche)
+SOMMETS.forEach(s => { if (surEau(s.col, s.ligne)) alert(`Sommet "${s.nom}" : la case ${s.col}, ${s.ligne} de la CARTE est dans l'eau !`); });
+for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) if (!surEau(i, j)) alt[j][i] += sommetEn(centre(i, j).x, centre(i, j).z).h;
 // une route prend la hauteur moyenne des cases autour d'elle
 for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) if (car(i, j) === '=') {
   const h = V8.map(([a, b]) => car(i + a, j + b)).map((c, k) => estRoute(c) || estPlat(c) ? null : alt[j + V8[k][1]][i + V8[k][0]]).filter(h => h !== null);
@@ -1133,7 +1179,9 @@ function terrainNaturel(x, z) {
   const fu = (x - R - S / 2) / PAS, fv = (z - R - S / 2) / PAS, i0 = Math.floor(fu), j0 = Math.floor(fv), wu = poids(fu - i0), wv = poids(fv - j0);
   let h = 0;
   for (let b = 0; b < 4; b++) for (let a = 0; a < 4; a++) h += wu[a] * wv[b] * altCase(i0 - 1 + a, j0 - 1 + b);
-  h += bosses(x, z) * (1.2 + 0.1 * Math.max(0, h));
+  // les SOMMETS n'ont pas de petites bosses (on y skie), mais de grandes arêtes et de grands creux
+  const sh = sommetEn(x, z).h;
+  h += bosses(x, z) * (1.2 + 0.1 * clamp(h - sh, 0, 270)) + bruitDoux(x / 260, z / 260) * 0.06 * sh;
   // autour d'une ville (ou d'une piste), le terrain est à plat, à la hauteur de la ville, puis il rejoint doucement le reste
   let dmin = Infinity, base = 0;
   const ci = Math.floor((x - R / 2) / PAS), cj = Math.floor((z - R / 2) / PAS);
@@ -1416,6 +1464,51 @@ const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
     for (const [k, d] of plus) { const u = clamp((d - LARGEUR_PISTE / 2 - 3) / 15, 0, 1); HT[k] = y0 - 0.08 + (HT[k] - y0 + 0.08) * u * u * (3 - 2 * u); }
   }
 }
+// les télésièges : de chaque station de ski (Y) jusqu'en haut du sommet le plus proche (à 5 % de son rayon du sommet).
+// Le câble passe sur des pylônes, toujours à 7 m au moins au-dessus du terrain. Les sièges montent à droite (en regardant
+// le sommet) et redescendent vides à gauche. En haut, le terrain est mis à plat autour de la gare d'arrivée
+const TELESIEGES = [];   // { bas, haut : les gares { x, y, z }, a : la direction du sommet, droite, pts : le milieu du câble, pylônes compris, long }
+for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
+  if (CARTE[j][i] !== 'Y') continue;
+  const bas = { ...centre(i, j), y: baseCase[j][i] + 0.2 }, c = s => centre(s.col, s.ligne);
+  const s = SOMMETS.reduce((m, q) => !m || dist(c(q), bas) < dist(c(m), bas) ? q : m, null);
+  if (!s) { alert('Station de ski (Y) : il faut un sommet dans le tableau SOMMETS !'); break; }
+  const a = angleVers(bas, c(s)), r = s.rayon * PAS * 0.05, haut = { x: c(s).x - Math.sin(a) * r, z: c(s).z - Math.cos(a) * r };
+  haut.y = hauteurTerrain(haut.x, haut.z);
+  for (let iz = Math.floor((haut.z - 34) / PT); iz <= Math.ceil((haut.z + 34) / PT); iz++) for (let ix = Math.floor((haut.x - 34) / PT); ix <= Math.ceil((haut.x + 34) / PT); ix++) {
+    if (ix < 0 || iz < 0 || ix >= NXT || iz >= NZT) continue;
+    const u = clamp((Math.hypot(ix * PT - haut.x, iz * PT - haut.z) - 14) / 20, 0, 1), k = iz * NXT + ix;   // à plat sur 14 m, puis la pente en 20 m
+    HT[k] = haut.y + (HT[k] - haut.y) * u * u * (3 - 2 * u);
+  }
+  // un pylône tous les 60 m environ, 10 m au-dessus du terrain ; le câble arrive à 3,2 m au-dessus du sol des gares
+  const n = Math.max(2, Math.round(dist(bas, haut) / 60)), pts = [], pylone = (x, z) => ({ x, z, y: hauteurTerrain(x, z) + 10, pylone: true });
+  for (let k = 0; k <= n; k++) {
+    const x = lerp(bas.x, haut.x, k / n), z = lerp(bas.z, haut.z, k / n);
+    pts.push(k === 0 ? { x, z, y: bas.y + 3.2 } : k === n ? { x, z, y: haut.y + 3.2 } : pylone(x, z));
+  }
+  // entre deux pylônes, le câble passe à 7 m au moins au-dessus du terrain (moins près des gares, où il descend) :
+  // là où il frôle le plus, on ajoute un pylône, et on recommence
+  for (let fois = 0; fois < 40; fois++) {
+    let pire = null;
+    for (let k = 0; k < pts.length - 1; k++) for (let t = 0.05; t < 1; t += 0.05) {
+      const A = pts[k], B = pts[k + 1], x = lerp(A.x, B.x, t), z = lerp(A.z, B.z, t);
+      const manque = hauteurTerrain(x, z) + Math.min(7, 3 + 0.2 * Math.min(dist({ x, z }, bas), dist({ x, z }, haut))) - lerp(A.y, B.y, t);
+      if (manque > 0.5 && (!pire || manque > pire.manque)) pire = { k, x, z, manque };
+    }
+    if (!pire) break;
+    pts.splice(pire.k + 1, 0, pylone(pire.x, pire.z));
+  }
+  pts.forEach((p, k) => p.s = k ? pts[k - 1].s + Math.hypot(p.x - pts[k - 1].x, p.y - pts[k - 1].y, p.z - pts[k - 1].z) : 0);
+  TELESIEGES.push({ bas, haut, a, droite: { x: -Math.cos(a), z: Math.sin(a) }, pts, long: pts.at(-1).s });
+}
+// un point du câble, à s mètres de la gare du bas : cote = 1 le câble qui monte (à droite), -1 celui qui descend
+function pointCable(l, s, cote) {
+  const q = l.pts; let k = 0;
+  while (k < q.length - 2 && q[k + 1].s < s) k++;
+  const A = q[k], B = q[k + 1], t = clamp((s - A.s) / (B.s - A.s), 0, 1);
+  return V3(lerp(A.x, B.x, t) + l.droite.x * 1.6 * cote, lerp(A.y, B.y, t), lerp(A.z, B.z, t) + l.droite.z * 1.6 * cote);
+}
+
 // la plus haute piste sous (x, z), sans dépasser la hauteur max (-Infinity s'il n'y en a pas).
 // gradPiste : de combien elle monte par mètre vers x et vers z
 const gradPiste = { x: 0, z: 0 };
@@ -1684,7 +1777,8 @@ const MAT = {
   routeCampagne: std(TEX.routeCampagne, { roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1 }),
   piste: std(TEX.piste, { roughness: 0.9, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 }),
   beton2: std(null, { color: '#a09c94', roughness: 0.9, side: THREE.DoubleSide }), rambarde: std(null, { color: '#c8ccd0', metalness: 0.6, roughness: 0.4, side: THREE.DoubleSide }),
-  rocher: std(null, { color: '#8a847a', roughness: 1, flatShading: true }),
+  rocher: std(null, { color: '#8a847a', roughness: 1, flatShading: true }), neige: std(TEX.sol, { color: '#f4f7fb', roughness: 1, bumpScale: 0.2 }),
+  cable: std(null, { color: '#222', metalness: 0.6, roughness: 0.4 }), siege: std(null, { color: '#2a5ad8', metalness: 0.4, roughness: 0.5 }),
   planches: std(TEX.parquet, { color: '#b89870' }),
   // l'intérieur des bâtiments
   platre: std(null, { color: '#d6cebf', roughness: 0.95 }), carrelage: std(TEX.carrelage), parquet: std(TEX.parquet), moquette: std(null, { color: '#6a4a48', roughness: 1 }),
@@ -2410,6 +2504,10 @@ function genererBloc(i, j) {
     garde(B, 5, b.point(-10, 0, 8)); garde(B, 4, b.point(10, 0, 8)); garde(B, 2, b.point(3, 0, 14));
     B.gyros.push({ x: X(22), y: Y0 + 6.2, z: Z(43.2) }, { x: X(38), y: Y0 + 6.2, z: Z(43.2) }, { ...P(0, -6), y: Y0 + sol0 + 3.3 });
     B.lumiere = { ...P(0, -6), y: Y0 + sol0 + 2.5 };
+  } else if (c === 'Y') { // une station de ski : une place enneigée et un chalet, derrière la gare du télésiège (construite avec le télésiège)
+    sol('neige', X(30), 0.21, Z(30), S, S);
+    const l = TELESIEGES.find(q => q.bas.x === X(30) && q.bas.z === Z(30));
+    if (l) maison('maison3', 'ardoise', X(30) - Math.sin(l.a) * 20 - l.droite.x * 12, Z(30) - Math.cos(l.a) * 20 - l.droite.z * 12);
   } else { // places : '.', 'X', et les lieux de mission
     sol('paves', X(30), 0.21, Z(30), S - 8, S - 8);
     for (const [a, b] of [[10, 10], [50, 10], [10, 50], [50, 50]]) { boite('pierre', X(a), 0.2, Z(b), 2.4, 0.6, 2.4); arbre(X(a), Z(b), 1); }
@@ -2616,7 +2714,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
   }));
   const C = s => new THREE.Color(s);
   const COUL = { herbe: C('#6a8a3e'), herbe2: C('#4f7234'), foret: C('#3e5d2a'), champ1: C('#8a9a3c'), champ2: C('#c0a855'), desert: C('#cfa56c'), desert2: C('#b98a55'),
-    plage: C('#dccb98'), roche: C('#8a8279'), rocheDesert: C('#a67c5a'), fond: C('#8f8466') };
+    plage: C('#dccb98'), roche: C('#8a8279'), rocheDesert: C('#a67c5a'), fond: C('#8f8466'), neige: C('#f4f7fb'), neige2: C('#dde6f2') };
   const h = (ix, iz) => HT[clamp(iz, 0, NZT - 1) * NXT + clamp(ix, 0, NXT - 1)];
   const coul = new THREE.Color(), une = new THREE.Color();
   const couleurSol = (s, ix, v) => {
@@ -2648,6 +2746,8 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
       if (y < EAU + 1.2 && s !== '~') coul.lerp(COUL.plage, clamp((EAU + 1.2 - y) / 1.5, 0, 1));   // du sable au bord de l'eau
       if (y < EAU - 0.5) coul.copy(COUL.fond);
       coul.lerp(s === ':' ? COUL.rocheDesert : COUL.roche, Math.max(clamp((0.9 - n.y) / 0.2, 0, 1), clamp((y - 260) / 60, 0, 1)));   // la roche : sur les pentes raides et en haut
+      // la neige des SOMMETS : elle couvre tout, sauf les pentes trop raides pour qu'elle tienne (plus de 55°), où l'on voit la roche
+      if (y > EAU) coul.lerp(une.lerpColors(COUL.neige, COUL.neige2, v), neigeEn(x, z) * clamp((n.y - 0.52) / 0.1, 0, 1));
       col.set([coul.r, coul.g, coul.b], k * 3);
       const ombre = clamp(0.85 - (n.x + n.z) * 1.5, 0.45, 1.3), srgb = v => 255 * Math.min(1, v * ombre) ** (1 / 2.2);
       imageTerrain.set(y < EAU ? [63, 121, 163, 255] : [srgb(coul.r), srgb(coul.g), srgb(coul.b), 255], (iz * NXT + ix) * 4);
@@ -2673,13 +2773,45 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
     for (let k = 0; k < n; k++) {
       const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z), r = routeSous(x, z);
       if (y < EAU + 0.4 || (r && r.d < 8) || Math.abs(hauteurTerrain(x + 2, z) - y) > 1.6 || presDePiste(x, z, 14)) continue;
-      arbre(x, z, 0.8 + rnd() * 0.6, y, sorte);
+      const neige = neigeEn(x, z) > 0.5;   // dans la neige : des sapins givrés, et plus rien au-dessus de 350 m
+      if (neige && y > 350) continue;
+      arbre(x, z, 0.8 + rnd() * 0.6, y, neige ? 'sapinNeige' : sorte);
     }
     if (chiffre >= 3 && rnd() < 0.6) { // un rocher
       const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z), t = 1.5 + rnd() * 2.5;
       if (!routeSous(x, z) && !presDePiste(x, z, 16)) { ajouterGeo('rocher', new THREE.IcosahedronGeometry(t, 0).scale(1, 0.7, 1.2).rotateY(rnd() * 6).translate(x, y + t * 0.3, z)); ajouterCollision(x - t, z - t, x + t, z + t, y + t, y - 1); }
     }
   }
+}
+// les télésièges : deux gares (un quai, quatre poteaux, un toit, et la grande roue où tourne le câble), les pylônes, le câble,
+// et les sièges, qui bougent : un seul objet pour tous ceux d'un télésiège (majTelesieges les fait avancer)
+const GEO_SIEGE = mergeGeometries([[0.06, 2.45, 0.06, 0, -1.2, -0.38], [0.06, 0.06, 0.42, 0, 0, -0.18], [1.2, 0.08, 0.5, 0, -2.4, -0.05], [1.2, 0.55, 0.06, 0, -2.08, -0.36],
+  [0.05, 0.9, 0.05, -0.58, -1.95, -0.05], [0.05, 0.9, 0.05, 0.58, -1.95, -0.05], [1.2, 0.05, 0.05, 0, -1.5, -0.05]].map(([l, h, p, x, y, z]) => new THREE.BoxGeometry(l, h, p).translate(x, y, z)));
+const chaise = new THREE.Mesh(GEO_SIEGE, MAT.siege);   // le siège de B.J. quand il monte
+chaise.castShadow = true; chaise.visible = false; scene.add(chaise);
+for (const l of TELESIEGES) {
+  for (const [p, a] of [[l.bas, l.a], [l.haut, l.a + Math.PI]]) { // une gare : le devant regarde le câble
+    const en = (av, dr) => ({ x: p.x + Math.sin(a) * av + l.droite.x * dr, z: p.z + Math.cos(a) * av + l.droite.z * dr });
+    const piece = (mat, av, dr, y, lg, h, pr) => { const q = en(av, dr); ajouterGeo(mat, new THREE.BoxGeometry(lg, h, pr).rotateY(a).translate(q.x, p.y + y + h / 2, q.z)); };
+    piece('pierre', 0, 0, -0.3, 8, 0.36, 12);   // le quai
+    for (const av of [-5, 5]) for (const dr of [-3.6, 3.6]) { piece('metal', av, dr, 0, 0.3, 5.2, 0.3); const q = en(av, dr); ajouterCollision(q.x - 0.2, q.z - 0.2, q.x + 0.2, q.z + 0.2, p.y + 5.2, p.y); }
+    piece('rouge', 0, 0, 5.2, 9, 0.4, 13);   // le toit
+    ajouterGeo('metal', new THREE.CylinderGeometry(1.75, 1.75, 0.3, 24).translate(p.x, p.y + 3.2, p.z));
+  }
+  for (const p of l.pts) if (p.pylone) { // un pylône : un poteau, et une traverse qui porte les deux câbles
+    const y0 = hauteurTerrain(p.x, p.z) - 0.5;
+    ajouterGeo('metal', new THREE.CylinderGeometry(0.3, 0.45, p.y + 0.3 - y0, 8).translate(p.x, (p.y + 0.3 + y0) / 2, p.z));
+    ajouterGeo('metal', new THREE.BoxGeometry(4.2, 0.35, 0.35).rotateY(l.a).translate(p.x, p.y + 0.3, p.z));
+    ajouterCollision(p.x - 0.4, p.z - 0.4, p.x + 0.4, p.z + 0.4, p.y, y0);
+  }
+  for (const cote of [1, -1]) for (let k = 0; k < l.pts.length - 1; k++) { // le câble, de pylône en pylône
+    const A = pointCable(l, l.pts[k].s, cote), B = pointCable(l, l.pts[k + 1].s, cote), o = new THREE.Object3D();
+    o.position.copy(A).add(B).multiplyScalar(0.5); o.lookAt(B); o.updateMatrix();
+    ajouterGeo('cable', new THREE.CylinderGeometry(0.03, 0.03, A.distanceTo(B), 4).rotateX(Math.PI / 2).applyMatrix4(o.matrix));
+  }
+  l.sieges = new THREE.InstancedMesh(GEO_SIEGE, MAT.siege, Math.floor(2 * l.long / 25));   // un siège tous les 25 m
+  l.sieges.castShadow = true; l.sieges.frustumCulled = false; scene.add(l.sieges);
+  l.milieu = { x: (l.bas.x + l.haut.x) / 2, z: (l.bas.z + l.haut.z) / 2 };
 }
 // l'eau : un grand plan à la hauteur EAU, qui brille et ondule
 const eau = new THREE.Mesh(new THREE.PlaneGeometry(TAILLE_X + 9000, TAILLE_Z + 9000).rotateX(-Math.PI / 2),
@@ -2690,8 +2822,8 @@ eau.position.set(TAILLE_X / 2, EAU, TAILLE_Z / 2); eau.receiveShadow = true; sce
 // fusion : quelques gros objets par morceau au lieu de milliers de petits (beaucoup plus rapide)
 const batiments = [];
 // les intérieurs (planchers, marches, meubles) ne font pas d'ombre : les murs et le toit la font déjà
-const SANS_OMBRE = ['platre', 'boisClair', 'parquet', 'carrelage', 'moquette', 'cuir', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'croix', 'enseigne', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'police', 'superette', 'customs', 'banque', 'yellowjack', 'essence', 'maze'];
-const PAS_UN_MUR = ['lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'trottoir', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'rambarde'];
+const SANS_OMBRE = ['platre', 'boisClair', 'parquet', 'carrelage', 'moquette', 'cuir', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'croix', 'enseigne', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'police', 'superette', 'customs', 'banque', 'yellowjack', 'essence', 'maze'];
+const PAS_UN_MUR = ['lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'cable', 'trottoir', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'rambarde'];
 const GEO_ARBRE = {
   rond: [new THREE.CylinderGeometry(0.15, 0.25, 3, 7).translate(0, 1.5, 0),
          mergeGeometries([[0, 4.4, 0, 1.7], [0.9, 3.9, 0.3, 1.2], [-0.8, 4, -0.5, 1.25], [0.1, 4.1, 0.9, 1.1], [-0.2, 5.3, -0.1, 1.2]].map(([x, y, z, r]) => new THREE.IcosahedronGeometry(r, 1).translate(x, y, z)))],
@@ -2706,7 +2838,9 @@ const GEO_ARBRE = {
             new THREE.CylinderGeometry(0.18, 0.18, 0.5, 6).rotateZ(Math.PI / 2).translate(0.3, 1.4, 0), new THREE.CylinderGeometry(0.16, 0.16, 1, 6).translate(-0.5, 2.3, 0),
             new THREE.CylinderGeometry(0.16, 0.16, 0.4, 6).rotateZ(Math.PI / 2).translate(-0.3, 1.8, 0)]), null],
 };
-const MAT_ARBRE = { tronc: std(null, { color: '#5a3d24' }), feuilles: std(TEX.feuilles, { roughness: 1, bumpScale: 0.6 }), sapin: std(TEX.feuilles, { color: '#7a9a78', roughness: 1, bumpScale: 0.6 }) };
+const MAT_ARBRE = { tronc: std(null, { color: '#5a3d24' }), feuilles: std(TEX.feuilles, { roughness: 1, bumpScale: 0.6 }), sapin: std(TEX.feuilles, { color: '#7a9a78', roughness: 1, bumpScale: 0.6 }),
+  sapinNeige: std(null, { color: '#c4d6d0', roughness: 1 }) };   // un sapin givré, dans la neige des SOMMETS
+GEO_ARBRE.sapinNeige = GEO_ARBRE.sapin;
 const GEO_POTEAU = mergeGeometries([new THREE.CylinderGeometry(0.07, 0.11, 7, 6).translate(0, 3.5, 0), new THREE.BoxGeometry(0.1, 0.1, 1.8).translate(0, 7, 0.85)]);
 const GEO_LAMPE = new THREE.BoxGeometry(0.35, 0.12, 0.7).translate(0, 6.92, 1.6);
 const MAT_POTEAU = std(null, { color: '#333', metalness: 0.6, roughness: 0.5 }), MAT_LAMPE = std(null, { color: '#ffe', emissive: '#ffe8b0', emissiveIntensity: 0.4 });
@@ -2739,7 +2873,7 @@ for (const m of morceaux.values()) {
     const l = m.arbres.filter(a => a.sorte === sorte), [tronc, feuilles] = GEO_ARBRE[sorte];
     const placer = (o, e) => { o.position.set(e.x, e.y, e.z); o.scale.setScalar(e.s); o.rotation.y = e.x; };
     instances(m.g, tronc, sorte === 'cactus' ? MAT.cactus : MAT_ARBRE.tronc, l, placer);
-    instances(m.g, feuilles, sorte === 'sapin' ? MAT_ARBRE.sapin : MAT_ARBRE.feuilles, l, placer);
+    instances(m.g, feuilles, MAT_ARBRE[sorte] || MAT_ARBRE.feuilles, l, placer);
   }
   const placer = (o, e) => { o.position.set(e.x, e.y, e.z); o.rotation.y = e.a; };
   const dessins = [instances(m.g, GEO_POTEAU, MAT_POTEAU, m.lampadaires, placer), instances(m.g, GEO_LAMPE, MAT_LAMPE, m.lampadaires, placer)];
@@ -2954,6 +3088,14 @@ function animerHumain(h, vitesse, dt, o = {}) {
   if (o.arme) { const l = o.leve || 0; h.brasD.rotation.set(-1.45 - l, 0, 0); h.brasG.rotation.set(-1.3 - l, 0, -0.55); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = 0; }
   if (o.assis) { h.brasD.rotation.set(-0.95, 0, -0.3); h.brasG.rotation.set(-0.95, 0, 0.3); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.5; } // les mains au guidon
   if (o.tenir) { h.brasD.rotation.set(-0.5, 0, -0.15); h.brasG.rotation.set(-0.5, 0, 0.15); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.7; } // debout, les mains au guidon (le Segway)
+  // la glisse : à ski, les genoux pliés (plie) et les mains en avant ; en snowboard, les bras écartés pour l'équilibre ;
+  // en luge, assis, les jambes tendues devant et les mains sur les montants
+  if (o.glisse === 'skis') { h.brasD.rotation.set(-0.6, 0, -0.3); h.brasG.rotation.set(-0.6, 0, 0.3); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.9; }
+  if (o.glisse === 'snowboard') { h.brasD.rotation.set(-0.15, 0, -1.1); h.brasG.rotation.set(-0.15, 0, 1.1); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.35; }
+  if (o.glisse === 'luge') {
+    h.jambeG.rotation.x = h.jambeD.rotation.x = -1.45; h.jambeG.pli.rotation.x = h.jambeD.pli.rotation.x = 0.2;
+    h.brasD.rotation.set(-0.35, 0, -0.5); h.brasG.rotation.set(-0.35, 0, 0.5); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.2;
+  }
   if (o.frappe > 0) { h.brasD.rotation.x = -1.7 * Math.sin(o.frappe * Math.PI); h.brasD.pli.rotation.x = -1.3 * (1 - Math.sin(o.frappe * Math.PI)); }
   // en l'air : il replie les jambes en montant, les tend vers le sol en redescendant, et pédale en tombant de haut.
   // Ses bras vont en avant en montant, s'écartent pour l'équilibre en redescendant, font des moulinets en tombant de haut.
@@ -2985,11 +3127,12 @@ function animerHumain(h, vitesse, dt, o = {}) {
     h.jambeG.rotation.x = lerp(-0.3, 0, e); h.jambeG.pli.rotation.x = lerp(0.6, 0.3, e);
     h.jambeD.rotation.x = 0.05; h.jambeD.pli.rotation.x = lerp(0.15, 0, e);
   }
-  // la danse, en trois pas. Seule la danse écarte les jambes, penche la tête ou met sur la pointe des pieds
+  // la danse, en trois pas. Seule la danse écarte les jambes (et le snowboard), penche la tête ou met sur la pointe des pieds
   const pas = o.danse?.pas;
   let penche = o.robot ? 0 : Math.max(plie * 0.25, o.accroupi ? 0 : amp * 0.12), monte = 0;   // on se penche en avant pour courir (pas un robot), et en pliant les genoux
-  h.tete.rotation.x = 0; h.brasD.position.y = 0.6;
+  h.tete.rotation.x = h.tete.rotation.y = 0; h.brasD.position.y = 0.6;
   for (const j of [h.jambeG, h.jambeD]) { j.rotation.z = 0; j.chaussure.rotation.set(0, 0, 0); }
+  if (o.glisse === 'snowboard') { h.jambeG.rotation.z = 0.3; h.jambeD.rotation.z = -0.3; h.tete.rotation.y = -1.2; }   // les pieds écartés sur la planche, la tête tournée vers l'avant
   if (pas === 'moonwalk') { // il marche vers l'avant mais il recule : le pied qui avance glisse sur la pointe, le bras gauche bouge à peine
     for (const j of [h.jambeG, h.jambeD]) j.chaussure.rotation.x = j.pli.rotation.x * 0.8;
     h.brasG.rotation.x *= 0.3;
@@ -3167,7 +3310,6 @@ const cachePeinture = {};
 const peinture = c => cachePeinture[c] ||= new THREE.MeshPhysicalMaterial({ color: c, metalness: 0.55, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08 });
 
 // petits outils pour fabriquer les pièces : une boîte (aux bords arrondis si r > 0), un tube, un phare rond, une pièce de chaque côté
-const lerp = THREE.MathUtils.lerp;
 const bloc = (l, h, p, x, y, z, r = 0) => (r ? new RoundedBoxGeometry(l, h, p, 1, r) : new THREE.BoxGeometry(l, h, p)).translate(x, y, z);
 function tube(rayon, l, x, y, z, axe = 'x') {
   const g = new THREE.CylinderGeometry(rayon, rayon, l, 14);
@@ -3304,6 +3446,31 @@ const MODELES = {
       f.peint.push(...deux(c => bloc(0.09, 0.3, 0.46, 0.33 * c, 0.34, 0, 0.04)));               // les garde-boue
       f.chrome.push(new THREE.CylinderGeometry(0.025, 0.025, 1, 8).rotateX(0.12).translate(0, 0.72, 0.18), tube(0.02, 0.55, 0, 1.2, 0.24));   // le manche, le guidon
       f.phares.push(rond(0.04, 0, 1.1, 0.26));
+    } },
+  // la glisse : pas de roues. glisse : la pose de B.J. dessus (animerHumain). deuxRoues : il penche dans les virages, comme à moto.
+  // Les skis : deux planches fines au bout relevé, avec leurs fixations
+  skis: { longueur: 1.75, largeur: 0.45, hauteur: 1.4, roue: 0.05, roues: [], oeil: [0, 1.6, 0.15], siege: [1, 0], ouvert: true, deuxRoues: true, glisse: 'skis',
+    plus: f => {
+      for (const c of [-1, 1]) {
+        f.peint.push(bloc(0.085, 0.025, 1.45, 0.12 * c, 0.013, -0.12, 0.01), new THREE.BoxGeometry(0.085, 0.025, 0.28).rotateX(-0.5).translate(0.12 * c, 0.07, 0.72));
+        f.noir.push(bloc(0.1, 0.07, 0.3, 0.12 * c, 0.06, 0, 0.02));   // la fixation, sous la chaussure
+      }
+    } },
+  // le snowboard : une planche aux bouts arrondis et relevés. On s'y tient de côté, les pieds en travers
+  snowboard: { longueur: 1.55, largeur: 0.5, hauteur: 1.4, roue: 0.05, roues: [], oeil: [0, 1.6, 0.1], siege: [1, 0], ouvert: true, deuxRoues: true, glisse: 'snowboard',
+    plus: f => {
+      f.peint.push(deformer(new THREE.CapsuleGeometry(0.14, 1.25, 4, 12).rotateX(Math.PI / 2).scale(1.3, 0.1, 1), (x, y, z) => [x, y + 0.02 + Math.max(0, Math.abs(z) - 0.5) ** 2 * 0.5, z]));
+      f.noir.push(...deux(c => bloc(0.26, 0.08, 0.12, 0, 0.07, 0.3 * c, 0.02)));   // les fixations
+    } },
+  // la luge : une luge en bois, sur deux patins en métal recourbés devant. On s'y assoit, les pieds devant
+  luge: { longueur: 1.3, largeur: 0.5, hauteur: 0.9, roue: 0.05, roues: [], oeil: [0, 1.05, -0.1], siege: [0.42, -0.25], ouvert: true, glisse: 'luge',
+    plus: f => {
+      for (const c of [-1, 1]) {
+        f.chrome.push(bloc(0.03, 0.03, 1.05, 0.21 * c, 0.015, -0.1), new THREE.BoxGeometry(0.03, 0.03, 0.34).rotateX(-0.9).translate(0.21 * c, 0.13, 0.52));   // les patins
+        f.peint.push(bloc(0.04, 0.04, 1.1, 0.21 * c, 0.26, -0.05, 0.01));                                          // les montants de chaque côté
+        for (const z of [-0.45, 0.05, 0.4]) f.peint.push(bloc(0.04, 0.25, 0.04, 0.21 * c, 0.14, z));             // les pieds
+      }
+      for (const z of [-0.5, -0.3, -0.1, 0.1, 0.3]) f.peint.push(bloc(0.46, 0.03, 0.14, 0, 0.29, z, 0.01));      // les lattes du siège
     } },
   // la DeLorean : de l'inox brossé, un coin tout plat, des lamelles noires sur la vitre arrière, et la machine à remonter le temps derrière
   delorean: { longueur: 4.2, largeur: 1.86, hauteur: 1.14, roue: 0.33, essieux: [-1.28, 1.2], garde: 0.16, arrondi: 0.06, oeil: [0.4, 1.02, -0.3],
@@ -3742,7 +3909,7 @@ const pireDegat = v => Math.max(...Object.values(v.degats));
 function abimer(v, P, D, force, balle = false, largeur = 0.5 + force * 0.7) {
   if (balle && estBlindee(v)) { bip(2600, 900, 0.1, 'sawtooth', 0.04 * clamp(1.3 - dist(v, J) / 60, 0, 1)); return; }   // les balles ricochent sur le blindage
   force *= R_.degatsVoitures * (estBlindee(v) ? 0.35 : 1);
-  if (pasDeTole(v) || v.detruite || force <= 0.005) return;
+  if (pasDeTole(v) || v.type.glisse || v.detruite || force <= 0.005) return;   // (des skis ne se cabossent pas)
   if (!v.abimee) preparerDegats(v);
   const zone = zoneDe(v.forme, P, D);
   v.degats[zone] = Math.min(1, v.degats[zone] + (balle ? force * 0.2 : force));
@@ -4092,7 +4259,7 @@ function regime(v) {
 // cote : de -1 (à gauche) à 1 (à droite), doppler : la note monte quand la voiture approche, et descend quand elle s'éloigne
 function reglerMoteur(m, v, gaz, fort, cote = 0, doppler = 1) {
   const t = audio.currentTime;
-  if (!v) { m.volume.gain.setTargetAtTime(0, t, 0.1); m.voiture = null; return; }
+  if (!v?.type.son) { m.volume.gain.setTargetAtTime(0, t, 0.1); m.voiture = null; return; }   // (la glisse n'a pas de moteur)
   const s = v.type.son, r = regime(v), note = (s.grave + (s.aigu - s.grave) * r) * doppler;
   if (m.voiture !== v) { m.voiture = v; m.r = r; m.gaz = gaz; m.notes[0].type = s.petarade ? 'square' : 'sawtooth'; m.notes[1].type = 'sawtooth'; m.filtre.Q.value = 0.7 + s.rauque * 3; m.crepite.gain.value = 2.5 * Math.sqrt(s.rauque); }
   // on passe la vitesse suivante : le régime retombe d'un coup, et le moteur se tait un instant (un moteur rauque claque)
@@ -4158,7 +4325,7 @@ const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, 
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0,
-  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null };   // atterri, genou, roule : voir retomber ; superman : voir decoller ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe
+  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null };   // atterri, genou, roule : voir retomber ; superman : voir decoller ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 joueurH.g.traverse(o => o.userData.habit = o.material);   // sa tenue normale, pour la lui remettre après les codes de triche
 scene.add(joueurH.g);
@@ -5035,6 +5202,14 @@ for (const g of garagistes) { const h = creerHumain(TENUES.garagiste()); h.g.pos
 const typeNomme = nom => nom && VOITURES.find(t => t.nom === nom);
 voituresGarees.forEach(v => creerVoiture(v.x, v.z, v.a, !!v.police, typeNomme(v.type) || undefined));
 bateauxDepart.forEach(b => creerVoiture(b.x, b.z, b.a, false, typeNomme(b.type) || undefined));
+// les skis, snowboards et luges des stations de ski : un de chaque en bas et en haut du télésiège, à droite du câble, s'il n'y en a plus
+function garnir(l) {
+  for (const [p, a] of [[l.bas, l.a], [l.haut, l.a + Math.PI]]) VOITURES.filter(t => t.glisse).forEach((t, k) => {
+    const x = p.x + l.droite.x * (6.5 + k * 1.3), z = p.z + l.droite.z * (6.5 + k * 1.3);
+    if (!voitures.some(o => o.type === t && !o.detruite && dist(o, { x, z }) < 12)) creerVoiture(x, z, a, false, t);
+  });
+}
+TELESIEGES.forEach(garnir);
 
 const $ = id => document.getElementById(id);
 function annonce(titre, sous = '', duree = 3) { $('annonce').innerHTML = `${titre}${sous ? `<small>${sous}</small>` : ''}`; $('annonce').style.opacity = 1; tempsAnnonce = duree; }
@@ -5172,8 +5347,59 @@ function ascenseurProche() {
     if (dist(de, J) < 1.8 && Math.abs(de.y - J.y) < 1.5) return { de, vers, monte: vers === a.haut };
   return null;
 }
+// le télésiège dont B.J. est au départ (à pied, ou sur ses skis, son snowboard ou sa luge), ou null
+function telesiegeProche() {
+  if (J.telesiege || J.robot || (J.voiture && !J.voiture.type.glisse)) return null;
+  return TELESIEGES.find(l => Math.hypot(J.x - l.bas.x - l.droite.x * 1.6, J.z - l.bas.z - l.droite.z * 1.6) < 3.5 && Math.abs(J.y - l.bas.y) < 2) || null;
+}
+// sur le télésiège : B.J. est assis sur un siège qui suit le câble jusqu'en haut, avec ses skis, son snowboard ou sa luge s'il en a.
+// En haut, il descend du siège à côté de la gare, tourné vers la pente
+function monterTelesiege(dt) {
+  const T = J.telesiege, l = T.l, v = J.voiture;
+  T.s += R_.vitesseTelesiege * dt;
+  if (T.s >= l.long) {
+    J.telesiege = null; chaise.visible = false;
+    J.x = l.haut.x + l.droite.x * 4; J.z = l.haut.z + l.droite.z * 4; J.y = hauteurSol(J.x, J.z); J.vy = 0; J.lacet = J.angleCorps = l.a + Math.PI;
+    if (v) Object.assign(v, { x: J.x, z: J.z, y: J.y, vy: 0, vitesse: 0, angle: l.a + Math.PI });
+    garnir(l);
+    return;
+  }
+  const p = pointCable(l, T.s, 1);
+  chaise.position.copy(p); chaise.rotation.set(0, l.a, 0);
+  J.x = p.x; J.z = p.z; J.y = p.y - 3.21; J.vy = 0; J.vitesse = 0; J.angleCorps = l.a; J.superman = null;
+  animerHumain(joueurH, 0, dt, { assis: true });
+  joueurH.g.position.set(J.x, J.y, J.z); joueurH.g.rotation.set(0, l.a, 0);
+  if (joueurH.arme) joueurH.arme.visible = false;
+  if (v) { // ses skis (ou sa luge) pendent sous ses pieds
+    Object.assign(v, { x: p.x + Math.sin(l.a) * 0.4, z: p.z + Math.cos(l.a) * 0.4, y: p.y - 3.05, vy: 0, vitesse: 0, angle: l.a, tangage: 0, roulis: 0, penche: 0 });
+    v.m.position.set(v.x, v.y, v.z); v.m.rotation.set(0, v.angle, 0);
+  }
+}
+// les sièges avancent le long du câble, en boucle : ils montent à droite et redescendent à gauche
+const O_SIEGE = new THREE.Object3D();
+function majTelesieges() {
+  for (const l of TELESIEGES) {
+    l.sieges.visible = Math.hypot(l.milieu.x - camera.position.x, l.milieu.z - camera.position.z) < R_.distanceVue + l.long / 2;
+    if (!l.sieges.visible) continue;
+    const n = l.sieges.count;
+    for (let k = 0; k < n; k++) {
+      const s = (k / n * 2 * l.long + temps * R_.vitesseTelesiege) % (2 * l.long), monte = s < l.long;
+      O_SIEGE.position.copy(pointCable(l, monte ? s : 2 * l.long - s, monte ? 1 : -1)); O_SIEGE.rotation.set(0, l.a + (monte ? 0 : Math.PI), 0);
+      O_SIEGE.updateMatrix(); l.sieges.setMatrixAt(k, O_SIEGE.matrix);
+    }
+    l.sieges.instanceMatrix.needsUpdate = true;
+  }
+}
 function action() {
   if (J.mort || J.roule) return;
+  if (J.telesiege) { // en plein trajet : il saute du siège... et retombe de haut !
+    const v = J.voiture;
+    J.telesiege = null; chaise.visible = false; J.vy = 0; J.sol = false;
+    if (v) Object.assign(v, { vol: true, decollage: { x: v.x, z: v.z, t: temps } });
+    return;
+  }
+  const tl = telesiegeProche();
+  if (tl) { J.telesiege = { l: tl, s: 0 }; J.danse = 0; J.accroupi = false; chaise.visible = true; bip(500, 750, 0.3, 'sine', 0.15); return; }
   if (J.voiture?.enVol) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }   // pas en plein vol
   if (J.voiture) { if (!J.voiture.rail && !(J.voiture.accident && !J.voiture.accident.dort)) sortirVoiture(); return; }   // pas en plein looping, ni pendant les tonneaux !
   if (J.robot) { sortirRobot(); return; }
@@ -5235,12 +5461,12 @@ function entrerVoiture(v) {
     if (v.police) c.alerte = true; else c.peur = 8;
     v.conducteur = null;
   }
-  if (!v.volee) { v.volee = true; if (v.police || policeVoit()) crime(1); }
+  if (!v.volee && !v.type.glisse) { v.volee = true; if (v.police || policeVoit()) crime(1); }   // (les skis de la station sont à tout le monde)
   J.voiture = v; J.accroupi = false; J.nage = false; J.decalage = 0; J.tangage = -0.12;
   if (v.type.vole) { // on regarde droit devant, et on rappelle les commandes
     J.lacet = v.angle; J.tangage = 0;
     annonce(tr(v.type.nom).toUpperCase(), v.type.vole === 'avion' ? tr('Z : accélérer · S : ralentir · la souris dirige (ou Q D, Espace et C)') : tr('Espace : monter · C : descendre · Z Q S D : avancer · la souris tourne'), 5);
-  } else annonce(tr(v.type.nom).toUpperCase(), '', 2);   // le nom du véhicule dans lequel on monte
+  } else annonce(tr(v.type.nom).toUpperCase(), v.type.glisse ? tr('Z : pousser · S : freiner · Espace : sauter') : '', v.type.glisse ? 4 : 2);   // le nom du véhicule dans lequel on monte
 }
 function sortirVoiture() {
   const v = J.voiture;
@@ -5562,7 +5788,8 @@ function conduire(v, dt) {
   const gaz = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), volant = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
   const t = v.type, auSol = !v.enAir && !v.rail;   // en l'air, les roues ne touchent rien : ni gaz, ni frein, ni volant
   const lourd = v.blindee ? R_.lourdeurBlindage : 1, acc = t.acceleration * lourd;   // le blindage Mad Max pèse lourd
-  if (auSol) {
+  if (auSol && t.glisse) glisser(v, dt, gaz, volant);
+  else if (auSol) {
     if (gaz > 0) v.vitesse += acc * dt * (v.vitesse < 0 ? 2.5 : 1);
     else if (gaz < 0) v.vitesse -= acc * dt * (v.vitesse > 0 ? 2.5 : 0.6);
     else v.vitesse *= Math.pow(0.6, dt);
@@ -5573,11 +5800,12 @@ function conduire(v, dt) {
   const crevees = v.roues.filter(r => r.crevee);
   if (!v.rail) v.vitesse = clamp(v.vitesse, -10, t.vitesse * lourd * (1 - 0.45 * v.degats.avant) * (1 - 0.15 * crevees.length));
   v.gaz = gaz * Math.sign(v.vitesse || gaz) > 0 ? 1 : 0;   // on accélère (pour le bruit du moteur) : pas quand on freine
-  const braquage = clamp(Math.abs(v.vitesse) / 6, 0, 1) * (1 - Math.abs(v.vitesse) / t.vitesse * 0.5) * Math.sign(v.vitesse) * (auSol ? 1 : 0);
+  // (à ski, on tourne aussi sur place, pour se mettre dans la pente)
+  const braquage = (t.glisse ? (v.vitesse < -0.1 ? -1 : 1) : clamp(Math.abs(v.vitesse) / 6, 0, 1) * Math.sign(v.vitesse)) * (1 - Math.abs(v.vitesse) / t.vitesse * 0.5) * (auSol ? 1 : 0);
   // des roues avant tordues, ou un pneu crevé, tirent la voiture d'un côté : il faut tenir le volant
   const avant = v.roues.filter(r => r.avant), tire = avant.reduce((s, r) => s + (r.pince || 0), 0) / (avant.length || 1) / 0.45 * 0.6
     + crevees.reduce((s, r) => s + Math.sign(r.pivot.position.x) * 0.25, 0);
-  v.angle -= (volant - tire) * 1.9 * t.virage * braquage * dt * (touches.Space ? 1.6 : 1);
+  v.angle -= (volant - tire) * 1.9 * t.virage * braquage * dt * (touches.Space && !t.glisse ? 1.6 : 1);
   v.braque = -volant * 0.45;
   if (v.accident) majAccident(v, dt);   // en plein accident : plus rien ne répond
   else if (v.rail || entrerRail(v)) roulerRail(v, dt); else bougerVoiture(v, dt, true);
@@ -5588,12 +5816,32 @@ function conduire(v, dt) {
     if (v.flux > 0) { v.flux -= dt; for (const c of [-1, 1]) { const f = new THREE.Sprite(M_FLASH.clone()), p = local(v, c * 0.72, -1.3); f.position.set(p.x, v.y + 0.25, p.z); scene.add(f); effets.push({ o: f, vie: 0.6, boule: 0.5 }); } }
     else if (Math.abs(v.vitesse) < 35) v.flux = 0;
   }
-  if (v.forme.siege) { // sur un tricycle, une moto, un Segway ou un bateau, on voit B.J. : la pose d'abord, puis il penche avec le véhicule
-    animerHumain(joueurH, 0, dt, v.forme.debout ? { tenir: true } : { assis: true });
-    if (v.quat) { v.m.updateMatrixWorld(); joueurH.g.position.copy(v.m.localToWorld(V3(0, v.forme.siege[0] - 0.95, v.forme.siege[1]))); joueurH.g.quaternion.copy(v.quat); }
-    else { const p = local(v, 0, v.forme.siege[1]); joueurH.g.position.set(p.x, v.y + v.forme.siege[0] - 0.95, p.z); joueurH.g.rotation.set(v.m.rotation.x, v.angle, v.m.rotation.z); }
+  if (v.forme.siege) { // sur un tricycle, une moto, un Segway, un bateau ou à ski, on voit B.J. : sa pose (majVoiture le place ensuite)
+    const g = v.forme.glisse, debout = g === 'skis' || g === 'snowboard';
+    animerHumain(joueurH, 0, dt, g ? { glisse: g, plie: debout ? 0.5 : 0, assis: !debout } : v.forme.debout ? { tenir: true } : { assis: true });
+    if (g && joueurH.arme) joueurH.arme.visible = false;   // pour glisser, il range son arme
   }
   if (temps - J.dernierMouvement > 1.5) { J.decalage *= Math.pow(0.1, dt); J.tangage += (-0.12 - J.tangage) * Math.min(1, dt * 2); }
+}
+// skis, snowboard, luge : pas de moteur. La pente fait avancer, la neige glisse (ailleurs, ça freine fort), l'air freine d'autant
+// plus qu'on va vite, et tourner freine un peu : pour ralentir, on tourne en travers de la pente.
+// Z pousse sur le plat (jusqu'à 4 m/s), S freine en chasse-neige puis recule un peu, Espace fait sauter
+function glisser(v, dt, gaz, volant) {
+  const s = Math.abs(v.vitesse), sens = Math.sign(v.vitesse);
+  if (gaz > 0 && v.vitesse < 4) v.vitesse = Math.min(4, v.vitesse + v.type.acceleration * dt);
+  if (gaz < 0) v.vitesse = v.vitesse > 0.5 ? v.vitesse - 12 * dt : Math.max(-2, v.vitesse - v.type.acceleration * dt);
+  const frein = R_.frottementNeige * (neigeSous(v.x, v.z) ? 1 : 15) + 0.004 * s * s + Math.abs(volant) * 0.1 * s;
+  v.vitesse -= sens * Math.min(s, frein * dt);
+  v.vitesse -= R_.graviteVoiture * Math.sin(v.tangage) * dt;   // la pente
+  const max = v.type.vitesse * Math.cos(v.tangage);   // (vitesse compte le long de la pente : à l'horizontale, on avance moins vite dans une pente raide)
+  v.vitesse = clamp(v.vitesse, -max, max);
+  if (touches.Space && !v.espace && !v.vol) v.vy = 4.5;   // hop ! (une fois par appui)
+  v.espace = touches.Space;
+}
+// la neige où l'on glisse : sur les SOMMETS (pas sur les routes, ni dans les villes), et sur la place d'une station de ski
+function neigeSous(x, z) {
+  const c = car(...blocEn(x, z));
+  return c === 'Y' || (neigeEn(x, z) > 0.5 && !estBloc(c) && !(routeSous(x, z)?.d < 5.5));
 }
 function bougerVoiture(v, dt, parJoueur) {
   const ax = v.x, az = v.z, vx = Math.sin(v.angle) * v.vitesse, vz = Math.cos(v.angle) * v.vitesse;
@@ -5717,8 +5965,11 @@ function poserVoiture(v, dt) {
     const dos = local(v, 0, 0.3), dos2 = local(v, 0, -0.3), monte = v.vitesse * (dosDAneEn(dos.x, dos.z) - dosDAneEn(dos2.x, dos2.z)) / 0.6, surDos = dosDAneEn(v.x, v.z) > 0;
     v.elanDos = surDos ? Math.max(v.elanDos || 0, monte) : 0;
     if (surDos && monte <= 0 && v.elanDos > 0) { v.vy = Math.max(v.vy, v.elanDos); v.elanDos = -1; }   // le sommet du dos d'âne : hop !
-    const vySol = (hp >= hc - 0.01 ? v.vitesse * (gradPiste.x * Math.sin(v.angle) + gradPiste.z * Math.cos(v.angle)) : v.vitesse * Math.sin(pente) + monte);
+    // (à ski, les pentes sont raides : la tangente, et non le sinus, pour que les skis restent collés à la neige)
+    const vySol = (hp >= hc - 0.01 ? v.vitesse * (gradPiste.x * Math.sin(v.angle) + gradPiste.z * Math.cos(v.angle)) : v.vitesse * (v.type.glisse ? Math.tan(pente) : Math.sin(pente)) + monte);
     v.vy -= R_.graviteVoiture * dt; v.y += v.vy * dt;
+    // à ski, on reste collé à la neige (les jambes amortissent les bosses) : on ne s'envole que d'un vrai rebord, ou en sautant
+    if (v.type.glisse && !v.vol && v.y > sol && v.y < sol + 0.15 + 0.02 * Math.abs(v.vitesse) && v.vy <= vySol + 0.5) v.y = sol;
     if (v.y <= sol) { // les roues touchent le sol
       v.vy = vySol + (v.vol ? atterrir(v, vySol - vy, pente) : 0);
       v.y = sol; v.vol = false;
@@ -5742,6 +5993,13 @@ function poserVoiture(v, dt) {
 // la voiture retombe : impact = à quelle vitesse elle tape le sol (m/s). Renvoie la vitesse du rebond
 function atterrir(v, impact, pente) {
   let rebond = impact > 3 ? impact * 0.2 : 0;
+  if (v.type.glisse) { // à ski, la neige ne fait pas rebondir. Seul compte ce qui tape en travers de la pente : dans une pente raide,
+    // on se reçoit bien (comme au bas d'un tremplin), et la vitesse de la chute qui va dans le sens de la pente n'est pas perdue.
+    // Plus de 11 m/s en travers (6 m de chute sur du plat), c'est la chute !
+    const travers = v.vitesse * Math.sin(pente) - v.vy * Math.cos(pente), long = v.vitesse * Math.cos(pente) + v.vy * Math.sin(pente);
+    if (travers > 11) { commencerAccident(v); return 0; }
+    v.vitesse = long * Math.cos(pente); rebond = impact = 0;
+  }
   const m = v.forme, d = v.tangage - pente;   // d < 0 : le nez tape en premier
   if (impact > 7) { // trop fort : ça cogne
     const f = (impact - 7) * 0.05;
@@ -6142,6 +6400,7 @@ function majVoitureIA(v, dt) {
 function majVoiture(v, dt) {
   const d = dist(v, J);
   v.m.visible = d < 350;
+  if (J.telesiege && v === J.voiture) return;   // sur le télésiège avec B.J. : monterTelesiege la porte
   if (v.gyro) { const on = Math.sin(temps * 14) > 0; v.gyro[0].material.emissiveIntensity = on ? 4 : 0.1; v.gyro[1].material.emissiveIntensity = on ? 0.1 : 4; }
   if (v === J.voiture) {}
   else if (v.type.vole) piloterAeronef(v, dt, false);
@@ -6188,6 +6447,19 @@ function majVoiture(v, dt) {
     } else { v.corps.remove(v.pilote.g); v.pilote = null; }
   }
   poserVoiture(v, dt);
+  // B.J. sur son tricycle, sa moto, son Segway, son bateau ou ses skis : il suit le véhicule, une fois celui-ci posé
+  // (avant, il avait une image de retard : à ski, jusqu'à 1 m au-dessus de la neige dans une pente raide)
+  if (v === J.voiture && v.forme.siege && !J.mort) {
+    const g = v.forme.glisse;
+    if (v.quat) { v.m.updateMatrixWorld(); joueurH.g.position.copy(v.m.localToWorld(V3(0, v.forme.siege[0] - 0.95, v.forme.siege[1]))); joueurH.g.quaternion.copy(v.quat); }
+    else {
+      const p = local(v, 0, v.forme.siege[1]); joueurH.g.position.set(p.x, v.y + v.forme.siege[0] - 0.95, p.z);
+      // debout sur des skis ou un snowboard, il reste droit dans la pente, et penche seulement dans les virages (de côté sur le snowboard)
+      if (g === 'skis') joueurH.g.rotation.set(0, v.angle, v.penche || 0);
+      else if (g === 'snowboard') joueurH.g.rotation.set(-(v.penche || 0), v.angle + Math.PI / 2, 0);
+      else joueurH.g.rotation.set(v.m.rotation.x, v.angle, v.m.rotation.z);
+    }
+  }
   if ((v.conducteur === 'civil' || v.epave) && (d > 280 || (d > 120 && derriere(v)))) v.supprimer = true;
   if (v.coule > 25 && d > 60) v.supprimer = true;
   if (v.police && v.renfort && !v.conducteur && v !== J.voiture && d > 150) v.supprimer = true;
@@ -6368,7 +6640,8 @@ function majCamera(dt) {
   const v = J.voiture;
   if (v?.accident) J.decalage = diffAngle(v.angle, J.lacetCam);   // la voiture tourne sur elle-même : la caméra, elle, ne tourne pas avec
   J.lacetCam = v && !v.type.vole ? v.angle + J.decalage : J.lacet;
-  const dir = new THREE.Vector3(Math.sin(J.lacetCam) * Math.cos(J.tangage), Math.sin(J.tangage), Math.cos(J.lacetCam) * Math.cos(J.tangage));
+  const tangage = J.tangage + (v?.type.glisse ? v.tangage * 0.8 : 0);   // à ski, la caméra plonge avec la pente : sinon, dans une pente raide, on ne verrait que le ciel
+  const dir = new THREE.Vector3(Math.sin(J.lacetCam) * Math.cos(tangage), Math.sin(tangage), Math.cos(J.lacetCam) * Math.cos(tangage));
   joueurH.g.visible = (!v || !!v.forme.siege) && J.vue !== 1;   // en voiture on ne voit pas B.J., sauf sur un tricycle
   if (J.mort) {
     joueurH.g.visible = !v || !!v.forme.siege;
@@ -6387,7 +6660,7 @@ function majCamera(dt) {
     else placerCamera(new THREE.Vector3(r.x, r.y + 4.4, r.z), dir, 7.5, 1.4);
   } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
   else placerCamera(new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z), dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
-  camera.rotation.set(J.tangage + J.recul * 0.03, J.lacetCam + Math.PI, 0);
+  camera.rotation.set(tangage + J.recul * 0.03, J.lacetCam + Math.PI, 0);
   if (v && v.quat && J.vue === 1) camera.quaternion.copy(v.quat).multiply(DEMI_TOUR);
   if (J.secousse > 0.005) { camera.position.x += entre(-1, 1) * J.secousse; camera.position.y += entre(-1, 1) * J.secousse; J.secousse *= Math.pow(0.01, dt); }   // les pas du robot font trembler
   const fov = dansLunette() ? 70 / ARMES[J.arme].zoom : visee && !v && !J.robot ? 45 : 70;
@@ -6401,7 +6674,7 @@ function majCamera(dt) {
 const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital'], C: ['#1a3a9a', 'P', 'Commissariat'], G: ['#7a3ac0', 'G', 'LS Customs'],
   K: ['#1a7a3a', '$', 'Banque'], S: ['#0a7a3a', 'S', 'Supérette'], E: ['#c01818', 'E', 'Station-service'], Z: ['#801010', 'Z', 'Tour Maze Bank'],
   L: ['#2a9a2a', 'F', 'Maison de Franklin'], O: ['#2a6ad8', 'M', 'Villa de Michael'], R: ['#e07a10', 'T', 'Caravane de Trevor'], J: ['#b89a10', 'Y', 'Yellow Jack'],
-  B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'],
+  B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'], Y: ['#1a7ad8', '❄', 'Station de ski'],
   U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'] };
 const LEGENDE = [...Object.values(ICONES), ['#d8501a', 'C', 'Piste de cascades']];   // les ronds de la légende de la grande carte
 const REPERES = [];   // [lieu, couleur, lettre, nom]
@@ -6427,6 +6700,9 @@ function dessinerPlan(g) {
   g.fillStyle = '#9a9a9a'; for (const [x, z, l, p] of PLAN.pistes) g.fillRect(x, z, l, p);
   g.strokeStyle = '#c8603a'; g.lineWidth = LARGEUR_PISTE; g.beginPath(); for (const r of PISTES) { g.moveTo(r.pts[0].p.x, r.pts[0].p.z); for (const q of r.pts) g.lineTo(q.p.x, q.p.z); } g.stroke();
   g.fillStyle = '#8c9196'; for (const [x, z, l, p] of PLAN.rues) g.fillRect(x, z, l, p);
+  g.strokeStyle = '#1a3a6a'; g.lineWidth = 6; g.setLineDash([24, 12]); g.beginPath();   // les télésièges : un trait tireté
+  for (const l of TELESIEGES) { g.moveTo(l.bas.x, l.bas.z); g.lineTo(l.haut.x, l.haut.z); }
+  g.stroke(); g.setLineDash([]);
   const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', F: '#5a7040', R: '#8a7a5a' };
   for (const [c, o] of PLAN.pates) { g.fillStyle = couleurs[c] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
   g.globalAlpha = 0.65; for (const gang of GANGS) { const o = origine(gang.col, gang.ligne); g.fillStyle = gang.couleur; g.fillRect(o.x - R / 2, o.z - R / 2, S + R, S + R); } g.globalAlpha = 1;   // le quartier des gangs
@@ -6566,7 +6842,9 @@ function majHUD(dt) {
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h` + (J.voiture.enVol ? ` · ${Math.round(J.voiture.y - Math.max(hauteurTerrain(J.voiture.x, J.voiture.z), EAU))} m` : '');   // en vol : la hauteur
   const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
   const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40), ech = aPied && !J.echelle && echelles.find(e => dist(e, J) < 1.5 && Math.abs(J.y - e.bas) < 1);
-  const aide = !aPied ? '' : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
+  const tl = telesiegeProche();
+  const aide = J.telesiege ? tr('Appuie sur <b>E</b> pour sauter du télésiège') : tl ? tr('Appuie sur <b>E</b> pour prendre le télésiège')
+    : !aPied ? '' : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
       : J.possede[s.arme] ? tr('Appuie sur <b>E</b> pour acheter : {arme} (munitions {prix} $)', { arme: tr(ARMES[s.arme].nom), prix: Math.round(ARMES[s.arme].prix / 2) })
       : tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr(ARMES[s.arme].nom), prix: ARMES[s.arme].prix }))
     : g ? tr('Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max ({prix})', { prix: montant(R_.prixBlindage) })
@@ -6589,7 +6867,7 @@ function mettreAJour(dt) {
   temps += dt;
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
   if (J.mort) {
-    J.mort += dt; J.roule = null;
+    J.mort += dt; J.roule = null; J.telesiege = null; chaise.visible = false;
     const k = Math.min(1, J.mort * 1.25);
     animerHumain(joueurH, 0, dt, poseMort(k, -1));
     if (!J.voiture && !J.robot && !J.nage) { // à pied : il tombe s'il était en l'air, et se couche sur le dos, tout mou
@@ -6601,13 +6879,13 @@ function mettreAJour(dt) {
     if (J.mort > 3.5) reapparaitre();
   }
   else {
-    if (J.voiture) conduire(J.voiture, dt); else if (J.robot) piloterRobot(J.robot, dt); else majJoueur(dt);
+    if (J.telesiege) { monterTelesiege(dt); J.danse = 0; } else if (J.voiture) conduire(J.voiture, dt); else if (J.robot) piloterRobot(J.robot, dt); else majJoueur(dt);
     J.cooldown -= dt; J.frappe = Math.max(0, J.frappe - dt * 3.3); J.recul = Math.max(0, J.recul - dt * 8);
     if (J.robot) { // dans le heavy robot : clic gauche = la mitrailleuse, clic droit = les roquettes
       const r = J.robot; for (const k in r.cdJ) r.cdJ[k] -= dt;
       if (sourisG && r.cdJ.lourde <= 0) tirer(ARMES_ROBOT.lourde);
       if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
-    } else if (sourisG && !J.voiture && !J.nage && !J.roule && !(J.superman && ARMES[J.arme].corps) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
+    } else if (sourisG && !J.voiture && !J.telesiege && !J.nage && !J.roule && !(J.superman && ARMES[J.arme].corps) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
@@ -6615,7 +6893,7 @@ function mettreAJour(dt) {
   for (const p of personnes) majPersonne(p, dt);
   for (const v of voitures) majVoiture(v, dt);
   for (const r of robots) majRobot(r, dt);
-  majBraquages(dt);
+  majBraquages(dt); majTelesieges();
   for (const o of objets) {
     if (o.cache) { o.cache -= dt; if (o.cache <= 0) { o.cache = 0; o.m.visible = true; } continue; }
     o.m.rotation.y += dt * 1.5; o.m.position.y = o.base + Math.sin(temps * 2 + o.x) * 0.1;
@@ -6678,7 +6956,7 @@ function mettreAJour(dt) {
     }
     reglerMoteur(moteurs[1], proche, 0.4, (1 - d / 40) ** 2 * 0.7, cote, doppler);
     roulement.setTargetAtTime(v ? Math.min(0.07, Math.abs(v.vitesse) * 0.002) : 0, t, 0.1);
-    crissement.setTargetAtTime(v && touches.Space && Math.abs(v.vitesse) > 6 ? 0.05 : 0, t, 0.05);
+    crissement.setTargetAtTime(v && touches.Space && !v.type.glisse && Math.abs(v.vitesse) > 6 ? 0.05 : 0, t, 0.05);
     let dp = Infinity; for (const v of voitures) if (v.police && v.conducteur) dp = Math.min(dp, dist(v, J));
     sireneGain.gain.value = dp < 180 ? 0.035 * (1 - dp / 180) : 0;
     sirene.frequency.value = Math.sin(temps * 5) > 0 ? 700 : 950;
@@ -6723,6 +7001,7 @@ requestAnimationFrame(boucle);
 etat('Clique pour jouer');
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
+  TELESIEGES, SOMMETS, neigeSous, telesiegeProche, chaise, sommetEn,
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
