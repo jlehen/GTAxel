@@ -1756,6 +1756,7 @@ function boite(mat, x, y, z, l, h, p, collision = false) {
   g.translate(x, Y0 + y + h / 2, z);
   ajouterGeo(mat, g);
   if (collision) { ajouterCollision(x - l / 2, z - p / 2, x + l / 2, z + p / 2, Y0 + y + h, Y0 + y); if (h > 2 && !interieur) empreintes.push([x - l / 2, z - p / 2, l, p]); }
+  return g;
 }
 function sol(mat, x, y, z, l, p) {
   const g = new THREE.PlaneGeometry(l, p).rotateX(-Math.PI / 2);
@@ -1804,7 +1805,7 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
                     sol: matSol = 'carrelage', mur = 'platre', toit = false, lampes = true, bas = 0 }) {
   const E = 0.3, [a, b, c, d] = { s: [1, 0, 0, 1], n: [-1, 0, 0, -1], e: [0, 1, -1, 0], o: [0, -1, 1, 0] }[porte];
   const P = (u, w) => [x + a * u + b * w, z + c * u + d * w];
-  const B = (m, u, y, w, lu, h, lw, coll = true) => { const [X, Z] = P(u, w); boite(m, X, y, Z, b ? lw : lu, h, b ? lu : lw, coll); };
+  const B = (m, u, y, w, lu, h, lw, coll = true) => { const [X, Z] = P(u, w); return boite(m, X, y, Z, b ? lw : lu, h, b ? lu : lw, coll); };
   const Plan = (m, u, y, w, lu, lw) => { const [X, Z] = P(u, w); sol(m, X, y, Z, b ? lw : lu, b ? lu : lw); };
   const y0 = 0.2 + bas, niveau = k => y0 + 0.05 + k * hEtage, hVisite = etages * hEtage + 0.05, hMur = hVisite + (toit ? 1.1 : 0);
   const moi = { x, z, geos: {} }, dedans = f => { const avant = interieur; interieur = moi; f(); interieur = avant; };   // ce qui est dedans ne se voit que de près
@@ -1812,8 +1813,13 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
   const iu = l / 2 - E, iw = p / 2 - E, g1 = decalagePorte - largeurPorte / 2, g2 = decalagePorte + largeurPorte / 2, pe = 0.02;
   // les murs (au-dessus du toit, ils font un garde-fou), et leur peau à l'intérieur
   B(mat, 0, y0, -p / 2 + E / 2, l, hMur, E); B(mat, -l / 2 + E / 2, y0, 0, E, hMur, p - 2 * E); B(mat, l / 2 - E / 2, y0, 0, E, hMur, p - 2 * E);
-  B(mat, (-l / 2 + g1) / 2, y0, p / 2 - E / 2, g1 + l / 2, hMur, E); B(mat, (g2 + l / 2) / 2, y0, p / 2 - E / 2, l / 2 - g2, hMur, E);
-  B(mat, decalagePorte, y0 + hauteurPorte, p / 2 - E / 2, largeurPorte, hMur - hauteurPorte, E);
+  // le mur de la porte, en 3 morceaux : le dessin de chacun reprend là où s'arrêtent celui de gauche et celui d'en dessous
+  // (sinon, les étages et les fenêtres au-dessus de la porte sont décalés)
+  const facade = (u1, u2, dy) => {
+    const uv = B(mat, (u1 + u2) / 2, y0 + dy, p / 2 - E / 2, u2 - u1, hMur - dy, E).attributes.uv, [tl, th] = DIM_TEX[mat] || [Infinity, Infinity];
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) + (u1 + l / 2) / tl, uv.getY(i) + dy / th);
+  };
+  facade(-l / 2, g1, 0); facade(g2, l / 2, 0); facade(g1, g2, hauteurPorte);
   dedans(() => {
     B(mur, 0, y0, -iw + pe / 2, 2 * iu, hVisite, pe, false); B(mur, -iu + pe / 2, y0, 0, pe, hVisite, 2 * iw, false); B(mur, iu - pe / 2, y0, 0, pe, hVisite, 2 * iw, false);
     B(mur, (-iu + g1) / 2, y0, iw - pe / 2, g1 + iu, hVisite, pe, false); B(mur, (g2 + iu) / 2, y0, iw - pe / 2, iu - g2, hVisite, pe, false);
@@ -1987,7 +1993,8 @@ function meubler(b, n, rnd) {
       cloison(uB, wC, xC, wC); if (uB > -iu) cloison(uB, wF, uB, wC);
       // la salle de bain : du carrelage, une baignoire, les toilettes, un lavabo et son miroir, la machine à laver
       tapis((uB + xC) / 2, (wF + wC) / 2, xC - uB - 0.12, wC - wF - 0.12, 'faience');
-      for (const [u, w, lu, lw] of [[(uB + xC) / 2, wF + 0.08, xC - uB, 0.02], [(uB + xC) / 2, wC - 0.08, xC - uB, 0.02], [uB + 0.08, (wF + wC) / 2, 0.02, wC - wF], [xC - 0.08, (wF + wC) / 2, 0.02, wC - wF]])
+      for (const [u, w, lu, lw] of [[(uB + xC) / 2, wF + 0.08, xC - uB, 0.02], [(uB + xC) / 2, wC - 0.08, xC - uB, 0.02], [uB + 0.08, (wF + wC) / 2, 0.02, wC - wF],
+                                     [xC - 0.08, wF + 0.6, 0.02, 1.2], [xC - 0.08, (wF + 2.2 + wC) / 2, 0.02, wC - wF - 2.2]])   // (pas devant la porte, de wF + 1,2 à wF + 2,2)
         M('faience', u, w, lu, 1.3, lw, 0, false);
       M('blanc', uB + 0.95, wF + 0.45, 1.7, 0.55, 0.75); M('eau', uB + 0.95, wF + 0.45, 1.5, 0.02, 0.55, 0.54, false);
       pose('blanc', uB + 0.35, wF + 2.3, [1, 0], 0.4, 0.42, 0.55, 0.05); pose('blanc', uB + 0.35, wF + 2.3, [1, 0], 0.42, 0.38, 0.18, -0.22, 0, 0.42);
@@ -6147,15 +6154,29 @@ function sauterMission(n) {
 // =====================================================================
 //  Caméra
 // =====================================================================
+// la caméra recule du pivot vers là où on la veut, mais s'arrête à MARGE_CAMERA des murs, des planchers et des meubles :
+// plus près, le bord de l'image passe à travers, et on voit un instant la pièce d'à côté ou celle du dessus
+const MARGE_CAMERA = 0.25;
 function placerCamera(pivot, direction, distance, epaule) {
   const droite = new THREE.Vector3(-Math.cos(J.lacetCam), 0, Math.sin(J.lacetCam));
   const voulu = pivot.clone().addScaledVector(direction, -distance).addScaledVector(droite, epaule);
-  let t = 1;
-  for (let s = 0.05; s <= 1; s += 0.05) { // la caméra ne passe pas dans les murs
-    const p = vTmp.lerpVectors(pivot, voulu, s);
-    if (dansBatiment(p.x, p.y, p.z)) { t = Math.max(0.05, s - 0.08); break; }
-  }
-  camera.position.lerpVectors(pivot, voulu, t);
+  const o = [pivot.x, pivot.y, pivot.z], d = [voulu.x - o[0], voulu.y - o[1], voulu.z - o[2]], M = MARGE_CAMERA;
+  let t = 1;   // où elle s'arrête : 0 au pivot, 1 là où on la veut
+  pourBoites(Math.min(o[0], voulu.x) - M, Math.min(o[2], voulu.z) - M, Math.max(o[0], voulu.x) + M, Math.max(o[2], voulu.z) + M, b => {
+    if (!(b.h > b.y0)) return;   // une boîte coupée (une porte ouverte)
+    for (const m of [M, 0]) { // la boîte grossie de la marge ; si le pivot y est déjà (tout près du plafond), la boîte elle-même
+      const bas = [b.x1 - m, b.y0 - m, b.z1 - m], haut = [b.x2 + m, b.h + m, b.z2 + m];
+      let t1 = -Infinity, t2 = Infinity;   // le chemin est dans la boîte de t1 à t2
+      for (let a = 0; a < 3; a++) {
+        if (Math.abs(d[a]) < 1e-9) { if (o[a] < bas[a] || o[a] > haut[a]) t1 = Infinity; continue; }
+        const ta = (bas[a] - o[a]) / d[a], tb = (haut[a] - o[a]) / d[a];
+        t1 = Math.max(t1, Math.min(ta, tb)); t2 = Math.min(t2, Math.max(ta, tb));
+      }
+      if (t1 > t2 || t2 < 0) break;             // le chemin ne la touche pas
+      if (t1 >= 0) { t = Math.min(t, t1); break; }
+    }
+  });
+  camera.position.lerpVectors(pivot, voulu, Math.max(0.05, t));
   camera.position.y = Math.max(Math.max(hauteurTerrain(camera.position.x, camera.position.z), EAU) + 0.3, camera.position.y);   // ni sous la terre, ni sous l'eau
 }
 const DEMI_TOUR = new THREE.Quaternion().setFromAxisAngle(V3(0, 1, 0), Math.PI);   // la caméra regarde vers -z, la voiture vers +z
