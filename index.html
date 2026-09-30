@@ -513,6 +513,7 @@ const REGLAGES = {
   etoilesBlindes: 4,         // à partir de 4 étoiles : une voiture de police sur deux est un fourgon blindé, avec 4 policiers d'élite
   vitesseBlindes: 34,        // m/s (122 km/h) : les fourgons blindés roulent vite !
   etoilesRobot: 5,           // à partir de 5 étoiles : le heavy robot de la police arrive (ses chiffres sont dans ENNEMIS)
+  tireursPolice: 2,          // chacun son tour : seuls les 2 policiers les plus proches qui te voient peuvent te toucher (le robot compte). Les autres tirent à côté
   // la vie, les dégâts et la précision des policiers, des nazis et des autres ennemis : voir ENNEMIS, après les voitures
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
@@ -4814,7 +4815,7 @@ function tirRobot(r, d) {
   const depart = boutRobot(r, false), arrivee = V3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
   let chance = ENNEMIS.robot.precision * clamp(1.2 - d / 60, 0.2, 1);
   if (J.accroupi) chance *= 0.5; if (J.vitesse > 6) chance *= 0.6; if (abrite()) chance *= 0.7;
-  const reussi = Math.random() < chance;
+  const reussi = Math.random() < chance && aSonTour(d);
   if (!reussi) arrivee.add(V3(entre(-2.5, 2.5), entre(-1, 2), entre(-2.5, 2.5)));
   balleLourde(depart, arrivee); flash(depart, 1.1);
   bruit(0.6 * clamp(1 - d / 150, 0.1, 1), 1100, 0.2);
@@ -5850,6 +5851,13 @@ function majChien(p, dt, d) {
   if (p.h.g.visible) { p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle; animerChien(p.h, vitesse, dt); }
 }
 function aboyer(p) { const f = clamp(1 - dist(p, J) / 60, 0, 1) * 0.4; bruit(f, 1400, 0.09); bip(560, 330, 0.11, 'sawtooth', f * 0.25); }
+// chacun son tour : un policier à d mètres ne peut te toucher que si moins de R_.tireursPolice policiers plus proches te voient
+// (le heavy robot compte). Les autres tirent à côté : ça siffle de partout, mais on a le temps de se mettre à l'abri
+function aSonTour(d) {
+  let devant = robots.filter(r => r.pilote === 'police' && r.voitJ && dist(r, J) < d).length;
+  for (const q of personnes) if (q.type === 'flic' && q.voitJ && q.vie > 0 && dist(q, J) < d) devant++;
+  return devant < R_.tireursPolice;
+}
 function tirEnnemi(p, d) {
   const arme = ARMES[p.armeIdx], E = fiche(p);
   // un fusil à pompe fait deux fois plus mal de près
@@ -5858,7 +5866,7 @@ function tirEnnemi(p, d) {
   if (J.accroupi) chance *= 0.5;
   if (J.vitesse > 6) chance *= 0.6;
   if (abrite()) chance *= 0.7;
-  const reussi = Math.random() < chance;
+  const reussi = Math.random() < chance && (p.type !== 'flic' || aSonTour(d));
   p.h.g.updateMatrixWorld(true);
   const depart = boutDuCanon(p.h, new THREE.Vector3());
   const arrivee = new THREE.Vector3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
