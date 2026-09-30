@@ -22,6 +22,7 @@ Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le j
 | Clic gauche | Tirer / frapper |
 | Clic droit | Viser (zoom, lunette avec le fusil de sniper) |
 | Maj | Courir |
+| Maj, 3 fois de suite (vite) | Voler comme Superman (encore 3 fois : tu arrêtes de voler… et tu tombes !) |
 | Espace | Sauter (frein à main en voiture) |
 | Ctrl ou C | S'accroupir (on se fait moins toucher) |
 | E | Monter / descendre (voiture, bateau, avion, hélicoptère, heavy robot ; en marche, tu sautes et tu roules par terre), acheter à l'armurerie, prendre l'ascenseur, parler au garagiste, voler le butin, poser la perceuse ou l'explosif, éjecter le pilote du heavy robot |
@@ -30,6 +31,8 @@ Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le j
 | M | Carte de tout le pays (molette : zoom, souris ou flèches : se déplacer) |
 | Entrée | Taper un code de triche |
 | Échap | Pause |
+
+En **Superman** : Z Q S D pour voler là où tu regardes, Espace pour monter, C ou Ctrl pour descendre, Maj pour aller plus vite. Descends jusqu'au sol, sur un toit ou dans l'eau pour te poser en douceur.
 
 Dans le **heavy robot** : Z Q S D pour marcher (Maj : plus vite), la souris pour viser, clic gauche : mitrailleuse, clic droit : roquettes, E : descendre.
 
@@ -69,7 +72,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 
   Chaque fois, beaucoup de police arrive, et vite. Sème-la, puis rapporte le butin à la planque, la caravane de Trevor à Sandy Shores, dans ta voiture blindée.
 - **Carte** : la touche M affiche tout le pays en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants. La légende, à gauche, dit ce que veut dire chaque rond. Elle te dit aussi dans quelle colonne et quelle ligne du tableau `CARTE` tu es.
-- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`, `GOKU`, `Z6PO` (ou `C3PO`)… à toi de voir ce qu'ils font ! Retape un code pour l'annuler. Et pour tester : `IDKFA` (ou `ARMES`, `WAFFEN`, `WEAPONS`) donne toutes les armes et plein de munitions, comme dans *Doom* ; `DIEU` (ou `GOD`, `GOTT`) te rend invincible, jusqu'à ce que tu le retapes ; `RICHE` donne 100 000 $ ; `MISSION` suivi d'un numéro saute directement à cette mission (`MISSION8` : le musée), avec une voiture blindée à côté s'il en faut une.
+- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`, `GOKU`, `Z6PO` (ou `C3PO`)… à toi de voir ce qu'ils font ! Retape un code pour l'annuler. Et pour tester : `IDKFA` (ou `ARMES`, `WAFFEN`, `WEAPONS`) donne toutes les armes et plein de munitions, comme dans *Doom* ; `DIEU` (ou `GOD`, `GOTT`, et `IDDQD` comme dans *Doom*) te rend invincible, jusqu'à ce que tu le retapes ; `RICHE` donne 100 000 $ ; `MISSION` suivi d'un numéro saute directement à cette mission (`MISSION8` : le musée), avec une voiture blindée à côté s'il en faut une.
 - **Danse** : tape Q S D trois fois de suite (A S D sur un clavier QWERTY) : B.J. met son chapeau et fait le moonwalk, tourne sur lui-même en poussant son petit cri, puis prend la pose de Michael Jackson, la main entre les jambes : « Who's bad ? ». Bouge pour l'arrêter.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital le plus proche (+ rouge sur la mini-carte) et tu perds 100 $.
 
@@ -82,7 +85,7 @@ Pour les tableaux `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES` et `ENNEMIS`, p
 Dans le code :
 
 
-1. **`REGLAGES`** : vitesses à pied et à la nage, vitesse des roquettes, vie, hauteur des chutes qui font mal et leurs dégâts (et ceux des roulades en sautant d'une voiture, et des piétons renversés), durée et force de la boisson énergisante, temps avant qu'un objet volé revienne, nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, hauteur des montagnes, touches et durée de la danse, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, accidents (à partir de quelle vitesse, force des tonneaux, temps avant qu'une voiture en feu explose, à partir de quand une voiture abîmée prend feu, hauteur des bornes), prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
+1. **`REGLAGES`** : vitesses à pied et à la nage, vitesse des roquettes, vie, hauteur des chutes qui font mal et leurs dégâts (et ceux des roulades en sautant d'une voiture, et des piétons renversés), durée et force de la boisson énergisante, temps avant qu'un objet volé revienne, nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, hauteur des montagnes, touches et durée de la danse, vitesse de vol de Superman, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, accidents (à partir de quelle vitesse, force des tonneaux, temps avant qu'une voiture en feu explose, à partir de quand une voiture abîmée prend feu, hauteur des bornes), prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
 2. **`ARMES`** : dégâts, cadence de tir, prix, munitions de chaque arme, rayon d'explosion du bazooka, zoom de la lunette du fusil de sniper. **`TRESORS`** : les objets à voler dans les immeubles, leur prix et leur forme. Et **`ARMES_ROBOT`** : la mitrailleuse et les roquettes du heavy robot.
 3. **`VOITURES`** : vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de voiture, de bateau, d'avion ou d'hélicoptère, et la chance de la croiser. Pour l'avion, la vitesse pour décoller ; pour l'hélicoptère, la vitesse à laquelle il monte. Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
 4. **`ENNEMIS`** : la vie, l'arme, les dégâts, la précision, jusqu'où ils te voient, le temps entre deux tirs et la vitesse de chaque ennemi : policiers, policiers d'élite, soldats nazis, Kommandant, Hitler, vigiles, membres de gang, chiens de garde, et la vitre, les dégâts et la vitesse du heavy robot. Donne un bazooka aux policiers (`arme: 6`), ou 5 000 points de vie à Hitler !

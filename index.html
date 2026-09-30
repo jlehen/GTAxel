@@ -300,6 +300,7 @@ const TRADUCTIONS = {
   'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
   // les annonces
   'Moonwalk !':       { de: 'Moonwalk!', en: 'Moonwalk!', gsw: 'Moonwalk!' },
+  'Superman !':       { de: 'Superman!', en: 'Superman!', gsw: 'Superman!' },
   "WHO'S BAD ?":      { de: "WHO'S BAD?", en: "WHO'S BAD?", gsw: "WHO'S BAD?" },
   'SAUT !':           { de: 'SPRUNG!', en: 'JUMP!', gsw: 'GUMP!' },
   'looping':          { de: 'Looping', en: 'loop', gsw: 'Looping' },
@@ -525,6 +526,9 @@ const REGLAGES = {
   touchesDanse: ['KeyA', 'KeyS', 'KeyD'], // à taper 3 fois de suite pour danser : gauche, arrière, droite (Q S D sur un clavier français)
   moonwalk: [3, 1, 2],       // la danse, en secondes : le moonwalk, la toupie, puis la pose « Who's bad ? »
   vitesseMoonwalk: 1.5,      // m/s, à reculons
+  vitesseVol: 12,            // Superman (Maj 3 fois de suite) : m/s en volant...
+  vitesseVolRapide: 40,      // ...et avec Maj (144 km/h)
+  tripleMaj: 0.6,            // secondes pour taper Maj 3 fois
   graviteVoiture: 9.8,       // la vraie gravité de la Terre pour les voitures qui sautent (mets 1.6 pour rouler sur la Lune !)
   degatsVoitures: 1,         // 1 = normal, 2 = les voitures s'abîment deux fois plus vite, 0 = jamais
   // les accidents
@@ -963,8 +967,8 @@ const TRICHES = [
   { code: 'IDKFA', alias: ['ARMES', 'WAFFEN', 'WEAPONS'], texte: 'Toutes les armes, plein de munitions, gilet et masque à gaz !', action: () => {
       ARMES.forEach((a, i) => { J.possede[i] = true; if (!a.corps) J.balles[i] = Math.max(J.balles[i], a.munitions * 3); });
       J.gilet = R_.giletMax; J.masque = true; } },
-  // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel
-  { code: 'DIEU', alias: ['GOD', 'GOTT'], texte: 'Invincible !', invincible: true, effet: () => {} },
+  // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel. IDDQD : comme dans Doom
+  { code: 'DIEU', alias: ['GOD', 'GOTT', 'IDDQD'], texte: 'Invincible !', invincible: true, effet: () => {} },
   // pour tester ce qui coûte cher : 100 000 $ d'un coup (change le nombre pour en avoir plus ou moins)
   { code: 'RICHE',       texte: 'Riche ! +100 000 $',   action: () => { J.argent += 100000; } },
   // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
@@ -2963,6 +2967,13 @@ function animerHumain(h, vitesse, dt, o = {}) {
     h.brasD.pli.rotation.x = h.brasG.pli.rotation.x = -0.2;
     h.jambeG.rotation.x = Math.sin(h.phase * 2) * 0.3; h.jambeD.rotation.x = -Math.sin(h.phase * 2) * 0.3; h.jambeG.pli.rotation.x = h.jambeD.pli.rotation.x = 0.1;
   }
+  if (o.superman !== undefined) { // Superman, de 0 (il flotte sur place : les bras un peu écartés, les jambes qui pendent) à 1 (lancé : le poing droit
+    const e = o.superman;         // tendu au-dessus de la tête, le bras gauche le long du corps, les jambes tendues, un genou à peine plié)
+    h.brasD.rotation.set(lerp(-0.2, -3.1, e), 0, lerp(-0.35, -0.1, e)); h.brasD.pli.rotation.x = lerp(-0.3, 0, e);
+    h.brasG.rotation.set(lerp(-0.2, 0.1, e), 0, lerp(0.35, 0.1, e)); h.brasG.pli.rotation.x = -0.3;
+    h.jambeG.rotation.x = lerp(-0.3, 0, e); h.jambeG.pli.rotation.x = lerp(0.6, 0.3, e);
+    h.jambeD.rotation.x = 0.05; h.jambeD.pli.rotation.x = lerp(0.15, 0, e);
+  }
   // la danse, en trois pas. Seule la danse écarte les jambes, penche la tête ou met sur la pointe des pieds
   const pas = o.danse?.pas;
   let penche = o.robot ? 0 : Math.max(plie * 0.25, o.accroupi ? 0 : amp * 0.12), monte = 0;   // on se penche en avant pour courir (pas un robot), et en pliant les genoux
@@ -4135,7 +4146,7 @@ const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, 
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0,
-  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0 };   // atterri, genou, roule : voir retomber ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe
+  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null };   // atterri, genou, roule : voir retomber ; superman : voir decoller ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 joueurH.g.traverse(o => o.userData.habit = o.material);   // sa tenue normale, pour la lui remettre après les codes de triche
 scene.add(joueurH.g);
@@ -5023,9 +5034,10 @@ addEventListener('keydown', e => {
   if (carte.ouverte) return;
   suite = (suite + e.code + ' ').slice(-SUITE_DANSE.length);
   if (suite === SUITE_DANSE) { suite = ''; danser(); }
+  if (e.key === 'Shift') { tapesMaj = [...tapesMaj, temps].slice(-3); if (tapesMaj[2] - tapesMaj[0] < R_.tripleMaj) { tapesMaj = []; decoller(); } }
   if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
-  if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot) J.accroupi = !J.accroupi;
+  if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
   if (e.code.startsWith('Digit') && !J.robot) changerArme(+e.code.slice(5) - 1);
 });
 addEventListener('keyup', e => touches[e.code] = false);
@@ -5087,7 +5099,7 @@ const invincible = () => TRICHES.some(t => t.actif && t.invincible);   // le cod
 const SUITE_DANSE = (R_.touchesDanse.join(' ') + ' ').repeat(3);
 let suite = '';   // les dernières touches tapées
 function danser() {
-  if (J.voiture || J.robot || J.nage || J.mort) return;   // on ne danse qu'à pied
+  if (J.voiture || J.robot || J.nage || J.mort || J.superman) return;   // on ne danse qu'à pied
   for (const k in touches) touches[k] = false;  // la dernière touche est encore enfoncée : on l'oublie, sinon elle arrêterait la danse
   J.danse = 0.001; J.angleDanse = J.lacet + Math.PI / 2; J.vue = 3; J.accroupi = false;
   annonce('', tr('Moonwalk !'), 2);
@@ -5104,6 +5116,15 @@ function pasDeDanse(dt) {
   if (t > moon + toupie + pose) J.danse = 0;
   J.angleCorps = J.angleDanse + Math.PI / 2;
   return { pas: 'pose', k: (t - moon - toupie) / pose };
+}
+// Superman : Maj 3 fois de suite (en moins de REGLAGES.tripleMaj secondes) fait décoller B.J. Encore 3 fois : il arrête de voler, et tombe !
+let tapesMaj = [];   // quand on a tapé Maj les 3 dernières fois
+function decoller() {
+  if (J.voiture || J.robot || J.mort) return;
+  if (J.superman) { J.superman = null; return; }
+  J.superman = { vx: 0, vz: 0 }; J.vy = 8;   // sa vitesse (la montée est dans J.vy) : il s'élance d'abord vers le ciel
+  J.sol = J.nage = J.saute = J.accroupi = false; J.roule = J.echelle = null; J.danse = J.genou = J.atterri = 0;
+  annonce('', tr('Superman !'), 2);
 }
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
@@ -5350,6 +5371,7 @@ function reapparaitre() {
 //  Mise à jour du joueur
 // =====================================================================
 function majJoueur(dt) {
+  if (J.superman) { superman(dt); return; }
   if (J.roule) { rouler(dt); return; }
   J.atterri = Math.max(0, J.atterri - dt * 3); J.genou = Math.max(0, J.genou - dt);
   const libre = J.genou <= 0;   // reçu sur un genou après une grosse chute : il ne bouge pas avant de s'être relevé
@@ -5453,6 +5475,32 @@ function rouler(dt) {
   if (r.fin === 1) { J.roule = null; J.atterri = 1; }
   // lentement, il reste bien en boule ; très vite (sorti d'une voiture lancée), il n'y arrive plus : ses bras et ses jambes battent
   membresMous(joueurH, dt, { raideur: clamp(30 - v * 1.1, 8, 25), sol: J.sol ? J.y : -Infinity, vx: r.vx, vy: J.vy, vz: r.vz });
+}
+// Superman : Z et S le font voler là où l'on regarde (vers le haut, vers le bas), Q et D glisser sur le côté, Espace monter, C ou Ctrl descendre,
+// Maj aller plus vite. Il se penche dans le sens où il va, le poing droit en avant ; sur place, il flotte debout.
+// S'il touche le sol, un toit ou l'eau en descendant, il se pose sans se faire mal
+function superman(dt) {
+  const f = J.superman, av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
+  const monte = touche('Space') - touche('KeyC', 'ControlLeft', 'ControlRight'), ct = Math.cos(J.tangage);
+  const dx = Math.sin(J.lacet) * ct * av - Math.cos(J.lacet) * lat, dy = Math.sin(J.tangage) * av + monte, dz = Math.cos(J.lacet) * ct * av + Math.sin(J.lacet) * lat;
+  const v = (touche('ShiftLeft', 'ShiftRight') ? R_.vitesseVolRapide : R_.vitesseVol) / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ
+  f.vx += (dx * v - f.vx) * k; J.vy += (dy * v - J.vy) * k; f.vz += (dz * v - f.vz) * k;
+  J.x += f.vx * dt; J.y += J.vy * dt; J.z += f.vz * dt;
+  resoudre(J, 0.35);
+  const hs = hauteurSol(J.x, J.z, J.y), sol = hs < EAU - 1.3 ? EAU - 1.25 : hs;   // au-dessus de l'eau profonde, il se pose sur l'eau (et nage)
+  if (J.y <= sol) {
+    J.y = sol;
+    if (J.vy < 0) { J.atterri = Math.min(1, -J.vy / 14); J.superman = null; J.vy = 0; return; }   // il se pose en pliant les genoux
+  }
+  const vh = Math.hypot(f.vx, f.vz), e = Math.min(1, Math.hypot(vh, J.vy) / 6);   // e : de 0 (il flotte sur place) à 1 (il est lancé)
+  if (vh > 1) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(f.vx, f.vz), 8 * dt);
+  J.vitesse = Math.hypot(vh, J.vy);   // vite, il est plus dur à toucher
+  joueurH.g.rotation.y = J.angleCorps;
+  if (joueurH.arme) joueurH.arme.visible = false;   // il range son arme pour voler
+  // à l'horizontale, il est couché ; tout droit vers le haut, debout, le bras levé ; en descendant tout droit, debout, les pieds en bas
+  animerHumain(joueurH, 0, dt, { superman: e, bascule: e * Math.atan2(vh, Math.max(J.vy, 0)) });
+  poserCorps(joueurH, J.x, J.y + 0.95, J.z, 0.95);   // il bascule autour de son bassin
+  membresMous(joueurH, dt, { raideur: 25, sol: hs, vx: f.vx, vy: J.vy, vz: f.vz });   // ses membres traînent un peu quand il tourne
 }
 // les échelles : on en attrape une en bas en avançant vers le mur, ou en haut, sur le toit, en avançant vers le bord au-dessus d'elle
 function echelleProche(dx, dz) {
@@ -6464,7 +6512,7 @@ function majHUD(dt) {
   const m = MISSIONS[missionIndex];
   $('objectif').textContent = tr(m ? m.etapes[etapeIndex].texte : 'Pays libre : fais ce que tu veux !');
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
-  $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !dansLunette() && (J.vue === 1 || visee || !a.corps || rb) ? 'block' : 'none';
+  $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !J.superman && !dansLunette() && (J.vue === 1 || visee || !a.corps || rb) ? 'block' : 'none';
   $('fumee').style.opacity = J.fumee * (J.masque ? 0.25 : 0.8);   // la fumée toxique brouille la vue (moins avec le masque)
   $('vitesse').style.display = J.voiture ? 'block' : 'none';
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h` + (J.voiture.enVol ? ` · ${Math.round(J.voiture.y - Math.max(hauteurTerrain(J.voiture.x, J.voiture.z), EAU))} m` : '');   // en vol : la hauteur
@@ -6491,7 +6539,7 @@ function majHUD(dt) {
 // =====================================================================
 function mettreAJour(dt) {
   temps += dt;
-  if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; }   // on ne danse et on ne grimpe qu'à pied
+  if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
   if (J.mort) {
     J.mort += dt; J.roule = null;
     const k = Math.min(1, J.mort * 1.25);
@@ -6511,7 +6559,7 @@ function mettreAJour(dt) {
       const r = J.robot; for (const k in r.cdJ) r.cdJ[k] -= dt;
       if (sourisG && r.cdJ.lourde <= 0) tirer(ARMES_ROBOT.lourde);
       if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
-    } else if (sourisG && !J.voiture && !J.nage && !J.roule && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
+    } else if (sourisG && !J.voiture && !J.nage && !J.roule && !J.superman && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
