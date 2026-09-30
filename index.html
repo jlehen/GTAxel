@@ -2921,6 +2921,7 @@ function creerHumain(s) {
 //   ecarte : de 0 à 1, les bras et les jambes écartés (projeté, couché) ; agite : de 0 à 1, il se débat ; touche : de 0 à 1, il encaisse un coup
 function animerHumain(h, vitesse, dt, o = {}) {
   h.phase += dt * (vitesse > 0.2 ? 2.5 + vitesse * 1.3 : 0); h.t += dt;
+  h.brasPris = !!o.arme || o.frappe > 0;   // ses bras tiennent une arme ou frappent : ils ne deviennent pas mous (membresMous)
   // un robot bouge par à-coups : sa pose ne change que 8 fois par pas, et il fait de petits pas
   const phase = o.robot ? Math.round(h.phase / (Math.PI / 4)) * Math.PI / 4 : h.phase;
   const amp = vitesse > 0.2 ? Math.min(o.robot ? 0.28 : 0.95, 0.35 + vitesse * 0.08) : 0, s = Math.sin(phase) * amp, c = Math.cos(phase) * amp;
@@ -2997,11 +2998,12 @@ function animerHumain(h, vitesse, dt, o = {}) {
     h.jambeG.rotation.z = 0.18 * e; h.jambeD.rotation.z = -0.18 * e;
     h.jambeG.rotation.x += ag * 0.5; h.jambeD.rotation.x -= ag * 0.5;
   }
-  // roulé en boule, pour une roulade : les genoux contre la poitrine, les bras autour, la tête rentrée
+  // roulé en boule, pour une roulade : les genoux contre la poitrine, les bras autour, la tête rentrée. De 0 à 1 : à la fin, il se déplie
   if (o.roulade) {
-    h.jambeG.rotation.set(-2.1, 0, 0.08); h.jambeD.rotation.set(-2.1, 0, -0.08); h.jambeG.pli.rotation.x = h.jambeD.pli.rotation.x = 2.4;
-    h.brasG.rotation.set(-0.9, 0, 0.25); h.brasD.rotation.set(-0.9, 0, -0.25); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -1.4;
-    h.tete.rotation.x = 0.6; penche = 0.8; hy = 0.55;
+    const e = o.roulade, m = (r, k, v) => { r[k] = lerp(r[k], v, e); };
+    for (const [j, c] of [[h.jambeG, 1], [h.jambeD, -1]]) { m(j.rotation, 'x', -2.1); m(j.rotation, 'z', 0.08 * c); m(j.pli.rotation, 'x', 2.4); }
+    for (const [b, c] of [[h.brasG, 1], [h.brasD, -1]]) { m(b.rotation, 'x', -0.9); m(b.rotation, 'z', 0.25 * c); m(b.pli.rotation, 'x', -1.4); }
+    m(h.tete.rotation, 'x', 0.6); penche = lerp(penche, 0.8, e); hy = lerp(hy, 0.55, e);
   }
   // l'atterrissage sur un genou, après une grosse chute : le genou droit et le poing droit au sol, la jambe gauche devant, le bras gauche en arrière
   if (o.genou) {
@@ -3035,6 +3037,74 @@ function poseMort(k, chute) {
 }
 // couché (sur le dos ou le ventre), le corps pivote autour des pieds : on le remonte de l'épaisseur du torse
 const hauteurCouche = h => 0.13 * Math.abs(Math.sin(h.g.rotation.x));
+// Les membres mous : quand un personnage ne se tient plus (projeté, mort, en roulade, en l'air), son buste, sa tête, ses bras et ses jambes
+// ont du poids. Chaque morceau a un bout (les épaules, la tête, le coude, la main, le genou, le pied) : un point qui a sa vitesse, qui tombe,
+// et que la pose tire vers elle comme un ressort. Le morceau tourne ensuite vers son bout, sans dépasser ce que son articulation permet
+// (un genou ne se plie pas à l'envers), et le bout ne passe pas sous le sol. Les membres traînent donc derrière quand le corps tourne,
+// continuent quand il s'arrête d'un coup, pendent, claquent par terre et y restent.
+// On l'appelle après animerHumain et après avoir placé le corps. o :
+//   raideur : la force des muscles (0 : tout mou, comme un mort ; 10 : il se débat ; 25 : il se tient). Sans raideur, il se tient de nouveau :
+//     le mou s'efface en 0,2 s
+//   sol : la hauteur du sol sous lui ; jambes : false si ses pieds suivent la pose (il atterrit, il marche)
+//   vx, vy, vz : sa vitesse quand il devient mou (sinon ses membres restent en arrière d'un coup, comme quand une voiture le fauche)
+const MOUS = [   // l : la longueur du morceau (m) ; r : l'épaisseur de son bout ; s : 1 s'il pend, -1 s'il monte ; x, z : ce que l'articulation permet (radians) ;
+                 // pli : un avant-bras ou un tibia, qui pend au morceau d'avant dans la liste
+  { os: h => h.haut, l: 0.55, r: 0.13, s: -1, x: [-0.5, 1.2], z: [-0.35, 0.35] },              // le buste, qui plie aux hanches
+  { os: h => h.tete, l: 0.15, r: 0.12, s: -1, x: [-0.7, 0.8], z: [-0.5, 0.5], cou: 0.15 },      // la tête, qui plie au cou, 15 cm plus bas
+  { os: h => h.brasG, l: 0.3, r: 0.06, s: 1, x: [-3.1, 1], z: [-0.1, 1.4], bras: true },         // l'épaule gauche (côté +X : z > 0 écarte le bras ; pas tout à fait à l'horizontale)
+  { os: h => h.brasG.pli, l: 0.29, r: 0.05, s: 1, x: [-2.5, 0], bras: true, pli: true },         // le coude ne plie que vers l'avant
+  { os: h => h.brasD, l: 0.3, r: 0.06, s: 1, x: [-3.1, 1], z: [-1.4, 0.1], bras: true },
+  { os: h => h.brasD.pli, l: 0.29, r: 0.05, s: 1, x: [-2.5, 0], bras: true, pli: true },
+  { os: h => h.jambeG, l: 0.45, r: 0.08, s: 1, x: [-2.3, 0.7], z: [-0.2, 0.9], jambe: true },    // la hanche
+  { os: h => h.jambeG.pli, l: 0.45, r: 0.05, s: 1, x: [0, 2.6], jambe: true, pli: true },        // le genou ne plie que vers l'arrière
+  { os: h => h.jambeD, l: 0.45, r: 0.08, s: 1, x: [-2.3, 0.7], z: [-0.9, 0.2], jambe: true },
+  { os: h => h.jambeD.pli, l: 0.45, r: 0.05, s: 1, x: [0, 2.6], jambe: true, pli: true },
+];
+const vJl = new THREE.Vector3(), vJ = new THREE.Vector3(), vT = new THREE.Vector3(), vVT = new THREE.Vector3(), vP0 = new THREE.Vector3(), vDir = new THREE.Vector3(), eMou = new THREE.Euler(), mInv = new THREE.Matrix4();
+function membresMous(h, dt, o) {
+  let m = h.mou;
+  if (m && h.t - m.t > dt * 1.5) m = h.mou = null;   // il n'était plus mou depuis un moment (en voiture, trop loin pour être vu) : on repart de la pose
+  const fin = o.raideur === undefined;
+  if (fin && (!m || (m.k -= dt * 5) <= 0)) { h.mou = null; return; }
+  if (!dt) return;
+  if (!m) m = h.mou = { k: 1, pts: MOUS.map(() => ({ P: new THREE.Vector3(), V: new THREE.Vector3(), T0: new THREE.Vector3(), neuf: true })) };
+  if (!fin) m.k = 1;
+  m.t = h.t;
+  const raideur = fin ? 40 : o.raideur, jambes = o.jambes ?? !fin, pris = h.brasPris;   // pris : ses bras tiennent une arme, ou frappent
+  const ks = Math.min(raideur * raideur, 1 / (dt * dt)), freine = Math.exp(-(2 + 1.4 * raideur) * dt), frotte = Math.exp(-10 * dt);
+  h.g.updateMatrixWorld(true);
+  MOUS.forEach((S, i) => {
+    const os = S.os(h), pt = m.pts[i], M = os.parent.matrixWorld;
+    // l'articulation (j) et le bout du morceau dans la pose (t), dans le monde
+    const jl = vJl.copy(os.position); if (S.cou) jl.y -= S.cou;
+    const j = vJ.copy(jl).applyMatrix4(M), t = vT.set(0, -S.s * S.l, 0).applyEuler(os.rotation).add(jl).applyMatrix4(M), L = t.distanceTo(j);
+    // T0 : la pose à l'image d'avant (au début, là d'où il vient)
+    if (pt.neuf) { pt.neuf = false; pt.V.set(o.vx || 0, o.vy || 0, o.vz || 0); pt.T0.copy(t).addScaledVector(pt.V, -dt); pt.P.copy(pt.T0); }
+    const P = pt.P, V = pt.V, T0 = pt.T0, vt = vVT.subVectors(t, T0).divideScalar(dt);
+    if ((S.bras && pris) || (S.jambe && !jambes)) { P.copy(t); V.copy(vt); T0.copy(t); return; }   // ce membre suit la pose
+    // freiné par rapport à la pose, tiré vers elle (le bout et la pose pris au même instant : à l'image d'avant), et il tombe
+    const P0 = vP0.copy(P);
+    V.sub(vt).multiplyScalar(freine).add(vt);
+    V.x += (T0.x - P.x) * ks * dt; V.y += ((T0.y - P.y) * ks - R_.gravite) * dt; V.z += (T0.z - P.z) * ks * dt;
+    T0.copy(t);
+    P.addScaledVector(V, dt).sub(j).setLength(L).add(j);   // il reste au bout du morceau
+    const bas = o.sol + S.r * h.g.scale.y, parTerre = P.y < bas;
+    if (parTerre) P.y = bas;
+    // on tourne le morceau vers son bout (dans le repère de son parent), sans dépasser ce que l'articulation permet
+    const d = vDir.subVectors(P, j).transformDirection(mInv.copy(M).invert()).multiplyScalar(S.s);
+    const mil = (S.x[0] + S.x[1]) / 2, x = clamp(mil + diffAngle(mil, Math.atan2(-d.z, -d.y)), ...S.x), z = S.z ? clamp(Math.asin(clamp(d.x, -1, 1)), ...S.z) : 0;
+    // le bout revient là où l'articulation l'arrête ; sa vitesse est ce qu'il a vraiment bougé (frottée s'il touche le sol)
+    P.set(0, -S.s * S.l, 0).applyEuler(eMou.set(x, 0, z)).add(jl).applyMatrix4(M);
+    V.subVectors(P, P0).divideScalar(dt);
+    if (parTerre) { V.x *= frotte; V.z *= frotte; }
+    // plié au maximum, la main ou le pied reste sous le sol : c'est le coude ou le genou qui monte (il s'appuie dessus). À l'image suivante,
+    // le bras ou la cuisse se relève
+    if (S.pli && P.y < bas - 0.005) { const q = m.pts[i - 1]; q.P.y += bas - P.y; q.V.y = Math.max(0, q.V.y); }
+    os.rotation.x += diffAngle(os.rotation.x, x) * m.k;
+    if (S.z) os.rotation.z += (z - os.rotation.z) * m.k;
+    os.updateMatrixWorld(true);
+  });
+}
 
 // armes en 3D (le canon pointe vers +Z)
 const M_METAL = mat('#2b2b2b', { metalness: 0.8, roughness: 0.35 }), M_LAME = mat('#d0d0d0', { metalness: 1, roughness: 0.2 }), M_BOIS = mat('#6b4423'), M_KAKI = mat('#4a5a2a');
@@ -5297,15 +5367,16 @@ function majJoueur(dt) {
   if (!J.echelle && n > 0 && !J.nage) J.echelle = echelleProche(mx / n, mz / n);
   if (J.echelle) { grimper(dt, n > 0 ? (mx * J.echelle.nx + mz * J.echelle.nz) / n : 0); return; }
   if (n > 0) { mx /= n; mz /= n; J.x += mx * v * dt; J.z += mz * v * dt; }
+  const vx = n > 0 ? mx * v : 0, vz = n > 0 ? mz * v : 0;   // sa vitesse à l'horizontale
   J.vitesse = n > 0 ? v : 0;
   // en nageant, on peut remonter sur un ponton ou une plage (une marche plus haute)
   const hs = hauteurSol(J.x, J.z, J.y + (J.nage ? 1.3 : 0)), surface = EAU - 1.25;
-  if (J.sol && touches.Space && !J.nage && libre) { J.vy = R_.forceSaut; J.sol = false; J.accroupi = false; }
+  if (J.sol && touches.Space && !J.nage && libre) { J.vy = R_.forceSaut; J.sol = false; J.saute = true; J.accroupi = false; }
   J.vy -= R_.gravite * dt; J.y += J.vy * dt;
   if (hs < EAU - 1.3 && J.y <= surface + 0.01) { J.y = surface; J.vy = 0; J.nage = true; J.sol = false; }   // trop profond pour avoir pied : on nage (sans se faire mal)
   else {
     J.nage = false;
-    if (J.y <= hs) { if (!J.sol) retomber(-J.vy, n > 0 ? mx * v : 0, n > 0 ? mz * v : 0); J.y = hs; J.vy = 0; J.sol = true; }
+    if (J.y <= hs) { if (!J.sol) retomber(-J.vy, vx, vz); J.y = hs; J.vy = 0; J.sol = true; }
     else if (J.y > hs + 0.05) J.sol = false;   // il quitte le sol : un saut, une marche qui descend, le bord d'un toit
   }
   resoudre(J, 0.35);
@@ -5334,8 +5405,13 @@ function majJoueur(dt) {
   joueurH.g.rotation.y = robot ? Math.round(J.angleCorps / 0.2) * 0.2 : J.angleCorps;   // un robot se tourne par crans
   if (joueurH.arme) joueurH.arme.visible = !J.nage && !danse;   // il range son arme pour nager ou danser
   const genou = J.genou > 0 ? Math.min(1, (0.9 - J.genou) / 0.08, J.genou / 0.3) : 0;   // il tombe vite sur le genou, et se relève doucement
+  // en l'air : il a sauté (jusqu'à ce qu'il retombe), ou il tombe vite (pas en descendant un escalier)
+  if (J.sol || J.nage) J.saute = false;
+  const enLair = !J.sol && !J.nage && (J.saute || J.vy < -4);
   animerHumain(joueurH, J.vitesse, dt, { arme: !ARMES[J.arme].corps && !J.nage && !danse, accroupi: J.accroupi, frappe: J.frappe, nage: J.nage, danse, robot,
-    saut: !J.sol && !J.nage && (J.vy > 0 || J.vy < -4) ? J.vy : undefined, atterri: J.atterri, genou });
+    saut: enLair ? J.vy : undefined, atterri: J.atterri, genou });
+  // en l'air, ses membres ont du poids ; à l'atterrissage, le haut du corps continue sur sa lancée, les pieds restent posés (pas un robot)
+  membresMous(joueurH, dt, !robot && (enLair || J.atterri > 0 || genou > 0) ? { raideur: 25, sol: J.sol ? J.y : -Infinity, jambes: enLair, vx, vy: J.vy, vz } : { sol: J.y });
 }
 // B.J. retombe au sol à la vitesse choc (m/s) : il amortit en pliant les genoux. De plus haut que REGLAGES.hauteurSansMal, ça fait mal
 // (le gilet ne protège pas) : il se reçoit sur un genou, ou fait une roulade s'il allait vite (vx, vz : sa vitesse à l'horizontale)
@@ -5362,16 +5438,21 @@ function rouler(dt) {
   J.vy -= R_.gravite * dt; J.y += J.vy * dt;
   if (hs < EAU - 1.3 && J.y <= EAU - 1.25) { J.roule = null; J.y = EAU - 1.25; J.vy = 0; J.nage = true; J.sol = false; return; }   // à l'eau : il nage
   if (J.y <= hs) { if (!J.sol) retomber(-J.vy, r.vx, r.vz); J.y = hs; J.vy = 0; J.sol = true; } else if (J.y > hs + 0.05) J.sol = false;   // tombé d'un pont, d'un toit : ça compte
-  // un tour tous les 3 m environ, 2 tours par seconde au plus. Presque arrêté, il finit son tour, puis se relève
+  // un tour tous les 3 m environ, 2 tours par seconde au plus. Presque arrêté, il finit son tour, se déplie en un quart de seconde (r.fin
+  // va de 0 à 1), se retrouve accroupi, puis se relève
   const tour = 2 * Math.PI, w = clamp(v / 0.45, 9, 13);
-  if (v < 1.5 && Math.floor((r.a + w * dt) / tour) > Math.floor(r.a / tour)) { J.roule = null; J.atterri = 1; }
+  if (r.fin !== undefined) r.fin = Math.min(1, r.fin + dt * 4);
+  else if (v < 1.5 && Math.floor((r.a + w * dt) / tour) > Math.floor(r.a / tour)) { r.fin = 0; r.a = 0; }
   else r.a += w * dt;
+  const e = 1 - (r.fin || 0);   // e : combien il est en boule
   J.vitesse = v;
   joueurH.g.rotation.y = J.angleCorps;
-  if (joueurH.arme) joueurH.arme.visible = !J.roule;
-  animerHumain(joueurH, 0, dt, J.roule ? { roulade: true, bascule: r.a } : { atterri: 1 });
-  if (J.roule) poserCorps(joueurH, J.x, J.y + 0.5, J.z, 0.75, 0.3);   // le milieu de la boule, à 50 cm du sol
-  else joueurH.g.position.set(J.x, J.y, J.z);
+  if (joueurH.arme) joueurH.arme.visible = false;
+  animerHumain(joueurH, 0, dt, { roulade: e, atterri: 1 - e, bascule: r.a });
+  poserCorps(joueurH, J.x, J.y + 0.5 * e, J.z, 0.75 * e, 0.3 * e);   // il tourne autour du milieu de la boule, à 50 cm du sol ; déplié, ses pieds sont en (J.x, J.y, J.z)
+  if (r.fin === 1) { J.roule = null; J.atterri = 1; }
+  // lentement, il reste bien en boule ; très vite (sorti d'une voiture lancée), il n'y arrive plus : ses bras et ses jambes battent
+  membresMous(joueurH, dt, { raideur: clamp(30 - v * 1.1, 8, 25), sol: J.sol ? J.y : -Infinity, vx: r.vx, vy: J.vy, vz: r.vz });
 }
 // les échelles : on en attrape une en bas en avançant vers le mur, ou en haut, sur le toit, en avançant vers le bord au-dessus d'elle
 function echelleProche(dx, dz) {
@@ -5734,7 +5815,10 @@ function majPersonne(p, dt) {
   if (p.vol) { majVol(p, dt); return; }
   if (p.vie <= 0) {
     if (p.h.chien) { p.mort = Math.min(1, p.mort + dt * 3); animerChien(p.h, 0, dt, p.mort); p.h.g.position.y = p.y + p.mort * 0.15; }
-    else { p.mort = Math.min(1, p.mort + dt * 1.25); animerHumain(p.h, 0, dt, poseMort(p.mort, p.chute || -1)); p.h.g.position.set(p.x, p.y + hauteurCouche(p.h), p.z); p.h.g.rotation.y = p.angle; }
+    else if (!(p.tempsMort > 3)) { // ses muscles lâchent : ses membres deviennent tout mous. Au bout de 3 s, il ne bouge plus : on le laisse tel quel
+      p.mort = Math.min(1, p.mort + dt * 1.25); animerHumain(p.h, 0, dt, poseMort(p.mort, p.chute || -1)); p.h.g.position.set(p.x, p.y + hauteurCouche(p.h), p.z); p.h.g.rotation.y = p.angle;
+      membresMous(p.h, dt, { raideur: 12 * (1 - p.mort) ** 2, sol: p.y });
+    }
     p.tempsMort = (p.tempsMort || 0) + dt;
     if (p.tempsMort > 15) p.supprimer = true;
     return;
@@ -5787,6 +5871,7 @@ function majPersonne(p, dt) {
   if (p.h.g.visible) {
     p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle;
     animerHumain(p.h, Math.abs(vitesse), dt, { arme, touche: p.touche / 0.3 });
+    membresMous(p.h, dt, p.touche > 0 ? { raideur: 12, sol: p.y, jambes: false } : { sol: p.y });   // un coup : le haut du corps part et revient, la tête et les bras suivent
   }
 }
 // un personnage projeté (renversé par une voiture, soufflé par une explosion, bousculé par B.J. qui court) : (vx, vy, vz) sa vitesse,
@@ -5795,7 +5880,7 @@ function projeter(p, vx, vy, vz, w) {
   if (p.h.chien || p.vol) return;
   p.releve = undefined; p.touche = 0;
   p.angle = Math.atan2(-vx, -vz) + entre(-0.3, 0.3);   // il fait face à ce qui le pousse
-  p.vol = { vx, vy, vz, w, a: 0, y: p.y + 0.95 * p.h.g.scale.y };   // y : la hauteur de son bassin, autour duquel il tourne
+  p.vol = { vx, vy, vz, w, a: 0, y: p.y + 0.95 * p.h.g.scale.y, r: 0, wr: w * entre(-0.25, 0.25) };   // y : la hauteur de son bassin, autour duquel il tourne ; r : il tourne aussi un peu de côté
 }
 // il vole en tournant, les bras et les jambes écartés, retombe, rebondit, roule et glisse. Arrêté, il se couche à plat,
 // sur le dos ou sur le ventre : mort, il reste couché ; sinon, il se relève
@@ -5805,18 +5890,20 @@ function majVol(p, dt) {
   p.x += v.vx * dt; p.z += v.vz * dt; v.y += v.vy * dt;
   if (resoudre(p, 0.3)) { v.vx *= -0.2; v.vz *= -0.2; }   // contre un mur : il rebondit à peine
   // couché, son bassin est à 15 cm du sol ; debout (ou sur la tête), à 95 cm
-  const sol = hauteurSol(p.x, p.z, v.y - 0.15), bas = sol + 0.15 + (H - 0.15) * Math.abs(Math.cos(v.a));
+  const sol = hauteurSol(p.x, p.z, v.y - 0.15), bas = sol + 0.15 + (H - 0.15) * Math.abs(Math.cos(v.a) * Math.cos(v.r));
   p.y = sol;
   if (v.y <= bas) {
     if (v.vy < -5) bruit(clamp(0.5 - dist(p, J) / 80, 0, 0.5), 260, 0.12);
     v.y = bas; v.vy = v.vy < -4 ? -v.vy * 0.3 : Math.max(0, v.vy);
-    const f = Math.pow(0.1, dt); v.vx *= f; v.vz *= f; v.w *= Math.pow(0.2, dt); v.sol = true;   // ça frotte : il ralentit vite
+    const f = Math.pow(0.1, dt); v.vx *= f; v.vz *= f; v.w *= Math.pow(0.2, dt); v.wr *= Math.pow(0.2, dt); v.sol = true;   // ça frotte : il ralentit vite
   }
-  v.a += v.w * dt;
+  v.a += v.w * dt; v.r += v.wr * dt;
+  // tourné de plus d'un quart de tour sur le côté : c'est la même position que tourné en arrière et retourné (on garde r petit)
+  if (Math.abs(v.r) > Math.PI / 2) { v.r -= Math.sign(v.r) * Math.PI; v.a = Math.PI - v.a; v.w = -v.w; p.angle += Math.PI; }
   if (v.sol && Math.hypot(v.vx, v.vz) < 1 && v.y <= bas + 0.05) {
     const couche = Math.round((v.a - Math.PI / 2) / Math.PI) * Math.PI + Math.PI / 2;   // l'angle le plus proche où il est à plat
-    v.w = 0; v.a += (couche - v.a) * Math.min(1, dt * 8);
-    if (Math.abs(couche - v.a) < 0.03) {
+    v.w = v.wr = 0; v.a += (couche - v.a) * Math.min(1, dt * 8); v.r -= v.r * Math.min(1, dt * 8);
+    if (Math.abs(couche - v.a) < 0.03 && Math.abs(v.r) < 0.03) {
       p.chute = Math.round(Math.sin(couche)); p.vol = null;   // 1 : sur le ventre, -1 : sur le dos
       p.x -= p.chute * H * Math.sin(p.angle); p.z -= p.chute * H * Math.cos(p.angle); p.y = hauteurSol(p.x, p.z, sol + 0.3);   // ses pieds
       if (p.vie <= 0) p.mort = 1; else p.releve = 0;
@@ -5824,8 +5911,9 @@ function majVol(p, dt) {
     }
   }
   p.h.g.rotation.y = p.angle;
-  animerHumain(p.h, 0, dt, { bascule: v.a, ecarte: 1, agite: v.sol ? 0.15 : 1, plie: 0.2 });
+  animerHumain(p.h, 0, dt, { bascule: v.a, roulis: v.r, ecarte: 1, agite: v.sol ? 0.15 : 1, plie: 0.2 });
   poserCorps(p.h, p.x, v.y, p.z, 0.95);
+  membresMous(p.h, dt, { raideur: p.vie <= 0 ? 1 : v.sol ? 5 : 9, sol: p.y });   // vivant, il se débat ; mort, il est tout mou
 }
 // il se relève : il pivote autour de ses pieds en pliant les genoux, puis repart (en courant, s'il a eu peur)
 function relever(p, dt) {
@@ -5833,6 +5921,7 @@ function relever(p, dt) {
   const k = p.releve, s = k * k * (3 - 2 * k);
   animerHumain(p.h, 0, dt, { bascule: p.chute * Math.PI / 2 * (1 - s), plie: Math.sin(k * Math.PI) * 0.9, ecarte: 1 - s });
   p.h.g.rotation.y = p.angle; p.h.g.position.set(p.x, p.y + hauteurCouche(p.h), p.z);
+  membresMous(p.h, dt, { raideur: 4 + 36 * s, sol: p.y });   // ses membres, encore mous, reprennent des forces
   if (k >= 1) p.releve = undefined;
 }
 // B.J. a une arme à feu à la main (pas en voiture) : les vigiles et les chiens le remarquent
@@ -6405,10 +6494,13 @@ function mettreAJour(dt) {
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; }   // on ne danse et on ne grimpe qu'à pied
   if (J.mort) {
     J.mort += dt; J.roule = null;
-    animerHumain(joueurH, 0, dt, poseMort(Math.min(1, J.mort * 1.25), -1));
-    if (!J.voiture && !J.robot && !J.nage) { // à pied : il tombe s'il était en l'air, et se couche sur le dos
-      J.vy -= R_.gravite * dt; J.y = Math.max(hauteurSol(J.x, J.z, J.y), J.y + J.vy * dt);
+    const k = Math.min(1, J.mort * 1.25);
+    animerHumain(joueurH, 0, dt, poseMort(k, -1));
+    if (!J.voiture && !J.robot && !J.nage) { // à pied : il tombe s'il était en l'air, et se couche sur le dos, tout mou
+      const hs = hauteurSol(J.x, J.z, J.y);
+      J.vy -= R_.gravite * dt; J.y = Math.max(hs, J.y + J.vy * dt);
       joueurH.g.position.set(J.x, J.y + hauteurCouche(joueurH), J.z);
+      membresMous(joueurH, dt, { raideur: 12 * (1 - k) ** 2, sol: hs, vy: J.vy });
     }
     if (J.mort > 3.5) reapparaitre();
   }
@@ -6534,7 +6626,7 @@ majJoueur(0);
 requestAnimationFrame(boucle);
 etat('Clique pour jouer');
 // pour les tests automatiques
-window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
+window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
