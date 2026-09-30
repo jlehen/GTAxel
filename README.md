@@ -19,9 +19,9 @@ Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le j
 | Z Q S D ou flèches | Se déplacer / conduire |
 | Q S D, 3 fois de suite | Danser comme Michael Jackson |
 | Souris | Regarder |
-| Clic gauche | Tirer / frapper |
+| Clic gauche | Tirer / frapper (en volant, tirer seulement) |
 | Clic droit | Viser (zoom, lunette avec le fusil de sniper) |
-| Maj | Courir |
+| Maj | Courir (en volant : chaque appui te fait aller plus vite) |
 | Maj, 3 fois de suite (vite) | Voler comme Superman (encore 3 fois : tu arrêtes de voler… et tu tombes !) |
 | Espace | Sauter (frein à main en voiture) |
 | Ctrl ou C | S'accroupir (on se fait moins toucher) |
@@ -32,7 +32,7 @@ Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le j
 | Entrée | Taper un code de triche |
 | Échap | Pause |
 
-En **Superman** : Z Q S D pour voler là où tu regardes, Espace pour monter, C ou Ctrl pour descendre, Maj pour aller plus vite. Descends jusqu'au sol, sur un toit ou dans l'eau pour te poser en douceur.
+En **Superman** : Z Q S D pour voler là où tu regardes, Espace pour monter, C ou Ctrl pour descendre. Chaque appui sur Maj te fait aller plus vite, jusqu'à 360 km/h : espace bien les appuis, 3 fois trop vite et tu arrêtes de voler ! Lâche toutes les touches pour t'arrêter et repartir doucement. Clic gauche pour tirer en volant (pas les coups de poing). Descends jusqu'au sol, sur un toit ou dans l'eau pour te poser en douceur.
 
 Dans le **heavy robot** : Z Q S D pour marcher (Maj : plus vite), la souris pour viser, clic gauche : mitrailleuse, clic droit : roquettes, E : descendre. Il écrase les gens et les voitures sur son chemin !
 
