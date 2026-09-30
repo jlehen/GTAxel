@@ -6067,11 +6067,19 @@ function pointRoute(r, t) {
   const A = NOEUDS[r.a], B = NOEUDS[r.b], l = longueurRoute(r), dx = (B.x - A.x) / l, dz = (B.z - A.z) / l;
   return { x: A.x + dx * t - dz * VOIE, z: A.z + dz * t + dx * VOIE };
 }
+// o est-il devant la voiture v, là où elle regarde (v.regard), à moins de portee mètres de son milieu et de largeur mètres de côté ?
+function devantDe(v, o, portee, largeur) {
+  const dx = o.x - v.x, dz = o.z - v.z, a = dx * v.regard.x + dz * v.regard.z;
+  return a > 0 && a < portee && Math.abs(dx * v.regard.z - dz * v.regard.x) < largeur;
+}
 // au bout de la route, on choisit la suivante : tout droit le plus souvent ; la police prend le chemin le plus court vers toi
 function choisirSuivant(v, a, b) {
-  const options = NOEUDS[b].voisins.filter(n => n !== a);
+  let options = NOEUDS[b].voisins.filter(n => n !== a);
   if (!options.length) return a;   // cul-de-sac : demi-tour
   if (v.police && distPolice) return options.reduce((m, n) => distPolice[n] < distPolice[m] ? n : m);
+  // une voiture arrêtée sur la rue qu'on prendrait, c'est un bouchon : on passe par une autre, s'il y en a une
+  const bouchon = n => voitures.some(o => o.conducteur && o.route.a === b && o.route.b === n && Math.abs(o.vitesse) < 1);
+  if (options.some(n => !bouchon(n))) options = options.filter(n => !bouchon(n));
   const cap = angleVers(NOEUDS[a], NOEUDS[b]), ecart = n => Math.abs(diffAngle(cap, angleVers(NOEUDS[b], NOEUDS[n])));
   const droit = options.reduce((m, n) => ecart(n) < ecart(m) ? n : m);
   return Math.random() < 0.6 ? droit : hasard(options);
@@ -6103,10 +6111,20 @@ function majVoitureIA(v, dt) {
     }
     return;
   }
-  const fx = Math.sin(v.angle), fz = Math.cos(v.angle);
-  const devant = (o, portee, largeur) => { const dx = o.x - v.x, dz = o.z - v.z, a = dx * fx + dz * fz; return a > 0 && a < portee && Math.abs(dx * fz - dz * fx) < largeur; };
+  for (let k = 0; k < 40 && dist(v, pointRoute(r, r.t)) < 6; k++) {
+    r.t += 0.5;
+    if (r.t >= longueurRoute(r)) { r.t -= longueurRoute(r); const n = choisirSuivant(v, r.a, r.b); r.a = r.b; r.b = n; }
+  }
+  // on regarde là où on va (vers la carotte), pas devant le capot : pour faire demi-tour, on regarde de côté, et plus la voiture de devant
+  const c = pointRoute(r, r.t), dc = dist(v, c) || 1;
+  v.regard = { x: (c.x - v.x) / dc, z: (c.z - v.z) / dc };
   const nez = v.forme.longueur / 2;   // les distances sont comptées depuis le milieu de la voiture : on ajoute sa demi-longueur
-  let bloque = voitures.some(o => o !== v && devant(o, 4.6 + nez + o.forme.longueur / 2, 2)) || robots.some(o => devant(o, 5 + nez, 2.5));
+  const devant = (o, portee, largeur) => devantDe(v, o, portee, largeur);
+  // deux voitures qui se bloquent l'une l'autre en se croisant : celle qui a la priorité (tirée au sort) passe, l'autre attend.
+  // Face à face, les deux attendent : l'une finira par faire demi-tour
+  v.priorite ??= Math.random();
+  const croise = o => o.conducteur && o.priorite < v.priorite && o.regard.x * v.regard.x + o.regard.z * v.regard.z > -0.9 && devantDe(o, v, 4.6 + o.forme.longueur / 2 + nez, 2);
+  let bloque = voitures.some(o => o !== v && devant(o, 4.6 + nez + o.forme.longueur / 2, 2) && !croise(o)) || robots.some(o => devant(o, 5 + nez, 2.5));
   if (!v.police) bloque ||= (!J.voiture && devant(J, 4.8 + nez, 1.6)) || personnes.some(p => p.vie > 0 && devant(p, 4.8 + nez, 1.6));
   v.attente = bloque ? v.attente + dt : 0;
   if (v.attente > 5) { // bloquée trop longtemps : demi-tour
@@ -6117,11 +6135,6 @@ function majVoitureIA(v, dt) {
   const dosDAne = !v.police && dosRoute.has(cleRoute(r.a, r.b)) && Math.abs(r.t - longueurRoute(r) / 2) < 14;   // un dos d'âne tout près : on ralentit (pas la police)
   const cible = bloque ? 0 : Math.min(v.type.vitesse, dosDAne ? 5 : Infinity, v.type.blinde ? R_.vitesseBlindes : v.police ? R_.vitessePolice : R_.vitesseCirculation);
   v.vitesse += clamp(cible - v.vitesse, -25 * dt, 8 * dt);
-  for (let k = 0; k < 40 && dist(v, pointRoute(r, r.t)) < 6; k++) {
-    r.t += 0.5;
-    if (r.t >= longueurRoute(r)) { r.t -= longueurRoute(r); const n = choisirSuivant(v, r.a, r.b); r.a = r.b; r.b = n; }
-  }
-  const c = pointRoute(r, r.t);
   v.braque = clamp(diffAngle(v.angle, angleVers(v, c)), -0.45, 0.45);
   v.angle += clamp(diffAngle(v.angle, angleVers(v, c)), -0.3 * v.vitesse * dt, 0.3 * v.vitesse * dt);
   v.x += Math.sin(v.angle) * v.vitesse * dt; v.z += Math.cos(v.angle) * v.vitesse * dt;
