@@ -5099,7 +5099,7 @@ function entrerVoiture(v) {
   if (v.type.vole) { // on regarde droit devant, et on rappelle les commandes
     J.lacet = v.angle; J.tangage = 0;
     annonce(tr(v.type.nom).toUpperCase(), v.type.vole === 'avion' ? tr('Z : accélérer · S : ralentir · la souris dirige (ou Q D, Espace et C)') : tr('Espace : monter · C : descendre · Z Q S D : avancer · la souris tourne'), 5);
-  }
+  } else annonce(tr(v.type.nom).toUpperCase(), '', 2);   // le nom du véhicule dans lequel on monte
 }
 function sortirVoiture() {
   const v = J.voiture;
