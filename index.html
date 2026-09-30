@@ -596,7 +596,7 @@ const ARMES_ROBOT = {
 //  vitesse : en m/s (× 3,6 pour avoir des km/h)   virage : 1 = normal, plus grand = tourne plus sec
 //  chance : plus le nombre est grand, plus on en croise (0 = jamais)   couleurs : si on n'en met pas, toutes
 //  son du moteur : grave et aigu = sa note au ralenti et à fond, rapports = le nombre de vitesses,
-//                  rauque = de 0 (tout doux) à 1 (il hurle), petarade = bruit de mobylette
+//                  rauque = de 0 (tout doux) à 1 (il hurle, crépite et claque quand on lâche l'accélérateur), petarade = bruit de mobylette
 // =====================================================================
 const VOITURES = [
   { nom: 'Classique', modele: 'classique', vitesse: 32, acceleration: 14, virage: 1, chance: 6,
@@ -3969,12 +3969,16 @@ function initAudio() {
   alarmeGain = audio.createGain(); alarmeGain.gain.value = 0;
   alarmeSon.connect(sonne).connect(alarmeGain).connect(audio.destination); alarmeSon.start();
 }
-// un moteur : deux notes (celle du moteur, et la même une octave plus bas) qui passent dans un filtre
+// un moteur : deux notes (celle du moteur, et la même une octave plus bas) et un souffle, qui passent dans un filtre.
+// La note basse hache le souffle : un « tchk » à chaque tour, comme les explosions dans les cylindres (le crépitement)
 function creerMoteur() {
-  const m = { notes: [audio.createOscillator(), audio.createOscillator()], filtre: audio.createBiquadFilter(), volume: audio.createGain(), voiture: null };
-  m.filtre.type = 'lowpass'; m.volume.gain.value = 0;
+  const m = { notes: [audio.createOscillator(), audio.createOscillator()], filtre: audio.createBiquadFilter(), volume: audio.createGain(), cote: audio.createStereoPanner(),
+    souffle: audio.createBufferSource(), hache: audio.createGain(), crepite: audio.createGain(), voiture: null, r: 0, gaz: 0, d: 0, coupure: 0, claque: 0, prochainClaque: 0 };
+  m.filtre.type = 'lowpass'; m.volume.gain.value = 0; m.hache.gain.value = 0;
   for (const n of m.notes) { n.connect(m.filtre); n.start(); }
-  m.filtre.connect(m.volume).connect(audio.destination);
+  m.souffle.buffer = bruitBuf; m.souffle.loop = true; m.souffle.connect(m.hache).connect(m.filtre); m.souffle.start(0, Math.random());
+  m.notes[1].connect(m.crepite).connect(m.hache.gain);   // crepite : la force du crépitement
+  m.filtre.connect(m.volume).connect(m.cote).connect(audio.destination);   // cote : à gauche ou à droite
   return m;
 }
 // le régime du moteur, de 0 (ralenti) à 1 (à fond) : il monte dans chaque rapport, puis retombe quand on passe le suivant
@@ -3983,17 +3987,28 @@ function regime(v) {
   for (let k = 1; k < n; k++) { const fin = (k / n) ** 1.5; if (x <= fin) return x / fin; }   // les premiers rapports sont plus courts
   return x;
 }
-// fait chanter le moteur m comme celui de la voiture v (null = silence). gaz : de 0 à 1, fort : de 0 (loin) à 1 (tout près)
-function reglerMoteur(m, v, gaz, fort) {
+// fait chanter le moteur m comme celui de la voiture v (null = silence). gaz : de 0 à 1, fort : de 0 (loin) à 1 (tout près),
+// cote : de -1 (à gauche) à 1 (à droite), doppler : la note monte quand la voiture approche, et descend quand elle s'éloigne
+function reglerMoteur(m, v, gaz, fort, cote = 0, doppler = 1) {
   const t = audio.currentTime;
-  if (!v) { m.volume.gain.setTargetAtTime(0, t, 0.1); return; }
-  const s = v.type.son, r = regime(v), note = s.grave + (s.aigu - s.grave) * r;
-  if (m.voiture !== v) { m.voiture = v; m.notes[0].type = s.petarade ? 'square' : 'sawtooth'; m.notes[1].type = 'sawtooth'; m.filtre.Q.value = 0.7 + s.rauque * 3; }
+  if (!v) { m.volume.gain.setTargetAtTime(0, t, 0.1); m.voiture = null; return; }
+  const s = v.type.son, r = regime(v), note = (s.grave + (s.aigu - s.grave) * r) * doppler;
+  if (m.voiture !== v) { m.voiture = v; m.r = r; m.gaz = gaz; m.notes[0].type = s.petarade ? 'square' : 'sawtooth'; m.notes[1].type = 'sawtooth'; m.filtre.Q.value = 0.7 + s.rauque * 3; m.crepite.gain.value = 2.5 * Math.sqrt(s.rauque); }
+  // on passe la vitesse suivante : le régime retombe d'un coup, et le moteur se tait un instant (un moteur rauque claque)
+  if (r < m.r - 0.1 && gaz > 0.3 && t > m.coupure) { m.coupure = t + 0.2; claquer(s, fort * 0.5); }
+  // on lâche l'accélérateur à haut régime : l'échappement claque pendant 0,6 s (pas celui d'un avion ni d'un hélicoptère)
+  if (m.gaz > 0.5 && gaz < 0.5 && r > 0.5 && !v.type.vole) m.claque = t + 0.6;
+  if (gaz < 0.5 && t < m.claque && t > m.prochainClaque) { claquer(s, fort); m.prochainClaque = t + 0.04 + Math.random() * 0.15; }
+  m.r = r; m.gaz = gaz;
   m.notes[0].frequency.setTargetAtTime(note, t, 0.05); m.notes[1].frequency.setTargetAtTime(note * 0.503, t, 0.05);
-  // plus le moteur est rauque, tourne vite et accélère, plus on laisse passer les sons aigus
-  m.filtre.frequency.setTargetAtTime(200 + s.rauque * 900 + r * (400 + s.rauque * 1500) * (0.5 + 0.5 * gaz), t, 0.1);
-  m.volume.gain.setTargetAtTime(s.volume * fort * (0.55 + 0.45 * gaz), t, 0.1);
+  // plus le moteur est rauque, tourne vite et accélère, plus on laisse passer les sons aigus ; de loin, on n'entend plus que les graves
+  m.filtre.frequency.setTargetAtTime((200 + s.rauque * 900 + r * (400 + s.rauque * 1500) * (0.5 + 0.5 * gaz)) * (0.4 + 0.6 * Math.sqrt(fort)), t, 0.1);
+  // (× 1,4 : au milieu, le son est partagé entre les deux oreilles)
+  m.volume.gain.setTargetAtTime(1.4 * s.volume * fort * (0.55 + 0.45 * gaz) * (t < m.coupure ? 0.3 : 1), t, 0.1);
+  m.cote.pan.setTargetAtTime(cote, t, 0.05);
 }
+// un claquement d'échappement : d'autant plus fort que le moteur est rauque (rien pour un moteur tout doux)
+function claquer(s, fort) { bruit(0.6 * s.rauque ** 2 * fort, 1000, 0.06); }
 function bruit(vol, freq, duree) {
   if (!audio || !(vol > 0.01)) return;   // « pas plus que » : un volume NaN (impossible) ne passe pas, il arrêterait tout le jeu
   const t = audio.currentTime, s = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
@@ -6437,7 +6452,14 @@ function mettreAJour(dt) {
     const v = J.voiture, t = audio.currentTime;
     reglerMoteur(moteurs[0], v, v?.gaz, 1);
     let proche = null, d = 40; for (const o of voitures) if (o !== v && o.conducteur && dist(o, J) < d) { d = dist(o, J); proche = o; }
-    reglerMoteur(moteurs[1], proche, 0.4, (1 - d / 40) ** 2 * 0.7);
+    // la voiture qui passe : à gauche ou à droite de la caméra, et plus aiguë quand elle approche (effet Doppler : le son va à 340 m/s)
+    let cote = 0, doppler = 1;
+    if (proche) {
+      vTmp.set(proche.x, proche.y, proche.z).applyMatrix4(camera.matrixWorldInverse); cote = 0.8 * vTmp.x / (vTmp.length() || 1);
+      if (proche === moteurs[1].voiture && dt > 0) doppler = 340 / (340 + clamp((d - moteurs[1].d) / dt, -100, 100));
+      moteurs[1].d = d;
+    }
+    reglerMoteur(moteurs[1], proche, 0.4, (1 - d / 40) ** 2 * 0.7, cote, doppler);
     roulement.setTargetAtTime(v ? Math.min(0.07, Math.abs(v.vitesse) * 0.002) : 0, t, 0.1);
     crissement.setTargetAtTime(v && touches.Space && Math.abs(v.vitesse) > 6 ? 0.05 : 0, t, 0.05);
     let dp = Infinity; for (const v of voitures) if (v.police && v.conducteur) dp = Math.min(dp, dist(v, J));
