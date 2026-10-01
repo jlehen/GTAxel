@@ -1,6 +1,6 @@
 # GTAxel — Document de design
 
-Mis à jour le 1er octobre 2026 (les ennemis ne voient plus B.J. et ne le touchent plus à travers les murs : un mur, un plancher ou un meuble arrête la vue et les balles, même un mur de 30 cm ; le code `DIEU` habille B.J. en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags ; le soutien-gorge du code `SOUTIF` est refait : deux bonnets bordés de dentelle, une bande, une agrafe et deux bretelles ; bouton 🎮 Codes de triche dans le menu : la liste de tous les codes, faite à partir du tableau `TRICHES` ; ce qui vole penche dans ses virages : l'hélicoptère et Superman comme l'avion, jusqu'à 36°, réglage `roulisVirage` ; de très hautes montagnes enneigées à l'est, le mont Gordo et le San Chianski (tableau `SOMMETS`), avec une station de ski (`Y`), son télésiège, et des skis, un snowboard et une luge ; la carte passe de 48 à 74 colonnes ; plus de gros bouchons : les voitures qui circulent regardent là où elles vont, font vraiment demi-tour quand elles restent bloquées, se laissent passer quand elles se croisent dans un carrefour, et prennent une autre rue quand la leur est bouchée ; numéro de version sous le titre du menu : le nombre de commits du jeu sur GitHub ; Superman tire en volant, et chaque appui sur Maj le fait voler plus vite, jusqu'à 360 km/h ; le heavy robot écrase les gens et les voitures sur son chemin, et deux robots ne passent plus l'un à travers l'autre ; une voiture qui explose après un long accident retombe par terre au lieu de rester figée en l'air ; Maj 3 fois de suite fait voler B.J. comme Superman ; le code `IDDQD` rend invincible, comme `DIEU` ; les membres des personnages ont du poids : ils traînent quand le corps tourne, pendent, claquent par terre et y restent, sans plier à l'envers ; les morts s'effondrent tout mous, les personnages renversés ou soufflés tournent aussi de côté, et un coup fait partir le buste et la tête ; B.J. garde sa pose en l'air pendant tout le saut, son buste et ses bras continuent sur leur lancée quand il atterrit, ses bras et ses jambes battent quand il sort très vite d'une voiture, et il se déplie à la fin d'une roulade ; la caméra ne voit plus à travers les murs, les cloisons et les plafonds ; les étages de la façade continuent au-dessus des portes ; le carrelage de la salle de bain ne barre plus sa porte ; chacun son tour : seuls les 2 policiers les plus proches qui voient B.J. peuvent le toucher, les autres tirent à côté, pour qu'on ne meure plus en 4 s quand un fourgon blindé arrive à 4 ou 5 étoiles ; le son des moteurs : crépitement, petit silence à chaque changement de vitesse, claquements d'échappement quand on lâche l'accélérateur ; la voiture qui passe s'entend de son côté, plus aiguë quand elle approche (effet Doppler) et plus sourde de loin ; le nom du véhicule s'affiche quand on monte dedans ; tomber de haut fait mal ; sauts, chutes, atterrissages sur un genou et roulades de B.J. ; sauter d'une voiture lancée le fait rouler par terre ; les personnages s'effondrent en mourant, volent quand une voiture les renverse ou qu'une explosion les souffle, vacillent ou tombent quand B.J. les bouscule, et se relèvent ; des meubles dans les immeubles où l'on entre : appartements, lofts et bureaux ; des objets à voler et des bonus ; moto, Segway, DeLorean, Coccinelle, Skoda Kodiaq, Audi TT, Lamborghini, Rolls-Royce, Audi Quattro de rallye et Austin Mini ; on se pose sur le toit des immeubles pleins, et plus 60 cm dedans ; écran des réglages ⚙ dans le menu, pour changer `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES` et `ENNEMIS` sans toucher au code ; nouveau tableau `ENNEMIS` : la vie, l'arme, les dégâts, la précision, la vue, la cadence de tir et la vitesse de chaque ennemi ; codes de triche `ARMES`, `WAFFEN` et `WEAPONS`, d'autres noms pour `IDKFA` ; `DIEU`, `GOD` ou `GOTT` rend invincible ; immeubles où l'on entre : des étages, et le toit par l'escalier, une échelle ou un escalier de secours, ou une terrasse ; avions et hélicoptères à piloter à l'aéroport ; dos d'âne dans les rues ; gangs dans leur quartier ; roquettes un peu plus rapides ; une voiture en toupie renverse les piétons et pousse les autres voitures ; une borne restée sous la voiture ne la bloque plus ; braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard ; police en force à 4 et 5 étoiles, heavy robot pilotable ; codes de triche `IDKFA`, `MISSION` + numéro, `RICHE` (100 000 $), `GOKU`, Super Saiyan, et `Z6PO` ou `C3PO`, un robot doré plus lent et plus solide ; menu des langues : français, allemand, anglais et züritüütsch, enseignes comprises ; légende de la grande carte ; foule au choix dans le menu, piétons et voitures : Peu, Normal, Beaucoup ou Énorme, Beaucoup au départ ; accidents : tonneaux, tête-à-queue et voitures qui décollent selon la force du choc, voiture couchée qui brûle puis explose, carrosserie qui s'écrase là où ça tape et d'autant plus que c'est fort, vitres brisées sombres avec des éclats, lampadaires qui tombent, bornes en béton autour des places, pneus qui crèvent sous les balles ; tirer sur une voiture touche celui qui la conduit, et le tuer donne une étoile ; une voiture trop abîmée prend feu, puis explose ; un son au volume impossible ne fige plus le jeu).
+Mis à jour le 1er octobre 2026. Ce qui a changé, jour par jour, est dans le « Journal des modifications », tout à la fin.
 
 ## Vision
 
@@ -1151,3 +1151,73 @@ Le jeu est complet et jouable, mais la fluidité sur une vraie carte graphique e
 - Effets d'image (halo autour des lumières, coins assombris) : essayés puis retirés. En plein jour, le halo délave toute l'image et les coins assombris ne se voient presque pas, pour un coût élevé. À retenter avec la nuit.
 - Missions au choix, avec des marqueurs sur la carte.
 - Des policiers qui mettent un moment à viser : ceux qui descendent d'un fourgon rateraient leurs premières balles, le temps de courir se cacher.
+
+## Journal des modifications
+
+Ce qui a été ajouté ou changé dans le jeu, jour par jour, le plus récent en premier. Les règles et les chiffres eux-mêmes sont dans les chapitres plus haut.
+
+### 1er octobre 2026
+
+- Les ennemis ne voient plus B.J. et ne le touchent plus à travers les murs : un mur, un plancher ou un meuble arrête la vue et les balles, même un mur de 30 cm.
+- Le code `DIEU` habille B.J. en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags.
+- Le soutien-gorge du code `SOUTIF` est refait : deux bonnets bordés de dentelle, une bande, une agrafe et deux bretelles.
+- Bouton 🎮 Codes de triche dans le menu : la liste de tous les codes, faite à partir du tableau `TRICHES`.
+- Ce qui vole penche dans ses virages : l'hélicoptère et Superman comme l'avion, jusqu'à 36°, réglage `roulisVirage`.
+
+### 30 septembre 2026
+
+- De très hautes montagnes enneigées à l'est, le mont Gordo et le San Chianski (tableau `SOMMETS`), avec une station de ski (`Y`), son télésiège, et des skis, un snowboard et une luge.
+- La carte passe de 48 à 74 colonnes.
+- Plus de gros bouchons : les voitures qui circulent regardent là où elles vont, font vraiment demi-tour quand elles restent bloquées, se laissent passer quand elles se croisent dans un carrefour, et prennent une autre rue quand la leur est bouchée.
+- Numéro de version sous le titre du menu : le nombre de commits du jeu sur GitHub.
+- Superman tire en volant, et chaque appui sur Maj le fait voler plus vite, jusqu'à 360 km/h.
+- Le heavy robot écrase les gens et les voitures sur son chemin, et deux robots ne passent plus l'un à travers l'autre.
+- Une voiture qui explose après un long accident retombe par terre au lieu de rester figée en l'air.
+- Maj 3 fois de suite fait voler B.J. comme Superman.
+- Le code `IDDQD` rend invincible, comme `DIEU`.
+- Les membres des personnages ont du poids : ils traînent quand le corps tourne, pendent, claquent par terre et y restent, sans plier à l'envers.
+- Les morts s'effondrent tout mous, les personnages renversés ou soufflés tournent aussi de côté, et un coup fait partir le buste et la tête.
+- B.J. garde sa pose en l'air pendant tout le saut, son buste et ses bras continuent sur leur lancée quand il atterrit, ses bras et ses jambes battent quand il sort très vite d'une voiture, et il se déplie à la fin d'une roulade.
+- La caméra ne voit plus à travers les murs, les cloisons et les plafonds.
+- Les étages de la façade continuent au-dessus des portes.
+- Le carrelage de la salle de bain ne barre plus sa porte.
+- Chacun son tour : seuls les 2 policiers les plus proches qui voient B.J. peuvent le toucher, les autres tirent à côté, pour qu'on ne meure plus en 4 s quand un fourgon blindé arrive à 4 ou 5 étoiles.
+- Le son des moteurs : crépitement, petit silence à chaque changement de vitesse, claquements d'échappement quand on lâche l'accélérateur.
+- La voiture qui passe s'entend de son côté, plus aiguë quand elle approche (effet Doppler) et plus sourde de loin.
+- Le nom du véhicule s'affiche quand on monte dedans.
+- Tomber de haut fait mal.
+- Sauts, chutes, atterrissages sur un genou et roulades de B.J.
+- Sauter d'une voiture lancée le fait rouler par terre.
+- Les personnages s'effondrent en mourant, volent quand une voiture les renverse ou qu'une explosion les souffle, vacillent ou tombent quand B.J. les bouscule, et se relèvent.
+- Des meubles dans les immeubles où l'on entre : appartements, lofts et bureaux.
+- Des objets à voler et des bonus.
+- Moto, Segway, DeLorean, Coccinelle, Skoda Kodiaq, Audi TT, Lamborghini, Rolls-Royce, Audi Quattro de rallye et Austin Mini.
+- On se pose sur le toit des immeubles pleins, et plus 60 cm dedans.
+- Écran des réglages ⚙ dans le menu, pour changer `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES` et `ENNEMIS` sans toucher au code.
+- Nouveau tableau `ENNEMIS` : la vie, l'arme, les dégâts, la précision, la vue, la cadence de tir et la vitesse de chaque ennemi.
+- Codes de triche `ARMES`, `WAFFEN` et `WEAPONS`, d'autres noms pour `IDKFA`.
+- `DIEU`, `GOD` ou `GOTT` rend invincible.
+
+### 29 septembre 2026
+
+- Immeubles où l'on entre : des étages, et le toit par l'escalier, une échelle ou un escalier de secours, ou une terrasse.
+- Avions et hélicoptères à piloter à l'aéroport.
+- Dos d'âne dans les rues.
+- Gangs dans leur quartier.
+- Roquettes un peu plus rapides.
+- Une voiture en toupie renverse les piétons et pousse les autres voitures.
+- Une borne restée sous la voiture ne la bloque plus.
+- Codes de triche `RICHE` (100 000 $), `GOKU`, Super Saiyan, et `Z6PO` ou `C3PO`, un robot doré plus lent et plus solide.
+- Menu des langues : français, allemand, anglais et züritüütsch, enseignes comprises.
+- Légende de la grande carte.
+- Foule au choix dans le menu, piétons et voitures : Peu, Normal, Beaucoup ou Énorme, Beaucoup au départ.
+- Accidents : tonneaux, tête-à-queue et voitures qui décollent selon la force du choc, voiture couchée qui brûle puis explose, carrosserie qui s'écrase là où ça tape et d'autant plus que c'est fort, vitres brisées sombres avec des éclats, lampadaires qui tombent, bornes en béton autour des places, pneus qui crèvent sous les balles.
+- Tirer sur une voiture touche celui qui la conduit, et le tuer donne une étoile.
+- Une voiture trop abîmée prend feu, puis explose.
+- Un son au volume impossible ne fige plus le jeu.
+
+### 28 septembre 2026
+
+- Braquages : voiture blindée façon Mad Max, musée, bijouterie Vangelico, banque Pacific Standard.
+- Police en force à 4 et 5 étoiles, heavy robot pilotable.
+- Codes de triche `IDKFA` et `MISSION` + numéro.

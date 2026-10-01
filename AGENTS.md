@@ -10,7 +10,8 @@ GTAxel est un jeu 3D dans le navigateur, entièrement contenu dans `index.html`.
    - les règles et les chiffres qui ont changé (tableaux, vitesses, dégâts, etc.) ;
    - le plan du fichier, si des lignes ont bougé ;
    - les limites connues et les pistes, si ta modification en règle une ou en crée une ;
-   - la date de mise à jour, en haut du document.
+   - la date de mise à jour, en haut du document (la date seule, sans résumé) ;
+   - le « Journal des modifications », tout à la fin : une puce par changement, en tête du jour concerné, le jour le plus récent en premier.
 4. Si la modification change les touches, les armes, la carte ou les missions, mets aussi à jour `README.md`.
 
 Une modification n'est pas terminée tant que `DESIGN.md` ne correspond pas au code.
