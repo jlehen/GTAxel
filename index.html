@@ -492,9 +492,12 @@ for (const ligne of document.querySelectorAll('.foule')) for (const nom in FOULE
 traduireMenu();
 // le numéro de version : le nombre de commits du jeu sur GitHub. Il augmente tout seul à chaque mise en ligne.
 // GitHub donne la liste des commits par pages (ici, d'un commit chacune) : le numéro de la dernière page, c'est leur nombre
+// GitHub ne répond qu'à 60 demandes par heure : on garde le dernier numéro reçu dans le localStorage, et on l'affiche en attendant la réponse
+const afficherVersion = n => { if (n) document.getElementById('version').textContent = 'Version ' + n; };
+try { afficherVersion(localStorage.version); } catch {}
 fetch('https://api.github.com/repos/jlehen/GTAxel/commits?sha=main&per_page=1')
-  .then(r => { const n = r.headers.get('Link')?.match(/page=(\d+)>; rel="last"/)?.[1]; if (n) document.getElementById('version').textContent = 'Version ' + n; })
-  .catch(() => {});   // GitHub ne répond pas : pas de numéro, le jeu marche quand même
+  .then(r => { const n = r.headers.get('Link')?.match(/page=(\d+)>; rel="last"/)?.[1]; afficherVersion(n); if (n) try { localStorage.version = n; } catch {} })
+  .catch(() => {});   // GitHub ne répond pas : on garde le numéro d'avant (ou rien, la première fois), le jeu marche quand même
 </script>
 
 <script type="importmap">
