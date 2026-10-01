@@ -125,7 +125,9 @@
     <tr><td>Maj</td><td>courir</td></tr>
     <tr><td>Espace</td><td>sauter (frein à main en voiture)</td></tr>
     <tr><td>Ctrl ou C</td><td>s'accroupir</td></tr>
-    <tr><td>E</td><td>monter / descendre (voiture, bateau, avion), acheter, ascenseur</td></tr>
+    <tr><td>À ski</td><td>Espace : sauter (plus haut sur une bosse) · Maj + Q ou D : déraper · R : peaux des skis de rando</td></tr>
+    <tr><td>En l'air, à ski</td><td>Q D : vrilles (180, 360…) · S : backflip · Z : frontflip · S + Q ou D : cork · clics : grabs</td></tr>
+    <tr><td>E</td><td>monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes</td></tr>
     <tr><td>V</td><td>vue 1re / 3e personne</td></tr>
     <tr><td>1 à 8 ou molette</td><td>changer d'arme</td></tr>
     <tr><td>M</td><td>carte du pays (molette : zoom)</td></tr>
@@ -199,7 +201,13 @@ const TRADUCTIONS = {
   'sauter (frein à main en voiture)': { de: 'springen (im Auto: Handbremse)', en: 'jump (in a car: handbrake)', gsw: 'gumpe (im Auto: Handbremse)' },
   'Ctrl ou C':                { de: 'Strg oder C', en: 'Ctrl or C', gsw: 'Strg oder C' },
   "s'accroupir":              { de: 'ducken', en: 'crouch', gsw: 'sich ducke' },
-  'monter / descendre (voiture, bateau, avion), acheter, ascenseur': { de: 'einsteigen / aussteigen (Auto, Boot, Flugzeug), kaufen, Aufzug', en: 'get in / out (car, boat, plane), buy, elevator', gsw: 'iistiige / uusstiige (Auto, Boot, Flüüger), chaufe, Lift' },
+  'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes': { de: 'einsteigen / aussteigen (Auto, Boot, Flugzeug), kaufen, Aufzug, Skibus', en: 'get in / out (car, boat, plane), buy, elevator, ski shuttle', gsw: 'iistiige / uusstiige (Auto, Boot, Flüüger), chaufe, Lift, Skibus' },
+  'À ski':                    { de: 'Auf Ski', en: 'On skis', gsw: 'Uf de Ski' },
+  'Espace : sauter (plus haut sur une bosse) · Maj + Q ou D : déraper · R : peaux des skis de rando': { de: 'Leertaste: springen (höher auf einem Buckel) · Shift + A oder D: driften · R: Felle der Tourenski',
+    en: 'Space: jump (higher off a bump) · Shift + A or D: skid · R: touring ski skins', gsw: 'Läärtaschte: gumpe (höcher uf eme Buckel) · Shift + A oder D: rutsche · R: Fäll vo de Tuureski' },
+  "En l'air, à ski":          { de: 'In der Luft, auf Ski', en: 'In the air, on skis', gsw: 'I de Luft, uf de Ski' },
+  'Q D : vrilles (180, 360…) · S : backflip · Z : frontflip · S + Q ou D : cork · clics : grabs': { de: 'A D: Drehungen (180, 360…) · S: Backflip · W: Frontflip · S + A oder D: Cork · Klicks: Grabs',
+    en: 'A D: spins (180, 360…) · S: backflip · W: frontflip · S + A or D: cork · clicks: grabs', gsw: 'A D: Dräiige (180, 360…) · S: Backflip · W: Frontflip · S + A oder D: Cork · Klicks: Grabs' },
   'vue 1re / 3e personne':    { de: 'Ansicht 1. / 3. Person', en: '1st / 3rd person view', gsw: 'Aasicht 1. / 3. Person' },
   '1 à 8 ou molette':         { de: '1 bis 8 oder Mausrad', en: '1 to 8 or wheel', gsw: '1 bis 8 oder Muusrad' },
   "changer d'arme":           { de: 'Waffe wechseln', en: 'switch weapon', gsw: 'Waffe wächsle' },
@@ -236,7 +244,25 @@ const TRADUCTIONS = {
   'Skis':             { de: 'Ski', en: 'Skis', gsw: 'Ski' },
   'Snowboard':        { de: 'Snowboard', en: 'Snowboard', gsw: 'Snowboard' },
   'Luge':             { de: 'Schlitten', en: 'Sled', gsw: 'Schlitte' },
-  'Z : pousser · S : freiner · Espace : sauter': { de: 'W: anschieben · S: bremsen · Leertaste: springen', en: 'W: push · S: brake · Space: jump', gsw: 'W: aaschiebe · S: brämse · Läärtaschte: gumpe' },
+  'Skis de rando':    { de: 'Tourenski', en: 'Touring skis', gsw: 'Tuureski' },
+  'Z : pousser · S : freiner · Espace : sauter · Maj : déraper': { de: 'W: anschieben · S: bremsen · Leertaste: springen · Shift: driften', en: 'W: push · S: brake · Space: jump · Shift: skid', gsw: 'W: aaschiebe · S: brämse · Läärtaschte: gumpe · Shift: rutsche' },
+  // les figures à ski, les skis de rando, la navette
+  'Pop !':            { de: 'Pop!', en: 'Pop!', gsw: 'Pop!' },
+  '{n} points':       { de: '{n} Punkte', en: '{n} points', gsw: '{n} Pünkt' },
+  '{n} points : nouveau record !': { de: '{n} Punkte: neuer Rekord!', en: '{n} points: new record!', gsw: '{n} Pünkt: neue Rekord!' },
+  'AÏE !':            { de: 'AUTSCH!', en: 'OUCH!', gsw: 'AUA!' },
+  'Figure ratée':     { de: 'Trick verpatzt', en: 'Trick failed', gsw: 'Trick verhaue' },
+  'Réception de travers !': { de: 'Schief gelandet!', en: 'Landed sideways!', gsw: 'Schräg glandet!' },
+  "Arrête-toi d'abord !": { de: 'Halt erst an!', en: 'Stop first!', gsw: 'Halt zerscht aa!' },
+  'MODE MONTÉE':      { de: 'AUFSTIEG', en: 'CLIMB MODE', gsw: 'UFSTIIG' },
+  'MODE DESCENTE':    { de: 'ABFAHRT', en: 'DOWNHILL MODE', gsw: 'ABFAHRT' },
+  'Les peaux sont collées : Z fait monter · R : les enlever': { de: 'Die Felle kleben: W steigt auf · R: abziehen', en: 'Skins on: W climbs · R: take them off', gsw: 'D Fäll chläbed: W stiigt uf · R: abzieh' },
+  'Les peaux sont rangées : à toi la descente ! · R : les recoller': { de: 'Die Felle sind verstaut: ab ins Tal! · R: wieder aufziehen', en: 'Skins stowed: enjoy the ride down! · R: put them back on', gsw: 'D Fäll sind versorgt: ab is Tal! · R: wider druf' },
+  'SKI SHUTTLE':      { de: 'SKI SHUTTLE', en: 'SKI SHUTTLE', gsw: 'SKI SHUTTLE' },
+  'Appuie sur <b>E</b> pour prendre la navette : {arret}': { de: 'Drücke <b>E</b> für den Skibus: {arret}', en: 'Press <b>E</b> to take the shuttle: {arret}', gsw: 'Drück <b>E</b> für de Skibus: {arret}' },
+  'Terminus : {arret}': { de: 'Endstation: {arret}', en: 'Last stop: {arret}', gsw: 'Ändstation: {arret}' },
+  'Los Santos':       { de: 'Los Santos', en: 'Los Santos', gsw: 'Los Santos' },
+  'Navette des pistes': { de: 'Skibus', en: 'Ski shuttle', gsw: 'Skibus' },
   // les ennemis (dans le menu des réglages)
   'Piéton':           { de: 'Fußgänger', en: 'Pedestrian', gsw: 'Fuessgänger' },
   'Policier':         { de: 'Polizist', en: 'Police officer', gsw: 'Polizischt' },
@@ -578,6 +604,11 @@ const REGLAGES = {
   neigeBas: 25,              // mètres : plus bas que ça sur la montagne, il n'y a plus de neige (sauf sur les pistes, qui en gardent jusqu'en bas)...
   neigeHaut: 150,            // ...et plus haut que ça, tout est blanc. Entre les deux, la neige s'en va par plaques
   sautGlisse: 4.5,           // m/s : le saut à ski, en snowboard ou en luge (Espace). 4.5 = environ 1 m de haut
+  sautBosse: 4,              // m/s en plus si on saute au bon moment sur une bosse : pendant qu'elle monte encore sous les skis (après le sommet, c'est trop tard)
+  vitesseVrille: 7.5,        // en l'air, Q et D font tourner comme une toupie : radians par seconde (7.5 = un 360 en 0,8 s)
+  vitesseSalto: 6.5,         // en l'air, S fait un backflip et Z un frontflip : radians par seconde (6.5 = un tour en 1 s)
+  derapage: 1.8,             // Maj + Q ou D : on dérape, et ça tourne autant de fois plus sec (1 = comme sans déraper)
+  vitesseRando: 5,           // m/s : en skis de rando, les peaux collées, quand on monte (moins vite quand c'est raide)
   chuteGlisse: 15,           // m/s : on se reçoit sur la neige sans tomber, sauf si on tape plus fort que ça (une chute de 11 m sur du plat)
   skieurs: 30,               // combien d'autres gens glissent sur les pistes et prennent les remontées (0 = tu as la montagne pour toi)
   vitesseNage: 2.2,          // dans l'eau
@@ -721,6 +752,9 @@ const VOITURES = [
   { nom: 'Skis', modele: 'skis', vitesse: 30, acceleration: 3, virage: 1.5, chance: 0, glisse: true, couleurs: ['#c81010', '#1a5ad8', '#f0c020', '#111', '#e8e8e8'] },
   { nom: 'Snowboard', modele: 'snowboard', vitesse: 32, acceleration: 2.5, virage: 1.3, chance: 0, glisse: true, couleurs: ['#2a8a3a', '#e06010', '#6a1a8a', '#111', '#1a5ad8'] },
   { nom: 'Luge', modele: 'luge', vitesse: 22, acceleration: 2, virage: 0.8, chance: 0, glisse: true, couleurs: ['#a0642a', '#8a4a1a', '#c81010'] },
+  // les skis de rando : pour monter la montagne sans remontée ! La touche R colle les peaux sous les skis (mode montée : Z fait grimper,
+  // à REGLAGES.vitesseRando, le talon libre) ou les enlève (mode descente : on glisse comme sur des skis)
+  { nom: 'Skis de rando', modele: 'rando', vitesse: 28, acceleration: 3, virage: 1.6, chance: 0, glisse: true, couleurs: ['#e8e8e8', '#f08010', '#1a9a8a', '#111'] },
   // ce qui vole (vole: 'avion' ou 'helico') : à l'aéroport (^ et @ sur la carte) et dans les hangars (N).
   // decollage : la vitesse (m/s) qu'il faut à l'avion pour s'envoler ; montee : à quelle vitesse (m/s) l'hélicoptère monte et descend
   { nom: 'Avion', modele: 'avion', vitesse: 70, acceleration: 6, virage: 1, chance: 0, vole: 'avion', decollage: 32, couleurs: ['#c81010', '#1a5ad8', '#0e5a2e', '#e06010'],
@@ -770,7 +804,8 @@ const ENNEMIS = {
 //    J bar Yellow Jack                  F ferme*          D docks du port   N hangar d'avions
 //    B bunker nazi    W château Wolfenstein* (repaire d'Hitler)
 //    Y station de ski : un télésiège monte de là jusqu'en haut du sommet le plus proche (tableau SOMMETS, juste après la carte),
-//      avec des skis, des snowboards et des luges en bas et en haut. Les autres remontées et les pistes : REMONTEES et PISTES_SKI, après la carte
+//      avec des skis, des snowboards, des luges et des skis de rando en bas et en haut. Les autres remontées et les pistes : REMONTEES et PISTES_SKI,
+//      après la carte. Le bus « SKI SHUTTLE » qui y emmène : NAVETTE, après les pistes
 //  Les pâtés à braquer (gardés, avec une alarme) :
 //    U musée d'art (vigiles et chiens)  V bijouterie Vangelico (fumée toxique)
 //    Q grande banque Pacific Standard (lasers, mitrailleuses, coffre-fort)
@@ -883,19 +918,37 @@ const REMONTEES = [
 //  couleur : 'bleue' (facile), 'rouge', 'noire' (très raide), ou 'jaune' pour un hors-piste. C'est la couleur de ses piquets.
 //  Une piste garde sa neige jusqu'en bas, aucun arbre n'y pousse, et les autres skieurs la descendent.
 //  kickers : des tremplins de neige, à tant de mètres du départ.
+//  bosses : des champs de bosses (56 m de petites bosses rondes, sur toute la largeur), à tant de mètres du départ.
+//  vagues : trois grosses vagues de neige à la file, en travers de toute la piste, à tant de mètres du départ.
+//  Sur une bosse, saute (Espace) juste avant le sommet : tu décolles bien plus haut ! Laisse 20 m entre deux reliefs.
 //  boardercross: true = une piste étroite avec des virages relevés et des bosses, chronométrée du portique de départ à l'arrivée.
 //  Fais partir une piste près du haut d'une remontée, et arriver près du bas d'une autre : les skieurs enchaînent !
 // =====================================================================
 const PISTES_SKI = [
-  { nom: 'La Gordo', couleur: 'noire', points: [[53, 20.3], [50, 19.6], [46, 18.5], [42.5, 17.5], [40.3, 16.9], [39.45, 16.3]], kickers: [520, 900] },
-  { nom: 'Les Crêtes', couleur: 'rouge', points: [[53.1, 19.5], [52.95, 18.2], [52.85, 17], [51.9, 16.3], [50.6, 15.6], [49.5, 15], [48.9, 14.75]], kickers: [420] },
-  { nom: 'Les Marmottes', couleur: 'bleue', points: [[48.5, 14.85], [46, 15.5], [43.5, 16], [41.5, 16.1], [40.2, 16], [39.6, 15.95]], kickers: [180, 420] },
+  { nom: 'La Gordo', couleur: 'noire', points: [[53, 20.3], [50, 19.6], [46, 18.5], [42.5, 17.5], [40.3, 16.9], [39.45, 16.3]],
+    kickers: [250, 520, 900], bosses: [120, 640], vagues: [380, 780] },
+  { nom: 'Les Crêtes', couleur: 'rouge', points: [[53.1, 19.5], [52.95, 18.2], [52.85, 17], [51.9, 16.3], [50.6, 15.6], [49.5, 15], [48.9, 14.75]],
+    kickers: [200, 420], bosses: [80], vagues: [290] },
+  { nom: 'Les Marmottes', couleur: 'bleue', points: [[48.5, 14.85], [46, 15.5], [43.5, 16], [41.5, 16.1], [40.2, 16], [39.6, 15.95]],
+    kickers: [180, 420, 570], bosses: [60, 480], vagues: [260] },
   { nom: 'Boardercross', couleur: 'rouge', boardercross: true, kickers: [150, 320, 470],
     points: [[48.2, 14.1], [47.2, 13.9], [46.3, 14.35], [45.3, 14], [44.3, 14.5], [43.3, 14.2], [42.3, 14.75], [41.4, 14.55], [40.6, 15.05], [39.9, 15.25]] },
-  { nom: 'Le Col', couleur: 'rouge', points: [[53.3, 20.75], [54.2, 21.5], [54.95, 22.6], [55.45, 24.5], [55.8, 27], [55.9, 28.5]], kickers: [380] },
-  { nom: 'La Liaison', couleur: 'rouge', points: [[53.95, 22.2], [52.8, 22.2], [51.3, 21.3], [50, 20.1], [49.4, 19.6]] },
-  { nom: 'Le San Chianski', couleur: 'noire', points: [[56.6, 33.3], [56, 31.8], [55.7, 30.4], [55.9, 29.45]] },
-  { nom: 'Hors-piste du Gordo', couleur: 'jaune', points: [[53.3, 19.4], [51.5, 17.5], [50, 16], [49.1, 15.1]] },
+  { nom: 'Le Col', couleur: 'rouge', points: [[53.3, 20.75], [54.2, 21.5], [54.95, 22.6], [55.45, 24.5], [55.8, 27], [55.9, 28.5]],
+    kickers: [150, 380], bosses: [230], vagues: [470] },
+  { nom: 'La Liaison', couleur: 'rouge', points: [[53.95, 22.2], [52.8, 22.2], [51.3, 21.3], [50, 20.1], [49.4, 19.6]], kickers: [120], bosses: [190], vagues: [300] },
+  { nom: 'Le San Chianski', couleur: 'noire', points: [[56.6, 33.3], [56, 31.8], [55.7, 30.4], [55.9, 29.45]], kickers: [200], bosses: [80] },
+  { nom: 'Hors-piste du Gordo', couleur: 'jaune', points: [[53.3, 19.4], [51.5, 17.5], [50, 16], [49.1, 15.1]], kickers: [180], bosses: [60, 250] },
+];
+// =====================================================================
+//  LA NAVETTE DES PISTES : un bus « SKI SHUTTLE » attend à chaque arrêt. On monte dedans (E), et on se retrouve à l'arrêt suivant
+//  de la liste (au dernier arrêt, on revient au premier).
+//  col, ligne : le pâté de la CARTE     x, z : où est le bus dans ce pâté, en mètres depuis son coin nord-ouest (de 0 à 60)
+//  angle : vers où regarde le bus : 0 = le sud, 90 = l'est, 180 = le nord, 270 = l'ouest. On descend du côté de sa porte, à sa droite
+//  abri: true = un abribus avec un banc, en face de la porte
+// =====================================================================
+const NAVETTE = [
+  { nom: 'Los Santos', col: 21, ligne: 45, x: 30, z: 17, angle: 90 },                       // sur la place du départ (X), juste devant B.J.
+  { nom: 'Station de ski', col: 39, ligne: 16, x: 14, z: 47, angle: 90, abri: true },       // au pied des pistes (Y)
 ];
 // les noms écrits sur la grande carte : [texte, colonne, ligne]
 const NOMS_LIEUX = [
@@ -1033,6 +1086,7 @@ const TENUES_GLISSE = {
     habiller(b.bassin, rose); habiller(b.ceinture, jaune); habillerMembre(b.brasD, bleu); habillerMembre(b.brasG, jaune);
     for (const j of [b.jambeD, b.jambeG]) { habillerMembre(j, rose); habiller(j.chaussure, vert); }
     for (const m of [b.brasD, b.brasG]) habiller(m.main, vert);   // les gants
+    for (const j of [b.jambeD, b.jambeG]) accessoire(new THREE.CylinderGeometry(0.082, 0.076, 0.22, 12), vert, j.pli, 0, -0.33, 0);   // la tige des chaussures de ski : elle penche en avant, avec le tibia
     accessoire(new THREE.CylinderGeometry(0.13, 0.13, 0.05, 16).scale(0.92, 1, 1), jaune, b.tete, 0, 0.075, 0);   // le bandeau
     accessoire(new THREE.BoxGeometry(0.2, 0.055, 0.04), '#ffb020', b.tete, 0, 0.025, 0.105).material = mat('#ffb020', { metalness: 1, roughness: 0.15 });   // les lunettes miroir
     batons(b, accessoire);
@@ -1046,6 +1100,44 @@ const TENUES_GLISSE = {
     accessoire(GEO.casque, orange, b.tete, 0, 0.045, 0);   // le bonnet
     accessoire(new THREE.BoxGeometry(0.21, 0.07, 0.04), '#3ad8ff', b.tete, 0, 0.03, 0.105).material = mat('#3ad8ff', { metalness: 1, roughness: 0.2 });   // le masque
     accessoire(new THREE.SphereGeometry(0.11, 10, 8).scale(1.2, 0.9, 0.7), kaki, b.torse, 0, 0.27, -0.12);   // la capuche
+  },
+  // en skis de rando : le collant-pipette des skieurs-alpinistes, tout fin, noir et rouge, avec le mammouth de la marque Mammut sur la poitrine,
+  // dans le dos et le long des cuisses, un bandeau, des lunettes de soleil... et des chaussures de rando : hautes, droites et raides
+  rando: b => {
+    const noir = '#16171b', rouge = '#e2001a', blanc = '#f4f4f0';
+    // le logo : un mammouth de profil (il regarde à gauche) et « MAMMUT » dessous. (x, y) : son milieu ; t : sa largeur
+    const mammouth = (g, x, y, t, c) => {
+      g.save(); g.translate(x, y); g.scale(t / 110, t / 110); g.fillStyle = g.strokeStyle = c; g.lineCap = 'round';
+      g.beginPath(); g.ellipse(12, -14, 34, 23, 0, 0, 7); g.fill();                                // le corps
+      g.beginPath(); g.ellipse(-22, -24, 17, 20, 0, 0, 7); g.fill();                               // la tête, avec sa bosse
+      g.fillRect(-12, -6, 13, 30); g.fillRect(26, -6, 14, 30);                                     // les pattes
+      g.lineWidth = 9; g.beginPath(); g.moveTo(-36, -18); g.quadraticCurveTo(-46, 6, -38, 20); g.stroke();   // la trompe
+      g.lineWidth = 4; g.beginPath(); g.moveTo(-26, -8); g.quadraticCurveTo(-50, 8, -56, -14); g.stroke();   // la défense
+      g.font = 'bold 27px Arial, sans-serif'; g.textAlign = 'center'; g.fillText('MAMMUT', 0, 52, 110);
+      g.restore();
+    };
+    const T = TENUES_GLISSE.tissus ||= {
+      logo: std(toile(128, 128, g => mammouth(g, 64, 58, 112, blanc)), { alphaTest: 0.5, bumpScale: 0.01 }),   // (là où rien n'est dessiné, on voit le collant à travers)
+      // la cuisse : presque toute sa longueur tient dans une bande au milieu de l'image. « MAMMUT » y est écrit de bas en haut, sur les côtés
+      cuisse: std(toile(128, 512, g => {
+        g.fillStyle = noir; g.fillRect(0, 0, 128, 512);
+        for (const x of [32, 96]) { g.fillStyle = rouge; g.fillRect(x - 13, 0, 26, 512);
+          g.save(); g.translate(x + 7, 256); g.rotate(-Math.PI / 2); g.scale(0.55, 1); g.fillStyle = blanc; g.font = 'bold 20px Arial, sans-serif'; g.textAlign = 'center'; g.fillText('MAMMUT', 0, 0); g.restore(); }
+      }), { bumpScale: 0.01 }),
+    };
+    habiller(b.torse, noir); habiller(b.bassin, noir); habiller(b.ceinture, rouge);
+    for (const geo of [GEO.blason, GEO.blasonDos ||= GEO.blason.clone().rotateY(Math.PI)]) accessoire(geo, blanc, b.torse, 0, 0, 0).material = T.logo;   // sur la poitrine et dans le dos
+    for (const m of [b.brasD, b.brasG]) { habiller(m.haut, rouge); habiller(m.bas, noir); habiller(m.main, noir); }
+    for (const j of [b.jambeD, b.jambeG]) {
+      habiller(j.bas, noir); j.haut.material = T.cuisse; j.scale.set(0.84, 1, 0.84);   // un collant bien serré
+      habiller(j.chaussure, blanc);
+      accessoire(new THREE.CylinderGeometry(0.086, 0.084, 0.32, 12), blanc, j.pli, 0, -0.29, 0);   // la tige : haute et toute droite
+      for (const y of [-0.2, -0.33]) accessoire(new THREE.CylinderGeometry(0.09, 0.09, 0.025, 12), rouge, j.pli, 0, y, 0);   // ses deux crochets
+    }
+    accessoire(new THREE.CylinderGeometry(0.13, 0.13, 0.055, 16).scale(0.92, 1, 1), rouge, b.tete, 0, 0.075, 0);   // le bandeau
+    accessoire(new THREE.BoxGeometry(0.21, 0.05, 0.045), '#111', b.tete, 0, 0.025, 0.103).material = mat('#15181c', { metalness: 0.9, roughness: 0.12 });   // les lunettes de soleil
+    for (const c of [-1, 1]) accessoire(new THREE.BoxGeometry(0.012, 0.02, 0.12), '#111', b.tete, 0.108 * c, 0.027, 0.045);   // leurs branches
+    batons(b, accessoire);
   },
   // en luge... surprise : le Père Noël sur son traîneau ! Le manteau rouge bordé de blanc, la ceinture noire, le bonnet à pompon et la grande barbe
   luge: b => {
@@ -1340,7 +1432,8 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) if (!surEau(i, j)) a
 // les pistes de ski (tableau PISTES_SKI) : une courbe douce qui passe par leurs points, avec un point tous les 6 m environ.
 // Chaque point : x, z, s (à combien de mètres du départ), tx, tz (vers où va la piste), c (le virage : plus de 0 = vers la gauche)
 const LARGEUR_SKI = 16, LARGEUR_BX = 7, CASE_SKI = 40;   // la moitié de la largeur d'une piste et d'un boardercross ; la taille des cases de rangement
-const grilleSki = new Map(), grilleRelief = new Map();   // les morceaux de piste rangés par case : tous, et ceux qui ont du relief (kickers, boardercross)
+const grilleSki = new Map(), grilleRelief = new Map();   // les morceaux de piste rangés par case : tous, et ceux qui ont du relief (kickers, bosses, vagues, boardercross)
+const LONG_BOSSES = 56, PAS_BOSSES = 7, HAUT_BOSSES = 0.8, LONG_VAGUE = 14, HAUT_VAGUE = 1.3;   // un champ de bosses : 8 rangées, une tous les 7 m ; une vague : 14 m de long
 for (const p of PISTES_SKI.filter(p => !(p.points?.length >= 2))) { alert(`Piste de ski "${p.nom}" : il lui faut au moins 2 points !`); PISTES_SKI.splice(PISTES_SKI.indexOf(p), 1); }
 for (const p of PISTES_SKI) {
   const P = p.points.map(([col, ligne]) => centre(col, ligne)), q = k => P[clamp(k, 0, P.length - 1)];
@@ -1358,8 +1451,10 @@ for (const p of PISTES_SKI) {
   p.long = p.pts.at(-1).s;
   // les kickers : un tremplin de neige au milieu d'un boardercross, sur un côté d'une piste (une fois à gauche, une fois à droite)
   p.sauts = (p.kickers || []).map((s, k) => p.boardercross ? { s, u: 0, haut: 1, long: 7, large: 11 } : { s, u: k % 2 ? -8 : 8, haut: 1.2, long: 10, large: 7 });
+  // tous ses reliefs : { s : à combien du départ, long }
+  p.reliefs = [...p.sauts, ...(p.bosses || []).map(s => ({ s, long: LONG_BOSSES })), ...(p.vagues || []).map(s => ({ s, long: 3 * LONG_VAGUE }))];
   for (let k = 0; k < p.pts.length - 1; k++) {
-    const A = p.pts[k], B = p.pts[k + 1], m = p.large + 12, relief = p.boardercross || p.sauts.some(q => B.s > q.s - 2 && A.s < q.s + q.long + 2);
+    const A = p.pts[k], B = p.pts[k + 1], m = p.large + 12, relief = p.boardercross || p.reliefs.some(q => B.s > q.s - 2 && A.s < q.s + q.long + 2);
     for (let cx = Math.floor((Math.min(A.x, B.x) - m) / CASE_SKI); cx <= Math.floor((Math.max(A.x, B.x) + m) / CASE_SKI); cx++)
       for (let cz = Math.floor((Math.min(A.z, B.z) - m) / CASE_SKI); cz <= Math.floor((Math.max(A.z, B.z) + m) / CASE_SKI); cz++)
         for (const g of relief ? [grilleSki, grilleRelief] : [grilleSki]) (g.get(cx * 4096 + cz) || g.set(cx * 4096 + cz, []).get(cx * 4096 + cz)).push({ p, k });
@@ -1380,14 +1475,22 @@ function pisteSkiEn(x, z, marge = 0, grille = grilleSki, r = SUR_PISTE) {
   return r.d < Infinity ? r : null;
 }
 // le relief d'une piste, à ajouter au terrain (toujours vers le haut : de la neige en plus). Ses kickers : ça monte en courbe, et au bout, le vide !
+// Ses champs de bosses : des bosses rondes en quinconce (une rangée tous les 7 m, une bosse tous les 6 m). Ses vagues : trois grosses bosses
+// à la file, en travers de toute la piste. marqueRelief : de 0 à 1, on est sur le bout d'un kicker ou sur le sommet d'une vague
+// (là où les pisteurs tracent une ligne bleue, pour qu'on voie la bosse de loin : bandeNeige)
 // Sur un boardercross : le bord extérieur des virages monte comme un mur (jusqu'à 3,5 m), des bosses se suivent dans les lignes droites
 // (tous les 12 m, sur 48 m, tous les 150 m), et un bourrelet de neige longe chaque bord
+let marqueRelief = 0;
 function reliefSki(x, z) {
   const r = pisteSkiEn(x, z, 3, grilleRelief, SUR_RELIEF);
+  marqueRelief = 0;
   if (!r) return 0;
   const { p, s, u } = r, A = p.pts[r.k], B = p.pts[r.k + 1];
   let h = 0;
-  for (const q of p.sauts) { const t = (s - q.s) / q.long; if (t > 0 && t <= 1) h = Math.max(h, q.haut * t * t * clamp((q.large / 2 - Math.abs(u - q.u)) / 0.8, 0, 1)); }
+  for (const q of p.sauts) { const t = (s - q.s) / q.long; if (t > 0 && t <= 1) { h = Math.max(h, q.haut * t * t * clamp((q.large / 2 - Math.abs(u - q.u)) / 0.8, 0, 1)); if (t > 0.85 && Math.abs(u - q.u) < q.large / 2) marqueRelief = 1; } }
+  const bosse = t => 0.5 - 0.5 * Math.cos(2 * Math.PI * t);   // de 0 à 1, puis de nouveau 0, quand t avance de 1
+  for (const s0 of p.bosses || []) { const a = (s - s0) / PAS_BOSSES; if (a > 0 && a < LONG_BOSSES / PAS_BOSSES) h = Math.max(h, HAUT_BOSSES * bosse(a) * bosse(u / 6 + Math.floor(a) % 2 / 2) * clamp((p.large - 1 - Math.abs(u)) / 3, 0, 1)); }
+  for (const s0 of p.vagues || []) { const a = (s - s0) / LONG_VAGUE; if (a > 0 && a < 3) { h = Math.max(h, HAUT_VAGUE * bosse(a) * clamp((p.large - Math.abs(u)) / 3, 0, 1)); marqueRelief = Math.max(marqueRelief, clamp((bosse(a) - 0.93) / 0.05, 0, 1)); } }
   if (!p.boardercross) return h;
   const c = lerp(A.c, B.c, (s - A.s) / (B.s - A.s)), dehors = clamp((2 - u * Math.sign(c)) / (p.large + 2), 0, 1);
   h = Math.max(h, 3.5 * clamp(Math.abs(c) * 35, 0, 1) * dehors * dehors * clamp((p.large + 3 - Math.abs(u)) / 3, 0, 1));
@@ -2814,6 +2917,42 @@ function genererBloc(i, j) {
 }
 for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) if (estBloc(CARTE[j][i])) genererBloc(i, j);
 if (!hopitaux.length) hopitaux.push(depart);
+// la navette des pistes (tableau NAVETTE) : à chaque arrêt, un bus blanc « SKI SHUTTLE » avec son coffre à skis sur le toit, un poteau d'arrêt,
+// et parfois un abribus. arrets : { nom, x, y, z : le milieu du bus, quai : là où l'on monte et où l'on descend, a : vers où regarde le bus (et B.J. en descendant) }
+const arrets = [];
+MAT.navette = enseigne('SKI SHUTTLE', '#fff', '#1a7ad8');
+MAT.carrosserie = std(null, { color: '#f4f4f0', metalness: 0.3, roughness: 0.35 }); MAT.vitreBus = std(null, { color: '#16222e', metalness: 0.8, roughness: 0.15 });
+for (const n of NAVETTE) {
+  if (!estBloc(car(n.col, n.ligne))) { alert(`Navette "${n.nom}" : la case ${n.col}, ${n.ligne} de la CARTE n'est pas un pâté !`); continue; }
+  const o = origine(n.col, n.ligne), x = o.x + n.x, z = o.z + n.z, y = baseCase[n.ligne][n.col] + 0.2, a = Math.round((n.angle || 0) / 90) * Math.PI / 2;
+  // un point du bus : lx mètres vers sa gauche, lz vers l'avant
+  const P = (lx, lz) => ({ x: x + lx * Math.cos(a) + lz * Math.sin(a), z: z - lx * Math.sin(a) + lz * Math.cos(a) });
+  const poser = (mat, g, lx, ly, lz) => ajouterGeo(mat, g.translate(lx, ly, lz).rotateY(a).translate(x, y, z));
+  const piece = (mat, l, h, p, lx, ly, lz) => poser(mat, new THREE.BoxGeometry(l, h, p), lx, ly + h / 2, lz);   // une boîte : large, haute, longue, posée à la hauteur ly
+  const mur = (lx1, lz1, lx2, lz2, h) => { const A = P(lx1, lz1), B = P(lx2, lz2); ajouterCollision(Math.min(A.x, B.x), Math.min(A.z, B.z), Math.max(A.x, B.x), Math.max(A.z, B.z), y + h, y); };
+  poser('carrosserie', new RoundedBoxGeometry(2.5, 2.75, 10, 3, 0.3), 0, 1.78, 0);
+  piece('vitreBus', 2.52, 0.85, 8.6, 0, 1.75, -0.2); piece('vitreBus', 2.2, 1.15, 10.02, 0, 1.45, 0);   // les vitres des côtés ; le pare-brise et la vitre arrière
+  for (const c of [-1, 1]) {
+    poser('navette', new THREE.PlaneGeometry(6.2, 1.16).rotateY(c * Math.PI / 2), c * 1.262, 1.07, -0.6);   // « SKI SHUTTLE » en grand, sur chaque flanc
+    for (const lz of [-3.2, 3.3]) poser('porte', new THREE.CylinderGeometry(0.5, 0.5, 0.36, 16).rotateZ(Math.PI / 2), c * 1.08, 0.5, lz);   // les roues
+    piece('lampe', 0.4, 0.2, 0.05, c * 0.85, 0.75, 4.99);   // les phares
+  }
+  poser('navette', new THREE.PlaneGeometry(1.9, 0.36), 0, 2.86, 5.006);   // ... et au-dessus du pare-brise
+  piece('porte', 0.05, 2.1, 1.1, -1.24, 0.45, 3.4);   // la porte, à droite
+  piece('porte', 1.3, 0.38, 3.2, 0, 3.15, -1.5);       // le coffre à skis, sur le toit
+  mur(-1.25, -5, 1.25, 5, 3.15);
+  // le poteau de l'arrêt, avec son panneau, écrit des deux côtés
+  poser('metal', new THREE.CylinderGeometry(0.05, 0.05, 2.9, 8), -3.1, 1.45, 5.4);
+  for (const r of [0, Math.PI]) poser('navette', new THREE.PlaneGeometry(1.5, 0.28).rotateY(Math.PI / 2 + r), -3.1, 2.7, 5.4);
+  if (n.abri) { // l'abribus : un toit sur deux poteaux, une paroi vitrée au fond, un banc
+    piece('metal', 1.5, 0.1, 3.8, -4.5, 2.4, 0.4);
+    for (const lz of [-1.4, 2.2]) piece('metal', 0.1, 2.4, 0.1, -5.15, 0, lz);
+    piece('vitrine', 0.05, 1.9, 3.5, -5.15, 0.4, 0.4); piece('bois', 0.45, 0.08, 3, -4.8, 0.45, 0.4);
+    for (const lz of [-0.9, 1.7]) piece('metal', 0.4, 0.45, 0.08, -4.8, 0, lz);
+    mur(-5.2, -1.4, -5.1, 2.2, 2.4); mur(-5.05, -1.1, -4.55, 1.9, 0.53);
+  }
+  arrets.push({ nom: n.nom, x, y, z, quai: P(-2.7, 3.4), a });
+}
 
 // les rues des villes : un morceau de chaussée par rue, avec ses lignes, ses passages piétons et parfois un dos d'âne
 const geoDosDAne = () => { // une bosse en travers de la rue (qui va vers z)
@@ -3136,27 +3275,31 @@ function pointPiste(p, s) {
   return { x: lerp(A.x, B.x, t), z: lerp(A.z, B.z, t), tx: lerp(A.tx, B.tx, t), tz: lerp(A.tz, B.tz, t) };
 }
 // une bande de neige posée sur le terrain, le long d'une piste (de s0 à s1 mètres du départ, de u0 à u1 mètres à gauche du milieu), un point
-// par mètre : c'est elle qui montre le relief des pistes (kickers, boardercross), trop fin pour la grille du terrain
+// par mètre : c'est elle qui montre le relief des pistes (kickers, bosses, vagues, boardercross), trop fin pour la grille du terrain.
+// Pour qu'on voie les bosses de loin, blanc sur blanc : les creux sont bleutés, les sommets tout blancs, et une ligne bleue est tracée
+// sur le bout des kickers et le sommet des vagues, comme dans les snowparks
+const NEIGE_CREUX = new THREE.Color('#8fa8d2'), NEIGE_HAUT = new THREE.Color('#ffffff'), NEIGE_LIGNE = new THREE.Color('#2a6ae0'), coulNeige = new THREE.Color();
 function bandeNeige(p, s0, s1, u0, u1) {
-  const ns = Math.ceil(s1 - s0), nu = Math.ceil(u1 - u0), pos = [], uv = [], idx = [];
+  const ns = Math.ceil(s1 - s0), nu = Math.ceil(u1 - u0), pos = [], uv = [], idx = [], coul = [];
   for (let i = 0; i <= ns; i++) {
     const A = pointPiste(p, s0 + (s1 - s0) * i / ns);
     for (let j = 0; j <= nu; j++) {
       const u = u0 + (u1 - u0) * j / nu, x = A.x + A.tz * u, z = A.z - A.tx * u, k = i * (nu + 1) + j;
       pos.push(x, hauteurTerrain(x, z) + 0.06, z); uv.push(x / 6, z / 6);
+      coulNeige.lerpColors(NEIGE_CREUX, NEIGE_HAUT, clamp(reliefSki(x, z) / 0.8, 0, 1)).lerp(NEIGE_LIGNE, marqueRelief); coul.push(coulNeige.r, coulNeige.g, coulNeige.b);
       if (i && j) idx.push(k - nu - 2, k - 1, k - nu - 1, k - 1, k, k - nu - 1);
     }
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
-  g.computeVertexNormals(); ajouterGeo('neigePiste', g);
+  g.setAttribute('color', new THREE.Float32BufferAttribute(coul, 3)); g.computeVertexNormals(); ajouterGeo('neigePiste', g);
 }
 // le balisage des pistes de ski : un piquet de la couleur de la piste tous les 30 m de chaque côté (ceux de droite ont le haut orange,
 // comme sur les vraies pistes), un panneau avec le nom de la piste au départ, et pour un boardercross les portiques de départ et d'arrivée
 const COULEURS_PISTES = { bleue: '#1a5ad8', rouge: '#d01818', noire: '#151515', jaune: '#f0c020' };
 for (const c in COULEURS_PISTES) MAT['balise' + c] = std(null, { color: COULEURS_PISTES[c], roughness: 0.6 });
 MAT.baliseOrange = std(null, { color: '#ff7a10', roughness: 0.6 });
-MAT.neigePiste = std(TEX.sol, { color: '#e2ecf8', roughness: 1, bumpScale: 0.2, polygonOffset: true, polygonOffsetFactor: -1 });
+MAT.neigePiste = std(TEX.sol, { vertexColors: true, roughness: 1, bumpScale: 0.2, polygonOffset: true, polygonOffsetFactor: -1 });
 MAT.bxDepart = enseigne('DÉPART', '#fff', '#d01818'); MAT.bxArrivee = enseigne('ARRIVÉE', '#111', '#f0c020');
 PISTES_SKI.forEach((p, n) => {
   const coul = COULEURS_PISTES[p.couleur] ? p.couleur : 'rouge', bord = p.large + (p.boardercross ? 3.5 : 0);
@@ -3177,7 +3320,10 @@ PISTES_SKI.forEach((p, n) => {
     p.depart = 10; p.arrivee = p.long - 15;
     panneau('bxDepart', p.depart, 0, 2 * bord, 2 * bord * 96 / 512, 4.6); panneau('bxArrivee', p.arrivee, 0, 2 * bord, 2 * bord * 96 / 512, 4.6);
     bandeNeige(p, 0, p.long, -p.large - 3, p.large + 3);
-  } else for (const q of p.sauts) bandeNeige(p, q.s - 1, q.s + q.long + 1, q.u - q.large / 2 - 1, q.u + q.large / 2 + 1);
+  } else {
+    for (const q of p.sauts) bandeNeige(p, q.s - 1, q.s + q.long + 1, q.u - q.large / 2 - 1, q.u + q.large / 2 + 1);
+    for (const q of p.reliefs.filter(q => !p.sauts.includes(q))) bandeNeige(p, q.s - 1, Math.min(p.long, q.s + q.long + 1), -p.large, p.large);   // les champs de bosses et les vagues
+  }
 });
 // l'eau : un grand plan à la hauteur EAU, qui brille et ondule
 const eau = new THREE.Mesh(new THREE.PlaneGeometry(TAILLE_X + 9000, TAILLE_Z + 9000).rotateX(-Math.PI / 2),
@@ -3609,7 +3755,9 @@ function animerHumain(h, vitesse, dt, o = {}) {
   h.tete.rotation.x = h.tete.rotation.y = 0; h.brasD.position.y = 0.6;
   for (const j of [h.jambeG, h.jambeD]) { j.rotation.z = 0; j.chaussure.rotation.set(0, 0, 0); }
   // les pieds écartés sur la planche, la tête tournée vers l'avant (quand il pousse, il se tourne vers l'avant, le pied arrière à côté de la planche)
-  if (o.glisse === 'snowboard') { h.jambeG.rotation.z = lerp(0.3, 0.15, pousse) - 0.22 * geste; h.jambeD.rotation.z = lerp(-0.3, -0.1, pousse); h.tete.rotation.y = lerp(-1.2, -0.55, pousse); }
+  // (envers : de 0 à 1, il glisse à l'envers, en « switch » : il regarde par-dessus son épaule, ou de l'autre côté sur un snowboard)
+  if (o.glisse === 'snowboard') { h.jambeG.rotation.z = lerp(0.3, 0.15, pousse) - 0.22 * geste; h.jambeD.rotation.z = lerp(-0.3, -0.1, pousse); h.tete.rotation.y = lerp(-1.2, -0.55, pousse) * (1 - 2 * (o.envers || 0)); }
+  if (o.glisse === 'skis' && o.envers) h.tete.rotation.y = 1.25 * o.envers;
   if (pas === 'moonwalk') { // il marche vers l'avant mais il recule : le pied qui avance glisse sur la pointe, le bras gauche bouge à peine
     for (const j of [h.jambeG, h.jambeD]) j.chaussure.rotation.x = j.pli.rotation.x * 0.8;
     h.brasG.rotation.x *= 0.3;
@@ -3659,10 +3807,59 @@ function animerHumain(h, vitesse, dt, o = {}) {
   if (o.penche !== undefined) penche = o.penche;
   if (o.touche) { penche -= 0.4 * o.touche; h.tete.rotation.x -= 0.4 * o.touche; }   // un coup : il part en arrière, la tête aussi
   h.haut.position.y = h.jambeG.position.y = h.jambeD.position.y = hy;
-  h.haut.rotation.x = penche;
+  h.haut.rotation.x = penche; h.haut.rotation.y = 0;
   h.haut.rotation.z = o.robot ? s * 0.25 : 0;   // un robot se dandine d'un pied sur l'autre
   h.g.rotation.x = o.nage ? 1.35 : o.bascule || 0;
   h.g.rotation.z = o.roulis || 0;
+  // la glisse, suite : les poses qui ont besoin de savoir où sont les hanches et le buste
+  if (o.rando?.peaux) posePeaux(h, o.rando.peaux); else if (o.rando?.montee) marcheRando(h, o.rando);
+  if (o.grab) poseGrab(h, o);
+}
+// plie la jambe j pour que sa cheville arrive à dz mètres devant la hanche et dy mètres dessous. Le pied reste à plat, ou tourne de « pied »
+// (plus de 0 : la pointe vers le bas, le talon levé)
+function poserPied(j, dz, dy, pied = 0) {
+  const d = Math.min(0.899, Math.hypot(dz, dy)), a = Math.acos(d / 0.9), base = Math.atan2(dz, dy);
+  j.rotation.x = -(base + a); j.pli.rotation.x = 2 * a; j.chaussure.rotation.x = base - a + pied;
+}
+// tend le bras b vers le point (x, y, z) du personnage (x : vers sa gauche, y : au-dessus de ses pieds, z : devant lui), d'autant que k (de 0 à 1) :
+// l'épaule tourne, et le coude se plie si c'est trop près. À appeler une fois le buste posé (h.haut)
+const AXE_X = new THREE.Vector3(1, 0, 0), AXE_Y = new THREE.Vector3(0, 1, 0), vBras = new THREE.Vector3();
+function tendreBras(h, b, x, y, z, k = 1) {
+  const q = vBras.set(x, y - h.haut.position.y, z).applyAxisAngle(AXE_X, -h.haut.rotation.x).applyAxisAngle(AXE_Y, -h.haut.rotation.y).sub(b.position);
+  const d = q.length(), a = Math.acos(clamp(d / 0.59, 0.25, 1));
+  b.rotation.set(lerp(b.rotation.x, Math.atan2(-q.z, -q.y) + a, k), 0, lerp(b.rotation.z, Math.asin(clamp(q.x / d, -1, 1)), k)); b.pli.rotation.x = lerp(b.pli.rotation.x, -2 * a, k);
+}
+// les skis de rando en mode montée : le pas alternatif. Chaque pied avance avec son ski (r.pas : de combien le droit est devant, en mètres ;
+// le gauche est derrière d'autant), en suivant la pente (r.pente). Le talon du pied de derrière se lève : il n'est pas attaché au ski.
+// Les bras plantent les bâtons à l'opposé des pieds : le bras gauche avance avec le pied droit
+function marcheRando(h, r) {
+  const sp = Math.sin(r.pente), cp = Math.cos(r.pente), hy = 0.9 - Math.abs(r.pas * sp);
+  h.haut.position.y = h.jambeG.position.y = h.jambeD.position.y = hy; h.haut.rotation.x = 0.2 + 0.35 * Math.max(0, sp);
+  for (const [j, c] of [[h.jambeD, 1], [h.jambeG, -1]]) {
+    const pas = r.pas * c, talon = 0.7 * clamp(-pas / 0.28, 0, 1);   // le talon se lève jusqu'à 40°
+    poserPied(j, pas * cp, hy - 0.05 - pas * sp - 0.135 * Math.sin(talon), talon - r.pente);
+  }
+  h.brasD.rotation.set(-0.4 + 1.8 * r.pas, 0, -0.2); h.brasG.rotation.set(-0.4 - 1.8 * r.pas, 0, 0.2); h.brasD.pli.rotation.x = h.brasG.pli.rotation.x = -0.75;
+}
+// il colle ou enlève une peau (T : voir etapePeaux) : debout, tourné vers le ski qu'il tient à côté de lui. La main de ce côté tient le ski
+// par le milieu ; l'autre tire la peau de la spatule vers le talon, ou la déroule du talon vers la spatule
+function posePeaux(h, T) {
+  const c = T.ski ? 1 : -1, e = T.leve, bas = T.colle ? 1 - T.peau : T.peau, [pres, loin] = c < 0 ? [h.brasD, h.brasG] : [h.brasG, h.brasD];   // bas : de 0 (la main en haut du ski) à 1
+  h.haut.rotation.y = c * 0.8 * e; h.haut.rotation.x = lerp(h.haut.rotation.x, 0.1 + 0.5 * bas, e); h.tete.rotation.y = c * 0.3 * e;
+  tendreBras(h, pres, c * 0.4, 1, 0.27, e); tendreBras(h, loin, c * 0.37, lerp(1.6, 0.8, bas), 0.24, e);
+}
+// un grab, en l'air : les genoux contre la poitrine, le buste penché en avant ; une main attrape le ski (ou la planche), l'autre bras part en l'air.
+// o.grab : { sorte : 1 (bouton gauche de la souris) ou 2 (bouton droit), k : de 0 à 1, pente : celle des skis (en l'air, leurs spatules piquent du nez) }
+//   à ski : 1 = le safety (la main droite attrape le ski droit, à côté de la chaussure), 2 = le mute (la main gauche attrape le ski droit, devant la fixation)
+//   en snowboard : 1 = l'indy (la main arrière attrape la planche entre les pieds, côté orteils), 2 = le mute (la main avant)
+function poseGrab(h, o) {
+  const ski = o.glisse === 'skis', e = o.grab.k, c = lerp(-h.jambeD.rotation.x, ski ? 1.39 : 1.15, e), ecart = ski ? 0 : lerp(0.3, 0.9, e);
+  for (const [j, cote] of [[h.jambeD, -1], [h.jambeG, 1]]) { j.rotation.x = -c; j.pli.rotation.x = 2 * c; if (!ski) j.rotation.z = cote * ecart; }
+  h.haut.position.y = h.jambeG.position.y = h.jambeD.position.y = lerp(h.haut.position.y, ski ? 0.22 : 0.4, e); h.haut.rotation.x = lerp(h.haut.rotation.x, ski ? 1.3 : 1.2, e);
+  const droite = ski ? o.grab.sorte === 1 : o.grab.sorte === 2, [main, autre, cote] = droite ? [h.brasD, h.brasG, 1] : [h.brasG, h.brasD, -1];
+  const [x, z] = ski ? (droite ? [-0.19, 0.25] : [-0.1, 0.45]) : [droite ? -0.1 : 0.1, 0.2];   // là où la main attrape, sur le ski ou sur la planche
+  tendreBras(h, main, x, (ski ? 0.07 + z * Math.tan(o.grab.pente) : 0.12), z, e);
+  autre.rotation.set(lerp(autre.rotation.x, -0.4, e), 0, lerp(autre.rotation.z, 1.9 * cote, e)); autre.pli.rotation.x = lerp(autre.pli.rotation.x, -0.3, e);
 }
 // place le corps h pour que son point (0, cy, cz) (en mètres, dans le repère du personnage, au-dessus des pieds) soit en (x, y, z) :
 // c'est autour de ce point qu'il bascule ou qu'il roule (son bassin quand il vole, le milieu de la boule pour une roulade, ses pieds pour tomber)
@@ -3933,6 +4130,10 @@ const MODELES = {
         f.noir.push(bloc(0.1, 0.07, 0.3, 0.12 * c, 0.06, 0, 0.02));   // la fixation, sous la chaussure
       }
     } },
+  // les skis de rando : fins et légers. Chaque ski est une pièce à part, avec sa peau dessous (v.skis, fabriqués par skisRando) : en mode montée,
+  // il suit le pied qui avance, et B.J. le prend dans la main pour coller ou enlever la peau. tenue : celle de TENUES_GLISSE
+  rando: { longueur: 1.7, largeur: 0.45, hauteur: 1.4, roue: 0.05, roues: [], oeil: [0, 1.6, 0.15], siege: [1, 0], ouvert: true, deuxRoues: true, glisse: 'skis', tenue: 'rando', rando: true,
+    plus: () => {} },
   // le snowboard : une planche aux bouts arrondis et relevés. On s'y tient de côté, les pieds en travers
   snowboard: { longueur: 1.55, largeur: 0.5, hauteur: 1.4, roue: 0.05, roues: [], oeil: [0, 1.6, 0.1], siege: [1, 0], ouvert: true, deuxRoues: true, glisse: 'snowboard',
     plus: f => {
@@ -4274,10 +4475,27 @@ function creerVoiture(x, z, angle, police = false, type = police ? typePolice : 
   voitures.push(v);
   return v;
 }
+// les deux skis de rando (v.skis : le droit, puis le gauche), accrochés au corps de l'engin. Chacun a sa planche, sa butée (là où s'accroche
+// le bout de la chaussure), sa talonnière (tournée de côté en mode montée : le talon est libre), et sa peau : une bande rose collée dessous,
+// avec son étrier sur la spatule (ski.peau : on la rétrécit vers le talon pour l'enlever)
+const M_PEAU = mat('#e8209a', { roughness: 1 });
+function skisRando(v) {
+  v.skis = [-1, 1].map(c => {
+    const ski = new THREE.Group(), poser = (geo, matiere, dans = ski) => { const p = new THREE.Mesh(geo, matiere); p.castShadow = true; dans.add(p); return p; };
+    poser(fusion([bloc(0.08, 0.022, 1.42, 0, 0.011, -0.12, 0.01), new THREE.BoxGeometry(0.08, 0.022, 0.28).rotateX(-0.5).translate(0, 0.066, 0.71)]), v.mats.peint);
+    poser(bloc(0.07, 0.05, 0.07, 0, 0.047, 0.17, 0.015), M_NOIR);                   // la butée
+    ski.talon = poser(bloc(0.07, 0.06, 0.1, 0, 0, 0, 0.015), M_CHROME); ski.talon.position.set(0, 0.052, -0.14);   // la talonnière
+    ski.peau = new THREE.Group(); ski.peau.position.z = -0.83; ski.add(ski.peau);   // (elle part du talon du ski)
+    poser(fusion([new THREE.BoxGeometry(0.066, 0.008, 1.42).translate(0, -0.003, 0.71), new THREE.BoxGeometry(0.094, 0.034, 0.05).rotateX(-0.5).translate(0, 0.125, 1.64)]), M_PEAU, ski.peau);
+    ski.position.x = ski.x0 = 0.12 * c; v.corps.add(ski);
+    return ski;
+  });
+}
 // fabrique (ou refait, au garage) la voiture en 3D, toute neuve
 function habillerVoiture(v) {
   if (v.m) scene.remove(v.m);
   Object.assign(v, modeleVoiture(v.type, v.couleur, v.police, v.blindee), { abimee: false, degats: { avant: 0, arriere: 0, gauche: 0, droite: 0, toit: 0 }, fenetres: [], pieces: [], deformables: [], impacts: [], roquettes: 0, brule: 0 });
+  if (v.forme.rando) skisRando(v);
   v.m.rotation.order = 'YXZ';   // elle tourne, puis elle penche (dans les pentes)
   v.m.traverse(o => o.userData.voiture = v);
   scene.add(v.m);
@@ -4516,7 +4734,7 @@ function commencerAccident(v) {
   // c : le centre de gravité (dans le monde), vel : sa vitesse, rot : comment elle tourne (un axe, et sa longueur : des tours en 2π s)
   v.accident = { c: V3(0, k.cg, 0).applyQuaternion(v.quat).add(V3(v.x, v.y, v.z)), vel, rot: V3(), calme: 0, duree: 0, conducteur: v.conducteur };
   if (v.conducteur === 'civil' || v.conducteur === 'skieur') v.epave = true;   // une voiture de la circulation (ou les skis d'un autre) : son épave disparaîtra quand on sera loin
-  Object.assign(v, { rail: null, enAir: true, vol: true, decollage: null, conducteur: null });   // son conducteur sortira quand elle s'arrêtera
+  Object.assign(v, { rail: null, enAir: true, vol: true, decollage: null, conducteur: null, figure: null, tour: 0, salto: 0, cork: 0, derape: 0, transition: 0 });   // son conducteur sortira quand elle s'arrêtera
   // sur une moto, un Segway ou un tricycle, rien ne retient le pilote : il est éjecté, et roule ou vole par terre
   if (v.forme.ouvert && !v.type.bateau && !surRail) {
     if (v === J.voiture) sortirVoiture();
@@ -5813,7 +6031,7 @@ bateauxDepart.forEach(b => creerVoiture(b.x, b.z, b.a, false, typeNomme(b.type) 
 function garnir(l) {
   for (const [p, a] of [[l.bas, l.a], [l.haut, l.a + Math.PI]]) VOITURES.filter(t => t.glisse).forEach((t, k) => {
     const x = p.x + l.droite.x * (6.5 + k * 1.3), z = p.z + l.droite.z * (6.5 + k * 1.3);
-    if (!voitures.some(o => o.type === t && !o.detruite && dist(o, { x, z }) < 12)) creerVoiture(x, z, a, false, t);
+    if (!voitures.some(o => o.type === t && !o.detruite && dist(o, { x, z }) < 12)) creerVoiture(x, z, a, false, t).montee = !!MODELES[t.modele].rando && p === l.bas;   // (en bas, les skis de rando ont leurs peaux)
   });
 }
 TELESIEGES.forEach(garnir);
@@ -5846,6 +6064,7 @@ addEventListener('keydown', e => {
   if (e.key === 'Shift') { tapesMaj = [...tapesMaj, temps].slice(-3); if (tapesMaj[2] - tapesMaj[0] < R_.tripleMaj) { tapesMaj = []; decoller(); } else if (J.superman) J.superman.crans++; }
   if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
+  if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
   if (e.code.startsWith('Digit') && !J.robot) changerArme(+e.code.slice(5) - 1);
 });
@@ -5901,7 +6120,7 @@ function rhabillerBJ() {
   for (const o of enTrop) o.removeFromParent();
   for (const j of [b.jambeD, b.jambeG]) j.scale.set(1, 1, 1);
   b.bassin.scale.set(1, 1, 1); b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
-  TENUES_GLISSE[J.voiture?.forme.glisse]?.(b);   // sur des skis, un snowboard ou une luge : sa tenue de glisse
+  TENUES_GLISSE[J.voiture?.forme.tenue || J.voiture?.forme.glisse]?.(b);   // sur des skis, un snowboard ou une luge : sa tenue de glisse
   for (const t of TRICHES) if (t.actif) t.effet(b);
 }
 // ce que les codes actifs changent au jeu : leurs nombres se multiplient (1 = rien ne change)
@@ -5957,6 +6176,17 @@ function ascenseurProche() {
   for (const a of ascenseurs) for (const [de, vers] of [[a.bas, a.haut], [a.haut, a.bas]])
     if (dist(de, J) < 1.8 && Math.abs(de.y - J.y) < 1.5) return { de, vers, monte: vers === a.haut };
   return null;
+}
+// l'arrêt de la navette des pistes où B.J. attend, à pied, près de la porte du bus : { de, vers } (le bus l'emmène à l'arrêt suivant), ou null
+function navetteProche() {
+  const k = arrets.findIndex(q => dist(q.quai, J) < 3 && Math.abs(q.y - J.y) < 1.5);
+  return k < 0 || arrets.length < 2 ? null : { de: arrets[k], vers: arrets[(k + 1) % arrets.length] };
+}
+// il monte dans le bus... et descend à l'autre arrêt, tourné comme le bus (à la station : vers les pistes)
+function prendreNavette({ vers }) {
+  Object.assign(J, { x: vers.quai.x, z: vers.quai.z, y: hauteurSol(vers.quai.x, vers.quai.z, vers.y + 1), vy: 0, lacet: vers.a, angleCorps: vers.a, danse: 0, accroupi: false });
+  dernierJ = null;   // (il n'est pas venu en courant : peupler ne doit pas croire qu'il file à 1 000 km/h)
+  annonce(tr('SKI SHUTTLE'), tr('Terminus : {arret}', { arret: tr(vers.nom) }), 3); bip(400, 800, 0.4, 'sine', 0.2);
 }
 // la remontée dont B.J. est au départ (à pied, ou sur ses skis, son snowboard ou sa luge), ou null
 function telesiegeProche() {
@@ -6081,7 +6311,7 @@ function action() {
     return;
   }
   const tl = telesiegeProche(), siege = tl && siegeLibre(tl);   // il s'assoit sur le siège libre le plus proche (s'il y en a un dans la gare)
-  if (siege) { J.telesiege = siege; J.danse = 0; J.accroupi = false; bip(500, 750, 0.3, 'sine', 0.15); return; }
+  if (siege) { J.telesiege = siege; J.danse = 0; J.accroupi = false; if (J.voiture) Object.assign(J.voiture, { tour: 0, derape: 0, pas: 0, transition: 0 }); bip(500, 750, 0.3, 'sine', 0.15); return; }
   if (tl) return;
   if (J.voiture?.enVol) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }   // pas en plein vol
   if (J.voiture) { if (!J.voiture.rail && !(J.voiture.accident && !J.voiture.accident.dort)) sortirVoiture(); return; }   // pas en plein looping, ni pendant les tonneaux !
@@ -6097,6 +6327,8 @@ function action() {
   if (r && !r.pilote) { monterRobot(r); return; }
   const a = ascenseurProche();
   if (a) { J.x = a.vers.x; J.z = a.vers.z; J.y = a.vers.y; J.vy = 0; bip(400, 800, 0.4, 'sine', 0.2); return; }
+  const n = navetteProche();
+  if (n) { prendreNavette(n); return; }
   const v = voitureProche();
   if (v) entrerVoiture(v);
 }
@@ -6150,7 +6382,7 @@ function entrerVoiture(v) {
   if (v.type.vole) { // on regarde droit devant, et on rappelle les commandes
     J.lacet = v.angle; J.tangage = 0;
     annonce(tr(v.type.nom).toUpperCase(), v.type.vole === 'avion' ? tr('Z : accélérer · S : ralentir · la souris dirige (ou Q D, Espace et C)') : tr('Espace : monter · C : descendre · Z Q S D : avancer · la souris tourne'), 5);
-  } else annonce(tr(v.type.nom).toUpperCase(), v.type.glisse ? tr('Z : pousser · S : freiner · Espace : sauter') : '', v.type.glisse ? 4 : 2);   // le nom du véhicule dans lequel on monte
+  } else annonce(tr(v.type.nom).toUpperCase(), !v.type.glisse ? '' : v.forme.rando ? tr(TEXTES_RANDO[!!v.montee]) : tr('Z : pousser · S : freiner · Espace : sauter · Maj : déraper'), v.type.glisse ? 4 : 2);   // le nom du véhicule dans lequel on monte
 }
 function sortirVoiture() {
   const v = J.voiture;
@@ -6160,7 +6392,7 @@ function sortirVoiture() {
     if (!dansBatiment(p.x, v.y + 1, p.z)) { J.x = p.x; J.z = p.z; break; }
   }
   J.voiture = null; if (!v.type.vole) J.lacet = v.angle + J.decalage; J.y = Math.max(hauteurSol(J.x, J.z, v.y + 1.4), Math.min(v.y, EAU - 1.25)); J.vy = 0;
-  if (v.type.glisse) { rhabillerBJ(); v.pousse = 0; }   // il remet sa tenue de tous les jours
+  if (v.type.glisse) { rhabillerBJ(); Object.assign(v, { pousse: 0, pas: 0, figure: null, tour: 0, salto: 0, cork: 0, grabK: 0, derape: 0, transition: 0 }); }   // il remet sa tenue de tous les jours
   if (v.enVol) J.y = v.y + 1;   // éjecté en plein vol : il tombe (et se fait mal en arrivant en bas)
   // sauter d'une voiture lancée : il roule par terre, dans le sens où elle allait. Trop vite, ça fait mal (le gilet ne protège pas)
   const vit = Math.abs(v.vitesse);
@@ -6639,9 +6871,9 @@ function grimper(dt, vers) {
 function conduire(v, dt) {
   if (v.type.vole) { piloterAeronef(v, dt, true); J.x = v.x; J.z = v.z; J.y = v.y; J.vitesse = Math.abs(v.vitesse); return; }
   const gaz = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), volant = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
-  const t = v.type, auSol = !v.enAir && !v.rail;   // en l'air, les roues ne touchent rien : ni gaz, ni frein, ni volant
+  const t = v.type, auSol = !v.enAir && !v.rail && !(t.glisse && v.vol);   // en l'air, les roues ne touchent rien : ni gaz, ni frein, ni volant (à ski : dès qu'on décolle)
   const lourd = v.blindee ? R_.lourdeurBlindage : 1, acc = t.acceleration * lourd;   // le blindage Mad Max pèse lourd
-  if (auSol && t.glisse) glisser(v, dt, gaz, volant);
+  if (t.glisse) { if (auSol) glisser(v, dt, gaz, volant); else if (v.vol && !v.accident) figures(v, dt, gaz, volant); }   // à ski : sur la neige, ou en l'air (les figures)
   else if (auSol) {
     if (gaz > 0) v.vitesse += acc * dt * (v.vitesse < 0 ? 2.5 : 1);
     else if (gaz < 0) v.vitesse -= acc * dt * (v.vitesse > 0 ? 2.5 : 0.6);
@@ -6658,7 +6890,8 @@ function conduire(v, dt) {
   // des roues avant tordues, ou un pneu crevé, tirent la voiture d'un côté : il faut tenir le volant
   const avant = v.roues.filter(r => r.avant), tire = avant.reduce((s, r) => s + (r.pince || 0), 0) / (avant.length || 1) / 0.45 * 0.6
     + crevees.reduce((s, r) => s + Math.sign(r.pivot.position.x) * 0.25, 0);
-  v.angle -= (volant - tire) * 1.9 * t.virage * braquage * dt * (touches.Space && !t.glisse ? 1.6 : 1);
+  // (le frein à main fait tourner plus sec ; à ski, c'est le dérapage, et on ne tourne pas pendant qu'on colle ses peaux)
+  v.angle -= (volant - tire) * 1.9 * t.virage * braquage * dt * (!t.glisse ? (touches.Space ? 1.6 : 1) : v.transition ? 0 : 1 + (R_.derapage - 1) * Math.min(1, Math.abs(v.derape || 0) / 0.75));
   v.braque = -volant * 0.45;
   if (v.accident) majAccident(v, dt);   // en plein accident : plus rien ne répond
   else if (v.rail || entrerRail(v)) roulerRail(v, dt); else bougerVoiture(v, dt, true);
@@ -6678,29 +6911,134 @@ function conduire(v, dt) {
 }
 // skis, snowboard, luge : pas de moteur. La pente fait avancer, la neige glisse (ailleurs, ça freine fort), l'air freine d'autant
 // plus qu'on va vite, et tourner freine un peu : pour ralentir, on tourne en travers de la pente.
-// Z pousse sur le plat (jusqu'à 4 m/s), S freine en chasse-neige puis recule un peu, Espace fait sauter
+// Z pousse sur le plat (jusqu'à 4 m/s), S freine en chasse-neige puis recule un peu, Espace fait sauter, Maj fait déraper
 function glisser(v, dt, gaz, volant) {
-  const s = Math.abs(v.vitesse), sens = Math.sign(v.vitesse);
+  redresser(v, dt);
+  if (v.transition) { changerPeaux(v, dt); return; }   // en skis de rando : il colle ou enlève ses peaux, sans bouger
+  if (v.montee) { monter(v, dt, gaz); return; }        // ... ou il monte, les peaux collées
+  const s = Math.abs(v.vitesse), sens = Math.sign(v.vitesse), neige = neigeSous(v.x, v.z);
   if (gaz > 0 && v.vitesse < 4) v.vitesse = Math.min(4, v.vitesse + v.type.acceleration * dt);
   if (gaz < 0) v.vitesse = v.vitesse > 0.5 ? v.vitesse - 12 * dt : Math.max(-2, v.vitesse - v.type.acceleration * dt);
   // il pousse (pour sa pose) : à ski sur ses bâtons, en snowboard avec le pied arrière
-  v.pousse = clamp((v.pousse || 0) + (gaz > 0 && v.vitesse < 4.5 ? 4 : -4) * dt, 0, 1); v.phasePousse = (v.phasePousse || 0) + dt * 7;
-  const frein = R_.frottementNeige * lerp(15, 1, neigeSous(v.x, v.z)) + 0.004 * s * s + Math.abs(volant) * 0.1 * s;
+  v.pousse = clamp((v.pousse || 0) + (gaz > 0 && v.vitesse < 4.5 ? 4 : -4) * dt, 0, 1); v.phasePousse = (v.phasePousse || 0) + dt * 7; v.pas = 0;
+  // Maj : on dérape. Avec Q ou D, les skis se mettent en travers du virage (v.derape : de combien, en radians), ça tourne plus sec
+  // (REGLAGES.derapage) et ça freine ; avec S, ils se mettent presque en travers de la pente : le freinage des hockeyeurs
+  const maj = touche('ShiftLeft', 'ShiftRight') && s > 3, cote = volant ? -volant : gaz < 0 ? (v.derape < 0 ? -1 : 1) : 0;
+  v.derape = (v.derape || 0) + ((maj ? cote * (gaz < 0 ? 1.3 : 0.75) : 0) - (v.derape || 0)) * Math.min(1, dt * 8);
+  const frein = R_.frottementNeige * lerp(15, 1, neige) + 0.004 * s * s + Math.abs(volant) * 0.1 * s + 7 * Math.abs(v.derape);
   v.vitesse -= sens * Math.min(s, frein * dt);
   v.vitesse -= R_.graviteVoiture * Math.sin(v.tangage) * dt;   // la pente
   const max = v.type.vitesse * Math.cos(v.tangage);   // (vitesse compte le long de la pente : à l'horizontale, on avance moins vite dans une pente raide)
   v.vitesse = clamp(v.vitesse, -max, max);
+  if (Math.abs(v.derape) > 0.3 && neige > 0.3 && (v.tGerbe = (v.tGerbe || 0) - dt) <= 0) { v.tGerbe = 0.04; gerbe(v); }   // la neige vole
   // hop ! (une fois par appui). Le saut s'ajoute à la vitesse à laquelle la pente descend sous les skis : on décolle d'un mètre
-  // de la neige, à l'arrêt comme à 100 km/h dans une pente raide
-  if (touches.Space && !v.espace && !v.vol) { v.vy += R_.sautGlisse; v.saute = true; }
+  // de la neige, à l'arrêt comme à 100 km/h dans une pente raide. Sur une bosse (un kicker, une vague, un champ de bosses), si on saute
+  // pendant qu'elle monte encore sous les skis, on décolle bien plus haut : il y a l'élan de la montée, et le bonus REGLAGES.sautBosse
+  // (entier dès qu'on est à 40 cm au-dessus du pied de la bosse). Trop tôt ou trop tard (elle redescend déjà) : un saut ordinaire
+  if (touches.Space && !v.espace && !v.vol) {
+    const derriere = local(v, 0, -1.2 * (sens || 1)), h = reliefSki(v.x, v.z), pop = h >= reliefSki(derriere.x, derriere.z) - 0.02 ? clamp((h - 0.1) / 0.3, 0, 1) : 0;
+    v.vy += R_.sautGlisse + R_.sautBosse * pop; v.saute = true;
+    if (pop > 0.5 && R_.sautBosse > 0) { annonce('', tr('Pop !'), 0.8); bip(500, 1100, 0.15, 'sine', 0.2); }
+  }
   v.espace = touches.Space;
+}
+// les skis de rando en mode montée : les peaux accrochent la neige. Z fait grimper (REGLAGES.vitesseRando, moins vite quand c'est raide),
+// S fait reculer, et ça ne glisse pas : pour redescendre, il faut enlever les peaux (touche R).
+// v.pas : de combien le pied droit est devant, en mètres (le gauche est derrière d'autant) : les skis et les jambes le suivent
+function monter(v, dt, gaz) {
+  const cible = gaz > 0 ? R_.vitesseRando * clamp(1.15 - Math.max(0, Math.sin(v.tangage)), 0.45, 1) : gaz < 0 ? -1.5 : 0;
+  v.vitesse += clamp(cible - v.vitesse, -12 * dt, 8 * dt);
+  v.pousse = clamp((v.pousse || 0) + (Math.abs(v.vitesse) > 0.3 ? 4 : -4) * dt, 0, 1); v.phasePousse = (v.phasePousse || 0) + dt * (3 + 1.1 * Math.abs(v.vitesse));
+  v.pas = 0.28 * v.pousse * Math.sin(v.phasePousse); v.derape = 0; v.espace = touches.Space;
+}
+// R : en skis de rando, B.J. change de mode. Arrêté, il prend un ski après l'autre et décolle sa peau (pour descendre), ou la recolle (pour monter)
+const DUREE_PEAUX = 3.2;   // secondes : 1,6 par ski
+const TEXTES_RANDO = { true: 'Les peaux sont collées : Z fait monter · R : les enlever', false: 'Les peaux sont rangées : à toi la descente ! · R : les recoller' };
+function changerMode() {
+  const v = J.voiture;
+  if (!v?.forme.rando || J.telesiege || v.vol || v.accident || v.transition) return;
+  if (Math.abs(v.vitesse) > 1.5) { annonce('', tr("Arrête-toi d'abord !"), 1.5); return; }
+  v.transition = 0.001;
+}
+function changerPeaux(v, dt) {
+  const t0 = v.transition; v.transition += dt; v.vitesse = 0; v.pousse = v.derape = 0; v.pas = (v.pas || 0) * Math.pow(0.001, dt);
+  for (const t of [0.4, 2]) if (t0 < t && v.transition >= t) bruit(0.3, 2500, 0.7);   // le « scratch » de la peau qu'on décolle
+  if (v.transition < DUREE_PEAUX) return;
+  v.transition = 0; v.montee = !v.montee; bip(700, 1000, 0.15, 'sine', 0.2);
+  annonce(tr(v.montee ? 'MODE MONTÉE' : 'MODE DESCENTE'), tr(TEXTES_RANDO[v.montee]), 3.5);
+}
+// sur la neige : ce qui reste d'une figure s'efface. v.tour finit sur 0, ou sur un demi-tour s'il s'est reçu à l'envers : il glisse alors
+// en « switch », le dos vers la pente (pas avec les peaux : il se remet à l'endroit)
+function redresser(v, dt) {
+  const k = Math.min(1, dt * 12), pas = v.montee || v.transition ? 2 * Math.PI : Math.PI, c = Math.round((v.tour || 0) / pas) * pas;
+  v.tour = Math.abs(c - (v.tour || 0)) < 0.01 ? Math.abs(c / Math.PI % 2) * Math.PI : v.tour + (c - v.tour) * k;
+  v.salto = (v.salto || 0) * (1 - k); v.cork = (v.cork || 0) * (1 - k); v.grabK = (v.grabK || 0) * (1 - k);
+}
+// les figures, en l'air : Q et D font tourner comme une toupie (v.tour : un 180, un 360...), S fait un backflip et Z un frontflip (v.salto).
+// S avec Q ou D : un cork, la vrille désaxée, le corps couché en arrière (v.cork) ; avec Z, un misty, couché en avant.
+// Le bouton gauche ou droit de la souris : un grab (v.grab : lequel ; v.grabK : de 0 à 1, pour la pose).
+// Quand on lâche les touches, il finit son demi-tour (son tour entier, pour un salto) et s'arrête là : il n'y a plus qu'à se recevoir.
+// v.figure : ce qu'il a fait depuis qu'il a décollé (recevoirFigure compte les points)
+function figures(v, dt, gaz, volant) {
+  const f = v.figure ||= { tour: v.tour || 0, cork: 0, grabs: [0, 0, 0], sensTour: 1, sensSalto: 1, envers: Math.cos(v.tour || 0) < 0 };
+  const cork = gaz && volant ? gaz : 0;
+  // l'angle rond où finir (un multiple de « pas ») : le suivant s'il a déjà fait le quart du chemin, sinon il revient
+  const finir = (a, pas, sens) => { const n = a / pas * sens, b = Math.floor(n + 1e-6); return (n - b > 0.25 ? b + 1 : b) * pas * sens; };
+  const tourner = (a, t, vitesse, pas, cle) => { if (t) f[cle] = t; return a + (t ? t * vitesse * dt : clamp(finir(a, pas, f[cle]) - a, -vitesse * dt, vitesse * dt)); };
+  const avant = v.tour || 0;
+  v.tour = tourner(avant, -volant, R_.vitesseVrille, Math.PI, 'sensTour');
+  v.salto = tourner(v.salto || 0, cork ? 0 : gaz, R_.vitesseSalto, 2 * Math.PI, 'sensSalto');
+  v.cork = (v.cork || 0) + (cork * 1.1 - (v.cork || 0)) * Math.min(1, dt * 7);
+  if (Math.abs(v.cork) > 0.55) { f.cork += Math.abs(v.tour - avant); f.misty = v.cork > 0; }
+  const grab = v.forme.glisse === 'luge' ? 0 : sourisG ? 1 : visee ? 2 : 0;
+  if (grab) { v.grab = grab; f.grabs[grab] += dt; }
+  v.grabK = clamp((v.grabK || 0) + (grab ? 8 : -8) * dt, 0, 1);
+  v.espace = touches.Space;
+}
+// la réception d'une figure. Renvoie ce qu'il garde de sa vitesse. Sur la tête (un salto ou un cork pas fini) : 0, c'est la chute.
+// De travers (une vrille pas finie) : 0.6, il se rattrape. Sinon 1, la figure est réussie : son nom s'affiche, avec ses points.
+//   une vrille : 100 points le 180, 300 le 360, 600 le 540, 1 000 le 720... (le double en cork ou en misty)
+//   un salto : 500, 1 500 le double, 3 000 le triple        un grab : 100, plus 300 par seconde où on le tient (2 s au plus)
+// Le record reste jusqu'à ce qu'on ferme la page
+const NOMS_GRABS = { skis: ['SAFETY', 'MUTE'], snowboard: ['INDY', 'MUTE'] };
+function recevoirFigure(v) {
+  const f = v.figure; v.figure = null;
+  if (Math.abs(diffAngle(0, v.salto + v.cork)) > 1) { v.tour = v.salto = v.cork = v.grabK = 0; annonce(tr('AÏE !'), tr('Figure ratée'), 2); return 0; }
+  const travers = Math.abs(v.tour - Math.round(v.tour / Math.PI) * Math.PI) > 0.6;
+  const demis = Math.round(Math.abs(v.tour - f.tour) / Math.PI), saltos = Math.round(v.salto / (2 * Math.PI)), n = Math.abs(saltos), cork = demis > 0 && f.cork > demis * Math.PI / 2;
+  v.salto = diffAngle(0, v.salto);   // (il ne reste que le petit bout à finir : redresser l'efface)
+  if (travers) { annonce('', tr('Réception de travers !'), 1.5); v.decollage = null; return 0.6; }
+  const mots = [], grabs = [1, 2].filter(k => f.grabs[k] > 0.25);
+  if (n) mots.push((['', '', 'DOUBLE ', 'TRIPLE '][n] ?? n + ' × ') + (saltos > 0 ? 'FRONTFLIP' : 'BACKFLIP'));
+  if (demis) mots.push((cork ? (f.misty ? 'MISTY ' : 'CORK ') : '') + demis * 180);
+  for (const k of grabs) mots.push(NOMS_GRABS[v.forme.glisse][k - 1]);
+  if (!mots.length) return 1;
+  if (f.envers) mots.unshift('SWITCH');
+  const points = 50 * demis * (demis + 1) * (cork ? 2 : 1) + 250 * n * (n + 1) + grabs.reduce((p, k) => p + 100 + Math.round(30 * Math.min(2, f.grabs[k])) * 10, 0);
+  const record = points > (J.recordFigure || 0);
+  if (record) J.recordFigure = points;
+  annonce(mots.join(' ') + ' !', tr(record ? '{n} points : nouveau record !' : '{n} points', { n: points }), 3); bip(700, 1400, 0.25, 'sine', 0.2);
+  v.decollage = null;   // (pas de « SAUT ! » par-dessus)
+  return 1;
+}
+// de la neige qui vole sous les skis : n petits nuages blancs (un dérapage, une réception)
+function gerbe(v, n = 1) {
+  for (let k = 0; k < n; k++) {
+    const f = new THREE.Sprite(M_FUMEE.clone()), p = local(v, entre(-0.5, 0.5), entre(-0.7, 0.7));
+    f.material.color.set('#fff'); f.position.set(p.x, v.y + 0.15, p.z); scene.add(f); effets.push({ o: f, vie: 0.45, fumee: 0.45, taille: 0.8 });
+  }
 }
 // la pose de celui qui glisse sur v (pour animerHumain) : debout sur des skis ou un snowboard, assis sur une luge. Il pousse sur le plat,
 // et quand il penche à plus de 30° de la neige dans un virage (couche), il tend la main vers elle (tout à fait à 50°), le bras droit vers
-// la neige (majVoiture le relève si la main de B.J. passe dessous)
+// la neige (majVoiture le relève si la main de B.J. passe dessous).
+// Ses genoux amortissent les bosses (v.amorti : plus pliés sur le haut de la bosse, plus tendus dans le creux) et se plient pour une figure.
+// En skis de rando, il se tient plus droit : ses chaussures sont raides
 function poseGlisse(v) {
-  const g = v.forme.glisse, debout = g !== 'luge', couche = (v.penche || 0) - v.roulis, c = Math.abs(couche), main = debout ? clamp((c - 0.55) / 0.3, 0, 1) * Math.sign(couche) : 0;
-  return { glisse: g, plie: debout ? 0.5 : 0, assis: !debout, pousse: v.pousse || 0, phase: v.phasePousse || 0, main: g === 'snowboard' ? -main : main, bras: c };
+  const g = v.forme.glisse, debout = g !== 'luge', envers = Math.cos(v.tour || 0) < 0 ? -1 : 1;
+  const couche = ((v.penche || 0) - v.roulis) * envers, c = Math.abs(couche), main = debout ? clamp((c - 0.55) / 0.3, 0, 1) * Math.sign(couche) : 0;
+  const rando = v.forme.rando ? { montee: !!v.montee, pas: v.pas || 0, pente: v.tangage, peaux: v.transition ? etapePeaux(v) : null } : null;
+  return { glisse: g, plie: debout ? clamp((rando ? 0.22 : 0.5) + (v.amorti || 0) / 0.35 + (v.figure ? 0.25 : 0), 0.1, 0.95) : 0, assis: !debout, pousse: v.montee ? 0 : v.pousse || 0,
+    phase: v.phasePousse || 0, main: g === 'snowboard' ? -main : main, bras: c, envers: (1 - Math.cos(v.tour || 0)) / 2, grab: v.grabK > 0.02 ? { sorte: v.grab, k: v.grabK, pente: v.tangage * Math.cos(v.tour || 0) } : null, rando };
 }
 // la neige où l'on glisse, de 0 (aucune) à 1 : sur les SOMMETS (pas sur les routes, ni dans les villes), et sur la place d'une station de ski
 function neigeSous(x, z) {
@@ -6855,7 +7193,10 @@ function poserVoiture(v, dt) {
     } else v.tangage += (Math.atan2(v.vy, Math.abs(v.vitesse) + 1) * (v.vitesse < 0 ? -1 : 1) - v.tangage) * Math.min(1, dt * 1.2);   // en l'air, le nez suit la trajectoire
   }
   v.m.position.set(v.x, v.y, v.z);
-  if (v.quat) v.m.quaternion.copy(v.quat); else v.m.rotation.set(-v.tangage, v.angle, v.roulis + (v.penche || 0));
+  const tour = (v.tour || 0) + (v.derape || 0);   // à ski : une vrille, une réception à l'envers, un dérapage. L'engin tourne à plat sur la pente, qui ne tourne pas avec lui
+  if (v.quat) v.m.quaternion.copy(v.quat);
+  else if (!tour) v.m.rotation.set(-v.tangage, v.angle, v.roulis + (v.penche || 0));
+  else { const c = Math.cos(tour), s = Math.sin(tour), t = Math.tan(v.tangage), r = Math.tan(v.roulis + (v.penche || 0)); v.m.rotation.set(-Math.atan(t * c + r * s), v.angle + tour, Math.atan(r * c - t * s)); }
 }
 // la voiture retombe : impact = à quelle vitesse elle tape le sol (m/s). Renvoie la vitesse du rebond
 function atterrir(v, impact, pente) {
@@ -6864,8 +7205,11 @@ function atterrir(v, impact, pente) {
     // on se reçoit bien (comme au bas d'un tremplin), et la vitesse de la chute qui va dans le sens de la pente n'est pas perdue.
     // On ne tombe (et on ne déchausse) qu'en tapant vraiment fort : plus de REGLAGES.chuteGlisse en travers (15 m/s : 11 m de chute sur du plat)
     const travers = v.vitesse * Math.sin(pente) - v.vy * Math.cos(pente), long = v.vitesse * Math.cos(pente) + v.vy * Math.sin(pente);
-    if (travers > R_.chuteGlisse) { commencerAccident(v); return 0; }
-    v.vitesse = long * Math.cos(pente); rebond = impact = 0;
+    // (une figure pas finie : sur la tête, on tombe aussi ; de travers, on perd de la vitesse)
+    const garde = travers > R_.chuteGlisse ? 0 : v.figure ? recevoirFigure(v) : 1;
+    if (!garde) { commencerAccident(v); return 0; }
+    v.vitesse = long * Math.cos(pente) * garde; rebond = impact = 0;
+    if (travers > 3 && v.m.visible && neigeSous(v.x, v.z) > 0.3) gerbe(v, 5);
   }
   const m = v.forme, d = v.tangage - pente;   // d < 0 : le nez tape en premier
   if (impact > 7) { // trop fort : ça cogne
@@ -7311,6 +7655,35 @@ function majSkieur(v, dt) {
   v.x += Math.sin(v.angle) * v.vitesse * dt; v.z += Math.cos(v.angle) * v.vitesse * dt;
   if (v.m.visible) animerHumain(v.pilote, 0, dt, poseGlisse(v));
 }
+// où en est B.J. quand il colle ou enlève ses peaux (v.transition : depuis combien de secondes) : { ski : 0 le droit, puis 1 le gauche ;
+// leve : de 0 (le ski est sur la neige) à 1 (il le tient debout à côté de lui) ; peau : de 0 à 1, ce qu'il a déjà décollé (ou recollé) ; colle }
+function etapePeaux(v) {
+  const u = v.transition / (DUREE_PEAUX / 2), ski = Math.min(1, Math.floor(u)), t = u - ski, doux = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  return { ski, leve: doux(t / 0.22) * (1 - doux((t - 0.8) / 0.2)), peau: clamp((t - 0.25) / 0.5, 0, 1), colle: !v.montee };
+}
+// les skis de rando, à chaque image. Au repos : côte à côte. En montée : chacun suit son pied (v.pas : de combien le droit est devant).
+// Quand B.J. change de mode : il prend un ski après l'autre et le tient debout sur son talon, à côté de lui, la semelle tournée vers lui
+// (et vers la caméra) : on voit la peau se décoller de la spatule vers le talon, ou se recoller du talon vers la spatule
+const Q_FIGURE = new THREE.Quaternion(), Q_SKI = new THREE.Quaternion(), M_SKI = new THREE.Matrix4(), vSki = new THREE.Vector3();
+function majSkisRando(v) {
+  const T = v.transition ? etapePeaux(v) : null, A = v.angle + (v.tour || 0);
+  v.skis.forEach((ski, k) => {
+    const c = k ? 1 : -1;   // -1 : le ski droit, 1 : le gauche
+    let peau = v.montee ? 1 : 0;
+    ski.position.set(ski.x0, 0, -c * (v.pas || 0)); ski.quaternion.identity(); ski.talon.rotation.y = v.montee ? Math.PI / 2 : 0;
+    if (T && T.ski > k) peau = 1 - peau;   // (celui-là, c'est déjà fait)
+    if (T && T.ski === k) {
+      peau = T.colle ? T.peau : 1 - T.peau;
+      // debout : la spatule vers le ciel, la semelle tournée vers B.J. et vers l'arrière. Le milieu du ski est à 85 cm de haut
+      M_SKI.makeBasis(vTmp.set(-0.66, 0, c * 0.75), vTmp2.set(c * 0.75, 0, 0.66), vSki.set(0, 1, 0));
+      Q_SKI.setFromRotationMatrix(M_SKI).premultiply(Q_FIGURE.setFromAxisAngle(vSki, A));
+      vSki.set(c * 0.42, 0.87, 0.3).applyAxisAngle(vTmp.set(0, 1, 0), A).add(vTmp.set(v.x, v.y, v.z));
+      v.corps.updateWorldMatrix(true, false);
+      ski.position.lerp(v.corps.worldToLocal(vSki), T.leve); ski.quaternion.slerp(v.corps.getWorldQuaternion(Q_FIGURE).invert().multiply(Q_SKI), T.leve);
+    }
+    ski.peau.scale.z = Math.max(peau, 0.001); ski.peau.visible = peau > 0.01;
+  });
+}
 function majVoiture(v, dt) {
   const d = dist(v, J);
   v.m.visible = d < 350;
@@ -7367,6 +7740,13 @@ function majVoiture(v, dt) {
     } else { v.corps.remove(v.pilote.g); v.pilote = null; }
   }
   poserVoiture(v, dt);
+  if (v.type.glisse && v.m.visible) { // à ski, les jambes amortissent les bosses des pistes. v.bosse : la hauteur de la bosse sous les skis ; v.amorti : de combien
+    // elle dépasse ce qu'il y avait juste avant (les genoux se plient d'autant : poseGlisse, et la caméra ne saute pas : majCamera)
+    const b = v.vol ? v.bosse || 0 : reliefSki(v.x, v.z);
+    v.bosseLisse = v.vol === v.volAvant ? (v.bosseLisse || 0) + (b - (v.bosseLisse || 0)) * Math.min(1, dt * 5) : v.vol ? v.bosseLisse || 0 : b;   // (à la réception : on repart de là)
+    v.bosse = b; v.amorti = b - v.bosseLisse; v.volAvant = v.vol;
+  }
+  if (v.skis) majSkisRando(v);
   // B.J. sur son tricycle, sa moto, son Segway, son bateau ou ses skis : il suit le véhicule, une fois celui-ci posé
   // (avant, il avait une image de retard : à ski, jusqu'à 1 m au-dessus de la neige dans une pente raide)
   // (un autre skieur aussi : son pilote est accroché à ses skis, placerHumain s'en arrange)
@@ -7377,10 +7757,18 @@ function majVoiture(v, dt) {
     else {
       // debout sur des skis ou un snowboard, il reste droit dans la pente, et penche seulement dans les virages (de côté sur le snowboard).
       // En snowboard, quand il pousse sur le plat (v.pousse), il se tourne vers l'avant, le pied avant toujours sur sa fixation
-      const k = g === 'snowboard' ? v.pousse || 0 : 0, p = local(v, 0.16 * k, v.forme.siege[1] + 0.19 * k), y = v.y + v.forme.siege[0] - 0.95;
-      if (g === 'skis') placerHumain(h, p.x, y, p.z, 0, v.angle, v.penche || 0);
-      else if (g === 'snowboard') placerHumain(h, p.x, y, p.z, -(v.penche || 0), v.angle + lerp(Math.PI / 2, 0.6, k), 0);
-      else placerHumain(h, p.x, y, p.z, v.m.rotation.x, v.angle, v.m.rotation.z);
+      // Il tourne avec ses skis (tour : une vrille, une réception à l'envers, un dérapage) : A = vers où il regarde, a = de combien il est tourné
+      // par rapport à là où il va. Il penche toujours vers l'intérieur du virage : de côté s'il regarde devant lui, en avant ou en arrière s'il est de côté
+      const k = g === 'snowboard' ? v.pousse || 0 : 0, tour = (v.tour || 0) + (v.derape || 0), a = tour + (g === 'snowboard' ? lerp(Math.PI / 2, 0.6, k) : 0), A = v.angle + a, pe = v.penche || 0;
+      const lx = 0.16 * k, lz = v.forme.siege[1] + 0.19 * k, c = Math.cos(v.angle + tour), s = Math.sin(v.angle + tour), p = { x: v.x + lx * c + lz * s, z: v.z - lx * s + lz * c }, y = v.y + v.forme.siege[0] - 0.95;
+      if (g === 'skis' || g === 'snowboard') placerHumain(h, p.x, y, p.z, -pe * Math.sin(a), A, pe * Math.cos(a));
+      else placerHumain(h, p.x, y, p.z, v.m.rotation.x, A, v.m.rotation.z);   // (sur une luge, une moto, un bateau : il penche avec l'engin)
+      // un salto, un cork : B.J. et son engin basculent ensemble, en avant ou en arrière, autour de son ventre
+      const bascule = (v.salto || 0) + (v.cork || 0);
+      if (Math.abs(bascule) > 0.001) {
+        Q_FIGURE.setFromAxisAngle(vTmp2.set(Math.cos(v.angle), 0, -Math.sin(v.angle)), bascule); vTmp.set(v.x, v.y + 0.9, v.z);
+        for (const o of [v.m, h.g]) { o.position.sub(vTmp).applyQuaternion(Q_FIGURE).add(vTmp); o.quaternion.premultiply(Q_FIGURE); }
+      }
       // les mains de B.J. ne passent jamais sous la neige. Très penché dans un virage, il tend la main vers elle (poseGlisse) ; dès qu'elle
       // la touche, ou dans une pente si raide que la neige est à hauteur d'épaule, il lève le bras juste ce qu'il faut (4 essais au plus)
       if (h === joueurH && g && g !== 'luge') {
@@ -7582,7 +7970,7 @@ function majCamera(dt) {
     const [ox, oy, oz] = v.forme.oeil;
     if (J.vue === 1 && v.quat) { v.m.updateMatrixWorld(); camera.position.copy(v.m.localToWorld(V3(ox, oy, oz))); }   // dans un looping, on tourne avec la voiture
     else if (J.vue === 1) { const p = local(v, ox, oz); camera.position.set(p.x, v.y + oy, p.z); }
-    else placerCamera(new THREE.Vector3(v.x, v.y + v.forme.hauteur + 0.35, v.z), dir, v.forme.longueur + 3.6 + Math.abs(v.vitesse) * 0.08, 0); // plus la voiture est grande, plus on recule
+    else placerCamera(new THREE.Vector3(v.x, v.y + v.forme.hauteur + 0.35 - (v.amorti || 0), v.z), dir, v.forme.longueur + 3.6 + Math.abs(v.vitesse) * 0.08, 0); // plus la voiture est grande, plus on recule (à ski, elle ne saute pas à chaque bosse)
   } else if (J.robot) { // dans le heavy robot : derrière son épaule, ou dans la cabine
     const r = J.robot;
     if (J.vue === 1) { r.m.g.updateMatrixWorld(true); camera.position.copy(r.m.torse.localToWorld(V3(0, 1.5, 0.75))); }
@@ -7605,10 +7993,11 @@ const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital
   L: ['#2a9a2a', 'F', 'Maison de Franklin'], O: ['#2a6ad8', 'M', 'Villa de Michael'], R: ['#e07a10', 'T', 'Caravane de Trevor'], J: ['#b89a10', 'Y', 'Yellow Jack'],
   B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'], Y: ['#1a7ad8', '❄', 'Station de ski'],
   U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'] };
-const LEGENDE = [...Object.values(ICONES), ['#d8501a', 'C', 'Piste de cascades']];   // les ronds de la légende de la grande carte
+const LEGENDE = [...Object.values(ICONES), ['#d8501a', 'C', 'Piste de cascades'], ['#0a9a9a', 'N', 'Navette des pistes']];   // les ronds de la légende de la grande carte
 const REPERES = [];   // [lieu, couleur, lettre, nom]
 for (const [c, [fond, lettre, nom]] of Object.entries(ICONES)) for (const p of lieux[c] || []) REPERES.push([p, fond, lettre, nom]);
 for (const c of CASCADES) REPERES.push([c.depart, '#d8501a', 'C', c.nom]);   // le départ des pistes de cascades
+for (const q of arrets) REPERES.push([q, '#0a9a9a', 'N', 'Navette des pistes']);   // les arrêts du bus « SKI SHUTTLE »
 const COULEUR_MER = '#3f79a3';
 // le terrain vu du ciel, un point par point de la grille, éclairé depuis le nord-ouest
 const terrainImg = document.createElement('canvas');
@@ -7777,7 +8166,7 @@ function majHUD(dt) {
     + (J.chrono?.t0 != null ? ` · ${(temps - J.chrono.t0).toFixed(1)} s` : '');   // sur le boardercross : le chronomètre
   const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
   const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40), ech = aPied && !J.echelle && echelles.find(e => dist(e, J) < 1.5 && Math.abs(J.y - e.bas) < 1);
-  const tl = telesiegeProche();
+  const tl = telesiegeProche(), nav = aPied && navetteProche();
   const aide = J.telesiege ? tr(J.telesiege.l.cabines ? 'Appuie sur <b>E</b> pour sauter de la cabine' : 'Appuie sur <b>E</b> pour sauter du télésiège')
     : tl ? tr(tl.cabines ? 'Appuie sur <b>E</b> pour prendre la télécabine' : 'Appuie sur <b>E</b> pour prendre le télésiège')
     : !aPied ? '' : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
@@ -7786,7 +8175,8 @@ function majHUD(dt) {
     : g ? tr('Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max ({prix})', { prix: montant(R_.prixBlindage) })
     : o ? (o.outil === 'perceuse' ? tr('Appuie sur <b>E</b> pour poser la perceuse thermique sur la porte du coffre-fort') : o.outil === 'charge' ? tr("Appuie sur <b>E</b> pour coller l'explosif sur la grille") : tr('Appuie sur <b>E</b> pour voler {objet}', { objet: tr(o.nom) }))
     : r && r.pilote === 'police' && r.vieVitre <= 0 ? tr('Appuie sur <b>E</b> pour éjecter le pilote du robot') : r && !r.pilote ? tr('Appuie sur <b>E</b> pour monter dans le heavy robot')
-    : asc ? tr(asc.monte ? "Appuie sur <b>E</b> pour prendre l'ascenseur (monter sur le toit)" : "Appuie sur <b>E</b> pour prendre l'ascenseur (redescendre)") : v ? tr('Appuie sur <b>E</b> pour monter : {vehicule}', { vehicule: tr(v.type.nom) })
+    : asc ? tr(asc.monte ? "Appuie sur <b>E</b> pour prendre l'ascenseur (monter sur le toit)" : "Appuie sur <b>E</b> pour prendre l'ascenseur (redescendre)")
+    : nav ? tr('Appuie sur <b>E</b> pour prendre la navette : {arret}', { arret: tr(nav.vers.nom) }) : v ? tr('Appuie sur <b>E</b> pour monter : {vehicule}', { vehicule: tr(v.type.nom) })
     : perce ? tr('Perceuse thermique : {n} %. Tiens bon !', { n: Math.floor(perce.perceuse / R_.dureePerceuse * 100) })
     : ech ? tr("Avance contre l'échelle pour grimper") : '';
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
@@ -7892,7 +8282,7 @@ function mettreAJour(dt) {
       moteurs[1].d = d;
     }
     reglerMoteur(moteurs[1], proche, 0.4, (1 - d / 40) ** 2 * 0.7, cote, doppler);
-    roulement.setTargetAtTime(v ? Math.min(0.07, Math.abs(v.vitesse) * 0.002) : 0, t, 0.1);
+    roulement.setTargetAtTime(v ? Math.min(0.07, Math.abs(v.vitesse) * 0.002) * (1 + 2.5 * Math.abs(v.derape || 0)) : 0, t, 0.1);   // (à ski, un dérapage racle la neige)
     crissement.setTargetAtTime(v && touches.Space && !v.type.glisse && Math.abs(v.vitesse) > 6 ? 0.05 : 0, t, 0.05);
     let dp = Infinity; for (const v of voitures) if (v.police && v.conducteur) dp = Math.min(dp, dist(v, J));
     sireneGain.gain.value = dp < 180 ? 0.035 * (1 - dp / 180) : 0;
@@ -7939,6 +8329,7 @@ etat('Clique pour jouer');
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   TELESIEGES, SOMMETS, neigeSous, telesiegeProche, sommetEn, REMONTEES, PISTES_SKI, pisteSkiEn, neigeEn, siegeEn, siegeLibre, reliefSki, creerSkieur, TENUES_GLISSE, rhabillerBJ, entrerVoiture, sortirVoiture, animerHumain, blesserConducteur,
+  touches, pointPiste, arrets, navetteProche, prendreNavette, changerMode, poseGlisse, garnir,
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, toucheSol, sorteDeSol, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
