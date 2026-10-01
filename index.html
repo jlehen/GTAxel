@@ -310,7 +310,7 @@ const TRADUCTIONS = {
   'Bébé !':           { de: 'Baby!', en: 'Baby!', gsw: 'Bébé!' },
   'San Goku, Super Saiyan !': { de: 'Son Goku, Super-Saiyajin!', en: 'Goku, Super Saiyan!', gsw: 'Son Goku, Super-Saiyajin!' },
   'Z6PO, le robot doré': { de: 'C-3PO, der goldene Roboter', en: 'C-3PO, the golden robot', gsw: 'C-3PO, de goldig Roboter' },
-  'Invincible !':     { de: 'Unbesiegbar!', en: 'Invincible!', gsw: 'Unbsiegbar!' },
+  'Invincible, comme Zeus !': { de: 'Unbesiegbar, wie Zeus!', en: 'Invincible, like Zeus!', gsw: 'Unbsiegbar, wie de Zeus!' },
   'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
   'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
   'Saute à une mission : MISSION8 pour la mission 8': { de: 'Springt zu einer Mission: MISSION8 für Mission 8', en: 'Jumps to a mission: MISSION8 for mission 8', gsw: 'Gumpt zunere Mission: MISSION8 für d Mission 8' },
@@ -966,11 +966,56 @@ const CASCADES = [
 const TENUE_BJ = { peau: '#e8b890', haut: '#e8e4d8', bas: '#4a5238', chaussures: '#3a2a1a', cheveux: '#b8955a', manchesCourtes: true };
 const PEAU_BJ = TENUE_BJ.peau;
 const TRICHES = [
+  // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel. IDDQD : comme dans Doom.
+  // B.J. est en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags (les autres codes s'ajoutent par-dessus)
+  { code: 'DIEU', alias: ['GOD', 'GOTT', 'IDDQD'], texte: 'Invincible, comme Zeus !', invincible: true, effet: b => {
+      const blanc = '#f4f2ea', cuir = '#7a4522';
+      habiller(b.torse, PEAU_BJ); for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, PEAU_BJ);
+      // le pagne : des brins de paille de toutes les longueurs (là où rien n'est dessiné, on voit à travers)
+      const paille = std(toile(128, 64, (g, l, h) => {
+        for (let x = 0; x < l; x += 2) { g.fillStyle = hasard(['#e2c558', '#cfa93c', '#b8902e', '#ecd67a']); g.fillRect(x, 1, 2, h * (0.6 + 0.4 * Math.random())); }
+      }), { alphaTest: 0.5, side: THREE.DoubleSide, roughness: 1, bumpScale: 0.05 });
+      // les santiags : la tige monte sur le mollet, le bout est pointu et relevé, avec un petit talon
+      const tige = std(toile(64, 64, (g, l, h) => {
+        g.fillStyle = cuir; g.fillRect(0, 0, l, h);
+        g.strokeStyle = '#e8d8b0'; g.lineWidth = 1.2;                             // les coutures : des ronds clairs, devant, derrière et sur les côtés
+        for (const x of [0, 16, 32, 48, 64]) for (const r of [5, 2]) { g.beginPath(); g.ellipse(x, 30, r, r * 3, 0, 0, 7); g.stroke(); }
+        g.globalCompositeOperation = 'destination-out';                           // le haut est découpé en V, devant et derrière
+        for (const x of [0, 32, 64]) { g.beginPath(); g.moveTo(x - 11, 0); g.lineTo(x + 11, 0); g.lineTo(x, 12); g.fill(); }
+        g.fillRect(0, h - 1, l, 1);                                               // (l'image se répète : sans ça, le bas déborde en haut, dans le V)
+      }), { alphaTest: 0.5, side: THREE.DoubleSide, bumpScale: 0.03 });
+      habiller(b.bassin, '#b8902e'); habiller(b.ceinture, '#8a6a22');             // la ceinture : une corde de paille
+      accessoire(GEO.pagne, '#cfa93c', b.bassin, 0, 0, 0).material = paille;      // les brins qui pendent de la ceinture...
+      for (const j of [b.jambeD, b.jambeG]) {
+        accessoire(GEO.pagneCuisse, '#cfa93c', j, 0, 0, 0).material = paille;     // ...et ceux qui suivent les cuisses, quand il marche ou s'assoit
+        habiller(j.chaussure, cuir);
+        accessoire(GEO.tigeSantiag, cuir, j.pli, 0, 0, 0).material = tige;
+        accessoire(GEO.boutSantiag, cuir, j.chaussure, 0, 0, 0.15).rotation.x = -0.1;
+        accessoire(GEO.moustache, '#3a200e', j.chaussure, 0, -0.027, -0.095).scale.set(2.2, 1, 3);   // le talon
+      }
+      // la tête de Zeus : les cheveux blancs, longs dans le cou, la moustache et une grande barbe en pointe
+      habiller(b.cheveux, blanc);
+      accessoire(GEO.cheveuxLongs, blanc, b.tete, 0, -0.08, -0.07);
+      accessoire(GEO.barbe, blanc, b.tete, 0, 0, 0);
+      accessoire(GEO.moustache, blanc, b.tete, 0, -0.045, 0.118).scale.set(1.9, 0.8, 1);
+    } },
   { code: 'SLIP',        texte: 'En slip !',            effet: b => { habiller(b.bassin, '#fff'); b.ceinture.visible = false; habillerMembre(b.jambeD, PEAU_BJ); habillerMembre(b.jambeG, PEAU_BJ); } },
   { code: 'CHAUSSURE',   texte: 'Une chaussure perdue', effet: b => habiller(b.jambeG.chaussure, '#eee') },   // il reste la chaussette
   { code: 'SOUTIF',      texte: 'Torse nu en soutien-gorge', effet: b => {
-      habiller(b.torse, PEAU_BJ); habillerMembre(b.brasD, PEAU_BJ); habillerMembre(b.brasG, PEAU_BJ);
-      accessoire(GEO.main, '#e0407a', b.torse, 0.09, 0.08, 0.11); accessoire(GEO.main, '#e0407a', b.torse, -0.09, 0.08, 0.11); } },
+      const rose = '#e0407a', dentelle = '#f7a8c8';
+      habillerMembre(b.brasD, PEAU_BJ); habillerMembre(b.brasG, PEAU_BJ);
+      b.torse.material = std(toile(128, 128, g => { // la bande est dessinée sur le torse nu : le devant est à gauche de l'image (et tout à droite), le dos au milieu
+        g.fillStyle = PEAU_BJ; g.fillRect(0, 0, 128, 128);
+        g.fillStyle = rose; g.fillRect(0, 71, 128, 7);                                  // la bande, tout autour
+        g.fillStyle = dentelle; g.fillRect(61, 72, 6, 5);                              // l'agrafe, dans le dos
+      }), { bumpScale: 0.02 });
+      for (const c of [-1, 1]) {
+        const bonnet = accessoire(GEO.bonnet, rose, b.torse, 0.088 * c, 0.105, 0.082); bonnet.rotation.y = 0.3 * c;   // tourné un peu vers le côté, comme le torse
+        accessoire(GEO.bordBonnet, dentelle, bonnet, 0, 0, 0);                         // un bord en dentelle
+        accessoire(GEO.bretelle, rose, b.torse, 0.09 * c, 0, 0);
+      }
+      accessoire(GEO.main, dentelle, b.torse, 0, 0.1, 0.122).scale.set(0.5, 0.3, 0.2); // le petit nœud, entre les deux
+    } },
   { code: 'JAMBEDEBOIS', texte: 'Jambe de bois',        effet: b => { habillerMembre(b.jambeD, '#8b5a2b'); b.jambeD.scale.set(0.45, 1, 0.45); b.jambeD.chaussure.visible = false; } },
   { code: 'BARCA',       texte: 'Maillot du Barça',     effet: b => {
       b.torse.material = std(toile(64, 64, g => { for (let k = 0; k < 8; k++) { g.fillStyle = k % 2 ? '#a50044' : '#004d98'; g.fillRect(k * 8, 0, 8, 64); } }));
@@ -1019,8 +1064,6 @@ const TRICHES = [
   { code: 'IDKFA', alias: ['ARMES', 'WAFFEN', 'WEAPONS'], texte: 'Toutes les armes, plein de munitions, gilet et masque à gaz !', action: () => {
       ARMES.forEach((a, i) => { J.possede[i] = true; if (!a.corps) J.balles[i] = Math.max(J.balles[i], a.munitions * 3); });
       J.gilet = R_.giletMax; J.masque = true; } },
-  // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel. IDDQD : comme dans Doom
-  { code: 'DIEU', alias: ['GOD', 'GOTT', 'IDDQD'], texte: 'Invincible !', invincible: true, effet: () => {} },
   // pour tester ce qui coûte cher : 100 000 $ d'un coup (change le nombre pour en avoir plus ou moins)
   { code: 'RICHE',       texte: 'Riche ! +100 000 $',   action: () => { J.argent += 100000; } },
   // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
@@ -3037,6 +3080,20 @@ const GEO = {
   casquette: new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16), visiere: new THREE.BoxGeometry(0.2, 0.02, 0.12),
   rebord: new THREE.CylinderGeometry(0.17, 0.2, 0.03, 16), brassard: new THREE.CylinderGeometry(0.065, 0.065, 0.08, 10),
   moustache: new THREE.BoxGeometry(0.05, 0.028, 0.02), meche: new THREE.BoxGeometry(0.13, 0.035, 0.03),
+  // le soutien-gorge (code SOUTIF) : un bonnet est un dôme tourné vers l'avant, et son bord un anneau.
+  // La bretelle est un ruban qui suit le torse [hauteur, avant] : elle monte devant, passe sur l'épaule et redescend dans le dos
+  bonnet: new THREE.SphereGeometry(0.074, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.6).rotateX(Math.PI / 2).scale(1, 0.95, 0.85),
+  bordBonnet: new THREE.TorusGeometry(0.07, 0.006, 6, 20).translate(0, 0, 0.023).scale(1, 0.95, 0.85),
+  // Zeus (code DIEU) : le pagne en paille autour du bassin, et un autre autour de chaque cuisse ; la barbe, sous le menton et sur les joues ;
+  // la tige des santiags, autour du mollet, et leur bout pointu
+  pagne: tour([[0.25, -0.2], [0.21, -0.02], [0.185, 0.1]], 24).scale(1, 1, 0.66),
+  pagneCuisse: tour([[0.16, -0.33], [0.135, -0.15], [0.112, 0.02]], 16),
+  barbe: mergeGeometries([new THREE.SphereGeometry(0.133, 16, 6, 0, Math.PI, Math.PI * 0.5, Math.PI * 0.5).rotateX(0.35).scale(0.9, 1.1, 1),   // sous le nez devant, jusqu'aux oreilles sur les côtés
+    tour([[0, -0.31], [0.035, -0.27], [0.075, -0.19], [0.097, -0.1], [0.085, -0.04]], 12).scale(1, 1, 0.7).translate(0, 0, 0.07)]),          // et la pointe, qui tombe sur la poitrine
+  tigeSantiag: tour([[0.062, -0.44], [0.064, -0.32], [0.082, -0.18]], 14),
+  boutSantiag: new THREE.ConeGeometry(0.066, 0.12, 12).rotateX(Math.PI / 2).scale(1, 0.6, 1),
+  bretelle: new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[0.13, 0.121], [0.19, 0.125], [0.25, 0.11], [0.276, 0.072], [0.291, 0.032], [0.297, 0],
+    [0.291, -0.032], [0.276, -0.072], [0.25, -0.11], [0.19, -0.125], [0.12, -0.119], [0.06, -0.112]].map(([y, z]) => new THREE.Vector3(0, y, z))), 30, 0.006, 6).scale(2.2, 1, 1),
 };
 function piece(geo, couleur, parent, x, y, z) {
   const m = new THREE.Mesh(geo, mat(couleur));
