@@ -547,6 +547,7 @@ const REGLAGES = {
   vitesseVolMaj: 12,         // ...et chaque appui sur Maj en volant ajoute ça (1 fois : 24 m/s, 2 fois : 36 m/s...)
   vitesseVolMax: 100,        // ...jusqu'à ça (360 km/h, plus vite que l'avion !)
   tripleMaj: 0.6,            // secondes pour taper Maj 3 fois
+  roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36°, 1.5 = jusqu'à 60°
   graviteVoiture: 9.8,       // la vraie gravité de la Terre pour les voitures qui sautent (mets 1.6 pour rouler sur la Lune !)
   degatsVoitures: 1,         // 1 = normal, 2 = les voitures s'abîment deux fois plus vite, 0 = jamais
   // les accidents
@@ -1095,6 +1096,8 @@ const angleVers = (a, b) => Math.atan2(b.x - a.x, b.z - a.z);     // 0 = vers +Z
 function diffAngle(a, b) { let d = (b - a) % (2 * Math.PI); if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; return d; }
 const lerpAngle = (a, b, k) => a + diffAngle(a, b) * Math.min(1, k);
 const lerp = THREE.MathUtils.lerp;   // de a (k = 0) à b (k = 1)
+// ce qui vole penche dans ses virages. vire : sa vitesse de virage, en radians par seconde (vers la gauche si elle est positive). Renvoie le roulis voulu
+const roulisVirage = vire => -clamp(vire, -0.7, 0.7) * R_.roulisVirage;
 function graine(n) { return () => { n = (n + 0x6D2B79F5) | 0; let t = Math.imul(n ^ (n >>> 15), 1 | n); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const hasardR = (l, rnd) => l[Math.floor(rnd() * l.length)];
 const indexArme = nom => ARMES.findIndex(a => a.nom === nom);
@@ -5324,7 +5327,7 @@ let tapesMaj = [];   // quand on a tapé Maj les 3 dernières fois
 function decoller() {
   if (J.voiture || J.robot || J.mort) return;
   if (J.superman) { J.superman = null; return; }
-  J.superman = { vx: 0, vz: 0, crans: 0 }; J.vy = 8;   // sa vitesse (la montée est dans J.vy) : il s'élance d'abord vers le ciel. crans : combien de fois on a tapé Maj en volant
+  J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0 }; J.vy = 8;   // sa vitesse (la montée est dans J.vy) : il s'élance d'abord vers le ciel. crans : combien de fois on a tapé Maj en volant ; roulis : il penche dans ses virages
   J.sol = J.nage = J.saute = J.accroupi = false; J.roule = J.echelle = null; J.danse = J.genou = J.atterri = 0;
   annonce('', tr('Superman !'), 2);
 }
@@ -5750,6 +5753,7 @@ function superman(dt) {
   }
   const vh = Math.hypot(f.vx, f.vz), e = Math.min(1, Math.hypot(vh, J.vy) / 6);   // e : de 0 (il flotte sur place) à 1 (il est lancé)
   const tir = !ARMES[J.arme].corps && (sourisG || visee || J.cooldown > -0.5);   // il tire, vise, ou vient de tirer
+  const angleAvant = J.angleCorps;
   if (tir) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
   else if (vh > 1) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(f.vx, f.vz), 8 * dt);
   const devant = f.vx * Math.sin(J.angleCorps) + f.vz * Math.cos(J.angleCorps);   // sa vitesse vers l'avant (négative s'il recule en tirant)
@@ -5759,6 +5763,9 @@ function superman(dt) {
   if (joueurH.arme) joueurH.arme.visible = tir;   // il range son arme pour voler, sauf pour tirer
   // à l'horizontale, il est couché ; tout droit vers le haut, debout, le bras levé ; en descendant tout droit, debout, les pieds en bas
   animerHumain(joueurH, 0, dt, { superman: e, bascule, arme: tir, leve: bascule + J.tangage });   // couché, il lève les bras pour viser devant lui
+  // lancé, il penche dans ses virages (pas quand il tire : il vise). Il roule autour de la direction où il vole, même couché : d'où l'ordre 'YZX'
+  if (dt) f.roulis += ((tir ? 0 : roulisVirage(diffAngle(angleAvant, J.angleCorps) / dt) * e) - f.roulis) * Math.min(1, dt * 3);
+  joueurH.g.quaternion.setFromEuler(new THREE.Euler(bascule, J.angleCorps, f.roulis, 'YZX'));
   poserCorps(joueurH, J.x, J.y + 0.95, J.z, 0.95);   // il bascule autour de son bassin
   membresMous(joueurH, dt, { raideur: 25, sol: hs, vx: f.vx, vy: J.vy, vz: f.vz });   // ses membres traînent un peu quand il tourne
 }
@@ -6085,7 +6092,7 @@ function pilotageAvion(v, dt, pilote) {
   // en l'air : il tourne vers où tu regardes et penche dans les virages ; son nez suit ton regard, vers le haut ou vers le bas
   const vire = pilote ? clamp(diffAngle(v.angle, J.lacet) * 1.2, -0.7, 0.7) : 0;
   v.angle += vire * dt;
-  v.roulis += (-vire * 0.9 - v.roulis) * Math.min(1, dt * 3);
+  v.roulis += (roulisVirage(vire) - v.roulis) * Math.min(1, dt * 3);
   if (pilote) v.tangage += clamp(clamp(J.tangage, -0.6, 0.6) - v.tangage, -0.6 * dt, 0.6 * dt);
   // la vitesse : les gaz, et la pente (il ralentit en montant, accélère en piquant). Trop lent, il décroche : il tombe, le nez en bas
   v.vitesse = clamp(v.vitesse + (gaz > 0 ? t.acceleration : gaz < 0 ? -t.acceleration : 0) * dt - R_.graviteVoiture * Math.sin(v.tangage) * 0.6 * dt, 0, t.vitesse);
@@ -6120,8 +6127,9 @@ function pilotageHelico(v, dt, pilote) {
   v.gaz = Math.max(Math.abs(av), Math.abs(lat), Math.abs(haut));
   v.hv ||= { x: 0, z: 0 };   // sa vitesse, à l'horizontale
   const sol = hauteurSol(v.x, v.z, v.y + 0.5), fx = Math.sin(v.angle), fz = Math.cos(v.angle);
+  const vire = pilote && v.rotor >= 1 ? diffAngle(v.angle, J.lacet) * 2 : 0;   // sa vitesse de virage (radians par seconde)
   if (v.rotor >= 1) {
-    if (pilote) v.angle = lerpAngle(v.angle, J.lacet, 2 * dt);
+    v.angle += vire * Math.min(0.5, dt);
     const vx = v.enVol ? (fx * av - fz * lat * 0.6) * t.vitesse : 0, vz = v.enVol ? (fz * av + fx * lat * 0.6) * t.vitesse : 0;   // (à droite : -fz, fx)
     v.hv.x += clamp(vx - v.hv.x, -t.acceleration * dt, t.acceleration * dt); v.hv.z += clamp(vz - v.hv.z, -t.acceleration * dt, t.acceleration * dt);
     v.vy += clamp(haut * t.montee - v.vy, -12 * dt, 12 * dt);   // il tient en l'air tout seul
@@ -6139,10 +6147,10 @@ function pilotageHelico(v, dt, pilote) {
     v.y = sol; v.vy = Math.max(0, v.vy); v.hv.x *= Math.pow(0.02, dt); v.hv.z *= Math.pow(0.02, dt);
   }
   v.enVol = v.y > sol + 0.2;
-  // il penche vers là où il va, et on voit sa vitesse au compteur
+  // il penche vers là où il va, et dans ses virages quand il avance (à fond dès 10 m/s) ; on voit sa vitesse au compteur
   const avance = v.hv.x * fx + v.hv.z * fz, cote = -v.hv.x * fz + v.hv.z * fx;
   v.vitesse = avance;
-  if (v.enVol) { v.tangage += (-avance / t.vitesse * 0.3 - v.tangage) * Math.min(1, dt * 3); v.roulis += (cote / t.vitesse * 0.4 - v.roulis) * Math.min(1, dt * 3); }
+  if (v.enVol) { v.tangage += (-avance / t.vitesse * 0.3 - v.tangage) * Math.min(1, dt * 3); v.roulis += (cote / t.vitesse * 0.4 + roulisVirage(vire) * clamp(avance / 10, -1, 1) - v.roulis) * Math.min(1, dt * 3); }
   else v.tangage = v.roulis = 0;
 }
 
