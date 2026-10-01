@@ -3041,13 +3041,44 @@ function hauteurSol(x, z, y = -Infinity) {
   return h;
 }
 const profondeur = (x, z) => EAU - hauteurTerrain(x, z);   // plus de 0 : il y a de l'eau
-function voit(a, b) {
-  const ya = (a.y ?? hauteurSol(a.x, a.z)) + 1.5, yb = (b.y ?? hauteurSol(b.x, b.z)) + 1.5, n = Math.ceil(dist(a, b) / 1.5);
-  for (let i = 1; i < n; i++) {
-    const t = i / n, x = a.x + (b.x - a.x) * t, z = a.z + (b.z - a.z) * t, y = ya + (yb - ya) * t;
-    if (dansBatiment(x, y, z) || y < hauteurTerrain(x, z)) return false;
+// un chemin tout droit part de o et avance de d (deux listes [x, y, z]) : il est dans la boîte (de bas à haut) de t1 à t2
+// (0 : en o, 1 : au bout de d). Renvoie [t1, t2] ; si t1 est plus grand que t2, il ne la touche pas
+function traversee(o, d, bas, haut) {
+  let t1 = -Infinity, t2 = Infinity;
+  for (let a = 0; a < 3; a++) {
+    if (Math.abs(d[a]) < 1e-9) { if (o[a] < bas[a] || o[a] > haut[a]) t1 = Infinity; continue; }
+    const ta = (bas[a] - o[a]) / d[a], tb = (haut[a] - o[a]) / d[a];
+    t1 = Math.max(t1, Math.min(ta, tb)); t2 = Math.min(t2, Math.max(ta, tb));
   }
-  return true;
+  return [t1, t2];
+}
+// le chemin tout droit du point a au point b (x, y, z) : où bute-t-il sur un mur, un plancher, un meuble ou une colline ?
+// Renvoie un nombre de 0 (tout de suite, en a) à 1 (rien ne gêne jusqu'à b). Pour les boîtes, le calcul est exact : en ne
+// regardant qu'un point de temps en temps, on sauterait par-dessus les murs de 30 cm des bâtiments où l'on entre
+function butee(a, b) {
+  const o = [a.x, a.y, a.z], d = [b.x - a.x, b.y - a.y, b.z - a.z];
+  let t = 1;
+  pourBoites(Math.min(a.x, b.x), Math.min(a.z, b.z), Math.max(a.x, b.x), Math.max(a.z, b.z), bo => {
+    if (!(bo.h > bo.y0)) return;   // une boîte coupée (une porte ouverte, un lampadaire renversé)
+    const [t1, t2] = traversee(o, d, [bo.x1, bo.y0, bo.z1], [bo.x2, bo.h, bo.z2]);
+    if (Math.max(t1, 0) <= Math.min(t2, t)) t = Math.max(t1, 0);
+  });
+  const n = Math.ceil(Math.hypot(d[0], d[2]) / 1.5);   // le terrain : un point tous les 1,5 m suffit, une colline est large
+  for (let i = 1; i < n && i / n < t; i++) if (o[1] + d[1] * i / n < hauteurTerrain(o[0] + d[0] * i / n, o[2] + d[2] * i / n)) return i / n;
+  return t;
+}
+// a voit-il b ? De ses yeux à ceux de b (1,5 m au-dessus des pieds), rien ne doit gêner
+function voit(a, b) {
+  const yeux = p => ({ x: p.x, y: (p.y ?? hauteurSol(p.x, p.z)) + 1.5, z: p.z });
+  return butee(yeux(a), yeux(b)) >= 1;
+}
+// la balle d'un ennemi, du bout de son canon (depart) vers le point visé (arrivee) : un mur, un plancher, un meuble ou une colline
+// l'arrête, et « arrivee » est ramené là où elle s'écrase. Renvoie true si rien ne l'arrête.
+// On suit le chemin depuis le milieu du tireur : collé à un mur fin, le bout de son canon est déjà de l'autre côté
+function balleArrive(tireur, depart, arrivee) {
+  const d = V3(tireur.x, depart.y, tireur.z), t = butee(d, arrivee);
+  if (t < 1) arrivee.lerpVectors(d, arrivee, t);
+  return t >= 1;
 }
 // à quelle distance un rayon (depart, dir) touche le terrain (Infinity s'il ne le touche pas avant loin)
 function toucheTerrain(depart, dir, loin) {
@@ -4990,9 +5021,10 @@ function majTourelles(B, dt) {
     if (!reussi) cible.add(V3(entre(-1, 1), entre(-0.8, 0.8), entre(-1, 1)));
     t.canon.updateMatrixWorld(true);
     const depart = t.canon.localToWorld(V3(0, 0.02, 0.78));
+    const arrive = balleArrive(bout, depart, cible);   // un mur entre elle et toi arrête la balle
     traceur(depart, cible); flash(depart, 0.45); lumiereTir.position.copy(depart); lumiereTir.intensity = 40;
     bruit(0.35 * clamp(1 - d / 80, 0.2, 1), 3200, 0.08);
-    if (reussi) blesserJoueur(R_.degatsMitrailleuse * parTriche('balles'));
+    if (reussi && arrive) blesserJoueur(R_.degatsMitrailleuse * parTriche('balles'));
   }
 }
 // le coffre-fort : la perceuse perce, la porte s'ouvre, l'explosif compte à rebours
@@ -5178,9 +5210,10 @@ function tirRobot(r, d) {
   if (J.accroupi) chance *= 0.5; if (J.vitesse > 6) chance *= 0.6; if (abrite()) chance *= 0.7;
   const reussi = Math.random() < chance && aSonTour(d);
   if (!reussi) arrivee.add(V3(entre(-2.5, 2.5), entre(-1, 2), entre(-2.5, 2.5)));
+  const arrive = balleArrive(r, depart, arrivee);   // un mur entre lui et toi arrête la balle
   balleLourde(depart, arrivee); flash(depart, 1.1);
   bruit(0.6 * clamp(1 - d / 150, 0.1, 1), 1100, 0.2);
-  if (!reussi) return;
+  if (!reussi || !arrive) return;
   blesserJoueur(ENNEMIS.robot.degats * parTriche('balles'));
   const v = J.voiture;   // la balle cabosse la voiture où tu es
   if (v) { const D = versLocal(v, J.x - r.x, J.z - r.z), l = Math.hypot(D.x, D.z) || 1; abimer(v, V3(-D.x / l * v.forme.largeur / 2, 0.8, -D.z / l * v.forme.longueur / 2), V3(D.x / l, 0, D.z / l), ENNEMIS.robot.degats / 400, true); }
@@ -6397,9 +6430,10 @@ function tirEnnemi(p, d) {
     return;
   }
   if (!reussi) arrivee.add(new THREE.Vector3(entre(-2, 2), entre(-1, 1.5), entre(-2, 2)));
+  const arrive = balleArrive(p, depart, arrivee);   // un mur entre lui et toi arrête la balle
   traceur(depart, arrivee); flash(depart, 0.4);
   bruit(0.4 * clamp(1 - d / 120, 0, 1), 1800, 0.18);
-  if (reussi) blesserJoueur(degats * parTriche('balles'));
+  if (reussi && arrive) blesserJoueur(degats * parTriche('balles'));
 }
 
 // voitures qui roulent toutes seules : elles suivent une "carotte" qui avance sur la voie de droite du réseau des routes.
@@ -6705,13 +6739,7 @@ function placerCamera(pivot, direction, distance, epaule) {
   pourBoites(Math.min(o[0], voulu.x) - M, Math.min(o[2], voulu.z) - M, Math.max(o[0], voulu.x) + M, Math.max(o[2], voulu.z) + M, b => {
     if (!(b.h > b.y0)) return;   // une boîte coupée (une porte ouverte)
     for (const m of [M, 0]) { // la boîte grossie de la marge ; si le pivot y est déjà (tout près du plafond), la boîte elle-même
-      const bas = [b.x1 - m, b.y0 - m, b.z1 - m], haut = [b.x2 + m, b.h + m, b.z2 + m];
-      let t1 = -Infinity, t2 = Infinity;   // le chemin est dans la boîte de t1 à t2
-      for (let a = 0; a < 3; a++) {
-        if (Math.abs(d[a]) < 1e-9) { if (o[a] < bas[a] || o[a] > haut[a]) t1 = Infinity; continue; }
-        const ta = (bas[a] - o[a]) / d[a], tb = (haut[a] - o[a]) / d[a];
-        t1 = Math.max(t1, Math.min(ta, tb)); t2 = Math.min(t2, Math.max(ta, tb));
-      }
+      const [t1, t2] = traversee(o, d, [b.x1 - m, b.y0 - m, b.z1 - m], [b.x2 + m, b.h + m, b.z2 + m]);   // le chemin est dans la boîte de t1 à t2
       if (t1 > t2 || t2 < 0) break;             // le chemin ne la touche pas
       if (t1 >= 0) { t = Math.min(t, t1); break; }
     }
@@ -7086,7 +7114,7 @@ etat('Clique pour jouer');
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   TELESIEGES, SOMMETS, neigeSous, telesiegeProche, chaise, sommetEn,
-  soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
+  soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
   exploser, blesserJoueur, cibleMission, V3, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
