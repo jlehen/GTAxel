@@ -592,7 +592,7 @@ const REGLAGES = {
   roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36°, 1.5 = jusqu'à 60°
   graviteVoiture: 9.8,       // la vraie gravité de la Terre pour les voitures qui sautent (mets 1.6 pour rouler sur la Lune !)
   degatsVoitures: 1,         // 1 = normal, 2 = les voitures s'abîment deux fois plus vite, 0 = jamais
-  impactsMurs: 300,          // combien d'impacts de balles restent sur les murs : au-delà, le plus vieux s'efface (0 = aucun impact)
+  impactsMurs: 500,          // combien d'impacts de balles restent sur les murs et par terre : au-delà, le plus vieux s'efface (0 = aucun impact)
   impactsVoiture: 20,        // et combien de trous de balles restent sur chaque voiture
   tailleImpacts: 1,          // 1 = normal, 3 = des impacts énormes
   // les accidents
@@ -3342,6 +3342,16 @@ function hauteurSol(x, z, y = -Infinity) {
   return h;
 }
 const profondeur = (x, z) => EAU - hauteurTerrain(x, z);   // plus de 0 : il y a de l'eau
+// sur quoi marche-t-on dehors, en (x, z) ? 'pave' : un pâté de ville (trottoir, place) ; 'herbe' : un parc ou des jardins (P, M) ;
+// 'rue' ; 'route' : une route de campagne ou un pont ; 'terre' : le terrain (herbe, sable, rocher, neige)
+function sorteDeSol(x, z) {
+  const i = Math.floor((x - R) / PAS), j = Math.floor((z - R) / PAS), c = car(i, j);
+  if (estBloc(c) && x - R - i * PAS <= S && z - R - j * PAS <= S) return c === 'P' || c === 'M' ? 'herbe' : 'pave';
+  const jl = Math.round((z - R / 2) / PAS), il = Math.round((x - R / 2) / PAS);
+  if (Math.abs(z - jl * PAS - R / 2) <= R / 2 && rueH(Math.floor((x - R / 2) / PAS), jl)) return 'rue';
+  if (Math.abs(x - il * PAS - R / 2) <= R / 2 && rueV(il, Math.floor((z - R / 2) / PAS))) return 'rue';
+  return routeSous(x, z)?.d < 5.3 ? 'route' : 'terre';
+}
 // un chemin tout droit part de o et avance de d (deux listes [x, y, z]) : il est dans la boîte (de bas à haut) de t1 à t2
 // (0 : en o, 1 : au bout de d). Renvoie [t1, t2] ; si t1 est plus grand que t2, il ne la touche pas
 function traversee(o, d, bas, haut) {
@@ -3375,7 +3385,7 @@ function voit(a, b) {
 }
 // la balle d'un ennemi, du bout de son canon (depart) vers le point visé (arrivee) : un mur, un plancher, un meuble ou une colline
 // l'arrête. Renvoie true si rien ne l'arrête avant le point visé. Une balle ratée (ratee) continue tout droit après ce point,
-// 60 m au plus. « arrivee » est ramené là où la balle finit : elle y laisse un impact, sur un mur ou sur la voiture de B.J.
+// 60 m au plus. « arrivee » est ramené là où la balle finit : elle y laisse un impact, sur un mur, par terre ou sur la voiture de B.J.
 // On suit le chemin depuis le milieu du tireur : collé à un mur fin, le bout de son canon est déjà de l'autre côté
 function balleArrive(tireur, depart, arrivee, ratee = false) {
   const d = V3(tireur.x, depart.y, tireur.z), dir = arrivee.clone().sub(d).normalize(), t = butee(d, arrivee);
@@ -3387,13 +3397,28 @@ function balleArrive(tireur, depart, arrivee, ratee = false) {
     const P = impactVoiture(J.voiture, rayonImpact);
     if (P) { arrivee.copy(P); return t >= 1; }
   }
+  if (mur || ratee) { // elle n'a pas touché B.J. : elle finit peut-être par terre, avant le mur
+    const ts = toucheSol(d, arrivee);
+    if (ts < 1) { arrivee.lerpVectors(d, arrivee, ts); impactSol(arrivee); return t >= 1; }
+  }
   if (mur) impactVers(arrivee, dir);
   return t >= 1;
 }
-// à quelle distance un rayon (depart, dir) touche le terrain (Infinity s'il ne le touche pas avant loin)
-function toucheTerrain(depart, dir, loin) {
-  for (let t = 0.5; t <= loin; t += 1) if (depart.y + dir.y * t < hauteurTerrain(depart.x + dir.x * t, depart.z + dir.z * t)) return t;
-  return Infinity;
+// le chemin tout droit du point a au point b : où touche-t-il le sol dehors (rue, trottoir, route, terrain) ou l'eau ?
+// De 0 (en a) à 1 (nulle part avant b). On avance d'un mètre à la fois, puis on cherche l'endroit exact dans le dernier mètre.
+// Sous un pont (son tablier fait 1,2 m d'épaisseur), le sol est le terrain ou l'eau, pas la route du dessus
+function toucheSol(a, b) {
+  const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z, n = Math.ceil(Math.hypot(dx, dy, dz));
+  const dessous = t => {
+    const x = a.x + dx * t, y = a.y + dy * t, z = a.z + dz * t, h = hauteurSol(x, z), bas = Math.max(hauteurTerrain(x, z), EAU);
+    return y < (h > bas + 1.5 && y < h - 1.2 ? bas : Math.max(h, EAU)) + 0.02;
+  };
+  for (let i = 1; i <= n; i++) if (dessous(i / n)) {
+    let t1 = (i - 1) / n, t2 = i / n;
+    for (let k = 0; k < 8; k++) { const m = (t1 + t2) / 2; if (dessous(m)) t2 = m; else t1 = m; }
+    return t1;
+  }
+  return 1;
 }
 
 // =====================================================================
@@ -5123,19 +5148,39 @@ const rayonImpact = Object.assign(new THREE.Raycaster(), { camera });
 // sur les murs : un seul objet pour tous les impacts (R_.impactsMurs au plus). Quand il est plein, le plus vieux laisse sa place
 const impactsMurs = new THREE.InstancedMesh(GEO_IMPACT, M_IMPACT, Math.max(1, R_.impactsMurs)), poseImpact = new THREE.Object3D();
 impactsMurs.count = 0; impactsMurs.frustumCulled = false; impactsMurs.receiveShadow = true; scene.add(impactsMurs);
-const C_IMPACT = new THREE.Color('#fff'), C_BRULE = new THREE.Color('#0c0a08');   // la couleur de chaque impact : telle quelle, ou noircie
+// la couleur de chaque impact : l'image telle quelle (du plâtre clair), de la terre, de la neige, ou la marque noire des yeux laser
+const C_IMPACT = new THREE.Color('#fff'), C_TERRE = new THREE.Color('#8a6f4e'), C_NEIGE = new THREE.Color('#dde6ee'), C_BRULE = new THREE.Color('#0c0a08');
 impactsMurs.setColorAt(0, C_IMPACT);
 let nImpacts = 0;   // combien on en a posé depuis le début
-// un impact au point P d'un mur (ou d'un plancher, d'un meuble), avec un peu de poussière. N : la direction qui sort du mur.
-// brule : une marque noire de brûlé, sans plâtre clair (les yeux laser)
-function impactMur(P, N, brule = false) {
+// un impact au point P d'un mur (ou d'un plancher, d'un meuble, du sol), avec un peu de poussière de la même couleur.
+// N : la direction qui sort du mur ; devant : de combien de mètres l'image est posée devant ; taille : 1.5 = une fois et demie plus gros
+function impactMur(P, N, couleur = C_IMPACT, devant = 0.01, taille = 1) {
   if (R_.impactsMurs < 1) return;
   const o = poseImpact, places = impactsMurs.instanceMatrix.count;
-  o.position.copy(P).addScaledVector(N, 0.01); o.quaternion.setFromUnitVectors(AXE_Z, N); o.rotateZ(entre(0, 6.3)); o.scale.setScalar(0.16 * R_.tailleImpacts * entre(0.7, 1.2)); o.updateMatrix();
+  o.position.copy(P).addScaledVector(N, devant); o.quaternion.setFromUnitVectors(AXE_Z, N); o.rotateZ(entre(0, 6.3)); o.scale.setScalar(0.16 * taille * R_.tailleImpacts * entre(0.7, 1.2)); o.updateMatrix();
   impactsMurs.setMatrixAt(nImpacts % places, o.matrix); impactsMurs.instanceMatrix.needsUpdate = true;
-  impactsMurs.setColorAt(nImpacts % places, brule ? C_BRULE : C_IMPACT); impactsMurs.instanceColor.needsUpdate = true;
+  impactsMurs.setColorAt(nImpacts % places, couleur); impactsMurs.instanceColor.needsUpdate = true;
   impactsMurs.count = Math.min(places, ++nImpacts);
-  const f = new THREE.Sprite(M_FUMEE.clone()); f.position.copy(P).addScaledVector(N, 0.1); f.scale.setScalar(0.1); scene.add(f); effets.push({ o: f, vie: 0.35, fumee: 0.35, taille: 0.25 });
+  poussiere(P.clone().addScaledVector(N, 0.1), couleur === C_IMPACT ? null : couleur);
+}
+// une petite bouffée de poussière (grise, ou de la couleur donnée)
+function poussiere(P, couleur = null) {
+  const f = new THREE.Sprite(M_FUMEE.clone()); f.position.copy(P); f.scale.setScalar(0.1); scene.add(f); effets.push({ o: f, vie: 0.35, fumee: 0.35, taille: 0.25 });
+  if (couleur) f.material.color.copy(couleur);
+}
+// une balle finit par terre au point P, dehors : un impact à plat sur le sol. En ville, le sol est à plat, et de pierre ; sur une
+// route ou sur le terrain, il suit la pente ; dans l'herbe, le sable ou la neige, l'impact prend leur couleur. Dans l'eau : une
+// éclaboussure, sans impact. couleur : pour imposer la marque noire des yeux laser
+function impactSol(P, couleur = null) {
+  const x = P.x, z = P.z, y = hauteurSol(x, z), sorte = sorteDeSol(x, z), e = 0.3;
+  if (y < EAU) { poussiere(V3(x, EAU + 0.1, z), C_IMPACT); return; }
+  if (Math.abs(P.y - y) > 0.3) return;   // sous un pont : pas sur la route du dessus
+  const h = sorte === 'terre' ? hauteurTerrain : hauteurSol;   // (le terrain seul : à côté d'un trottoir, l'impact ne penche pas)
+  const N = sorte === 'route' || sorte === 'terre' ? V3(h(x - e, z) - h(x + e, z), 2 * e, h(x, z - e) - h(x, z + e)).normalize() : V3(0, 1, 0);
+  if (sorte === 'route' && N.y < 0.9) N.set(0, 1, 0);   // au bord de la route, la hauteur saute : on reste à plat
+  const tendre = sorte === 'herbe' || sorte === 'terre';
+  // (vu de biais, un impact par terre paraît tout petit : il est une fois et demie plus gros que sur un mur)
+  impactMur(V3(x, y, z), N, couleur || (neigeSous(x, z) > 0.5 ? C_NEIGE : tendre ? C_TERRE : C_IMPACT), 0.04, 1.5);
 }
 // une balle finit au point P, en allant dans la direction dir : on cherche ce qui est dessiné juste là, pour poser l'impact
 // bien à plat dessus (un vrai rayon, long à calculer : seulement contre les formes des bâtiments d'à côté, et pas trop loin de la caméra)
@@ -6173,15 +6218,17 @@ function tirer(a = ARMES[J.arme]) {
     const d = (a.dispersion || 0.004) * (visee ? 0.5 : 1) * (J.vitesse > 5 ? 2 : 1);
     raycaster.setFromCamera(new THREE.Vector2(entre(-d, d), entre(-d, d)), camera);
     let hit = raycaster.intersectObjects(cibles, true)[0];
-    const t = toucheTerrain(raycaster.ray.origin, raycaster.ray.direction, hit ? hit.distance : a.portee);   // une colline arrête la balle
-    if (t < Infinity) hit = null;
-    const point = hit ? hit.point : raycaster.ray.at(Math.min(t, a.portee), new THREE.Vector3());
+    // le sol arrête la balle avant ? (une rue, un trottoir, une colline, l'eau)
+    const debut = raycaster.ray.at(raycaster.near, new THREE.Vector3()), bout = hit ? hit.point : raycaster.ray.at(a.portee, new THREE.Vector3());
+    const t = toucheSol(debut, bout), sol = t < 1;
+    if (sol) hit = null;
+    const point = sol ? debut.lerp(bout, t) : bout;
     if (a.explosion) { // roquette : elle part du canon vers le viseur
       flash(depart, J.vue === 1 ? 0.6 : 1.5);
       lancerRoquette(depart, point, a.portee, a.explosion, a.degats, R_.degatsExplosion, null, rb);
       continue;
     }
-    if (hit || t < Infinity) {
+    if (hit || sol) {
       const u = hit?.object.userData || {}, p = u.personne;
       if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
       const vc = !p && u.voiture, roue = vc && vc.roues.find(r => r.tourne === hit.object.parent);
@@ -6196,7 +6243,8 @@ function tirer(a = ARMES[J.arme]) {
       if (!p && !vc && u.tourelle && (u.tourelle.vie -= a.degats) <= 0) { // une mitrailleuse de la banque, détruite
         u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
       }
-      if (u.mur) impactMur(point, hit.face.normal.clone().transformDirection(hit.object.matrixWorld), a.laser);   // un mur, un plancher, un meuble
+      if (u.mur) impactMur(point, hit.face.normal.clone().transformDirection(hit.object.matrixWorld), a.laser ? C_BRULE : C_IMPACT);   // un mur, un plancher, un meuble
+      if (sol) impactSol(point, a.laser ? C_BRULE : null);
       flash(point, 0.3);
       if (a.laser) etincelles(point, 2, 2);   // ça grésille là où les rayons touchent
     }
@@ -7891,7 +7939,7 @@ etat('Clique pour jouer');
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   TELESIEGES, SOMMETS, neigeSous, telesiegeProche, sommetEn, REMONTEES, PISTES_SKI, pisteSkiEn, neigeEn, siegeEn, siegeLibre, reliefSki, creerSkieur, TENUES_GLISSE, rhabillerBJ, entrerVoiture, sortirVoiture, animerHumain, blesserConducteur,
-  soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
+  soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, toucheSol, sorteDeSol, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, ecraser, effets, capeBJ, rayonsLaser, majLaser, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
