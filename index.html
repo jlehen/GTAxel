@@ -47,8 +47,8 @@
   #histoire { font-size: 22px; max-width: 700px; margin-top: 6px; }
   #etat { font-size: 28px; margin: 10px 0 26px; color: #f0c850; }
   #menu table { border-collapse: collapse; font-size: 18px; }
-  #menu td { padding: 3px 14px; }
-  #menu td:first-child { text-align: right; color: #f0c850; font-weight: 700; }
+  #menu td, #triches th { padding: 3px 14px; }
+  #menu td:first-child, #triches th { text-align: right; color: #f0c850; font-weight: 700; }
   #langues { margin: 2px 0 10px; }
   .foule { font-size: 18px; margin-bottom: 4px; }
   .foule span { display: inline-block; min-width: 100px; text-align: right; margin-right: 4px; color: #f0c850; font-weight: 700; }
@@ -56,13 +56,14 @@
                 border-radius: 18px; padding: 4px 16px; margin: 3px; cursor: pointer; }
   #menu button:hover { border-color: #f0c850; }
   #menu button.on { background: #f0c850; border-color: #f0c850; color: #000; }
-  /* l'écran des réglages : il se déplie sous le bouton ⚙ */
-  #reglages { font-size: 16px; width: min(900px, calc(100% - 32px)); margin: 4px 0 6px; cursor: auto; }
-  #reglages summary { cursor: pointer; }
-  #reglages > summary { display: inline-block; list-style: none; font-weight: 700; font-size: 18px; background: rgba(255,255,255,.12);
+  /* l'écran des réglages et la liste des codes de triche : ils se déplient sous leur bouton, ⚙ et 🎮 */
+  #reglages, #triches { font-size: 16px; width: min(900px, calc(100% - 32px)); margin: 4px 0 6px; cursor: auto; }
+  #reglages summary, #triches summary { cursor: pointer; }
+  #reglages > summary, #triches > summary { display: inline-block; list-style: none; font-weight: 700; font-size: 18px; background: rgba(255,255,255,.12);
                         border: 2px solid rgba(255,255,255,.35); border-radius: 18px; padding: 4px 16px; }
-  #reglages[open] { background: rgba(12,12,12,.94); padding-bottom: 8px; }   /* presque opaque : le HUD derrière ne gêne pas la lecture */
-  #reglages p { max-width: 700px; margin: 8px auto; }
+  #reglages[open], #triches[open] { background: rgba(12,12,12,.94); padding-bottom: 8px; }   /* presque opaque : le HUD derrière ne gêne pas la lecture */
+  #reglages p, #triches p { max-width: 700px; margin: 8px auto; }
+  #triches table { margin: 0 auto; text-align: left; }
   #reglages details { text-align: left; margin: 3px 0 3px 14px; }
   #reglages details > summary { color: #f0c850; font-weight: 700; }
   #reglages .champs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2px 16px; margin: 2px 0 4px 14px; }
@@ -108,6 +109,11 @@
     <summary>⚙ <span class="tr">Réglages</span></summary>
     <p class="tr">Les nombres des tableaux du haut de index.html. Le jeu en tient compte tout de suite, sauf pour ce qu'il construit au départ (la carte, les ombres, les ennemis déjà là…) : appuie alors sur F5. Le navigateur se souvient des cases en jaune ; si tu changes le même nombre dans le code, c'est le code qui gagne.</p>
     <button id="remettre" class="tr">Tout remettre</button>
+  </details>
+  <details id="triches">
+    <summary>🎮 <span class="tr">Codes de triche</span></summary>
+    <p class="tr">Pendant le jeu, appuie sur Entrée, tape un code, puis Entrée. Pour annuler un code, retape-le.</p>
+    <table></table>
   </details>
   <div id="histoire">Tu es B.J. Blazkowicz. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !</div>
   <div id="etat">Chargement… (il faut une connexion Internet)</div>
@@ -175,6 +181,9 @@ const TRADUCTIONS = {
     en: 'The numbers from the tables at the top of index.html. The game uses them right away, except for what it builds at the start (the map, the shadows, the enemies already there…): press F5 for those. The browser remembers the yellow boxes; if you change the same number in the code, the code wins.',
     gsw: 'D Zahle us de Tabälle zoberst im index.html. S Spiil nimmt si grad, ussert für das, wo s am Aafang baut (d Charte, d Schätte, d Feind, wo scho da sind…): Druck dänn F5. De Browser merkt sich di gäle Fälder; wänn du di glichi Zahl im Code änderisch, gwünnt de Code.' },
   'Tout remettre':    { de: 'Alles zurücksetzen', en: 'Reset everything', gsw: 'Alles zruggsetze' },
+  'Codes de triche':  { de: 'Cheatcodes', en: 'Cheat codes', gsw: 'Cheatcodes' },
+  "Pendant le jeu, appuie sur Entrée, tape un code, puis Entrée. Pour annuler un code, retape-le.": { de: 'Drück im Spiel Enter, tipp einen Code ein, dann Enter. Um einen Code aufzuheben, tipp ihn nochmal ein.',
+    en: 'While playing, press Enter, type a code, then Enter. To cancel a code, type it again.', gsw: 'Druck im Spiil Enter, tipp en Code ii, dänn Enter. Zum en Code abstelle, tipp en nomal ii.' },
   'Pause — clique pour continuer': { de: 'Pause — klicke zum Weiterspielen', en: 'Paused — click to continue', gsw: 'Pause — klick zum Wiiterspile' },
   'Z Q S D':                  { de: 'W A S D', en: 'W A S D', gsw: 'W A S D' },   // les mêmes touches, sur un clavier allemand ou anglais
   'se déplacer / conduire':   { de: 'laufen / fahren', en: 'move / drive', gsw: 'laufe / fahre' },
@@ -304,6 +313,7 @@ const TRADUCTIONS = {
   'Invincible !':     { de: 'Unbesiegbar!', en: 'Invincible!', gsw: 'Unbsiegbar!' },
   'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
   'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
+  'Saute à une mission : MISSION8 pour la mission 8': { de: 'Springt zu einer Mission: MISSION8 für Mission 8', en: 'Jumps to a mission: MISSION8 for mission 8', gsw: 'Gumpt zunere Mission: MISSION8 für d Mission 8' },
   // les annonces
   'Moonwalk !':       { de: 'Moonwalk!', en: 'Moonwalk!', gsw: 'Moonwalk!' },
   'Superman !':       { de: 'Superman!', en: 'Superman!', gsw: 'Superman!' },
@@ -456,7 +466,7 @@ function tr(texte, valeurs = {}) {
 }
 // le menu : ses textes en français sont gardés dans data-fr, pour pouvoir changer de langue autant qu'on veut
 function traduireMenu() {
-  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, #reglages .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent);
+  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, #menu .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent);
   for (const b of document.querySelectorAll('#langues button')) b.classList.toggle('on', b.dataset.langue === langue);
   for (const b of document.querySelectorAll('.foule button')) b.classList.toggle('on', foule[b.parentNode.dataset.foule] === b.dataset.fr);
   document.documentElement.lang = langue;
@@ -948,6 +958,7 @@ const CASCADES = [
 //  alias : un autre code qui fait la même chose (ou une liste : ['ARMES', 'WAFFEN']).
 //  Ils peuvent aussi changer le jeu : vitesse (0.5 = deux fois plus lent), balles (0.5 = les balles
 //  font moitié moins mal), robot (il bouge par à-coups), invincible (plus rien ne fait mal).
+//  Le bouton 🎮 du menu les montre tous, avec leur texte : un code que tu ajoutes ici y sera aussi.
 // =====================================================================
 //  Un bras ou une jambe est en deux morceaux (haut et bas) : habillerMembre les colorie ensemble.
 //  Au bout, il y a b.brasD.main ou b.jambeD.chaussure.
@@ -1013,8 +1024,16 @@ const TRICHES = [
   // pour tester ce qui coûte cher : 100 000 $ d'un coup (change le nombre pour en avoir plus ou moins)
   { code: 'RICHE',       texte: 'Riche ! +100 000 $',   action: () => { J.argent += 100000; } },
   // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
-  { code: 'MISSION',     texte: 'Saut de mission',      action: n => sauterMission(n) },
+  { code: 'MISSION',     texte: 'Saute à une mission : MISSION8 pour la mission 8', action: n => sauterMission(n) },
 ];
+// la liste des codes (🎮 dans le menu) : une ligne par code, avec ses autres noms et son texte
+const boiteTriches = document.getElementById('triches');
+boiteTriches.onclick = e => e.stopPropagation();   // ne lance pas le jeu
+for (const t of TRICHES) {
+  const ligne = boiteTriches.querySelector('table').insertRow(), nom = document.createElement('th');   // th : le code ne se traduit pas
+  nom.textContent = [t.code, t.alias].flat().filter(c => c).join(', ');
+  ligne.append(nom); ligne.insertCell().textContent = t.texte;
+}
 
 // =====================================================================
 //  L'écran des réglages (⚙ dans le menu) : il change REGLAGES, ARMES, ARMES_ROBOT, VOITURES et ENNEMIS sans toucher au code.

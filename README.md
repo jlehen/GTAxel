@@ -14,6 +14,8 @@ Choisis aussi combien de **piétons** et de **voitures** vivent autour de toi : 
 
 Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le jeu ») : change-les sans toucher au code.
 
+Le bouton **🎮 Codes de triche** montre tous les codes de triche du jeu.
+
 | Touche | Action |
 |---|---|
 | Z Q S D ou flèches | Se déplacer / conduire |
@@ -75,7 +77,7 @@ Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'ongle
 
   Chaque fois, beaucoup de police arrive, et vite. Sème-la, puis rapporte le butin à la planque, la caravane de Trevor à Sandy Shores, dans ta voiture blindée.
 - **Carte** : la touche M affiche tout le pays en plein écran et met le jeu en pause. On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants. La légende, à gauche, dit ce que veut dire chaque rond. Elle te dit aussi dans quelle colonne et quelle ligne du tableau `CARTE` tu es.
-- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`, `GOKU`, `Z6PO` (ou `C3PO`)… à toi de voir ce qu'ils font ! Retape un code pour l'annuler. Et pour tester : `IDKFA` (ou `ARMES`, `WAFFEN`, `WEAPONS`) donne toutes les armes et plein de munitions, comme dans *Doom* ; `DIEU` (ou `GOD`, `GOTT`, et `IDDQD` comme dans *Doom*) te rend invincible, jusqu'à ce que tu le retapes ; `RICHE` donne 100 000 $ ; `MISSION` suivi d'un numéro saute directement à cette mission (`MISSION8` : le musée), avec une voiture blindée à côté s'il en faut une.
+- **Codes de triche** : appuie sur Entrée, tape le code, puis Entrée. Dans le menu, le bouton **🎮 Codes de triche** les montre tous. `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`, `GOKU`, `Z6PO` (ou `C3PO`)… à toi de voir ce qu'ils font ! Retape un code pour l'annuler. Et pour tester : `IDKFA` (ou `ARMES`, `WAFFEN`, `WEAPONS`) donne toutes les armes et plein de munitions, comme dans *Doom* ; `DIEU` (ou `GOD`, `GOTT`, et `IDDQD` comme dans *Doom*) te rend invincible, jusqu'à ce que tu le retapes ; `RICHE` donne 100 000 $ ; `MISSION` suivi d'un numéro saute directement à cette mission (`MISSION8` : le musée), avec une voiture blindée à côté s'il en faut une.
 - **Danse** : tape Q S D trois fois de suite (A S D sur un clavier QWERTY) : B.J. met son chapeau et fait le moonwalk, tourne sur lui-même en poussant son petit cri, puis prend la pose de Michael Jackson, la main entre les jambes : « Who's bad ? ». Bouge pour l'arrêter.
 - **WASTED** : si tu meurs, tu te réveilles à l'hôpital le plus proche (+ rouge sur la mini-carte) et tu perds 100 $.
 
@@ -132,7 +134,7 @@ Dans le code :
 6. **`GANGS`** : le nom, la couleur, le pâté (colonne et ligne de la carte), le nombre de membres et l'arme de chaque gang. Invente le tien !
 7. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture` (avec `rapide`, `blindee` ou `sansPolice` si tu veux), `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`, `blindage`, `voler`. Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ». Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
 8. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
-9. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`), plus solide (`balles: 0.5`) ou invincible (`invincible: true`), et avoir plusieurs noms (`alias: ['ARMES', 'WAFFEN']`).
+9. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`), plus solide (`balles: 0.5`) ou invincible (`invincible: true`), et avoir plusieurs noms (`alias: ['ARMES', 'WAFFEN']`). Ton code apparaît tout seul dans la liste **🎮 Codes de triche** du menu, avec son `texte`.
 10. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
 11. **`FOULES`** (tout en haut) : le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
 
