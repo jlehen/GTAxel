@@ -547,7 +547,7 @@ const REGLAGES = {
   vitesseVolMaj: 12,         // ...et chaque appui sur Maj en volant ajoute ça (1 fois : 24 m/s, 2 fois : 36 m/s...)
   vitesseVolMax: 100,        // ...jusqu'à ça (360 km/h, plus vite que l'avion !)
   tripleMaj: 0.6,            // secondes pour taper Maj 3 fois
-  roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36°, 1.5 = jusqu'à 60°
+  roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36° (Superman : le double), 1.5 = jusqu'à 60°
   graviteVoiture: 9.8,       // la vraie gravité de la Terre pour les voitures qui sautent (mets 1.6 pour rouler sur la Lune !)
   degatsVoitures: 1,         // 1 = normal, 2 = les voitures s'abîment deux fois plus vite, 0 = jamais
   // les accidents
@@ -5763,8 +5763,9 @@ function superman(dt) {
   if (joueurH.arme) joueurH.arme.visible = tir;   // il range son arme pour voler, sauf pour tirer
   // à l'horizontale, il est couché ; tout droit vers le haut, debout, le bras levé ; en descendant tout droit, debout, les pieds en bas
   animerHumain(joueurH, 0, dt, { superman: e, bascule, arme: tir, leve: bascule + J.tangage });   // couché, il lève les bras pour viser devant lui
-  // lancé, il penche dans ses virages (pas quand il tire : il vise). Il roule autour de la direction où il vole, même couché : d'où l'ordre 'YZX'
-  if (dt) f.roulis += ((tir ? 0 : roulisVirage(diffAngle(angleAvant, J.angleCorps) / dt) * e) - f.roulis) * Math.min(1, dt * 3);
+  // lancé, il penche dans ses virages (pas quand il tire : il vise), deux fois plus tôt et deux fois plus fort que l'avion : de derrière, son corps
+  // est mince, on ne le verrait pas sinon. Il roule autour de la direction où il vole, même couché : d'où l'ordre 'YZX'
+  if (dt) f.roulis += ((tir ? 0 : roulisVirage(diffAngle(angleAvant, J.angleCorps) / dt * 2) * 2 * e) - f.roulis) * Math.min(1, dt * 3);
   joueurH.g.quaternion.setFromEuler(new THREE.Euler(bascule, J.angleCorps, f.roulis, 'YZX'));
   poserCorps(joueurH, J.x, J.y + 0.95, J.z, 0.95);   // il bascule autour de son bassin
   membresMous(joueurH, dt, { raideur: 25, sol: hs, vx: f.vx, vy: J.vy, vz: f.vz });   // ses membres traînent un peu quand il tourne
