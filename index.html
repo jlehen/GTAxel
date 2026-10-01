@@ -536,7 +536,7 @@ const REGLAGES = {
   ombres: true,              // mets false si le jeu rame
   distanceVue: 900,          // mètres : au-delà, le brouillard cache tout (mets 500 si le jeu rame)
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
-  vitesseTelesiege: 15,      // m/s : le télésiège des stations de ski (Y sur la carte). Mets 5 pour un vrai télésiège, tout lent
+  vitesseTelesiege: 15,      // m/s : le télésiège des stations de ski (le rond bleu ❄ sur la carte du jeu). Mets 5 pour un vrai télésiège, tout lent
   frottementNeige: 0.4,      // à ski, en snowboard ou en luge : ce que la neige freine (m/s par seconde). Hors de la neige, ça freine 15 fois plus
   vitesseNage: 2.2,          // dans l'eau
   vitesseNageRapide: 4,      // dans l'eau, avec Maj
@@ -667,7 +667,7 @@ const VOITURES = [
   { nom: 'Jet-ski', modele: 'jetski', vitesse: 24, acceleration: 12, virage: 1.5, chance: 0, bateau: true, couleurs: ['#f0c020', '#1a5ad8', '#c81010', '#2a8a3a'],
     son: { grave: 60, aigu: 280, rapports: 1, rauque: 0.9, volume: 0.05, petarade: true } },
   // la glisse (glisse: true) : pas de moteur, c'est la pente qui fait avancer, et on ne glisse que sur la neige (tableau SOMMETS).
-  // On les trouve aux stations de ski (Y sur la carte), en bas et en haut du télésiège. vitesse : le plus vite qu'on descend ;
+  // On les trouve aux stations de ski (le rond bleu ❄ sur la carte du jeu), en bas et en haut du télésiège. vitesse : le plus vite qu'on descend ;
   // acceleration : quand on pousse (Z) sur le plat, sans dépasser 4 m/s
   { nom: 'Skis', modele: 'skis', vitesse: 30, acceleration: 3, virage: 1.5, chance: 0, glisse: true, couleurs: ['#c81010', '#1a5ad8', '#f0c020', '#111', '#e8e8e8'] },
   { nom: 'Snowboard', modele: 'snowboard', vitesse: 32, acceleration: 2.5, virage: 1.3, chance: 0, glisse: true, couleurs: ['#2a8a3a', '#e06010', '#6a1a8a', '#111', '#1a5ad8'] },
