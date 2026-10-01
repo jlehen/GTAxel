@@ -9,7 +9,7 @@ GTAxel est un jeu d'action en 3D, en monde ouvert, qui se joue dans le navigateu
 **Piliers de design**
 
 - **Liberté** : dès le départ, on va où on veut, à pied ou en voiture volée. Les missions sont un fil conducteur, pas un couloir.
-- **Pardonnant** : les ennemis visent mal, deux policiers seulement peuvent toucher B.J. à la fois, la vie remonte toute seule et la mort ne coûte que 100 $. On doit pouvoir faire des bêtises sans être puni trop vite. Les braquages sont l'exception voulue : ils doivent être « le plus réalistes possible », donc dangereux (vigiles qui visent bien, mitrailleuses, fumée toxique, heavy robot). Mourir y coûte toujours 100 $, et on garde le butin déjà volé.
+- **Pardonnant** : les ennemis visent mal, deux policiers seulement peuvent toucher B.J. à la fois, la vie remonte toute seule et la mort ne coûte que 100 $ : on doit pouvoir faire des bêtises sans être puni trop vite. Les braquages sont l'exception voulue : ils doivent être « le plus réalistes possible », donc dangereux (vigiles qui visent bien, mitrailleuses, fumée toxique, heavy robot). Mourir y coûte toujours 100 $, et on garde le butin déjà volé.
 - **Bidouillable** : tout tient dans un seul fichier `index.html`. Les réglages, les armes, les voitures, les ennemis, la carte, les sommets, les missions et les traductions sont des tableaux commentés en français, en haut du fichier. On voit une modification en appuyant sur F5. Les nombres de `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES` et `ENNEMIS` se changent aussi dans le menu, sans ouvrir le code (voir « L'écran des réglages »).
 - **Zéro installation** : un double-clic ou un lien suffit, pourvu qu'on ait Internet. En ligne : [jlehen.github.io/GTAxel](https://jlehen.github.io/GTAxel/).
 
