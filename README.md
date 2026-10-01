@@ -23,9 +23,9 @@ Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le j
 | Clic droit | Viser (zoom, lunette avec le fusil de sniper) |
 | Maj | Courir (en volant : chaque appui te fait aller plus vite) |
 | Maj, 3 fois de suite (vite) | Voler comme Superman (encore 3 fois : tu arrêtes de voler… et tu tombes !) |
-| Espace | Sauter (frein à main en voiture ; à ski aussi, tu sautes) |
+| Espace | Sauter (frein à main en voiture ; à ski aussi, tu sautes : un mètre, même à fond) |
 | Ctrl ou C | S'accroupir (on se fait moins toucher) |
-| E | Monter / descendre (voiture, bateau, avion, hélicoptère, heavy robot, skis, snowboard, luge ; en marche, tu sautes et tu roules par terre), acheter à l'armurerie, prendre l'ascenseur ou le télésiège (et en sauter en route !), parler au garagiste, voler le butin, poser la perceuse ou l'explosif, éjecter le pilote du heavy robot |
+| E | Monter / descendre (voiture, bateau, avion, hélicoptère, heavy robot, skis, snowboard, luge ; en marche, tu sautes et tu roules par terre), acheter à l'armurerie, prendre l'ascenseur, un télésiège ou la télécabine (et en sauter en route !), parler au garagiste, voler le butin, poser la perceuse ou l'explosif, éjecter le pilote du heavy robot |
 | V | Vue à la 1re / 3e personne |
 | 1 à 8 ou molette | Changer d'arme |
 | M | Carte de tout le pays (molette : zoom, souris ou flèches : se déplacer) |
@@ -42,14 +42,20 @@ En **hélicoptère** : Espace pour monter, C pour descendre, Z Q S D pour avance
 
 Sur une **échelle** : avance vers le mur pour grimper, recule pour descendre, Espace pour lâcher.
 
-À **ski**, en **snowboard** ou en **luge** : pas de moteur, c'est la pente qui te fait avancer. Z pour pousser sur le plat, S pour freiner, Q D pour tourner, Espace pour sauter. Pour ralentir, tourne en travers de la pente. On ne glisse que sur la neige.
+À **ski**, en **snowboard** ou en **luge** : pas de moteur, c'est la pente qui te fait avancer. Z pour pousser sur le plat (à ski avec tes bâtons, en snowboard avec le pied arrière), S pour freiner, Q D pour tourner, Espace pour sauter. Pour ralentir, tourne en travers de la pente. On ne glisse que sur la neige : plus bas, il n'y en a plus que sur les pistes.
 
 Astuce : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'onglet avec Ctrl+W.
 
 ## Le jeu
 
 - **Le pays** : Los Santos au sud (Vinewood, le centre et ses gratte-ciel, la plage de Vespucci, l'aéroport, le port), les collines de Vinewood, le désert de Grand Senora, Sandy Shores au bord de l'Alamo Sea, Grapeseed et ses champs, le mont Chiliad et Paleto Bay au nord, et à l'est les très hautes montagnes enneigées du mont Gordo et du San Chianski. Il faut environ 3 minutes en voiture pour le traverser. Des routes de campagne et des ponts relient les villes.
-- **Montagnes et ski** : le mont Gordo monte à 850 m (le mont Chiliad fait 270 m), et la neige le couvre jusqu'en bas. Sa station de ski (❄ bleu sur la mini-carte) est au bord de la route, à l'est de Grapeseed : un **télésiège** t'y emmène tout en haut en une minute et demie (E au départ, sous le toit de la gare ; E en route pour sauter du siège... de haut !). En bas et en haut, des **skis**, un **snowboard** et une **luge** t'attendent, et tu peux les prendre sur le télésiège. Plus la pente est raide, plus tu vas vite : jusqu'à 108 km/h à ski, 115 km/h en snowboard et 79 km/h en luge. Attention aux sapins, aux pylônes et aux grosses réceptions : tu tombes, et tu roules dans la neige !
+- **Montagnes et ski** : le mont Gordo monte à 850 m (le mont Chiliad fait 270 m). Tout le haut est blanc ; en descendant, la neige s'en va par plaques, sauf sur les pistes. Sa station de ski (❄ bleu sur la mini-carte) est au bord de la route, à l'est de Grapeseed. C'est un vrai domaine skiable :
+  - **4 remontées** : le télésiège du mont Gordo (tout en haut en 1 min 45), la télécabine des Marmottes (jusqu'à mi-hauteur), et au col entre les deux montagnes, le télésiège du San Chianski et le télésiège du Col. E au départ, sous le toit de la gare : les sièges ralentissent pour que tu montes, et le garde-corps se baisse en route. E en route pour sauter du siège... de haut !
+  - **8 pistes balisées** par des piquets de leur couleur : bleue (Les Marmottes), rouges, noires (La Gordo, Le San Chianski), et jaune pour le hors-piste. Elles sont dessinées sur la carte (M). Sur leurs côtés, des **kickers** : prends-les vite, et tu t'envoles !
+  - **Le boardercross** : une piste en zigzag avec des virages relevés, des bosses et trois kickers, chronométrée de la banderole DÉPART à la banderole ARRIVÉE. Bats ton record !
+  - **D'autres skieurs** descendent les pistes et prennent les remontées. Attention à ne pas leur rentrer dedans.
+  - Dans chaque gare, des **skis**, un **snowboard** et une **luge** t'attendent, et tu peux les prendre sur les remontées. B.J. s'habille pour l'occasion : combinaison fluo des années 80 et bâtons à ski, tenue de rider en snowboard... et en luge, surprise !
+  - Plus la pente est raide, plus tu vas vite : jusqu'à 108 km/h à ski, 115 km/h en snowboard et 79 km/h en luge. On se reçoit sans tomber, sauf de vraiment très haut. Attention aux sapins et aux pylônes : là, tu tombes, et tu roules dans la neige !
 - **Bâtiments** : entre dans l'armurerie, l'hôpital, le commissariat (monte sur le toit !), les supérettes, le garage LS Customs, la banque, les stations-service, la maison de Franklin, la villa de Michael (avec piscine), la caravane de Trevor, le bar Yellow Jack, les fermes, les hangars d'avions, les entrepôts du port, le bunker, le donjon du château, et les trois bâtiments à braquer : le musée d'art, la bijouterie Vangelico et la banque Pacific Standard. Au gratte-ciel Maze Bank, un ascenseur t'emmène sur le toit, à 141 m.
 - **Immeubles** : un immeuble sur 5 a une porte ouverte. Entre, monte l'escalier d'étage en étage, et va sur le toit : par l'escalier, par une échelle ou par un escalier de secours dehors. Certains ont une terrasse, où l'on monte par l'intérieur ou par dehors, avec un étage plus petit posé dessus. Chaque étage est meublé : un appartement (chambre, salle de bain, salon avec la télé, cuisine), un loft ou des bureaux ; les grands immeubles ont aussi une chambre d'enfant et une salle de jeux avec un billard et des bornes d'arcade.
 - **Objets à voler** : dans les immeubles, des objets tournent au-dessus des meubles. Anneau violet : un objet de valeur à voler (collier de perles, montre en or, bague en diamant, gros diamant, lingot d'or, liasse de billets, console de jeux, ordinateur portable, téléphone : de 150 à 1 500 $) ; attention, si la police te voit, c'est une étoile. Anneau turquoise : un bonus (des munitions pour tes armes, une boisson énergisante pour courir plus vite pendant 30 secondes, un pot-de-vin qui enlève une étoile), et parfois une trousse de soin ou un gilet. Ils reviennent au bout de 10 minutes.
@@ -88,7 +94,7 @@ Pour les tableaux `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES` et `ENNEMIS`, p
 Dans le code :
 
 
-1. **`REGLAGES`** : vitesses à pied et à la nage, vitesse des roquettes, vie, hauteur des chutes qui font mal et leurs dégâts (et ceux des roulades en sautant d'une voiture, et des piétons renversés), durée et force de la boisson énergisante, temps avant qu'un objet volé revienne, nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, hauteur des montagnes, vitesse du télésiège et ce que la neige freine à ski, touches et durée de la danse, vitesse de vol de Superman, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, accidents (à partir de quelle vitesse, force des tonneaux, temps avant qu'une voiture en feu explose, à partir de quand une voiture abîmée prend feu, hauteur des bornes), prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
+1. **`REGLAGES`** : vitesses à pied et à la nage, vitesse des roquettes, vie, hauteur des chutes qui font mal et leurs dégâts (et ceux des roulades en sautant d'une voiture, et des piétons renversés), durée et force de la boisson énergisante, temps avant qu'un objet volé revienne, nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, hauteur des montagnes, vitesse des remontées (en ligne et dans les gares), ce que la neige freine à ski, jusqu'où descend la neige, hauteur du saut à ski, nombre d'autres skieurs, touches et durée de la danse, vitesse de vol de Superman, gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, accidents (à partir de quelle vitesse, force des tonneaux, temps avant qu'une voiture en feu explose, à partir de quand une voiture abîmée prend feu, hauteur des bornes), prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses… Si le jeu rame, mets `distanceVue: 500` ou `ombres: false`.
 2. **`ARMES`** : dégâts, cadence de tir, prix, munitions de chaque arme, rayon d'explosion du bazooka, zoom de la lunette du fusil de sniper. **`TRESORS`** : les objets à voler dans les immeubles, leur prix et leur forme. Et **`ARMES_ROBOT`** : la mitrailleuse et les roquettes du heavy robot.
 3. **`VOITURES`** : vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de voiture, de bateau, d'avion ou d'hélicoptère (et des skis, du snowboard et de la luge, qui n'ont pas de moteur), et la chance de la croiser. Pour l'avion, la vitesse pour décoller ; pour l'hélicoptère, la vitesse à laquelle il monte. Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
 4. **`ENNEMIS`** : la vie, l'arme, les dégâts, la précision, jusqu'où ils te voient, le temps entre deux tirs et la vitesse de chaque ennemi : policiers, policiers d'élite, soldats nazis, Kommandant, Hitler, vigiles, membres de gang, chiens de garde, et la vitre, les dégâts et la vitesse du heavy robot. Donne un bazooka aux policiers (`arme: 6`), ou 5 000 points de vie à Hitler !
@@ -111,7 +117,7 @@ Dans le code :
    | `W` | Château Wolfenstein (soldats + Hitler) | `.` | Place |
    | `U` | Musée d'art (à braquer) | `V` | Bijouterie Vangelico (à braquer) |
    | `Q` | Banque Pacific Standard (à braquer) | `X` | Départ du joueur |
-   | `Y` | Station de ski : un télésiège monte au sommet le plus proche (voir `SOMMETS`) | `a` `b` `d`… | Lieux de mission |
+   | `Y` | Station de ski : un télésiège monte au sommet le plus proche (voir `SOMMETS`, `REMONTEES` et `PISTES_SKI`) | `a` `b` `d`… | Lieux de mission |
 
    Les autres signes sont le terrain :
 
@@ -127,13 +133,18 @@ Dans le code :
 
    Une route (`=`) doit toucher le coin d'un pâté pour se brancher sur les rues d'une ville.
 
-   **`SOMMETS`**, juste après la carte : les très hautes montagnes enneigées. Pour chacune : son nom, sa case (colonne et ligne), sa hauteur en mètres et son rayon en cases. Elle s'ajoute au terrain de la carte, et la neige la couvre jusqu'en bas. Mets de la terre dessous (pas de `~`), et un `Y` à son pied pour y faire monter un télésiège. Invente la tienne : un Everest de 3 000 m ?
+   **`SOMMETS`**, juste après la carte : les très hautes montagnes enneigées. Pour chacune : son nom, sa case (colonne et ligne), sa hauteur en mètres et son rayon en cases. Elle s'ajoute au terrain de la carte, et la neige couvre tout son haut. Mets de la terre dessous (pas de `~`), et un `Y` à son pied pour y faire monter un télésiège. Invente la tienne : un Everest de 3 000 m ?
+
+   **`REMONTEES`**, juste après : les autres télésièges et la télécabine. Pour chacune : son nom, la case de la gare du bas (`de`) et celle de la gare du haut (`vers`), et `cabines: true` pour une télécabine.
+
+   **`PISTES_SKI`**, juste après : les pistes de ski. Pour chacune : son nom, sa couleur (`'bleue'`, `'rouge'`, `'noire'` ou `'jaune'`), les cases par où elle passe, du haut vers le bas, et si tu veux ses `kickers` (à tant de mètres du départ) ou `boardercross: true`. Fais-la partir du haut d'une remontée et arriver au bas d'une autre : les skieurs enchaînent.
 
 6. **`GANGS`** : le nom, la couleur, le pâté (colonne et ligne de la carte), le nombre de membres et l'arme de chaque gang. Invente le tien !
 7. **`MISSIONS`** : invente tes missions avec ces étapes : `aller`, `voiture` (avec `rapide`, `blindee` ou `sansPolice` si tu veux), `eliminer` (`soldat`, `boss` ou `hitler`), `etoiles`, `semer`, `arme`, `blindage`, `voler`. Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ». Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
 8. **`CASCADES`** : invente tes pistes de cascades. Choisis la case de départ et la direction, puis mets bout à bout des morceaux : `droit`, `virage` (relevé ou non), `tremplin`, `looping`, `tire-bouchon`, `pont`, `bosses`.
-9. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`), plus solide (`balles: 0.5`) ou invincible (`invincible: true`), et avoir plusieurs noms (`alias: ['ARMES', 'WAFFEN']`).
-10. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
-11. **`FOULES`** (tout en haut) : le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
+9. **`TENUES_GLISSE`** (juste avant les codes de triche) : ce que B.J. porte à ski, en snowboard et en luge. Change les couleurs, ou invente une tenue.
+10. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`), plus solide (`balles: 0.5`) ou invincible (`invincible: true`), et avoir plusieurs noms (`alias: ['ARMES', 'WAFFEN']`).
+11. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
+12. **`FOULES`** (tout en haut) : le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).
