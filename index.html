@@ -592,6 +592,9 @@ const REGLAGES = {
   roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36°, 1.5 = jusqu'à 60°
   graviteVoiture: 9.8,       // la vraie gravité de la Terre pour les voitures qui sautent (mets 1.6 pour rouler sur la Lune !)
   degatsVoitures: 1,         // 1 = normal, 2 = les voitures s'abîment deux fois plus vite, 0 = jamais
+  impactsMurs: 300,          // combien d'impacts de balles restent sur les murs : au-delà, le plus vieux s'efface (0 = aucun impact)
+  impactsVoiture: 20,        // et combien de trous de balles restent sur chaque voiture
+  tailleImpacts: 1,          // 1 = normal, 3 = des impacts énormes
   // les accidents
   seuilAccident: 11,         // m/s (40 km/h) : un choc plus fort que ça, et la voiture part en tête-à-queue, en l'air ou en tonneaux
   forceTonneaux: 1,          // 2 = les voitures se retournent deux fois plus fort, 0 = elles glissent sans jamais se retourner
@@ -1866,6 +1869,12 @@ function toile(l, h, dessin) {
   t.anisotropy = renderer.capabilities.getMaxAnisotropy();
   return t;
 }
+// une tache ronde aux bords déchiquetés, de rayon r au plus, au milieu d'une image de 64 points (creux : de combien ses bords rentrent, de 0 à 1)
+function tache(g, r, couleur, creux = 0.25) {
+  g.fillStyle = couleur; g.beginPath();
+  for (let k = 0; k < 18; k++) { const a = k * Math.PI / 9, rr = r * entre(1 - creux, 1); g.lineTo(32 + Math.cos(a) * rr, 32 + Math.sin(a) * rr); }
+  g.closePath(); g.fill();
+}
 function grain(g, l, h, n, a, t = 2) {
   for (let i = 0; i < n; i++) { const v = Math.random() * 255 | 0; g.fillStyle = `rgba(${v},${v},${v},${a})`; g.fillRect(Math.random() * l, Math.random() * h, t, t); }
 }
@@ -1951,6 +1960,12 @@ const TEX = {
       for (let x = 0; x < l;) { x += entre(2, 9); g.lineTo(x, Math.random() < 0.2 ? entre(12, 26) : entre(2, 10)); x += entre(2, 9); g.lineTo(Math.min(x, l), entre(0, 3)); }   // un bout de verre (parfois long), puis un creux
       g.lineTo(l, 0); g.closePath(); g.fill(); g.stroke(); g.restore();
     } }),
+  // un impact de balle sur un mur : le plâtre arraché (clair), le creux (gris) et le trou (noir). Autour, on voit à travers
+  impact: toile(64, 64, (g) => { tache(g, 31, 'rgba(226,221,208,.95)', 0.55); tache(g, 17, '#7a7266', 0.35); tache(g, 9, '#0c0b0a');
+    g.strokeStyle = 'rgba(50,45,38,.7)'; g.lineWidth = 0.7;   // quelques fissures
+    for (let k = 0; k < 5; k++) { const a = entre(0, 6.3); g.beginPath(); g.moveTo(32 + Math.cos(a) * 8, 32 + Math.sin(a) * 8); g.lineTo(32 + Math.cos(a + 0.15) * entre(18, 30), 32 + Math.sin(a + 0.15) * entre(18, 30)); g.stroke(); } }),
+  // un trou de balle dans la tôle d'une voiture : la peinture partie (le métal nu, gris) et le trou (noir)
+  trou: toile(64, 64, (g) => { tache(g, 28, 'rgba(165,170,176,.95)', 0.4); tache(g, 14, '#050505', 0.15); }),
   carrelage: toile(128, 128, (g) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) { g.fillStyle = (x + y) % 2 ? '#e8e4dc' : '#cfc9bc'; g.fillRect(x * 32, y * 32, 32, 32); } g.fillStyle = 'rgba(0,0,0,.25)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 32, 0, 1, 128); g.fillRect(0, k * 32, 128, 1); } }),
   parquet: toile(128, 128, (g) => { for (let y = 0; y < 8; y++) for (let x = 0; x < 3; x++) { g.fillStyle = `hsl(28,${entre(35, 50)}%,${entre(30, 42)}%)`; g.fillRect(x * 48 + (y % 2) * 24 - 24, y * 16, 47, 15); } }),
   vagues: toile(128, 128, (g, l, h) => { g.fillStyle = '#808080'; g.fillRect(0, 0, l, h); for (let i = 0; i < 600; i++) { const v = Math.random() * 255 | 0; g.fillStyle = `rgba(${v},${v},${v},.25)`; g.beginPath(); g.ellipse(Math.random() * l, Math.random() * h, entre(4, 14), entre(1, 3), 0, 0, 7); g.fill(); } }),
@@ -3212,7 +3227,7 @@ function fusionner(geos, g, ombre = true) {   // ombre = false : rien ne fait d'
     const mesh = new THREE.Mesh(mergeGeometries(liste), MAT[nom]);
     mesh.castShadow = ombre && !SANS_OMBRE.includes(nom); mesh.receiveShadow = true;
     g.add(mesh);
-    if (!PAS_UN_MUR.includes(nom)) batiments.push(mesh);
+    if (!PAS_UN_MUR.includes(nom)) { batiments.push(mesh); mesh.userData.mur = true; }   // mur : une balle y laisse un impact
     liste.forEach(f => f.dispose());
   }
 }
@@ -3359,11 +3374,20 @@ function voit(a, b) {
   return butee(yeux(a), yeux(b)) >= 1;
 }
 // la balle d'un ennemi, du bout de son canon (depart) vers le point visé (arrivee) : un mur, un plancher, un meuble ou une colline
-// l'arrête, et « arrivee » est ramené là où elle s'écrase. Renvoie true si rien ne l'arrête.
+// l'arrête. Renvoie true si rien ne l'arrête avant le point visé. Une balle ratée (ratee) continue tout droit après ce point,
+// 60 m au plus. « arrivee » est ramené là où la balle finit : elle y laisse un impact, sur un mur ou sur la voiture de B.J.
 // On suit le chemin depuis le milieu du tireur : collé à un mur fin, le bout de son canon est déjà de l'autre côté
-function balleArrive(tireur, depart, arrivee) {
-  const d = V3(tireur.x, depart.y, tireur.z), t = butee(d, arrivee);
-  if (t < 1) arrivee.lerpVectors(d, arrivee, t);
+function balleArrive(tireur, depart, arrivee, ratee = false) {
+  const d = V3(tireur.x, depart.y, tireur.z), dir = arrivee.clone().sub(d).normalize(), t = butee(d, arrivee);
+  let mur = t < 1;
+  if (mur) arrivee.lerpVectors(d, arrivee, t);
+  else if (ratee) { const loin = arrivee.clone().addScaledVector(dir, 60), t2 = butee(arrivee, loin); arrivee.lerp(loin, t2); mur = t2 < 1; }
+  if (J.voiture) { // la voiture de B.J. est sur son chemin : la balle s'arrête dans la tôle
+    rayonImpact.set(d, dir); rayonImpact.near = 0; rayonImpact.far = d.distanceTo(arrivee) + 0.5;
+    const P = impactVoiture(J.voiture, rayonImpact);
+    if (P) { arrivee.copy(P); return t >= 1; }
+  }
+  if (mur) impactVers(arrivee, dir);
   return t >= 1;
 }
 // à quelle distance un rayon (depart, dir) touche le terrain (Infinity s'il ne le touche pas avant loin)
@@ -4228,7 +4252,7 @@ function creerVoiture(x, z, angle, police = false, type = police ? typePolice : 
 // fabrique (ou refait, au garage) la voiture en 3D, toute neuve
 function habillerVoiture(v) {
   if (v.m) scene.remove(v.m);
-  Object.assign(v, modeleVoiture(v.type, v.couleur, v.police, v.blindee), { abimee: false, degats: { avant: 0, arriere: 0, gauche: 0, droite: 0, toit: 0 }, fenetres: [], pieces: [], deformables: [], roquettes: 0, brule: 0 });
+  Object.assign(v, modeleVoiture(v.type, v.couleur, v.police, v.blindee), { abimee: false, degats: { avant: 0, arriere: 0, gauche: 0, droite: 0, toit: 0 }, fenetres: [], pieces: [], deformables: [], impacts: [], roquettes: 0, brule: 0 });
   v.m.rotation.order = 'YXZ';   // elle tourne, puis elle penche (dans les pentes)
   v.m.traverse(o => o.userData.voiture = v);
   scene.add(v.m);
@@ -4279,6 +4303,7 @@ function preparerDegats(v) {
     for (const [nom, forme] of Object.entries(p.formes)) poser(forme, v.mats[nom], g);
     return { g, zone: p.zone, seuil: p.seuil + Math.random() * 0.2 };
   });
+  recalerImpacts(v);   // les trous de balles déjà là passent sur les nouvelles pièces
 }
 // des plis dans la tôle : une ondulation de -1 à 1, qui revient tous les 70 cm environ. Toujours la même pour le même point,
 // et presque la même pour deux points voisins : la tôle se plie sans se déchirer
@@ -4328,6 +4353,7 @@ function bosseler(v, P, D, prof, rayon, maxi = 0.45) {
     }
     g.attributes.position.needsUpdate = g.attributes.normal.needsUpdate = true; g.computeBoundingSphere();
   }
+  recalerImpacts(v, P, rayon);   // les trous de balles de cet endroit suivent la tôle
 }
 // le côté le plus abîmé de la voiture, de 0 (neuve) à 1 (épave)
 const pireDegat = v => Math.max(...Object.values(v.degats));
@@ -5036,6 +5062,7 @@ function exploserVoiture(v, pos = v, parJoueur = true) {
     if (v === J.voiture) annonce('', R_.roquettesBlindage - v.roquettes > 0 ? tr('Le blindage tient ! (encore {n} roquettes)', { n: R_.roquettesBlindage - v.roquettes }) : tr('Le blindage est à bout : la prochaine roquette la fait sauter !'), 2.5);
     return;
   }
+  effacerImpacts(v);   // sur une carcasse brûlée, on ne voit plus les trous de balles
   toutCasser(v);   // les vitres volent en éclats et les pièces partent
   if (v === J.voiture) sortirVoiture();
   blesserConducteur(v, Infinity, parJoueur);   // celui qui la conduisait est tué
@@ -5088,6 +5115,85 @@ function eclats(mesh, n = 16) {
   const c = mesh.getWorldPosition(V3());
   for (let k = 0; k < n; k++) { const e = new THREE.Mesh(GEO_ECLAT, M_ECLAT); e.position.copy(c).add(V3(entre(-0.4, 0.4), entre(-0.2, 0.3), entre(-0.4, 0.4))); scene.add(e); lancerDebris(e, V3(entre(-2, 2), entre(0.5, 3), entre(-2, 2)), entre(1, 2)); }
 }
+// les impacts de balles : une petite image carrée posée à plat sur ce que la balle a touché, à peine devant pour qu'on la voie
+const GEO_IMPACT = new THREE.PlaneGeometry(1, 1), AXE_Z = V3(0, 0, 1);
+const matImpact = (map, o = {}) => new THREE.MeshStandardMaterial({ map, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, roughness: 0.9, ...o });
+const M_IMPACT = matImpact(TEX.impact), M_TROU_BALLE = matImpact(TEX.trou, { metalness: 0.4, roughness: 0.5 });
+const rayonImpact = Object.assign(new THREE.Raycaster(), { camera });
+// sur les murs : un seul objet pour tous les impacts (R_.impactsMurs au plus). Quand il est plein, le plus vieux laisse sa place
+const impactsMurs = new THREE.InstancedMesh(GEO_IMPACT, M_IMPACT, Math.max(1, R_.impactsMurs)), poseImpact = new THREE.Object3D();
+impactsMurs.count = 0; impactsMurs.frustumCulled = false; impactsMurs.receiveShadow = true; scene.add(impactsMurs);
+const C_IMPACT = new THREE.Color('#fff'), C_BRULE = new THREE.Color('#0c0a08');   // la couleur de chaque impact : telle quelle, ou noircie
+impactsMurs.setColorAt(0, C_IMPACT);
+let nImpacts = 0;   // combien on en a posé depuis le début
+// un impact au point P d'un mur (ou d'un plancher, d'un meuble), avec un peu de poussière. N : la direction qui sort du mur.
+// brule : une marque noire de brûlé, sans plâtre clair (les yeux laser)
+function impactMur(P, N, brule = false) {
+  if (R_.impactsMurs < 1) return;
+  const o = poseImpact, places = impactsMurs.instanceMatrix.count;
+  o.position.copy(P).addScaledVector(N, 0.01); o.quaternion.setFromUnitVectors(AXE_Z, N); o.rotateZ(entre(0, 6.3)); o.scale.setScalar(0.16 * R_.tailleImpacts * entre(0.7, 1.2)); o.updateMatrix();
+  impactsMurs.setMatrixAt(nImpacts % places, o.matrix); impactsMurs.instanceMatrix.needsUpdate = true;
+  impactsMurs.setColorAt(nImpacts % places, brule ? C_BRULE : C_IMPACT); impactsMurs.instanceColor.needsUpdate = true;
+  impactsMurs.count = Math.min(places, ++nImpacts);
+  const f = new THREE.Sprite(M_FUMEE.clone()); f.position.copy(P).addScaledVector(N, 0.1); f.scale.setScalar(0.1); scene.add(f); effets.push({ o: f, vie: 0.35, fumee: 0.35, taille: 0.25 });
+}
+// une balle finit au point P, en allant dans la direction dir : on cherche ce qui est dessiné juste là, pour poser l'impact
+// bien à plat dessus (un vrai rayon, long à calculer : seulement contre les formes des bâtiments d'à côté, et pas trop loin de la caméra)
+function impactVers(P, dir) {
+  if (R_.impactsMurs < 1 || P.distanceTo(camera.position) > 80) return;
+  const o = P.clone().addScaledVector(dir, -0.6);
+  const pres = batiments.filter(m => { const g = m.geometry; if (!g.boundingSphere) g.computeBoundingSphere(); return g.boundingSphere.distanceToPoint(o) < 1.2; });
+  rayonImpact.set(o, dir); rayonImpact.near = 0; rayonImpact.far = 1.2;
+  const hit = rayonImpact.intersectObjects(pres, false)[0];
+  if (hit) impactMur(hit.point, hit.face.normal.clone().transformDirection(hit.object.matrixWorld));
+}
+// sur les voitures : un trou collé à la pièce de tôle touchée (R_.impactsVoiture au plus par voiture). Il la suit si elle se détache
+const VITRES = [M_VITRE, M_VITRE_FELEE, M_VITRE_BRISEE];
+const tientALaVoiture = (t, v) => { for (let o = t.parent; o; o = o.parent) if (o === v.m) return true; return false; };
+// la pièce o de la voiture v est-elle de la tôle, où un trou se voit ? Pas une vitre, une roue, celui qui conduit, une épave, ni des skis
+const estTole = (v, o) => R_.impactsVoiture >= 1 && !v.detruite && !v.type.glisse && !VITRES.includes(o.material) && (o.parent === v.corps || v.pieces.some(p => p.g === o.parent));
+// la voiture v est sur le chemin du rayon (un Raycaster déjà réglé) : des étincelles, et un trou dans la tôle (pas dans un blindage).
+// Renvoie le point touché, ou null si le rayon passe à côté
+function impactVoiture(v, rayon) {
+  v.m.updateMatrixWorld(true);
+  const hit = rayon.intersectObject(v.m, true)[0];
+  if (!hit) return null;
+  etincelles(hit.point, 2, 1.5);
+  if (!estBlindee(v)) collerImpact(v, hit);
+  return hit.point;
+}
+// colle un trou de balle sur la pièce touchée (hit : ce que le rayon a trouvé), si c'est de la tôle ; t : un trou déjà fait, qu'on déplace
+function collerImpact(v, hit, t = null) {
+  const o = hit.object;
+  if (!estTole(v, o)) return;
+  if (!t) {
+    t = new THREE.Mesh(GEO_IMPACT, M_TROU_BALLE); t.raycast = () => {};   // les rayons ne le voient pas : la balle suivante touche la tôle dessous
+    t.scale.setScalar(0.08 * R_.tailleImpacts * entre(0.8, 1.2)); t.userData.tour = entre(0, 6.3);
+    v.impacts.push(t);
+    while (v.impacts.length > R_.impactsVoiture) v.impacts.shift().removeFromParent();
+  }
+  o.add(t);
+  t.position.copy(o.worldToLocal(hit.point.clone())).addScaledVector(hit.face.normal, 0.004);
+  t.quaternion.setFromUnitVectors(AXE_Z, hit.face.normal); t.rotateZ(t.userData.tour);
+}
+// la tôle a bougé (une bosse au point P de la voiture, large de « rayon » ; sans P : toute la voiture) : chaque trou de balle
+// est recollé sur la tôle, là où elle est maintenant : la plus proche de son ancienne place, le long d'un rayon qui part de 40 cm
+// devant lui (un rétroviseur devant le trou ne le prend pas). S'il n'y a plus de tôle sur ce rayon, il s'efface
+function recalerImpacts(v, P = null, rayon = 0) {
+  if (!v.impacts.length) return;
+  v.m.updateMatrixWorld(true);
+  v.impacts = v.impacts.filter(t => {
+    if (!tientALaVoiture(t, v)) return false;   // parti avec une pièce qui s'est détachée : on l'oublie
+    const W = t.getWorldPosition(V3());
+    if (P && v.m.worldToLocal(W.clone()).distanceTo(P) > rayon + 0.2) return true;
+    const N = V3(0, 0, 1).transformDirection(t.matrixWorld);
+    rayonImpact.set(W.addScaledVector(N, 0.4), N.negate()); rayonImpact.near = 0; rayonImpact.far = 1.4;
+    const hit = rayonImpact.intersectObject(v.m, true).filter(h => estTole(v, h.object)).reduce((m, h) => !m || Math.abs(h.distance - 0.4) < Math.abs(m.distance - 0.4) ? h : m, null);
+    if (hit) collerImpact(v, hit, t); else t.removeFromParent();
+    return !!hit;
+  });
+}
+function effacerImpacts(v) { for (const t of v.impacts) t.removeFromParent(); v.impacts = []; }
 
 // =====================================================================
 //  Les braquages : le butin, l'alarme, la fumée toxique, les lasers, les mitrailleuses, le coffre-fort
@@ -5361,7 +5467,7 @@ function majTourelles(B, dt) {
     if (!reussi) cible.add(V3(entre(-1, 1), entre(-0.8, 0.8), entre(-1, 1)));
     t.canon.updateMatrixWorld(true);
     const depart = t.canon.localToWorld(V3(0, 0.02, 0.78));
-    const arrive = balleArrive(bout, depart, cible);   // un mur entre elle et toi arrête la balle
+    const arrive = balleArrive(bout, depart, cible, !reussi);   // un mur entre elle et toi arrête la balle
     traceur(depart, cible); flash(depart, 0.45); lumiereTir.position.copy(depart); lumiereTir.intensity = 40;
     bruit(0.35 * clamp(1 - d / 80, 0.2, 1), 3200, 0.08);
     if (reussi && arrive) blesserJoueur(R_.degatsMitrailleuse * parTriche('balles'));
@@ -5554,7 +5660,7 @@ function tirRobot(r, d) {
   if (J.accroupi) chance *= 0.5; if (J.vitesse > 6) chance *= 0.6; if (abrite()) chance *= 0.7;
   const reussi = Math.random() < chance && aSonTour(d);
   if (!reussi) arrivee.add(V3(entre(-2.5, 2.5), entre(-1, 2), entre(-2.5, 2.5)));
-  const arrive = balleArrive(r, depart, arrivee);   // un mur entre lui et toi arrête la balle
+  const arrive = balleArrive(r, depart, arrivee, !reussi);   // un mur entre lui et toi arrête la balle
   balleLourde(depart, arrivee); flash(depart, 1.1);
   bruit(0.6 * clamp(1 - d / 150, 0.1, 1), 1100, 0.2);
   if (!reussi || !arrive) return;
@@ -6084,11 +6190,13 @@ function tirer(a = ARMES[J.arme]) {
         const q = vc.m.quaternion.clone().invert();
         abimer(vc, vc.m.worldToLocal(hit.point.clone()), raycaster.ray.direction.clone().applyQuaternion(q), a.degats / 400, true);
         if (!estBlindee(vc)) blesserConducteur(vc, a.degats);   // et celui qui conduit est touché
+        impactVoiture(vc, raycaster);   // le trou de la balle (sur un blindage : juste des étincelles)
       }
       if (!p && !vc && u.robot) toucherRobot(u.robot, a.degats, hit.object);   // le heavy robot : la vitre, puis le pilote
       if (!p && !vc && u.tourelle && (u.tourelle.vie -= a.degats) <= 0) { // une mitrailleuse de la banque, détruite
         u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
       }
+      if (u.mur) impactMur(point, hit.face.normal.clone().transformDirection(hit.object.matrixWorld), a.laser);   // un mur, un plancher, un meuble
       flash(point, 0.3);
       if (a.laser) etincelles(point, 2, 2);   // ça grésille là où les rayons touchent
     }
@@ -7025,7 +7133,7 @@ function tirEnnemi(p, d) {
     return;
   }
   if (!reussi) arrivee.add(new THREE.Vector3(entre(-2, 2), entre(-1, 1.5), entre(-2, 2)));
-  const arrive = balleArrive(p, depart, arrivee);   // un mur entre lui et toi arrête la balle
+  const arrive = balleArrive(p, depart, arrivee, !reussi);   // un mur entre lui et toi arrête la balle
   traceur(depart, arrivee); flash(depart, 0.4);
   bruit(0.4 * clamp(1 - d / 120, 0, 1), 1800, 0.18);
   if (reussi && arrive) blesserJoueur(degats * parTriche('balles'));
@@ -7711,7 +7819,7 @@ function mettreAJour(dt) {
   for (const e of effets) {
     e.vie -= dt;
     if (e.boule) { e.o.scale.setScalar(e.boule * (2.6 - e.vie * 2)); e.o.material.opacity = e.vie / 0.6; } // boule de feu
-    if (e.fumee) { const t = 1 - e.vie / e.fumee; e.o.scale.setScalar(0.4 + t * 1.6); e.o.material.opacity = 0.6 * (1 - t); } // bouffée de fumée
+    if (e.fumee) { const t = 1 - e.vie / e.fumee; e.o.scale.setScalar((0.4 + t * 1.6) * (e.taille || 1)); e.o.material.opacity = 0.6 * (1 - t); } // bouffée de fumée (taille : plus petite, pour la poussière d'un impact)
     if (e.vie <= 0) { (e.dans || scene).remove(e.o); if (e.o.isLine) e.o.geometry.dispose(); if (e.boule || e.fumee) e.o.material.dispose(); e.jeter?.dispose(); }
   }
   lumiereTir.intensity = Math.max(0, lumiereTir.intensity - dt * 1400);
@@ -7783,7 +7891,7 @@ etat('Clique pour jouer');
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   TELESIEGES, SOMMETS, neigeSous, telesiegeProche, sommetEn, REMONTEES, PISTES_SKI, pisteSkiEn, neigeEn, siegeEn, siegeLibre, reliefSki, creerSkieur, TENUES_GLISSE, rhabillerBJ, entrerVoiture, sortirVoiture, animerHumain, blesserConducteur,
-  soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
+  soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, ecraser, effets, capeBJ, rayonsLaser, majLaser, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
