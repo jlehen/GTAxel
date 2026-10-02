@@ -1,6 +1,6 @@
 # GTAxel
 
-Un jeu d'action en 3D dans un grand pays inspiré de celui de **GTA 5**, mélangé à **Wolfenstein** : tu es **B.J. Blazkowicz**. Tu parcours Los Santos, les collines, le désert et les montagnes, tu prends le bus des pistes pour dévaler les pentes enneigées du mont Gordo à ski, en snowboard ou en luge, en faisant des figures sur les bosses (ou tu remontes tout en skis de rando), tu voles des voitures, des bateaux, des avions et des hélicoptères, tu échappes à la police, tu achètes des armes, tu attaques le bunker nazi du Kommandant à Fort Zancudo, tu affrontes le boss final, **Hitler**, dans le château Wolfenstein, sur le mont Chiliad... puis tu braques un musée, une bijouterie et une grande banque, dans une voiture blindée façon **Mad Max**.
+Un jeu d'action en 3D dans un grand pays inspiré de celui de **GTA 5**, mélangé à **Wolfenstein** : tu es **B.J. Blazkowicz**, ou sa fille **Jess**. Tu parcours Los Santos, les collines, le désert et les montagnes, tu prends le bus des pistes pour dévaler les pentes enneigées du mont Gordo à ski, en snowboard ou en luge, en faisant des figures sur les bosses (ou tu remontes tout en skis de rando), tu voles des voitures, des bateaux, des avions et des hélicoptères, tu échappes à la police, tu achètes des armes, tu attaques le bunker nazi du Kommandant à Fort Zancudo, tu affrontes le boss final, **Hitler**, dans le château Wolfenstein, sur le mont Chiliad... puis tu braques un musée, une bijouterie et une grande banque, dans une voiture blindée façon **Mad Max**.
 
 ## Jouer
 
@@ -10,7 +10,7 @@ Ou ouvre `index.html` dans un navigateur (double-clic). Il faut une connexion In
 
 Dans le menu, choisis ta langue : **Français**, **Deutsch**, **English** ou **Züritüütsch**. Le navigateur s'en souvient pour la prochaine fois. Même les enseignes des magasins changent de langue. En allemand et en anglais, les touches pour se déplacer sont W A S D.
 
-Choisis ton personnage : une **fille** ou un **garçon**, et la couleur de ses **cheveux** (blonds, châtains, bruns, noirs, roux, roses, bleus ou verts). Tu peux en changer quand tu veux, même en pause (Échap).
+Choisis ton personnage : **B.J.**, le garçon tout en muscles, ou sa fille **Jess**, en jupe et talons hauts, et la couleur de ses **cheveux** (blonds, châtains, bruns, noirs, roux, roses, bleus ou verts). Le menu te le montre de face. Tu peux en changer quand tu veux, même en pause (Échap).
 
 Choisis aussi combien de **piétons** et de **voitures** vivent autour de toi : **Peu**, **Normal**, **Beaucoup** ou **Énorme**. Au départ, c'est Beaucoup. Si le jeu rame, prends moins de monde.
 
@@ -160,6 +160,6 @@ Dans le code :
 10. **`TRICHES`** : renomme les codes ou invente les tiens (un `effet` change l'apparence de B.J., une `action` fait quelque chose tout de suite). Un code peut aussi te rendre plus rapide (`vitesse: 2`), plus solide (`balles: 0.5`) ou invincible (`invincible: true`), te donner les yeux laser (`laser: true`), le sceptre de foudre (`eclair: true`) ou la chute qui écrase (`ecrase: true`), te faire montrer ton biceps (`biceps: 1.3`, en secondes), et avoir plusieurs noms (`alias: ['ARMES', 'WAFFEN']`). Ton code apparaît tout seul dans la liste **🎮 Codes de triche** du menu, avec son `texte`.
 11. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
 12. **`FOULES`** (tout en haut) : le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
-13. **`CHEVEUX`** (tout en haut) : les couleurs de cheveux du menu. Change-les, ou ajoute la tienne : `'Violets': '#8a3ad8'`.
+13. **`HEROS`** et **`CHEVEUX`** (tout en haut) : le nom et la carrure de chaque héros du menu (épaules, taille, bras, cou, cuisses, poitrine), la couleur de la jupe et des talons, et les couleurs de cheveux. Change les nombres, ajoute ta couleur (`'Violets': '#8a3ad8'`), ou invente un héros.
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).

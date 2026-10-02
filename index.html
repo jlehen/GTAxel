@@ -52,9 +52,13 @@
   #langues { margin: 2px 0 10px; }
   .foule, .heros { font-size: 18px; margin-bottom: 4px; }
   .foule span, .heros span { display: inline-block; min-width: 100px; text-align: right; margin-right: 4px; color: #f0c850; font-weight: 700; }
-  /* la pastille de la couleur des cheveux, sur son bouton */
-  .heros button[style]::before { content: ''; display: inline-block; width: 13px; height: 13px; margin-right: 6px; vertical-align: -1px;
-                                 border-radius: 50%; border: 1px solid rgba(255,255,255,.7); background: var(--pastille); }
+  /* les choix du menu : l'aperçu du héros à gauche (avec son nom dessous), les lignes de boutons à droite */
+  #choix { display: flex; align-items: center; justify-content: center; gap: 14px; max-width: 100%; }
+  #apercu { display: block; width: 104px; height: 176px; border-radius: 12px; border: 2px solid rgba(255,255,255,.35); background: rgba(0,0,0,.4); }
+  #nom-heros { font-size: 15px; font-weight: 700; color: #f0c850; margin-top: 2px; }
+  /* une couleur de cheveux : un rond de cette couleur (son nom s'affiche quand la souris passe dessus) ; celle qu'on a choisie est entourée de jaune */
+  #menu .heros button.pastille { width: 30px; height: 30px; padding: 0; vertical-align: middle; border-radius: 50%; background: var(--pastille); }
+  #menu .heros button.pastille.on { border-color: #fff; box-shadow: 0 0 0 3px #f0c850; }
   #menu button { font: 700 18px 'Roboto Condensed', Arial, sans-serif; color: #fff; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35);
                 border-radius: 18px; padding: 4px 16px; margin: 3px; cursor: pointer; }
   #menu button:hover { border-color: #f0c850; }
@@ -106,10 +110,15 @@
   <h1>GTAxel</h1>
   <div id="version"></div>
   <div id="langues"></div>
-  <div class="heros" data-heros="genre"><span>Personnage :</span></div>
-  <div class="heros" data-heros="cheveux"><span>Cheveux :</span></div>
-  <div class="foule" data-foule="pietons"><span>Piétons :</span></div>
-  <div class="foule" data-foule="voitures"><span>Voitures :</span></div>
+  <div id="choix">
+    <div><canvas id="apercu"></canvas><div id="nom-heros"></div></div>
+    <div>
+      <div class="heros" data-heros="genre"><span>Personnage :</span></div>
+      <div class="heros" data-heros="cheveux"><span>Cheveux :</span></div>
+      <div class="foule" data-foule="pietons"><span>Piétons :</span></div>
+      <div class="foule" data-foule="voitures"><span>Voitures :</span></div>
+    </div>
+  </div>
   <details id="reglages">
     <summary>⚙ <span class="tr">Réglages</span></summary>
     <p class="tr">Les nombres des tableaux du haut de index.html. Le jeu en tient compte tout de suite, sauf pour ce qu'il construit au départ (la carte, les ombres, les ennemis déjà là…) : appuie alors sur F5. Le navigateur se souvient des cases en jaune ; si tu changes le même nombre dans le code, c'est le code qui gagne.</p>
@@ -120,7 +129,7 @@
     <p class="tr">Pendant le jeu, appuie sur Entrée, tape un code, puis Entrée. Pour annuler un code, retape-le.</p>
     <table></table>
   </details>
-  <div id="histoire">Tu es B.J. Blazkowicz. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !</div>
+  <div id="histoire">Tu es {nom}. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !</div>
   <div id="etat">Chargement… (il faut une connexion Internet)</div>
   <table>
     <tr><td>Z Q S D</td><td>se déplacer / conduire</td></tr>
@@ -143,11 +152,19 @@
 
 <script>
 // =====================================================================
-//  LE HÉROS : une fille ou un garçon, et la couleur de ses cheveux. On les choisit dans le menu.
-//  Ajoute ta couleur (par exemple 'Violets': '#8a3ad8') : elle aura son bouton dans le menu !
-//  Pour trouver le code d'une couleur, cherche « sélecteur de couleur » sur Internet.
-//  Ce que la fille a de différent (sa queue de cheval, ses cils...) est plus bas, dans majHeros.
+//  LES HÉROS : le garçon et la fille du menu, et la couleur de leurs cheveux. Le menu montre celui qu'on a choisi.
+//  nom : il s'écrit sous l'aperçu, et dans l'histoire (« Tu es... »). Jess est la fille de B.J., dans le jeu Wolfenstein: Youngblood.
+//  epaules, taille, bras, avantBras, cou, cuisses : leur grosseur (1 = comme tout le monde, 1.35 = 35 % plus gros : des muscles !)
+//  poitrine : la bosse de chaque pectoral, ou de chaque sein, en mètres (0 = tout plat)
+//  fille: true = une queue de cheval et des cils     jupe : sa couleur (les jambes sont alors nues)     talons : la couleur des talons hauts
+//  Change les nombres et les couleurs, ou invente un héros : 'Géant': { nom: 'Hulk', epaules: 1.4, bras: 1.8, ... }
 // =====================================================================
+const HEROS = {
+  'Garçon': { nom: 'B.J. Blazkowicz', epaules: 1.15, taille: 0.95, bras: 1.35, avantBras: 1.2, cou: 1.3, cuisses: 1.15, poitrine: 0.035 },
+  'Fille':  { nom: 'Jess Blazkowicz', epaules: 0.9,  taille: 0.82, bras: 0.9,  avantBras: 0.9, cou: 0.85, cuisses: 1,   poitrine: 0.026, fille: true, jupe: '#4a5238', talons: '#b3122e' },
+};
+//  Les cheveux : ajoute ta couleur (par exemple 'Violets': '#8a3ad8'), elle aura son bouton dans le menu !
+//  Pour trouver le code d'une couleur, cherche « sélecteur de couleur » sur Internet.
 const CHEVEUX = {
   'Blonds':   '#b8955a',
   'Châtains': '#7a5230',
@@ -158,7 +175,7 @@ const CHEVEUX = {
   'Bleus':    '#2a7ae0',
   'Verts':    '#3ac04a',
 };
-const CHOIX_HEROS = { genre: ['Garçon', 'Fille'], cheveux: Object.keys(CHEVEUX) };   // les boutons de chaque ligne du menu
+const CHOIX_HEROS = { genre: Object.keys(HEROS), cheveux: Object.keys(CHEVEUX) };   // les boutons de chaque ligne du menu
 // le choix au tout premier lancement ; ensuite, le navigateur se souvient de ce qu'on a choisi
 const heros = { genre: 'Garçon', cheveux: 'Blonds' };
 for (const k in heros) {
@@ -194,10 +211,10 @@ for (const k in foule) {
 const LANGUES = { fr: 'Français', de: 'Deutsch', en: 'English', gsw: 'Züritüütsch' };
 const TRADUCTIONS = {
   // le menu
-  'Tu es B.J. Blazkowicz. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !': {
-    de: 'Du bist B.J. Blazkowicz. Streif durch Los Santos und Umgebung, jag die Nazis und erledige Hitler im Schloss Wolfenstein auf dem Mount Chiliad!',
-    en: 'You are B.J. Blazkowicz. Roam Los Santos and the countryside, hunt the Nazis and take out Hitler in Castle Wolfenstein, on top of Mount Chiliad!',
-    gsw: 'Du bisch de B.J. Blazkowicz. Streif dur Los Santos und d Umgäbig, jag d Nazis und mach de Hitler im Schloss Wolfenstein uf em Mount Chiliad fertig!' },
+  'Tu es {nom}. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !': {
+    de: 'Du bist {nom}. Streif durch Los Santos und Umgebung, jag die Nazis und erledige Hitler im Schloss Wolfenstein auf dem Mount Chiliad!',
+    en: 'You are {nom}. Roam Los Santos and the countryside, hunt the Nazis and take out Hitler in Castle Wolfenstein, on top of Mount Chiliad!',
+    gsw: 'Du bisch {nom}. Streif dur Los Santos und d Umgäbig, jag d Nazis und mach de Hitler im Schloss Wolfenstein uf em Mount Chiliad fertig!' },
   'Chargement… (il faut une connexion Internet)': { de: 'Lädt… (braucht eine Internetverbindung)', en: 'Loading… (needs an Internet connection)', gsw: 'Am Lade… (es bruucht Internet)' },
   'Clique pour jouer':             { de: 'Klicke zum Spielen', en: 'Click to play', gsw: 'Klick zum Spile' },
   'Personnage :':     { de: 'Figur:', en: 'Character:', gsw: 'Figur:' },
@@ -552,8 +569,12 @@ function tr(texte, valeurs = {}) {
   return ((TRADUCTIONS[texte] || {})[langue] || texte).replace(/\{(\w+)\}/g, (_, k) => valeurs[k]);
 }
 // le menu : ses textes en français sont gardés dans data-fr, pour pouvoir changer de langue autant qu'on veut
+// ({nom}, dans l'histoire : le nom du héros choisi)
 function traduireMenu() {
-  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, .heros span, .heros button, #menu .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent);
+  const nom = HEROS[heros.genre].nom;
+  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, .heros span, .heros button:not(.pastille), #menu .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent, { nom });
+  for (const b of document.querySelectorAll('.pastille')) b.title = tr(b.dataset.fr);   // le nom de la couleur
+  document.getElementById('nom-heros').textContent = nom;
   for (const b of document.querySelectorAll('#langues button')) b.classList.toggle('on', b.dataset.langue === langue);
   for (const b of document.querySelectorAll('.foule button')) b.classList.toggle('on', foule[b.parentNode.dataset.foule] === b.dataset.fr);
   for (const b of document.querySelectorAll('.heros button')) b.classList.toggle('on', heros[b.parentNode.dataset.heros] === b.dataset.fr);
@@ -566,12 +587,12 @@ for (const [l, nom] of Object.entries(LANGUES)) {
   b.onclick = e => { e.stopPropagation(); langue = l; try { localStorage.langue = l; } catch {} traduireMenu(); };   // stopPropagation : ne lance pas le jeu
   document.getElementById('langues').append(b);
 }
-// les boutons du héros : une ligne pour la fille ou le garçon, une pour la couleur des cheveux (chaque bouton a une pastille de sa couleur).
-// Le jeu est prévenu (l'évènement « heros ») : il change le personnage tout de suite (voir majHeros)
+// les boutons du héros : une ligne pour le garçon ou la fille, une pour la couleur des cheveux (chaque bouton est un rond de sa couleur).
+// Le jeu est prévenu (l'évènement « heros ») : il change le personnage et l'aperçu tout de suite (voir majHeros)
 for (const ligne of document.querySelectorAll('.heros')) for (const nom of CHOIX_HEROS[ligne.dataset.heros]) {
   const b = document.createElement('button'), k = ligne.dataset.heros;
-  b.textContent = nom;
-  if (k === 'cheveux') b.style.setProperty('--pastille', CHEVEUX[nom]);
+  b.dataset.fr = nom;
+  if (k === 'cheveux') { b.className = 'pastille'; b.style.setProperty('--pastille', CHEVEUX[nom]); } else b.textContent = nom;
   b.onclick = e => { e.stopPropagation(); heros[k] = nom; try { localStorage['heros-' + k] = nom; } catch {} traduireMenu(); dispatchEvent(new Event('heros')); };
   ligne.append(b);
 }
@@ -3711,9 +3732,19 @@ const tour = (points, n = 20, angle = Math.PI * 2) => new THREE.LatheGeometry(po
 // un morceau de bras ou de jambe, de longueur l, qui pend sous son articulation : rond aux deux bouts, plus fin en bas qu'en haut
 const QUART = [0, 0.4, 0.8, 1.2, Math.PI / 2];
 const fuseau = (rHaut, rBas, l) => tour([...QUART.map(a => [rBas * Math.sin(a), -l - rBas * Math.cos(a)]), ...QUART.map(a => [rHaut * Math.cos(a), rHaut * Math.sin(a)])], 12);
+// découpe un profil [rayon, hauteur] en morceaux n fois plus petits : la forme ne change pas, mais on peut ensuite la bosseler (voir bomber)
+const affiner = (pts, n) => pts.flatMap((p, i) => i ? Array.from({ length: n }, (_, k) => [lerp(pts[i - 1][0], p[0], (k + 1) / n), lerp(pts[i - 1][1], p[1], (k + 1) / n)]) : [p]);
+// le torse : large aux épaules, plus fin à la taille, aplati d'avant en arrière
+const PROFIL_TORSE = [[0, -0.3], [0.165, -0.3], [0.175, -0.12], [0.215, 0.08], [0.23, 0.18], [0.205, 0.25], [0.1, 0.295], [0, 0.3]];
+// le blason : un morceau du devant du torse, à peine plus gros que lui, où l'image du « S » est posée bien à plat (vue de face)
+// (n : en combien de tranches il est découpé ; fin : voir affiner)
+function formeBlason(n = 8, fin = 1) {
+  const g = tour(affiner([[0.215, 0.06], [0.219, 0.08], [0.234, 0.18], [0.209, 0.25]], fin), n, 0.84).rotateY(-0.42).scale(1, 1, 0.58), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) g.attributes.uv.setXY(i, 0.5 + p.getX(i) / 0.19, (p.getY(i) - 0.06) / 0.19);
+  return g;
+}
 const GEO = {
-  // le torse : large aux épaules, plus fin à la taille, aplati d'avant en arrière
-  torse: tour([[0, -0.3], [0.165, -0.3], [0.175, -0.12], [0.215, 0.08], [0.23, 0.18], [0.205, 0.25], [0.1, 0.295], [0, 0.3]]).scale(1, 1, 0.58),
+  torse: tour(PROFIL_TORSE).scale(1, 1, 0.58),
   bassin: new RoundedBoxGeometry(0.37, 0.2, 0.21, 2, 0.08), ceinture: new THREE.CylinderGeometry(0.173, 0.173, 0.045, 20).scale(1, 1, 0.6),
   tete: new THREE.SphereGeometry(0.125, 20, 14).scale(0.9, 1.1, 1), cou: new THREE.CylinderGeometry(0.05, 0.06, 0.12, 8),
   nez: new THREE.SphereGeometry(0.02, 8, 6).scale(0.8, 1.4, 1), oreille: new THREE.SphereGeometry(0.032, 8, 6).scale(0.4, 1, 0.7),
@@ -3746,13 +3777,49 @@ const GEO = {
     for (let i = 0; i < p.count; i++) { const u = p.getX(i) * 2, t = 0.5 - p.getY(i);
       p.setXYZ(i, u * (0.21 + 0.13 * t), -1.08 * t, 0.05 * u * u * (1 - t) - 0.03 * Math.sin(u * 5 + t * 4) * t); }
     g.computeVertexNormals(); return g; })(),
-  // le blason : un morceau du devant du torse, à peine plus gros que lui, où l'image du « S » est posée bien à plat (vue de face)
-  blason: (() => { const g = tour([[0.215, 0.06], [0.219, 0.08], [0.234, 0.18], [0.209, 0.25]], 8, 0.84).rotateY(-0.42).scale(1, 1, 0.58), p = g.attributes.position;
-    for (let i = 0; i < p.count; i++) g.attributes.uv.setXY(i, 0.5 + p.getX(i) / 0.19, (p.getY(i) - 0.06) / 0.19);
-    return g; })(),
+  blason: formeBlason(),
+  // la jupe de la fille : une cloche autour du bassin, et une autour de chaque cuisse, qui suit la jambe quand elle marche ou s'assoit
+  // (comme le pagne de Zeus)
+  jupe: tour([[0.245, -0.3], [0.228, -0.15], [0.21, 0], [0.19, 0.1]], 24).scale(1, 1, 0.7),
+  jupeCuisse: tour([[0.118, -0.3], [0.11, -0.15], [0.104, 0], [0.09, 0.052], [0.052, 0.09], [0, 0.104]], 16),   // (fermée en haut : elle couvre la hanche)
   boucle: new THREE.TorusGeometry(0.02, 0.008, 6, 12, Math.PI * 1.5),   // l'accroche-cœur
 };
-// la coiffure de la fille (voir majHeros) : les mêmes cheveux, avec une queue de cheval derrière la tête (un nœud, et la mèche qui pend
+// Les talons hauts : le pied est sur la pointe, le talon levé de 5,5 cm (TALONS : le personnage est grandi d'autant, voir animerHumain).
+// Le bout rond de la jambe fait le talon du pied. La chaussure : le bout, à plat par terre ; le dessus du pied, qui descend vers lui ;
+// le contrefort, derrière le talon ; et le talon aiguille. Tout est placé par rapport à la cheville, puis ramené au milieu de la chaussure
+const TALONS = 0.055;
+GEO.escarpin = mergeGeometries([
+  new THREE.SphereGeometry(1, 12, 8).scale(0.043, 0.022, 0.06).translate(0, -0.083, 0.135),
+  new THREE.SphereGeometry(1, 12, 8).scale(0.04, 0.024, 0.062).rotateX(0.46).translate(0, -0.055, 0.07),
+  new THREE.SphereGeometry(0.05, 12, 8).translate(0, -0.012, -0.01),
+  new THREE.CylinderGeometry(0.013, 0.006, 0.05, 8).translate(0, -0.08, -0.025),
+]).translate(0, 0, -0.045);
+// Les héros du menu ont deux bosses sur le devant du torse : les pectoraux de B.J., la poitrine de la fille.
+// Une bosse B : [de côté, hauteur, largeur, hauteur de la bosse, épaisseur], en mètres ; bosse dit de combien elle avance au point (x, y).
+// Leur torse se resserre aussi vers la taille (serre : la largeur en bas, par rapport à celle des épaules)
+const bosse = (B, x, y) => B[4] * Math.exp(-(((Math.abs(x) - B[0]) / B[2]) ** 2 + ((y - B[1]) / B[3]) ** 2));
+function bomber(geo, B, serre) {
+  const p = geo.attributes.position, n = geo.attributes.normal;
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i);
+    if (p.getZ(i) > 0) p.setZ(i, p.getZ(i) + bosse(B, x, y));
+    p.setX(i, x * lerp(serre, 1, THREE.MathUtils.smoothstep(y, -0.15, 0.12)));
+  }
+  geo.computeVertexNormals();
+  // la couture d'une forme faite au tour passe au milieu du devant : on y remet la lumière bien de face, sinon on y voit un trait
+  for (let i = 0; i < p.count; i++) if (Math.abs(p.getX(i)) < 1e-6) { const l = Math.hypot(n.getY(i), n.getZ(i)) || 1; n.setXYZ(i, 0, n.getY(i) / l, n.getZ(i) / l); }
+  return geo;
+}
+// le torse et le blason bosselés d'un héros (H : sa ligne du tableau HEROS), découpés plus fin que ceux de tout le monde. Faits une seule fois
+const torsesHeros = new Map();
+function torseHeros(H) {
+  if (!torsesHeros.has(H)) {
+    const B = H.fille ? [0.075, 0.1, 0.045, 0.045, H.poitrine || 0] : [0.085, 0.13, 0.07, 0.05, H.poitrine || 0];
+    const serre = (H.taille || 1) / (H.epaules || 1);
+    torsesHeros.set(H, { B, torse: bomber(tour(affiner(PROFIL_TORSE, 5), 48).scale(1, 1, 0.58), B, serre), blason: bomber(formeBlason(24, 4), B, serre) });
+  }
+  return torsesHeros.get(H);
+}
+// la coiffure de la fille (voir corpsHeros) : les mêmes cheveux, avec une queue de cheval derrière la tête (un nœud, et la mèche qui pend
 // dans le dos, faite au tour : [rayon, hauteur], de bas en haut) et une mèche devant chaque oreille.
 // Le tout est une seule forme : elle change de couleur d'un seul coup.
 // Les mèches sont placées par rapport à la tête, puis ramenées dans le repère des cheveux, qui sont penchés vers l'arrière
@@ -3782,7 +3849,7 @@ function creerHumain(s) {
   haut.position.y = 0.95; g.add(haut);
   const bassin = piece(GEO.bassin, s.bas, haut, 0, 0, 0), ceinture = piece(GEO.ceinture, '#2a2018', haut, 0, 0.095, 0);
   const torse = piece(GEO.torse, s.haut, haut, 0, 0.38, 0);
-  piece(GEO.cou, s.peau, haut, 0, 0.72, 0);
+  const cou = piece(GEO.cou, s.peau, haut, 0, 0.72, 0);
   const tete = piece(GEO.tete, s.peau, haut, 0, 0.87, 0);
   tete.material = visage(s.peau);
   piece(GEO.nez, s.peau, tete, 0, -0.018, 0.122);
@@ -3803,7 +3870,7 @@ function creerHumain(s) {
     j.chaussure = piece(GEO.chaussure, s.chaussures, j.pli, 0, -0.45, 0.045); return j; });
   if (s.brassard) piece(GEO.brassard, s.brassard, brasG, 0, -0.15, 0);
   if (s.taille) g.scale.set(s.taille * s.carrure, s.taille, s.taille * s.carrure);
-  return { g, haut, tete, cheveux, torse, bassin, ceinture, brasD, brasG, jambeD, jambeG, tenue: s, phase: Math.random() * 6, arme: null, air: 0, t: 0 };
+  return { g, haut, tete, cou, cheveux, torse, bassin, ceinture, brasD, brasG, jambeD, jambeG, tenue: s, phase: Math.random() * 6, arme: null, air: 0, t: 0 };
 }
 // les bâtons de ski : un dans chaque main, avec sa rondelle. Ils suivent l'avant-bras, la pointe vers la neige quand les mains sont en avant.
 // poser : piece (pour de bon) ou accessoire (pour B.J., qui les lâche en quittant ses skis)
@@ -3934,7 +4001,8 @@ function animerHumain(h, vitesse, dt, o = {}) {
     h.tete.rotation.y = -0.75 * e; h.tete.rotation.x = 0.12 * e; penche = lerp(penche, -0.08, e);
   }
   // les genoux pliés : le bassin descend. À chaque pas, le corps descend un peu quand les jambes sont écartées
-  let hy = 0.95 - 0.35 * plie - Math.min(0.06, 0.5 * (1 - Math.cos(s))) + monte;
+  // (h.talons : des talons hauts grandissent, sauf assis : voir chausser)
+  let hy = 0.95 - 0.35 * plie - Math.min(0.06, 0.5 * (1 - Math.cos(s))) + monte + (o.assis ? 0 : h.talons || 0);
   // projeté ou couché : les bras et les jambes écartés, qui se débattent peut-être
   if (o.ecarte) {
     const e = o.ecarte, ag = (o.agite || 0) * Math.sin(h.t * 11);
@@ -5239,17 +5307,60 @@ function majCape(dt) {
   }
   avantCape.copy(ici);
 }
-// Le héros choisi dans le menu : une fille ou un garçon, et la couleur de ses cheveux (le tableau CHEVEUX, tout en haut du fichier).
-// La fille a une queue de cheval, des cils, les épaules et les bras plus fins (fin : 0.9 = 10 % de moins). Pour le reste, rien ne change :
-// même taille, même tenue, mêmes forces. On change sa tenue normale (userData.habit), puis rhabillerBJ remet par-dessus sa tenue
-// de glisse et les codes de triche
+// Le héros choisi dans le menu (sa ligne du tableau HEROS, tout en haut du fichier, et la couleur de ses cheveux) : son corps et sa
+// tenue normale, pour B.J. et pour l'aperçu du menu. B.J. est musclé : des épaules larges, de gros bras, des pectoraux. La fille est plus
+// fine : une queue de cheval, des cils, un peu de poitrine, une jupe, les jambes nues, des talons hauts. Le reste ne change pas :
+// même taille (aux talons près), mêmes forces
+const vetir = (m, matiere) => { m.material = m.userData.habit = matiere; };   // la tenue normale d'une pièce (rhabillerBJ la lui remet)
+function corpsHeros(h) {
+  const H = HEROS[heros.genre], peau = mat(PEAU_BJ), bas = H.jupe ? peau : mat(TENUE_BJ.bas);
+  h.cheveux.geometry = H.fille ? GEO.cheveuxFille : GEO.cheveux;
+  vetir(h.cheveux, mat(CHEVEUX[heros.cheveux])); vetir(h.tete, visage(PEAU_BJ, H.fille));
+  h.torse.geometry = torseHeros(H).torse; h.torse.scale.x = H.epaules; h.cou.scale.set(H.cou, 1, H.cou);
+  for (const [m, c] of [[h.brasD, -1], [h.brasG, 1]]) { m.position.x = 0.255 * c * H.epaules; m.haut.scale.set(H.bras, 1, H.bras); m.bas.scale.set(H.avantBras, 1, H.avantBras); }
+  // la jupe : une pièce sur le bassin, une sur chaque cuisse ; on ne la voit que si le héros en porte une
+  h.jupe ||= [piece(GEO.jupe, '#000', h.bassin, 0, 0, 0), ...[h.jambeD, h.jambeG].map(j => piece(GEO.jupeCuisse, '#000', j, 0, 0, 0))];
+  for (const p of h.jupe) { p.material = mat(H.jupe || '#000', { side: THREE.DoubleSide }); p.visible = !!H.jupe; }
+  vetir(h.bassin, mat(H.jupe || TENUE_BJ.bas));
+  for (const j of [h.jambeD, h.jambeG]) {
+    // une grosse cuisse grossit en largeur, vers l'autre jambe : les hanches ne s'élargissent pas, et elle ne perce pas le slip (codes SLIP, SUPERMAN)
+    j.haut.scale.x = H.cuisses; j.haut.position.x = -j.position.x * (H.cuisses - 1);
+    vetir(j.haut, bas); vetir(j.bas, bas); vetir(j.chaussure, mat(H.talons || TENUE_BJ.chaussures));
+  }
+  chausser(h, !!H.talons);
+}
+// des talons hauts, ou les chaussures de tout le monde : leur forme, et de combien ils grandissent (h.talons, voir animerHumain)
+function chausser(h, talons) {
+  for (const j of [h.jambeD, h.jambeG]) j.chaussure.geometry = talons ? GEO.escarpin : GEO.chaussure;
+  h.talons = talons ? TALONS : 0;
+}
+// L'aperçu du héros, dans le menu : un mannequin habillé comme lui (sans tenue de glisse ni code de triche), vu de face, qui se tourne
+// un peu d'un côté puis de l'autre. On le dessine dans un coin de l'image du jeu, on recopie ce coin dans le cadre du menu (#apercu),
+// puis le jeu est dessiné par-dessus, comme d'habitude
+const apercu = { h: creerHumain(TENUE_BJ), scene: new THREE.Scene(), camera: new THREE.PerspectiveCamera(26, 104 / 176, 0.5, 20), cadre: document.getElementById('apercu') };
+apercu.scene.background = new THREE.Color('#2c3848');
+apercu.scene.add(apercu.h.g, new THREE.HemisphereLight(0xffffff, 0x555555, 1.2));
+{ const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(1, 2, 2); apercu.scene.add(l); }
+apercu.scene.environment = scene.environment; apercu.scene.environmentIntensity = 0.25;
+apercu.camera.position.set(0, 1.02, 4.5); apercu.camera.lookAt(0, 0.95, 0);
+function dessinerApercu(dt) {
+  const { h, cadre } = apercu, l = cadre.clientWidth, ha = cadre.clientHeight, pr = renderer.getPixelRatio(), image = renderer.domElement;
+  if (!l) return;   // le menu est caché
+  if (cadre.width !== Math.round(l * pr)) { cadre.width = Math.round(l * pr); cadre.height = Math.round(ha * pr); }
+  h.g.rotation.y = 0.7 * Math.sin(performance.now() / 1300);
+  animerHumain(h, 0, dt);
+  renderer.setViewport(0, 0, l, ha); renderer.setScissor(0, 0, l, ha); renderer.setScissorTest(true);   // le coin en bas à gauche de l'image
+  renderer.render(apercu.scene, apercu.camera);
+  renderer.setScissorTest(false); renderer.setViewport(0, 0, innerWidth, innerHeight);
+  cadre.getContext('2d').drawImage(image, 0, image.height - cadre.height, cadre.width, cadre.height, 0, 0, cadre.width, cadre.height);
+}
+// on a choisi un héros dans le menu : B.J. et le mannequin de l'aperçu prennent son corps et sa tenue normale, puis rhabillerBJ remet
+// par-dessus la tenue de glisse et les codes de triche. Le gilet pare-balles prend sa carrure
 function majHeros() {
-  const b = joueurH, fille = heros.genre === 'Fille', fin = fille ? 0.9 : 1;
-  b.cheveux.geometry = fille ? GEO.cheveuxFille : GEO.cheveux;
-  b.cheveux.userData.habit = mat(CHEVEUX[heros.cheveux]);
-  b.tete.userData.habit = visage(PEAU_BJ, fille);
-  b.torse.scale.x = giletBJ.scale.x = fin;
-  for (const [m, c] of [[b.brasD, -1], [b.brasG, 1]]) { m.position.x = 0.255 * c * fin; m.haut.scale.set(fin, 1, fin); m.bas.scale.set(fin, 1, fin); }
+  const H = HEROS[heros.genre];
+  corpsHeros(joueurH); corpsHeros(apercu.h);
+  apercu.h.g.traverse(o => o.frustumCulled = false);   // (sinon il n'est pas dessiné : le jeu saute ce qui est loin de la caméra du jeu)
+  giletBJ.scale.set(H.epaules, 1, 1 + 7 * (H.poitrine || 0));
   rhabillerBJ();
 }
 addEventListener('heros', majHeros);   // on a cliqué sur un bouton du menu
@@ -6372,6 +6483,16 @@ function rhabillerBJ() {
   b.bassin.scale.set(1, 1, 1); b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
   TENUES_GLISSE[J.voiture?.forme.tenue || J.voiture?.forme.glisse]?.(b);   // sur des skis, un snowboard ou une luge : sa tenue de glisse
   for (const t of TRICHES) if (t.actif) t.effet(b);
+  // Le héros du menu (voir corpsHeros). Sa jupe et ses talons s'en vont dès qu'une tenue ou un code rhabille le bassin ou les chaussures.
+  // Torse nu, la fille a la poitrine plate. Et ce qu'on pose sur la poitrine (un blason, un soutien-gorge) suit ses bosses
+  const H = HEROS[heros.genre], T = torseHeros(H), enHabit = o => o.visible && o.material === o.userData.habit;
+  for (const p of b.jupe) p.visible = !!H.jupe && enHabit(b.bassin);
+  chausser(b, !!H.talons && enHabit(b.jambeD.chaussure) && enHabit(b.jambeG.chaussure));
+  const plat = H.fille && b.torse.material === mat(PEAU_BJ);
+  b.torse.geometry = plat ? GEO.torse : T.torse;
+  if (!plat) for (const o of b.torse.children) if (o.name === 'accessoire') {
+    if (o.geometry === GEO.blason) o.geometry = T.blason; else if (o.position.z > 0.05) o.position.z += bosse(T.B, o.position.x, o.position.y);
+  }
 }
 // ce que les codes actifs changent au jeu : leurs nombres se multiplient (1 = rien ne change)
 const parTriche = cle => TRICHES.reduce((k, t) => t.actif && t[cle] !== undefined ? k * t[cle] : k, 1);
@@ -8613,7 +8734,7 @@ function boucle(t) {
   const dt = clamp((t - dernier) / 1000, 0, 0.05);
   dernier = t;
   if (carte.ouverte) { dessinerGrandeCarte(dt); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
-  if (enJeu) mettreAJour(dt);
+  if (enJeu) mettreAJour(dt); else dessinerApercu(dt);   // dans le menu : l'aperçu du héros
   majCamera(dt); majRepere(dt); majHUD(dt); majLaser(dt);
   soleil.position.set(J.x + soleilDir.x * 200, J.y + soleilDir.y * 200, J.z + soleilDir.z * 200);
   soleil.target.position.set(J.x, J.y, J.z);
@@ -8641,7 +8762,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, toucheSol, sorteDeSol, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
-  exploser, blesserJoueur, cibleMission, V3, TRICHES, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
+  exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
