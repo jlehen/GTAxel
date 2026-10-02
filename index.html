@@ -599,8 +599,8 @@ const REGLAGES = {
   ombres: true,              // mets false si le jeu rame
   distanceVue: 900,          // mètres : au-delà, le brouillard cache tout (mets 500 si le jeu rame)
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
-  vitesseTelesiege: 15,      // m/s : les télésièges et la télécabine des stations de ski (le rond bleu ❄ sur la carte du jeu). Mets 5 pour un vrai télésiège, tout lent
-  vitesseGare: 2,            // m/s : dans les gares, les sièges ralentissent pour qu'on monte dessus (un télésiège « débrayable »). Mets 15 pour qu'ils ne ralentissent plus
+  vitesseTelesiege: 42,      // m/s : les télésièges et la télécabine des stations de ski (le rond bleu ❄ sur la carte du jeu). 42 = 45 secondes pour monter en haut du mont Gordo. Mets 5 pour un vrai télésiège, tout lent
+  vitesseGare: 2,            // m/s : dans les gares, les sièges ralentissent pour qu'on monte dessus (un télésiège « débrayable »). Mets 42 pour qu'ils ne ralentissent plus
   frottementNeige: 0.4,      // à ski, en snowboard ou en luge : ce que la neige freine (m/s par seconde). Hors de la neige, ça freine 15 fois plus
   neigeBas: 25,              // mètres : plus bas que ça sur la montagne, il n'y a plus de neige (sauf sur les pistes, qui en gardent jusqu'en bas)...
   neigeHaut: 150,            // ...et plus haut que ça, tout est blanc. Entre les deux, la neige s'en va par plaques
@@ -3262,8 +3262,9 @@ for (const l of TELESIEGES) {
     o.position.copy(A).add(B).multiplyScalar(0.5); o.lookAt(B); o.updateMatrix();
     ajouterGeo('cable', new THREE.CylinderGeometry(0.03, 0.03, A.distanceTo(B), 4).rotateX(Math.PI / 2).applyMatrix4(o.matrix));
   }
-  // un siège tous les 25 m (une cabine tous les 60 m), chacun avec son garde-corps
-  horaire(l); l.n = Math.floor(l.periode * l.vL / (l.cabines ? 60 : 25));
+  // un siège toutes les 1,7 s (une cabine toutes les 4 s), chacun avec son garde-corps : dans les gares, où ils ralentissent, ils se suivent
+  // à 3,30 m (à REGLAGES.vitesseGare), aussi vite qu'aille la remontée ; en ligne, à 70 m (à 42 m/s)
+  horaire(l); l.n = Math.floor(l.periode / (l.cabines ? 4 : 5 / 3));
   l.sieges = new THREE.InstancedMesh(l.cabines ? GEO_CABINE : GEO_SIEGE, l.cabines ? MAT.cabine : MAT.siege, l.n);
   if (l.cabines) for (let k = 0; k < l.n; k++) l.sieges.setColorAt(k, new THREE.Color(COULEURS_CABINES[k % COULEURS_CABINES.length]));
   else l.barres = new THREE.InstancedMesh(GEO_BARRE, MAT.metal, l.n);
