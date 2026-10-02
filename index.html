@@ -253,7 +253,8 @@ const TRADUCTIONS = {
   'AÏE !':            { de: 'AUTSCH!', en: 'OUCH!', gsw: 'AUA!' },
   'Figure ratée':     { de: 'Trick verpatzt', en: 'Trick failed', gsw: 'Trick verhaue' },
   'Réception de travers !': { de: 'Schief gelandet!', en: 'Landed sideways!', gsw: 'Schräg glandet!' },
-  "Arrête-toi d'abord !": { de: 'Halt erst an!', en: 'Stop first!', gsw: 'Halt zerscht aa!' },
+  "Ralentis d'abord !": { de: 'Brems erst ab!', en: 'Slow down first!', gsw: 'Brems zerscht ab!' },
+  'Avec les peaux, ça glisse mal : enlève-les (R) pour descendre': { de: 'Mit Fellen gleitet es schlecht: zieh sie ab (R) für die Abfahrt', en: 'Skins glide badly: take them off (R) to ski down', gsw: 'Mit de Fäll rutschts schlächt: zieh si ab (R) für d Abfahrt' },
   'MODE MONTÉE':      { de: 'AUFSTIEG', en: 'CLIMB MODE', gsw: 'UFSTIIG' },
   'MODE DESCENTE':    { de: 'ABFAHRT', en: 'DOWNHILL MODE', gsw: 'ABFAHRT' },
   'Les peaux sont collées : Z fait monter · R : les enlever': { de: 'Die Felle kleben: W steigt auf · R: abziehen', en: 'Skins on: W climbs · R: take them off', gsw: 'D Fäll chläbed: W stiigt uf · R: abzieh' },
@@ -609,7 +610,9 @@ const REGLAGES = {
   vitesseSalto: 6.5,         // en l'air, S fait un backflip et Z un frontflip : radians par seconde (6.5 = un tour en 1 s)
   derapage: 1.8,             // Maj + Q ou D : on dérape, et ça tourne autant de fois plus sec (1 = comme sans déraper)
   vitesseRando: 5,           // m/s : en skis de rando, les peaux collées, quand on monte (moins vite quand c'est raide)
-  chuteGlisse: 15,           // m/s : on se reçoit sur la neige sans tomber, sauf si on tape plus fort que ça (une chute de 11 m sur du plat)
+  vitessePeaux: 8,           // m/s : avec les peaux collées, on glisse quand même un peu en descente, mais jamais plus vite que ça (pour descendre vraiment, enlève-les : touche R)
+  chuteGlisse: 15,           // m/s : à ski, sur un sol dur (herbe, route), on tombe si on tape plus fort que ça en se recevant (une chute de 11 m sur du plat)
+  amortiNeige: 5,            // la neige amortit les chutes : on y tombe comme de 5 fois moins haut, à pied comme à ski, et une roulade y fait 5 fois moins mal (1 = comme sur du goudron)
   skieurs: 30,               // combien d'autres gens glissent sur les pistes et prennent les remontées (0 = tu as la montagne pour toi)
   vitesseNage: 2.2,          // dans l'eau
   vitesseNageRapide: 4,      // dans l'eau, avec Maj
@@ -6398,7 +6401,7 @@ function sortirVoiture() {
   const vit = Math.abs(v.vitesse);
   if (vit > 4 && !v.type.bateau && !v.enVol && !v.coule) {
     commencerRoulade(Math.sin(v.angle) * v.vitesse, Math.cos(v.angle) * v.vitesse);
-    if (vit > R_.vitesseSansMal) blesserJoueur((vit - R_.vitesseSansMal) * R_.degatsRoulade, false);
+    if (vit > R_.vitesseSansMal) blesserJoueur((vit - R_.vitesseSansMal) * R_.degatsRoulade / coussin(J.x, J.z), false);   // (dans la neige, ça fait bien moins mal)
   }
 }
 
@@ -6640,15 +6643,17 @@ function majJoueur(dt) {
 // Avec un code de triche qui a « ecrase: true » (SUPERMAN, DIEU), ça ne lui fait rien : c'est ce qu'il y a dessous qui prend (voir ecraser),
 // et il se reçoit sur un genou, comme un super-héros. Renvoie true s'il passe à travers un toit ou un plancher : il tombe encore
 function retomber(choc, vx, vz) {
-  const h = choc * choc / (2 * R_.gravite);   // la hauteur de la chute
+  const h = choc * choc / (2 * R_.gravite), mou = coussin(J.x, J.z);   // la hauteur de la chute ; ce que le sol amortit (la neige)
   if (choc > 4) J.atterri = Math.min(1, choc / 14);
-  if (h <= R_.hauteurSansMal) return false;
+  if (mou > 1.5 && choc > 7) gerbe({ x: J.x, y: J.y, z: J.z, angle: 0 }, Math.min(8, Math.round(choc / 3)));   // il s'enfonce dans la neige, qui vole
   if (pouvoir('ecrase')) {
+    if (h <= R_.hauteurSansMal) return false;
     J.roule = null;
     if (ecraser(h, choc)) return true;
     J.genou = 0.9; return false;
   }
-  blesserJoueur((h - R_.hauteurSansMal) * R_.degatsChute, false);
+  if (h / mou <= R_.hauteurSansMal) return false;   // (sur la neige : comme s'il tombait de 5 fois moins haut)
+  blesserJoueur((h / mou - R_.hauteurSansMal) * R_.degatsChute, false);
   bruit(Math.min(0.8, choc / 25), 250, 0.25);
   if (J.mort) return false;
   if (Math.hypot(vx, vz) > 3) commencerRoulade(vx, vz); else J.genou = 0.9;
@@ -6943,25 +6948,33 @@ function glisser(v, dt, gaz, volant) {
   v.espace = touches.Space;
 }
 // les skis de rando en mode montée : les peaux accrochent la neige. Z fait grimper (REGLAGES.vitesseRando, moins vite quand c'est raide),
-// S fait reculer, et ça ne glisse pas : pour redescendre, il faut enlever les peaux (touche R).
+// S freine puis fait reculer, et on ne glisse jamais en arrière. En descente, les peaux glissent quand même un peu vers l'avant : de plus en plus
+// vite avec la pente, jusqu'à REGLAGES.vitessePeaux (à partir de 24° de pente). Pour descendre vraiment, il faut les enlever (touche R).
 // v.pas : de combien le pied droit est devant, en mètres (le gauche est derrière d'autant) : les skis et les jambes le suivent
 function monter(v, dt, gaz) {
-  const cible = gaz > 0 ? R_.vitesseRando * clamp(1.15 - Math.max(0, Math.sin(v.tangage)), 0.45, 1) : gaz < 0 ? -1.5 : 0;
-  v.vitesse += clamp(cible - v.vitesse, -12 * dt, 8 * dt);
-  v.pousse = clamp((v.pousse || 0) + (Math.abs(v.vitesse) > 0.3 ? 4 : -4) * dt, 0, 1); v.phasePousse = (v.phasePousse || 0) + dt * (3 + 1.1 * Math.abs(v.vitesse));
+  const descend = -Math.sin(v.tangage), glisse = clamp(25 * (descend - 0.1), 0, R_.vitessePeaux);   // (descend : plus de 0 quand la pente descend devant les skis)
+  const marche = gaz > 0 ? R_.vitesseRando * clamp(1.15 - Math.max(0, -descend), 0.45, 1) : 0, cible = gaz < 0 ? (v.vitesse > 0.5 ? 0 : -1.5) : Math.max(marche, glisse);
+  v.vitesse += clamp(cible - v.vitesse, -12 * dt, (cible > marche ? 3 : 8) * dt);   // (on prend de la vitesse moins vite en glissant qu'en marchant)
+  // il marche (Z ou S) : le pas alternatif. Il se laisse glisser : les pieds côte à côte
+  v.pousse = clamp((v.pousse || 0) + (gaz && Math.abs(v.vitesse) > 0.3 ? 4 : -4) * dt, 0, 1); v.phasePousse = (v.phasePousse || 0) + dt * (3 + 1.1 * Math.abs(v.vitesse));
   v.pas = 0.28 * v.pousse * Math.sin(v.phasePousse); v.derape = 0; v.espace = touches.Space;
+  // il glisse dans une descente, les peaux collées : on lui rappelle de les enlever (une fois toutes les 20 s)
+  if (v === J.voiture && v.vitesse > 0.6 * R_.vitessePeaux && glisse > marche && temps > (v.conseilPeaux || 0)) { v.conseilPeaux = temps + 20; annonce('', tr('Avec les peaux, ça glisse mal : enlève-les (R) pour descendre'), 4); }
 }
-// R : en skis de rando, B.J. change de mode. Arrêté, il prend un ski après l'autre et décolle sa peau (pour descendre), ou la recolle (pour monter)
+// R : en skis de rando, B.J. change de mode. Il s'arrête (il freine tout seul ; à plus de 10 m/s, il faut d'abord ralentir), puis il prend
+// un ski après l'autre et décolle sa peau (pour descendre), ou la recolle (pour monter)
 const DUREE_PEAUX = 3.2;   // secondes : 1,6 par ski
 const TEXTES_RANDO = { true: 'Les peaux sont collées : Z fait monter · R : les enlever', false: 'Les peaux sont rangées : à toi la descente ! · R : les recoller' };
 function changerMode() {
   const v = J.voiture;
   if (!v?.forme.rando || J.telesiege || v.vol || v.accident || v.transition) return;
-  if (Math.abs(v.vitesse) > 1.5) { annonce('', tr("Arrête-toi d'abord !"), 1.5); return; }
+  if (Math.abs(v.vitesse) > 10) { annonce('', tr("Ralentis d'abord !"), 1.5); return; }
   v.transition = 0.001;
 }
 function changerPeaux(v, dt) {
-  const t0 = v.transition; v.transition += dt; v.vitesse = 0; v.pousse = v.derape = 0; v.pas = (v.pas || 0) * Math.pow(0.001, dt);
+  v.pousse = v.derape = 0; v.pas = (v.pas || 0) * Math.pow(0.001, dt);
+  if (Math.abs(v.vitesse) > 0.5) { v.vitesse -= Math.sign(v.vitesse) * Math.min(Math.abs(v.vitesse), 14 * dt); return; }   // il s'arrête d'abord
+  const t0 = v.transition; v.transition += dt; v.vitesse = 0;
   for (const t of [0.4, 2]) if (t0 < t && v.transition >= t) bruit(0.3, 2500, 0.7);   // le « scratch » de la peau qu'on décolle
   if (v.transition < DUREE_PEAUX) return;
   v.transition = 0; v.montee = !v.montee; bip(700, 1000, 0.15, 'sine', 0.2);
@@ -7045,6 +7058,8 @@ function neigeSous(x, z) {
   const c = car(...blocEn(x, z));
   return c === 'Y' ? 1 : estBloc(c) || routeSous(x, z)?.d < 5.5 ? 0 : neigeEn(x, z);
 }
+// par combien le sol divise une chute en (x, z) : 1 sur un sol dur, REGLAGES.amortiNeige sur la neige (entre les deux là où elle s'en va par plaques)
+const coussin = (x, z) => lerp(1, Math.max(1, R_.amortiNeige), neigeSous(x, z));
 function bougerVoiture(v, dt, parJoueur) {
   const ax = v.x, az = v.z, vx = Math.sin(v.angle) * v.vitesse, vz = Math.cos(v.angle) * v.vitesse;
   v.x += vx * dt; v.z += vz * dt;
@@ -7203,10 +7218,11 @@ function atterrir(v, impact, pente) {
   let rebond = impact > 3 ? impact * 0.2 : 0;
   if (v.type.glisse) { // à ski, la neige ne fait pas rebondir. Seul compte ce qui tape en travers de la pente : dans une pente raide,
     // on se reçoit bien (comme au bas d'un tremplin), et la vitesse de la chute qui va dans le sens de la pente n'est pas perdue.
-    // On ne tombe (et on ne déchausse) qu'en tapant vraiment fort : plus de REGLAGES.chuteGlisse en travers (15 m/s : 11 m de chute sur du plat)
+    // On ne tombe (et on ne déchausse) qu'en tapant vraiment fort : plus de REGLAGES.chuteGlisse en travers (15 m/s : 11 m de chute sur du plat).
+    // La neige amortit : il faut y tomber de 5 fois plus haut (REGLAGES.amortiNeige), donc taper √5 fois plus fort (34 m/s : 57 m de chute)
     const travers = v.vitesse * Math.sin(pente) - v.vy * Math.cos(pente), long = v.vitesse * Math.cos(pente) + v.vy * Math.sin(pente);
     // (une figure pas finie : sur la tête, on tombe aussi ; de travers, on perd de la vitesse)
-    const garde = travers > R_.chuteGlisse ? 0 : v.figure ? recevoirFigure(v) : 1;
+    const garde = travers > R_.chuteGlisse * Math.sqrt(coussin(v.x, v.z)) ? 0 : v.figure ? recevoirFigure(v) : 1;
     if (!garde) { commencerAccident(v); return 0; }
     v.vitesse = long * Math.cos(pente) * garde; rebond = impact = 0;
     if (travers > 3 && v.m.visible && neigeSous(v.x, v.z) > 0.3) gerbe(v, 5);
@@ -8329,7 +8345,7 @@ etat('Clique pour jouer');
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   TELESIEGES, SOMMETS, neigeSous, telesiegeProche, sommetEn, REMONTEES, PISTES_SKI, pisteSkiEn, neigeEn, siegeEn, siegeLibre, reliefSki, creerSkieur, TENUES_GLISSE, rhabillerBJ, entrerVoiture, sortirVoiture, animerHumain, blesserConducteur,
-  touches, pointPiste, arrets, navetteProche, prendreNavette, changerMode, poseGlisse, garnir,
+  touches, pointPiste, arrets, navetteProche, prendreNavette, changerMode, poseGlisse, garnir, coussin,
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, toucheSol, sorteDeSol, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
