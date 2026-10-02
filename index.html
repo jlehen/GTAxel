@@ -339,8 +339,8 @@ const TRADUCTIONS = {
   'Bébé !':           { de: 'Baby!', en: 'Baby!', gsw: 'Bébé!' },
   'San Goku, Super Saiyan !': { de: 'Son Goku, Super-Saiyajin!', en: 'Goku, Super Saiyan!', gsw: 'Son Goku, Super-Saiyajin!' },
   'Z6PO, le robot doré': { de: 'C-3PO, der goldene Roboter', en: 'C-3PO, the golden robot', gsw: 'C-3PO, de goldig Roboter' },
-  'Invincible, comme Zeus ! Sceptre de foudre (touche 9), et tomber de haut écrase tout': { de: 'Unbesiegbar, wie Zeus! Blitzzepter (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
-    en: 'Invincible, like Zeus! Lightning sceptre (key 9), and falling from high up crushes everything', gsw: 'Unbsiegbar, wie de Zeus! Blitzzepter (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
+  'Invincible, comme Zeus ! Sceptre de foudre et yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Unbesiegbar, wie Zeus! Blitzzepter und Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
+    en: 'Invincible, like Zeus! Lightning sceptre and laser eyes (key 9), and falling from high up crushes everything', gsw: 'Unbsiegbar, wie de Zeus! Blitzzepter und Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
   'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Superman! Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
     en: 'Superman! Laser eyes (key 9), and falling from high up crushes everything', gsw: 'Superman! Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
   'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
@@ -674,7 +674,7 @@ const ARMES = [
   // zoom : en visant (clic droit), on regarde dans la lunette, qui grossit 5 fois
   { nom: 'Fusil de sniper', modele: 'sniper',      degats: 150, cadence: 1.5, portee: 250, prix: 2500, munitions: 20, zoom: 5, dispersion: 0.006 },
   // laser : deux rayons rouges qui partent des yeux. Pas de prix, pas de munitions : on ne les a qu'avec un code de triche
-  // qui a « laser: true » (SUPERMAN), et ils ne s'épuisent jamais
+  // qui a « laser: true » (SUPERMAN, DIEU), et ils ne s'épuisent jamais
   { nom: 'Yeux laser',     modele: null,           degats: 40, cadence: 0.066, portee: 200, auto: true, laser: true },
   // le sceptre de Zeus : un gros éclair doré au bout d'un manche, qui lance la foudre là où on vise. eclair = le rayon, en mètres,
   // de tout ce que la foudre grille autour (comme l'explosion du bazooka). Pas de prix, pas de munitions : on ne l'a qu'avec un code
@@ -1182,8 +1182,8 @@ const PEAU_BJ = TENUE_BJ.peau;
 const TRICHES = [
   // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel. IDDQD : comme dans Doom.
   // B.J. est en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags (les autres codes s'ajoutent par-dessus).
-  // Il montre son biceps droit pendant 1,3 seconde, et il a le sceptre de foudre dans la main gauche
-  { code: 'DIEU', alias: ['GOD', 'GOTT', 'IDDQD'], texte: 'Invincible, comme Zeus ! Sceptre de foudre (touche 9), et tomber de haut écrase tout', invincible: true, eclair: true, ecrase: true, biceps: 1.3, effet: b => {
+  // Il montre son biceps droit pendant 1,3 seconde, et il a le sceptre de foudre dans la main gauche. Il a aussi les yeux laser : la touche 9 passe de l'un à l'autre
+  { code: 'DIEU', alias: ['GOD', 'GOTT', 'IDDQD'], texte: 'Invincible, comme Zeus ! Sceptre de foudre et yeux laser (touche 9), et tomber de haut écrase tout', invincible: true, eclair: true, laser: true, ecrase: true, biceps: 1.3, effet: b => {
       const blanc = '#f4f2ea', cuir = '#7a4522';
       habiller(b.torse, PEAU_BJ); for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, PEAU_BJ);
       // le pagne : des brins de paille de toutes les longueurs (là où rien n'est dessiné, on voit à travers)
