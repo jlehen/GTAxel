@@ -225,7 +225,8 @@ const TRADUCTIONS = {
   "Fusil d'assaut":   { de: 'Sturmgewehr', en: 'Assault rifle', gsw: 'Sturmgwehr' },
   'Fusil de sniper':  { de: 'Scharfschützengewehr', en: 'Sniper rifle', gsw: 'Scharfschützegwehr' },
   'Yeux laser':       { de: 'Laseraugen', en: 'Laser eyes', gsw: 'Laserauge' },
-  'Masque à gaz':     { de: 'Gasmaske', en: 'Gas mask', gsw: 'Gasmaske' },
+  'Sceptre de foudre': { de: 'Blitzzepter', en: 'Lightning sceptre', gsw: 'Blitzzepter' },
+  'Masque à gaz':    { de: 'Gasmaske', en: 'Gas mask', gsw: 'Gasmaske' },
   '{n} balles':       { de: '{n} Kugeln', en: '{n} bullets', gsw: '{n} Kugle' },
   '{n} roquettes':    { de: '{n} Raketen', en: '{n} rockets', gsw: '{n} Rakete' },
   'Classique':        { de: 'Klassiker', en: 'Sedan', gsw: 'Klassiker' },
@@ -338,8 +339,8 @@ const TRADUCTIONS = {
   'Bébé !':           { de: 'Baby!', en: 'Baby!', gsw: 'Bébé!' },
   'San Goku, Super Saiyan !': { de: 'Son Goku, Super-Saiyajin!', en: 'Goku, Super Saiyan!', gsw: 'Son Goku, Super-Saiyajin!' },
   'Z6PO, le robot doré': { de: 'C-3PO, der goldene Roboter', en: 'C-3PO, the golden robot', gsw: 'C-3PO, de goldig Roboter' },
-  'Invincible, comme Zeus ! Yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Unbesiegbar, wie Zeus! Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
-    en: 'Invincible, like Zeus! Laser eyes (key 9), and falling from high up crushes everything', gsw: 'Unbsiegbar, wie de Zeus! Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
+  'Invincible, comme Zeus ! Sceptre de foudre (touche 9), et tomber de haut écrase tout': { de: 'Unbesiegbar, wie Zeus! Blitzzepter (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
+    en: 'Invincible, like Zeus! Lightning sceptre (key 9), and falling from high up crushes everything', gsw: 'Unbsiegbar, wie de Zeus! Blitzzepter (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
   'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Superman! Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
     en: 'Superman! Laser eyes (key 9), and falling from high up crushes everything', gsw: 'Superman! Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
   'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
@@ -673,8 +674,12 @@ const ARMES = [
   // zoom : en visant (clic droit), on regarde dans la lunette, qui grossit 5 fois
   { nom: 'Fusil de sniper', modele: 'sniper',      degats: 150, cadence: 1.5, portee: 250, prix: 2500, munitions: 20, zoom: 5, dispersion: 0.006 },
   // laser : deux rayons rouges qui partent des yeux. Pas de prix, pas de munitions : on ne les a qu'avec un code de triche
-  // qui a « laser: true » (SUPERMAN, DIEU), et ils ne s'épuisent jamais
+  // qui a « laser: true » (SUPERMAN), et ils ne s'épuisent jamais
   { nom: 'Yeux laser',     modele: null,           degats: 40, cadence: 0.066, portee: 200, auto: true, laser: true },
+  // le sceptre de Zeus : un gros éclair doré au bout d'un manche, qui lance la foudre là où on vise. eclair = le rayon, en mètres,
+  // de tout ce que la foudre grille autour (comme l'explosion du bazooka). Pas de prix, pas de munitions : on ne l'a qu'avec un code
+  // de triche qui a « eclair: true » (DIEU)
+  { nom: 'Sceptre de foudre', modele: 'sceptre',   degats: 400, cadence: 0.5, portee: 200, auto: true, eclair: 4 },
 ];
 // Les objets de valeur qu'on vole dans les immeubles où l'on entre, et ce qu'ils rapportent. Change les prix, ou ajoute une ligne
 // avec une de ces formes : collier, montre, bague, diamant, lingot, billets, console, portable, telephone
@@ -1163,8 +1168,10 @@ const TENUES_GLISSE = {
 //  alias : un autre code qui fait la même chose (ou une liste : ['ARMES', 'WAFFEN']).
 //  Ils peuvent aussi changer le jeu : vitesse (0.5 = deux fois plus lent), balles (0.5 = les balles
 //  font moitié moins mal), robot (il bouge par à-coups), invincible (plus rien ne fait mal),
-//  laser (il a les yeux laser, la dernière des ARMES : touche 9), ecrase (tomber de haut ne lui fait
-//  pas mal : ça écrase ce qu'il y a dessous, voir REGLAGES.rayonEcrase).
+//  laser (il a les yeux laser, une des ARMES : touche 9), eclair (il a le sceptre de foudre, une autre
+//  des ARMES : touche 9 aussi, et il le prend en main), ecrase (tomber de haut ne lui fait pas mal : ça
+//  écrase ce qu'il y a dessous, voir REGLAGES.rayonEcrase), biceps (quand on tape le code, il prend
+//  la pose du culturiste et montre son biceps droit : le nombre de secondes que ça dure).
 //  Le bouton 🎮 du menu les montre tous, avec leur texte : un code que tu ajoutes ici y sera aussi.
 // =====================================================================
 //  Un bras ou une jambe est en deux morceaux (haut et bas) : habillerMembre les colorie ensemble.
@@ -1174,8 +1181,9 @@ const TENUE_BJ = { peau: '#e8b890', haut: '#e8e4d8', bas: '#4a5238', chaussures:
 const PEAU_BJ = TENUE_BJ.peau;
 const TRICHES = [
   // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel. IDDQD : comme dans Doom.
-  // B.J. est en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags (les autres codes s'ajoutent par-dessus)
-  { code: 'DIEU', alias: ['GOD', 'GOTT', 'IDDQD'], texte: 'Invincible, comme Zeus ! Yeux laser (touche 9), et tomber de haut écrase tout', invincible: true, laser: true, ecrase: true, effet: b => {
+  // B.J. est en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags (les autres codes s'ajoutent par-dessus).
+  // Il montre son biceps droit pendant 1,3 seconde, et il a le sceptre de foudre dans la main gauche
+  { code: 'DIEU', alias: ['GOD', 'GOTT', 'IDDQD'], texte: 'Invincible, comme Zeus ! Sceptre de foudre (touche 9), et tomber de haut écrase tout', invincible: true, eclair: true, ecrase: true, biceps: 1.3, effet: b => {
       const blanc = '#f4f2ea', cuir = '#7a4522';
       habiller(b.torse, PEAU_BJ); for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, PEAU_BJ);
       // le pagne : des brins de paille de toutes les longueurs (là où rien n'est dessiné, on voit à travers)
@@ -1289,7 +1297,7 @@ const TRICHES = [
     } },
   // comme dans Doom : toutes les armes, plein de munitions, le gilet et le masque à gaz
   { code: 'IDKFA', alias: ['ARMES', 'WAFFEN', 'WEAPONS'], texte: 'Toutes les armes, plein de munitions, gilet et masque à gaz !', action: () => {
-      ARMES.forEach((a, i) => { if (a.laser) return;   // pas les yeux laser : il faut un code qui a « laser: true »
+      ARMES.forEach((a, i) => { if (pouvoirArme(a)) return;   // pas les yeux laser ni le sceptre de foudre : il faut un code qui a « laser: true » ou « eclair: true »
         J.possede[i] = true; if (!a.corps) J.balles[i] = Math.max(J.balles[i], a.munitions * 3); });
       J.gilet = R_.giletMax; J.masque = true; } },
   // pour tester ce qui coûte cher : 100 000 $ d'un coup (change le nombre pour en avoir plus ou moins)
@@ -1391,6 +1399,8 @@ const roulisVirage = vire => -clamp(vire, -0.7, 0.7) * R_.roulisVirage;
 function graine(n) { return () => { n = (n + 0x6D2B79F5) | 0; let t = Math.imul(n ^ (n >>> 15), 1 | n); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const hasardR = (l, rnd) => l[Math.floor(rnd() * l.length)];
 const indexArme = nom => ARMES.findIndex(a => a.nom === nom);
+// une arme qu'on n'a qu'avec un code de triche : le pouvoir que ce code doit avoir ('laser', 'eclair'). Pour les autres armes : rien
+const pouvoirArme = a => a.laser ? 'laser' : a.eclair ? 'eclair' : null;
 
 // =====================================================================
 //  Géographie : cases de PAS mètres (un pâté de S mètres et sa rue de R mètres)
@@ -3680,6 +3690,7 @@ function batons(h, poser = piece) {
 //   bascule : l'angle dont il bascule, en avant ou en arrière (pour tomber, voler, se coucher) ; plie : de 0 à 1, les genoux pliés
 //   ecarte : de 0 à 1, les bras et les jambes écartés (projeté, couché) ; agite : de 0 à 1, il se débat ; touche : de 0 à 1, il encaisse un coup
 //   leve : de combien (en radians) il lève son arme en plus (Superman couché en l'air, ou qui vise vers le haut)
+//   pointe : de 0 à 1, il pointe son sceptre vers la cible, au lieu de le tenir debout ; biceps : de 0 à 1, la pose du culturiste
 function animerHumain(h, vitesse, dt, o = {}) {
   h.phase += dt * (vitesse > 0.2 ? 2.5 + vitesse * 1.3 : 0); h.t += dt;
   h.brasPris = !!o.arme || o.frappe > 0;   // ses bras tiennent une arme ou frappent : ils ne deviennent pas mous (membresMous)
@@ -3699,7 +3710,11 @@ function animerHumain(h, vitesse, dt, o = {}) {
     h.brasG.rotation.set(-s * 0.3, 0, 0.2); h.brasD.rotation.set(s * 0.3, 0, -0.2);
     h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.6;
   }
-  if (o.arme) { const l = o.leve || 0; h.brasD.rotation.set(-1.45 - l, 0, 0); h.brasG.rotation.set(-1.3 - l, 0, -0.55); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = 0; }
+  if (o.arme && h.arme?.userData.sceptre) { // le sceptre, dans la main gauche : debout comme un bâton, le coude plié (pointe = 0), ou pointé vers la cible, le bras tendu (pointe = 1)
+    const e = o.pointe || 0;
+    h.brasG.rotation.set(lerp(0, -1.45 - (o.leve || 0), e), 0, lerp(0.3, 0, e)); h.brasG.pli.rotation.x = lerp(-1.5, 0, e);
+    h.arme.rotation.set(lerp(0, Math.PI / 2, e), lerp(0.45, 0, e), 0);   // debout, il penche un peu vers le dehors, loin de la tête
+  } else if (o.arme) { const l = o.leve || 0; h.brasD.rotation.set(-1.45 - l, 0, 0); h.brasG.rotation.set(-1.3 - l, 0, -0.55); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = 0; }
   if (o.assis) { h.brasD.rotation.set(-0.95, 0, -0.3); h.brasG.rotation.set(-0.95, 0, 0.3); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.5; } // les mains au guidon
   if (o.tenir) { h.brasD.rotation.set(-0.5, 0, -0.15); h.brasG.rotation.set(-0.5, 0, 0.15); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.7; } // debout, les mains au guidon (le Segway)
   // la glisse : à ski, les genoux pliés (plie) et les mains en avant ; en snowboard, les bras écartés pour l'équilibre ;
@@ -3782,6 +3797,14 @@ function animerHumain(h, vitesse, dt, o = {}) {
     h.brasD.rotation.set(-0.11 * e, 0, 0.42 * e); h.brasD.pli.rotation.x = -0.25 * e; h.brasD.position.y = 0.6 - 0.1 * e;   // il baisse l'épaule : son bras est trop court
     h.brasG.rotation.set(0, 0, 1.75 * e); h.brasG.pli.rotation.x = -0.1 * e;
     h.tete.rotation.x = 0.35 * e; penche = -0.12 * e;   // le bassin en avant, la tête baissée sous le chapeau
+  }
+  // la pose du culturiste : le bras droit levé sur le côté, le coude plié, le poing vers la tête, pour gonfler le biceps ;
+  // le poing gauche sur la hanche (sauf s'il tient le sceptre) ; il bombe le torse et regarde son biceps
+  if (o.biceps) {
+    const e = o.biceps, m = (r, k, v) => { r[k] = lerp(r[k], v, e); };
+    m(h.brasD.rotation, 'x', -1.35); m(h.brasD.rotation, 'z', -Math.PI / 2); m(h.brasD.pli.rotation, 'x', -2);
+    if (!o.arme) { h.brasG.rotation.set(lerp(h.brasG.rotation.x, 1.05, e), -0.82 * e, lerp(h.brasG.rotation.z, 0.95, e)); m(h.brasG.pli.rotation, 'x', -1.41); }
+    h.tete.rotation.y = -0.75 * e; h.tete.rotation.x = 0.12 * e; penche = lerp(penche, -0.08, e);
   }
   // les genoux pliés : le bassin descend. À chaque pas, le corps descend un peu quand les jambes sont écartées
   let hy = 0.95 - 0.35 * plie - Math.min(0.06, 0.5 * (1 - Math.cos(s))) + monte;
@@ -3952,6 +3975,16 @@ function membresMous(h, dt, o) {
 
 // armes en 3D (le canon pointe vers +Z)
 const M_METAL = mat('#2b2b2b', { metalness: 0.8, roughness: 0.35 }), M_LAME = mat('#d0d0d0', { metalness: 1, roughness: 0.2 }), M_BOIS = mat('#6b4423'), M_KAKI = mat('#4a5a2a');
+// Le sceptre de Zeus. Le dessin de l'éclair, vu à plat : [de côté, le long du sceptre], de 0 (sa pointe) à 1 (là où il tient au manche).
+// Change les points pour le tordre autrement, ou les nombres d'après pour le grossir (0.3 = 30 cm de large, 0.85 = 85 cm de long)
+const DESSIN_ECLAIR = [[0, 1], [-0.22, 0.66], [-0.04, 0.66], [-0.17, 0.36], [0, 0.36], [0, 0], [0.18, 0.5], [0.02, 0.5], [0.17, 0.8], [-0.01, 0.8]];
+const GEO_SCEPTRE = {
+  eclair: new THREE.ExtrudeGeometry(new THREE.Shape(DESSIN_ECLAIR.map(([x, y]) => new THREE.Vector2(x * 0.3 / 0.4, 1.15 - y * 0.85))),
+    { depth: 0.05, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 1 }).translate(0, 0, -0.025).rotateX(Math.PI / 2),
+  manche: mergeGeometries([new THREE.CylinderGeometry(0.02, 0.024, 0.6, 10).rotateX(Math.PI / 2).translate(0, 0, 0.02),
+    new THREE.SphereGeometry(0.045, 12, 8).translate(0, 0, -0.28), new THREE.SphereGeometry(0.055, 12, 8).translate(0, 0, 0.3)]),
+};
+const M_MANCHE = mat('#e0b030', { metalness: 1, roughness: 0.22 }), M_FOUDRE = mat('#ffc400', { emissive: '#c08400', roughness: 0.4 });   // de l'or, et un jaune qui brille tout seul
 function creerArme(i) {
   const modele = ARMES[i].modele;
   if (!modele) return null;
@@ -3964,12 +3997,16 @@ function creerArme(i) {
   if (modele === 'bazooka') { b(0.13, 0.13, 1.1, M_KAKI, 0, 0.08, 0.1); b(0.17, 0.17, 0.12, M_METAL, 0, 0.08, 0.66); b(0.03, 0.12, 0.05, M_METAL, 0, -0.03, 0.05); b(0.03, 0.12, 0.05, M_METAL, 0, -0.03, 0.3); g.userData.bout = 0.7; }
   if (modele === 'sniper') { b(0.045, 0.07, 0.5, M_BOIS, 0, 0.01, 0.05); b(0.022, 0.022, 0.6, M_METAL, 0, 0.04, 0.55); b(0.04, 0.11, 0.28, M_BOIS, 0, -0.02, -0.3); b(0.03, 0.1, 0.04, M_BOIS, 0, -0.06, -0.05); b(0.04, 0.04, 0.26, M_METAL, 0, 0.1, 0.08); g.userData.bout = 0.85; } // la lunette est dessus
   if (modele === 'fusil') { b(0.05, 0.09, 0.5, M_METAL, 0, 0.02, 0.12); b(0.025, 0.025, 0.3, M_METAL, 0, 0.04, 0.5); b(0.035, 0.17, 0.06, M_METAL, 0, -0.09, 0.16); b(0.04, 0.11, 0.26, M_METAL, 0, -0.01, -0.24); g.userData.bout = 0.64; }
+  if (modele === 'sceptre') { // un manche doré avec son pommeau, une boule, et le gros éclair qui brille au bout
+    for (const [geo, m] of [[GEO_SCEPTRE.manche, M_MANCHE], [GEO_SCEPTRE.eclair, M_FOUDRE]]) { const e = new THREE.Mesh(geo, m); e.castShadow = true; g.add(e); }
+    g.userData.bout = 1.15; g.userData.sceptre = true;   // (il se tient debout, dans la main gauche : voir animerHumain)
+  }
   return g;
 }
-function donnerArme(h, i) { // l'arme tient dans la main droite, au bout de l'avant-bras
-  if (h.arme) h.brasD.pli.remove(h.arme);
+function donnerArme(h, i) { // l'arme tient dans la main droite, au bout de l'avant-bras (le sceptre : dans la main gauche)
+  h.arme?.removeFromParent();
   h.arme = creerArme(i);
-  if (h.arme) { h.arme.position.set(0, -0.3, 0.03); h.arme.rotation.x = Math.PI / 2; h.brasD.pli.add(h.arme); }
+  if (h.arme) { h.arme.position.set(0, -0.3, 0.03); h.arme.rotation.x = Math.PI / 2; (h.arme.userData.sceptre ? h.brasG : h.brasD).pli.add(h.arme); }
 }
 function boutDuCanon(h, v) {
   if (!h.arme) return h.brasD.pli.localToWorld(v.set(0, -0.3, 0));
@@ -5029,12 +5066,15 @@ const SON_ARME = { pistolet: [0.5, 2500, 0.2], mitraillette: [0.35, 3000, 0.12],
 // =====================================================================
 const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, sol: true, nage: false, lacet: Math.PI, lacetCam: Math.PI, tangage: -0.1, decalage: 0, angleCorps: Math.PI,
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
-  balles: ARMES.map(a => a.corps || a.laser ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
+  balles: ARMES.map(a => a.corps || pouvoirArme(a) ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0,
-  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null, laser: 0 };   // atterri, genou, roule : voir retomber ; superman : voir decoller ; laser : voir majLaser ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege
+  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null, laser: 0, biceps: null };   // atterri, genou, roule : voir retomber ; superman : voir decoller ; laser : voir majLaser ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege ; biceps : voir poserBiceps
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 joueurH.g.traverse(o => o.userData.habit = o.material);   // sa tenue normale, pour la lui remettre après les codes de triche
 scene.add(joueurH.g);
+// son biceps droit : une bosse sur le haut du bras, qu'on ne voit que quand il prend la pose du culturiste (voir poserBiceps)
+const bicepsBJ = piece(new THREE.SphereGeometry(0.075, 14, 10).scale(0.95, 1.45, 1), PEAU_BJ, joueurH.brasD, 0, -0.14, 0.045);
+bicepsBJ.visible = false;
 const giletBJ = piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#243a5a', joueurH.haut, 0, 0.4, 0); // visible quand il en porte un
 // le chapeau de la danse : il tourne autour du milieu de la tête, pour être rabattu sur les yeux
 const chapeauBJ = new THREE.Group(); chapeauBJ.rotation.x = 0.3; joueurH.tete.add(chapeauBJ);
@@ -5083,12 +5123,20 @@ function construireVM() {
   vm.clear();
   const bras = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.085, 0.5), mat('#e0b090')); bras.position.set(0, -0.02, 0.25); vm.add(bras);
   vm.add(new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), mat('#e0b090')));
-  const a = creerArme(J.arme);
+  const a = vm.userData.arme = creerArme(J.arme);
   if (a) { a.rotation.y = Math.PI; a.position.set(0, 0.03, -0.02); vm.add(a); }
+  if (a?.userData.sceptre) { a.rotation.x = 0.8; a.scale.setScalar(0.7); }   // le sceptre : dressé vers le haut, plus petit pour ne pas cacher le viseur (et à gauche de l'écran : voir boucle)
+}
+// en 1re personne, le sceptre est dessiné à part, par-dessus le reste : renvoie le point de la scène qui est à l'écran derrière son bout, à 1 m
+function boutSceptreVM(v) {
+  const a = vm.userData.arme; vm.updateMatrixWorld(true);
+  a.localToWorld(v.set(0, 0, a.userData.bout)).project(vmCamera).unproject(camera);
+  return v.sub(camera.position).setLength(1).add(camera.position);
 }
 function changerArme(i) {
   if (!J.possede[i] || J.arme === i) return;
   J.arme = i; donnerArme(joueurH, i); construireVM();
+  if (joueurH.arme && (J.voiture || J.telesiege)) joueurH.arme.visible = false;   // en voiture ou sur un télésiège, il la garde rangée
 }
 construireVM();
 
@@ -5281,18 +5329,41 @@ function traceur(a, b) {
   scene.add(l); effets.push({ o: l, vie: 0.05 });
 }
 const M_FLASH = new THREE.SpriteMaterial({ map: TEX.flash, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
-function flash(pos, taille = 0.6, dans = scene) {
-  const s = new THREE.Sprite(M_FLASH); s.position.copy(pos); s.scale.setScalar(taille);
+function flash(pos, taille = 0.6, dans = scene, m = M_FLASH) {
+  const s = new THREE.Sprite(m); s.position.copy(pos); s.scale.setScalar(taille);
   dans.add(s); effets.push({ o: s, vie: 0.05, dans });
+}
+// La foudre : un éclair en zigzag du point a au point b, blanc dans son halo bleu, avec des branches qui partent de ses coudes.
+// Plus il s'éloigne, plus il est gros (de loin, on le voit quand même). Il s'éteint au bout de « vie » secondes
+const M_ECLAIR = new THREE.MeshBasicMaterial({ color: '#f4f8ff', toneMapped: false });
+const M_HALO_ECLAIR = new THREE.MeshBasicMaterial({ color: '#4a8cff', transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+const M_FLASH_FOUDRE = new THREE.SpriteMaterial({ blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false,
+  map: toile(64, 64, g => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.3, 'rgba(170,205,255,.8)'); r.addColorStop(1, 'rgba(60,110,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }) });
+const poseEclair = new THREE.Object3D();
+function foudre(a, b, gros = 1, vie = 0.14, branches = 3) {
+  const l = a.distanceTo(b), n = clamp(Math.round(l / 1.5), 3, 24), pts = [a], grossit = k => gros * (1 + k / n * l / 25);
+  for (let k = 1; k < n; k++) pts.push(a.clone().lerp(b, k / n).add(V3(entre(-1, 1), entre(-1, 1), entre(-1, 1)).multiplyScalar(0.22 * l / n)));   // les coudes du zigzag
+  pts.push(b);
+  for (const [m, large] of [[M_ECLAIR, 1], [M_HALO_ECLAIR, 3.5]]) { // un seul objet pour tous les traits (le fil blanc), un autre pour leur halo
+    const traits = new THREE.InstancedMesh(GEO_BALLE, m, n), o = poseEclair;
+    for (let k = 0; k < n; k++) { o.position.copy(pts[k]); o.lookAt(pts[k + 1]); o.scale.set(grossit(k) * large, grossit(k) * large, pts[k].distanceTo(pts[k + 1])); o.updateMatrix(); traits.setMatrixAt(k, o.matrix); }
+    traits.frustumCulled = false; scene.add(traits); effets.push({ o: traits, vie, jeter: traits });
+  }
+  for (let i = 0; i < branches; i++) { // une branche : un petit éclair, deux fois plus fin, qui part de travers
+    const k = 1 + Math.floor(Math.random() * (n - 1)), dir = b.clone().sub(a).normalize().multiplyScalar(0.6).add(V3(entre(-1, 1), entre(-1, 1), entre(-1, 1)));
+    foudre(pts[k], pts[k].clone().addScaledVector(dir, Math.min(10, l * entre(0.06, 0.16))), grossit(k) * 0.5, vie, 0);
+  }
 }
 const lumiereTir = new THREE.PointLight('#ffb050', 0, 12); scene.add(lumiereTir);
 const lumiereBoum = new THREE.PointLight('#ff8030', 0, 40); scene.add(lumiereBoum);
 // une explosion : boule de feu, gros boum, dégâts qui baissent avec la distance, et les voitures proches sautent aussi
 // tireur = celui qui a tiré la roquette (null si c'est B.J.) : l'explosion l'épargne
-function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null) {
-  const s = new THREE.Sprite(M_FLASH.clone()); s.position.copy(pos); scene.add(s);
-  effets.push({ o: s, vie: 0.6, boule: rayon });
-  lumiereBoum.position.copy(pos); lumiereBoum.intensity = 5000;
+// foudre = true : c'est la foudre qui tombe (le sceptre de Zeus). Tout pareil, mais au lieu de la boule de feu, c'est un éclat blanc et bleu,
+// plus petit et qui s'éteint plus vite
+function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null, foudre = false) {
+  const s = new THREE.Sprite((foudre ? M_FLASH_FOUDRE : M_FLASH).clone()); s.position.copy(pos); scene.add(s);
+  effets.push(foudre ? { o: s, vie: 0.3, boule: rayon * 0.6 } : { o: s, vie: 0.6, boule: rayon });
+  lumiereBoum.color.set(foudre ? '#b8d0ff' : '#ff8030'); lumiereBoum.position.copy(pos); lumiereBoum.intensity = 5000;
   bruit(clamp(1.2 - dist(pos, J) / 150, 0, 1), 350, 1.4);
   if (degatsPNJ) for (const p of personnes) { // elle blesse et souffle les personnages : ils volent à la renverse
     const d = Math.hypot(p.x - pos.x, p.y + 1 - pos.y, p.z - pos.z), k = 1 - d / rayon, dx = p.x - pos.x, dz = p.z - pos.z, l = Math.hypot(dx, dz) || 1;
@@ -5376,7 +5447,7 @@ const rayonImpact = Object.assign(new THREE.Raycaster(), { camera });
 // sur les murs : un seul objet pour tous les impacts (R_.impactsMurs au plus). Quand il est plein, le plus vieux laisse sa place
 const impactsMurs = new THREE.InstancedMesh(GEO_IMPACT, M_IMPACT, Math.max(1, R_.impactsMurs)), poseImpact = new THREE.Object3D();
 impactsMurs.count = 0; impactsMurs.frustumCulled = false; impactsMurs.receiveShadow = true; scene.add(impactsMurs);
-// la couleur de chaque impact : l'image telle quelle (du plâtre clair), de la terre, de la neige, ou la marque noire des yeux laser
+// la couleur de chaque impact : l'image telle quelle (du plâtre clair), de la terre, de la neige, ou la marque noire des yeux laser et de la foudre
 const C_IMPACT = new THREE.Color('#fff'), C_TERRE = new THREE.Color('#8a6f4e'), C_NEIGE = new THREE.Color('#dde6ee'), C_BRULE = new THREE.Color('#0c0a08');
 impactsMurs.setColorAt(0, C_IMPACT);
 let nImpacts = 0;   // combien on en a posé depuis le début
@@ -5398,8 +5469,8 @@ function poussiere(P, couleur = null) {
 }
 // une balle finit par terre au point P, dehors : un impact à plat sur le sol. En ville, le sol est à plat, et de pierre ; sur une
 // route ou sur le terrain, il suit la pente ; dans l'herbe, le sable ou la neige, l'impact prend leur couleur. Dans l'eau : une
-// éclaboussure, sans impact. couleur : pour imposer la marque noire des yeux laser
-function impactSol(P, couleur = null) {
+// éclaboussure, sans impact. couleur : pour imposer la marque noire des yeux laser ou de la foudre ; taille : 3 = trois fois plus gros
+function impactSol(P, couleur = null, taille = 1) {
   const x = P.x, z = P.z, y = hauteurSol(x, z), sorte = sorteDeSol(x, z), e = 0.3;
   if (y < EAU) { poussiere(V3(x, EAU + 0.1, z), C_IMPACT); return; }
   if (Math.abs(P.y - y) > 0.3) return;   // sous un pont : pas sur la route du dessus
@@ -5408,7 +5479,7 @@ function impactSol(P, couleur = null) {
   if (sorte === 'route' && N.y < 0.9) N.set(0, 1, 0);   // au bord de la route, la hauteur saute : on reste à plat
   const tendre = sorte === 'herbe' || sorte === 'terre';
   // (vu de biais, un impact par terre paraît tout petit : il est une fois et demie plus gros que sur un mur)
-  impactMur(V3(x, y, z), N, couleur || (neigeSous(x, z) > 0.5 ? C_NEIGE : tendre ? C_TERRE : C_IMPACT), 0.04, 1.5);
+  impactMur(V3(x, y, z), N, couleur || (neigeSous(x, z) > 0.5 ? C_NEIGE : tendre ? C_TERRE : C_IMPACT), 0.04, 1.5 * taille);
 }
 // une balle finit au point P, en allant dans la direction dir : on cherche ce qui est dessiné juste là, pour poser l'impact
 // bien à plat dessus (un vrai rayon, long à calculer : seulement contre les formes des bâtiments d'à côté, et pas trop loin de la caméra)
@@ -6078,8 +6149,15 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
-  if (e.code.startsWith('Digit') && !J.robot) changerArme(+e.code.slice(5) - 1);
+  if (e.code.startsWith('Digit') && !J.robot) choisirArme((+e.code.slice(5) + 9) % 10);
 });
+// les touches 1 à 9 (et 0 pour une 10e arme) : une arme chacune. Les armes des codes de triche (les yeux laser, le sceptre de foudre)
+// sont toutes sur la touche de la première (9) : si on en a plusieurs, chaque appui passe à la suivante
+function choisirArme(i) {
+  if (!ARMES[i] || !pouvoirArme(ARMES[i])) { changerArme(i); return; }
+  const dons = ARMES.map((a, k) => k).filter(k => pouvoirArme(ARMES[k]) && J.possede[k]);
+  if (dons.length) changerArme(dons[(dons.indexOf(J.arme) + 1) % dons.length]);
+}
 addEventListener('keyup', e => touches[e.code] = false);
 const touche = (...codes) => codes.some(c => touches[c]) ? 1 : 0;
 const dansLunette = () => visee && !J.voiture && !J.robot && !J.mort && !!ARMES[J.arme].zoom; // on regarde dans la lunette du sniper
@@ -6121,9 +6199,27 @@ function validerTriche() {
   if (t.action) { t.action(n); if (t.code !== 'MISSION') annonce('', tr(t.texte), 2.5); return; }
   t.actif = !t.actif; // retaper un code annule son effet
   rhabillerBJ();
-  ARMES.forEach((a, i) => { if (a.laser) J.possede[i] = pouvoir('laser'); });   // les yeux laser : on ne les a que tant qu'un code actif les donne
+  ARMES.forEach((a, i) => { const don = pouvoirArme(a); if (don) J.possede[i] = pouvoir(don); });   // les yeux laser, le sceptre de foudre : on ne les a que tant qu'un code actif les donne
   if (!J.possede[J.arme]) changerArme(0);
+  if (t.actif && !J.robot) changerArme(ARMES.findIndex(a => a.modele && t[pouvoirArme(a)]));   // une arme qui se tient (le sceptre) : il la prend en main
+  if (t.actif && t.biceps) poserBiceps(t.biceps);
   annonce('', t.actif ? tr(t.texte) : tr('{effet} (annulé)', { effet: tr(t.texte) }), 2);
+}
+// La pose du culturiste (un code de triche qui a « biceps: 1.3 » : le nombre de secondes) : B.J. se tourne vers la caméra et gonfle son
+// biceps droit. On le regarde de dehors, le temps de la pose. Seulement à pied ; bouger, sauter, s'accroupir, tirer ou viser l'arrête
+function poserBiceps(duree) {
+  if (J.voiture || J.robot || J.telesiege || J.nage || J.mort || J.superman || J.roule || J.echelle) return;
+  J.biceps = { reste: duree, duree, vue: J.vue }; J.vue = 3; J.danse = 0; J.accroupi = false;
+}
+function finirBiceps() { J.vue = J.biceps.vue; J.biceps = null; bicepsBJ.visible = false; }
+// où il en est, de 0 à 1 : il prend la pose d'un coup sec, et la quitte un peu moins vite. Son biceps gonfle, et bat deux fois
+function majBiceps(dt) {
+  const b = J.biceps;
+  if ((b.reste -= dt) <= 0) { finirBiceps(); return 0; }
+  const e = Math.min(1, (b.duree - b.reste) / 0.15, b.reste / 0.25);
+  bicepsBJ.visible = true; bicepsBJ.material = joueurH.brasD.haut.material;   // de la couleur de son bras (nu, en collant bleu, en or...)
+  bicepsBJ.scale.setScalar(e * (1 + 0.25 * Math.abs(Math.sin((b.duree - b.reste) * 2 * Math.PI / b.duree))));
+  return e;
 }
 // remet B.J. dans sa tenue normale (sans accessoires), puis applique les codes actifs
 function rhabillerBJ() {
@@ -6137,7 +6233,7 @@ function rhabillerBJ() {
 }
 // ce que les codes actifs changent au jeu : leurs nombres se multiplient (1 = rien ne change)
 const parTriche = cle => TRICHES.reduce((k, t) => t.actif && t[cle] !== undefined ? k * t[cle] : k, 1);
-const pouvoir = cle => TRICHES.some(t => t.actif && t[cle]);   // un code actif donne-t-il ce pouvoir ? ('laser', 'ecrase')
+const pouvoir = cle => TRICHES.some(t => t.actif && t[cle]);   // un code actif donne-t-il ce pouvoir ? ('laser', 'eclair', 'ecrase')
 const invincible = () => pouvoir('invincible');   // le code DIEU
 // la danse (gauche, arrière, droite, 3 fois de suite) : B.J. se met de profil, pour qu'on voie bien le moonwalk
 const SUITE_DANSE = (R_.touchesDanse.join(' ') + ' ').repeat(3);
@@ -6422,6 +6518,7 @@ function sortirVoiture() {
 const raycaster = new THREE.Raycaster(), vTmp = new THREE.Vector3(), vTmp2 = new THREE.Vector3();
 // d'où part le tir : du bout du canon. cote = -1 ou 1 : de l'œil droit ou gauche (les yeux laser)
 function positionTir(cote = 0) {
+  if (J.vue === 1 && !cote && vm.userData.arme?.userData.sceptre) return boutSceptreVM(vTmp);
   if (J.vue === 1) return camera.localToWorld(cote ? vTmp.set(0.06 * cote, -0.06, -0.6) : vTmp.set(0.2, -0.18, -0.7));
   joueurH.g.updateMatrixWorld(true);
   return cote ? joueurH.tete.localToWorld(vTmp.set(0.042 * cote, 0.012, 0.11)) : boutDuCanon(joueurH, vTmp);
@@ -6453,7 +6550,10 @@ function tirer(a = ARMES[J.arme]) {
   stock[k]--;
   const depart = rb ? boutRobot(rb, a.explosion) : positionTir().clone();
   if (a.laser) bip(2400, 1700, 0.08, 'sawtooth', 0.04);   // les yeux laser grésillent : ni coup de feu, ni recul, ni éclair
-  else {
+  else if (a.eclair) { // la foudre claque au bout du sceptre (le tonnerre, c'est là où elle tombe : voir exploser)
+    J.recul = 1; bruit(0.9, 7000, 0.1); bip(1600, 90, 0.3, 'sawtooth', 0.1);
+    flash(depart, J.vue === 1 ? 0.25 : 1.2, scene, M_FLASH_FOUDRE);
+  } else {
     J.recul = 1;
     bruit(...SON_ARME[a.modele]);
     if (J.vue === 1 && !rb) flash(vTmp2.set(0, 0.03, -0.75).applyMatrix4(vm.matrixWorld), 0.25, vmScene); else flash(depart, rb ? 1.1 : 0.6);
@@ -6479,25 +6579,29 @@ function tirer(a = ARMES[J.arme]) {
     }
     if (hit || sol) {
       const u = hit?.object.userData || {}, p = u.personne;
-      if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
       const vc = !p && u.voiture, roue = vc && vc.roues.find(r => r.tourne === hit.object.parent);
-      if (roue) crever(vc, roue);   // un pneu : il éclate
+      // la foudre : tout ce qui est à moins de a.eclair mètres prend le choc, comme dans une explosion (les gens volent, les voitures sautent)
+      if (a.eclair) { exploser(point, a.eclair, a.degats, R_.degatsExplosion, null, true); etincelles(point, 10, 6); }
+      else if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
+      else if (roue) crever(vc, roue);   // un pneu : il éclate
       else if (vc) { // une voiture : un petit trou dans la tôle, et la vitre touchée se fêle (puis se brise)
         const q = vc.m.quaternion.clone().invert();
         abimer(vc, vc.m.worldToLocal(hit.point.clone()), raycaster.ray.direction.clone().applyQuaternion(q), a.degats / 400, true);
         if (!estBlindee(vc)) blesserConducteur(vc, a.degats);   // et celui qui conduit est touché
         impactVoiture(vc, raycaster);   // le trou de la balle (sur un blindage : juste des étincelles)
       }
-      if (!p && !vc && u.robot) toucherRobot(u.robot, a.degats, hit.object);   // le heavy robot : la vitre, puis le pilote
+      else if (u.robot) toucherRobot(u.robot, a.degats, hit.object);   // le heavy robot : la vitre, puis le pilote
       if (!p && !vc && u.tourelle && (u.tourelle.vie -= a.degats) <= 0) { // une mitrailleuse de la banque, détruite
         u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
       }
-      if (u.mur) impactMur(point, hit.face.normal.clone().transformDirection(hit.object.matrixWorld), a.laser ? C_BRULE : C_IMPACT);   // un mur, un plancher, un meuble
-      if (sol) impactSol(point, a.laser ? C_BRULE : null);
+      const brule = a.laser || a.eclair, taille = a.eclair ? 3 : 1;   // les yeux laser et la foudre laissent une marque noire (la foudre : trois fois plus grosse)
+      if (u.mur) impactMur(point, hit.face.normal.clone().transformDirection(hit.object.matrixWorld), brule ? C_BRULE : C_IMPACT, 0.01, taille);   // un mur, un plancher, un meuble
+      if (sol) impactSol(point, brule ? C_BRULE : null, taille);
       flash(point, 0.3);
       if (a.laser) etincelles(point, 2, 2);   // ça grésille là où les rayons touchent
     }
     if (a.laser) { cibleLaser.copy(point); J.laser = 0.1; }   // les deux rayons rouges : voir majLaser
+    else if (a.eclair) { const gros = J.vue === 1 ? 0.5 : 1; foudre(depart, point, gros); foudre(depart, point, gros * 0.6, 0.07, 1); }   // deux éclairs l'un sur l'autre, dont un qui s'éteint plus vite : ça clignote (en 1re personne, ils partent tout près : plus fins)
     else if (a.modele === 'lourde') balleLourde(depart, point); else traceur(depart, point);
   }
   // le bruit fait fuir les piétons et alerte soldats, vigiles et policiers
@@ -6596,6 +6700,7 @@ function majJoueur(dt) {
   const court = touche('ShiftLeft', 'ShiftRight') && !visee;
   if ((court || J.nage) && J.accroupi) J.accroupi = false;
   if (J.danse && (av || lat || touches.Space || J.accroupi || sourisG || visee || J.nage)) J.danse = 0;   // bouger, sauter, s'accroupir, tirer ou viser arrête la danse
+  if (J.biceps && (av || lat || touches.Space || J.accroupi || sourisG || visee || J.nage || J.danse)) finirBiceps();   // ...et la pose du culturiste aussi
   const moonwalk = J.danse > 0 && J.danse < R_.moonwalk[0];
   const v = (moonwalk ? R_.vitesseMoonwalk : J.nage ? (court ? R_.vitesseNageRapide : R_.vitesseNage) : J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche)
     * parTriche('vitesse') * (J.energie > 0 ? R_.vitesseEnergie : 1);   // la boisson énergisante fait aller plus vite
@@ -6634,21 +6739,24 @@ function majJoueur(dt) {
     else { p.x = J.x + dx * 0.65; p.z = J.z + dz * 0.65; p.touche = 0.3; }
   }
   // orientation du corps : celle de la danse, sinon vers la caméra avec une arme à feu, sinon vers où on marche
-  const danse = J.danse ? pasDeDanse(dt) : null;
-  if (!danse) {
+  const danse = J.danse ? pasDeDanse(dt) : null, biceps = J.biceps ? majBiceps(dt) : 0;
+  if (J.biceps) J.angleCorps = lerpAngle(J.angleCorps, J.lacet + Math.PI, 15 * dt);   // la pose du culturiste : face à la caméra
+  else if (!danse) {
     if (!J.nage && (!ARMES[J.arme].corps || visee || J.vue === 1)) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
     else if (n > 0) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(mx, mz), 10 * dt);
   }
   if (J.nage) joueurH.g.position.set(J.x - Math.sin(J.angleCorps) * 0.9, EAU - 0.25, J.z - Math.cos(J.angleCorps) * 0.9);   // couché dans l'eau
   else joueurH.g.position.set(J.x, J.y, J.z);
   joueurH.g.rotation.y = robot ? Math.round(J.angleCorps / 0.2) * 0.2 : J.angleCorps;   // un robot se tourne par crans
-  if (joueurH.arme) joueurH.arme.visible = !J.nage && !danse;   // il range son arme pour nager ou danser
+  // il range son arme pour nager, pour danser, ou pour montrer son biceps (pas le sceptre : il est dans l'autre main)
+  const sceptre = !!joueurH.arme?.userData.sceptre, range = J.nage || !!danse || (!!J.biceps && !sceptre);
+  if (joueurH.arme) joueurH.arme.visible = !range;
   const genou = J.genou > 0 ? Math.min(1, (0.9 - J.genou) / 0.08, J.genou / 0.3) : 0;   // il tombe vite sur le genou, et se relève doucement
   // en l'air : il a sauté (jusqu'à ce qu'il retombe), ou il tombe vite (pas en descendant un escalier)
   if (J.sol || J.nage) J.saute = false;
   const enLair = !J.sol && !J.nage && (J.saute || J.vy < -4);
-  animerHumain(joueurH, J.vitesse, dt, { arme: armeEnMain() && !J.nage && !danse, accroupi: J.accroupi, frappe: J.frappe, nage: J.nage, danse, robot,
-    saut: enLair ? J.vy : undefined, atterri: J.atterri, genou });
+  animerHumain(joueurH, J.vitesse, dt, { arme: armeEnMain() && !range, accroupi: J.accroupi, frappe: J.frappe, nage: J.nage, danse, robot,
+    saut: enLair ? J.vy : undefined, atterri: J.atterri, genou, pointe: 0.4 * J.recul, biceps });   // (le sceptre part en avant à chaque éclair)
   // en l'air, ses membres ont du poids ; à l'atterrissage, le haut du corps continue sur sa lancée, les pieds restent posés (pas un robot)
   membresMous(joueurH, dt, !robot && (enLair || J.atterri > 0 || genou > 0) ? { raideur: 25, sol: J.sol ? J.y : -Infinity, jambes: enLair, vx, vy: J.vy, vz } : { sol: J.y });
 }
@@ -6859,7 +6967,7 @@ function superman(dt) {
   joueurH.g.rotation.y = J.angleCorps;
   if (joueurH.arme) joueurH.arme.visible = tir;   // il range son arme pour voler, sauf pour tirer
   // à l'horizontale, il est couché ; tout droit vers le haut, debout, le bras levé ; en descendant tout droit, debout, les pieds en bas
-  animerHumain(joueurH, 0, dt, { superman: e, bascule, arme: tir && armeEnMain(), leve: bascule + J.tangage });   // couché, il lève les bras pour viser devant lui (pas pour les yeux laser)
+  animerHumain(joueurH, 0, dt, { superman: e, bascule, arme: tir && armeEnMain(), leve: bascule + J.tangage, pointe: 1 });   // couché, il lève les bras pour viser devant lui (pas pour les yeux laser) ; il pointe son sceptre
   // lancé, il penche dans ses virages (pas quand il tire : il vise). Il roule autour de la direction où il vole, même couché : d'où l'ordre 'YZX'
   if (dt) f.roulis += ((tir ? 0 : roulisVirage(diffAngle(angleAvant, J.angleCorps) / dt) * e) - f.roulis) * Math.min(1, dt * 3);
   joueurH.g.quaternion.setFromEuler(new THREE.Euler(bascule, J.angleCorps, f.roulis, 'YZX'));
@@ -8210,7 +8318,7 @@ function majHUD(dt) {
   $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
   const a = ARMES[J.arme], rb = J.robot;
   $('arme').textContent = rb ? 'Heavy robot' : tr(a.nom);
-  $('munitions').textContent = rb ? `${tr('{n} balles', { n: rb.munitions.lourde })} · ${tr('{n} roquettes', { n: rb.munitions.roquettes })}` : a.corps || a.laser ? '' : tr(a.explosion ? '{n} roquettes' : '{n} balles', { n: J.balles[J.arme] });
+  $('munitions').textContent = rb ? `${tr('{n} balles', { n: rb.munitions.lourde })} · ${tr('{n} roquettes', { n: rb.munitions.roquettes })}` : a.corps || pouvoirArme(a) ? '' : tr(a.explosion ? '{n} roquettes' : '{n} balles', { n: J.balles[J.arme] });
   const m = MISSIONS[missionIndex];
   $('objectif').textContent = tr(m ? m.etapes[etapeIndex].texte : 'Pays libre : fais ce que tu veux !');
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
@@ -8248,6 +8356,7 @@ function majHUD(dt) {
 function mettreAJour(dt) {
   temps += dt;
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
+  if (J.biceps && (J.mort || J.voiture || J.robot || J.telesiege || J.superman || J.roule || J.echelle)) finirBiceps();   // et on ne montre son biceps que debout
   if (J.mort) {
     J.mort += dt; J.roule = null; J.telesiege = null;
     const k = Math.min(1, J.mort * 1.25);
@@ -8288,7 +8397,7 @@ function mettreAJour(dt) {
       annonce(tr('{objet} volé !', { objet: tr(t.nom) }), `+${t.prix} $`, 2);
     }
     if (o.type === 'munitions') { // des munitions pour chaque arme à feu qu'on a (pas de roquettes)
-      const armes = ARMES.map((a, i) => i).filter(i => J.possede[i] && !ARMES[i].corps && !ARMES[i].explosion && !ARMES[i].laser);
+      const armes = ARMES.map((a, i) => i).filter(i => J.possede[i] && !ARMES[i].corps && !ARMES[i].explosion && !pouvoirArme(ARMES[i]));
       if (!armes.length) continue;
       for (const i of armes) J.balles[i] += Math.ceil(ARMES[i].munitions / 2);
       annonce('', tr('+ munitions pour tes armes'), 2);
@@ -8373,6 +8482,7 @@ function boucle(t) {
   // arme en première personne : balancement en marchant, recul au tir
   vm.position.set(0.2 + Math.sin(joueurH.phase) * 0.01, -0.2 - Math.abs(Math.cos(joueurH.phase)) * 0.01, -0.5 + J.recul * 0.05);
   vm.rotation.set(J.recul * 0.15 - J.frappe * 0.8, 0, 0);
+  if (vm.userData.arme?.userData.sceptre) { vm.position.x -= 0.52; vm.position.y -= 0.1; vm.rotation.x = -J.recul * 0.25; }   // le sceptre : dans la main gauche, et il part en avant à chaque éclair
   renderer.clear();
   renderer.render(scene, camera);
   if (J.vue === 1 && !J.voiture && !J.mort && !dansLunette()) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
@@ -8389,7 +8499,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, toucheSol, sorteDeSol, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
-  exploser, blesserJoueur, cibleMission, V3, TRICHES, ecraser, effets, capeBJ, rayonsLaser, majLaser, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
+  exploser, blesserJoueur, cibleMission, V3, TRICHES, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
