@@ -284,6 +284,11 @@ const TRADUCTIONS = {
   'Fusil de sniper':  { de: 'Scharfschützengewehr', en: 'Sniper rifle', gsw: 'Scharfschützegwehr' },
   'Yeux laser':       { de: 'Laseraugen', en: 'Laser eyes', gsw: 'Laserauge' },
   'Sceptre de foudre': { de: 'Blitzzepter', en: 'Lightning sceptre', gsw: 'Blitzzepter' },
+  'Batarang enflammé': { de: 'Brennender Batarang', en: 'Flaming batarang', gsw: 'Brännende Batarang' },
+  'Batarang électrique': { de: 'Elektro-Batarang', en: 'Electric batarang', gsw: 'Elektro-Batarang' },
+  'Batarang explosif': { de: 'Explosiver Batarang', en: 'Explosive batarang', gsw: 'Explosive Batarang' },
+  'Filet':            { de: 'Netz', en: 'Net', gsw: 'Netz' },
+  "Toile d'araignée": { de: 'Spinnennetz', en: 'Spider web', gsw: 'Spinnenetz' },
   'Masque à gaz':    { de: 'Gasmaske', en: 'Gas mask', gsw: 'Gasmaske' },
   '{n} balles':       { de: '{n} Kugeln', en: '{n} bullets', gsw: '{n} Kugle' },
   '{n} roquettes':    { de: '{n} Raketen', en: '{n} rockets', gsw: '{n} Rakete' },
@@ -401,6 +406,16 @@ const TRADUCTIONS = {
     en: 'Invincible, like Zeus! Lightning sceptre and laser eyes (key 9), and falling from high up crushes everything', gsw: 'Unbsiegbar, wie de Zeus! Blitzzepter und Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
   'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Superman! Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
     en: 'Superman! Laser eyes (key 9), and falling from high up crushes everything', gsw: 'Superman! Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
+  "Batman ! Batarangs et filet (touche 9), grappin (G), la cape pour planer (Maj en l'air), et la Batmobile": { de: 'Batman! Batarangs und Netz (Taste 9), Greifhaken (G), der Umhang zum Gleiten (Shift in der Luft) und das Batmobil',
+    en: 'Batman! Batarangs and net (key 9), grapple (G), the cape to glide (Shift in the air), and the Batmobile', gsw: 'Batman! Batarangs und Netz (Taschte 9), Griifhaagge (G), de Umhang zum Gleite (Shift i de Luft) und s Batmobil' },
+  'Spiderman ! Toile et filet (touche 9), se balancer (G), grimper aux murs, et tomber de haut ne fait pas mal': { de: 'Spiderman! Spinnennetz und Netz (Taste 9), schwingen (G), an Wänden hochklettern, und ein Sturz aus großer Höhe tut nicht weh',
+    en: 'Spiderman! Web and net (key 9), swing (G), climb walls, and falling from high up does not hurt', gsw: 'Spiderman! Spinnenetz und Netz (Taschte 9), schwinge (G), a de Wänd ufechlättere, und vo wiit obe abegheie tuet nöd weh' },
+  'Vise un bâtiment': { de: 'Ziel auf ein Gebäude', en: 'Aim at a building', gsw: 'Ziel uf es Gebäude' },
+  'Z S : monter ou descendre · Q D : de côté · Espace : sauter du mur': { de: 'W S: hoch oder runter · A D: zur Seite · Leertaste: von der Wand springen', en: 'W S: up or down · A D: sideways · Space: jump off the wall', gsw: 'W S: ufe oder abe · A D: uf d Siite · Läärtaschte: vo de Wand gumpe' },
+  'Lâche <b>G</b> pour lâcher la toile · Z Q S D : prendre de l\'élan': { de: 'Lass <b>G</b> los, um das Netz loszulassen · W A S D: Schwung holen', en: 'Release <b>G</b> to let go of the web · W A S D: build up speed', gsw: 'Laa <b>G</b> los, zum s Netz loslaa · W A S D: Schwung hole' },
+  'Lâche le bouton pour lancer la voiture là où tu regardes': { de: 'Lass die Maustaste los, um das Auto dorthin zu werfen, wo du hinschaust', en: 'Release the button to throw the car where you are looking', gsw: 'Laa d Muustaschte los, zum s Auto det ane rüere, wo d aneluegsch' },
+  '<b>Espace</b> : lâcher le grappin': { de: '<b>Leertaste</b>: Greifhaken loslassen', en: '<b>Space</b>: let go of the grapple', gsw: '<b>Läärtaschte</b>: Griifhaagge loslaa' },
+  'Garde <b>Maj</b> enfoncé pour déployer la cape': { de: 'Halte <b>Shift</b> gedrückt, um den Umhang auszubreiten', en: 'Hold <b>Shift</b> to spread the cape', gsw: 'Heb <b>Shift</b> druckt, zum de Umhang uusbreite' },
   'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
   'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
   'Saute à une mission : MISSION8 pour la mission 8': { de: 'Springt zu einer Mission: MISSION8 für Mission 8', en: 'Jumps to a mission: MISSION8 for mission 8', gsw: 'Gumpt zunere Mission: MISSION8 für d Mission 8' },
@@ -699,6 +714,15 @@ const REGLAGES = {
   vitesseVolMax: 100,        // ...jusqu'à ça (360 km/h, plus vite que l'avion !)
   tripleMaj: 0.6,            // secondes pour taper Maj 3 fois
   roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36°, 1.5 = jusqu'à 60°
+  // les codes de triche BATMAN et SPIDERMAN (leurs armes sont dans ARMES, juste en dessous)
+  porteeGrappin: 90,         // mètres : jusqu'où s'accrochent le grappin de Batman et la toile de Spiderman (touche G)
+  vitesseGrappin: 30,        // m/s : le grappin tire Batman jusqu'au toit à cette vitesse
+  vitesseCape: 16,           // m/s : Batman plane, la cape déployée (Maj en l'air)...
+  chuteCape: 2,              // ...en descendant de ça (m/s). En regardant vers le bas, il pique : il va plus vite, et il descend plus vite
+  vitesseGrimpe: 5,          // m/s : Spiderman grimpe aux murs
+  vitesseBalance: 35,        // m/s : au bout de sa toile, Spiderman ne va jamais plus vite que ça
+  vitesseLancer: 35,         // m/s : la voiture que Spiderman fait tourner au bout de sa toile part à cette vitesse
+  vitesseBatarang: 40,       // m/s : les batarangs et les filets volent à cette vitesse
   graviteVoiture: 9.8,       // la vraie gravité de la Terre pour les voitures qui sautent (mets 1.6 pour rouler sur la Lune !)
   degatsVoitures: 1,         // 1 = normal, 2 = les voitures s'abîment deux fois plus vite, 0 = jamais
   impactsMurs: 500,          // combien d'impacts de balles restent sur les murs et par terre : au-delà, le plus vieux s'efface (0 = aucun impact)
@@ -753,6 +777,20 @@ const ARMES = [
   // de tout ce que la foudre grille autour (comme l'explosion du bazooka). Pas de prix, pas de munitions : on ne l'a qu'avec un code
   // de triche qui a « eclair: true » (DIEU)
   { nom: 'Sceptre de foudre', modele: 'sceptre',   degats: 400, cadence: 0.5, portee: 200, auto: true, eclair: 4 },
+  // les batarangs de Batman : des étoiles en forme de chauve-souris, qu'il lance là où on vise. On ne les a qu'avec un code de triche
+  // qui a « batarang: true » (BATMAN). batarang : ce qu'il fait en arrivant, à tout ce qui est à moins de « rayon » mètres :
+  //   'feu' : ça brûle pendant « duree » secondes, et les voitures prennent feu
+  //   'electrique' : les gens sont paralysés pendant « duree » secondes, et les voitures qui roulent tombent en panne
+  //   'explosif' : ça saute, comme une roquette
+  { nom: 'Batarang enflammé',   modele: 'batarang', degats: 60,  cadence: 0.4, portee: 80, batarang: 'feu',        rayon: 2.5, duree: 4 },
+  { nom: 'Batarang électrique', modele: 'batarang', degats: 20,  cadence: 0.4, portee: 80, batarang: 'electrique', rayon: 4,   duree: 6 },
+  { nom: 'Batarang explosif',   modele: 'batarang', degats: 200, cadence: 0.8, portee: 80, batarang: 'explosif',   rayon: 4 },
+  // le filet (un code qui a « filet: true » : BATMAN, SPIDERMAN) : il s'ouvre en arrivant, et ceux qui sont dessous, à moins de « rayon » mètres,
+  // sont pris pendant « duree » secondes : ils ne bougent plus et ne tirent plus. Ça ne fait pas mal
+  { nom: 'Filet',               modele: null,       degats: 0,   cadence: 1,   portee: 60, filet: true, rayon: 2.5, duree: 12 },
+  // la toile de Spiderman (un code qui a « toile: true » : SPIDERMAN). Sur quelqu'un : elle l'emballe dans un cocon pendant « duree » secondes.
+  // Sur une voiture : elle l'attrape. Garde le bouton enfoncé pour la faire tourner autour de toi, lâche-le pour la lancer
+  { nom: "Toile d'araignée",    modele: null,       degats: 0,   cadence: 0.35, portee: 60, toile: true, duree: 20 },
 ];
 // Les objets de valeur qu'on vole dans les immeubles où l'on entre, et ce qu'ils rapportent. Change les prix, ou ajoute une ligne
 // avec une de ces formes : collier, montre, bague, diamant, lingot, billets, console, portable, telephone
@@ -776,7 +814,7 @@ const ARMES_ROBOT = {
 // =====================================================================
 //  LES VOITURES : change-les, ou invente les tiennes !
 //  modele : la forme ('classique', 'porsche', 'minibus', '4x4', 'limousine', 'tricycle', 'fourgon', 'moto', 'segway', 'delorean', 'coccinelle',
-//           'kodiaq', 'tt', 'lamborghini', 'rolls', 'quattro', 'mini', pour les bateaux 'horsbord' ou 'jetski',
+//           'kodiaq', 'tt', 'lamborghini', 'rolls', 'quattro', 'mini', 'batmobile', pour les bateaux 'horsbord' ou 'jetski',
 //           et pour ce qui vole 'avion' ou 'helico')
 //  vitesse : en m/s (× 3,6 pour avoir des km/h)   virage : 1 = normal, plus grand = tourne plus sec
 //  chance : plus le nombre est grand, plus on en croise (0 = jamais)   couleurs : si on n'en met pas, toutes
@@ -843,6 +881,10 @@ const VOITURES = [
     son: { grave: 110, aigu: 320, rapports: 1, rauque: 0.4, volume: 0.07 } },
   { nom: 'Hélicoptère', modele: 'helico', vitesse: 40, acceleration: 8, virage: 1, chance: 0, vole: 'helico', montee: 8, couleurs: ['#1a3a8a', '#c81010', '#111', '#f0c020'],
     son: { grave: 14, aigu: 24, rapports: 1, rauque: 1, volume: 0.09, petarade: true } },
+  // la Batmobile : on ne la croise jamais, elle apparaît à côté de toi quand tu tapes le code de triche BATMAN. Longue, basse, toute noire,
+  // avec deux ailerons et un réacteur. Elle est blindée (blinde: true), comme le fourgon : les balles ne lui font rien
+  { nom: 'Batmobile', modele: 'batmobile', vitesse: 62, acceleration: 30, virage: 1.25, chance: 0, couleurs: ['#101014'], blinde: true,
+    son: { grave: 45, aigu: 300, rapports: 5, rauque: 1, volume: 0.07 } },
 ];
 
 // =====================================================================
@@ -1244,7 +1286,12 @@ const TENUES_GLISSE = {
 //  laser (il a les yeux laser, une des ARMES : touche 9), eclair (il a le sceptre de foudre, une autre
 //  des ARMES : touche 9 aussi, et il le prend en main), ecrase (tomber de haut ne lui fait pas mal : ça
 //  écrase ce qu'il y a dessous, voir REGLAGES.rayonEcrase), biceps (quand on tape le code, il prend
-//  la pose du culturiste et montre son biceps droit : le nombre de secondes que ça dure).
+//  la pose du culturiste et montre son biceps droit : le nombre de secondes que ça dure),
+//  batarang, filet, toile (il a les ARMES qui ont le même mot : les batarangs, le filet, la toile d'araignée ; touche 9
+//  encore. Avec toile, la touche G lance aussi une toile sur un bâtiment, pour se balancer), grappin (la touche G lance
+//  un grappin qui le tire sur le toit du bâtiment visé), cape (en l'air, Maj déploie sa cape : il plane), grimpe (il grimpe
+//  aux murs en avançant dessus), souple (tomber de haut ne lui fait pas mal), voiture (le nom d'une des VOITURES :
+//  elle apparaît à côté de lui quand on tape le code).
 //  Le bouton 🎮 du menu les montre tous, avec leur texte : un code que tu ajoutes ici y sera aussi.
 // =====================================================================
 //  Un bras ou une jambe est en deux morceaux (haut et bas) : habillerMembre les colorie ensemble.
@@ -1305,8 +1352,77 @@ const TRICHES = [
         g.fillStyle = jaune; g.fill(); g.lineWidth = 9; g.lineJoin = 'round'; g.strokeStyle = rouge; g.stroke();
         g.fillStyle = rouge; g.font = 'bold 82px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('S', 0, 57);
       }), { alphaTest: 0.5, bumpScale: 0.01 });
-      b.torse.add(capeBJ);   // la cape, qui flotte au vent
+      mettreCape(b, rouge);   // la cape, qui flotte au vent
       habiller(b.cheveux, noir); accessoire(GEO.boucle, noir, b.tete, 0.012, 0.086, 0.104).rotation.z = 2.4;   // l'accroche-cœur, sur le front
+    } },
+  // Batman : le costume gris, le slip, les gants, les bottes et la cagoule noirs (avec ses deux oreilles pointues), la ceinture jaune,
+  // la chauve-souris sur la poitrine et la grande cape noire. Il a les batarangs et le filet (touche 9), le grappin (touche G), la cape
+  // pour planer (Maj en l'air), et sa Batmobile apparaît à côté de lui. Il n'est pas invincible, et tomber de haut lui fait mal : à lui de planer !
+  { code: 'BATMAN', texte: "Batman ! Batarangs et filet (touche 9), grappin (G), la cape pour planer (Maj en l'air), et la Batmobile", batarang: true, filet: true, grappin: true, cape: true, voiture: 'Batmobile', effet: b => {
+      const gris = '#5c6068', noir = '#131318', jaune = '#f0c41a';
+      habiller(b.torse, gris); habiller(b.bassin, noir); habiller(b.ceinture, jaune);
+      for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, gris);
+      for (const [m, c] of [[b.brasD, -1], [b.brasG, 1]]) { // les gants montent jusqu'au coude, avec trois ailerons pointus sur le côté
+        habiller(m.bas, noir); habiller(m.main, noir);
+        for (const y of [-0.09, -0.15, -0.21]) accessoire(GEO.aileronGant, noir, m.pli, 0.05 * c, y, -0.01).rotation.z = -1.2 * c;
+      }
+      for (const j of [b.jambeD, b.jambeG]) { // les bottes montent sur le mollet
+        habiller(j.chaussure, noir);
+        accessoire(GEO.tigeSantiag, noir, j.pli, 0, 0, 0).material = mat(noir, { side: THREE.DoubleSide });
+      }
+      for (const x of [-0.1, 0, 0.1]) accessoire(GEO.moustache, jaune, b.ceinture, x, 0, 0.1).scale.set(1.1, 1.9, 1.6);   // les sacoches de la ceinture
+      // l'écusson : un ovale jaune bordé de noir, avec la chauve-souris (la forme du batarang : DESSIN_BATARANG)
+      accessoire(GEO.blason, jaune, b.torse, 0, 0, 0).material = std(toile(128, 128, g => {
+        g.translate(64, 62);
+        g.beginPath(); g.ellipse(0, 0, 56, 32, 0, 0, 7); g.fillStyle = jaune; g.fill(); g.lineWidth = 5; g.strokeStyle = noir; g.stroke();
+        g.beginPath(); for (const [x, y] of CONTOUR_BATARANG) g.lineTo(x * 46, -y * 46); g.fillStyle = noir; g.fill();
+      }), { alphaTest: 0.5, bumpScale: 0.01 });
+      // la cagoule : toute la tête est noire, sauf le bas du visage ; les yeux sont blancs, et deux oreilles pointues se dressent dessus
+      b.cheveux.visible = false;
+      habiller(b.cou, noir); for (const o of b.tete.children) if (o.userData.habit && o !== b.cheveux) habiller(o, noir);   // (le cou, le nez et les oreilles sont dessous)
+      b.tete.material = new THREE.MeshStandardMaterial({ roughness: 0.75, map: toile(256, 128, (g, l, h) => {   // (le devant de la tête est au quart de l'image)
+        g.fillStyle = noir; g.fillRect(0, 0, l, h);
+        g.fillStyle = PEAU_BJ; g.beginPath(); g.moveTo(40, h); g.lineTo(40, 86); g.quadraticCurveTo(64, 68, 88, 86); g.lineTo(88, h); g.fill();
+        g.fillStyle = 'rgba(110,30,30,.75)'; g.fillRect(54, 86, 20, 2.6);                                         // la bouche
+        g.fillStyle = '#f4f4f0';
+        for (const c of [-1, 1]) { g.beginPath(); g.moveTo(64 + 8 * c, 60); g.lineTo(64 + 23 * c, 52); g.lineTo(64 + 21 * c, 60); g.lineTo(64 + 11 * c, 62.5); g.fill(); }   // les yeux, en amande
+      }) });
+      for (const c of [-1, 1]) accessoire(GEO.oreilleBatman, noir, b.tete, 0.078 * c, 0.155, -0.012).rotation.z = -0.18 * c;
+      mettreCape(b, noir, true);   // la cape, noire, le bas découpé comme une aile de chauve-souris
+    } },
+  // Spiderman : le costume rouge et bleu, avec les fils noirs de la toile, l'araignée sur la poitrine, et la cagoule rouge aux grands yeux blancs.
+  // Il a la toile d'araignée et le filet (touche 9), il se balance au bout de sa toile (touche G), il grimpe aux murs en avançant dessus,
+  // et il retombe toujours sur ses pattes : tomber de haut ne lui fait pas mal. Il n'est pas invincible : les balles lui font mal
+  { code: 'SPIDERMAN', texte: 'Spiderman ! Toile et filet (touche 9), se balancer (G), grimper aux murs, et tomber de haut ne fait pas mal', toile: true, filet: true, grimpe: true, souple: true, effet: b => {
+      const rouge = '#c8141c', bleu = '#1a3a9a', noir = '#101014';
+      // les fils de la toile, sur le tissu rouge : des traits de haut en bas, reliés par des petits arcs qui pendent
+      const fils = (g, l, h) => {
+        g.fillStyle = rouge; g.fillRect(0, 0, l, h); g.strokeStyle = noir; g.lineWidth = 1.2;
+        for (let x = 0; x <= l; x += 16) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+        for (let y = 6; y < h; y += 14) for (let x = 0; x < l; x += 16) { g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + 8, y + 6, x + 16, y); g.stroke(); }
+      };
+      const tissu = std(toile(64, 64, fils), { bumpScale: 0.02 });
+      b.torse.material = std(toile(128, 128, (g, l, h) => { // le devant est à gauche de l'image (et tout à droite), le dos au milieu : les côtés, sous les bras, sont bleus
+        fils(g, l, h); g.fillStyle = bleu; for (const x of [32, 96]) g.fillRect(x - 15, 46, 30, h);
+      }), { bumpScale: 0.02 });
+      habiller(b.bassin, bleu); habiller(b.ceinture, rouge);
+      for (const m of [b.brasD, b.brasG]) { habiller(m.haut, bleu); m.bas.material = tissu; habiller(m.main, rouge); }       // les gants rouges montent jusqu'au coude
+      for (const j of [b.jambeD, b.jambeG]) { habiller(j.haut, bleu); j.bas.material = tissu; habiller(j.chaussure, rouge); }   // et les bottes jusqu'au genou
+      // l'araignée noire, sur la poitrine (là où rien n'est dessiné, on voit le costume à travers)
+      accessoire(GEO.blason, noir, b.torse, 0, 0, 0).material = std(toile(128, 128, g => {
+        g.translate(64, 58); g.fillStyle = g.strokeStyle = noir; g.lineWidth = 5; g.lineCap = g.lineJoin = 'round';
+        g.beginPath(); g.ellipse(0, -10, 9, 11, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(0, 14, 11, 19, 0, 0, 7); g.fill();   // la tête et le ventre
+        for (const c of [-1, 1]) for (const [y0, x1, y1, x2, y2] of [[-8, 24, -22, 34, -42], [-4, 30, -8, 47, -18], [2, 30, 12, 47, 26], [6, 22, 26, 30, 50]]) {
+          g.beginPath(); g.moveTo(0, y0); g.lineTo(x1 * c, y1); g.lineTo(x2 * c, y2); g.stroke(); }                              // les 8 pattes, pliées
+      }), { alphaTest: 0.5, bumpScale: 0.01 });
+      // la cagoule : toute la tête est rouge, avec les fils de la toile et deux grands yeux blancs bordés de noir
+      b.cheveux.visible = false;
+      habiller(b.cou, rouge); for (const o of b.tete.children) if (o.userData.habit && o !== b.cheveux) habiller(o, rouge);   // (le cou, le nez et les oreilles sont dessous)
+      b.tete.material = new THREE.MeshStandardMaterial({ roughness: 0.75, map: toile(256, 128, (g, l, h) => {   // (le devant de la tête est au quart de l'image)
+        fils(g, l, h);
+        for (const c of [-1, 1]) { g.save(); g.translate(64 + 17 * c, 58); g.rotate(-0.42 * c);
+          g.beginPath(); g.ellipse(0, 0, 13, 8, 0, 0, 7); g.fillStyle = '#f6f6f2'; g.fill(); g.lineWidth = 3.5; g.strokeStyle = noir; g.stroke(); g.restore(); }
+      }) });
     } },
   { code: 'SLIP',        texte: 'En slip !',            effet: b => { habiller(b.bassin, '#fff'); b.ceinture.visible = false; habillerMembre(b.jambeD, PEAU_BJ); habillerMembre(b.jambeG, PEAU_BJ); } },
   { code: 'CHAUSSURE',   texte: 'Une chaussure perdue', effet: b => habiller(b.jambeG.chaussure, '#eee') },   // il reste la chaussette
@@ -1473,8 +1589,9 @@ const roulisVirage = vire => -clamp(vire, -0.7, 0.7) * R_.roulisVirage;
 function graine(n) { return () => { n = (n + 0x6D2B79F5) | 0; let t = Math.imul(n ^ (n >>> 15), 1 | n); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const hasardR = (l, rnd) => l[Math.floor(rnd() * l.length)];
 const indexArme = nom => ARMES.findIndex(a => a.nom === nom);
-// une arme qu'on n'a qu'avec un code de triche : le pouvoir que ce code doit avoir ('laser', 'eclair'). Pour les autres armes : rien
-const pouvoirArme = a => a.laser ? 'laser' : a.eclair ? 'eclair' : null;
+// une arme qu'on n'a qu'avec un code de triche : le pouvoir que ce code doit avoir ('laser', 'eclair', 'batarang'...). Pour les autres armes : rien
+const POUVOIRS_ARMES = ['laser', 'eclair', 'batarang', 'filet', 'toile'];
+const pouvoirArme = a => POUVOIRS_ARMES.find(k => a[k]) || null;
 
 // =====================================================================
 //  Géographie : cases de PAS mètres (un pâté de S mètres et sa rue de R mètres)
@@ -3621,11 +3738,13 @@ function resoudre(o, r, haut = 1.7) { // pousse un cercle (o.x, o.z, rayon r, ha
   o.x = clamp(o.x, -30, TAILLE_X + 30); o.z = clamp(o.z, -30, TAILLE_Z + 30);
   return choc;
 }
-function dansBatiment(x, y, z) {
-  let r = false;
-  pourBoites(x, z, x, z, b => { if (x > b.x1 && x < b.x2 && z > b.z1 && z < b.z2 && y < b.h && y > b.y0) r = true; });
+// la boîte de collision où est le point (x, y, z), ou null
+function boiteEn(x, y, z) {
+  let r = null;
+  pourBoites(x, z, x, z, b => { if (x > b.x1 && x < b.x2 && z > b.z1 && z < b.z2 && y < b.h && y > b.y0) r = b; });
   return r;
 }
+function dansBatiment(x, y, z) { return !!boiteEn(x, y, z); }
 // la hauteur du sol en (x, z) : terrain, trottoir, rue, route, pont... Si on donne y (la hauteur des pieds),
 // on compte aussi les planchers, les marches et les toits qui ne sont pas trop haut au-dessus
 function hauteurSol(x, z, y = -Infinity) {
@@ -3783,6 +3902,11 @@ const GEO = {
   jupe: tour([[0.245, -0.3], [0.228, -0.15], [0.21, 0], [0.19, 0.1]], 24).scale(1, 1, 0.7),
   jupeCuisse: tour([[0.118, -0.3], [0.11, -0.15], [0.104, 0], [0.09, 0.052], [0.052, 0.09], [0, 0.104]], 16),   // (fermée en haut : elle couvre la hanche)
   boucle: new THREE.TorusGeometry(0.02, 0.008, 6, 12, Math.PI * 1.5),   // l'accroche-cœur
+  // Batman (code BATMAN) : une oreille pointue de la cagoule, et un des ailerons des gants (une petite lame plate)
+  oreilleBatman: new THREE.ConeGeometry(0.03, 0.11, 8).scale(1, 1, 0.7),
+  aileronGant: new THREE.ConeGeometry(0.028, 0.075, 4).scale(1, 1, 0.25),
+  // le cocon de toile de Spiderman, qui emballe quelqu'un des chevilles aux épaules (sa tête dépasse)
+  cocon: new THREE.CapsuleGeometry(0.27, 0.85, 6, 14).scale(1.4, 1, 0.95),
 };
 // Les talons hauts : le pied est sur la pointe, le talon levé de 5,5 cm (TALONS : le personnage est grandi d'autant, voir animerHumain).
 // Le bout rond de la jambe fait le talon du pied. La chaussure : le bout, à plat par terre ; le dessus du pied, qui descend vers lui ;
@@ -3884,10 +4008,12 @@ function batons(h, poser = piece) {
 //   bascule : l'angle dont il bascule, en avant ou en arrière (pour tomber, voler, se coucher) ; plie : de 0 à 1, les genoux pliés
 //   ecarte : de 0 à 1, les bras et les jambes écartés (projeté, couché) ; agite : de 0 à 1, il se débat ; touche : de 0 à 1, il encaisse un coup
 //   leve : de combien (en radians) il lève son arme en plus (Superman couché en l'air, ou qui vise vers le haut)
-//   pointe : de 0 à 1, il pointe son sceptre vers la cible, au lieu de le tenir debout ; biceps : de 0 à 1, la pose du culturiste
+//   pointe : de 0 à 1, il pointe son sceptre vers la cible, au lieu de le tenir debout (ou il lance son batarang) ; biceps : de 0 à 1, la pose du culturiste
+//   tend : de 0 à 1, il tend le bras droit devant lui (il lance sa toile ou son filet) ; grimpe : Spiderman sur un mur ;
+//   pend : pendu par la main droite au bout d'un grappin ou d'une toile ; plane : Batman qui plane, les bras écartés
 function animerHumain(h, vitesse, dt, o = {}) {
   h.phase += dt * (vitesse > 0.2 ? 2.5 + vitesse * 1.3 : 0); h.t += dt;
-  h.brasPris = !!o.arme || o.frappe > 0;   // ses bras tiennent une arme ou frappent : ils ne deviennent pas mous (membresMous)
+  h.brasPris = !!o.arme || o.frappe > 0 || !!(o.tend || o.grimpe || o.pend || o.plane);   // ses bras tiennent une arme, frappent ou s'accrochent : ils ne deviennent pas mous (membresMous)
   // un robot bouge par à-coups : sa pose ne change que 8 fois par pas, et il fait de petits pas
   const phase = o.robot ? Math.round(h.phase / (Math.PI / 4)) * Math.PI / 4 : h.phase;
   const amp = vitesse > 0.2 ? Math.min(o.robot ? 0.28 : 0.95, 0.35 + vitesse * 0.08) : 0, s = Math.sin(phase) * amp, c = Math.cos(phase) * amp;
@@ -3908,6 +4034,9 @@ function animerHumain(h, vitesse, dt, o = {}) {
     const e = o.pointe || 0;
     h.brasG.rotation.set(lerp(0, -1.45 - (o.leve || 0), e), 0, lerp(0.3, 0, e)); h.brasG.pli.rotation.x = lerp(-1.5, 0, e);
     h.arme.rotation.set(lerp(0, Math.PI / 2, e), lerp(0.45, 0, e), 0);   // debout, il penche un peu vers le dehors, loin de la tête
+  } else if (o.arme && h.arme?.userData.jet) { // un batarang, dans la main droite : le bras levé, le coude plié, prêt à lancer ; quand il le lance, le bras part en avant, tendu
+    const e = Math.min(1, (o.pointe || 0) * 2.5);
+    h.brasD.rotation.set(lerp(-2.3, -1.3, e) - (o.leve || 0), 0, -0.3); h.brasD.pli.rotation.x = lerp(-1.7, -0.1, e);
   } else if (o.arme) { const l = o.leve || 0; h.brasD.rotation.set(-1.45 - l, 0, 0); h.brasG.rotation.set(-1.3 - l, 0, -0.55); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = 0; }
   if (o.assis) { h.brasD.rotation.set(-0.95, 0, -0.3); h.brasG.rotation.set(-0.95, 0, 0.3); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.5; } // les mains au guidon
   if (o.tenir) { h.brasD.rotation.set(-0.5, 0, -0.15); h.brasG.rotation.set(-0.5, 0, 0.15); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = -0.7; } // debout, les mains au guidon (le Segway)
@@ -3968,6 +4097,32 @@ function animerHumain(h, vitesse, dt, o = {}) {
   let penche = o.robot ? 0 : Math.max(plie * 0.25, o.accroupi ? 0 : amp * 0.12), monte = 0;   // on se penche en avant pour courir (pas un robot), et en pliant les genoux
   h.tete.rotation.set(0, 0, 0); h.brasD.position.y = 0.6;   // (penchée sur le côté aussi : les membres mous la penchent, et elle resterait de travers)
   for (const j of [h.jambeG, h.jambeD]) { j.rotation.z = 0; j.chaussure.rotation.set(0, 0, 0); }
+  // il tend le bras droit devant lui : pour lancer sa toile ou son filet, ou pour tenir la voiture qui tourne au bout de sa toile
+  if (o.tend) { const e = o.tend; h.brasD.rotation.set(lerp(h.brasD.rotation.x, -1.5 - (o.leve || 0), e), 0, lerp(h.brasD.rotation.z, -0.05, e)); h.brasD.pli.rotation.x = lerp(h.brasD.pli.rotation.x, -0.05, e); }
+  // Spiderman sur un mur : les mains au-dessus de la tête, les coudes pliés, les genoux remontés et écartés, comme une grenouille.
+  // Un bras monte en même temps que la jambe de l'autre côté
+  if (o.grimpe) {
+    const g = Math.sin(h.phase);
+    h.brasD.rotation.set(-2.45 - 0.4 * g, 0, -0.5); h.brasD.pli.rotation.x = -0.9 + 0.5 * g;
+    h.brasG.rotation.set(-2.45 + 0.4 * g, 0, 0.5); h.brasG.pli.rotation.x = -0.9 - 0.5 * g;
+    h.jambeD.rotation.set(-0.75 + 0.4 * g, 0, -0.75); h.jambeD.pli.rotation.x = 1.5 - 0.5 * g;
+    h.jambeG.rotation.set(-0.75 - 0.4 * g, 0, 0.75); h.jambeG.pli.rotation.x = 1.5 + 0.5 * g;
+    penche = 0.12;
+  }
+  // pendu par la main droite, au bout du grappin de Batman ou de la toile de Spiderman : le bras droit tendu vers le haut, l'autre un peu écarté,
+  // un genou remonté
+  if (o.pend) {
+    h.brasD.rotation.set(-3.05, 0, -0.08); h.brasD.pli.rotation.x = -0.05;
+    h.brasG.rotation.set(-0.35, 0, 0.55); h.brasG.pli.rotation.x = -0.5;
+    h.jambeG.rotation.x = -0.75; h.jambeG.pli.rotation.x = 1.2; h.jambeD.rotation.x = 0.15; h.jambeD.pli.rotation.x = 0.45;
+    penche = 0;
+  }
+  // Batman qui plane : couché dans l'air, les bras écartés pour tendre sa cape, les jambes tendues, la tête relevée pour regarder devant lui
+  if (o.plane) {
+    h.brasD.rotation.set(-0.25, 0, -1.45); h.brasG.rotation.set(-0.25, 0, 1.45); h.brasD.pli.rotation.x = h.brasG.pli.rotation.x = -0.1;
+    h.jambeD.rotation.set(0.1, 0, -0.22); h.jambeG.rotation.set(0.1, 0, 0.22); h.jambeD.pli.rotation.x = h.jambeG.pli.rotation.x = 0.1;
+    h.tete.rotation.x = -0.6; penche = 0;
+  }
   // les pieds écartés sur la planche, la tête tournée vers l'avant (quand il pousse, il se tourne vers l'avant, le pied arrière à côté de la planche)
   // (envers : de 0 à 1, il glisse à l'envers, en « switch » : il regarde par-dessus son épaule, ou de l'autre côté sur un snowboard)
   if (o.glisse === 'snowboard') { h.jambeG.rotation.z = lerp(0.3, 0.15, pousse) - 0.22 * geste; h.jambeD.rotation.z = lerp(-0.3, -0.1, pousse); h.tete.rotation.y = lerp(-1.2, -0.55, pousse) * (1 - 2 * (o.envers || 0)); }
@@ -4180,6 +4335,21 @@ const GEO_SCEPTRE = {
     new THREE.SphereGeometry(0.045, 12, 8).translate(0, 0, -0.28), new THREE.SphereGeometry(0.055, 12, 8).translate(0, 0, 0.3)]),
 };
 const M_MANCHE = mat('#e0b030', { metalness: 1, roughness: 0.22 }), M_FOUDRE = mat('#ffc400', { emissive: '#c08400', roughness: 0.4 });   // de l'or, et un jaune qui brille tout seul
+// Le batarang de Batman, vu à plat : sa moitié droite, [de côté, vers le haut] (l'autre moitié est la même, retournée). De 0 (le milieu)
+// à 1 (le bout de l'aile). Change les points pour lui faire d'autres ailes ; le même dessin sert à la chauve-souris de son costume.
+// Il fait 34 cm d'un bout à l'autre (le nombre 0.17 : la moitié)
+const DESSIN_BATARANG = [[0, 0.2], [0.08, 0.2], [0.12, 0.4], [0.2, 0.22], [0.55, 0.32], [1, 0.1], [0.78, -0.05], [0.66, -0.22], [0.5, -0.05], [0.36, -0.2], [0.2, -0.08], [0, -0.42]];
+const CONTOUR_BATARANG = [...DESSIN_BATARANG, ...DESSIN_BATARANG.slice(1, -1).reverse().map(([x, y]) => [-x, y])];
+const GEO_BATARANG = new THREE.ExtrudeGeometry(new THREE.Shape(CONTOUR_BATARANG.map(([x, y]) => new THREE.Vector2(x * 0.17, y * 0.17))), { depth: 0.012, bevelEnabled: false })
+  .translate(0, 0, -0.006).rotateY(-Math.PI / 2);   // (ses ailes vont de l'arrière vers l'avant, comme le canon d'une arme)
+const M_BATARANG = mat('#18181c', { metalness: 0.85, roughness: 0.3 });
+// la couleur de la pastille au milieu du batarang, et de ce qu'il fait en arrivant : le feu, l'électricité, l'explosif
+const COULEURS_BATARANG = { feu: '#ff7a1a', electrique: '#58c8ff', explosif: '#ff2020' };
+function creerBatarang(sorte) {
+  const g = new THREE.Group(), e = new THREE.Mesh(GEO_BATARANG, M_BATARANG), c = COULEURS_BATARANG[sorte] || '#fff';
+  e.castShadow = true; g.add(e, new THREE.Mesh(new THREE.SphereGeometry(0.024, 10, 8), mat(c, { emissive: c })));
+  return g;
+}
 function creerArme(i) {
   const modele = ARMES[i].modele;
   if (!modele) return null;
@@ -4195,6 +4365,10 @@ function creerArme(i) {
   if (modele === 'sceptre') { // un manche doré avec son pommeau, une boule, et le gros éclair qui brille au bout
     for (const [geo, m] of [[GEO_SCEPTRE.manche, M_MANCHE], [GEO_SCEPTRE.eclair, M_FOUDRE]]) { const e = new THREE.Mesh(geo, m); e.castShadow = true; g.add(e); }
     g.userData.bout = 1.15; g.userData.sceptre = true;   // (il se tient debout, dans la main gauche : voir animerHumain)
+  }
+  if (modele === 'batarang') { // il le tient par le bout d'une aile, le bras levé, prêt à le lancer
+    const e = creerBatarang(ARMES[i].batarang); e.position.z = 0.12; g.add(e);
+    g.userData.bout = 0.12; g.userData.jet = true;   // (jet : une arme qu'on lance, voir animerHumain)
   }
   return g;
 }
@@ -4480,6 +4654,22 @@ const MODELES = {
       f.feux.push(...deux(c => bloc(0.08, 0.16, 0.05, 0.62 * c, 0.62, -1.52, 0.02)));
       f.chrome.push(bloc(0.55, 0.2, 0.04, 0, 0.58, 1.52, 0.02), tube(0.03, 0.2, 0.4, 0.22, -1.5, 'z'));
     } },
+  // la Batmobile : très longue, très basse, une petite cabine tout à l'arrière du capot, deux grands ailerons en aile de chauve-souris,
+  // et un réacteur qui rougeoie entre les deux
+  batmobile: { longueur: 5.6, largeur: 2.2, hauteur: 1.2, roue: 0.38, essieux: [-1.75, 1.85], garde: 0.14, arrondi: 0.1, oeil: [0.3, 1.02, -0.45],
+    profil: [[-2.8, 0.66], [-2.6, 0.86], [-0.9, 0.84], [0.8, 0.74], [2.3, 0.6], [2.8, 0.4]],
+    cabine: { bas: [-1.25, 0.55], haut: [-0.85, -0.1], y: [0.74, 1.2], vitres: 0.86, largeur: [1.3, 0.9], piliers: [0.5] },
+    portes: [0.5, -1.1], poignees: [],
+    plus: f => {
+      f.phares.push(...deux(c => bloc(0.5, 0.05, 0.08, 0.72 * c, 0.52, 2.72, 0.02)));             // deux fentes de lumière
+      // un aileron : un triangle debout, vu de côté [vers l'avant, vers le haut], avec une dent découpée derrière
+      const aileron = c => new THREE.ExtrudeGeometry(new THREE.Shape([[-0.2, 0], [1.5, 0], [0.1, 0.5], [-0.05, 0.78], [-0.45, 0.95], [-0.25, 0.45]].map(([z, y]) => new THREE.Vector2(z, y))),
+        { depth: 0.07, bevelEnabled: false }).rotateY(-Math.PI / 2).translate(0.82 * c + 0.035, 0.84, -2.5);
+      f.peint.push(...deux(aileron));
+      f.chrome.push(tube(0.33, 0.5, 0, 0.62, -2.62, 'z'), ...deux(c => tube(0.05, 1.3, 1.08 * c, 0.34, -0.9, 'z')));   // la tuyère du réacteur, et un pot de chaque côté
+      f.feux.push(tube(0.27, 0.06, 0, 0.62, -2.88, 'z'), ...deux(c => bloc(0.3, 0.06, 0.06, 0.8 * c, 0.74, -2.8, 0.02)));   // le feu du réacteur, et les feux arrière
+      f.noir.push(...deux(c => bloc(0.06, 0.2, 1.1, 1.1 * c, 0.58, 0.3)), bloc(1.3, 0.1, 0.06, 0, 0.36, 2.77));   // les prises d'air, sur les flancs et devant
+    } },
   // les bateaux n'ont pas de roues : leur coque est dans « plus ». Le bas de la coque est sous l'eau
   horsbord: { longueur: 5.5, largeur: 2.1, hauteur: 1.4, roue: 0.3, roues: [], siege: [0.95, -1.3], ouvert: true, oeil: [0, 1.9, -1.3],
     plus: f => {
@@ -4684,7 +4874,7 @@ function modeleVoiture(type, couleur, police, blindee = false) {
     parts.bande = poser(f.bande, mats.bande = mat('#1a3a9a'));
     gyro = [['#f22', '#f00', 0.28], ['#22f', '#00f', -0.28]].map(([c, lueur, x]) => { const p = poser(GEO_V.gyro, new THREE.MeshStandardMaterial({ color: c, emissive: lueur })); p.position.set(x, ...f.gyro); return p; });
   }
-  if (type.blinde) // « POLICE » en grand sur les flancs du fourgon
+  if (type.blinde && type.police) // « POLICE » en grand sur les flancs du fourgon
     parts.ecusson = poser(fusion(deux(c => new THREE.PlaneGeometry(2.4, 0.5).rotateY(c * Math.PI / 2).translate(c * (m.largeur / 2 + 0.012), 1.2, -0.4))), mats.ecusson = MAT.police);
   if (blindee) { const b = formesBlindage(type.modele); parts.rouille = poser(b.rouille, mats.rouille = M_ROUILLE); parts.acier = poser(b.acier, mats.acier = M_ACIER); }
   // les pales d'un hélicoptère : deux longues barres en croix, qui tournent autour de leur axe (majVoiture)
@@ -4695,7 +4885,7 @@ function modeleVoiture(type, couleur, police, blindee = false) {
   });
   return { m: g, corps, roues, gyro, parts, mats, rotors };
 }
-const typePolice = VOITURES.find(t => t.police && !t.blinde) || VOITURES[0], typeBlinde = VOITURES.find(t => t.blinde) || typePolice;
+const typePolice = VOITURES.find(t => t.police && !t.blinde) || VOITURES[0], typeBlinde = VOITURES.find(t => t.blinde && t.police) || typePolice;
 function typeAuHasard() { // plus la « chance » d'un type est grande, plus il sort souvent
   let n = Math.random() * VOITURES.reduce((s, t) => s + t.chance, 0);
   return VOITURES.find(t => (n -= t.chance) < 0) || VOITURES[0];
@@ -5263,7 +5453,8 @@ const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, 
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps || pouvoirArme(a) ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0,
-  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null, laser: 0, biceps: null };   // atterri, genou, roule : voir retomber ; superman : voir decoller ; laser : voir majLaser ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege ; biceps : voir poserBiceps
+  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null, laser: 0, biceps: null,   // atterri, genou, roule : voir retomber ; superman : voir decoller ; laser : voir majLaser ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege ; biceps : voir poserBiceps
+  grappin: null, plane: null, balance: null, mur: null, lance: null, prise: null, sansMur: 0 };   // les codes BATMAN et SPIDERMAN. grappin : voir accrocher ; plane : voir planer ; balance : voir balancer ; mur : celui où il grimpe (escalader) ; lance : son élan en l'air (majJoueur) ; prise : la voiture au bout de sa toile (attraper)
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 joueurH.g.traverse(o => o.userData.habit = o.material);   // sa tenue normale, pour la lui remettre après les codes de triche
 scene.add(joueurH.g);
@@ -5288,9 +5479,21 @@ const auraBJ = new THREE.Mesh(tour([[0, 0], [0.45, 0.05], [0.6, 0.6], [0.55, 1.3
           g.fillStyle = d; g.fillRect(x, y0, w, l);
         } } }) }));
 auraBJ.name = 'accessoire';
-// la cape de Superman (code SUPERMAN), accrochée en haut du dos : elle pend, et le vent la soulève
+// la cape (codes SUPERMAN et BATMAN), accrochée en haut du dos : elle pend, et le vent la soulève
 const capeBJ = new THREE.Group(); capeBJ.name = 'accessoire'; capeBJ.position.set(0, 0.27, -0.145);
 capeBJ.add(new THREE.Mesh(GEO.cape, mat('#c8141c', { side: THREE.DoubleSide, roughness: 0.9 }))).children[0].castShadow = true;
+// b met la cape, de cette couleur. dents : son bas est découpé en pointes, comme une aile de chauve-souris (là où rien n'est dessiné, on voit à travers)
+const cacheCapes = {};
+function mettreCape(b, couleur, dents = false) {
+  const dessin = (g, l, h) => {
+    g.fillStyle = couleur; g.fillRect(0, 0, l, h);
+    g.globalCompositeOperation = 'destination-out';
+    for (let k = 0; k < 4; k++) { g.beginPath(); g.ellipse(8 + k * 16, h, 7.5, 13, 0, 0, 7); g.fill(); }   // quatre creux ronds en bas : il reste cinq pointes
+  };
+  capeBJ.children[0].material = cacheCapes[couleur + dents] ||= !dents ? mat(couleur, { side: THREE.DoubleSide, roughness: 0.9 })
+    : new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, roughness: 0.9, alphaTest: 0.5, map: Object.assign(toile(64, 64, dessin), { wrapT: THREE.ClampToEdgeWrapping }) });   // (l'image ne se répète pas : sinon le haut de la cape déborde tout en bas, et fait un trait)
+  b.torse.add(capeBJ);
+}
 const avantCape = V3(), iciCape = V3(), ventCape = V3(), quatCape = new THREE.Quaternion();
 // Le vent, c'est l'inverse de la vitesse de B.J. (à 10 m/s, il pousse autant que le poids de la cape). Sans bouger, elle pend dans son dos ;
 // quand il court, elle se soulève derrière lui ; quand il tombe, elle monte au-dessus de sa tête ; quand il vole couché, elle reste sur son dos
@@ -5304,6 +5507,7 @@ function majCape(dt) {
     const angle = clamp(Math.atan2(0.05 - ventCape.z, -ventCape.y), 0.08, 2.7) + Math.sin(temps * 11) * 0.05 * Math.min(1, force);   // elle bat un peu au vent
     capeBJ.rotation.x += (angle - capeBJ.rotation.x) * Math.min(1, dt * 8);
     capeBJ.rotation.z += (clamp(ventCape.x * 0.4, -0.4, 0.4) - capeBJ.rotation.z) * Math.min(1, dt * 8);
+    capeBJ.scale.x += ((J.plane ? 3 : 1) - capeBJ.scale.x) * Math.min(1, dt * 10);   // Batman plane : elle se déploie, large comme une aile
   }
   avantCape.copy(ici);
 }
@@ -5682,6 +5886,110 @@ function majRoquettes(dt) {
     }
   }
   for (let k = roquettes.length - 1; k >= 0; k--) if (roquettes[k].fini) roquettes.splice(k, 1);
+}
+// Les armes des codes BATMAN et SPIDERMAN.
+// La toile que Spiderman vient de lancer : un fil blanc tendu du point a au point b, pendant « vie » secondes
+const M_FIL = new THREE.MeshBasicMaterial({ color: '#f4f4f0', toneMapped: false }), M_CABLE = new THREE.MeshBasicMaterial({ color: '#1c1c20' });
+function fil(a, b, vie = 0.15) {
+  const m = new THREE.Mesh(GEO_BALLE, M_FIL); m.position.copy(a); m.lookAt(b); m.scale.set(0.3, 0.3, a.distanceTo(b));
+  scene.add(m); effets.push({ o: m, vie });
+}
+// Les batarangs et les filets : ils volent tout droit vers le point visé (REGLAGES.vitesseBatarang) et s'arrêtent sur le premier mur,
+// la première voiture ou le premier personnage qu'ils touchent, ou par terre. Au bout de leur portée, s'ils n'ont rien touché, ils sont perdus
+// (le batarang explosif, lui, saute quand même)
+const lances = [], filets = [], feux = [];
+const M_TOILE = mat('#f0f0ec', { roughness: 1 }), GEO_FILET_PLIE = new THREE.IcosahedronGeometry(0.16, 0), GEO_FILET = new THREE.SphereGeometry(1, 24, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+// les mailles du filet : des fils en croix (là où rien n'est dessiné, on voit à travers)
+const M_FILET = new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, alphaTest: 0.5, roughness: 1, map: toile(32, 32, (g, l, h) => {
+  g.strokeStyle = '#e6e6de'; g.lineWidth = 3;
+  for (const [x1, y1, x2, y2] of [[0, 0, l, h], [0, h, l, 0]]) { g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); }
+}) });
+M_FILET.map.repeat.set(28, 8);
+function lancer(depart, vers, a) {
+  const m = a.filet ? new THREE.Mesh(GEO_FILET_PLIE, M_TOILE) : creerBatarang(a.batarang);
+  m.position.copy(depart); m.lookAt(vers); m.rotateZ(Math.PI / 2);   // à plat, comme un frisbee
+  if (!a.filet) m.scale.setScalar(1.5);                              // (un peu plus gros que dans sa main : on le voit voler)
+  scene.add(m);
+  lances.push({ m, a, dir: vers.clone().sub(depart).normalize(), reste: a.portee });
+}
+function majLances(dt) {
+  for (const l of lances) {
+    const pos = l.m.position, pas = Math.min(R_.vitesseBatarang * dt, l.reste);
+    rayonRoquette.set(pos, l.dir); rayonRoquette.far = pas;
+    const hit = rayonRoquette.intersectObjects([...batiments, ...voitures.map(v => v.m), ...robots.map(o => o.m.g)], true)[0];
+    let avance = hit ? hit.distance : pas, touche = !!hit;
+    for (const p of personnes) { // quelqu'un est touché s'il passe à moins de 80 cm du milieu de son corps
+      if (p.vie <= 0) continue;
+      const v = new THREE.Vector3(p.x, p.y + 1, p.z).sub(pos), t = clamp(v.dot(l.dir), 0, pas);
+      if (t < avance && v.addScaledVector(l.dir, -t).length() < 0.8) { avance = t; touche = true; }
+    }
+    pos.addScaledVector(l.dir, avance); l.reste -= avance;
+    l.m.rotateX(30 * dt);   // il tournoie
+    const sol = hauteurSol(pos.x, pos.z, pos.y), parTerre = pos.y <= sol;
+    if (!touche && !parTerre && l.reste > 0) continue;
+    pos.y = Math.max(pos.y, sol + 0.05);
+    l.fini = true; scene.remove(l.m);
+    if (touche || parTerre || l.a.batarang === 'explosif') arriver(l.a, pos.clone());
+  }
+  for (let k = lances.length - 1; k >= 0; k--) if (lances[k].fini) lances.splice(k, 1);
+  // les filets ouverts : ils se déplient d'un coup, et s'en vont à la fin
+  for (const f of filets) {
+    f.age += dt;
+    const e = Math.min(1, f.age / 0.2, (f.duree - f.age) / 0.3);
+    f.m.scale.set(f.rayon * e, 1.5 * Math.max(0.05, e), f.rayon * e);
+    if (f.age >= f.duree) scene.remove(f.m);
+  }
+  for (let k = filets.length - 1; k >= 0; k--) if (filets[k].age >= filets[k].duree) filets.splice(k, 1);
+  // les flammes d'un batarang enflammé : elles dansent, et deux fois par seconde, ceux qui sont dedans se brûlent (B.J. aussi, un peu)
+  const dedans = (f, o) => Math.hypot(o.x - f.pos.x, o.y + 1 - f.pos.y, o.z - f.pos.z) < f.a.rayon;
+  for (const f of feux) {
+    f.reste -= dt;
+    for (const fl of f.flammes) fl.scale.setScalar(entre(0.9, 1.7) * Math.min(1, 0.2 + f.reste * 2));
+    if ((f.t -= dt) <= 0) {
+      f.t = 0.5;
+      for (const p of personnes) if (p.vie > 0 && dedans(f, p)) blesser(p, f.a.degats / 4);
+      if (!J.voiture && !J.robot && !J.mort && dedans(f, J)) blesserJoueur(f.a.degats / 12);
+      const fu = new THREE.Sprite(M_FUMEE.clone()); fu.material.color.set('#3a3a3a'); fu.position.copy(f.pos).setY(f.pos.y + 1); scene.add(fu); effets.push({ o: fu, vie: 1.2, fumee: 1.2 });
+    }
+    if (f.reste <= 0) for (const fl of f.flammes) scene.remove(fl);
+  }
+  for (let k = feux.length - 1; k >= 0; k--) if (feux[k].reste <= 0) feux.splice(k, 1);
+}
+// un batarang ou un filet arrive au point pos : ce qu'il fait à tout ce qui est à moins de a.rayon mètres
+function arriver(a, pos) {
+  const fort = clamp(1.2 - dist(pos, J) / 100, 0, 1);   // (de loin, on l'entend moins)
+  for (const p of personnes) if (p.type === 'pieton' && dist(p, pos) < 15) p.peur = 8;   // les passants d'à côté s'enfuient
+  if (a.filet) { ouvrirFilet(a, pos); return; }
+  if (a.batarang === 'explosif') { exploser(pos, a.rayon, a.degats, R_.degatsExplosion); return; }
+  const pres = personnes.filter(p => p.vie > 0 && Math.hypot(p.x - pos.x, p.y + 1 - pos.y, p.z - pos.z) < a.rayon);
+  const autos = voitures.filter(v => !v.detruite && !v.coule && Math.abs(v.y - pos.y) < 3 && dist(v, pos) < a.rayon + v.rayon);
+  for (const r of robots) if (Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z) < a.rayon + 1.5) toucherRobot(r, a.degats);   // le heavy robot : sa vitre
+  if (a.batarang === 'feu') { // des flammes : ceux qui sont là sont brûlés, puis encore tant qu'ils y restent ; les voitures prennent feu (pas les blindées)
+    for (const p of pres) blesser(p, a.degats);
+    for (const v of autos) if (!estBlindee(v)) allumer(v);
+    const flammes = [...Array(6)].map((_, k) => {
+      const fl = new THREE.Sprite(M_FLASH), an = k * 1.05, d = k ? a.rayon * 0.55 : 0;
+      fl.position.set(pos.x + Math.sin(an) * d, pos.y + 0.45, pos.z + Math.cos(an) * d); scene.add(fl); return fl;
+    });
+    feux.push({ pos, a, reste: a.duree, t: 0.5, flammes });
+    lumiereBoum.color.set('#ff8030'); lumiereBoum.position.copy(pos); lumiereBoum.intensity = 2500;
+    bruit(0.6 * fort, 500, 0.7);
+  }
+  if (a.batarang === 'electrique') { // une décharge : un éclair saute sur chacun, qui reste paralysé ; les voitures qui roulent tombent en panne
+    for (const p of pres) { foudre(pos, V3(p.x, p.y + 1, p.z), 0.35, 0.18, 1); blesser(p, a.degats); prendre(p, 'choc', a.duree); }
+    for (const v of autos) if (v !== J.voiture && !pasDeTole(v)) { v.panne = a.duree; foudre(pos, V3(v.x, v.y + 0.8, v.z), 0.35, 0.18, 1); }
+    flash(pos, 3, scene, M_FLASH_FOUDRE); etincelles(pos, 10, 5);
+    lumiereBoum.color.set('#b8d0ff'); lumiereBoum.position.copy(pos); lumiereBoum.intensity = 2500;
+    bruit(0.5 * fort, 6000, 0.25); bip(1500, 120, 0.35, 'sawtooth', 0.12 * fort);
+  }
+}
+// le filet s'ouvre au point pos : une cloche de mailles posée par terre, pendant a.duree secondes. Ceux qui sont dessous sont pris (voir prendre)
+function ouvrirFilet(a, pos) {
+  const y = hauteurSol(pos.x, pos.z, pos.y + 0.5), m = new THREE.Mesh(GEO_FILET, M_FILET);
+  m.position.set(pos.x, y, pos.z); m.rotation.y = entre(0, 6.3); m.scale.setScalar(0.01); scene.add(m);
+  filets.push({ m, age: 0, duree: a.duree, rayon: a.rayon });
+  for (const p of personnes) if (p.vie > 0 && dist(p, pos) < a.rayon && Math.abs(p.y - y) < 2) { blesser(p, a.degats); prendre(p, 'filet', a.duree); }
+  bruit(0.4 * clamp(1.2 - dist(pos, J) / 100, 0, 1), 1500, 0.25);
 }
 // des étincelles qui volent, rebondissent et s'éteignent (soudure, perceuse, balle sur du métal)
 function etincelles(pos, n = 6, force = 3) {
@@ -6401,6 +6709,7 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
+  if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
   if (e.code.startsWith('Digit') && !J.robot) choisirArme((+e.code.slice(5) + 9) % 10);
 });
@@ -6454,14 +6763,20 @@ function validerTriche() {
   rhabillerBJ();
   ARMES.forEach((a, i) => { const don = pouvoirArme(a); if (don) J.possede[i] = pouvoir(don); });   // les yeux laser, le sceptre de foudre : on ne les a que tant qu'un code actif les donne
   if (!J.possede[J.arme]) changerArme(0);
-  if (t.actif && !J.robot) changerArme(ARMES.findIndex(a => a.modele && t[pouvoirArme(a)]));   // une arme qui se tient (le sceptre) : il la prend en main
+  if (t.actif && !J.robot) changerArme(ARMES.findIndex(a => (a.modele || a.toile) && t[pouvoirArme(a)]));   // une arme qui se tient (le sceptre, un batarang), ou la toile : il la prend en main
   if (t.actif && t.biceps) poserBiceps(t.biceps);
+  if (t.actif && t.voiture) amenerVoiture(t.voiture);   // sa voiture (la Batmobile) apparaît à côté de lui
+  // on n'a plus le pouvoir : il lâche son grappin ou sa toile, tombe du mur, replie sa cape
+  if (!pouvoir('grappin')) J.grappin = null;
+  if (!pouvoir('toile')) J.balance = J.prise = null;
+  if (!pouvoir('grimpe')) J.mur = null;
+  if (!pouvoir('cape')) J.plane = null;
   annonce('', t.actif ? tr(t.texte) : tr('{effet} (annulé)', { effet: tr(t.texte) }), 2);
 }
 // La pose du culturiste (un code de triche qui a « biceps: 1.3 » : le nombre de secondes) : B.J. se tourne vers la caméra et gonfle son
 // biceps droit. On le regarde de dehors, le temps de la pose. Seulement à pied ; bouger, sauter, s'accroupir, tirer ou viser l'arrête
 function poserBiceps(duree) {
-  if (J.voiture || J.robot || J.telesiege || J.nage || J.mort || J.superman || J.roule || J.echelle) return;
+  if (J.voiture || J.robot || J.telesiege || J.nage || J.mort || J.superman || J.roule || J.echelle || accroche()) return;
   J.biceps = { reste: duree, duree, vue: J.vue }; J.vue = 3; J.danse = 0; J.accroupi = false;
 }
 function finirBiceps() { J.vue = J.biceps.vue; J.biceps = null; bicepsBJ.visible = false; }
@@ -6498,11 +6813,12 @@ function rhabillerBJ() {
 const parTriche = cle => TRICHES.reduce((k, t) => t.actif && t[cle] !== undefined ? k * t[cle] : k, 1);
 const pouvoir = cle => TRICHES.some(t => t.actif && t[cle]);   // un code actif donne-t-il ce pouvoir ? ('laser', 'eclair', 'ecrase')
 const invincible = () => pouvoir('invincible');   // le code DIEU
+const accroche = () => !!(J.grappin || J.balance || J.mur || J.plane);   // au bout de son grappin ou de sa toile, sur un mur, ou la cape déployée
 // la danse (gauche, arrière, droite, 3 fois de suite) : B.J. se met de profil, pour qu'on voie bien le moonwalk
 const SUITE_DANSE = (R_.touchesDanse.join(' ') + ' ').repeat(3);
 let suite = '';   // les dernières touches tapées
 function danser() {
-  if (J.voiture || J.robot || J.nage || J.mort || J.superman) return;   // on ne danse qu'à pied
+  if (J.voiture || J.robot || J.nage || J.mort || J.superman || accroche()) return;   // on ne danse qu'à pied
   for (const k in touches) touches[k] = false;  // la dernière touche est encore enfoncée : on l'oublie, sinon elle arrêterait la danse
   J.danse = 0.001; J.angleDanse = J.lacet + Math.PI / 2; J.vue = 3; J.accroupi = false;
   annonce('', tr('Moonwalk !'), 2);
@@ -6526,7 +6842,7 @@ function decoller() {
   if (J.voiture || J.robot || J.mort) return;
   if (J.superman) { J.superman = null; return; }
   J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0 }; J.vy = 8;   // sa vitesse (la montée est dans J.vy) : il s'élance d'abord vers le ciel. crans : combien de fois on a tapé Maj en volant ; roulis : il penche dans ses virages
-  J.sol = J.nage = J.saute = J.accroupi = false; J.roule = J.echelle = null; J.danse = J.genou = J.atterri = 0;
+  J.sol = J.nage = J.saute = J.accroupi = false; J.roule = J.echelle = J.grappin = J.balance = J.mur = J.plane = J.lance = null; J.danse = J.genou = J.atterri = 0;
   annonce('', tr('Superman !'), 2);
 }
 document.addEventListener('pointerlockchange', () => {
@@ -6804,6 +7120,43 @@ function majLaser(dt) {
     r.g.position.copy(positionTir(r.cote)); r.g.lookAt(cibleLaser); r.g.scale.set(fin, fin, r.g.position.distanceTo(cibleLaser));
   }
 }
+// Le câble du grappin de Batman (noir), ou la toile de Spiderman (blanche) : un fil tendu de sa main droite jusqu'à là où il est accroché.
+// Il est caché au début de chaque image ; ce qui s'en sert le retend (grappiner, balancer, tenirPrise)
+const cable = new THREE.Mesh(GEO_BALLE, M_FIL); cable.visible = false; cable.frustumCulled = false; scene.add(cable);
+function tendreCable(vers, toile = true) {
+  const main = J.vue === 1 ? positionTir() : (joueurH.g.updateMatrixWorld(true), joueurH.brasD.main.getWorldPosition(vTmp));
+  cable.material = toile ? M_FIL : M_CABLE; cable.visible = true;
+  cable.position.copy(main); cable.lookAt(vers); cable.scale.set(0.3, 0.3, main.distanceTo(vers));
+}
+// La toile de Spiderman attrape une voiture. Tant qu'on garde le bouton enfoncé, elle tourne autour de lui au bout de la toile, de plus en
+// plus vite (jusqu'à REGLAGES.vitesseLancer) ; quand on le lâche, elle part là où on regarde, dès qu'elle file dans cette direction.
+// Pendant qu'elle tourne, c'est une voiture accidentée comme les autres (majAccident) : elle fauche les gens et cogne ce qu'elle touche.
+// J.prise : { v : la voiture, a : où elle en est de son tour, w : sa vitesse de rotation (radians par seconde), r : la longueur de la toile, y : sa hauteur }
+function attraper(v) {
+  if (J.prise || v === J.voiture) return;
+  const a = commencerAccident(v);
+  if (!a) return;   // (un bateau, un avion, un hélicoptère : trop lourd)
+  if ((a.conducteur || v.police) && (v.police || policeVoit())) crime(1);   // attraper une voiture avec quelqu'un dedans, devant la police
+  J.prise = { v, a: angleVers(J, v), w: 2.5, r: Math.max(3, dist(v, J)), y: a.c.y };
+}
+function tenirPrise(dt) {
+  const q = J.prise;
+  if (!q) return;
+  const v = q.v, a = v.accident;
+  if (!a || v.supprimer || v.coule || J.mort || J.voiture || J.robot || J.telesiege || !pouvoir('toile')) { J.prise = null; return; }
+  const R = 4 + v.forme.longueur / 2;   // la toile : assez longue pour que la voiture ne touche pas B.J.
+  q.w = Math.min(R_.vitesseLancer / R, q.w + 5 * dt); q.r += (R - q.r) * Math.min(1, dt * 3); q.y += (J.y + 1.6 - q.y) * Math.min(1, dt * 4);
+  q.a += q.w * dt;
+  const cap = q.a + Math.PI / 2, vit = q.w * q.r;   // vers où elle file, et à quelle vitesse
+  a.c.set(J.x + Math.sin(q.a) * q.r, q.y, J.z + Math.cos(q.a) * q.r);
+  a.vel.set(Math.sin(cap) * vit, 0, Math.cos(cap) * vit); a.rot.set(0, q.w, 0); a.duree = a.calme = 0; a.dort = false;
+  if ((!sourisG || !ARMES[J.arme].toile) && Math.abs(diffAngle(cap, J.lacet)) < Math.max(0.15, q.w * dt)) { // on a lâché le bouton : elle part
+    a.vel.y = 4; a.rot.set(entre(-2, 2), q.w, entre(-2, 2)); J.prise = null;
+    bruit(0.4, 900, 0.3);
+    return;
+  }
+  tendreCable(a.c);
+}
 // a : l'arme (dans le heavy robot, sa mitrailleuse ou ses roquettes : ARMES_ROBOT)
 function tirer(a = ARMES[J.arme]) {
   const rb = J.robot, stock = rb ? rb.munitions : J.balles, k = rb ? a.modele : J.arme;
@@ -6812,7 +7165,9 @@ function tirer(a = ARMES[J.arme]) {
   if (stock[k] <= 0) { bip(1000, 900, 0.05, 'square', 0.15); annonce('', tr('Plus de munitions'), 1); if (!rb) J.cooldown = 0.3; return; }
   stock[k]--;
   const depart = rb ? boutRobot(rb, a.explosion) : positionTir().clone();
+  const jet = a.batarang || a.filet, muet = jet || a.toile;   // jet : ça se lance (un batarang, un filet). muet : ça ne fait presque pas de bruit
   if (a.laser) bip(2400, 1700, 0.08, 'sawtooth', 0.04);   // les yeux laser grésillent : ni coup de feu, ni recul, ni éclair
+  else if (muet) { J.recul = 1; bruit(0.3, 5000, 0.12); if (a.toile) bip(1800, 600, 0.08, 'triangle', 0.06); }   // ça siffle (la toile : « thwip ! »)
   else if (a.eclair) { // la foudre claque au bout du sceptre (le tonnerre, c'est là où elle tombe : voir exploser)
     J.recul = 1; bruit(0.9, 7000, 0.1); bip(1600, 90, 0.3, 'sawtooth', 0.1);
     flash(depart, J.vue === 1 ? 0.25 : 1.2, scene, M_FLASH_FOUDRE);
@@ -6840,11 +7195,14 @@ function tirer(a = ARMES[J.arme]) {
       lancerRoquette(depart, point, a.portee, a.explosion, a.degats, R_.degatsExplosion, null, rb);
       continue;
     }
+    if (jet) { lancer(depart, point, a); continue; }   // un batarang, un filet : il vole vers le viseur (voir lancer)
     if (hit || sol) {
       const u = hit?.object.userData || {}, p = u.personne;
       const vc = !p && u.voiture, roue = vc && vc.roues.find(r => r.tourne === hit.object.parent);
+      // la toile de Spiderman : elle emballe quelqu'un dans un cocon, ou elle attrape une voiture
+      if (a.toile) { if (p) { blesser(p, 0); prendre(p, 'cocon', a.duree); } else if (vc) attraper(vc); }
       // la foudre : tout ce qui est à moins de a.eclair mètres prend le choc, comme dans une explosion (les gens volent, les voitures sautent)
-      if (a.eclair) { exploser(point, a.eclair, a.degats, R_.degatsExplosion, null, true); etincelles(point, 10, 6); }
+      else if (a.eclair) { exploser(point, a.eclair, a.degats, R_.degatsExplosion, null, true); etincelles(point, 10, 6); }
       else if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
       else if (roue) crever(vc, roue);   // un pneu : il éclate
       else if (vc) { // une voiture : un petit trou dans la tôle, et la vitre touchée se fêle (puis se brise)
@@ -6858,15 +7216,17 @@ function tirer(a = ARMES[J.arme]) {
         u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
       }
       const brule = a.laser || a.eclair, taille = a.eclair ? 3 : 1;   // les yeux laser et la foudre laissent une marque noire (la foudre : trois fois plus grosse)
-      if (u.mur) impactMur(point, hit.face.normal.clone().transformDirection(hit.object.matrixWorld), brule ? C_BRULE : C_IMPACT, 0.01, taille);   // un mur, un plancher, un meuble
-      if (sol) impactSol(point, brule ? C_BRULE : null, taille);
-      flash(point, 0.3);
+      if (u.mur && !a.toile) impactMur(point, hit.face.normal.clone().transformDirection(hit.object.matrixWorld), brule ? C_BRULE : C_IMPACT, 0.01, taille);   // un mur, un plancher, un meuble
+      if (sol && !a.toile) impactSol(point, brule ? C_BRULE : null, taille);
+      if (!a.toile) flash(point, 0.3);
       if (a.laser) etincelles(point, 2, 2);   // ça grésille là où les rayons touchent
     }
     if (a.laser) { cibleLaser.copy(point); J.laser = 0.1; }   // les deux rayons rouges : voir majLaser
     else if (a.eclair) { const gros = J.vue === 1 ? 0.5 : 1; foudre(depart, point, gros); foudre(depart, point, gros * 0.6, 0.07, 1); }   // deux éclairs l'un sur l'autre, dont un qui s'éteint plus vite : ça clignote (en 1re personne, ils partent tout près : plus fins)
+    else if (a.toile) fil(depart, point);
     else if (a.modele === 'lourde') balleLourde(depart, point); else traceur(depart, point);
   }
+  if (muet) return;   // un batarang, un filet, une toile : personne n'entend rien (ceux qui sont touchés, eux, le sentent : voir blesser)
   // le bruit fait fuir les piétons et alerte soldats, vigiles et policiers
   for (const p of personnes) {
     if (p.vie <= 0) continue;
@@ -6956,7 +7316,10 @@ function reapparaitre() {
 // =====================================================================
 function majJoueur(dt) {
   if (J.superman) { superman(dt); return; }
+  if (J.grappin) { grappiner(dt); return; }            // Batman, tiré par son grappin
+  if (J.balance && balancer(dt)) return;               // Spiderman, au bout de sa toile
   if (J.roule) { rouler(dt); return; }
+  if (planer(dt)) return;                              // Batman, la cape déployée
   J.atterri = Math.max(0, J.atterri - dt * 3); J.genou = Math.max(0, J.genou - dt);
   const libre = J.genou <= 0;   // reçu sur un genou après une grosse chute : il ne bouge pas avant de s'être relevé
   const av = libre ? touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown') : 0, lat = libre ? touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft') : 0;
@@ -6973,9 +7336,21 @@ function majJoueur(dt) {
   const n = Math.hypot(mx, mz);
   if (!J.echelle && n > 0 && !J.nage) J.echelle = echelleProche(mx / n, mz / n);
   if (J.echelle) { grimper(dt, n > 0 ? (mx * J.echelle.nx + mz * J.echelle.nz) / n : 0); return; }
-  if (n > 0) { mx /= n; mz /= n; J.x += mx * v * dt; J.z += mz * v * dt; }
-  const vx = n > 0 ? mx * v : 0, vz = n > 0 ? mz * v : 0;   // sa vitesse à l'horizontale
-  J.vitesse = n > 0 ? v : 0;
+  if (n > 0) { mx /= n; mz /= n; }
+  // lancé (il a lâché sa toile ou son grappin, sauté d'un mur, replié sa cape) : en l'air, il garde son élan, et les touches le dévient à peine
+  if (J.lance && (J.sol || J.nage)) J.lance = null;
+  const L = J.lance, vL = L ? Math.hypot(L.vx, L.vz) : 0;
+  // Spiderman (un code qui a « grimpe: true ») : en avançant contre un mur, ou lancé dessus, il s'y colle et il grimpe
+  J.sansMur = Math.max(0, J.sansMur - dt);
+  if (!J.mur && !J.nage && !J.sansMur && libre && (n > 0 || vL > 3) && pouvoir('grimpe')) {
+    J.mur = n > 0 ? murDevant(mx, mz) : murDevant(L.vx / vL, L.vz / vL);
+    if (J.mur) { J.mur.y0 = J.y; J.mur.espace = touches.Space; J.lance = null; }   // (y0 : la hauteur où il s'est collé ; espace : la touche du saut est-elle déjà enfoncée ?)
+  }
+  if (J.mur) { escalader(dt, av, lat); return; }
+  if (L) { L.vx += mx * 6 * dt; L.vz += mz * 6 * dt; J.x += L.vx * dt; J.z += L.vz * dt; }
+  else if (n > 0) { J.x += mx * v * dt; J.z += mz * v * dt; }
+  const vx = L ? L.vx : n > 0 ? mx * v : 0, vz = L ? L.vz : n > 0 ? mz * v : 0;   // sa vitesse à l'horizontale
+  J.vitesse = L ? Math.hypot(vx, vz) : n > 0 ? v : 0; J.pasX = vx; J.pasZ = vz;
   // en nageant, on peut remonter sur un ponton ou une plage (une marche plus haute)
   const hs = hauteurSol(J.x, J.z, J.y + (J.nage ? 1.3 : 0)), surface = EAU - 1.25;
   if (J.sol && touches.Space && !J.nage && libre) { J.vy = R_.forceSaut; J.sol = false; J.saute = true; J.accroupi = false; }
@@ -6986,7 +7361,7 @@ function majJoueur(dt) {
     if (J.y <= hs) { const tombe = !J.sol; J.y = hs; if (!tombe || !retomber(-J.vy, vx, vz)) { J.vy = 0; J.sol = true; } }   // (s'il casse le toit, il tombe encore : voir retomber)
     else if (J.y > hs + 0.05) J.sol = false;   // il quitte le sol : un saut, une marche qui descend, le bord d'un toit
   }
-  resoudre(J, 0.35);
+  if (resoudre(J, 0.35) && L) { L.vx *= 0.3; L.vz *= 0.3; }   // (lancé contre un mur : son élan s'arrête presque)
   for (const o of voitures) for (const lz of o.cercles) { // on ne traverse pas les voitures
     if (Math.abs(o.y - J.y) > 1.5) continue;
     const c = local(o, 0, lz), d = dist(c, J), r = o.rayon + 0.35;
@@ -7008,25 +7383,29 @@ function majJoueur(dt) {
     if (!J.nage && (!ARMES[J.arme].corps || visee || J.vue === 1)) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
     else if (n > 0) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(mx, mz), 10 * dt);
   }
+  if (J.prise) J.angleCorps = J.prise.a;   // il tourne avec la voiture qu'il tient au bout de sa toile
   if (J.nage) joueurH.g.position.set(J.x - Math.sin(J.angleCorps) * 0.9, EAU - 0.25, J.z - Math.cos(J.angleCorps) * 0.9);   // couché dans l'eau
   else joueurH.g.position.set(J.x, J.y, J.z);
   joueurH.g.rotation.y = robot ? Math.round(J.angleCorps / 0.2) * 0.2 : J.angleCorps;   // un robot se tourne par crans
   // il range son arme pour nager, pour danser, ou pour montrer son biceps (pas le sceptre : il est dans l'autre main)
   const sceptre = !!joueurH.arme?.userData.sceptre, range = J.nage || !!danse || (!!J.biceps && !sceptre);
-  if (joueurH.arme) joueurH.arme.visible = !range;
+  if (joueurH.arme) joueurH.arme.visible = !range && !(joueurH.arme.userData.jet && J.cooldown > 0.15);   // (le batarang qu'il vient de lancer n'est plus dans sa main)
+  // il tend le bras pour lancer sa toile ou son filet, et tant qu'il tient une voiture au bout de sa toile
+  const A = ARMES[J.arme], tend = J.prise ? 1 : A.toile || A.filet ? clamp(J.cooldown / A.cadence * 3, 0, 1) : 0;
   const genou = J.genou > 0 ? Math.min(1, (0.9 - J.genou) / 0.08, J.genou / 0.3) : 0;   // il tombe vite sur le genou, et se relève doucement
   // en l'air : il a sauté (jusqu'à ce qu'il retombe), ou il tombe vite (pas en descendant un escalier)
   if (J.sol || J.nage) J.saute = false;
   const enLair = !J.sol && !J.nage && (J.saute || J.vy < -4);
   animerHumain(joueurH, J.vitesse, dt, { arme: armeEnMain() && !range, accroupi: J.accroupi, frappe: J.frappe, nage: J.nage, danse, robot,
-    saut: enLair ? J.vy : undefined, atterri: J.atterri, genou, pointe: 0.4 * J.recul, biceps });   // (le sceptre part en avant à chaque éclair)
+    saut: enLair ? J.vy : undefined, atterri: J.atterri, genou, pointe: 0.4 * J.recul, biceps, tend });   // (le sceptre part en avant à chaque éclair)
   // en l'air, ses membres ont du poids ; à l'atterrissage, le haut du corps continue sur sa lancée, les pieds restent posés (pas un robot)
   membresMous(joueurH, dt, !robot && (enLair || J.atterri > 0 || genou > 0) ? { raideur: 25, sol: J.sol ? J.y : -Infinity, jambes: enLair, vx, vy: J.vy, vz } : { sol: J.y });
 }
 // B.J. retombe au sol à la vitesse choc (m/s) : il amortit en pliant les genoux. De plus haut que REGLAGES.hauteurSansMal, ça fait mal
 // (le gilet ne protège pas) : il se reçoit sur un genou, ou fait une roulade s'il allait vite (vx, vz : sa vitesse à l'horizontale).
 // Avec un code de triche qui a « ecrase: true » (SUPERMAN, DIEU), ça ne lui fait rien : c'est ce qu'il y a dessous qui prend (voir ecraser),
-// et il se reçoit sur un genou, comme un super-héros. Renvoie true s'il passe à travers un toit ou un plancher : il tombe encore
+// et il se reçoit sur un genou, comme un super-héros. Avec « souple: true » (SPIDERMAN), ça ne lui fait rien non plus, sans rien écraser.
+// Renvoie true s'il passe à travers un toit ou un plancher : il tombe encore
 function retomber(choc, vx, vz) {
   const h = choc * choc / (2 * R_.gravite), mou = coussin(J.x, J.z);   // la hauteur de la chute ; ce que le sol amortit (la neige)
   if (choc > 4) J.atterri = Math.min(1, choc / 14);
@@ -7038,6 +7417,10 @@ function retomber(choc, vx, vz) {
     J.genou = 0.9; return false;
   }
   if (h / mou <= R_.hauteurSansMal) return false;   // (sur la neige : comme s'il tombait de 5 fois moins haut)
+  if (pouvoir('souple')) { // Spiderman retombe toujours sur ses pattes, sans se faire mal : sur un genou, ou en roulade s'il allait vite
+    if (Math.hypot(vx, vz) > 6) commencerRoulade(vx, vz); else J.genou = 0.9;
+    return false;
+  }
   blesserJoueur((h / mou - R_.hauteurSansMal) * R_.degatsChute, false);
   bruit(Math.min(0.8, choc / 25), 250, 0.25);
   if (J.mort) return false;
@@ -7167,7 +7550,7 @@ function fissurer(x, y, z, r) {
 }
 // la roulade : B.J. roule en boule dans le sens (vx, vz), glisse et ralentit sans qu'on puisse le diriger, finit son tour, puis se relève
 function commencerRoulade(vx, vz) {
-  J.roule = { vx, vz, a: 0 }; J.accroupi = false; J.danse = 0; J.echelle = null; J.genou = 0;
+  J.roule = { vx, vz, a: 0 }; J.accroupi = false; J.danse = 0; J.echelle = null; J.genou = 0; J.lance = null;
   J.angleCorps = Math.atan2(vx, vz);
 }
 function rouler(dt) {
@@ -7236,6 +7619,184 @@ function superman(dt) {
   joueurH.g.quaternion.setFromEuler(new THREE.Euler(bascule, J.angleCorps, f.roulis, 'YZX'));
   poserCorps(joueurH, J.x, J.y + 0.95, J.z, 0.95);   // il bascule autour de son bassin
   membresMous(joueurH, dt, { raideur: 25, sol: hs, vx: f.vx, vy: J.vy, vz: f.vz });   // ses membres traînent un peu quand il tourne
+}
+// La touche G, avec un code de triche qui a « grappin: true » (BATMAN) ou « toile: true » (SPIDERMAN) : on vise un bâtiment, à
+// REGLAGES.porteeGrappin mètres au plus. Le grappin de Batman le tire jusqu'au toit ; la toile de Spiderman s'y colle, et il se balance
+// au bout tant qu'on garde G enfoncé. (Avec les deux codes à la fois : le grappin)
+const elanJ = () => { const e = J.lance || J.plane || J.balance; return e ? { vx: e.vx, vz: e.vz } : { vx: J.pasX || 0, vz: J.pasZ || 0 }; };   // sa vitesse à l'horizontale
+function accrocher() {
+  const grappin = pouvoir('grappin');
+  if ((!grappin && !pouvoir('toile')) || J.voiture || J.robot || J.mort || J.telesiege || J.grappin || J.balance) return;
+  const epaule = new THREE.Vector3(J.x, J.y + 1.5, J.z);
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+  raycaster.near = J.vue === 3 ? camera.position.distanceTo(epaule) : 0; raycaster.far = raycaster.near + R_.porteeGrappin;
+  const hit = raycaster.intersectObjects(batiments, false)[0];
+  // (par terre, ou derrière une colline : rien où s'accrocher)
+  if (!hit || toucheSol(raycaster.ray.at(raycaster.near, new THREE.Vector3()), hit.point) < 1) { annonce('', tr('Vise un bâtiment'), 1); bip(300, 200, 0.1, 'square', 0.1); return; }
+  const P = hit.point, N = hit.face.normal.clone().transformDirection(hit.object.matrixWorld), e = elanJ();
+  Object.assign(J, { sol: false, nage: false, saute: false, accroupi: false, roule: null, echelle: null, mur: null, plane: null, lance: null, superman: null, danse: 0, genou: 0, atterri: 0 });
+  if (!grappin) { // la toile : plus courte que la distance, elle le tire vers le bâtiment ; et assez courte pour qu'au plus bas, ses pieds passent à 2 m du sol
+    J.balance = { ancre: P.clone(), L: Math.max(3, Math.min(epaule.distanceTo(P) * 0.8, P.y - J.y - 3.5)), vx: e.vx, vz: e.vz };
+    fil(epaule, P); bruit(0.3, 5000, 0.12); bip(1800, 600, 0.08, 'triangle', 0.06);
+    return;
+  }
+  // le grappin. q.cible : là où il le tire (ses pieds) ; q.pose : là où il le pose ensuite, sur le toit ; q.ancre : là où le crochet tient
+  const q = J.grappin = { cible: V3(P.x, P.y + 0.3, P.z), pose: null, ancre: P.clone(), v: 0, espace: touches.Space };
+  if (N.y > 0.5) q.pose = P.clone();   // on a visé un toit, une terrasse : il y va tout droit
+  else { // on a visé un mur : il monte jusqu'au bord du toit qui est au-dessus, et passe dessus
+    const n = Math.hypot(N.x, N.z) || 1, nx = N.x / n, nz = N.z / n, ix = P.x - nx * 0.9, iz = P.z - nz * 0.9, toit = hauteurSol(ix, iz, 1e4);
+    if (toit > P.y - 0.3 && !dansBatiment(ix, toit + 1, iz)) { q.ancre.y = toit; q.cible.set(P.x + nx * 0.6, toit + 0.3, P.z + nz * 0.6); q.pose = V3(ix, toit, iz); }
+    else q.cible.set(P.x + nx * 0.6, P.y - 1, P.z + nz * 0.6);   // rien où se poser là-haut (une enseigne, un pylône) : il monte jusque-là, et lâche
+  }
+  bruit(0.4, 4000, 0.15); bip(700, 1500, 0.2, 'square', 0.06);   // « pfiou », le grappin part
+}
+// Batman au bout de son grappin : le câble le tire tout droit vers le bord du toit (REGLAGES.vitesseGrappin), pendu par la main droite,
+// puis il passe sur le toit. Espace : il lâche, et continue sur sa lancée
+function grappiner(dt) {
+  const q = J.grappin, vers = q.cible.clone().sub(V3(J.x, J.y, J.z)), l = vers.length();
+  q.v = Math.min(R_.vitesseGrappin, q.v + 80 * dt);
+  const pas = q.v * dt, dir = vers.divideScalar(l || 1);
+  if (touches.Space && !q.espace) { J.lance = { vx: dir.x * q.v, vz: dir.z * q.v }; J.vy = Math.min(10, dir.y * q.v); J.grappin = null; return; }
+  q.espace = touches.Space;   // (un nouvel appui : pas la touche du saut d'avant, encore enfoncée)
+  if (l <= pas + 0.3) { // arrivé
+    J.grappin = null; J.vy = 0; bip(500, 300, 0.08, 'square', 0.08);
+    if (q.pose) Object.assign(J, { x: q.pose.x, y: q.pose.y, z: q.pose.z, sol: true, atterri: 0.6 });
+    else Object.assign(J, { x: q.cible.x, y: q.cible.y, z: q.cible.z });
+    majJoueur(0);   // (sa pose, debout sur le toit)
+    return;
+  }
+  J.x += dir.x * pas; J.y += dir.y * pas; J.z += dir.z * pas; J.vy = 0; J.vitesse = q.v;
+  if (Math.hypot(dir.x, dir.z) > 0.2) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(dir.x, dir.z), 10 * dt);
+  joueurH.g.position.set(J.x, J.y, J.z); joueurH.g.rotation.y = J.angleCorps;
+  if (joueurH.arme) joueurH.arme.visible = false;
+  animerHumain(joueurH, 0, dt, { pend: 1 });
+  membresMous(joueurH, dt, { raideur: 14, sol: -Infinity, vx: dir.x * q.v, vy: dir.y * q.v, vz: dir.z * q.v });   // ses jambes traînent derrière lui
+  tendreCable(q.ancre, false);
+}
+// Spiderman au bout de sa toile : c'est un pendule. La toile (b.L mètres) retient sa main, 1,5 m au-dessus de ses pieds ; Z Q S D lui donnent
+// de l'élan, comme sur une balançoire. Quand on lâche G, il lâche la toile et continue sur sa lancée, avec un petit saut.
+// Renvoie false quand il a lâché : il tombe comme d'habitude (majJoueur)
+function balancer(dt) {
+  const b = J.balance, A = b.ancre;
+  if (!touches.KeyG) { J.lance = { vx: b.vx, vz: b.vz }; J.balance = null; if (!J.sol) J.vy += 3; return false; }
+  const av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
+  b.vx += (Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat) * 8 * dt; b.vz += (Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat) * 8 * dt;
+  J.vy -= R_.gravite * dt;
+  // la toile est tendue : elle le ramène vers l'accroche, d'autant plus vite qu'il a dépassé (jamais plus de 20 m/s)
+  const dx = J.x - A.x, dy = J.y + 1.5 - A.y, dz = J.z - A.z, d = Math.hypot(dx, dy, dz) || 1, trop = d - b.L;
+  if (trop > 0) {
+    const vn = (b.vx * dx + J.vy * dy + b.vz * dz) / d, voulu = -Math.min(20, trop * 8);
+    if (vn > voulu) { const k = (voulu - vn) / d; b.vx += dx * k; J.vy += dy * k; b.vz += dz * k; }
+  }
+  const v = Math.hypot(b.vx, J.vy, b.vz), frein = Math.min(1, R_.vitesseBalance / (v || 1));
+  b.vx *= frein; J.vy *= frein; b.vz *= frein;
+  J.x += b.vx * dt; J.y += J.vy * dt; J.z += b.vz * dt;
+  const bx = J.x, bz = J.z;
+  if (resoudre(J, 0.35)) { // un mur : il ne garde que sa vitesse le long du mur
+    const nx = J.x - bx, nz = J.z - bz, n = Math.hypot(nx, nz);
+    if (n > 1e-6) { const vn = (b.vx * nx + b.vz * nz) / n; if (vn < 0) { b.vx -= vn * nx / n; b.vz -= vn * nz / n; } }
+  }
+  const hs = hauteurSol(J.x, J.z, J.y);
+  if (hs < EAU - 1.3 && J.y <= EAU - 1.25) { J.balance = null; J.y = EAU - 1.25; J.vy = 0; J.nage = true; return false; }   // à l'eau : il lâche et nage
+  J.sol = J.y <= hs;
+  if (J.sol) { J.y = hs; J.vy = Math.max(0, J.vy); const f = Math.pow(0.02, dt); b.vx *= f; b.vz *= f; }   // par terre, ça frotte
+  const vh = Math.hypot(b.vx, b.vz);
+  J.vitesse = Math.hypot(vh, J.vy);
+  if (vh > 1.5) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(b.vx, b.vz), 8 * dt);
+  // il pend sous sa toile : son corps bascule vers l'accroche, en avant, en arrière ou de côté
+  const sn = Math.sin(J.angleCorps), cs = Math.cos(J.angleCorps), haut = Math.max(A.y - J.y - 1.5, 0.5);
+  const bascule = J.sol ? 0 : clamp(Math.atan2(-dx * sn - dz * cs, haut), -1.2, 1.2), roulis = J.sol ? 0 : clamp(-Math.atan2(-dx * cs + dz * sn, haut), -0.8, 0.8);
+  joueurH.g.rotation.y = J.angleCorps;
+  if (joueurH.arme) joueurH.arme.visible = false;
+  animerHumain(joueurH, J.sol ? vh : 0, dt, { pend: 1, bascule, roulis });
+  poserCorps(joueurH, J.x, J.y + 1.5, J.z, 1.5);
+  membresMous(joueurH, dt, { raideur: 14, sol: J.sol ? J.y : -Infinity, jambes: !J.sol, vx: b.vx, vy: J.vy, vz: b.vz });
+  tendreCable(A);
+  return true;
+}
+// Spiderman et les murs (un code de triche qui a « grimpe: true »). Le mur devant B.J. quand il avance dans la direction (dx, dz) : une boîte
+// de collision plus haute que sa taille, qui descend jusqu'à ses pieds, à moins de 25 cm devant lui. Renvoie { nx, nz, f } (la direction qui entre dans le mur, et où est
+// sa face : son x si le mur est à l'est ou à l'ouest, sinon son z), ou null
+function murDevant(dx, dz) {
+  const x = J.x + dx * 0.6, z = J.z + dz * 0.6, y = J.y + 1;
+  let m = null;
+  pourBoites(x, z, x, z, b => {
+    if (!(x > b.x1 && x < b.x2 && z > b.z1 && z < b.z2 && y < b.h && y > b.y0) || b.h < J.y + 1.2 || b.y0 > J.y + 0.3) return;
+    // de quel côté de la boîte est-il ? (au coin : du côté où il va le plus)
+    const ex = J.x < b.x1 ? -1 : J.x > b.x2 ? 1 : 0, ez = J.z < b.z1 ? -1 : J.z > b.z2 ? 1 : 0;
+    if (ex && (!ez || Math.abs(dx) > Math.abs(dz))) m = { nx: -ex, nz: 0, f: ex < 0 ? b.x1 : b.x2 }; else if (ez) m = { nx: 0, nz: -ez, f: ez < 0 ? b.z1 : b.z2 };
+  });
+  return m && dx * m.nx + dz * m.nz > 0.7 ? m : null;
+}
+// Spiderman sur son mur (J.mur) : Z monte, S descend, Q et D vont de côté (REGLAGES.vitesseGrimpe), Espace saute du mur. En haut, il passe
+// sur le toit ; en bas, il repose les pieds par terre. Il reste à 35 cm de la face du mur (rien ne le repousse : ni une corniche, ni un balcon)
+function escalader(dt, av, lat) {
+  const m = J.mur, v = R_.vitesseGrimpe * parTriche('vitesse'), cx = -m.nz * lat, cz = m.nx * lat;   // (cx, cz) : le côté où il va
+  const devant = () => dansBatiment(J.x + m.nx * 0.6, J.y + 0.3, J.z + m.nz * 0.6);   // y a-t-il encore du mur devant ses pieds ?
+  const quitter = () => { J.mur = null; J.sansMur = 0.4; };   // (il ne s'y recolle pas tout de suite)
+  if (touches.Space && !m.espace) { // il saute du mur, en arrière
+    quitter(); J.lance = { vx: -m.nx * 6, vz: -m.nz * 6 }; J.vy = R_.forceSaut; J.sol = false; J.saute = true;
+    return;
+  }
+  m.espace = touches.Space;
+  if (m.nx) J.x = m.f - m.nx * 0.35; else J.z = m.f - m.nz * 0.35;   // collé au mur
+  if (lat) { // de côté, sans dépasser le bord du mur, ni entrer dans un autre mur qui fait l'angle
+    const ax = J.x, az = J.z;
+    J.x += cx * v * 0.6 * dt; J.z += cz * v * 0.6 * dt;
+    if (!devant() || dansBatiment(J.x + cx * 0.35, J.y + 1, J.z + cz * 0.35)) { J.x = ax; J.z = az; }
+  }
+  // quelque chose au-dessus de sa tête (on regarde 20 cm plus près du mur que lui : une corniche dépasse à peine) ? Un rebord (la corniche d'un toit,
+  // un balcon : son dessus est à moins de 3,50 m de ses pieds) : il passe par-dessus et se met debout dessus. Un plafond : il ne monte pas plus
+  const tx = J.x + m.nx * 0.2, tz = J.z + m.nz * 0.2, dessus = av > 0 ? boiteEn(tx, J.y + 1.9 + av * v * dt, tz) : null;
+  if (dessus && !dessus.mur && dessus.h - J.y < 3.5 && !dansBatiment(tx, dessus.h + 1, tz)) { Object.assign(J, { x: tx, y: dessus.h, z: tz, sol: true, mur: null }); return; }
+  if (!dessus) J.y += av * v * dt;
+  J.vy = 0; J.sol = false; J.accroupi = false; J.danse = 0; J.vitesse = (av || lat) ? v : 0;
+  const hs = hauteurSol(J.x, J.z, J.y);
+  if (J.y <= hs) { J.y = hs; J.sol = true; if (av < 0) { quitter(); return; } }   // en bas : il repose les pieds par terre
+  if (!devant()) { // plus de mur devant ses pieds
+    if (!(av > 0 && J.y > m.y0 + 0.5)) { quitter(); return; }   // une porte s'est ouverte, il est passé sous le bas du mur : il tombe
+    // il est arrivé en haut du mur : il passe sur le toit, 80 cm plus loin (50 cm si c'est tout étroit : le haut d'un lampadaire)
+    const d = [0.8, 0.5].find(d => hauteurSol(J.x + m.nx * d, J.z + m.nz * d, J.y + PASMAX) > J.y - 0.5) || 0.8;
+    J.x += m.nx * d; J.z += m.nz * d; J.y = Math.max(J.y, hauteurSol(J.x, J.z, J.y + PASMAX)); J.sol = true; J.mur = null;
+    return;
+  }
+  J.angleCorps = Math.atan2(m.nx, m.nz);   // face au mur
+  joueurH.g.position.set(J.x + m.nx * 0.1, J.y, J.z + m.nz * 0.1); joueurH.g.rotation.y = J.angleCorps;
+  if (joueurH.arme) joueurH.arme.visible = false;
+  animerHumain(joueurH, J.vitesse, dt, { grimpe: true });
+  membresMous(joueurH, dt, { sol: J.y });
+}
+// La cape de Batman (un code de triche qui a « cape: true ») : en l'air, tant qu'on garde Maj enfoncé, elle se déploie et il plane.
+// Il avance là où on regarde (REGLAGES.vitesseCape) en descendant doucement (REGLAGES.chuteCape) ; en regardant vers le bas, il pique :
+// presque deux fois plus vite, et il descend jusqu'à 12 m/s. Elle ne se déploie qu'après un saut, ou à plus de 1,50 m du sol (pas en
+// descendant un escalier). Renvoie false s'il ne plane pas (ou plus) : il marche ou il tombe comme d'habitude (majJoueur)
+function planer(dt) {
+  const maj = touche('ShiftLeft', 'ShiftRight');
+  if (!J.plane) {
+    if (!maj || J.sol || J.nage || J.vy > 0 || !pouvoir('cape') || !(J.saute || J.y - hauteurSol(J.x, J.z, J.y) > 1.5)) return false;
+    J.plane = { ...elanJ(), roulis: 0 }; J.lance = null; J.danse = 0; J.accroupi = false;
+    bruit(0.35, 700, 0.3);   // la cape claque
+  }
+  const q = J.plane;
+  if (!maj) { J.lance = { vx: q.vx, vz: q.vz }; J.plane = null; return false; }   // il replie sa cape : il tombe, avec son élan
+  const pique = clamp((-J.tangage - 0.35) / 0.6, 0, 1), v = R_.vitesseCape * (1 + 0.8 * pique), chute = lerp(R_.chuteCape, 12, pique), k = Math.min(1, 2 * dt);
+  q.vx += (Math.sin(J.lacet) * v - q.vx) * k; q.vz += (Math.cos(J.lacet) * v - q.vz) * k;
+  J.vy += (-chute - J.vy) * Math.min(1, 4 * dt);
+  J.x += q.vx * dt; J.y += J.vy * dt; J.z += q.vz * dt;
+  if (resoudre(J, 0.35)) { q.vx *= 0.3; q.vz *= 0.3; }   // contre un mur : il n'avance presque plus
+  const hs = hauteurSol(J.x, J.z, J.y);
+  if (hs < EAU - 1.3 && J.y <= EAU - 1.25) { J.plane = null; J.y = EAU - 1.25; J.vy = 0; J.nage = true; return false; }   // à l'eau : il nage
+  if (J.y <= hs) { J.y = hs; J.atterri = Math.min(1, 0.3 - J.vy / 14); J.vy = 0; J.sol = true; J.saute = false; J.plane = null; return false; }   // il se pose, en douceur
+  const vh = Math.hypot(q.vx, q.vz), avant = J.angleCorps;
+  if (vh > 1) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(q.vx, q.vz), 8 * dt);
+  J.vitesse = Math.hypot(vh, J.vy);
+  if (dt) q.roulis += (roulisVirage(diffAngle(avant, J.angleCorps) / dt) - q.roulis) * Math.min(1, dt * 3);   // il penche dans ses virages
+  if (joueurH.arme) joueurH.arme.visible = false;
+  animerHumain(joueurH, 0, dt, { plane: 1 });
+  joueurH.g.quaternion.setFromEuler(new THREE.Euler(1.2 + 0.3 * pique, J.angleCorps, q.roulis, 'YZX'));   // couché dans l'air, le nez plus bas quand il pique
+  poserCorps(joueurH, J.x, J.y + 0.95, J.z, 0.95);
+  membresMous(joueurH, dt, { sol: hs });
+  return true;
 }
 // les échelles : on en attrape une en bas en avançant vers le mur, ou en haut, sur le toit, en avançant vers le bord au-dessus d'elle
 function echelleProche(dx, dz) {
@@ -7802,6 +8363,7 @@ function majPersonne(p, dt) {
     return;
   }
   if (p.releve !== undefined) { relever(p, dt); return; }
+  if (p.pris) { majPris(p, dt); return; }   // sous un filet, dans un cocon de toile, ou paralysé
   if (p.h.chien) { majChien(p, dt, d); return; }
   p.cooldown -= dt; p.peur -= dt; p.touche = Math.max(0, (p.touche || 0) - dt);
   let vitesse = 0, arme = false;
@@ -7902,8 +8464,32 @@ function relever(p, dt) {
   membresMous(p.h, dt, { raideur: 4 + 36 * s, sol: p.y });   // ses membres, encore mous, reprennent des forces
   if (k >= 1) p.releve = undefined;
 }
+// Un personnage pris : sous un filet ('filet' : accroupi dessous), emballé dans la toile de Spiderman ('cocon' : debout, les bras le long du corps,
+// seule sa tête dépasse) ou paralysé par un batarang électrique ('choc' : il tremble, avec des étincelles). Pendant « duree » secondes,
+// il ne bouge plus et ne tire plus ; ensuite il est libre, et un piéton s'enfuit
+function prendre(p, sorte, duree) {
+  if (p.vie <= 0) return;
+  liberer(p);
+  p.pris = { sorte, reste: duree, t: 0 }; p.voitJ = false;
+  if (sorte !== 'cocon') return;
+  const c = p.pris.m = new THREE.Mesh(GEO.cocon, M_TOILE); c.castShadow = true; c.userData.personne = p;
+  if (p.h.chien) { c.rotation.x = Math.PI / 2; c.scale.setScalar(0.7); c.position.y = 0.5; } else c.position.y = 0.78;   // (un chien : couché dans son cocon)
+  p.h.g.add(c);
+}
+function liberer(p) { p.pris?.m?.removeFromParent(); p.pris = null; }
+function majPris(p, dt) {
+  const q = p.pris, choc = q.sorte === 'choc';
+  if ((q.reste -= dt) <= 0) { liberer(p); return; }
+  if (!p.h.g.visible) return;
+  const tremble = choc ? Math.sin(temps * 60) * 0.12 : q.sorte === 'cocon' ? Math.sin(temps * 9) * 0.06 : 0;
+  p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle + tremble;
+  if (choc && (q.t -= dt) <= 0) { q.t = 0.15; etincelles(V3(p.x, p.y + entre(0.5, 1.6), p.z), 1, 1.5); }
+  if (p.h.chien) { animerChien(p.h, 0, dt); return; }
+  animerHumain(p.h, 0, dt, choc ? { ecarte: 0.6, agite: 1 } : q.sorte === 'filet' ? { accroupi: true, ecarte: 0.25, agite: 0.6 } : { penche: Math.sin(temps * 7) * 0.07 });
+  membresMous(p.h, dt, { sol: p.y });
+}
 // B.J. a une arme à feu à la main (pas en voiture) : les vigiles et les chiens le remarquent
-const armeEnMain = () => !ARMES[J.arme].corps && !ARMES[J.arme].laser && !J.voiture && !J.robot;   // une arme à feu à la main (pas les yeux laser)
+const armeEnMain = () => !ARMES[J.arme].corps && !!ARMES[J.arme].modele && !J.voiture && !J.robot;   // une arme à feu à la main (pas les yeux laser, la toile ni le filet : il n'a rien à tenir)
 // un chien de garde : il court plus vite que B.J., mord, et aboie autour des voitures
 function majChien(p, dt, d) {
   let vitesse = 0;
@@ -8121,8 +8707,12 @@ function majVoiture(v, dt) {
   else if (v.type.vole) piloterAeronef(v, dt, false);
   else if (v.accident) majAccident(v, dt);
   else if (v.ski) majSkieur(v, dt);
-  else if (v.conducteur) majVoitureIA(v, dt);
+  else if (v.conducteur && !(v.panne > 0)) majVoitureIA(v, dt);
   else if (Math.abs(v.vitesse) > 0.05) { v.vitesse *= Math.pow(0.3, dt); bougerVoiture(v, dt, false); }
+  if (v.panne > 0) { // en panne (un batarang électrique) : elle s'arrête en roue libre, et des étincelles sautent sur le capot
+    v.panne -= dt;
+    if (d < 150 && Math.random() < dt * 6) { const c = local(v, entre(-0.6, 0.6), v.forme.longueur * 0.3); etincelles(V3(c.x, v.y + v.forme.hauteur * 0.6, c.z), 2, 2); }
+  }
   if (!v.conducteur && v !== J.voiture) v.braque = 0;
   let affaisse = 0, penche = 0;   // les pneus crevés : la voiture s'affaisse de leur côté
   for (const r of v.roues) { // elle roule, braque (à l'avant), et si elle est tordue : elle penche, elle part de travers, elle se dandine
@@ -8347,14 +8937,29 @@ function sauterMission(n) {
   missionIndex = clamp(Math.round(n) - 1, 0, MISSIONS.length); etapeIndex = 0; J.sac = 0;
   const m = MISSIONS[missionIndex];
   if (m?.etapes.some(e => e.blindee) && !voitures.some(v => v.blindee && !v.detruite) && !J.voiture) {
-    for (let k = 0; k < 16; k++) { // une place libre autour de B.J.
-      const a = k * Math.PI / 8, x = J.x + Math.sin(a) * 5, z = J.z + Math.cos(a) * 5, y = hauteurSol(x, z, J.y + 0.6);
-      if (Math.abs(y - J.y) > 0.8 || [-1, 0, 1].some(e => dansBatiment(x + Math.cos(a) * e * 2.5, y + 1, z - Math.sin(a) * e * 2.5))) continue;
-      const v = creerVoiture(x, z, a + Math.PI / 2, false, typeNomme('Porsche')); v.blindee = true; habillerVoiture(v);
-      break;
-    }
+    const v = garerPres(typeNomme('Porsche'));
+    if (v) { v.blindee = true; habillerVoiture(v); }
   }
   annonce(`MISSION ${missionIndex + 1}`, tr(m ? m.nom : 'Pays libre'), 3);
+}
+// une voiture de ce type apparaît à une place libre autour de B.J., à 5 m (puis 8, puis 11), au même niveau que lui, de côté par rapport à lui.
+// Renvoie la voiture, ou rien s'il n'y a pas de place (il est dans une pièce, sur un toit, dans l'eau)
+function garerPres(type) {
+  for (const d of [5, 8, 11]) for (let k = 0; k < 16; k++) {
+    const a = J.lacet + Math.PI / 2 + k * Math.PI / 8, x = J.x + Math.sin(a) * d, z = J.z + Math.cos(a) * d, y = hauteurSol(x, z, J.y + 0.6);
+    if (Math.abs(y - J.y) > 0.8 || y < EAU || Math.abs(hauteurSol(x, z) - y) > 0.3 || [-1, 0, 1].some(e => dansBatiment(x + Math.cos(a) * e * 2.5, y + 1, z - Math.sin(a) * e * 2.5))
+      || voitures.some(o => dist(o, { x, z }) < 4)) continue;
+    return creerVoiture(x, z, a + Math.PI / 2, false, type);
+  }
+}
+// un code de triche qui a « voiture: 'Batmobile' » : elle apparaît à côté de B.J. quand on tape le code. Il n'y en a qu'une à la fois :
+// celle d'avant s'en va (sauf s'il est dedans). Elle est à lui : monter dedans n'est pas un vol
+function amenerVoiture(nom) {
+  const type = typeNomme(nom);
+  if (!type || J.voiture || J.robot) return;
+  for (const o of voitures) if (o.triche === nom) o.supprimer = true;
+  const v = garerPres(type);
+  if (v) { v.triche = nom; v.volee = true; bip(300, 900, 0.3, 'sawtooth', 0.08); }
 }
 
 // =====================================================================
@@ -8587,8 +9192,9 @@ function majHUD(dt) {
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
   $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !(J.superman && a.corps) && !dansLunette() && (J.vue === 1 || visee || !a.corps || rb) ? 'block' : 'none';
   $('fumee').style.opacity = J.fumee * (J.masque ? 0.25 : 0.8);   // la fumée toxique brouille la vue (moins avec le masque)
-  $('vitesse').style.display = J.voiture || J.superman ? 'block' : 'none';
-  if (J.superman) $('vitesse').textContent = `${Math.round(J.vitesse * 3.6)} km/h`;   // Superman : chaque appui sur Maj le fait monter
+  const vole = J.superman || J.plane || J.balance || J.grappin;   // en volant, au bout d'une toile ou d'un grappin : sa vitesse
+  $('vitesse').style.display = J.voiture || vole ? 'block' : 'none';
+  if (vole) $('vitesse').textContent = `${Math.round(J.vitesse * 3.6)} km/h`;   // Superman : chaque appui sur Maj le fait monter
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h` + (J.voiture.enVol ? ` · ${Math.round(J.voiture.y - Math.max(hauteurTerrain(J.voiture.x, J.voiture.z), EAU))} m` : '')   // en vol : la hauteur
     + (J.chrono?.t0 != null ? ` · ${(temps - J.chrono.t0).toFixed(1)} s` : '');   // sur le boardercross : le chronomètre
   const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
@@ -8605,7 +9211,11 @@ function majHUD(dt) {
     : asc ? tr(asc.monte ? "Appuie sur <b>E</b> pour prendre l'ascenseur (monter sur le toit)" : "Appuie sur <b>E</b> pour prendre l'ascenseur (redescendre)")
     : nav ? tr('Appuie sur <b>E</b> pour prendre la navette : {arret}', { arret: tr(nav.vers.nom) }) : v ? tr('Appuie sur <b>E</b> pour monter : {vehicule}', { vehicule: tr(v.type.nom) })
     : perce ? tr('Perceuse thermique : {n} %. Tiens bon !', { n: Math.floor(perce.perceuse / R_.dureePerceuse * 100) })
-    : ech ? tr("Avance contre l'échelle pour grimper") : '';
+    : ech ? tr("Avance contre l'échelle pour grimper")
+    // les codes BATMAN et SPIDERMAN : ce qu'on peut faire, là, tout de suite
+    : J.mur ? tr('Z S : monter ou descendre · Q D : de côté · Espace : sauter du mur') : J.balance ? tr("Lâche <b>G</b> pour lâcher la toile · Z Q S D : prendre de l'élan")
+    : J.prise ? tr('Lâche le bouton pour lancer la voiture là où tu regardes') : J.grappin ? tr('<b>Espace</b> : lâcher le grappin')
+    : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape') : '';
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
@@ -8619,7 +9229,9 @@ function majHUD(dt) {
 function mettreAJour(dt) {
   temps += dt;
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
-  if (J.biceps && (J.mort || J.voiture || J.robot || J.telesiege || J.superman || J.roule || J.echelle)) finirBiceps();   // et on ne montre son biceps que debout
+  if (J.mort || J.voiture || J.robot || J.telesiege) J.grappin = J.balance = J.mur = J.plane = J.lance = null;   // ni grappin, ni toile, ni mur, ni cape
+  if (J.biceps && (J.mort || J.voiture || J.robot || J.telesiege || J.superman || J.roule || J.echelle || accroche())) finirBiceps();   // et on ne montre son biceps que debout
+  cable.visible = false;   // le câble du grappin, la toile : ce qui s'en sert le retend à chaque image
   if (J.mort) {
     J.mort += dt; J.roule = null; J.telesiege = null;
     const k = Math.min(1, J.mort * 1.25);
@@ -8642,6 +9254,7 @@ function mettreAJour(dt) {
     } else if (sourisG && !J.voiture && !J.telesiege && !J.nage && !J.roule && !(J.superman && ARMES[J.arme].corps) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
+  tenirPrise(dt);   // la voiture que Spiderman fait tourner au bout de sa toile
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
   auraBJ.material.map.offset.y -= dt * 1.5; auraBJ.material.opacity = 0.45 + Math.random() * 0.25;   // l'aura monte et tremble
   if (capeBJ.parent) majCape(dt);   // la cape de Superman flotte au vent
@@ -8678,7 +9291,7 @@ function mettreAJour(dt) {
     if (o.cachette) { o.cachette.pris = temps; o.cachette.objet = null; }
     if (o.reapparait) { o.cache = o.delai || 60; o.m.visible = false; } else o.supprimer = true;
   }
-  majRoquettes(dt); majDebris(dt); majLampadaires(dt); majCachettes();
+  majRoquettes(dt); majLances(dt); majDebris(dt); majLampadaires(dt); majCachettes();
   J.energie = Math.max(0, J.energie - dt);
   // au garage LS Customs, une voiture abîmée est réparée (gratuitement)
   if (J.voiture?.abimee && lieux.G && dist(J.voiture, lieuProche('G', J)) < 9) { habillerVoiture(J.voiture); annonce('LS CUSTOMS', tr('Voiture réparée !'), 2.5); bip(600, 1200, 0.3, 'sine', 0.3); }
@@ -8762,6 +9375,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, toucheSol, sorteDeSol, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
+  dansBatiment, pourBoites, resoudre, majJoueur, accrocher, attraper, tenirPrise, prendre, liberer, lancer, lances, filets, feux, arriver, murDevant, cable, garerPres, amenerVoiture, pouvoir, creerArme, raycaster,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
