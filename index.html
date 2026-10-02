@@ -597,7 +597,8 @@ const REGLAGES = {
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
   ombres: true,              // mets false si le jeu rame
-  distanceVue: 900,          // mètres : au-delà, le brouillard cache tout (mets 500 si le jeu rame)
+  distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
+  distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
   vitesseTelesiege: 15,      // m/s : les télésièges et la télécabine des stations de ski (le rond bleu ❄ sur la carte du jeu). Mets 5 pour un vrai télésiège, tout lent
   vitesseGare: 2,            // m/s : dans les gares, les sièges ralentissent pour qu'on monte dessus (un télésiège « débrayable »). Mets 15 pour qu'ils ne ralentissent plus
@@ -1937,8 +1938,39 @@ renderer.autoClear = false;
 document.body.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0xa9c4e0, R_.distanceVue * 0.2, R_.distanceVue);
-const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, R_.distanceVue * 1.5 + 200);
+// La brume : elle commence à 20 % de distanceVue, et ne cache tout qu'à distanceRelief. On voit donc le relief de très loin...
+const VUE_RELIEF = Math.max(R_.distanceRelief, R_.distanceVue);
+scene.fog = new THREE.Fog(0xa9c4e0, R_.distanceVue * 0.2, VUE_RELIEF);
+// ...mais pas les détails (bâtiments, arbres, routes, voitures, gens) : ils s'effacent point par point entre 80 % de distanceVue et distanceVue,
+// et plus loin on ne les dessine plus du tout (majMorceaux). Le terrain et l'eau, eux, restent : leur matière est marquée RELIEF (voir relief).
+// Pour ça, on retouche le bout de programme de Three.js qui dessine la brume. La distance se compte pour chaque point de l'image, tout autour
+// de la caméra, et pas seulement devant elle : sinon tout changerait quand on tourne la tête
+{
+  const retoucher = (nom, avant, apres) => { // (si Three.js change un jour ce bout de programme, on le voit tout de suite)
+    if (!THREE.ShaderChunk[nom].includes(avant)) alert(`Brume : le programme « ${nom} » de Three.js a changé !`);
+    THREE.ShaderChunk[nom] = THREE.ShaderChunk[nom].replace(avant, apres);
+  };
+  const debut = (R_.distanceVue * 0.8).toFixed(1), large = (R_.distanceVue * 0.2).toFixed(1);
+  retoucher('fog_pars_vertex', 'varying float vFogDepth;', 'varying vec3 vFogPosition;');
+  retoucher('fog_vertex', 'vFogDepth = - mvPosition.z;', 'vFogPosition = mvPosition.xyz;');
+  retoucher('fog_pars_fragment', 'varying float vFogDepth;', 'varying vec3 vFogPosition;');
+  retoucher('fog_fragment', '#ifdef USE_FOG', '#ifdef USE_FOG\n\tfloat vFogDepth = length( vFogPosition );');
+  THREE.ShaderChunk.fog_fragment += `
+#if defined( USE_FOG ) && ! defined( RELIEF )
+	if ( vFogDepth > ${debut} && fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) ) < ( vFogDepth - ${debut} ) / ${large} ) discard;
+#endif`;
+}
+const relief = m => { m.defines = { ...m.defines, RELIEF: 1 }; return m; };   // une matière qu'on voit de très loin
+// Ce qui est tout entier plus loin que distanceVue (une voiture garée à l'autre bout du pays...) n'est même pas envoyé à la carte graphique :
+// Three.js sait déjà sauter ce qui est hors du champ de la caméra, on lui fait sauter aussi ce qui est trop loin (sauf le relief)
+const dansLeChamp = THREE.Frustum.prototype.intersectsObject, bouleLoin = new THREE.Sphere();
+THREE.Frustum.prototype.intersectsObject = function (o) {
+  if (!dansLeChamp.call(this, o)) return false;
+  if (o.material.defines?.RELIEF || o.material.fog === false) return true;   // (sans brouillard : le repère jaune des missions, qu'on voit de partout)
+  bouleLoin.copy(o.boundingSphere || o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
+  return bouleLoin.center.distanceTo(camera.position) - bouleLoin.radius < R_.distanceVue;
+};
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, Math.max(R_.distanceVue * 1.5 + 200, VUE_RELIEF * 1.05));
 camera.rotation.order = 'YXZ';
 scene.add(camera);
 
@@ -2181,7 +2213,7 @@ const MAT = {
   chateau: std(TEX.pierres, { roughness: 0.95 }), banniere: std(TEX.banniere, { side: THREE.DoubleSide }),
   croix: std(TEX.croix, { emissive: '#fff', emissiveMap: TEX.croix, emissiveIntensity: 0.3 }),
   enseigne: enseigne('ARMURERIE', '#ff7a1a'),
-  terrain: std(TEX.sol, { vertexColors: true, roughness: 1, bumpScale: 0.4 }),
+  terrain: relief(std(TEX.sol, { vertexColors: true, roughness: 1, bumpScale: 0.4 })),
   routeCampagne: std(TEX.routeCampagne, { roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1 }),
   piste: std(TEX.piste, { roughness: 0.9, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 }),
   beton2: std(null, { color: '#a09c94', roughness: 0.9, side: THREE.DoubleSide }), rambarde: std(null, { color: '#c8ccd0', metalness: 0.6, roughness: 0.4, side: THREE.DoubleSide }),
@@ -3157,7 +3189,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
     return Object.keys(n).sort((p, q) => n[q] - n[p])[0] || ',';
   }));
   const C = s => new THREE.Color(s);
-  const COUL = { herbe: C('#6a8a3e'), herbe2: C('#4f7234'), foret: C('#3e5d2a'), champ1: C('#8a9a3c'), champ2: C('#c0a855'), desert: C('#cfa56c'), desert2: C('#b98a55'),
+  const COUL = { ville: C('#8d8b86'), herbe: C('#6a8a3e'), herbe2: C('#4f7234'), foret: C('#3e5d2a'), champ1: C('#8a9a3c'), champ2: C('#c0a855'), desert: C('#cfa56c'), desert2: C('#b98a55'),
     plage: C('#dccb98'), roche: C('#8a8279'), rocheDesert: C('#a67c5a'), fond: C('#8f8466'), neige: C('#f4f7fb'), neige2: C('#dde6f2') };
   const h = (ix, iz) => HT[clamp(iz, 0, NZT - 1) * NXT + clamp(ix, 0, NXT - 1)];
   const coul = new THREE.Color(), une = new THREE.Color();
@@ -3192,16 +3224,41 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
       coul.lerp(s === ':' ? COUL.rocheDesert : COUL.roche, Math.max(clamp((0.9 - n.y) / 0.2, 0, 1), clamp((y - 260) / 60, 0, 1)));   // la roche : sur les pentes raides et en haut
       // la neige des SOMMETS : elle couvre tout, sauf les pentes trop raides pour qu'elle tienne (plus de 55°), où l'on voit la roche
       if (y > EAU) coul.lerp(une.lerpColors(COUL.neige, COUL.neige2, v), neigeEn(x, z) * clamp((n.y - 0.52) / 0.1, 0, 1));
-      col.set([coul.r, coul.g, coul.b], k * 3);
       const ombre = clamp(0.85 - (n.x + n.z) * 1.5, 0.45, 1.3), srgb = v => 255 * Math.min(1, v * ombre) ** (1 / 2.2);
       imageTerrain.set(y < EAU ? [63, 121, 163, 255] : [srgb(coul.r), srgb(coul.g), srgb(coul.b), 255], (iz * NXT + ix) * 4);
+      // sous une ville, le terrain est gris : de près, les rues et les trottoirs le cachent ; de très loin, c'est tout ce qu'on voit de la ville
+      if (estBloc(CARTE[j][i]) && !'PM'.includes(CARTE[j][i])) coul.copy(COUL.ville);
+      col.set([coul.r, coul.g, coul.b], k * 3);
       if (a < nx - 1 && b < nz - 1) idx.push(k, k + nx, k + 1, k + nx, k + nx + 1, k + 1);
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
     g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); g.setIndex(idx);
     const m = new THREE.Mesh(g, MAT.terrain); m.receiveShadow = true;
-    morceauEn((x0 + 32) * PT, (z0 + 32) * PT).g.add(m);
+    const morceau = morceauEn((x0 + 32) * PT, (z0 + 32) * PT);
+    morceau.g.add(m);
+    // Le même morceau pour quand il est très loin (majMorceaux le dessine à la place de l'autre) : un point sur 4 seulement, tous les 37 m.
+    // Autour, une jupe pend 40 m plus bas : elle bouche les fentes entre un morceau détaillé et son voisin simplifié.
+    // (rien pour un morceau qui est tout entier sous l'eau : de loin, on ne voit que la mer)
+    if (pos.every((y, q) => q % 3 !== 1 || y < EAU)) continue;
+    const P = 4, mx = (nx - 1) / P + 1, mz = (nz - 1) / P + 1, garde = [], idxLoin = [], contour = [];
+    for (let b = 0; b < mz; b++) for (let a = 0; a < mx; a++) garde.push(b * P * nx + a * P);
+    for (let b = 0; b < mz - 1; b++) for (let a = 0; a < mx - 1; a++) { const k = b * mx + a; idxLoin.push(k, k + mx, k + 1, k + mx, k + mx + 1, k + 1); }
+    for (let a = 0; a < mx - 1; a++) contour.push(a);                                 // le tour du morceau, dans l'ordre
+    for (let b = 0; b < mz - 1; b++) contour.push(b * mx + mx - 1);
+    for (let a = mx - 1; a > 0; a--) contour.push((mz - 1) * mx + a);
+    for (let b = mz - 1; b > 0; b--) contour.push(b * mx);
+    const bord = garde.length;
+    contour.forEach((k, t) => { // un point de la jupe sous chaque point du tour, et un carré (visible des deux côtés) jusqu'au suivant
+      const k2 = contour[(t + 1) % contour.length], j = bord + t, j2 = bord + (t + 1) % contour.length;
+      garde.push(garde[k]); idxLoin.push(k, j, k2, k2, j, j2, k, k2, j, k2, j2, j);
+    });
+    const copie = (src, n) => { const d = new Float32Array(garde.length * n); garde.forEach((k, q) => { for (let c = 0; c < n; c++) d[q * n + c] = src[k * n + c]; }); return d; };
+    const posLoin = copie(pos, 3); for (let q = bord; q < garde.length; q++) posLoin[q * 3 + 1] -= 40;
+    const gl = new THREE.BufferGeometry();
+    gl.setAttribute('position', new THREE.BufferAttribute(posLoin, 3)); gl.setAttribute('normal', new THREE.BufferAttribute(copie(nor, 3), 3));
+    gl.setAttribute('color', new THREE.BufferAttribute(copie(col, 3), 3)); gl.setAttribute('uv', new THREE.BufferAttribute(copie(uv, 2), 2)); gl.setIndex(idxLoin);
+    morceau.loin = new THREE.Mesh(gl, MAT.terrain); morceau.loin.visible = false; scene.add(morceau.loin);
   }
   // la végétation de la campagne : des sapins dans les forêts et les montagnes, des arbres dans l'herbe, des cactus dans le désert, des palmiers sur les plages
   for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
@@ -3336,9 +3393,10 @@ PISTES_SKI.forEach((p, n) => {
   }
 });
 // l'eau : un grand plan à la hauteur EAU, qui brille et ondule
-const eau = new THREE.Mesh(new THREE.PlaneGeometry(TAILLE_X + 9000, TAILLE_Z + 9000).rotateX(-Math.PI / 2),
-  new THREE.MeshStandardMaterial({ color: '#2b6384', roughness: 0.12, metalness: 0.15, bumpMap: TEX.vagues, bumpScale: 0.35 }));
-TEX.vagues.repeat.set((TAILLE_X + 9000) / 14, (TAILLE_Z + 9000) / 14);
+const LARGE = 2 * Math.max(4500, VUE_RELIEF);   // elle dépasse le pays de tous les côtés, jusqu'au bout de la vue
+const eau = new THREE.Mesh(new THREE.PlaneGeometry(TAILLE_X + LARGE, TAILLE_Z + LARGE).rotateX(-Math.PI / 2),
+  relief(new THREE.MeshStandardMaterial({ color: '#2b6384', roughness: 0.12, metalness: 0.15, bumpMap: TEX.vagues, bumpScale: 0.35 })));
+TEX.vagues.repeat.set((TAILLE_X + LARGE) / 14, (TAILLE_Z + LARGE) / 14);
 eau.position.set(TAILLE_X / 2, EAU, TAILLE_Z / 2); eau.receiveShadow = true; scene.add(eau);
 
 // fusion : quelques gros objets par morceau au lieu de milliers de petits (beaucoup plus rapide)
@@ -3449,9 +3507,13 @@ function majLampadaires(dt) {
   }
   for (let k = lampadairesTombes.length - 1; k >= 0; k--) if (lampadairesTombes[k].fini) lampadairesTombes.splice(k, 1);
 }
-// on ne dessine que les morceaux qui ne sont pas cachés par le brouillard
+// on ne dessine en entier que les morceaux assez proches (ceux où l'on peut voir des détails) ; des autres, seulement le relief simplifié
 function majMorceaux() {
-  for (const m of morceaux.values()) m.g.visible = Math.hypot(m.x - camera.position.x, m.z - camera.position.z) < R_.distanceVue + MORCEAU * 0.71;
+  for (const m of morceaux.values()) {
+    const d = Math.hypot(m.x - camera.position.x, m.z - camera.position.z) - MORCEAU * 0.71;
+    m.g.visible = d < R_.distanceVue;
+    if (m.loin) m.loin.visible = !m.g.visible && d < VUE_RELIEF;   // (plus loin encore, la brume cache tout)
+  }
   for (const d of interieurs) d.g.visible = Math.hypot(d.x - camera.position.x, d.z - camera.position.z) < 100;   // l'intérieur des bâtiments, seulement de près
 }
 
