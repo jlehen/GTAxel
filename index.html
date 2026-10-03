@@ -657,6 +657,7 @@ import { TessellateModifier } from 'three/addons/modifiers/TessellateModifier.js
 //  RÉGLAGES : change ces nombres pour modifier le jeu !
 // =====================================================================
 const REGLAGES = {
+  vitesseJeu: 0.87,          // tout le jeu va à cette vitesse : 1 = normal, 0.87 = 13 % plus lent (on a le temps de viser), 0.5 = au ralenti
   vitesseMarche: 4,          // mètres par seconde
   vitesseCourse: 8,          // avec Maj
   vitesseAccroupi: 2,
@@ -805,9 +806,10 @@ const ARMES = [
   { nom: 'Filet',               modele: null,       degats: 0,   cadence: 1,   portee: 60, filet: true, rayon: 2.5, duree: 12 },
   { nom: 'Filet électrique',    modele: null,       degats: 0,   cadence: 1,   portee: 60, filet: true, rayon: 2.5, duree: 12, electrique: 10 },
   // la toile de Spiderman (un code qui a « toile: true » : SPIDERMAN), pour se balancer d'immeuble en immeuble. Vise un bâtiment, à « portee »
-  // mètres au plus, et garde le bouton enfoncé : tu te balances au bout ; lâche-le pour lâcher la toile (la touche G fait pareil).
-  // Sur une voiture : elle l'attrape. Garde le bouton enfoncé pour la faire tourner autour de toi, lâche-le pour la lancer
-  { nom: "Toile d'araignée",    modele: null,       degats: 0,   cadence: 0.35, portee: 90, toile: true },
+  // mètres au plus (300 : quatre pâtés de maisons plus loin), et garde le bouton enfoncé : tu te balances au bout ; lâche-le pour lâcher la
+  // toile (la touche G fait pareil). Sur une voiture, à « porteeVoiture » mètres au plus : elle l'attrape. Garde le bouton enfoncé pour la
+  // faire tourner autour de toi, lâche-le pour la lancer
+  { nom: "Toile d'araignée",    modele: null,       degats: 0,   cadence: 0.35, portee: 300, porteeVoiture: 90, toile: true },
 ];
 // Les objets de valeur qu'on vole dans les immeubles où l'on entre, et ce qu'ils rapportent. Change les prix, ou ajoute une ligne
 // avec une de ces formes : collier, montre, bague, diamant, lingot, billets, console, portable, telephone
@@ -7747,7 +7749,7 @@ function accrocher(a = ARMES.find(x => x[pouvoir('grappin') ? 'grappin' : 'toile
   const hit = raycaster.intersectObjects(batiments, false)[0], debut = raycaster.ray.at(raycaster.near, new THREE.Vector3());
   const auto = grappin ? null : raycaster.intersectObjects(voitures.filter(v => v.m.visible && !v.detruite && !pasDeTole(v)).map(v => v.m), true)[0];
   if (!grappin) { J.recul = 1; bruit(0.3, 5000, 0.12); bip(1800, 600, 0.08, 'triangle', 0.06); }   // « thwip ! »
-  if (auto && (!hit || auto.distance < hit.distance) && toucheSol(debut, auto.point) >= 1) { // la toile attrape une voiture
+  if (auto && auto.distance <= raycaster.near + (a.porteeVoiture ?? a.portee) && (!hit || auto.distance < hit.distance) && toucheSol(debut, auto.point) >= 1) { // la toile attrape une voiture
     fil(main, auto.point); attraper(auto.object.userData.voiture, souris);
     return;
   }
@@ -7807,9 +7809,10 @@ function balancer(dt) {
   if (!tient(b)) { J.lance = { vx: b.vx, vz: b.vz }; J.balance = null; if (!J.sol) J.vy += 3; return false; }
   const av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
   b.vx += (Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat) * 8 * dt; b.vz += (Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat) * 8 * dt;
-  J.vy -= R_.gravite * dt;
-  // la toile est tendue : elle le ramène vers l'accroche, d'autant plus vite qu'il a dépassé (jamais plus de 20 m/s)
+  // la toile est tendue : elle le ramène vers l'accroche, d'autant plus vite qu'il a dépassé (jamais plus de 20 m/s). Tant qu'il en est
+  // encore loin (plus de 10 m de toile en trop), elle le tient aussi en l'air : il file vers l'accroche sans tomber, puis il se balance
   const dx = J.x - A.x, dy = J.y + 1.5 - A.y, dz = J.z - A.z, d = Math.hypot(dx, dy, dz) || 1, trop = d - b.L;
+  J.vy -= R_.gravite * dt * clamp(1 - trop / 10, 0, 1);
   if (trop > 0) {
     const vn = (b.vx * dx + J.vy * dy + b.vz * dz) / d, voulu = -Math.min(20, trop * 8);
     if (vn > voulu) { const k = (voulu - vn) / d; b.vx += dx * k; J.vy += dy * k; b.vz += dz * k; }
@@ -8504,9 +8507,10 @@ function piloterBatmobile(v, dt, pilote) {
     v.tangage += clamp(clamp(J.tangage, -0.6, 0.6) - v.tangage, -0.8 * dt, 0.8 * dt);   // son nez suit ton regard, vers le haut ou vers le bas
     const decolle = v.ailes < 1 && v.y < hauteurSol(v.x, v.z, v.y + 1) + 4 ? 5 : 0;   // au décollage, elle monte toute seule
     v.vy += clamp(Math.sin(v.tangage) * v.vitesse + haut * 10 + decolle - v.vy, -15 * dt, 15 * dt);
-  } else { // elle se pose : elle ralentit, se remet à plat et descend doucement
+  } else { // elle se pose : elle ralentit, se remet à plat et descend doucement, sur ses réacteurs (6 m/s, puis 2 m/s en touchant le sol)
     v.vitesse *= Math.pow(0.4, dt); v.tangage *= Math.pow(0.05, dt); v.roulis *= Math.pow(0.05, dt);
-    v.vy += clamp(-6 - v.vy, -15 * dt, 15 * dt);
+    const dessous = Math.max(0, v.y - hauteurSol(v.x, v.z, v.y + 1));
+    v.vy += clamp(-Math.min(6, 2 + 2 * dessous) - v.vy, -15 * dt, 15 * dt);
   }
   const h = Math.cos(v.tangage) * v.vitesse;
   v.x += Math.sin(v.angle) * h * dt; v.z += Math.cos(v.angle) * h * dt; v.y = Math.min(v.y + v.vy * dt, PLAFOND);
@@ -8917,20 +8921,26 @@ function majVoiture(v, dt) {
   if (!v.conducteur && v !== J.voiture) v.braque = 0;
   let affaisse = 0, penche = 0;   // les pneus crevés : la voiture s'affaisse de leur côté
   // la Batmobile déploie ses ailes en une seconde (ou les replie), et ses roues basculent à plat. plat : de 0 (une voiture) à 1 (prête à voler)
-  if (v.type.vitesseVol) v.ailes = clamp((v.ailes || 0) + (v.envole ? dt : -dt), 0, 1);   // (une autre voiture à qui on donne vitesseVol vole aussi : ses roues basculent, mais elle n'a pas d'ailes)
-  const plat = v.ailes ? v.ailes * v.ailes * (3 - 2 * v.ailes) : 0;
+  if (v.type.vitesseVol) { // (une autre voiture à qui on donne vitesseVol vole aussi : ses roues basculent, mais elle n'a pas d'ailes)
+    v.ailes = clamp((v.ailes || 0) + (v.envole ? dt : -dt), 0, 1);
+    // pour se poser, ses roues restent à plat : ce sont ses réacteurs, qui la tiennent en l'air. Elles ne se remettent droites
+    // (en un quart de seconde) qu'à 1,5 m du sol, juste avant de le toucher
+    const reacteurs = v.envole || (v.enVol && v.y - hauteurSol(v.x, v.z, v.y + 1) > 1.5);
+    v.rouesPlat = clamp((v.rouesPlat || 0) + (reacteurs ? dt : -4 * dt), 0, 1);
+  }
+  const lisse = x => x ? x * x * (3 - 2 * x) : 0, plat = lisse(v.ailes), rouesPlat = lisse(v.rouesPlat);
   for (const r of v.roues) { // elle roule, braque (à l'avant), et si elle est tordue : elle penche, elle part de travers, elle se dandine
     r.tourne.rotation.x += v.vitesse * dt / v.forme.roue; r.tourne.rotation.z = r.voile || 0;
     if (r.avant) r.b = (r.b || 0) + (v.braque - (r.b || 0)) * Math.min(1, dt * 8);
-    r.pivot.rotation.y = (r.b || 0) + (r.pince || 0); r.pivot.rotation.z = (r.carrossage || 0) + plat * Math.PI / 2 * Math.sign(r.pivot.position.x);
+    r.pivot.rotation.y = (r.b || 0) + (r.pince || 0); r.pivot.rotation.z = (r.carrossage || 0) + rouesPlat * Math.PI / 2 * Math.sign(r.pivot.position.x);
     if (r.crevee) { affaisse += Math.sign(r.pivot.position.z) * 0.03; penche -= Math.sign(r.pivot.position.x) * 0.04; }
   }
   if (v.voilure) { // ses ailes sortent de ses flancs ; en vol, ses roues à plat crachent une flamme bleue (plus longue quand elle tient en l'air
     // sans avancer, ou qu'elle monte), et son réacteur une flamme orange (plus longue quand on accélère)
     for (const a of v.voilure) { a.visible = plat > 0.02; a.scale.set(a.userData.cote * Math.max(plat, 0.02), 1, 0.4 + 0.6 * plat); }
-    for (const j of v.reacteurs) {
-      j.visible = !!v.enVol && plat > 0.6;
-      const l = (j.arriere ? 0.5 + 1.5 * (v.gaz || 0) : 0.6 + 0.9 * clamp(1 - v.vitesse / 30 + v.vy / 10, 0, 1)) * entre(0.85, 1.15) * plat;
+    for (const j of v.reacteurs) { // (les flammes suivent les roues : elles brûlent jusqu'à ce que les roues se remettent droites)
+      j.visible = !!v.enVol && rouesPlat > 0.6;
+      const l = (j.arriere ? 0.5 + 1.5 * (v.gaz || 0) : 0.6 + 0.9 * clamp(1 - v.vitesse / 30 + v.vy / 10, 0, 1)) * entre(0.85, 1.15) * rouesPlat;
       if (j.arriere) j.scale.set(1, 1, l); else j.scale.set(1, l, 1);
     }
   }
@@ -9559,7 +9569,7 @@ function majRepere(dt) {
 
 let dernier = performance.now();
 function boucle(t) {
-  const dt = clamp((t - dernier) / 1000, 0, 0.05);
+  const dt = clamp((t - dernier) / 1000 * R_.vitesseJeu, 0, 0.05);   // (REGLAGES.vitesseJeu ralentit tout le jeu)
   dernier = t;
   if (carte.ouverte) { dessinerGrandeCarte(dt); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
   if (enJeu) mettreAJour(dt); else dessinerApercu(dt);   // dans le menu : l'aperçu du héros
