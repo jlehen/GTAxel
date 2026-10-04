@@ -7958,6 +7958,19 @@ function murDevant(dx, dz) {
   });
   return m && dx * m.nx + dz * m.nz > 0.7 ? m : null;
 }
+// Ce que Spiderman a au-dessus de la tête, sur le mur m (la boîte b, au-dessus du point (x, z), à 15 cm du mur) : est-ce un rebord (la corniche
+// d'un toit, un balcon, le palier d'un escalier de secours) ? Un rebord dépasse du mur de 2,50 m au plus ; juste derrière son bord, c'est
+// le vide ; et un peu plus loin (à 2,60 m du mur), il n'y a rien au-dessus : le ciel. On peut donc passer par-dessus. Sinon, c'est un
+// plafond : le plancher de l'étage du dessus (derrière son bord : un mur, ou un autre morceau du plancher, qui est fait de plusieurs
+// boîtes autour du trou de l'escalier), le plafond d'un couloir, le tablier d'un pont
+function estRebord(m, b, x, z) {
+  const bord = m.nx ? (m.nx > 0 ? b.x1 : b.x2) : (m.nz > 0 ? b.z1 : b.z2), y = (b.y0 + b.h) / 2;   // le bord de la boîte, du côté opposé au mur ; sa hauteur
+  if (Math.abs(bord - m.f) > 2.5 || dansBatiment(m.nx ? bord - m.nx * 0.15 : x, y, m.nx ? z : bord - m.nz * 0.15)) return false;
+  const cx = x - m.nx * 2.45, cz = z - m.nz * 2.45;
+  let ciel = true;
+  pourBoites(cx, cz, cx, cz, c => { if (cx > c.x1 && cx < c.x2 && cz > c.z1 && cz < c.z2 && c.h > y) ciel = false; });
+  return ciel;
+}
 // Spiderman sur son mur (J.mur) : Z monte, S descend, Q et D vont de côté (REGLAGES.vitesseGrimpe), Espace saute du mur. En haut, il passe
 // sur le toit ; en bas, il repose les pieds par terre. Il reste à 35 cm de la face du mur (rien ne le repousse : ni une corniche, ni un balcon)
 function escalader(dt, av, lat) {
@@ -7976,9 +7989,10 @@ function escalader(dt, av, lat) {
     if (!devant() || dansBatiment(J.x + cx * 0.35, J.y + 1, J.z + cz * 0.35)) { J.x = ax; J.z = az; }
   }
   // quelque chose au-dessus de sa tête (on regarde 20 cm plus près du mur que lui : une corniche dépasse à peine) ? Un rebord (la corniche d'un toit,
-  // un balcon : son dessus est à moins de 3,50 m de ses pieds) : il passe par-dessus et se met debout dessus. Un plafond : il ne monte pas plus
+  // un balcon : son dessus est à moins de 3,50 m de ses pieds) : il passe par-dessus et se met debout dessus. Un plafond (voir estRebord) : il ne
+  // monte pas plus, même s'il y a une pièce au-dessus
   const tx = J.x + m.nx * 0.2, tz = J.z + m.nz * 0.2, dessus = av > 0 ? boiteEn(tx, J.y + 1.9 + av * v * dt, tz) : null;
-  if (dessus && !dessus.mur && dessus.h - J.y < 3.5 && !dansBatiment(tx, dessus.h + 1, tz)) { Object.assign(J, { x: tx, y: dessus.h, z: tz, sol: true, mur: null }); return; }
+  if (dessus && !dessus.mur && dessus.h - J.y < 3.5 && estRebord(m, dessus, tx, tz) && !dansBatiment(tx, dessus.h + 1, tz)) { Object.assign(J, { x: tx, y: dessus.h, z: tz, sol: true, mur: null }); return; }
   if (!dessus) J.y += av * v * dt;
   J.vy = 0; J.sol = false; J.accroupi = false; J.danse = 0; J.vitesse = (av || lat) ? v : 0;
   const hs = hauteurSol(J.x, J.z, J.y);
