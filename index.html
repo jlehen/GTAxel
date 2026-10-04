@@ -909,7 +909,8 @@ const VOITURES = [
   // Longue, basse, toute noire, avec deux ailerons et un réacteur. Elle est blindée (blinde: true), comme le fourgon : les balles ne lui font rien.
   // vitesseVol : elle vole ! La touche R déploie ses ailes, ses roues basculent à plat (ce sont des réacteurs), et elle s'envole.
   // En l'air, elle va jusqu'à cette vitesse (m/s : 70 = 252 km/h). R encore : elle se pose
-  { nom: 'Batmobile', modele: 'batmobile', vitesse: 62, acceleration: 30, virage: 1.25, chance: 0, couleurs: ['#101014'], blinde: true, vitesseVol: 70,
+  // descente : pour se poser, elle descend à cette vitesse (m/s : 25 = 90 km/h), et freine sur ses réacteurs juste avant le sol
+  { nom: 'Batmobile', modele: 'batmobile', vitesse: 62, acceleration: 30, virage: 1.25, chance: 0, couleurs: ['#101014'], blinde: true, vitesseVol: 70, descente: 25,
     son: { grave: 45, aigu: 300, rapports: 5, rauque: 1, volume: 0.07 } },
 ];
 
@@ -8582,7 +8583,7 @@ function pilotageHelico(v, dt, pilote) {
 // La Batmobile vole (une des VOITURES qui a « vitesseVol ») : R déploie ses ailes, ses roues basculent à plat (ce sont des réacteurs), et elle
 // décolle tout droit. En l'air, elle va là où tu regardes (la souris, ou Q et D) : Z accélère, S ralentit (jusqu'à s'arrêter : elle tient en
 // l'air sur ses réacteurs), Espace la fait monter et C descendre. Elle bute contre les murs sans casser (elle est blindée), et frôle le sol et
-// l'eau sans s'écraser. R encore : elle replie ses ailes et descend doucement se poser (pas sur l'eau : elle coulerait).
+// l'eau sans s'écraser. R encore : elle replie ses ailes et descend vite se poser, en freinant juste avant le sol (pas sur l'eau : elle coulerait).
 // v.envole : on lui a demandé de voler (R) ; v.enVol : elle est en l'air ; v.ailes : de 0 (rangées) à 1 (déployées), voir majVoiture
 function deployerAiles(v) {
   if (v.detruite || v.coule || v.accident || v.rail || J.telesiege) return;
@@ -8598,7 +8599,7 @@ function piloterBatmobile(v, dt, pilote) {
   if (v.accident || v.detruite || v.coule) { v.enVol = v.envole = false; return; }   // une roquette l'a renversée : elle tombe comme une voiture
   if (!pilote) v.envole = false;   // personne dedans : elle se pose toute seule
   const t = v.type, gaz = pilote ? touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown') : 0, haut = pilote ? touche('Space') - touche('KeyC', 'ControlLeft', 'ControlRight') : 0;
-  v.gaz = gaz > 0 ? 1 : 0;
+  v.gaz = gaz > 0 ? 1 : 0; v.freine = 0;
   if (v.envole) {
     if (pilote) J.lacet -= (touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft')) * 1.5 * dt;   // au clavier aussi, Q et D tournent
     v.vitesse = clamp(v.vitesse + (gaz > 0 ? t.acceleration : gaz < 0 ? -t.acceleration : 0) * dt, 0, t.vitesseVol);
@@ -8608,10 +8609,15 @@ function piloterBatmobile(v, dt, pilote) {
     v.tangage += clamp(clamp(J.tangage, -0.6, 0.6) - v.tangage, -0.8 * dt, 0.8 * dt);   // son nez suit ton regard, vers le haut ou vers le bas
     const decolle = v.ailes < 1 && v.y < hauteurSol(v.x, v.z, v.y + 1) + 4 ? 5 : 0;   // au décollage, elle monte toute seule
     v.vy += clamp(Math.sin(v.tangage) * v.vitesse + haut * 10 + decolle - v.vy, -15 * dt, 15 * dt);
-  } else { // elle se pose : elle ralentit, se remet à plat et descend doucement, sur ses réacteurs (6 m/s, puis 2 m/s en touchant le sol)
+  } else { // elle se pose : elle ralentit, se remet à plat et descend vite, sur ses réacteurs (t.descente), puis freine en arrivant
     v.vitesse *= Math.pow(0.4, dt); v.tangage *= Math.pow(0.05, dt); v.roulis *= Math.pow(0.05, dt);
-    const dessous = Math.max(0, v.y - hauteurSol(v.x, v.z, v.y + 1));
-    v.vy += clamp(-Math.min(6, 2 + 2 * dessous) - v.vy, -15 * dt, 15 * dt);
+    // le sol sous elle, ou un toit plus haut qui l'attend sur sa lancée (elle glisse encore de vitesse / 0,92 mètres : on regarde tous les 8 m)
+    let sol = hauteurSol(v.x, v.z, v.y + 1);
+    for (let d = 8; d <= v.vitesse / 0.92; d += 8) { const c = local(v, 0, d); sol = Math.max(sol, hauteurSol(c.x, c.z, v.y + 1)); }
+    const dessous = Math.max(0, v.y - sol);
+    // (près du sol, elle freine de 15 m/s par seconde, pour le toucher à 2 m/s : c'est la vitesse qu'il faut avoir à cette hauteur)
+    const frein = clamp(-Math.min(t.descente || 25, Math.sqrt(4 + 30 * dessous)) - v.vy, -20 * dt, 20 * dt);
+    v.vy += frein; v.freine = clamp(frein / (15 * dt || 1), 0, 1);   // v.freine, de 0 à 1 : ses réacteurs la retiennent, leurs flammes s'allongent (voir majVoiture)
   }
   const h = Math.cos(v.tangage) * v.vitesse;
   v.x += Math.sin(v.angle) * h * dt; v.z += Math.cos(v.angle) * h * dt; v.y = Math.min(v.y + v.vy * dt, PLAFOND);
@@ -9037,11 +9043,11 @@ function majVoiture(v, dt) {
     if (r.crevee) { affaisse += Math.sign(r.pivot.position.z) * 0.03; penche -= Math.sign(r.pivot.position.x) * 0.04; }
   }
   if (v.voilure) { // ses ailes sortent de ses flancs ; en vol, ses roues à plat crachent une flamme bleue (plus longue quand elle tient en l'air
-    // sans avancer, ou qu'elle monte), et son réacteur une flamme orange (plus longue quand on accélère)
+    // sans avancer, qu'elle monte, ou qu'elle freine pour se poser), et son réacteur une flamme orange (plus longue quand on accélère)
     for (const a of v.voilure) { a.visible = plat > 0.02; a.scale.set(a.userData.cote * Math.max(plat, 0.02), 1, 0.4 + 0.6 * plat); }
     for (const j of v.reacteurs) { // (les flammes suivent les roues : elles brûlent jusqu'à ce que les roues se remettent droites)
       j.visible = !!v.enVol && rouesPlat > 0.6;
-      const l = (j.arriere ? 0.5 + 1.5 * (v.gaz || 0) : 0.6 + 0.9 * clamp(1 - v.vitesse / 30 + v.vy / 10, 0, 1)) * entre(0.85, 1.15) * rouesPlat;
+      const l = (j.arriere ? 0.5 + 1.5 * (v.gaz || 0) : 0.6 + 0.9 * Math.max(v.freine || 0, clamp(1 - v.vitesse / 30 + v.vy / 10, 0, 1))) * entre(0.85, 1.15) * rouesPlat;
       if (j.arriere) j.scale.set(1, 1, l); else j.scale.set(1, l, 1);
     }
   }
