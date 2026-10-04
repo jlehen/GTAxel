@@ -25,7 +25,7 @@ Le bouton **🎮 Codes de triche** montre tous les codes de triche du jeu.
 | Souris | Regarder |
 | Clic gauche | Tirer / frapper (en volant, tirer seulement ; en l'air à ski ou en snowboard : un grab ; avec le grappin ou la toile en main : t'accrocher au bâtiment que tu vises) |
 | Clic droit | Viser (zoom, lunette avec le fusil de sniper ; en l'air à ski ou en snowboard : un autre grab) |
-| Maj | Courir (en volant : chaque appui te fait aller plus vite ; à ski : déraper ; avec le code `BATMAN`, en l'air : garde-le enfoncé pour planer) |
+| Maj | Courir (en volant : chaque appui te fait aller plus vite, et en le gardant enfoncé tu fais des figures : avec Q ou D un tonneau, avec Espace ou C un looping ; à ski : déraper ; avec le code `BATMAN`, en l'air : garde-le enfoncé pour planer) |
 | Maj, 3 fois de suite (vite) | Voler comme Superman (encore 3 fois : tu arrêtes de voler… et tu tombes !) |
 | Espace | Sauter (frein à main en voiture ; à ski aussi, tu sautes : un mètre, et bien plus haut sur une bosse) |
 | Ctrl ou C | S'accroupir (on se fait moins toucher) |
@@ -40,7 +40,7 @@ Le bouton **🎮 Codes de triche** montre tous les codes de triche du jeu.
 | Entrée | Taper un code de triche |
 | Échap | Pause |
 
-En **Superman** : Z Q S D pour voler là où tu regardes, Espace pour monter, C ou Ctrl pour descendre. Chaque appui sur Maj te fait aller plus vite, jusqu'à 360 km/h : espace bien les appuis, 3 fois trop vite et tu arrêtes de voler ! Lâche toutes les touches pour t'arrêter et repartir doucement. Clic gauche pour tirer en volant (pas les coups de poing). Descends jusqu'au sol, sur un toit ou dans l'eau pour te poser en douceur. Avec le code de triche `SUPERMAN` (ou `DIEU`), attention : si tu fonces vers le sol après avoir appuyé sur Maj, tu écrases tout ce qu'il y a dessous !
+En **Superman** : Z Q S D pour voler là où tu regardes, Espace pour monter, C ou Ctrl pour descendre. Chaque appui sur Maj te fait aller plus vite, jusqu'à 360 km/h : espace bien les appuis, 3 fois trop vite et tu arrêtes de voler ! Lâche toutes les touches pour t'arrêter et repartir doucement. Pour les **figures**, garde Maj enfoncé : avec Q ou D, tu fais un **tonneau** (tu tournes sur toi-même) ; avec Espace, un **looping** (avec C, un looping vers le bas) : plus tu voles vite, plus la boucle est grande. Garde les touches pour enchaîner les tours ; lâche-les, et tu finis ton tour. Clic gauche pour tirer en volant (pas les coups de poing). Descends jusqu'au sol, sur un toit ou dans l'eau pour te poser en douceur. Avec le code de triche `SUPERMAN` (ou `DIEU`), attention : si tu fonces vers le sol après avoir appuyé sur Maj, tu écrases tout ce qu'il y a dessous !
 
 En **Batman** (code de triche `BATMAN`) : tu as ton **grappin** en main. Vise un bâtiment et clique (ou appuie sur G) : le crochet part, et le câble te tire jusque sur le toit (Espace pour lâcher en route). Saute dans le vide et garde Maj enfoncé : ta cape se déploie et tu planes là où tu regardes, en descendant tout doucement ; regarde vers le bas pour piquer et aller plus vite. Sans la cape, attention : tomber de haut fait mal ! Touche 9 pour tes batarangs (enflammé, électrique, explosif) et tes filets.
 

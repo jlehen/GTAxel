@@ -466,6 +466,7 @@ const TRADUCTIONS = {
   'Lâche le bouton pour lancer la voiture là où tu regardes': { de: 'Lass die Maustaste los, um das Auto dorthin zu werfen, wo du hinschaust', en: 'Release the button to throw the car where you are looking', gsw: 'Laa d Muustaschte los, zum s Auto det ane rüere, wo d aneluegsch' },
   'Lâche <b>G</b> pour lancer la voiture là où tu regardes': { de: 'Lass <b>G</b> los, um das Auto dorthin zu werfen, wo du hinschaust', en: 'Release <b>G</b> to throw the car where you are looking', gsw: 'Laa <b>G</b> los, zum s Auto det ane rüere, wo d aneluegsch' },
   '<b>Espace</b> : lâcher le grappin': { de: '<b>Leertaste</b>: Greifhaken loslassen', en: '<b>Space</b>: let go of the grapple', gsw: '<b>Läärtaschte</b>: Griifhaagge loslaa' },
+  '<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping': { de: '<b>Shift</b> + A oder D: Fassrolle · <b>Shift</b> + Leertaste oder C: Looping', en: '<b>Shift</b> + A or D: barrel roll · <b>Shift</b> + Space or C: loop', gsw: '<b>Shift</b> + A oder D: Fassrolle · <b>Shift</b> + Läärtaschte oder C: Looping' },
   'Garde <b>Maj</b> enfoncé pour déployer la cape': { de: 'Halte <b>Shift</b> gedrückt, um den Umhang auszubreiten', en: 'Hold <b>Shift</b> to spread the cape', gsw: 'Heb <b>Shift</b> druckt, zum de Umhang uusbreite' },
   'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
   'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
@@ -476,6 +477,7 @@ const TRADUCTIONS = {
   "WHO'S BAD ?":      { de: "WHO'S BAD?", en: "WHO'S BAD?", gsw: "WHO'S BAD?" },
   'SAUT !':           { de: 'SPRUNG!', en: 'JUMP!', gsw: 'GUMP!' },
   'looping':          { de: 'Looping', en: 'loop', gsw: 'Looping' },
+  'tonneau':          { de: 'Fassrolle', en: 'barrel roll', gsw: 'Fassrolle' },
   'tire-bouchon':     { de: 'Korkenzieher', en: 'corkscrew', gsw: 'Zapfezieher' },
   '{figure} !':       { de: '{figure}!', en: '{figure}!', gsw: '{figure}!' },
   "Pas assez d'élan !": { de: 'Nicht genug Schwung!', en: 'Not enough speed!', gsw: 'Nöd gnueg Schwung!' },
@@ -772,6 +774,8 @@ const REGLAGES = {
   vitesseVolMaj: 12,         // ...et chaque appui sur Maj en volant ajoute ça (1 fois : 24 m/s, 2 fois : 36 m/s...)
   vitesseVolMax: 100,        // ...jusqu'à ça (360 km/h, plus vite que l'avion !)
   tripleMaj: 0.6,            // secondes pour taper Maj 3 fois
+  vitesseTonneau: 7.5,       // en volant, Maj + Q ou D : il tourne sur lui-même, en radians par seconde (7.5 = un tour en 0,8 s)
+  vitesseLooping: 3,         // en volant, Maj + Espace (ou C) : un looping, en radians par seconde (3 = un looping en 2 s). Plus il vole vite, plus la boucle est grande
   roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36°, 1.5 = jusqu'à 60°
   // les codes de triche BATMAN et SPIDERMAN (leurs armes sont dans ARMES, juste en dessous : jusqu'où s'accrochent le grappin et la toile, c'est leur « portee »)
   vitesseGrappin: 30,        // m/s : le grappin tire Batman jusqu'au toit à cette vitesse
@@ -7254,7 +7258,7 @@ addEventListener('keydown', e => {
   if (carte.ouverte) return;
   suite = (suite + e.code + ' ').slice(-SUITE_DANSE.length);
   if (suite === SUITE_DANSE) { suite = ''; danser(); }
-  if (e.key === 'Shift') { tapesMaj = [...tapesMaj, temps].slice(-3); if (tapesMaj[2] - tapesMaj[0] < R_.tripleMaj) { tapesMaj = []; decoller(); } else if (J.superman) J.superman.crans++; }
+  if (e.key === 'Shift') { tapesMaj = [...tapesMaj, temps].slice(-3); if (tapesMaj[2] - tapesMaj[0] < R_.tripleMaj) { tapesMaj = []; decoller(); } else if (J.superman) J.superman.appui = true; }   // en volant : cet appui le fera aller plus vite quand on relâchera Maj, sauf s'il a servi à une figure
   if (e.code === 'KeyF' && J.robot?.armure) tirerFusees(J.robot);   // dans l'armure, F tire les fusées
   else if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
@@ -7271,7 +7275,10 @@ function choisirArme(i) {
   const dons = ARMES.map((a, k) => k).filter(k => pouvoirArme(ARMES[k]) && J.possede[k]);
   if (dons.length) changerArme(dons[(dons.indexOf(J.arme) + 1) % dons.length]);
 }
-addEventListener('keyup', e => touches[e.code] = false);
+addEventListener('keyup', e => {
+  touches[e.code] = false;
+  if (e.key === 'Shift' && J.superman?.appui) { J.superman.appui = false; J.superman.crans++; }   // Superman : Maj relâché sans avoir fait de figure, il va plus vite
+});
 const touche = (...codes) => codes.some(c => touches[c]) ? 1 : 0;
 const dansLunette = () => visee && !J.voiture && !J.robot && !J.mort && !!ARMES[J.arme].zoom; // on regarde dans la lunette du sniper
 addEventListener('mousedown', e => { if (!enJeu || carte.ouverte) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
@@ -7409,7 +7416,9 @@ let tapesMaj = [];   // quand on a tapé Maj les 3 dernières fois
 function decoller() {
   if (J.voiture || J.robot || J.mort) return;
   if (J.superman) { J.superman = null; return; }
-  J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0 }; J.vy = 8;   // sa vitesse (la montée est dans J.vy) : il s'élance d'abord vers le ciel. crans : combien de fois on a tapé Maj en volant ; roulis : il penche dans ses virages
+  // sa vitesse (la montée est dans J.vy) : il s'élance d'abord vers le ciel. crans : combien de fois on a tapé Maj en volant ; roulis : il penche dans ses virages ;
+  // bascule : debout (0) ou couché ; tonneau, sensTonneau : le tonneau en cours (superman y ajoute « looping », le looping en cours)
+  J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0, bascule: 0, tonneau: 0, sensTonneau: 0 }; J.vy = 8;
   J.sol = J.nage = J.saute = J.accroupi = false; J.roule = J.echelle = J.grappin = J.balance = J.mur = J.plane = J.lance = null; J.danse = J.genou = J.atterri = 0;
   annonce('', tr('Superman !'), 2);
 }
@@ -8251,35 +8260,68 @@ function rouler(dt) {
 }
 // Superman : Z et S le font voler là où l'on regarde (vers le haut, vers le bas), Q et D glisser sur le côté, Espace monter, C ou Ctrl descendre,
 // chaque appui sur Maj aller plus vite (quand il s'arrête, il repart à la vitesse normale).
+// Les figures, en gardant Maj enfoncé : Q et D font un tonneau (il tourne sur lui-même), Espace un looping, C ou Ctrl un looping vers le bas.
+// Tant qu'on garde les touches, il enchaîne ; quand on les lâche, il finit son tour.
 // Il se penche dans le sens où il va, le poing droit en avant ; sur place, il flotte debout.
 // Pour tirer (ou viser), il sort son arme, se tourne vers le viseur et tend les bras dans cette direction.
 // S'il touche le sol, un toit ou l'eau en descendant, il se pose sans se faire mal
+const figureVol = nom => annonce(tr('{figure} !', { figure: tr(nom).toUpperCase() }), '', 1.5);   // une figure réussie : son nom s'affiche
 function superman(dt) {
-  const f = J.superman, av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
-  const monte = touche('Space') - touche('KeyC', 'ControlLeft', 'ControlRight'), ct = Math.cos(J.tangage);
-  const dx = Math.sin(J.lacet) * ct * av - Math.cos(J.lacet) * lat, dy = Math.sin(J.tangage) * av + monte, dz = Math.cos(J.lacet) * ct * av + Math.sin(J.lacet) * lat;
-  if (!av && !lat && !monte) f.crans = 0;   // il s'arrête : il repart à la vitesse normale
-  const v = Math.min(R_.vitesseVolMax, R_.vitesseVol + f.crans * R_.vitesseVolMaj) / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ
-  f.vx += (dx * v - f.vx) * k; J.vy += (dy * v - J.vy) * k; f.vz += (dz * v - f.vz) * k;
+  const f = J.superman, maj = touche('ShiftLeft', 'ShiftRight'), tour = 2 * Math.PI;
+  const cote = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft'), haut = touche('Space') - touche('KeyC', 'ControlLeft', 'ControlRight');
+  const av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = maj ? 0 : cote, monte = maj ? 0 : haut, ct = Math.cos(J.tangage);   // avec Maj, Q, D, Espace et C ne le déplacent plus : ils font les figures
+  if (maj && (cote || haut)) { f.appui = false; tapesMaj = []; }   // cet appui sur Maj sert à une figure : il ne compte ni pour accélérer, ni pour arrêter de voler
+  // le tonneau. f.tonneau : ce qu'il a déjà tourné de son tour (de 0 à 2π), vers la droite (f.sensTonneau = 1) ou vers la gauche (-1)
+  const roule = maj ? cote : 0;
+  if (roule && roule !== f.sensTonneau) { f.sensTonneau = roule; if (f.tonneau) f.tonneau = tour - f.tonneau; }   // dans l'autre sens : le même angle, compté à l'envers
+  if (roule && !f.tonneau) bruit(0.25, 1200, 0.5);   // l'air siffle
+  if (roule || f.tonneau) {
+    f.tonneau += R_.vitesseTonneau * dt;
+    if (f.tonneau >= tour) { f.tonneau = roule ? f.tonneau - tour : 0; figureVol('tonneau'); }   // un tour entier : touches lâchées, il s'arrête là
+  }
+  // le looping : sa vitesse fait un tour entier, vers le haut (sens = 1) ou vers le bas (-1), sans changer de cap, comme sur des rails.
+  // L.a : ce qu'il a déjà tourné ; L.vh, L.vy : sa vitesse au départ (vers l'avant, vers le haut). Sur place, c'est un salto
+  let L = f.looping;
+  if (!L && maj && haut) {
+    const vh = Math.hypot(f.vx, f.vz);
+    L = f.looping = { sens: haut, a: 0, cap: vh > 1 ? Math.atan2(f.vx, f.vz) : J.angleCorps, vh, vy: J.vy };
+    bruit(0.3, 900, 0.9);
+  }
+  if (L) {
+    L.a += R_.vitesseLooping * dt;
+    if (L.a >= tour) { // la boucle est bouclée : il enchaîne si on garde les touches, sinon il repart comme il était arrivé
+      figureVol('looping');
+      if (maj && haut === L.sens) { L.a -= tour; bruit(0.3, 900, 0.9); } else { L.a = tour; f.looping = null; }
+    }
+    const c = Math.cos(L.a), s = Math.sin(L.a) * L.sens, vh = L.vh * c - L.vy * s;
+    f.vx = Math.sin(L.cap) * vh; J.vy = L.vh * s + L.vy * c; f.vz = Math.cos(L.cap) * vh;
+  } else {
+    const dx = Math.sin(J.lacet) * ct * av - Math.cos(J.lacet) * lat, dy = Math.sin(J.tangage) * av + monte, dz = Math.cos(J.lacet) * ct * av + Math.sin(J.lacet) * lat;
+    if (!av && !lat && !monte) f.crans = 0;   // il s'arrête : il repart à la vitesse normale
+    const v = Math.min(R_.vitesseVolMax, R_.vitesseVol + f.crans * R_.vitesseVolMaj) / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ
+    f.vx += (dx * v - f.vx) * k; J.vy += (dy * v - J.vy) * k; f.vz += (dz * v - f.vz) * k;
+  }
   J.x += f.vx * dt; J.y += J.vy * dt; J.z += f.vz * dt;
   resoudre(J, 0.35);
   const hs = hauteurSol(J.x, J.z, J.y), sol = hs < EAU - 1.3 ? EAU - 1.25 : hs;   // au-dessus de l'eau profonde, il se pose sur l'eau (et nage)
   if (J.y <= sol) {
     J.y = sol;
-    if (J.vy < 0) { // il se pose en pliant les genoux. Avec le code SUPERMAN ou DIEU, en piqué, il écrase tout, comme en tombant (voir retomber)
-      const choc = -J.vy;
+    if (J.vy < 0 && !L) { // il se pose en pliant les genoux. Avec le code SUPERMAN ou DIEU, en piqué, il écrase tout, comme en tombant (voir retomber)
+      const choc = -J.vy;   // (en plein looping, il ne se pose pas : il glisse sur le sol et finit sa boucle)
       J.superman = null; J.vy = 0; J.atterri = Math.min(1, choc / 14);
       if (sol === hs && pouvoir('ecrase')) retomber(choc, f.vx, f.vz);
       return;
     }
   }
   const vh = Math.hypot(f.vx, f.vz), e = Math.min(1, Math.hypot(vh, J.vy) / 6);   // e : de 0 (il flotte sur place) à 1 (il est lancé)
-  const tir = !ARMES[J.arme].corps && (sourisG || visee || J.cooldown > -0.5);   // il tire, vise, ou vient de tirer
+  const tir = !L && !ARMES[J.arme].corps && (sourisG || visee || J.cooldown > -0.5);   // il tire, vise, ou vient de tirer (pas en plein looping)
   const angleAvant = J.angleCorps;
-  if (tir) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
+  if (L) J.angleCorps = lerpAngle(J.angleCorps, L.cap, 8 * dt);   // en looping, il garde son cap, même quand il revient sur le dos
+  else if (tir) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
   else if (vh > 1) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(f.vx, f.vz), 8 * dt);
   const devant = f.vx * Math.sin(J.angleCorps) + f.vz * Math.cos(J.angleCorps);   // sa vitesse vers l'avant (négative s'il recule en tirant)
-  const bascule = e * Math.atan2(devant, Math.max(J.vy, 0));
+  if (!L) f.bascule = e * Math.atan2(devant, Math.max(J.vy, 0));
+  const bascule = f.bascule - (L ? L.sens * L.a : 0);   // en looping, il bascule en arrière (ou en avant) d'un tour entier, depuis la pose qu'il avait
   J.vitesse = Math.hypot(vh, J.vy);   // vite, il est plus dur à toucher
   joueurH.g.rotation.y = J.angleCorps;
   if (joueurH.arme) joueurH.arme.visible = tir;   // il range son arme pour voler, sauf pour tirer
@@ -8288,6 +8330,8 @@ function superman(dt) {
   // lancé, il penche dans ses virages (pas quand il tire : il vise). Il roule autour de la direction où il vole, même couché : d'où l'ordre 'YZX'
   if (dt) f.roulis += ((tir ? 0 : roulisVirage(diffAngle(angleAvant, J.angleCorps) / dt) * e) - f.roulis) * Math.min(1, dt * 3);
   joueurH.g.quaternion.setFromEuler(new THREE.Euler(bascule, J.angleCorps, f.roulis, 'YZX'));
+  // le tonneau : il tourne autour de son corps, de la tête aux pieds (couché, c'est un tonneau ; debout, sur place, une pirouette)
+  if (f.tonneau) joueurH.g.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(V3(0, 1, 0), f.sensTonneau * f.tonneau));
   poserCorps(joueurH, J.x, J.y + 0.95, J.z, 0.95);   // il bascule autour de son bassin
   membresMous(joueurH, dt, { raideur: 25, sol: hs, vx: f.vx, vy: J.vy, vz: f.vz });   // ses membres traînent un peu quand il tourne
 }
@@ -9830,7 +9874,8 @@ function majCamera(dt) {
     else placerCamera(new THREE.Vector3(r.x, r.y + 4.4, r.z), dir, 7.5, 1.4);
   } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
   else placerCamera(new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z), dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
-  camera.rotation.set(tangage + J.recul * 0.03, J.lacetCam + Math.PI, 0);
+  const fig = J.vue === 1 && !v && !J.robot ? J.superman : null, lp = fig?.looping;   // en volant, à la 1re personne : on fait le looping et le tonneau avec lui
+  camera.rotation.set(tangage + J.recul * 0.03 + (lp ? lp.sens * lp.a : 0), J.lacetCam + Math.PI, fig ? -fig.sensTonneau * fig.tonneau : 0);
   if (v && v.quat && J.vue === 1) camera.quaternion.copy(v.quat).multiply(DEMI_TOUR);
   if (J.secousse > 0.005) { camera.position.x += entre(-1, 1) * J.secousse; camera.position.y += entre(-1, 1) * J.secousse; J.secousse *= Math.pow(0.01, dt); }   // les pas du robot font trembler
   const fov = dansLunette() ? 70 / ARMES[J.arme].zoom : visee && !v && !J.robot ? 45 : 70;
@@ -10045,7 +10090,8 @@ function majHUD(dt) {
     : J.mur ? tr('Z S : monter ou descendre · Q D : de côté · Espace : sauter du mur')
     : J.balance ? tr(J.balance.souris ? "Lâche le bouton pour lâcher la toile · Z Q S D : prendre de l'élan" : "Lâche <b>G</b> pour lâcher la toile · Z Q S D : prendre de l'élan")
     : J.prise ? tr(J.prise.souris ? 'Lâche le bouton pour lancer la voiture là où tu regardes' : 'Lâche <b>G</b> pour lancer la voiture là où tu regardes') : J.grappin ? tr('<b>Espace</b> : lâcher le grappin')
-    : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape') : '';
+    : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape')
+    : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping') : '';   // en volant : les figures
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
@@ -10087,7 +10133,7 @@ function mettreAJour(dt) {
         if (sourisG && r.cdJ.lourde <= 0) tirer(ARMES_ROBOT.lourde);
         if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
       }
-    } else if (sourisG && !J.voiture && !J.telesiege && !J.nage && !J.roule && !(J.superman && ARMES[J.arme].corps) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
+    } else if (sourisG && !J.voiture && !J.telesiege && !J.nage && !J.roule && !(J.superman && (ARMES[J.arme].corps || J.superman.looping)) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
   tenirPrise(dt);   // la voiture que Spiderman fait tourner au bout de sa toile
