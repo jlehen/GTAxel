@@ -391,8 +391,8 @@ const TRADUCTIONS = {
     en: "Lose the cops, then bring the jackpot to the hideout: walk into Trevor's trailer", gsw: 'Häng d Polizei ab und bring s Gäld is Versteck: gang i em Trevor sin Wohnwage ine' },
   // le camp militaire, l'armure et le bunker secret
   'Le camp militaire': { de: 'Das Militärlager', en: 'The military camp', gsw: 'S Militärlager' },
-  'Va au camp militaire, au nord-ouest du mont Gordo (★ sur la carte)': { de: 'Geh zum Militärlager, nordwestlich vom Mount Gordo (★ auf der Karte)',
-    en: 'Go to the military camp, north-west of Mount Gordo (★ on the map)', gsw: 'Gang zum Militärlager, nordweschtlich vom Mount Gordo (★ uf de Charte)' },
+  'Va au camp militaire, au nord-est du mont Gordo (★ sur la carte)': { de: 'Geh zum Militärlager, nordöstlich vom Mount Gordo (★ auf der Karte)',
+    en: 'Go to the military camp, north-east of Mount Gordo (★ on the map)', gsw: 'Gang zum Militärlager, nordöschtlich vom Mount Gordo (★ uf de Charte)' },
   "Monte dans la grosse armure, devant la porte (touche E), et élimine tous les militaires du camp : il en reste {n}": { de: 'Steig in die große Rüstung vor dem Tor (Taste E) und erledige alle Soldaten im Lager: noch {n}',
     en: 'Climb into the big armor outside the gate (E key) and take out every soldier in the camp: {n} left', gsw: 'Stiig i di gross Rüschtig vor em Tor ii (Taschte E) und erledig alli Soldate im Lager: no {n}' },
   'Appuie sur le bouton rouge, dans le bureau de la commandante Irene Engel (touche E)': { de: 'Drück den roten Knopf im Büro der Kommandantin Irene Engel (Taste E)',
@@ -414,6 +414,7 @@ const TRADUCTIONS = {
   'BUNKER OUVERT !':  { de: 'BUNKER OFFEN!', en: 'BUNKER OPEN!', gsw: 'BUNKER OFFE!' },
   'Sa porte blindée descend, un peu plus haut dans la montagne (? sur la carte)': { de: 'Sein Panzertor senkt sich, ein Stück weiter oben am Berg (? auf der Karte)',
     en: 'Its armored door is sinking, a little higher up the mountain (? on the map)', gsw: 'Sis Panzertor gaat abe, es Stuck wiiter obe am Berg (? uf de Charte)' },
+  'Tout le camp te tombe dessus !': { de: 'Das ganze Lager stürzt sich auf dich!', en: 'The whole camp is coming for you!', gsw: 'S ganze Lager gaat uf dich los!' },
   'CAMP VIDÉ !':      { de: 'LAGER GERÄUMT!', en: 'CAMP CLEARED!', gsw: 'LAGER GRUUMT!' },
   'Appuie sur le bouton rouge, dans le bureau de la commandante': { de: 'Drück den roten Knopf im Büro der Kommandantin', en: "Press the red button in the commander's office", gsw: 'Drück de roti Chnopf im Büro vo de Kommandantin' },
   'Militaires : il en reste {n}': { de: 'Soldaten: noch {n}', en: 'Soldiers: {n} left', gsw: 'Soldate: no {n}' },
@@ -986,18 +987,21 @@ const ENNEMIS = {
   robot:  { nom: 'Heavy robot', vitre: 350, degats: 10, degatsRoquette: 40, precision: 0.5, vitesse: 4 },
   // le camp militaire (% sur la carte) : ses militaires, à la mitraillette (arme 3), et leur commandante, dans son bureau.
   // Combien ils sont, et combien à la fois : voir CAMP, juste en dessous
-  militaire: { nom: 'Militaire',     vie: 75,  arme: 3, degats: 10, precision: 0.27, vue: 45, tir: [1.2, 2],   vitesse: 4.5 },
+  militaire: { nom: 'Militaire',     vie: 75,  arme: 3, degats: 10, precision: 0.4,  vue: 45, tir: [1.2, 2],   vitesse: 4.5 },
   engel:     { nom: 'Irene Engel',   vie: 300, arme: 2, degats: 12, precision: 0.4,  vue: 14, tir: [0.7, 1.4], vitesse: 4.5 },   // (vue : elle ne voit pas plus loin que son bureau)
 };
 
 // =====================================================================
 //  LE CAMP MILITAIRE (% sur la carte) : la commandante Irene Engel et ses militaires gardent le bouton rouge qui ouvre le bunker secret (?).
-//  Les militaires sortent des baraques au fur et à mesure qu'on en élimine. Leur vie, leurs dégâts et leur précision : « militaire », dans ENNEMIS.
+//  Tant que tu restes dehors, les militaires te laissent tranquille. Dès que tu passes l'enceinte (ou que tu leur tires dessus de dehors),
+//  l'alarme sonne, et tout le camp t'attaque. Ils sortent des baraques au fur et à mesure qu'on en élimine, et certains tirent d'en haut,
+//  depuis les miradors et les toits. Leur vie, leurs dégâts et leur précision : « militaire », dans ENNEMIS.
 //  Si tu meurs, ceux que tu as éliminés le restent : tu reviens finir le travail.
 // =====================================================================
 const CAMP = {
   militaires: 150,       // combien il faut en éliminer pour vider le camp
   ensemble: [8, 15],     // ils ne sont jamais plus que ça à la fois : 8 au début, 15 quand il n'en reste presque plus
+  enHaut: 5,             // combien, au plus, sont postés en hauteur (sur les miradors et les toits), d'où ils te tirent dessus. Jamais plus d'un sur trois
   renfort: 0.6,          // secondes entre deux militaires qui sortent des baraques
   tireurs: 2,            // chacun son tour : à pied, seuls les 2 militaires les plus proches qui te voient peuvent te toucher (les autres tirent à côté)...
   tireursArmure: 6,      // ...mais l'armure est bien plus grosse : les 6 plus proches peuvent la toucher
@@ -1017,7 +1021,7 @@ const CAMP = {
 const ARMURE = {
   points: 1000, vitesse: 4.5, course: 7,
   mitrailleuse: { nom: 'Grosse mitrailleuse', modele: 'lourde', degats: 30, cadence: 0.08, portee: 120, auto: true, dispersion: 0.02 },
-  flammes:      { nom: 'Double lance-flammes', degats: 180, portee: 13, angle: 16 },
+  flammes:      { nom: 'Double lance-flammes', degats: 180, portee: 20, angle: 12 },
   fusees:       { nom: 'Fusées téléguidées', nombre: 10, recharge: 5, degats: 150, explosion: 3, vitesse: 32, portee: 90 },
 };
 
@@ -1036,7 +1040,8 @@ const ARMURE = {
 //    L maison de Franklin*              O villa de Michael*                   R caravane de Trevor
 //    J bar Yellow Jack                  F ferme*          D docks du port   N hangar d'avions
 //    B bunker nazi    W château Wolfenstein* (repaire d'Hitler)
-//    % camp militaire de la commandante Irene Engel : une grosse armure attend devant la porte (voir CAMP et ARMURE, après les ennemis)
+//    % camp militaire de la commandante Irene Engel : il lui faut 4 cases en carré (2 de large, 2 de haut), réunies derrière une même enceinte.
+//      Une grosse armure attend devant sa porte nord (voir CAMP et ARMURE, après les ennemis). La route du bunker part de celle du camp, juste avant d'arriver
 //    ? bunker secret, dans la montagne : sa porte ne s'ouvre qu'avec le bouton rouge du camp. Dedans, la seule DeLorean du pays
 //    Y station de ski : un télésiège monte de là jusqu'en haut du sommet le plus proche (tableau SOMMETS, juste après la carte),
 //      avec des skis, des snowboards, des luges et des skis de rando en bas et en haut. Les autres remontées et les pistes : REMONTEES et PISTES_SKI,
@@ -1060,14 +1065,14 @@ const CARTE = [
   "~~~~~~~~~~~~~~~~~~~~~_~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 2
   "~~~~~~~~~~~~~~~~~~~~_,,~~~~~~~~~~~~~~~~~~~~~~~~~~___________~~~~~~~~~~~~~~",  // 3
   "~~~~~~~~~~~~~~~~~~~~,,,,_~~~~~~~~~~~~~~~~~~~~~~__***********__~~~~~~~~~~~~",  // 4
-  "~~~~~~~~~~~~~~~~~~~_,__,,,_~~~~~~~~~~~~~~~~~~__***************__~~~~~~~~~~",  // 5
-  "~~~~~~~~~~~~~~~~~~&,MMSM_,,,_______~~~~~~~~__,***,,,,,,,,,,,****__~~~~~~~~",  // 6
-  "~~~~~~~~~~~~~~~~~~_MIHAME=======,,,,___~~~_,,,*,,,,,,,,,,,,,,,****_~~~~~~~",  // 7
-  "~~~~~~~~~~~~~~~~~~2MMIGM55431,,,===,,,,,~_,,,,,,,,,,,,,,,,,,,,,****_~~~~~~",  // 8
-  "~~~~~~~~~~~~~~~~~1=44356776531,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,***_~~~~~",  // 9
-  "~~~~~~~~~~~~~~~~~=344567887652,,,,,,=======%,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 10
-  "~~~~~~~~~~~~~~~~*=233678998763,,,,,,=,,,,,,,==,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 11
-  "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=,,,,,,,,?,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 12
+  "~~~~~~~~~~~~~~~~~~~_,__,,,_~~~~~~~~~~~~~~~~~~__*******========__~~~~~~~~~~",  // 5
+  "~~~~~~~~~~~~~~~~~~&,MMSM_,,,_______~~~~~~~~__=========,,,,,,**==__~~~~~~~~",  // 6
+  "~~~~~~~~~~~~~~~~~~_MIHAME=======,,,,___~~~_,=,*,,,,,,,,,,,,,,,=*%%_~~~~~~~",  // 7
+  "~~~~~~~~~~~~~~~~~~2MMIGM55431,,,===,,,,,~_,=,,,,,,,,,,,,,,,,,,=*%%*_~~~~~~",  // 8
+  "~~~~~~~~~~~~~~~~~1=44356776531,,,,,=,,,,,,=,,,,,,,,,,,,,,,,,,?,,,***_~~~~~",  // 9
+  "~~~~~~~~~~~~~~~~~=344567887652,,,,,,======,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 10
+  "~~~~~~~~~~~~~~~~*=233678998763,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 11
+  "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 12
   "~~~~~~~~~~~~~~3=2***3678998W=3,,,,,,,2=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 13
   "~~~~~~~~~~~~~3=432**256788765=,,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 14
   "~~~~~~~~~~~~3=5543**1356776531====;;;;==,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 15
@@ -1264,7 +1269,7 @@ const MISSIONS = [
   ]},
   // le camp militaire : 150 militaires, par vagues. Sans la grosse armure qui attend devant la porte, c'est presque impossible !
   { nom: 'Le camp militaire', recompense: 300000, etapes: [
-    { type: 'aller', lieu: '%', texte: 'Va au camp militaire, au nord-ouest du mont Gordo (★ sur la carte)' },
+    { type: 'aller', lieu: '%', texte: 'Va au camp militaire, au nord-est du mont Gordo (★ sur la carte)' },
     { type: 'eliminer', cible: 'militaire', texte: 'Monte dans la grosse armure, devant la porte (touche E), et élimine tous les militaires du camp : il en reste {n}' },
     { type: 'bouton', lieu: '%', texte: 'Appuie sur le bouton rouge, dans le bureau de la commandante Irene Engel (touche E)' },
     { type: 'conduire', voiture: 'DeLorean', texte: 'Le bunker secret est ouvert, un peu plus haut dans la montagne (? sur la carte) : monte dans la DeLorean' },
@@ -1940,17 +1945,19 @@ function carrefour(i, j) {
   if (!numCarrefour.has(k)) { const n = noeud(i, j); numCarrefour.set(k, nouveauNoeud(n.x, n.z, baseNoeud(i, j))); }
   return numCarrefour.get(k);
 }
+// (les rues qui traversent le camp militaire, entre deux de ses pâtés, ne sont pas dans le réseau : personne n'y circule, et elles n'ont pas de dos d'âne)
+const dansCampH = (i, j) => car(i, j - 1) === '%' && car(i, j) === '%', dansCampV = (i, j) => car(i - 1, j) === '%' && car(i, j) === '%';
 for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
-  if (rueH(i, j)) relier(carrefour(i, j), carrefour(i + 1, j));
-  if (rueV(i, j)) relier(carrefour(i, j), carrefour(i, j + 1));
+  if (rueH(i, j) && !dansCampH(i, j)) relier(carrefour(i, j), carrefour(i + 1, j));
+  if (rueV(i, j) && !dansCampV(i, j)) relier(carrefour(i, j), carrefour(i, j + 1));
 }
 // les dos d'âne, au milieu de certaines rues (pas sur les ponts) : dosH a les rues rueH(i, j) qui en ont un (rangées i * 1000 + j), dosV les rueV.
 // dosRoute : les mêmes, en morceaux du réseau des routes (pour que la circulation ralentisse)
 const LONG_DOS_ANE = 4;   // mètres, dans le sens de la rue
 const dosH = new Set(), dosV = new Set(), dosRoute = new Set(), cleRoute = (a, b) => Math.min(a, b) * 100000 + Math.max(a, b);
 for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
-  if (rueH(i, j) && !(surEau(i, j - 1) && surEau(i, j)) && graine(i * 7919 + j * 31337)() < R_.dosDAne) { dosH.add(i * 1000 + j); dosRoute.add(cleRoute(carrefour(i, j), carrefour(i + 1, j))); }
-  if (rueV(i, j) && !(surEau(i - 1, j) && surEau(i, j)) && graine(i * 31337 + j * 7919 + 1)() < R_.dosDAne) { dosV.add(i * 1000 + j); dosRoute.add(cleRoute(carrefour(i, j), carrefour(i, j + 1))); }
+  if (rueH(i, j) && !dansCampH(i, j) && !(surEau(i, j - 1) && surEau(i, j)) && graine(i * 7919 + j * 31337)() < R_.dosDAne) { dosH.add(i * 1000 + j); dosRoute.add(cleRoute(carrefour(i, j), carrefour(i + 1, j))); }
+  if (rueV(i, j) && !dansCampV(i, j) && !(surEau(i - 1, j) && surEau(i, j)) && graine(i * 31337 + j * 7919 + 1)() < R_.dosDAne) { dosV.add(i * 1000 + j); dosRoute.add(cleRoute(carrefour(i, j), carrefour(i, j + 1))); }
 }
 // la hauteur d'un dos d'âne à d mètres de son milieu, dans le sens de la rue : une bosse arrondie
 const bosseDosDAne = d => Math.abs(d) < LONG_DOS_ANE / 2 ? R_.hauteurDosDAne * Math.cos(Math.PI * d / LONG_DOS_ANE) ** 2 : 0;
@@ -3165,61 +3172,114 @@ function genererBloc(i, j) {
     for (const [a, b] of [[12, 14], [12, 30], [12, 46], [24, 44], [40, 44], [50, 14], [50, 30], [50, 46]]) pnjDepart.push({ type: 'soldat', x: X(a), z: Z(b) });
     soins.push({ x: X(9), z: Z(51) }, { x: X(51), z: Z(51) });
     pickupsDepart.push({ type: 'arme', arme: 3, x: X(30), z: Z(50) }, { type: 'gilet', x: X(36), z: Z(50), reapparait: true });
-  } else if (c === '%') { // le camp militaire de la commandante Irene Engel : une enceinte, deux baraques, son bureau au fond. Devant la porte, l'armure
-    sol('beton2', X(33), 0.21, Z(30), 45, 51);
-    const mur = (a, b, l, p, h = 4) => boite('bunker', X(a), 0.2, Z(b), l, h, p, true);
-    mur(32.75, 4.5, 46.5, 1); mur(32.75, 55.5, 46.5, 1); mur(55.5, 30, 1, 50);        // les murs d'enceinte : nord, sud, est
-    mur(10, 15.5, 1, 21); mur(10, 44.5, 1, 21);                                       // le mur ouest, avec la porte (8 m) au milieu
-    for (const z of [25.4, 34.6]) mur(10, z, 1.8, 1.8, 5.4);                           // les piliers de la porte
-    const banniere = (a, z, l, h) => geoBloc('banniere', new THREE.PlaneGeometry(l, h).rotateY(-Math.PI / 2).translate(X(a), 0.2 + h / 2 + 0.5, Z(z)));   // tournée vers l'ouest
-    banniere(9.44, 20, 2.4, 3.2); banniere(9.44, 40, 2.4, 3.2);
-    // les deux baraques d'où sortent les militaires (une au nord, une au sud), avec deux portes chacune. sorties : devant chaque porte
-    const sorties = [];
-    for (const [z, cote] of [[10, 1], [50, -1]]) {
-      boite('tole', X(31), 0.2, Z(z), 26, 3.2, 8, true); toitPente('ardoise', X(31), 3.4, Z(z), 26, 8, 0.4);
-      for (const a of [24, 38]) { boite('porte', X(a), 0.2, Z(z + cote * 4.06), 1.6, 2.3, 0.12); sorties.push({ x: X(a), z: Z(z + cote * 5.6) }); }
+  } else if (c === '%') { // le camp militaire de la commandante Irene Engel : 4 pâtés réunis derrière une même enceinte, avec leurs rues dedans
+    if (car(i - 1, j) === '%' || car(i, j - 1) === '%') { /* (tout le camp est construit avec son pâté du nord-ouest) */ }
+    else if (car(i + 1, j) !== '%' || car(i, j + 1) !== '%' || car(i + 1, j + 1) !== '%') alert('Carte : le camp militaire (%) doit faire 4 cases, 2 de large et 2 de haut !');
+    else {
+      // dans le camp, tout se place en mètres depuis son coin nord-ouest : a vers l'est, z vers le sud, de 0 à 134.
+      // Les rues qui le traversent : de 60 à 74, dans les deux sens. L'enceinte est à 3,50 m du bord
+      const T = S + PAS, mur = (a, z, l, p, h = 4) => boite('bunker', X(a), 0.2, Z(z), l, h, p, true);
+      for (const [a, z, l, p] of [[30, 30, 54, 54], [104, 30, 54, 54], [30, 104, 54, 54], [104, 104, 54, 54]]) sol('beton2', X(a), 0.21, Z(z), l, p);   // les quatre cours
+      mur(T / 2, T - 3.5, T - 6, 1); mur(T - 3.5, T / 2, 1, T - 6);                     // l'enceinte : le sud et l'est, d'un seul tenant (ils barrent le bout des rues)
+      mur(32, 3.5, 58, 1); mur(102, 3.5, 58, 1); mur(3.5, 32, 1, 58); mur(3.5, 102, 1, 58);   // le nord et l'ouest, chacun avec sa porte au bout de la rue : 8 m entre deux piliers
+      for (const k of [61.9, 72.1]) { mur(k, 3.5, 1.8, 1.8, 5.4); mur(3.5, k, 1.8, 1.8, 5.4); }
+      const banniere = (a, z, l, h, tourne = 0) => geoBloc('banniere', new THREE.PlaneGeometry(l, h).rotateY(tourne).translate(X(a), 0.2 + h / 2 + 0.5, Z(z)));   // (on la voit des deux côtés)
+      for (const k of [56, 78]) { banniere(k, 2.94, 2.4, 3.2); banniere(2.94, k, 2.4, 3.2, Math.PI / 2); }
+      const gyros = [], gyro = (a, y, z) => gyros.push({ x: X(a), y: Y0 + y, z: Z(z) });   // les gyrophares de l'alarme
+      for (const k of [61.9, 72.1]) { gyro(k, 5.75, 3.5); gyro(3.5, 5.75, k); }
+      // les baraques d'où sortent les militaires : cinq, en tôle, avec deux portes chacune. sorties : devant chaque porte
+      const sorties = [], baraque = (a, z, cote) => { // cote : 1 = les portes au sud, -1 = au nord
+        boite('tole', X(a), 0.2, Z(z), 26, 3.2, 8, true); toitPente('ardoise', X(a), 3.4, Z(z), 26, 8, 0.4);
+        for (const da of [-7, 7]) { boite('porte', X(a + da), 0.2, Z(z + cote * 4.06), 1.6, 2.3, 0.12); sorties.push({ x: X(a + da), z: Z(z + cote * 5.6) }); }
+      };
+      baraque(36, 13, 1); baraque(36, 31, 1); baraque(92, 13, 1); baraque(30, 121, -1); baraque(100, 121, -1);
+      // les postes en hauteur, d'où les militaires tirent : { x, y, z } (y : là où ils posent les pieds)
+      const hauts = [];
+      for (const [a, z] of [[10, 10], [T - 10, 10], [10, T - 10], [T - 10, T - 10]]) { // quatre miradors, aux coins : une plateforme à 5,60 m, sous un toit de tôle
+        for (const [da, dz] of [[-1.7, -1.7], [1.7, -1.7], [-1.7, 1.7], [1.7, 1.7]]) { // quatre pieds jusqu'à la plateforme ; au-dessus, des montants fins (ils n'arrêtent ni la vue ni les balles)
+          boite('bois', X(a + da), 0.2, Z(z + dz), 0.35, 5.2, 0.35, true); boite('bois', X(a + da), 5.65, Z(z + dz), 0.14, 2.55, 0.14);
+        }
+        boite('planches', X(a), 5.4, Z(z), 4, 0.25, 4, true); boite('tole', X(a), 8.2, Z(z), 4.8, 0.2, 4.8);
+        for (const [da, dz, l, p] of [[0, -1.9, 4, 0.08], [0, 1.9, 4, 0.08], [-1.9, 0, 0.08, 4], [1.9, 0, 0.08, 4]]) boite('bois', X(a + da), 6.5, Z(z + dz), l, 0.1, p);   // le garde-corps
+        hauts.push({ x: X(a), y: Y0 + 5.65, z: Z(z) }); gyro(a, 8.5, z);
+      }
+      // trois bâtiments à étage, avec un escalier jusqu'au toit. Sur le toit, derrière le muret, une banquette de tir : les militaires qui
+      // montent dessus dépassent du muret, et tirent dans la rue. u, w : où sont les banquettes sur le toit (comme les meubles d'un bâtiment)
+      const etage = (o, banquettes) => {
+        const b = batiment({ mat: 'beton', etages: 2, toit: true, largeurPorte: 2.6, hauteurPorte: 2.6, sol: 'beton2', ...o });
+        for (const [u, w, lu, lw] of banquettes) { b.B('beton2', u, b.niveau(2), w, lu, 0.45, lw); hauts.push({ ...b.point(u, 2, w), y: Y0 + b.niveau(2) + 0.45 }); }
+        for (let k = 0; k < 3; k++) { b.meuble('metal', -b.iu + 1.2 + k * 2.2, 0, b.iw - 1.2, 0.9, 0.5, 2); b.meuble('boisClair', b.iu - 1.3, 1, -b.iw + 1.2 + k * 1.6, 1.2, 0.9, 1.2); }   // des lits de camp en fer, des caisses à l'étage
+        const g = b.point(0, 0, b.iw + 0.5); gyros.push({ x: g.x, y: Y0 + 3.3, z: g.z });   // un gyrophare au-dessus de la porte
+        return b;
+      };
+      etage({ x: X(22), z: Z(90), l: 18, p: 11, porte: 'n' }, [[-5, 4.4, 2.4, 1], [5, 4.4, 2.4, 1]]);            // au sud-ouest : ses tireurs donnent sur la rue qui traverse le camp d'ouest en est
+      etage({ x: X(96), z: Z(90), l: 18, p: 11, porte: 'n' }, [[-5, 4.4, 2.4, 1], [5, 4.4, 2.4, 1]]);            // au sud-est
+      etage({ x: X(120), z: Z(44), l: 14, p: 11 }, [[-4, 4.4, 2.4, 1], [4, 4.4, 2.4, 1]]);                       // au nord-est : les transmissions, à côté du bureau de la commandante
+      geoBloc('metal', new THREE.CylinderGeometry(0.12, 0.2, 16, 8).translate(X(124), 14.6, Z(41)));              // leur antenne, sur le toit
+      // le garage, ouvert sur la rue : un 4x4 du désert dedans
+      const garage = batiment({ x: X(46), z: Z(100), l: 16, p: 14, mat: 'tole', porte: 'e', hEtage: 5, largeurPorte: 9, hauteurPorte: 4, sol: 'beton2', mur: 'tole' });
+      voituresGarees.push({ ...garage.point(0, 0, -1), a: Math.PI / 2, type: '4x4 du désert' });
+      garage.meuble('bois', -6.5, 0, -5.5, 2.6, 1, 0.8); for (let k = 0; k < 3; k++) garage.meuble('noirMeuble', 6.5, 0, -5.5 + k * 1.1, 0.9, 1.2, 0.9);   // un établi, des pneus
+      // d'autres bâtiments, où l'on n'entre pas : un toit plat et une porte fermée. cote : 1 = la porte au sud, -1 = au nord
+      const plein = (m, a, z, l, p, h, cote) => {
+        boite(m, X(a), 0.2, Z(z), l, h, p, true); boite('toit', X(a), 0.2 + h, Z(z), l + 0.5, 0.4, p + 0.5, true);
+        boite('porte', X(a), 0.2, Z(z + cote * (p / 2 + 0.06)), 2, 2.4, 0.12);
+      };
+      plein('brique', 26, 48, 26, 10, 3.8, 1);                                          // le réfectoire
+      plein('beton', 54, 44, 8, 6, 3.2, -1);                                            // le poste de garde, près de la porte nord
+      plein('hopital', 82, 36, 10, 12, 3.8, 1); panneau('croix', X(82), 3.2, Z(42.08), 1.6, 1.6);   // l'infirmerie
+      plein('tole', 14, 106, 12, 10, 4.2, -1);                                          // l'atelier
+      plein('beton', 50, 82, 12, 8, 3.6, -1);                                           // l'armurerie
+      plein('tole', 123.5, 114, 10, 12, 5, -1);                                         // le hangar
+      // le château d'eau : une cuve sur quatre pieds. Et deux citernes de carburant, couchées
+      for (const [da, dz] of [[-1.5, -1.5], [1.5, -1.5], [-1.5, 1.5], [1.5, 1.5]]) boite('metal', X(12 + da), 0.2, Z(26 + dz), 0.3, 8, 0.3, true);
+      geoBloc('metal', new THREE.CylinderGeometry(2.6, 2.6, 3.2, 16).translate(X(12), 9.8, Z(26)));
+      for (const z of [20, 24]) { geoBloc('blanc', new THREE.CylinderGeometry(1.4, 1.4, 8, 14).rotateZ(Math.PI / 2).translate(X(118), 1.9, Z(z))); ajouterCollision(X(114), Z(z - 1.4), X(122), Z(z + 1.4), Y0 + 3.3, Y0); }
+      // le dépôt : des conteneurs empilés, des fûts, et une aire d'hélicoptère (vide)
+      for (const [a, z, n] of [[86, 108, 2], [86, 111.5, 1], [112, 104, 3], [112, 107.5, 2], [120, 78, 1]]) for (let k = 0; k < n; k++) boite(CONTENEURS[(k + n) % 4], X(a), 0.2 + k * 2.6, Z(z), 12, 2.6, 2.4, true);
+      for (let k = 0; k < 5; k++) boite('metal', X(78 + k * 1.2), 0.2, Z(100 + (k % 2)), 0.8, 1.1, 0.8, true);
+      sol('helipad', X(117), 0.22, Z(90), 16, 16);
+      // des sacs de sable et des caisses, pour se mettre à couvert
+      for (const [a, z, l, p] of [[58, 14, 5, 1], [76, 14, 5, 1], [14, 58, 1, 5], [14, 76, 1, 5], [56, 50, 1, 5], [78, 84, 1, 5], [88, 44, 5, 1]]) boite('sacs', X(a), 0.2, Z(z), l, 1.1, p, true);
+      for (const [a, z] of [[8, 40], [9.5, 40], [52, 8], [80, 56], [126, 70], [50, 78], [8, 100]]) boite('boisClair', X(a), 0.2, Z(z), 1.3, 1.3, 1.3, true);
+      // le bureau de la commandante, au nord-est : sa porte donne sur la rue. Elle garde le bouton rouge qui ouvre le bunker secret
+      const b = batiment({ x: X(100), z: Z(36), l: 18, p: 13, mat: 'bunker', hEtage: 4, largeurPorte: 3, hauteurPorte: 3.2, sol: 'parquet' });
+      banniere(95, 42.56, 1.8, 3); banniere(105, 42.56, 1.8, 3); gyro(100, 4.5, 42.7);
+      // une cloison coupe la pièce en deux : l'entrée, puis le bureau, où l'on passe par l'est. De la rue, par la porte, on ne voit pas la commandante
+      b.meuble('platre', -2.85, 0, 2, 11.7, 4, 0.25);
+      b.meuble('bois', 0, 0, -2.6, 3.4, 0.8, 1.5); b.meuble('ecran', -1, 0, -2.6, 0.7, 0.45, 0.08, 0.8);   // sa table, avec un écran
+      b.meuble('cuir', 0, 0, -4.3, 0.9, 1.1, 0.9);                                       // son fauteuil
+      b.meuble('banniere', 0, 0, -b.iw + 0.03, 2.4, 3.2, 0.04, 0.6);                      // la grande bannière, derrière elle
+      b.meuble('boisClair', -6.6, 0, -1, 2.2, 0.8, 1.4);                                 // la table des cartes
+      b.meuble('metal', 8.2, 0, -3, 0.6, 2, 3); b.meuble('boisClair', -7.6, 0, 4.5, 1.2, 1.2, 1.2);   // des armoires en fer, une caisse
+      b.meuble('metal', -5.5, 0, -5.3, 1.4, 1.05, 0.9);                                  // le pupitre du bouton rouge
+      const e0 = b.point(-8.3, 0, -5.8), e1 = b.point(2.5, 0, -1.6);
+      const engel = { type: 'engel', ...b.point(1.6, 0, -4.4), zone: [e0.x, e0.z, e1.x, e1.z] };   // (elle reste au fond, loin de la cloison : une fusée qui explose dans l'entrée ne l'atteint pas)
+      pnjDepart.push(engel);
+      soins.push({ x: X(8), z: Z(50) }, { x: X(126), z: Z(64) }, { x: X(70), z: Z(126) });
+      pickupsDepart.push({ type: 'gilet', x: X(67), z: Z(67), reapparait: true }, { type: 'gilet', x: X(50), z: Z(112), reapparait: true });
+      // le lieu des missions : devant la porte nord, là où attend l'armure. Sur les cartes, un seul rond pour tout le camp
+      const poste = { x: X(51.5), z: Z(1.6) };
+      lieux[c].splice(0, lieux[c].length, { ...poste, y: Y0 + 0.2 });
+      camp = { x: X(T / 2), z: Z(T / 2), y: Y0 + 0.2, sorties, hauts, gyros, engel, poste: { ...poste, angle: Math.PI }, bouton: { ...b.point(-5.5, 0, -5.3), h: 1.05 }, tues: 0, t: 0, ouvert: false,
+        dedans: [X(4), Z(4), X(T - 4), Z(T - 4)],   // derrière l'enceinte : c'est là que l'alarme se déclenche, et les militaires n'en sortent pas
+        // là où se tiennent les militaires tant qu'on les laisse tranquilles : aux portes, le long des rues, devant les bâtiments
+        postes: [[63, 9], [71, 9], [9, 63], [9, 71], [40, 67], [94, 67], [67, 40], [67, 94], [67, 67], [44, 44], [100, 48], [116, 56], [22, 80], [96, 80], [50, 113], [100, 110], [44, 22], [84, 22], [30, 110], [124, 100]]
+          .map(([a, z]) => ({ x: X(a), z: Z(z) })) };
     }
-    for (const z of [10, 50]) { // deux miradors
-      for (const [da, dz] of [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]]) boite('bois', X(50 + da), 0.2, Z(z + dz), 0.35, 8, 0.35, true);
-      boite('planches', X(50), 5.4, Z(z), 4, 0.25, 4); boite('tole', X(50), 8.2, Z(z), 4.8, 0.2, 4.8);
-    }
-    for (const [a, z, l, p] of [[16, 22, 1, 5], [16, 38, 1, 5], [37, 25.5, 1, 3], [37, 34.5, 1, 3]]) boite('sacs', X(a), 0.2, Z(z), l, 1.1, p, true);   // des sacs de sable
-    for (const [a, z] of [[13, 52], [14.5, 52], [13, 8], [46, 43], [46, 17]]) boite('boisClair', X(a), 0.2, Z(z), 1.3, 1.3, 1.3, true);                // des caisses
-    // le bureau de la commandante, au fond : on y entre par l'ouest. Elle garde le bouton rouge qui ouvre le bunker secret
-    const b = batiment({ x: X(47), z: Z(30), l: 18, p: 13, mat: 'bunker', porte: 'o', hEtage: 4, largeurPorte: 3, hauteurPorte: 3.2, sol: 'parquet' });
-    banniere(40.44, 25, 1.8, 3); banniere(40.44, 35, 1.8, 3);
-    // une cloison coupe la pièce en deux : l'entrée, puis le bureau, où l'on passe par le sud. De la cour, par la porte, on ne voit pas la commandante
-    b.meuble('platre', -2.85, 0, 2, 11.7, 4, 0.25);
-    b.meuble('bois', 0, 0, -2.6, 3.4, 0.8, 1.5); b.meuble('ecran', -1, 0, -2.6, 0.7, 0.45, 0.08, 0.8);   // son bureau, avec un écran
-    b.meuble('cuir', 0, 0, -4.3, 0.9, 1.1, 0.9);                                       // son fauteuil
-    b.meuble('banniere', 0, 0, -b.iw + 0.03, 2.4, 3.2, 0.04, 0.6);                      // la grande bannière, derrière elle
-    b.meuble('boisClair', -6.6, 0, -1, 2.2, 0.8, 1.4);                                 // la table des cartes
-    b.meuble('metal', 8.2, 0, -3, 0.6, 2, 3); b.meuble('boisClair', -7.6, 0, 4.5, 1.2, 1.2, 1.2);   // des armoires en fer, une caisse
-    b.meuble('metal', -5.5, 0, -5.3, 1.4, 1.05, 0.9);                                  // le pupitre du bouton rouge
-    const engel = { type: 'engel', ...b.point(1.6, 0, -4.4), zone: [X(48.6), Z(21.7), X(52.8), Z(32.5)] };   // (elle reste au fond, loin de la cloison : une fusée qui explose dans l'entrée ne l'atteint pas)
-    pnjDepart.push(engel);
-    soins.push({ x: X(14), z: Z(8.5) }, { x: X(16), z: Z(51.5) });
-    pickupsDepart.push({ type: 'gilet', x: X(34), z: Z(30), reapparait: true });
-    voituresGarees.push({ x: X(14.5), z: Z(43), a: 0, type: '4x4 du désert' });
-    // le lieu des missions : devant la porte, là où attend l'armure
-    const poste = { x: X(4.5), z: Z(30) };
-    Object.assign(lieux[c].find(q => q.x === X(30) && q.z === Z(30)), poste);
-    camp = { x: X(30), z: Z(30), y: Y0 + 0.2, sorties, engel, poste: { ...poste, angle: -Math.PI / 2 }, bouton: { ...b.point(-5.5, 0, -5.3), h: 1.05 }, tues: 0, t: 0, ouvert: false,
-      // là où se tiennent les militaires tant qu'on les laisse tranquilles
-      postes: [[14, 26], [14, 34], [22, 20], [22, 40], [30, 30], [36, 22], [36, 38], [28, 24], [28, 36], [20, 30], [34, 30], [18, 26], [18, 34], [26, 19], [26, 41]].map(([a, z]) => ({ x: X(a), z: Z(z) })) };
   } else if (c === '?') { // le bunker secret, creusé dans la montagne. Sa porte blindée ne s'ouvre qu'avec le bouton rouge du camp militaire. Dedans : la DeLorean
     sol('beton2', X(30), 0.21, Z(30), 54, 54);
-    const b = batiment({ x: X(38), z: Z(32), l: 24, p: 26, mat: 'bunker', porte: 'o', hEtage: 5, largeurPorte: 9, hauteurPorte: 4, sol: 'beton2', mur: 'bunker' });
+    const b = batiment({ x: X(20), z: Z(30), l: 26, p: 24, mat: 'bunker', porte: 'e', hEtage: 5, largeurPorte: 9, hauteurPorte: 4, sol: 'beton2', mur: 'bunker' });
     b.meuble('ecran', 0, 0, -b.iw + 0.08, 7, 2.4, 0.1, 1.4);                            // un grand écran, au fond
     b.meuble('metal', 0, 0, -b.iw + 1, 5, 1, 1);                                       // et son pupitre
-    for (const [u, w] of [[-9.5, -10], [-8.2, -10], [-9.5, -8.6], [9.5, -10], [9.5, -8.6]]) b.meuble('boisClair', u, 0, w, 1.2, 1.2, 1.2);   // des caisses
-    for (const u of [-10, 10]) b.meuble('jaune', u, 0, 2, 0.8, 1.6, 0.8);              // deux gros accumulateurs dorés
-    for (const [a, z, l, p] of [[18, 22, 1, 6], [18, 42, 1, 6]]) boite('sacs', X(a), 0.2, Z(z), l, 1.1, p, true);
-    voituresGarees.push({ ...b.point(0, 0, -3), a: -Math.PI / 2, type: 'DeLorean' });   // la seule DeLorean du pays, le nez vers la porte
-    // la porte blindée (9 × 4 m) : fermée, un bouchon de collision. Elle descend dans le sol quand on appuie sur le bouton
+    for (const [u, w] of [[-10.5, -9], [-9.2, -9], [-10.5, -7.6], [10.5, -9], [10.5, -7.6]]) b.meuble('boisClair', u, 0, w, 1.2, 1.2, 1.2);   // des caisses
+    for (const u of [-11, 11]) b.meuble('jaune', u, 0, 2, 0.8, 1.6, 0.8);              // deux gros accumulateurs dorés
+    for (const [a, z, l, p] of [[40, 18, 1, 6], [40, 42, 1, 6]]) boite('sacs', X(a), 0.2, Z(z), l, 1.1, p, true);
+    voituresGarees.push({ ...b.point(0, 0, -3), a: Math.PI / 2, type: 'DeLorean' });    // la seule DeLorean du pays, le nez vers la porte
+    // la porte blindée (9 × 4 m), à l'est : fermée, un bouchon de collision. Elle descend dans le sol quand on appuie sur le bouton
     const y = Y0 + 0.25;
-    bunkerSecret = { x: X(30), z: Z(30), y, porte: { x: X(25.15), z: Z(32), y, l: 9, h: 4 }, bouchon: ajouterCollision(X(24.9), Z(27.5), X(25.4), Z(36.5), y + 4.1, Y0),
-      garage: { ...b.point(0, 0, -3), a: -Math.PI / 2 }, ouverture: 0 };
+    bunkerSecret = { x: X(30), z: Z(30), y, porte: { x: X(31.85), z: Z(30), y, l: 9, h: 4 }, bouchon: ajouterCollision(X(31.6), Z(25.5), X(32.1), Z(34.5), y + 4.1, Y0),
+      garage: { ...b.point(0, 0, -3), a: Math.PI / 2 }, ouverture: 0 };
   } else if (c === 'U') { // le musée d'art : des œuvres gardées par des vigiles armés et des chiens
     const B = braquage(4, { x: X(30), z: Z(52) });
     const b = batiment({ x: X(30), z: Z(22), l: 40, p: 28, mat: 'musee', hEtage: 6, plein: 1, largeurPorte: 4, hauteurPorte: 3.6, sol: 'marbre' });
@@ -7038,10 +7098,10 @@ function lanceFlammes(r, dt) {
   const dir = V3(Math.sin(J.lacet) * Math.cos(J.tangage), Math.sin(J.tangage), Math.cos(J.lacet) * Math.cos(J.tangage)), cone = Math.tan(F.angle * Math.PI / 180);
   for (const buse of r.m.buses) {
     const depart = buse.getWorldPosition(V3()), l = F.portee * butee(depart, depart.clone().addScaledVector(dir, F.portee));
-    for (let k = 0; k < 3; k++) { // trois flammes par jet à chaque image, au hasard le long du jet : de plus en plus grosses, de plus en plus écartées
+    for (let k = 0; k < 4; k++) { // quatre flammes par jet à chaque image, au hasard le long du jet : de plus en plus grosses, de plus en plus écartées
       const t = Math.random(), e = t * l * cone, s = new THREE.Sprite(M_FLASH);
       s.position.copy(depart).addScaledVector(dir, t * l).add(V3(entre(-e, e), entre(-e, e) * 0.6, entre(-e, e)));
-      s.scale.setScalar(0.4 + 2.6 * t); scene.add(s); effets.push({ o: s, vie: 0.09 });
+      s.scale.setScalar(0.4 + 3.4 * t); scene.add(s); effets.push({ o: s, vie: 0.09 });
     }
     lumiereTir.position.copy(depart).addScaledVector(dir, l * 0.4); lumiereTir.intensity = 60;
   }
@@ -7113,20 +7173,23 @@ function aSonTourCamp(d) {
 // combien de militaires il reste à éliminer (ceux qu'on voit, et ceux qui attendent dans les baraques)
 const resteCamp = () => camp ? Math.max(0, CAMP.militaires - camp.tues) : 0;
 // le bouton rouge, sur son pupitre dans le bureau de la commandante, et la porte blindée du bunker secret, avec son voyant
+const M_GYRO_CAMP = new THREE.MeshStandardMaterial({ color: '#8a2010', emissive: '#ff2a10', emissiveIntensity: 0 });
 const M_BOUTON = new THREE.MeshStandardMaterial({ color: '#c01010', emissive: '#ff2010', emissiveIntensity: 0.6 }), M_BOUTON_OK = new THREE.MeshStandardMaterial({ color: '#10a030', emissive: '#20ff50', emissiveIntensity: 1.2 });
 if (camp) {
   const q = camp.bouton;
   camp.boutonM = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.1, 20), M_BOUTON); camp.boutonM.position.set(q.x, q.y + q.h + 0.09, q.z); scene.add(camp.boutonM);
   const socle = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.08, 20), mat('#e0c020', { roughness: 0.5 })); socle.position.set(q.x, q.y + q.h + 0.04, q.z); scene.add(socle);
-  camp.alerte = -1e9;
+  camp.alarme = false;
   camp.armure = creerArmure(camp.poste.x, camp.poste.z, camp.poste.angle);
+  camp.gyrosM = new THREE.Group(); scene.add(camp.gyrosM);   // les gyrophares de l'alarme : sur les piliers des portes, les miradors et les bâtiments
+  for (const g of camp.gyros) { const m = new THREE.Mesh(GEO_GYRO_ALARME, M_GYRO_CAMP); m.position.set(g.x, g.y, g.z); m.scale.setScalar(1.6); camp.gyrosM.add(m); }
 }
 if (bunkerSecret) {
   const B = bunkerSecret, p = B.porte;
   B.hBouchon = B.bouchon.h;
   B.porteM = new THREE.Mesh(new THREE.BoxGeometry(0.3, p.h + 0.1, p.l + 0.1), M_PORTE_COFFRE); B.porteM.castShadow = true; scene.add(B.porteM);
-  for (let k = -1; k <= 1; k++) { const barre = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.25, p.l), M_ACIER); barre.position.set(-0.18, k * 1.2, 0); B.porteM.add(barre); }   // trois barres de renfort
-  B.voyant = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.3, 1.4), M_BOUTON); B.voyant.position.set(p.x - 0.3, p.y + p.h + 0.5, p.z); scene.add(B.voyant);
+  for (let k = -1; k <= 1; k++) { const barre = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.25, p.l), M_ACIER); barre.position.set(0.18, k * 1.2, 0); B.porteM.add(barre); }   // trois barres de renfort
+  B.voyant = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.3, 1.4), M_BOUTON); B.voyant.position.set(p.x + 0.3, p.y + p.h + 0.5, p.z); scene.add(B.voyant);
   B.porteM.traverse(e => e.userData.mur = true); batiments.push(B.porteM);   // elle arrête les balles, comme un mur
   B.porteM.position.set(p.x, p.y + p.h / 2, p.z);
 }
@@ -7139,27 +7202,126 @@ function appuyerBouton() {
   bip(500, 1000, 0.4, 'sine', 0.3); bruit(0.5, 200, 1.5);
   annonce(tr('BUNKER OUVERT !'), tr('Sa porte blindée descend, un peu plus haut dans la montagne (? sur la carte)'), 5);
 }
-// le camp, à chaque image : l'armure revient à son poste, les militaires sortent des baraques, la porte du bunker descend
+// L'alarme du camp : tant qu'elle ne sonne pas, les militaires laissent B.J. tranquille. Elle se déclenche dès qu'il passe l'enceinte, ou
+// qu'il s'en prend à eux de dehors (un militaire touché, un coup de feu tout près). La sirène hurle, les gyrophares clignotent, et tout le camp attaque
+function declencherAlarmeCamp() {
+  if (!camp || camp.alarme || !resteAEliminer('militaire')) return;
+  camp.alarme = true;
+  for (const p of personnes) if (p.type === 'militaire') p.alerte = true;
+  annonce(tr('ALARME !'), tr('Tout le camp te tombe dessus !'), 3); bip(1800, 1800, 0.5, 'square', 0.15);
+}
+// Le chemin des militaires jusqu'à B.J. : le camp est découpé en petites cases, libres ou prises par un mur, un bâtiment ou un meuble,
+// avec les passages d'une case libre à sa voisine (un mur fin, entre deux cases libres, ne se traverse pas).
+// Trois fois par seconde, on compte de proche en proche à combien de cases chaque case libre est de B.J., en contournant ce qui gêne ;
+// un militaire qui ne le voit pas va vers la case voisine qui en est le plus près : il contourne les bâtiments au lieu de buter dessus
+const PAS_CHAMP = 1.5;
+function champCamp() {
+  if (!camp.champ) { // les cases libres et leurs passages : une seule fois (les murs ne bougent pas)
+    const [x1, z1, x2, z2] = camp.dedans, n = Math.ceil((x2 - x1) / PAS_CHAMP), m = Math.ceil((z2 - z1) / PAS_CHAMP), y = camp.y, e = 0.4;
+    const libre = new Uint8Array(n * m), lien = new Uint8Array(n * m);   // lien : 1 = on passe vers l'est, 2 = vers le sud
+    const P = (i, k) => ({ x: x1 + (i + 0.5) * PAS_CHAMP, y: y + 0.9, z: z1 + (k + 0.5) * PAS_CHAMP });
+    for (let k = 0; k < m; k++) for (let i = 0; i < n; i++) {
+      const { x, z } = P(i, k);
+      let ok = 1;
+      pourBoites(x - e, z - e, x + e, z + e, b => { if (b.h > y + PASMAX && b.y0 < y + 1.7 && x > b.x1 - e && x < b.x2 + e && z > b.z1 - e && z < b.z2 + e) ok = 0; });
+      libre[k * n + i] = ok;
+    }
+    for (let k = 0; k < m; k++) for (let i = 0; i < n; i++) {
+      const c = k * n + i;
+      if (!libre[c]) continue;
+      if (i < n - 1 && libre[c + 1] && butee(P(i, k), P(i + 1, k)) >= 1) lien[c] |= 1;
+      if (k < m - 1 && libre[c + n] && butee(P(i, k), P(i, k + 1)) >= 1) lien[c] |= 2;
+    }
+    camp.champ = { x1, z1, n, m, libre, lien, d: new Uint16Array(n * m), file: new Int32Array(n * m), t: -1 };
+  }
+  const C = camp.champ, { x1, z1, n, m, libre, lien, d, file } = C;
+  if (temps - C.t < 0.35) return C;
+  C.t = temps; d.fill(65535);
+  let i0 = clamp(Math.floor((J.x - x1) / PAS_CHAMP), 0, n - 1), k0 = clamp(Math.floor((J.z - z1) / PAS_CHAMP), 0, m - 1);
+  if (!libre[k0 * n + i0]) { // B.J. est contre un mur (ou dehors, derrière l'enceinte) : on part de la case libre la plus proche de lui
+    let mieux = -1, dm = Infinity;
+    for (let dk = -4; dk <= 4; dk++) for (let di = -4; di <= 4; di++) {
+      const i = i0 + di, k = k0 + dk;
+      if (i >= 0 && k >= 0 && i < n && k < m && libre[k * n + i] && di * di + dk * dk < dm) { dm = di * di + dk * dk; mieux = k * n + i; }
+    }
+    if (mieux < 0) return C;
+    i0 = mieux % n; k0 = (mieux - i0) / n;
+  }
+  let a = 0, b = 0;
+  file[b++] = k0 * n + i0; d[k0 * n + i0] = 0;
+  while (a < b) {
+    const c = file[a++], i = c % n, v = d[c] + 1;
+    if (lien[c] & 1 && d[c + 1] > v) { d[c + 1] = v; file[b++] = c + 1; }
+    if (i > 0 && lien[c - 1] & 1 && d[c - 1] > v) { d[c - 1] = v; file[b++] = c - 1; }
+    if (lien[c] & 2 && d[c + n] > v) { d[c + n] = v; file[b++] = c + n; }
+    if (c >= n && lien[c - n] & 2 && d[c - n] > v) { d[c - n] = v; file[b++] = c - n; }
+  }
+  return C;
+}
+// vers où va un militaire qui ne voit pas B.J. (sinon : defaut, tout droit vers lui)
+function capCamp(p, defaut) {
+  const C = champCamp(), { n, m, lien, d } = C, i = Math.floor((p.x - C.x1) / PAS_CHAMP), k = Math.floor((p.z - C.z1) / PAS_CHAMP);
+  if (i < 0 || k < 0 || i >= n || k >= m) return defaut;
+  // passe-t-on de la case c à sa voisine, d'un pas vers l'est ou l'ouest (di), ou vers le sud ou le nord (dk) ?
+  const passe = (c, di, dk) => di ? (di > 0 ? lien[c] & 1 : c % n > 0 && lien[c - 1] & 1) : dk > 0 ? lien[c] & 2 : c >= n && lien[c - n] & 2;
+  const c = k * n + i;
+  let mieux = d[c], bi = 0, bk = 0;
+  for (const [di, dk] of V8) {
+    const v = c + di + dk * n;
+    if (i + di < 0 || i + di >= n || k + dk < 0 || k + dk >= m || d[v] >= mieux) continue;
+    // en diagonale : seulement si on peut aussi y aller par les deux côtés (pas au coin d'un mur)
+    if (di && dk ? !(passe(c, di, 0) && passe(c + di, 0, dk) && passe(c, 0, dk) && passe(c + dk * n, di, 0)) : !passe(c, di, dk)) continue;
+    mieux = d[v]; bi = di; bk = dk;
+  }
+  return bi || bk ? Math.atan2(C.x1 + (i + bi + 0.5) * PAS_CHAMP - p.x, C.z1 + (k + bk + 0.5) * PAS_CHAMP - p.z) : defaut;
+}
+// le camp, à chaque image : l'armure revient à son poste, l'alarme sonne ou se tait, les militaires sortent des baraques, la porte du bunker descend
 function majCamp(dt) {
   if (!camp) return;
   const d = dist(J, camp), a = camp.armure;
   // l'armure : cassée, ou laissée loin derrière lui (abîmée, ou ailleurs qu'à son poste), une neuve revient devant la porte du camp
   if (a && a !== J.robot && dist(a, J) > 250 && (a.points < ARMURE.points || dist(a, camp.poste) > 1)) { a.supprimer = true; camp.armure = null; }
   if (!camp.armure && dist(J, camp.poste) > 150) camp.armure = creerArmure(camp.poste.x, camp.poste.z, camp.poste.angle);
-  // les militaires : jamais plus de CAMP.ensemble à la fois (de plus en plus nombreux à mesure qu'on en élimine). Tant que B.J. est loin,
-  // ils se tiennent à leur poste, dans la cour ; pendant le combat, les renforts sortent des baraques, un par un, par une porte qu'il ne voit pas
-  const vivants = personnes.filter(p => p.type === 'militaire' && p.vie > 0), [e0, e1 = e0] = CAMP.ensemble, loin = d > 160;
+  const vivants = personnes.filter(p => p.type === 'militaire' && p.vie > 0), [e0, e1 = e0] = CAMP.ensemble, loin = d > 250;
+  // l'alarme : elle sonne dès que B.J. a passé l'enceinte ; elle se tait quand il est mort, reparti au loin, ou quand le camp est vide
+  const [x1, z1, x2, z2] = camp.dedans;
+  if (!J.mort && J.x > x1 && J.x < x2 && J.z > z1 && J.z < z2 && J.y < camp.y + 40) declencherAlarmeCamp();
+  if (camp.alarme && (J.mort || d > 190 || !resteAEliminer('militaire'))) { camp.alarme = false; for (const p of vivants) p.alerte = false; }
+  const clignote = Math.sin(temps * 14) > 0;
+  camp.gyrosM.visible = d < 450; M_GYRO_CAMP.emissiveIntensity = camp.alarme && clignote ? 8 : 0;
+  if (camp.alarme) { // une lumière rouge clignote, au gyrophare le plus proche de B.J.
+    const g = camp.gyros.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);
+    lumiereAlarme.position.set(g.x, g.y - 0.6, g.z); lumiereAlarme.intensity = clignote ? 150 : 0;
+  }
+  // les militaires : jamais plus de CAMP.ensemble à la fois (de plus en plus nombreux à mesure qu'on en élimine), dont quelques-uns postés
+  // en hauteur, sur les miradors et les toits (CAMP.enHaut au plus, et pas plus d'un sur trois). Tant que B.J. est loin, le camp se remplit
+  // d'un coup, chacun à son poste. Ensuite, les renforts sortent des baraques un par un, par une porte que B.J. ne voit pas, ou montent
+  // à un poste en hauteur qu'il ne voit pas
+  for (const p of vivants) if (p.poste) {
+    if (Math.abs(p.y - p.poste.y) > 0.6 || dist(p, p.poste) > 1.2) { p.poste = null; continue; }   // soufflé de son poste par une explosion : il continue à pied
+    // pendant l'alarme, celui qui n'a pas vu B.J. depuis 20 s redescend : il s'en va (sans que B.J. le voie faire), et un autre sortira d'une baraque
+    p.sansVoir = camp.alarme && !p.voitJ ? (p.sansVoir || 0) + dt : 0;
+    if (p.sansVoir > 20 && !voit(p, J)) p.supprimer = true;
+  }
   const max = Math.min(resteCamp(), Math.round(lerp(e0, e1, clamp(camp.tues / (CAMP.militaires || 1), 0, 1))));
-  if (loin) for (const p of vivants) p.alerte = false;   // B.J. est parti : ils se calment
   camp.t -= dt;
   if (vivants.length < max && (loin || camp.t <= 0)) {
     camp.t = CAMP.renfort;
-    let q;
-    if (loin) q = camp.postes.find(s => !vivants.some(p => dist(p, s) < 1.5)) || hasard(camp.postes);
-    else { const cachees = camp.sorties.filter(s => !voit(s, J)); q = cachees.length ? hasard(cachees) : camp.sorties.reduce((m, s) => dist(s, J) > dist(m, J) ? s : m); }
-    const p = creerPersonne('militaire', q.x + entre(-0.5, 0.5), q.z + entre(-0.5, 0.5));
-    p.angle = angleVers(p, loin ? camp.poste : J);
-    if (!loin && temps - camp.alerte < 30) p.alerte = true;   // en plein combat : il sort en courant, l'arme à la main
+    const cache = q => !voit({ x: q.x, z: q.z, y: q.y ?? camp.y }, J);
+    const libres = camp.hauts.filter(h => !vivants.some(p => p.poste === h) && (loin || !camp.alarme || dist(h, J) < 60));   // (en plein combat : seulement les postes d'où l'on voit jusqu'à B.J.)
+    const monte = vivants.filter(p => p.poste).length < Math.min(CAMP.enHaut, Math.ceil(max / 3)) && (loin || Math.random() < 0.34);
+    const haut = monte ? loin ? libres[0] : hasard(libres.filter(cache)) : null;
+    let q = haut;
+    if (!q && (loin || !camp.alarme)) q = camp.postes.find(s => !vivants.some(p => dist(p, s) < 1.5) && (loin || cache(s)));   // au calme : à un poste libre
+    if (!q && !loin) { // en plein combat : par une des trois portes de baraque les plus proches de B.J. parmi celles qu'il ne voit pas (sinon, par la plus loin)
+      const cachees = camp.sorties.filter(cache).sort((s, t) => dist(s, J) - dist(t, J));
+      q = cachees.length ? hasard(cachees.slice(0, 3)) : camp.sorties.reduce((m, s) => dist(s, J) > dist(m, J) ? s : m);
+    }
+    if (q) {
+      const p = haut ? creerPersonne('militaire', q.x, q.z, undefined, q.y) : creerPersonne('militaire', q.x + entre(-0.5, 0.5), q.z + entre(-0.5, 0.5));
+      p.zone = camp.dedans; p.poste = haut || null; p.alerte = camp.alarme;
+      p.angle = camp.alarme ? angleVers(p, J) : entre(0, 6.28);
+    }
   }
   camp.boutonM.material = camp.ouvert ? M_BOUTON_OK : M_BOUTON;
   camp.boutonM.position.y = camp.bouton.y + camp.bouton.h + (camp.ouvert ? 0.05 : 0.09);
@@ -7182,7 +7344,7 @@ function majCamp(dt) {
 // (avec la DeLorean dedans), et une armure neuve attend devant la porte
 function reinitialiserCamp() {
   if (!camp) return;
-  Object.assign(camp, { tues: 0, ouvert: false, alerte: -1e9, t: 0 });
+  Object.assign(camp, { tues: 0, ouvert: false, alarme: false, t: 0 });
   for (const p of personnes) if (p.type === 'militaire') p.supprimer = true;
   if (!personnes.some(p => p.type === 'engel' && p.vie > 0)) { const e = camp.engel; creerPersonne('engel', e.x, e.z, undefined, e.y).zone = e.zone; }
   if (J.robot?.armure) Object.assign(J.robot, { points: ARMURE.points, fusees: ARMURE.fusees.nombre });
@@ -7839,7 +8001,7 @@ function frapper(a) {
 function alerter(p) {
   p.alerte = true; declencherAlarme(p.braquage);
   if (p.gang) for (const q of personnes) if (q.gang === p.gang) q.alerte = true;
-  if (p.type === 'militaire' && camp) { camp.alerte = temps; for (const q of personnes) if (q.type === 'militaire') q.alerte = true; }   // tout le camp est en alerte
+  if (p.type === 'militaire') declencherAlarmeCamp();   // au camp militaire : l'alarme sonne, et tout le camp attaque
 }
 // parJoueur = false quand c'est Hitler qui le blesse : pas d'étoile pour B.J.
 function blesser(p, degats, parJoueur = true) {
@@ -9172,12 +9334,13 @@ function majPersonne(p, dt) {
   p.cooldown -= dt; p.peur -= dt; p.touche = Math.max(0, (p.touche || 0) - dt);
   let vitesse = 0, arme = false;
   // un vigile (ou un membre de gang) n'attaque que si on le provoque ; un gang se calme quand B.J. est loin
-  const vigile = p.type === 'garde' || p.type === 'gang', hostile = NAZIS.includes(p.type) || vigile || (p.type === 'flic' && etoiles > 0);
+  const vigile = p.type === 'garde' || p.type === 'gang', militaire = p.type === 'militaire';   // (les militaires du camp : calmes tant que son alarme ne sonne pas)
+  const hostile = (NAZIS.includes(p.type) && (!militaire || camp?.alarme)) || vigile || (p.type === 'flic' && etoiles > 0);
   if (p.gang && p.alerte && d > 100) p.alerte = false;
   if (hostile && !J.mort) {
     p.vuTimer -= dt;
     if (p.vuTimer <= 0) { // un vigile n'attaque que s'il voit B.J. arme à la main, de près (ou si l'alarme sonne)
-      p.vuTimer = 0.3; p.voitJ = d < fiche(p).vue && voitBJ(p);
+      p.vuTimer = 0.3; p.voitJ = d < fiche(p).vue * (p.poste ? 1.5 : 1) && voitBJ(p);   // (posté en hauteur, il voit une fois et demie plus loin)
       if (p.voitJ && !p.alerte && (!vigile || (d < 15 && armeEnMain()))) alerter(p);
     }
     if (p.type === 'flic') p.alerte = true;
@@ -9185,8 +9348,9 @@ function majPersonne(p, dt) {
     else if (p.alerte) {
       arme = true;
       const vise = angleVers(p, J);
-      p.angle = lerpAngle(p.angle, vise, 8 * dt);
+      p.angle = lerpAngle(p.angle, militaire && !p.voitJ && !p.poste ? capCamp(p, vise) : vise, 8 * dt);   // (au camp militaire, celui qui ne voit pas B.J. contourne les bâtiments)
       if (!p.voitJ || d > 22) vitesse = fiche(p).vitesse; else if (d < 6) vitesse = -2;
+      if (p.poste) vitesse = 0;   // posté en hauteur (un mirador, un toit) : il ne bouge pas, il tire
       if (p.voitJ && p.cooldown <= 0 && Math.abs(diffAngle(p.angle, vise)) < 0.3) {
         // les vigiles et les policiers d'élite à la mitraillette ou au fusil d'assaut tirent en rafales de 3 à 5 balles
         if (p.rafale !== undefined) p.cooldown = p.rafale-- > 0 ? 0.13 : (p.rafale = 2 + Math.floor(Math.random() * 3), entre(1.2, 2));
@@ -10212,8 +10376,10 @@ function mettreAJour(dt) {
     sirene.frequency.value = Math.sin(temps * 5) > 0 ? 700 : 950;
     // la sonnerie de l'alarme d'un braquage : on l'entend jusqu'à 250 m
     let da = Infinity; for (const B of braquages) if (B.alarme) da = Math.min(da, dist(B, J));
+    const dc = camp?.alarme ? Math.max(0, dist(camp, J) - 95) : Infinity;   // l'alarme du camp militaire : aussi forte partout dans le camp
+    da = Math.min(da, dc);
     alarmeGain.gain.setTargetAtTime(da < 250 ? 0.05 * (1 - da / 250) : 0, t, 0.05);
-    alarmeSon.frequency.value = temps % 0.8 < 0.4 ? 980 : 780;
+    alarmeSon.frequency.value = dc <= da && dc < Infinity ? 520 + 380 * Math.abs(Math.sin(temps * 1.7)) : temps % 0.8 < 0.4 ? 980 : 780;   // (la sirène du camp monte et descend)
   }
 }
 function majRepere(dt) {
@@ -10259,7 +10425,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
   dansBatiment, pourBoites, resoudre, majJoueur, accrocher, attraper, tenirPrise, prendre, liberer, lancer, lances, filets, feux, arriver, murDevant, cable, garerPres, amenerVoiture, rappelerVoiture, pouvoir, creerArme, raycaster,
   crochetCable, ouvrirFilet, oterFilet, deployerAiles, rendreInvisible, invisible, policeVoit,
-  camp, bunkerSecret, CAMP, ARMURE, creerArmure, monterRobot, sortirRobot, tirerFusees, fuseesVol, majCamp, reinitialiserCamp, appuyerBouton, boutonProche, resteCamp, casserArmure, toucherArmure, etapeFinie, majHUD,
+  camp, bunkerSecret, CAMP, ARMURE, tirEnnemi, boutDuCanon, balleArrive, aSonTourCamp, champCamp, capCamp, declencherAlarmeCamp, creerArmure, monterRobot, sortirRobot, tirerFusees, fuseesVol, majCamp, reinitialiserCamp, appuyerBouton, boutonProche, resteCamp, casserArmure, toucherArmure, etapeFinie, majHUD,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
