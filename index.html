@@ -670,6 +670,8 @@ const REGLAGES = {
   degatsChute: 10,           // ...autant de points de vie par mètre en plus (de 9 m : 50 points ; de 14 m, on meurt). Le gilet ne protège pas
   vitesseSansMal: 10,        // m/s (36 km/h) : sauter d'une voiture qui va plus vite fait mal...
   degatsRoulade: 1.5,        // ...autant de points de vie par m/s en plus (à 100 km/h : 27 points ; même à 200 km/h, on ne meurt pas si on a toute sa vie)
+  toursChute: 1.1,           // en tombant d'une voiture lancée, on roule par terre : autant de tours sur soi-même par seconde, au plus
+  reposChute: 0.4,           // ...puis on reste couché autant de secondes avant de se relever (moins après une petite chute)
   degatsRenverse: 10,        // un piéton renversé perd autant de points de vie par m/s de la voiture (au-delà de 2) : doucement, il se relève
   // avec les codes de triche SUPERMAN et DIEU, tomber de plus haut que hauteurSansMal ne fait pas mal : ça écrase tout ce qu'il y a dessous !
   rayonEcrase: 0.3,          // ...à autant de mètres à la ronde par mètre de chute (de 20 m de haut : 6 m à la ronde)...
@@ -4295,6 +4297,7 @@ const hauteurCouche = h => 0.13 * Math.abs(Math.sin(h.g.rotation.x));
 //   raideur : la force des muscles (0 : tout mou, comme un mort ; 10 : il se débat ; 25 : il se tient). Sans raideur, il se tient de nouveau :
 //     le mou s'efface en 0,2 s
 //   sol : la hauteur du sol sous lui ; jambes : false si ses pieds suivent la pose (il atterrit, il marche)
+//   penche : le sol penche. { x, z : de combien il monte par mètre vers +x et vers +z ; x0, z0 : là où il est à la hauteur « sol » }
 //   vx, vy, vz : sa vitesse quand il devient mou (sinon ses membres restent en arrière d'un coup, comme quand une voiture le fauche)
 const MOUS = [   // l : la longueur du morceau (m) ; r : l'épaisseur de son bout ; s : 1 s'il pend, -1 s'il monte ; x, z : ce que l'articulation permet (radians) ;
                  // pli : un avant-bras ou un tibia, qui pend au morceau d'avant dans la liste
@@ -4337,7 +4340,7 @@ function membresMous(h, dt, o) {
     V.x += (T0.x - P.x) * ks * dt; V.y += ((T0.y - P.y) * ks - R_.gravite) * dt; V.z += (T0.z - P.z) * ks * dt;
     T0.copy(t);
     P.addScaledVector(V, dt).sub(j).setLength(L).add(j);   // il reste au bout du morceau
-    const bas = o.sol + S.r * h.g.scale.y, parTerre = P.y < bas;
+    const bas = o.sol + (o.penche ? o.penche.x * (P.x - o.penche.x0) + o.penche.z * (P.z - o.penche.z0) : 0) + S.r * h.g.scale.y, parTerre = P.y < bas;
     if (parTerre) P.y = bas;
     // on tourne le morceau vers son bout (dans le repère de son parent), sans dépasser ce que l'articulation permet
     const d = vDir.subVectors(P, j).transformDirection(mInv.copy(M).invert()).multiplyScalar(S.s);
@@ -5513,7 +5516,7 @@ const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, 
   vie: R_.viesJoueur, argent: R_.argentDepart, voiture: null, arme: 0, possede: ARMES.map((a, i) => i < 2),
   balles: ARMES.map(a => a.corps || pouvoirArme(a) ? Infinity : 0), cooldown: 0, accroupi: false, vue: R_.vueDepart, dernierDegat: -99,
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0,
-  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null, laser: 0, biceps: null,   // atterri, genou, roule : voir retomber ; superman : voir decoller ; laser : voir majLaser ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege ; biceps : voir poserBiceps
+  robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null, laser: 0, biceps: null,   // atterri, genou, roule : voir retomber (roule : il roule par terre, en roulade ou en chute : voir commencerRoulade et commencerChute) ; superman : voir decoller ; laser : voir majLaser ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege ; biceps : voir poserBiceps
   grappin: null, plane: null, balance: null, mur: null, lance: null, prise: null, sansMur: 0 };   // les codes BATMAN et SPIDERMAN. grappin : voir accrocher ; plane : voir planer ; balance : voir balancer ; mur : celui où il grimpe (escalader) ; lance : son élan en l'air (majJoueur) ; prise : la voiture au bout de sa toile (attraper)
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 joueurH.g.traverse(o => o.userData.habit = o.material);   // sa tenue normale, pour la lui remettre après les codes de triche
@@ -7115,7 +7118,7 @@ function action() {
   if (siege) { J.telesiege = siege; J.danse = 0; J.accroupi = false; if (J.voiture) Object.assign(J.voiture, { tour: 0, derape: 0, pas: 0, transition: 0 }); bip(500, 750, 0.3, 'sine', 0.15); return; }
   if (tl) return;
   if (J.voiture?.enVol) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }   // pas en plein vol
-  if (J.voiture) { if (!J.voiture.rail && !(J.voiture.accident && !J.voiture.accident.dort)) sortirVoiture(); return; }   // pas en plein looping, ni pendant les tonneaux !
+  if (J.voiture) { if (!J.voiture.rail) sortirVoiture(); return; }   // pas en plein looping. En plein accident (tonneaux, tête-à-queue), on peut : B.J. saute, et tombe par terre
   if (J.robot) { sortirRobot(); return; }
   const s = standProche();
   if (s) { acheter(s); return; }
@@ -7202,11 +7205,17 @@ function sortirVoiture() {
     if (laisses.length > 6) laisses[0].supprimer = true;
   }
   if (v.enVol) J.y = v.y + 1;   // éjecté en plein vol : il tombe (et se fait mal en arrivant en bas)
-  // sauter d'une voiture lancée : il roule par terre, dans le sens où elle allait. Trop vite, ça fait mal (le gilet ne protège pas)
-  const vit = Math.abs(v.vitesse);
+  // sauter d'une voiture lancée : il tombe par terre, avec la vitesse qu'elle avait (en plein accident : celle de ses tonneaux), et un peu
+  // d'élan pour s'en écarter. Trop vite, ça fait mal en touchant le sol (le gilet ne protège pas)
+  const u = vitesseDe(v), vit = Math.hypot(u.x, u.z);
   if (vit > 4 && !v.type.bateau && !v.enVol && !v.coule) {
-    commencerRoulade(Math.sin(v.angle) * v.vitesse, Math.cos(v.angle) * v.vitesse);
-    if (vit > R_.vitesseSansMal) blesserJoueur((vit - R_.vitesseSansMal) * R_.degatsRoulade / coussin(J.x, J.z), false);   // (dans la neige, ça fait bien moins mal)
+    const dx = J.x - v.x, dz = J.z - v.z, d = Math.hypot(dx, dz) || 1, vx = u.x + dx / d * 2, vz = u.z + dz / d * 2;
+    // sa vitesse vers le haut : celle du sol qui monte ou descend sous lui (dans une pente, il part le long de la pente), ou bien celle de
+    // la voiture si elle est en l'air (un tremplin, des tonneaux) : il part alors de là-haut. (Des skis : on tombe en touchant la neige)
+    const enLair = (v.accident || v.vol) && !v.type.glisse;
+    const monte = enLair ? (v.accident ? u.y : v.vy || 0) : (hauteurSol(J.x + vx * 0.05, J.z + vz * 0.05, J.y) - hauteurSol(J.x, J.z, J.y)) / 0.05;
+    J.y = Math.max(J.y, v.accident ? v.accident.c.y - 0.5 : v.y) + 0.3;
+    commencerChute(vx, monte + 1.5, vz, Math.sign(dx * u.z - dz * u.x) || hasard([-1, 1]), Math.max(0, vit - R_.vitesseSansMal) * R_.degatsRoulade);
   }
 }
 
@@ -7541,12 +7550,12 @@ function retomber(choc, vx, vz) {
   }
   if (h / mou <= R_.hauteurSansMal) return false;   // (sur la neige : comme s'il tombait de 5 fois moins haut)
   if (pouvoir('souple')) { // Spiderman retombe toujours sur ses pattes, sans se faire mal : sur un genou, ou en roulade s'il allait vite
-    if (Math.hypot(vx, vz) > 6) commencerRoulade(vx, vz); else J.genou = 0.9;
+    if (Math.hypot(vx, vz) > 6) commencerRoulade(vx, vz); else { if (J.roule?.chute) J.roule = null; J.genou = 0.9; }   // (même jeté d'une voiture)
     return false;
   }
   blesserJoueur((h / mou - R_.hauteurSansMal) * R_.degatsChute, false);
   bruit(Math.min(0.8, choc / 25), 250, 0.25);
-  if (J.mort) return false;
+  if (J.mort || J.roule?.chute) return false;   // (jeté d'une voiture, il tombait déjà : il continue de rouler par terre, voir chuter)
   if (Math.hypot(vx, vz) > 3) commencerRoulade(vx, vz); else J.genou = 0.9;
   return false;
 }
@@ -7676,15 +7685,99 @@ function commencerRoulade(vx, vz) {
   J.roule = { vx, vz, a: 0 }; J.accroupi = false; J.danse = 0; J.echelle = null; J.genou = 0; J.lance = null;
   J.angleCorps = Math.atan2(vx, vz);
 }
+// la chute : B.J. saute (ou est jeté) d'un véhicule lancé, avec la vitesse (vx, vy, vz). Ce n'est pas une roulade : il bascule sur le côté,
+// la tête vers le dehors (cote : 1 s'il sort à gauche de là où il va, -1 à droite), tape le sol, rebondit, puis glisse en roulant sur
+// lui-même comme un tronc d'arbre, les bras et les jambes qui battent. Arrêté, il reste couché un instant (REGLAGES.reposChute), sur le
+// ventre ou sur le dos, puis se relève. On ne peut pas le diriger. mal : les points de vie qu'il perd en touchant le sol (voir taperSol)
+function commencerChute(vx, vy, vz, cote, mal = 0) {
+  commencerRoulade(vx, vz);
+  // tete : vers où pointe sa tête une fois couché (en travers de là où il va) ; couche : de 0 (debout) à 1 (couché) ;
+  // tour : de combien il a roulé sur lui-même (0 : sur le ventre, π : sur le dos ; au début, sur le côté, il regarde devant lui)
+  Object.assign(J.roule, { chute: true, cote, tete: J.angleCorps + cote * Math.PI / 2, tour: -cote * Math.PI / 2, couche: 0, mal,
+    repos: R_.reposChute * clamp(Math.hypot(vx, vz) / 20, 0.25, 1) });   // (une petite chute : il se relève plus vite)
+  J.vy = vy; J.sol = false;
+}
+// il tape le sol à la vitesse choc (m/s) : un bruit sourd, de la poussière (ou de la neige), la caméra tremble, et il rebondit un peu.
+// La première fois, c'est là qu'il se fait mal, et plus il allait vite (v), plus il rebondit
+function taperSol(r, choc, v) {
+  if (!r.touche) {
+    r.touche = true; choc = Math.max(choc, Math.min(8, v * 0.3));
+    if (r.mal) blesserJoueur(r.mal / coussin(J.x, J.z), false);   // (dans la neige, ça fait bien moins mal)
+  }
+  if (choc < 1.5) return;
+  bruit(Math.min(0.7, choc / 10), 220, 0.2);
+  J.secousse = Math.max(J.secousse || 0, Math.min(0.1, choc * 0.012));
+  if (coussin(J.x, J.z) > 1.5) gerbe({ x: J.x, y: J.y, z: J.z, angle: 0 }, 3); else poussiere(V3(J.x, J.y + 0.15, J.z));
+  if (choc > 3) { J.vy = r.pente + choc * 0.35; J.sol = false; }
+}
+const eChute = new THREE.Euler(), qChute = new THREE.Quaternion(), qPente = new THREE.Quaternion(), vPente = new THREE.Vector3();
+// la pente du sol en (x, z) : de combien il monte par mètre vers +x et vers +z (le bord d'un toit, un mur : ce n'est pas une pente, ça compte pour 0)
+function penteSol(x, z, y) {
+  const e = 0.4, d = (a, b) => Math.abs(a - b) > 1.6 ? 0 : (a - b) / (2 * e);
+  return { x: d(hauteurSol(x + e, z, y), hauteurSol(x - e, z, y)), z: d(hauteurSol(x, z + e, y), hauteurSol(x, z - e, y)) };
+}
+// la chute, image par image (v : sa vitesse, sol : la hauteur du sol sous lui)
+function chuter(r, v, sol, dt) {
+  const h = joueurH, taille = h.g.scale.y, mort = !!J.mort;
+  J.vitesse = v;
+  if (h.arme) h.arme.visible = false;
+  // dans une pente (une piste de ski, une colline), couché, il penche comme le sol (r.penche : la pente, adoucie). « coucher » penche le corps
+  // d'autant qu'il est couché (k : de 0, debout, à 1)
+  const p = penteSol(J.x, J.z, J.y + 0.3), doux = Math.min(1, dt * 10);
+  r.penche ||= { x: p.x, z: p.z };
+  Object.assign(r.penche, { x: r.penche.x + (p.x - r.penche.x) * doux, z: r.penche.z + (p.z - r.penche.z) * doux, x0: J.x, z0: J.z });
+  const coucher = k => h.g.quaternion.premultiply(qChute.identity().slerp(qPente.setFromUnitVectors(HAUT, vPente.set(-r.penche.x, 1, -r.penche.z).normalize()), k));
+  if (r.fin !== undefined) { // il se relève : il ramène ses pieds sous lui en pliant les genoux, et se redresse (r.fin va de 0 à 1)
+    r.fin = Math.min(1, r.fin + dt / 0.8);
+    const k = r.fin, s = k * k * (3 - 2 * k), b = r.ventre * Math.PI / 2 * (1 - s);
+    animerHumain(h, 0, dt, { bascule: b, plie: Math.sin(k * Math.PI) * 0.9, ecarte: 1 - s });
+    h.g.rotation.y = J.angleCorps; coucher(1 - s);
+    const hy = h.haut.position.y;
+    poserCorps(h, J.x, J.y + (0.13 + (hy - 0.13) * Math.cos(b)) * taille, J.z, hy);   // son bassin reste au-dessus de (J.x, J.z)
+    membresMous(h, dt, { raideur: 4 + 36 * s, sol, penche: r.penche });   // ses membres, encore mous, reprennent des forces
+    if (k >= 1) { J.roule = null; J.atterri = 0; }   // debout : on reprend la main
+    return;
+  }
+  r.couche =Math.min(1, r.couche + dt * 3.5);
+  const plat = Math.round(r.tour / Math.PI) * Math.PI, avant = r.tour;   // plat : l'angle le plus proche où il est à plat (ventre ou dos)
+  if (v < 1.5 && J.sol) { // presque arrêté : il finit à plat, et reste couché un instant avant de se relever (mort, il reste couché)
+    r.tour += (plat - r.tour) * Math.min(1, dt * 8);
+    if (r.couche === 1 && Math.abs(plat - r.tour) < 0.03 && (r.repos -= dt) <= 0 && !mort) {
+      r.fin = 0; r.ventre = Math.cos(plat) > 0 ? 1 : -1;
+      J.angleCorps = r.tete + (r.ventre > 0 ? 0 : Math.PI);
+    }
+  } else {
+    // il roule sur lui-même dans le sens où il va : d'autant plus vite qu'il va vite (REGLAGES.toursChute tours par seconde au plus),
+    // moins vite à plat que sur le côté. À chaque fois qu'il passe sur le côté, lancé, il rebondit
+    r.tour += r.cote * Math.min(v * 0.5, 2 * Math.PI * R_.toursChute) * (1 - 0.4 * Math.cos(2 * r.tour)) * dt;
+    if (J.sol && v > 8 && Math.floor(r.tour / Math.PI + 0.5) !== Math.floor(avant / Math.PI + 0.5)) { J.vy = r.pente + Math.min(2.4, v * 0.1); J.sol = false; }
+  }
+  const k = r.couche, b = Math.PI / 2 * Math.sin(k * Math.PI / 2);   // b : de combien il a basculé
+  animerHumain(h, 0, dt, { plie: lerp(0.8, 0.2, k), ecarte: 0.8 * k, agite: J.sol ? 0.15 : 0.8 });
+  const genou = k * Math.min(1, v / 4);   // tant qu'il roule, un genou remonté : pas raide comme une planche
+  h.jambeG.rotation.x -= 0.5 * genou; h.jambeG.pli.rotation.x += 0.8 * genou;
+  // il bascule la tête vers r.tete, puis tourne autour de son corps (de la tête aux pieds), de r.tour
+  h.g.quaternion.setFromEuler(eChute.set(b, r.tete, 0, 'YXZ')).multiply(qChute.setFromAxisAngle(AXE_Y, r.tour)); coucher(k);
+  const hy = h.haut.position.y, bas = 0.13 + 0.07 * Math.sin(r.tour) ** 2;   // bas : son bassin est à 13 cm du sol à plat, à 20 cm sur le côté
+  poserCorps(h, J.x, J.y + (bas + (hy - bas) * Math.cos(b)) * taille, J.z, hy);   // (J.x, J.z) : là où est son bassin
+  membresMous(h, dt, { raideur: mort ? 1 : 8, sol, penche: r.penche, vx: r.vx, vy: J.vy, vz: r.vz });   // il se débat (mort, il est tout mou)
+}
 function rouler(dt) {
-  const r = J.roule, v = Math.hypot(r.vx, r.vz), f = v > 0 ? Math.max(0, v - 12 * dt) / v : 0;   // ça frotte : il perd 12 m/s chaque seconde
+  const r = J.roule, v = Math.hypot(r.vx, r.vz), frotte = r.chute && !r.touche ? 0 : 12, f = v > 0 ? Math.max(0, v - frotte * dt) / v : 0;   // ça frotte : il perd 12 m/s chaque seconde (pas avant d'avoir touché le sol, dans une chute)
   r.vx *= f; r.vz *= f;
   J.x += r.vx * dt; J.z += r.vz * dt;
   if (resoudre(J, 0.35)) { r.vx *= 0.2; r.vz *= 0.2; }   // contre un mur, il s'arrête presque
-  const hs = hauteurSol(J.x, J.z, J.y);
-  J.vy -= R_.gravite * dt; J.y += J.vy * dt;
+  // pente : à quelle vitesse le sol monte ou descend sous lui (m/s). Une pente ou une marche, pas le bord d'un toit ou d'un pont : là, il tombe
+  const hs = hauteurSol(J.x, J.z, J.y), marche = 0.25 + 1.7 * v * dt, dh = hs - (r.hs ?? hs), pente = r.pente = Math.abs(dh) <= marche ? dh / dt : 0;
+  r.hs = hs;
+  if (J.sol && J.y - hs <= marche) { J.y = hs; J.vy = pente; }   // par terre, il suit le sol : dans une descente, même raide, il ne s'envole pas
+  else { J.vy -= R_.gravite * dt; J.y += J.vy * dt; }
   if (hs < EAU - 1.3 && J.y <= EAU - 1.25) { J.roule = null; J.y = EAU - 1.25; J.vy = 0; J.nage = true; J.sol = false; return; }   // à l'eau : il nage
-  if (J.y <= hs) { const tombe = !J.sol; J.y = hs; if (!tombe || !retomber(-J.vy, r.vx, r.vz)) { J.vy = 0; J.sol = true; } } else if (J.y > hs + 0.05) J.sol = false;   // tombé d'un pont, d'un toit : ça compte
+  if (J.y <= hs) { // tombé d'un pont, d'un toit : ça compte (choc : sa vitesse par rapport au sol, qui descend peut-être avec lui)
+    const tombe = !J.sol, choc = Math.max(0, pente - J.vy); J.y = hs;
+    if (!tombe || !retomber(choc, r.vx, r.vz)) { J.vy = pente; J.sol = true; if (tombe && r.chute && J.roule === r) taperSol(r, choc, v); }
+  } else J.sol = false;
+  if (r.chute) { if (J.roule === r) chuter(r, v, hs, dt); return; }   // (Superman, Spiderman, tombés de haut : ils se sont reçus sur leurs pieds)
   // un tour tous les 3 m environ, 2 tours par seconde au plus. Presque arrêté, il finit son tour, se déplie en un quart de seconde (r.fin
   // va de 0 à 1), se retrouve accroupi, puis se relève
   const tour = 2 * Math.PI, w = clamp(v / 0.45, 9, 13);
@@ -8302,9 +8395,9 @@ function poserVoiture(v, dt) {
   else if (!tour) v.m.rotation.set(-v.tangage, v.angle, v.roulis + (v.penche || 0));
   else { const c = Math.cos(tour), s = Math.sin(tour), t = Math.tan(v.tangage), r = Math.tan(v.roulis + (v.penche || 0)); v.m.rotation.set(-Math.atan(t * c + r * s), v.angle + tour, Math.atan(r * c - t * s)); }
 }
-// B.J. tombe, et son engin reste près de lui (3 fois sur 4 : REGLAGES.skisPlantes) : B.J. part en roulade, les skis le suivent (v.suit)
+// B.J. tombe, et son engin reste près de lui (3 fois sur 4 : REGLAGES.skisPlantes) : B.J. roule par terre, les skis le suivent (v.suit)
 function lacherSkis(v) {
-  sortirVoiture();   // (avec la vitesse des skis : il roule dans la neige)
+  sortirVoiture();   // (avec la vitesse des skis : il roule dans la neige, voir commencerChute)
   Object.assign(v, { vitesse: 0, vy: 0, vol: false, enAir: false, saute: false, decollage: null, suit: { cote: hasard([-1, 1]), t: 0 } });
 }
 // les skis (ou le snowboard, la luge) lâchés par B.J. Tant qu'il roule, ils glissent et culbutent à 1,20 m de lui (v.suit) ; quand il s'arrête,
@@ -8315,7 +8408,7 @@ function poserSkisTombes(v, dt) {
   v.x += (J.x + Math.cos(a) * s.cote * 1.2 - Math.sin(a) * 0.6 - v.x) * k; v.z += (J.z - Math.sin(a) * s.cote * 1.2 - Math.cos(a) * 0.6 - v.z) * k;
   v.y = hauteurSol(v.x, v.z, J.y + 1); s.t += dt;
   v.m.position.set(v.x, v.y + 0.3 + 0.25 * Math.abs(Math.sin(s.t * 7)), v.z); v.m.rotation.set(-s.t * 9, v.angle + s.t * 4, 0.6);
-  if (!J.roule || J.mort || J.voiture) planterSkis(v);   // B.J. s'est arrêté (ou il n'a pas roulé : il est tombé presque sur place)
+  if (!J.roule || Math.hypot(J.roule.vx, J.roule.vz) < 1.5 || J.mort || J.voiture) planterSkis(v);   // B.J. s'est arrêté (ou il n'a pas roulé : il est tombé presque sur place)
 }
 // ils se plantent : la spatule vers le ciel (de 63 à 80°), le talon enfoncé de 25 cm dans la neige, tournés et penchés au hasard.
 // Une luge reste couchée sur le côté. Hors de la neige, rien ne se plante : ils restent posés par terre
@@ -9479,10 +9572,12 @@ function mettreAJour(dt) {
   cable.visible = crochetCable.visible = false;   // le câble du grappin, la toile : ce qui s'en sert le retend à chaque image
   if (joueurH.arme?.userData.crochet) joueurH.arme.userData.crochet.visible = !J.grappin;   // le crochet revient au bout du pistolet à grappin
   if (J.mort) {
-    J.mort += dt; J.roule = null; J.telesiege = null;
+    J.mort += dt; J.telesiege = null;
+    if (!J.roule?.chute || J.roule.fin !== undefined) J.roule = null;
     const k = Math.min(1, J.mort * 1.25);
-    animerHumain(joueurH, 0, dt, poseMort(k, -1));
-    if (!J.voiture && !J.robot && !J.nage) { // à pied : il tombe s'il était en l'air, et se couche sur le dos, tout mou
+    if (J.roule) rouler(dt);   // tué en tombant d'une voiture lancée : il finit de rouler par terre, et y reste couché (voir chuter)
+    else animerHumain(joueurH, 0, dt, poseMort(k, -1));
+    if (!J.roule && !J.voiture && !J.robot && !J.nage) { // à pied : il tombe s'il était en l'air, et se couche sur le dos, tout mou
       const hs = hauteurSol(J.x, J.z, J.y);
       J.vy -= R_.gravite * dt; J.y = Math.max(hs, J.y + J.vy * dt);
       joueurH.g.position.set(J.x, J.y + hauteurCouche(joueurH), J.z);
