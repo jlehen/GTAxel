@@ -2062,6 +2062,24 @@ function routeSous(x, z) {
   }
   return r;
 }
+// à moins de marge mètres du bord d'une chaussée ? (pour ne pas y planter d'arbres, ni y poser de rochers)
+// Les chaussées : les routes de campagne (10 m de large), les rues des villes (14 m) et les pistes d'aéroport (toute leur case)
+function presDeChaussee(x, z, marge) {
+  // les routes de campagne : on regarde dans toutes les cases de rangement autour de (x, z)
+  const m = 5 + marge;
+  for (let cx = Math.floor((x - m) / CELL); cx <= Math.floor((x + m) / CELL); cx++)
+    for (let cz = Math.floor((z - m) / CELL); cz <= Math.floor((z + m) / CELL); cz++)
+      for (const s of grilleRoutes.get(cx * 1000 + cz) || []) {
+        const dx = s.bx - s.ax, dz = s.bz - s.az, t = clamp(((x - s.ax) * dx + (z - s.az) * dz) / (dx * dx + dz * dz || 1), 0, 1);
+        if (Math.hypot(s.ax + dx * t - x, s.az + dz * t - z) < m) return true;
+      }
+  // les rues : les quatre qui partent du carrefour le plus proche. long : de combien on avance dans la rue ; travers : à combien de son milieu
+  const i = Math.round((x - R / 2) / PAS), j = Math.round((z - R / 2) / PAS), u = x - noeud(i, j).x, v = z - noeud(i, j).z;
+  const pres = (long, travers) => Math.hypot(Math.max(0, -R / 2 - long), Math.max(0, Math.abs(travers) - R / 2)) < marge;
+  if ((rueH(i, j) && pres(u, v)) || (rueH(i - 1, j) && pres(-u, v)) || (rueV(i, j) && pres(v, u)) || (rueV(i, j - 1) && pres(-v, u))) return true;
+  // les pistes d'aéroport : un des coins du carré de marge mètres autour de (x, z) est dessus
+  return [-marge, marge].some(a => [-marge, marge].some(b => estPiste(car(...blocEn(x + a, z + b)))));
+}
 // le terrain est creusé ou remblayé sous les routes (pas sous les ponts, qui passent au-dessus)
 for (const pts of ROUTES) for (let q = 1; q < pts.length; q++) {
   const a = pts[q - 1], b = pts[q];
@@ -3717,16 +3735,16 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
     else if (s === '_' && j > 40) { n = 2; sorte = 'palmier'; }   // les plages de Los Santos
     if (chiffre && s === '*') n = chiffre >= 7 ? 3 : 8;
     for (let k = 0; k < n; k++) {
-      const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z), r = routeSous(x, z);
-      if (y < EAU + 0.4 || (r && r.d < 8) || Math.abs(hauteurTerrain(x + 2, z) - y) > 1.6 || presDePiste(x, z, 14)) continue;
+      const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z);
+      if (y < EAU + 0.4 || presDeChaussee(x, z, 3) || Math.abs(hauteurTerrain(x + 2, z) - y) > 1.6 || presDePiste(x, z, 14)) continue;   // ni dans l'eau, ni à moins de 3 m d'une rue ou d'une route
       if (pisteSkiEn(x, z, 6) || presDeRemontee(x, z, 8)) continue;   // ni sur une piste de ski, ni sous le câble d'une remontée
       const neige = neigeEn(x, z) > 0.5;   // dans la neige : des sapins givrés, et plus rien au-dessus de 350 m
       if (neige && y > 350) continue;
       arbre(x, z, 0.8 + rnd() * 0.6, y, neige ? 'sapinNeige' : sorte);
     }
-    if (chiffre >= 3 && rnd() < 0.6) { // un rocher
+    if (chiffre >= 3 && rnd() < 0.6) { // un rocher (il ne dépasse sur aucune chaussée : 2 m de marge en plus de sa taille)
       const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z), t = 1.5 + rnd() * 2.5;
-      if (!routeSous(x, z) && !presDePiste(x, z, 16) && !pisteSkiEn(x, z, 6)) { ajouterGeo('rocher', new THREE.IcosahedronGeometry(t, 0).scale(1, 0.7, 1.2).rotateY(rnd() * 6).translate(x, y + t * 0.3, z)); ajouterCollision(x - t, z - t, x + t, z + t, y + t, y - 1); }
+      if (!presDeChaussee(x, z, t + 2) && !presDePiste(x, z, 16) && !pisteSkiEn(x, z, 6)) { ajouterGeo('rocher', new THREE.IcosahedronGeometry(t, 0).scale(1, 0.7, 1.2).rotateY(rnd() * 6).translate(x, y + t * 0.3, z)); ajouterCollision(x - t, z - t, x + t, z + t, y + t, y - 1); }
     }
   }
 }
