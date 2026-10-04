@@ -408,11 +408,14 @@ const TRADUCTIONS = {
     en: 'Invincible, like Zeus! Lightning sceptre and laser eyes (key 9), and falling from high up crushes everything', gsw: 'Unbsiegbar, wie de Zeus! Blitzzepter und Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
   'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Superman! Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
     en: 'Superman! Laser eyes (key 9), and falling from high up crushes everything', gsw: 'Superman! Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
-  "Batman ! Grappin, batarangs et filets (touche 9), la cape pour planer (Maj en l'air), et la Batmobile qui vole (R)": { de: 'Batman! Greifhaken, Batarangs und Netze (Taste 9), der Umhang zum Gleiten (Shift in der Luft) und das Batmobil, das fliegt (R)',
-    en: 'Batman! Grapple, batarangs and nets (key 9), the cape to glide (Shift in the air), and the Batmobile that flies (R)', gsw: 'Batman! Griifhaagge, Batarangs und Netz (Taschte 9), de Umhang zum Gleite (Shift i de Luft) und s Batmobil, wo flüügt (R)' },
+  "Batman ! Grappin, batarangs et filets (touche 9), la cape pour planer (Maj en l'air), et la Batmobile qui vole (R ; B la rappelle)": { de: 'Batman! Greifhaken, Batarangs und Netze (Taste 9), der Umhang zum Gleiten (Shift in der Luft) und das Batmobil, das fliegt (R; B ruft es zurück)',
+    en: 'Batman! Grapple, batarangs and nets (key 9), the cape to glide (Shift in the air), and the Batmobile that flies (R; B calls it back)', gsw: 'Batman! Griifhaagge, Batarangs und Netz (Taschte 9), de Umhang zum Gleite (Shift i de Luft) und s Batmobil, wo flüügt (R; B rüeft s zrugg)' },
   'Spiderman ! La toile pour se balancer, et les filets (touche 9), grimper aux murs, et tomber de haut ne fait pas mal': { de: 'Spiderman! Das Spinnennetz zum Schwingen und die Netze (Taste 9), an Wänden hochklettern, und ein Sturz aus großer Höhe tut nicht weh',
     en: 'Spiderman! The web to swing and the nets (key 9), climb walls, and falling from high up does not hurt', gsw: 'Spiderman! S Spinnenetz zum Schwinge und d Netz (Taschte 9), a de Wänd ufechlättere, und vo wiit obe abegheie tuet nöd weh' },
   'Invisible ! Personne ne te voit : ni la police, ni les ennemis': { de: 'Unsichtbar! Niemand sieht dich: weder die Polizei noch die Feinde', en: 'Invisible! Nobody can see you: not the police, not the enemies', gsw: 'Unsichtbar! Niemert gseht di: nöd d Polizei und nöd d Feind' },
+  '{voiture} : à côté de toi !': { de: '{voiture}: gleich neben dir!', en: '{voiture}: right next to you!', gsw: '{voiture}: grad näb dir!' },
+  '{voiture} : pas de place ici !': { de: '{voiture}: kein Platz hier!', en: '{voiture}: no room here!', gsw: '{voiture}: kei Platz da!' },
+  "Descends d'abord !": { de: 'Steig zuerst aus!', en: 'Get out first!', gsw: 'Stiig zerscht uus!' },
   'Vise un bâtiment': { de: 'Ziel auf ein Gebäude', en: 'Aim at a building', gsw: 'Ziel uf es Gebäude' },
   'Vise un bâtiment ou une voiture': { de: 'Ziel auf ein Gebäude oder ein Auto', en: 'Aim at a building or a car', gsw: 'Ziel uf es Gebäude oder es Auto' },
   'Z S : monter ou descendre · Q D : de côté · Espace : sauter du mur': { de: 'W S: hoch oder runter · A D: zur Seite · Leertaste: von der Wand springen', en: 'W S: up or down · A D: sideways · Space: jump off the wall', gsw: 'W S: ufe oder abe · A D: uf d Siite · Läärtaschte: vo de Wand gumpe' },
@@ -900,8 +903,8 @@ const VOITURES = [
     son: { grave: 110, aigu: 320, rapports: 1, rauque: 0.4, volume: 0.07 } },
   { nom: 'Hélicoptère', modele: 'helico', vitesse: 40, acceleration: 8, virage: 1, chance: 0, vole: 'helico', montee: 8, couleurs: ['#1a3a8a', '#c81010', '#111', '#f0c020'],
     son: { grave: 14, aigu: 24, rapports: 1, rauque: 1, volume: 0.09, petarade: true } },
-  // la Batmobile : on ne la croise jamais, elle apparaît à côté de toi quand tu tapes le code de triche BATMAN. Longue, basse, toute noire,
-  // avec deux ailerons et un réacteur. Elle est blindée (blinde: true), comme le fourgon : les balles ne lui font rien.
+  // la Batmobile : on ne la croise jamais, elle apparaît à côté de toi quand tu tapes le code de triche BATMAN (et la touche B la rappelle).
+  // Longue, basse, toute noire, avec deux ailerons et un réacteur. Elle est blindée (blinde: true), comme le fourgon : les balles ne lui font rien.
   // vitesseVol : elle vole ! La touche R déploie ses ailes, ses roues basculent à plat (ce sont des réacteurs), et elle s'envole.
   // En l'air, elle va jusqu'à cette vitesse (m/s : 70 = 252 km/h). R encore : elle se pose
   { nom: 'Batmobile', modele: 'batmobile', vitesse: 62, acceleration: 30, virage: 1.25, chance: 0, couleurs: ['#101014'], blinde: true, vitesseVol: 70,
@@ -1311,7 +1314,8 @@ const TENUES_GLISSE = {
 //  grappin, batarang, filet, toile (il a les ARMES qui ont le même mot : le grappin, les batarangs, les filets, la toile
 //  d'araignée ; touche 9 encore. La touche G lance aussi le grappin, ou la toile), cape (en l'air, Maj déploie sa cape :
 //  il plane), grimpe (il grimpe aux murs en avançant dessus), souple (tomber de haut ne lui fait pas mal), voiture (le nom
-//  d'une des VOITURES : elle apparaît à côté de lui quand on tape le code), invisible (personne ne le voit plus).
+//  d'une des VOITURES : elle apparaît à côté de lui quand on tape le code, et la touche B la rappelle : il n'y en a jamais
+//  qu'une à la fois), invisible (personne ne le voit plus).
 //  Le bouton 🎮 du menu les montre tous, avec leur texte : un code que tu ajoutes ici y sera aussi.
 // =====================================================================
 //  Un bras ou une jambe est en deux morceaux (haut et bas) : habillerMembre les colorie ensemble.
@@ -1377,9 +1381,9 @@ const TRICHES = [
     } },
   // Batman : le costume gris, le slip, les gants, les bottes et la cagoule noirs (avec ses deux oreilles pointues), la ceinture jaune,
   // la chauve-souris sur la poitrine et la grande cape noire. Il a le grappin (qu'il prend en main), les batarangs et les filets (touche 9),
-  // la cape pour planer (Maj en l'air), et sa Batmobile, qui vole (touche R), apparaît à côté de lui. Il n'est pas invincible, et tomber de
-  // haut lui fait mal : à lui de planer !
-  { code: 'BATMAN', texte: "Batman ! Grappin, batarangs et filets (touche 9), la cape pour planer (Maj en l'air), et la Batmobile qui vole (R)", batarang: true, filet: true, grappin: true, cape: true, voiture: 'Batmobile', effet: b => {
+  // la cape pour planer (Maj en l'air), et sa Batmobile, qui vole (touche R), apparaît à côté de lui (la touche B la rappelle). Il n'est pas
+  // invincible, et tomber de haut lui fait mal : à lui de planer !
+  { code: 'BATMAN', texte: "Batman ! Grappin, batarangs et filets (touche 9), la cape pour planer (Maj en l'air), et la Batmobile qui vole (R ; B la rappelle)", batarang: true, filet: true, grappin: true, cape: true, voiture: 'Batmobile', effet: b => {
       const gris = '#5c6068', noir = '#131318', jaune = '#f0c41a';
       habiller(b.torse, gris); habiller(b.bassin, noir); habiller(b.ceinture, jaune);
       for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, gris);
@@ -6799,6 +6803,7 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
   if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
+  if (e.code === 'KeyB') rappelerVoiture();   // Batman rappelle sa Batmobile
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
   if (e.code.startsWith('Digit') && !J.robot) choisirArme((+e.code.slice(5) + 9) % 10);
 });
@@ -9175,14 +9180,25 @@ function garerPres(type) {
     return creerVoiture(x, z, a + Math.PI / 2, false, type);
   }
 }
-// un code de triche qui a « voiture: 'Batmobile' » : elle apparaît à côté de B.J. quand on tape le code. Il n'y en a qu'une à la fois :
-// celle d'avant s'en va (sauf s'il est dedans). Elle est à lui : monter dedans n'est pas un vol
+// un code de triche qui a « voiture: 'Batmobile' » : elle apparaît à côté de B.J. quand on tape le code, ou quand on appuie sur B (voir
+// rappelerVoiture). Il n'y en a qu'une à la fois : dès que la nouvelle est là, celle d'avant s'en va. Elle est à lui : monter dedans n'est
+// pas un vol. Renvoie la voiture, ou rien s'il n'y a pas de place (celle d'avant reste alors où elle est)
 function amenerVoiture(nom) {
   const type = typeNomme(nom);
   if (!type || J.voiture || J.robot) return;
-  for (const o of voitures) if (o.triche === nom) o.supprimer = true;
   const v = garerPres(type);
-  if (v) { v.triche = nom; v.volee = true; bip(300, 900, 0.3, 'sawtooth', 0.08); }
+  if (!v) return;
+  for (const o of voitures) if (o.triche === nom && o !== v) o.supprimer = true;
+  v.triche = nom; v.volee = true; bip(300, 900, 0.3, 'sawtooth', 0.08);
+  return v;
+}
+// la touche B : Batman rappelle sa Batmobile (la « voiture » du code de triche actif), où qu'elle soit, même en morceaux. Seulement à pied
+function rappelerVoiture() {
+  const nom = TRICHES.find(t => t.actif && t.voiture)?.voiture, type = typeNomme(nom);
+  if (!type || J.mort || J.telesiege || J.voiture?.triche === nom) return;   // (il est déjà dedans)
+  if (J.voiture || J.robot) { annonce('', tr("Descends d'abord !"), 1.5); return; }
+  if (amenerVoiture(nom)) annonce('', tr('{voiture} : à côté de toi !', { voiture: tr(nom) }), 1.5);
+  else { annonce('', tr('{voiture} : pas de place ici !', { voiture: tr(nom) }), 1.5); bip(300, 200, 0.1, 'square', 0.1); }
 }
 
 // =====================================================================
@@ -9600,7 +9616,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   soleil, soleilDir, ciel, dessinerGrandeCarte, hauteurSol, hauteurTerrain, routeSous, NOEUDS, ROUTES, ascenseurs, lieuProche, morceaux, EAU, CARTE, baseCase, voit, butee, impactsMurs, toucheSol, sorteDeSol, centre, noeud, bateauxDepart, majMorceaux, profondeur, batiments,
   CASCADES, PISTES, RAILS, pisteSous, abimer, habillerVoiture, debris, heurter, crever, exploserVoiture, bornesSous, lampadairesTombes, coqueAccident,
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
-  dansBatiment, pourBoites, resoudre, majJoueur, accrocher, attraper, tenirPrise, prendre, liberer, lancer, lances, filets, feux, arriver, murDevant, cable, garerPres, amenerVoiture, pouvoir, creerArme, raycaster,
+  dansBatiment, pourBoites, resoudre, majJoueur, accrocher, attraper, tenirPrise, prendre, liberer, lancer, lances, filets, feux, arriver, murDevant, cable, garerPres, amenerVoiture, rappelerVoiture, pouvoir, creerArme, raycaster,
   crochetCable, ouvrirFilet, oterFilet, deployerAiles, rendreInvisible, invisible, policeVoit,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
