@@ -15,6 +15,8 @@
   #barre-vie > div { height: 100%; width: 100%; background: #56b24c; transition: width .15s; }
   #barre-gilet { position: absolute; left: 30px; bottom: 12px; width: 214px; height: 6px; background: rgba(0,0,0,.55); display: none; }
   #barre-gilet > div { height: 100%; background: #4a9ae0; transition: width .15s; }
+  #barre-armure { position: absolute; left: 30px; bottom: 38px; width: 214px; height: 8px; background: rgba(0,0,0,.55); display: none; }
+  #barre-armure > div { height: 100%; background: #d8a030; transition: width .15s; }
   #haut-droite { position: absolute; right: 28px; top: 18px; text-align: right; }
   #argent { font: 38px 'Anton', Impact, sans-serif; color: #7fcf6f; }
   #etoiles { font-size: 32px; letter-spacing: 3px; }
@@ -89,6 +91,7 @@
   <canvas id="minicarte" width="220" height="220"></canvas>
   <div id="barre-vie"><div></div></div>
   <div id="barre-gilet"><div></div></div>
+  <div id="barre-armure"><div></div></div>
   <div id="haut-droite">
     <div id="argent">0 $</div>
     <div id="etoiles"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
@@ -386,6 +389,45 @@ const TRADUCTIONS = {
     en: 'Get past the lasers without touching them, drill the vault, blow up the gate and grab the jackpot (E key)', gsw: 'Chum a de Laser verbii ohni s z berüere, bohr de Tresor uf, spräng s Gitter und schnapp der s Gäld (Taschte E)' },
   'Sème la police, puis rapporte le pactole à la planque : entre dans la caravane de Trevor': { de: 'Häng die Polizei ab und bring die Kohle ins Versteck: Geh in Trevors Wohnwagen hinein',
     en: "Lose the cops, then bring the jackpot to the hideout: walk into Trevor's trailer", gsw: 'Häng d Polizei ab und bring s Gäld is Versteck: gang i em Trevor sin Wohnwage ine' },
+  // le camp militaire, l'armure et le bunker secret
+  'Le camp militaire': { de: 'Das Militärlager', en: 'The military camp', gsw: 'S Militärlager' },
+  'Va au camp militaire, au nord-ouest du mont Gordo (★ sur la carte)': { de: 'Geh zum Militärlager, nordwestlich vom Mount Gordo (★ auf der Karte)',
+    en: 'Go to the military camp, north-west of Mount Gordo (★ on the map)', gsw: 'Gang zum Militärlager, nordweschtlich vom Mount Gordo (★ uf de Charte)' },
+  "Monte dans la grosse armure, devant la porte (touche E), et élimine tous les militaires du camp : il en reste {n}": { de: 'Steig in die große Rüstung vor dem Tor (Taste E) und erledige alle Soldaten im Lager: noch {n}',
+    en: 'Climb into the big armor outside the gate (E key) and take out every soldier in the camp: {n} left', gsw: 'Stiig i di gross Rüschtig vor em Tor ii (Taschte E) und erledig alli Soldate im Lager: no {n}' },
+  'Appuie sur le bouton rouge, dans le bureau de la commandante Irene Engel (touche E)': { de: 'Drück den roten Knopf im Büro der Kommandantin Irene Engel (Taste E)',
+    en: "Press the red button in Commander Irene Engel's office (E key)", gsw: 'Drück de roti Chnopf im Büro vo de Kommandantin Irene Engel (Taschte E)' },
+  'Le bunker secret est ouvert, un peu plus haut dans la montagne (? sur la carte) : monte dans la DeLorean': { de: 'Der Geheimbunker ist offen, ein Stück weiter oben am Berg (? auf der Karte): Steig in den DeLorean',
+    en: 'The secret bunker is open, a little higher up the mountain (? on the map): get into the DeLorean', gsw: 'De Gheimbunker isch offe, es Stuck wiiter obe am Berg (? uf de Charte): stiig in DeLorean ii' },
+  'ARMURE !':         { de: 'RÜSTUNG!', en: 'ARMOR!', gsw: 'RÜSCHTIG!' },
+  'Clic gauche : mitrailleuse · clic droit : lance-flammes · F : fusées · E : sortir': { de: 'Linksklick: Maschinengewehr · Rechtsklick: Flammenwerfer · F: Raketen · E: aussteigen',
+    en: 'Left click: machine gun · right click: flamethrowers · F: rockets · E: get out', gsw: 'Linksklick: Maschinegwehr · Rächtsklick: Flammewerfer · F: Rakete · E: uusstiige' },
+  'Clic gauche : mitrailleuse · clic droit : lance-flammes · <b>F</b> : fusées · <b>E</b> : sortir': { de: 'Linksklick: Maschinengewehr · Rechtsklick: Flammenwerfer · <b>F</b>: Raketen · <b>E</b>: aussteigen',
+    en: 'Left click: machine gun · right click: flamethrowers · <b>F</b>: rockets · <b>E</b>: get out', gsw: 'Linksklick: Maschinegwehr · Rächtsklick: Flammewerfer · <b>F</b>: Rakete · <b>E</b>: uusstiige' },
+  'ARMURE DÉTRUITE !': { de: 'RÜSTUNG ZERSTÖRT!', en: 'ARMOR DESTROYED!', gsw: 'RÜSCHTIG KAPUTT!' },
+  "Continue à pied : une armure neuve t'attendra devant le camp quand tu te seras éloigné": { de: 'Weiter zu Fuß: Eine neue Rüstung wartet vor dem Lager, sobald du dich entfernt hast',
+    en: 'Carry on on foot: a new armor will be waiting outside the camp once you have moved away', gsw: 'Wiiter z Fuess: e neui Rüschtig wartet vor em Lager, sobald d wiit gnueg ewägg bisch' },
+  'Fusées : encore {n} s': { de: 'Raketen: noch {n} s', en: 'Rockets: {n} s to go', gsw: 'Rakete: no {n} s' },
+  'Fusées : aucun ennemi en vue': { de: 'Raketen: kein Feind in Sicht', en: 'Rockets: no enemy in sight', gsw: 'Rakete: kei Find i Sicht' },
+  'BOUTON VERROUILLÉ': { de: 'KNOPF GESPERRT', en: 'BUTTON LOCKED', gsw: 'CHNOPF GSPEERT' },
+  "Élimine d'abord tous les militaires du camp : il en reste {n}": { de: 'Erledige zuerst alle Soldaten im Lager: noch {n}', en: 'Take out every soldier in the camp first: {n} left', gsw: 'Erledig zerscht alli Soldate im Lager: no {n}' },
+  'BUNKER OUVERT !':  { de: 'BUNKER OFFEN!', en: 'BUNKER OPEN!', gsw: 'BUNKER OFFE!' },
+  'Sa porte blindée descend, un peu plus haut dans la montagne (? sur la carte)': { de: 'Sein Panzertor senkt sich, ein Stück weiter oben am Berg (? auf der Karte)',
+    en: 'Its armored door is sinking, a little higher up the mountain (? on the map)', gsw: 'Sis Panzertor gaat abe, es Stuck wiiter obe am Berg (? uf de Charte)' },
+  'CAMP VIDÉ !':      { de: 'LAGER GERÄUMT!', en: 'CAMP CLEARED!', gsw: 'LAGER GRUUMT!' },
+  'Appuie sur le bouton rouge, dans le bureau de la commandante': { de: 'Drück den roten Knopf im Büro der Kommandantin', en: "Press the red button in the commander's office", gsw: 'Drück de roti Chnopf im Büro vo de Kommandantin' },
+  'Militaires : il en reste {n}': { de: 'Soldaten: noch {n}', en: 'Soldiers: {n} left', gsw: 'Soldate: no {n}' },
+  'Armure':           { de: 'Rüstung', en: 'Armor', gsw: 'Rüschtig' },
+  '{n} points':       { de: '{n} Punkte', en: '{n} points', gsw: '{n} Pünkt' },
+  '{n} fusées':       { de: '{n} Raketen', en: '{n} rockets', gsw: '{n} Rakete' },
+  'Appuie sur <b>E</b> pour appuyer sur le bouton rouge': { de: 'Drücke <b>E</b>, um den roten Knopf zu drücken', en: 'Press <b>E</b> to push the red button', gsw: 'Drück <b>E</b>, zum de roti Chnopf drücke' },
+  "Appuie sur <b>E</b> pour monter dans l'armure": { de: 'Drücke <b>E</b>, um in die Rüstung zu steigen', en: 'Press <b>E</b> to climb into the armor', gsw: 'Drück <b>E</b>, zum i d Rüschtig iistiige' },
+  'Militaire':        { de: 'Soldat', en: 'Soldier', gsw: 'Soldat' },
+  'Grosse mitrailleuse': { de: 'Großes Maschinengewehr', en: 'Big machine gun', gsw: 'Grosses Maschinegwehr' },
+  'Double lance-flammes': { de: 'Doppelter Flammenwerfer', en: 'Twin flamethrowers', gsw: 'Doppelte Flammewerfer' },
+  'Fusées téléguidées': { de: 'Lenkraketen', en: 'Homing rockets', gsw: 'Länkrakete' },
+  'Camp militaire':   { de: 'Militärlager', en: 'Military camp', gsw: 'Militärlager' },
+  'Bunker secret':    { de: 'Geheimbunker', en: 'Secret bunker', gsw: 'Gheimbunker' },
   'Pays libre':       { de: 'Freies Land', en: 'Free country', gsw: 'Freis Land' },
   'Pays libre : fais ce que tu veux !': { de: 'Freies Land: mach, was du willst!', en: 'Free country: do whatever you want!', gsw: 'Freis Land: mach, was d wotsch!' },
   'MISSION RÉUSSIE':  { de: 'MISSION ERFÜLLT', en: 'MISSION PASSED', gsw: 'MISSION GSCHAFFT' },
@@ -862,8 +904,9 @@ const VOITURES = [
     son: { grave: 70, aigu: 420, rapports: 6, rauque: 0.95, volume: 0.06 } },
   { nom: 'Segway', modele: 'segway', vitesse: 6, acceleration: 5, virage: 2.2, chance: 1, couleurs: ['#111', '#e8e8e8'],
     son: { grave: 180, aigu: 520, rapports: 1, rauque: 0, volume: 0.02 } },
-  // la DeLorean : à 88 miles à l'heure (142 km/h), il se passe quelque chose...
-  { nom: 'DeLorean', modele: 'delorean', vitesse: 42, acceleration: 13, virage: 1, chance: 1, couleurs: ['#b4b8bc'],
+  // la DeLorean : à 88 miles à l'heure (142 km/h), il se passe quelque chose... On ne la croise plus (chance: 0) : il n'y en a qu'une dans
+  // tout le pays, cachée dans le bunker secret (? sur la carte)
+  { nom: 'DeLorean', modele: 'delorean', vitesse: 42, acceleration: 13, virage: 1, chance: 0, couleurs: ['#b4b8bc'],
     son: { grave: 55, aigu: 210, rapports: 5, rauque: 0.4, volume: 0.05 } },
   { nom: 'Coccinelle', modele: 'coccinelle', vitesse: 30, acceleration: 9, virage: 1.1, chance: 2, couleurs: ['#e8c020', '#3a8ad8', '#d83020', '#6ab04a', '#f0e8d0'],
     son: { grave: 45, aigu: 180, rapports: 4, rauque: 0.6, volume: 0.05, petarade: true } },
@@ -921,7 +964,7 @@ const VOITURES = [
 //  precision : sa chance de te toucher quand tu es près (1 = il ne rate jamais) ; elle baisse quand tu es loin
 //  vue : jusqu'où il te voit, en mètres     tir : les secondes entre deux tirs (au hasard entre les deux nombres)
 //  vitesse : en m/s, quand il te court après
-//  À la mitraillette ou au fusil d'assaut, les vigiles, les policiers d'élite et les gangs tirent en rafales de 3 à 5 balles.
+//  À la mitraillette ou au fusil d'assaut, les vigiles, les policiers d'élite, les gangs et les militaires tirent en rafales de 3 à 5 balles.
 // =====================================================================
 const ENNEMIS = {
   pieton: { nom: 'Piéton',           vie: 50 },
@@ -936,6 +979,41 @@ const ENNEMIS = {
   // le heavy robot de la police : il faut casser sa vitre blindée pour atteindre le pilote. degats : une balle de sa mitrailleuse.
   // Sa vitesse compte aussi quand c'est toi qui le pilotes
   robot:  { nom: 'Heavy robot', vitre: 350, degats: 10, degatsRoquette: 40, precision: 0.5, vitesse: 4 },
+  // le camp militaire (% sur la carte) : ses militaires, à la mitraillette (arme 3), et leur commandante, dans son bureau.
+  // Combien ils sont, et combien à la fois : voir CAMP, juste en dessous
+  militaire: { nom: 'Militaire',     vie: 75,  arme: 3, degats: 10, precision: 0.27, vue: 45, tir: [1.2, 2],   vitesse: 4.5 },
+  engel:     { nom: 'Irene Engel',   vie: 300, arme: 2, degats: 12, precision: 0.4,  vue: 14, tir: [0.7, 1.4], vitesse: 4.5 },   // (vue : elle ne voit pas plus loin que son bureau)
+};
+
+// =====================================================================
+//  LE CAMP MILITAIRE (% sur la carte) : la commandante Irene Engel et ses militaires gardent le bouton rouge qui ouvre le bunker secret (?).
+//  Les militaires sortent des baraques au fur et à mesure qu'on en élimine. Leur vie, leurs dégâts et leur précision : « militaire », dans ENNEMIS.
+//  Si tu meurs, ceux que tu as éliminés le restent : tu reviens finir le travail.
+// =====================================================================
+const CAMP = {
+  militaires: 150,       // combien il faut en éliminer pour vider le camp
+  ensemble: [8, 15],     // ils ne sont jamais plus que ça à la fois : 8 au début, 15 quand il n'en reste presque plus
+  renfort: 0.6,          // secondes entre deux militaires qui sortent des baraques
+  tireurs: 2,            // chacun son tour : à pied, seuls les 2 militaires les plus proches qui te voient peuvent te toucher (les autres tirent à côté)...
+  tireursArmure: 6,      // ...mais l'armure est bien plus grosse : les 6 plus proches peuvent la toucher
+};
+
+// =====================================================================
+//  L'ARMURE : une grosse armure en ferraille, comme la toute première d'Iron Man. Elle attend devant le camp militaire : monte dedans (E) !
+//  points : tout ce qu'elle encaisse à ta place. À 0, elle casse : tu continues à pied, et une neuve revient devant le camp quand tu t'éloignes.
+//  vitesse, course : en m/s (course : avec Maj)
+//  Ses armes ne manquent jamais de munitions :
+//    mitrailleuse (clic gauche) : comme une arme du tableau ARMES
+//    flammes (clic droit) : les deux lance-flammes. degats : par seconde, à tous ceux qui sont dans les flammes · portee : en mètres
+//      · angle : la largeur du jet, en degrés de chaque côté
+//    fusees (touche F) : « nombre » petites fusées partent d'un coup et se dirigent toutes seules vers les ennemis présents, à « portee » mètres
+//      au plus. Il faut ensuite « recharge » secondes pour en ravoir. explosion : son rayon, en mètres · vitesse : en m/s
+// =====================================================================
+const ARMURE = {
+  points: 1000, vitesse: 4.5, course: 7,
+  mitrailleuse: { nom: 'Grosse mitrailleuse', modele: 'lourde', degats: 30, cadence: 0.08, portee: 120, auto: true, dispersion: 0.02 },
+  flammes:      { nom: 'Double lance-flammes', degats: 180, portee: 13, angle: 16 },
+  fusees:       { nom: 'Fusées téléguidées', nombre: 10, recharge: 5, degats: 150, explosion: 3, vitesse: 32, portee: 90 },
 };
 
 // =====================================================================
@@ -953,6 +1031,8 @@ const ENNEMIS = {
 //    L maison de Franklin*              O villa de Michael*                   R caravane de Trevor
 //    J bar Yellow Jack                  F ferme*          D docks du port   N hangar d'avions
 //    B bunker nazi    W château Wolfenstein* (repaire d'Hitler)
+//    % camp militaire de la commandante Irene Engel : une grosse armure attend devant la porte (voir CAMP et ARMURE, après les ennemis)
+//    ? bunker secret, dans la montagne : sa porte ne s'ouvre qu'avec le bouton rouge du camp. Dedans, la seule DeLorean du pays
 //    Y station de ski : un télésiège monte de là jusqu'en haut du sommet le plus proche (tableau SOMMETS, juste après la carte),
 //      avec des skis, des snowboards, des luges et des skis de rando en bas et en haut. Les autres remontées et les pistes : REMONTEES et PISTES_SKI,
 //      après la carte. Le bus « SKI SHUTTLE » qui y emmène : NAVETTE, après les pistes
@@ -980,9 +1060,9 @@ const CARTE = [
   "~~~~~~~~~~~~~~~~~~_MIHAME=======,,,,___~~~_,,,*,,,,,,,,,,,,,,,****_~~~~~~~",  // 7
   "~~~~~~~~~~~~~~~~~~2MMIGM55431,,,===,,,,,~_,,,,,,,,,,,,,,,,,,,,,****_~~~~~~",  // 8
   "~~~~~~~~~~~~~~~~~1=44356776531,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,***_~~~~~",  // 9
-  "~~~~~~~~~~~~~~~~~=344567887652,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 10
-  "~~~~~~~~~~~~~~~~*=233678998763,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 11
-  "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 12
+  "~~~~~~~~~~~~~~~~~=344567887652,,,,,,=======%,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 10
+  "~~~~~~~~~~~~~~~~*=233678998763,,,,,,=,,,,,,,==,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 11
+  "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=,,,,,,,,?,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 12
   "~~~~~~~~~~~~~~3=2***3678998W=3,,,,,,,2=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 13
   "~~~~~~~~~~~~~3=432**256788765=,,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 14
   "~~~~~~~~~~~~3=5543**1356776531====;;;;==,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 15
@@ -1126,9 +1206,11 @@ const GANGS = [
 // =====================================================================
 //  LES MISSIONS : invente les tiennes !
 //  lieu : une lettre de la CARTE. S'il y en a plusieurs (un garage 'G'...), c'est la plus proche qui compte.
-//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss' ou 'hitler')
+//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss', 'hitler', 'militaire' ou 'engel')
 //  etoiles (nombre) · semer · arme (le nom d'une arme à posséder)
 //  blindage (avoir une voiture blindée par le garagiste) · voler (lieu : tout le butin de ce pâté est dans le sac)
+//  bouton (le bouton rouge du camp militaire est enfoncé) · conduire (voiture : être au volant d'une voiture de ce nom)
+//  Dans le texte d'une étape « eliminer », {n} est remplacé par le nombre d'ennemis qu'il reste.
 //  Pour « voiture », on peut exiger : rapide: true (une voiture rapide), blindee: true, sansPolice: true (0 étoile)
 //  Pour « aller », on peut exiger sansPolice: true. Le lieu 'R' est dans la caravane de Trevor : il faut y entrer, à pied.
 //  Pour tester : le code de triche MISSION8 (Entrée, MISSION8, Entrée) saute à la mission 8.
@@ -1174,6 +1256,13 @@ const MISSIONS = [
     { type: 'voiture', lieu: 'Q', blindee: true, texte: 'Gare ta voiture blindée devant la banque Pacific Standard (Q sur la carte)' },
     { type: 'voler', lieu: 'Q', texte: 'Passe les lasers sans les toucher, perce le coffre-fort, fais sauter la grille et prends le pactole (touche E)' },
     { type: 'aller', lieu: 'R', sansPolice: true, texte: 'Sème la police, puis rapporte le pactole à la planque : entre dans la caravane de Trevor' },
+  ]},
+  // le camp militaire : 150 militaires, par vagues. Sans la grosse armure qui attend devant la porte, c'est presque impossible !
+  { nom: 'Le camp militaire', recompense: 300000, etapes: [
+    { type: 'aller', lieu: '%', texte: 'Va au camp militaire, au nord-ouest du mont Gordo (★ sur la carte)' },
+    { type: 'eliminer', cible: 'militaire', texte: 'Monte dans la grosse armure, devant la porte (touche E), et élimine tous les militaires du camp : il en reste {n}' },
+    { type: 'bouton', lieu: '%', texte: 'Appuie sur le bouton rouge, dans le bureau de la commandante Irene Engel (touche E)' },
+    { type: 'conduire', voiture: 'DeLorean', texte: 'Le bunker secret est ouvert, un peu plus haut dans la montagne (? sur la carte) : monte dans la DeLorean' },
   ]},
 ];
 
@@ -1541,7 +1630,7 @@ for (const t of TRICHES) {
 //  Le navigateur se souvient de ce qu'on y change : "ARMES.3.degats": [22, 40] = la mitraillette, le nombre du code puis celui du menu.
 //  Si tu changes ce nombre dans le code, le menu l'oublie : c'est le code qui gagne.
 // =====================================================================
-const TABLEAUX = { REGLAGES, ARMES, ARMES_ROBOT, VOITURES, ENNEMIS };
+const TABLEAUX = { REGLAGES, ARMES, ARMES_ROBOT, VOITURES, ENNEMIS, CAMP, ARMURE };
 const DU_CODE = structuredClone(TABLEAUX);   // les nombres du code, avant ceux du menu
 const pareil = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 let changes = {};
@@ -1639,7 +1728,7 @@ const centre = (i, j) => ({ x: i * PAS + R + S / 2, z: j * PAS + R + S / 2 });
 const noeud = (i, j) => ({ x: i * PAS + R / 2, z: j * PAS + R / 2 });        // carrefour
 const blocEn = (x, z) => [clamp(Math.floor((x - R / 2) / PAS), 0, NBX - 1), clamp(Math.floor((z - R / 2) / PAS), 0, NBZ - 1)];
 const car = (i, j) => (i >= 0 && j >= 0 && i < NBX && j < NBZ) ? CARTE[j][i] : '~';
-const estBloc = c => /[A-Za-z.]/.test(c);          // un pâté, avec des rues autour
+const estBloc = c => /[A-Za-z.%?]/.test(c);        // un pâté, avec des rues autour
 const estPiste = c => '!^@'.includes(c);          // une piste d'aéroport (avec un avion ou un hélicoptère, ou rien)
 const estPlat = c => estBloc(c) || estPiste(c);    // le terrain y est aplani
 const estRoute = c => c === '=' || c === '#';
@@ -2831,6 +2920,7 @@ const CONTENEURS = ['conteneur1', 'conteneur2', 'conteneur3', 'conteneur4'];
 const stands = [], soins = [], pnjDepart = [], voituresGarees = [], pickupsDepart = [], ascenseurs = [], bateauxDepart = [], hopitaux = [];
 const garagistes = [], braquages = [], butinsDepart = [];
 let chateau = null, bunker = null;
+let camp = null, bunkerSecret = null;   // le camp militaire (%) et le bunker secret (?) : voir « Le camp militaire », plus bas
 function genererBloc(i, j) {
   const c = CARTE[j][i], o = origine(i, j), rnd = graine(i * 7919 + j * 104729);
   const X = v => o.x + v, Z = v => o.z + v;
@@ -3070,6 +3160,61 @@ function genererBloc(i, j) {
     for (const [a, b] of [[12, 14], [12, 30], [12, 46], [24, 44], [40, 44], [50, 14], [50, 30], [50, 46]]) pnjDepart.push({ type: 'soldat', x: X(a), z: Z(b) });
     soins.push({ x: X(9), z: Z(51) }, { x: X(51), z: Z(51) });
     pickupsDepart.push({ type: 'arme', arme: 3, x: X(30), z: Z(50) }, { type: 'gilet', x: X(36), z: Z(50), reapparait: true });
+  } else if (c === '%') { // le camp militaire de la commandante Irene Engel : une enceinte, deux baraques, son bureau au fond. Devant la porte, l'armure
+    sol('beton2', X(33), 0.21, Z(30), 45, 51);
+    const mur = (a, b, l, p, h = 4) => boite('bunker', X(a), 0.2, Z(b), l, h, p, true);
+    mur(32.75, 4.5, 46.5, 1); mur(32.75, 55.5, 46.5, 1); mur(55.5, 30, 1, 50);        // les murs d'enceinte : nord, sud, est
+    mur(10, 15.5, 1, 21); mur(10, 44.5, 1, 21);                                       // le mur ouest, avec la porte (8 m) au milieu
+    for (const z of [25.4, 34.6]) mur(10, z, 1.8, 1.8, 5.4);                           // les piliers de la porte
+    const banniere = (a, z, l, h) => geoBloc('banniere', new THREE.PlaneGeometry(l, h).rotateY(-Math.PI / 2).translate(X(a), 0.2 + h / 2 + 0.5, Z(z)));   // tournée vers l'ouest
+    banniere(9.44, 20, 2.4, 3.2); banniere(9.44, 40, 2.4, 3.2);
+    // les deux baraques d'où sortent les militaires (une au nord, une au sud), avec deux portes chacune. sorties : devant chaque porte
+    const sorties = [];
+    for (const [z, cote] of [[10, 1], [50, -1]]) {
+      boite('tole', X(31), 0.2, Z(z), 26, 3.2, 8, true); toitPente('ardoise', X(31), 3.4, Z(z), 26, 8, 0.4);
+      for (const a of [24, 38]) { boite('porte', X(a), 0.2, Z(z + cote * 4.06), 1.6, 2.3, 0.12); sorties.push({ x: X(a), z: Z(z + cote * 5.6) }); }
+    }
+    for (const z of [10, 50]) { // deux miradors
+      for (const [da, dz] of [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]]) boite('bois', X(50 + da), 0.2, Z(z + dz), 0.35, 8, 0.35, true);
+      boite('planches', X(50), 5.4, Z(z), 4, 0.25, 4); boite('tole', X(50), 8.2, Z(z), 4.8, 0.2, 4.8);
+    }
+    for (const [a, z, l, p] of [[16, 22, 1, 5], [16, 38, 1, 5], [37, 25.5, 1, 3], [37, 34.5, 1, 3]]) boite('sacs', X(a), 0.2, Z(z), l, 1.1, p, true);   // des sacs de sable
+    for (const [a, z] of [[13, 52], [14.5, 52], [13, 8], [46, 43], [46, 17]]) boite('boisClair', X(a), 0.2, Z(z), 1.3, 1.3, 1.3, true);                // des caisses
+    // le bureau de la commandante, au fond : on y entre par l'ouest. Elle garde le bouton rouge qui ouvre le bunker secret
+    const b = batiment({ x: X(47), z: Z(30), l: 18, p: 13, mat: 'bunker', porte: 'o', hEtage: 4, largeurPorte: 3, hauteurPorte: 3.2, sol: 'parquet' });
+    banniere(40.44, 25, 1.8, 3); banniere(40.44, 35, 1.8, 3);
+    // une cloison coupe la pièce en deux : l'entrée, puis le bureau, où l'on passe par le sud. De la cour, par la porte, on ne voit pas la commandante
+    b.meuble('platre', -2.85, 0, 2, 11.7, 4, 0.25);
+    b.meuble('bois', 0, 0, -2.6, 3.4, 0.8, 1.5); b.meuble('ecran', -1, 0, -2.6, 0.7, 0.45, 0.08, 0.8);   // son bureau, avec un écran
+    b.meuble('cuir', 0, 0, -4.3, 0.9, 1.1, 0.9);                                       // son fauteuil
+    b.meuble('banniere', 0, 0, -b.iw + 0.03, 2.4, 3.2, 0.04, 0.6);                      // la grande bannière, derrière elle
+    b.meuble('boisClair', -6.6, 0, -1, 2.2, 0.8, 1.4);                                 // la table des cartes
+    b.meuble('metal', 8.2, 0, -3, 0.6, 2, 3); b.meuble('boisClair', -7.6, 0, 4.5, 1.2, 1.2, 1.2);   // des armoires en fer, une caisse
+    b.meuble('metal', -5.5, 0, -5.3, 1.4, 1.05, 0.9);                                  // le pupitre du bouton rouge
+    const engel = { type: 'engel', ...b.point(1.6, 0, -4.4), zone: [X(48.6), Z(21.7), X(52.8), Z(32.5)] };   // (elle reste au fond, loin de la cloison : une fusée qui explose dans l'entrée ne l'atteint pas)
+    pnjDepart.push(engel);
+    soins.push({ x: X(14), z: Z(8.5) }, { x: X(16), z: Z(51.5) });
+    pickupsDepart.push({ type: 'gilet', x: X(34), z: Z(30), reapparait: true });
+    voituresGarees.push({ x: X(14.5), z: Z(43), a: 0, type: '4x4 du désert' });
+    // le lieu des missions : devant la porte, là où attend l'armure
+    const poste = { x: X(4.5), z: Z(30) };
+    Object.assign(lieux[c].find(q => q.x === X(30) && q.z === Z(30)), poste);
+    camp = { x: X(30), z: Z(30), y: Y0 + 0.2, sorties, engel, poste: { ...poste, angle: -Math.PI / 2 }, bouton: { ...b.point(-5.5, 0, -5.3), h: 1.05 }, tues: 0, t: 0, ouvert: false,
+      // là où se tiennent les militaires tant qu'on les laisse tranquilles
+      postes: [[14, 26], [14, 34], [22, 20], [22, 40], [30, 30], [36, 22], [36, 38], [28, 24], [28, 36], [20, 30], [34, 30], [18, 26], [18, 34], [26, 19], [26, 41]].map(([a, z]) => ({ x: X(a), z: Z(z) })) };
+  } else if (c === '?') { // le bunker secret, creusé dans la montagne. Sa porte blindée ne s'ouvre qu'avec le bouton rouge du camp militaire. Dedans : la DeLorean
+    sol('beton2', X(30), 0.21, Z(30), 54, 54);
+    const b = batiment({ x: X(38), z: Z(32), l: 24, p: 26, mat: 'bunker', porte: 'o', hEtage: 5, largeurPorte: 9, hauteurPorte: 4, sol: 'beton2', mur: 'bunker' });
+    b.meuble('ecran', 0, 0, -b.iw + 0.08, 7, 2.4, 0.1, 1.4);                            // un grand écran, au fond
+    b.meuble('metal', 0, 0, -b.iw + 1, 5, 1, 1);                                       // et son pupitre
+    for (const [u, w] of [[-9.5, -10], [-8.2, -10], [-9.5, -8.6], [9.5, -10], [9.5, -8.6]]) b.meuble('boisClair', u, 0, w, 1.2, 1.2, 1.2);   // des caisses
+    for (const u of [-10, 10]) b.meuble('jaune', u, 0, 2, 0.8, 1.6, 0.8);              // deux gros accumulateurs dorés
+    for (const [a, z, l, p] of [[18, 22, 1, 6], [18, 42, 1, 6]]) boite('sacs', X(a), 0.2, Z(z), l, 1.1, p, true);
+    voituresGarees.push({ ...b.point(0, 0, -3), a: -Math.PI / 2, type: 'DeLorean' });   // la seule DeLorean du pays, le nez vers la porte
+    // la porte blindée (9 × 4 m) : fermée, un bouchon de collision. Elle descend dans le sol quand on appuie sur le bouton
+    const y = Y0 + 0.25;
+    bunkerSecret = { x: X(30), z: Z(30), y, porte: { x: X(25.15), z: Z(32), y, l: 9, h: 4 }, bouchon: ajouterCollision(X(24.9), Z(27.5), X(25.4), Z(36.5), y + 4.1, Y0),
+      garage: { ...b.point(0, 0, -3), a: -Math.PI / 2 }, ouverture: 0 };
   } else if (c === 'U') { // le musée d'art : des œuvres gardées par des vigiles armés et des chiens
     const B = braquage(4, { x: X(30), z: Z(52) });
     const b = batiment({ x: X(30), z: Z(22), l: 40, p: 28, mat: 'musee', hEtage: 6, plein: 1, largeurPorte: 4, hauteurPorte: 3.6, sol: 'marbre' });
@@ -4009,7 +4154,7 @@ function creerHumain(s) {
   const torse = piece(GEO.torse, s.haut, haut, 0, 0.38, 0);
   const cou = piece(GEO.cou, s.peau, haut, 0, 0.72, 0);
   const tete = piece(GEO.tete, s.peau, haut, 0, 0.87, 0);
-  tete.material = visage(s.peau);
+  tete.material = visage(s.peau, s.fille);   // (fille : le visage d'une femme, comme celui de Jess)
   piece(GEO.nez, s.peau, tete, 0, -0.018, 0.122);
   for (const c of [-1, 1]) piece(GEO.oreille, s.peau, tete, 0.112 * c, 0, -0.01);
   let cheveux = null;
@@ -5680,6 +5825,9 @@ const TENUES = {
   soldat: () => ({ peau: hasard(PEAUX.slice(0, 2)), haut: '#5d6352', bas: '#4a4f42', chaussures: '#111', casque: '#4a5040', brassard: '#b01010' }),
   boss: () => ({ peau: '#e0b090', haut: '#222', bas: '#111', chaussures: '#000', casquette: '#111', brassard: '#b01010' }),
   hitler: () => ({ peau: '#e8c0a0', haut: '#8a7a55', bas: '#1a1a1a', chaussures: '#000', cheveux: '#111', moustache: '#111', brassard: '#b01010' }),
+  // le camp militaire : ses militaires en treillis vert sombre et casque noir, et la commandante Irene Engel, cheveux gris et uniforme noir
+  militaire: () => ({ peau: hasard(PEAUX), haut: '#3c4a30', bas: '#2f3a28', chaussures: '#111', casque: '#1e2420' }),
+  engel: () => ({ peau: '#ecc8b0', haut: '#17171b', bas: '#17171b', chaussures: '#000', cheveux: '#c9c9c4', cheveuxLongs: true, fille: true, brassard: '#b01010', carrure: 0.92, taille: 0.97 }),
   // les vigiles des braquages, les policiers d'élite (casque et tenue noire) et le garagiste (combinaison bleue)
   garde: () => ({ peau: hasard(PEAUX), haut: '#5a6068', bas: '#1c1c20', chaussures: '#111', casquette: '#1c1c20' }),
   elite: () => ({ peau: hasard(PEAUX), haut: '#1a1c20', bas: '#1a1c20', chaussures: '#111', casque: '#22252a' }),
@@ -5690,7 +5838,7 @@ const TENUES = {
   // un membre de gang : le maillot et la casquette de la couleur de son gang
   gang: couleur => ({ peau: hasard(PEAUX), haut: couleur, bas: hasard(['#2a3a5a', '#222', '#4a4a4a']), chaussures: hasard(['#eee', '#222']), casquette: couleur, manchesCourtes: true }),
 };
-const NAZIS = ['soldat', 'boss', 'hitler'], VIGILES = ['garde', 'chien', 'gang'];   // ils restent dans leur pâté
+const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel'], VIGILES = ['garde', 'chien', 'gang'];   // ils restent dans leur pâté
 const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
 const personnes = [];
 function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z)) {
@@ -5698,6 +5846,7 @@ function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z
   if (type === 'boss') h.g.scale.setScalar(1.15);
   const p = { type, h, x, y, z, angle: Math.random() * 6.28, vie: ENNEMIS[type]?.vie, cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
   if (ENNEMIS[type]?.arme !== undefined) { p.armeIdx = ENNEMIS[type].arme; donnerArme(h, p.armeIdx); }
+  if (type === 'militaire' && ARMES[p.armeIdx]?.auto) p.rafale = 0;   // à la mitraillette, en rafales
   h.g.traverse(o => o.userData.personne = p);
   h.g.position.set(x, y, z);
   scene.add(h.g); personnes.push(p);
@@ -5891,7 +6040,7 @@ function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null, foudre = f
     if (p.vie > 0 && p !== tireur && d < rayon) { blesser(p, degatsPNJ * k, !tireur); projeter(p, dx / l * (3 + 9 * k), 3 + 6 * k, dz / l * (3 + 9 * k), -3 - 8 * k); }
   }
   const d = Math.hypot(J.x - pos.x, J.y + 1 - pos.y, J.z - pos.z);
-  if (d < rayon) blesserJoueur(degatsJoueur * (1 - d / rayon));
+  if (d < rayon && degatsJoueur) blesserJoueur(degatsJoueur * (1 - d / rayon));   // (degatsJoueur = 0 : les fusées de l'armure, qui épargnent B.J.)
   for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v, pos, !tireur);
   // le heavy robot : l'explosion casse la vitre de sa cabine, puis blesse son pilote
   for (const r of robots) { const d = Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z); if (r !== tireur && d < rayon + 1.5) toucherRobot(r, degatsPNJ * (1 - d / (rayon + 1.5)), null, !tireur); }
@@ -5938,7 +6087,7 @@ function majRoquettes(dt) {
     const frole = (x, y, z) => { const v = new THREE.Vector3(x, y, z).sub(pos), t = clamp(v.dot(r.dir), 0, pas);
       if (t < avance && v.addScaledVector(r.dir, -t).length() < 1) { avance = t; touche = true; } };
     for (const p of personnes) if (p.vie > 0 && p !== r.tireur) frole(p.x, p.y + 1, p.z);
-    if (r.tireur) frole(J.x, J.y + (J.robot ? 3 : 1), J.z);
+    if (r.tireur) frole(J.x, J.y + (J.robot?.armure ? 1.4 : J.robot ? 3 : 1), J.z);
     pos.addScaledVector(r.dir, avance); r.reste -= avance;
     // traînée de fumée : une bouffée grise par image, qui grossit et s'efface
     const f = new THREE.Sprite(M_FUMEE.clone()); f.position.copy(pos); scene.add(f); effets.push({ o: f, vie: 1.2, fumee: 1.2 });
@@ -6596,16 +6745,17 @@ function aplatir(o, parJoueur = true) {
 }
 // il bute contre les murs et les autres robots, et ne va pas dans l'eau profonde. Il écrase les gens et les voitures sur son chemin
 function bougerRobot(r, ax, az) {
-  resoudre(r, 1.3, 4.5);
+  const rayon = r.armure ? 0.75 : 1.3;   // l'armure est bien plus petite : elle passe par les grandes portes (2,70 m de haut), et n'écrase rien
+  resoudre(r, rayon, r.armure ? 2.7 : 4.5);
   const parJoueur = r === J.robot;   // c'est toi qui le pilotes : ce qu'il écrase compte comme tes crimes
   for (const o of voitures) for (const lz of o.cercles) {
-    const c = local(o, 0, lz), d = dist(c, r), rr = o.rayon + 1.3;
+    const c = local(o, 0, lz), d = dist(c, r), rr = o.rayon + rayon;
     if (d >= rr || d === 0 || Math.abs(o.y - r.y) >= 3 || o.ecrasee) continue;
-    // un bateau, un avion, un blindé, une carcasse brûlée ou ta voiture : ils l'arrêtent, comme un mur
-    if (pasDeTole(o) || estBlindee(o) || o.detruite || o === J.voiture) { r.x = c.x + (r.x - c.x) / d * rr; r.z = c.z + (r.z - c.z) / d * rr; continue; }
+    // un bateau, un avion, un blindé, une carcasse brûlée ou ta voiture : ils l'arrêtent, comme un mur (et toutes les voitures arrêtent l'armure)
+    if (r.armure || pasDeTole(o) || estBlindee(o) || o.detruite || o === J.voiture) { r.x = c.x + (r.x - c.x) / d * rr; r.z = c.z + (r.z - c.z) / d * rr; continue; }
     aplatir(o, parJoueur);   // les autres, il leur marche dessus
   }
-  for (const p of personnes) { // les gens sous ses pieds : écrasés, ils volent de côté
+  if (!r.armure) for (const p of personnes) { // les gens sous ses pieds : écrasés, ils volent de côté
     const dx = p.x - r.x, dz = p.z - r.z, l = Math.hypot(dx, dz) || 1;
     if (p.vie > 0 && !p.vol && l < 1.7 && Math.abs(p.y - r.y) < 2) { blesser(p, 1000, parJoueur); projeter(p, dx / l * 5, 3, dz / l * 5, 6); }
   }
@@ -6613,7 +6763,7 @@ function bougerRobot(r, ax, az) {
     const d = dist(o, r);
     if (o !== r && d < 2.6 && d > 0 && Math.abs(o.y - r.y) < 3) { r.x = o.x + (r.x - o.x) / d * 2.6; r.z = o.z + (r.z - o.z) / d * 2.6; }
   }
-  if (profondeur(r.x, r.z) > 2) { r.x = ax; r.z = az; }
+  if (profondeur(r.x, r.z) > (r.armure ? 1 : 2)) { r.x = ax; r.z = az; }
   r.y = hauteurSol(r.x, r.z, r.y);
 }
 // le chemin vers B.J. quand le robot ne le voit pas : par les rues, comme les voitures de police.
@@ -6652,12 +6802,12 @@ function majRobot(r, dt) {
     }
   }
   if (vitesse) { const ax = r.x, az = r.z; r.x += Math.sin(r.angle) * vitesse * dt; r.z += Math.cos(r.angle) * vitesse * dt; bougerRobot(r, ax, az); }
-  animerRobot(r, vitesse, dt, tangage);
+  if (r.armure) animerArmure(r, 0, dt); else animerRobot(r, vitesse, dt, tangage);   // (l'armure vide attend, debout)
   r.m.g.position.set(r.x, r.y, r.z); r.m.g.rotation.y = r.angle;
 }
 // une énorme balle : un trait jaune épais
 function balleLourde(a, b) { const m = new THREE.Mesh(GEO_BALLE, M_BALLE_LOURDE); m.position.copy(a); m.lookAt(b); m.scale.z = a.distanceTo(b); scene.add(m); effets.push({ o: m, vie: 0.06 }); }
-const boutRobot = (r, roquette) => { r.m.g.updateMatrixWorld(true); return roquette ? r.m.bras[1].arme.localToWorld(V3(0, 0, 0.9)) : r.m.canons.localToWorld(V3(0, 0, 1.15)); };
+const boutRobot = (r, roquette) => { r.m.g.updateMatrixWorld(true); return roquette ? r.m.bras[1].arme.localToWorld(V3(0, 0, 0.9)) : r.m.canons.localToWorld(V3(0, 0, r.armure ? 0.6 : 1.15)); };
 function tirRobot(r, d) {
   const depart = boutRobot(r, false), arrivee = V3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
   let chance = ENNEMIS.robot.precision * clamp(1.2 - d / 60, 0.2, 1);
@@ -6680,6 +6830,7 @@ function roquetteRobot(r, d) {
 }
 // une balle ou une explosion sur le robot : d'abord la vitre de la cabine, ensuite le pilote (le reste est blindé)
 function toucherRobot(r, degats, objet = null, parJoueur = true) {
+  if (r.armure) { if (objet) bip(2600, 900, 0.1, 'sawtooth', 0.04); return; }   // l'armure : les balles de B.J. ricochent dessus (ce qu'elle encaisse quand il est dedans : voir blesserJoueur)
   if (objet && !objet.userData.vitre && !objet.userData.piloteRobot) { bip(2600, 900, 0.1, 'sawtooth', 0.04); return; }   // ça ricoche sur le blindage
   if (r.vieVitre > 0) { r.vieVitre -= degats; if (r.vieVitre <= 0) casserVitreRobot(r); return; }
   if (r.pilote !== 'police') return;
@@ -6695,7 +6846,7 @@ function casserVitreRobot(r) {
   bruit(0.6, 9000, 0.5); bip(2800, 1800, 0.3, 'triangle', 0.1);
   if (dist(r, J) < 100) annonce('', tr('La vitre du robot est cassée : vise le pilote, ou éjecte-le (touche E) !'), 3);
 }
-const robotProche = () => robots.find(r => r !== J.robot && dist(r, J) < 3.8 && Math.abs(r.y - J.y) < 2);
+const robotProche = () => robots.find(r => r !== J.robot && !r.supprimer && dist(r, J) < (r.armure ? 2.6 : 3.8) && Math.abs(r.y - J.y) < 2);
 function ejecterPilote(r) {
   r.pilote = null; r.m.torse.remove(r.m.pilote.g);
   const f = creerPersonne('flic', r.x + Math.cos(r.angle) * 2.6, r.z - Math.sin(r.angle) * 2.6);
@@ -6703,28 +6854,34 @@ function ejecterPilote(r) {
   annonce('', tr('Pilote éjecté ! Monte dans le robot (touche E)'), 3);
 }
 function monterRobot(r) {
-  if (r.m.pilote.g.parent) r.m.torse.remove(r.m.pilote.g);   // le pilote abattu sort de la cabine
   J.robot = r; r.pilote = 'joueur'; J.accroupi = false; J.danse = 0; J.lacet = r.angle; J.tangage = 0;
+  if (r.armure) { // l'armure se referme sur lui : on ne le voit plus (voir majCamera)
+    bip(300, 700, 0.3, 'sawtooth', 0.12); bruit(0.4, 400, 0.3);
+    annonce(tr('ARMURE !'), tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · F : fusées · E : sortir'), 5);
+    return;
+  }
+  if (r.m.pilote.g.parent) r.m.torse.remove(r.m.pilote.g);   // le pilote abattu sort de la cabine
   joueurH.jambeD.visible = joueurH.jambeG.visible = false;   // assis dans la cabine : ses jambes sont dans la caisse
   annonce(tr('HEAVY ROBOT !'), tr('Clic gauche : mitrailleuse · clic droit : roquettes · E : descendre'), 4);
 }
 function sortirRobot() {
-  const r = J.robot;
-  J.robot = null; r.pilote = null; joueurH.jambeD.visible = joueurH.jambeG.visible = true;
-  J.x = r.x + Math.cos(r.angle) * 2.6; J.z = r.z - Math.sin(r.angle) * 2.6; J.y = hauteurSol(J.x, J.z, r.y + 1); J.vy = 0;
+  const r = J.robot, e = r.armure ? 1.4 : 2.6;   // il descend à côté
+  J.robot = null; r.pilote = null; r.tire = false; joueurH.jambeD.visible = joueurH.jambeG.visible = true;
+  J.x = r.x + Math.cos(r.angle) * e; J.z = r.z - Math.sin(r.angle) * e; J.y = hauteurSol(J.x, J.z, r.y + 1); J.vy = 0;
   resoudre(J, 0.35);
 }
 // tu pilotes le robot : il marche où tu vas (Z Q S D, Maj pour aller plus vite) et se tourne vers où tu regardes
 function piloterRobot(r, dt) {
   const av = touche('KeyW', 'ArrowUp') - touche('KeyS', 'ArrowDown'), lat = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft');
   const mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat, n = Math.hypot(mx, mz);
-  const v = touche('ShiftLeft', 'ShiftRight') ? 6 : ENNEMIS.robot.vitesse;
+  const course = touche('ShiftLeft', 'ShiftRight'), v = r.armure ? (course ? ARMURE.course : ARMURE.vitesse) : course ? 6 : ENNEMIS.robot.vitesse;
   if (n) { const ax = r.x, az = r.z; r.x += mx / n * v * dt; r.z += mz / n * v * dt; bougerRobot(r, ax, az); }
-  r.angle = lerpAngle(r.angle, J.lacet, 3 * dt);
+  r.angle = lerpAngle(r.angle, J.lacet, (r.armure ? 9 : 3) * dt);   // (l'armure se tourne bien plus vite)
   r.tire = sourisG && r.munitions.lourde > 0;
-  animerRobot(r, n ? v : 0, dt, J.tangage);
+  if (r.armure) animerArmure(r, n ? v : 0, dt, J.tangage); else animerRobot(r, n ? v : 0, dt, J.tangage);
   r.m.g.position.set(r.x, r.y, r.z); r.m.g.rotation.y = r.angle;
   J.x = r.x; J.z = r.z; J.y = r.y; J.vitesse = n ? v : 0;
+  if (r.armure) { joueurH.g.position.set(r.x, r.y, r.z); return; }   // B.J. est dans l'armure : on ne le voit pas
   // B.J. est assis dans la cabine
   r.m.g.updateMatrixWorld(true);
   joueurH.g.position.copy(r.m.torse.localToWorld(V3(0, 1.45 - 1.82, 0.3))); joueurH.g.rotation.set(0, r.angle, 0);
@@ -6742,8 +6899,299 @@ function apparaitreRobot() {
   }
 }
 
+// =====================================================================
+//  Le camp militaire (% sur la carte), son armure, et le bunker secret (?)
+//  L'armure est un petit cousin du heavy robot : elle est rangée avec les robots, et on la pilote de la même façon (J.robot).
+//  Ses nombres sont dans le tableau ARMURE, ceux du camp dans CAMP, tout en haut du fichier.
+// =====================================================================
+const M_FER = mat('#6a6763', { metalness: 0.6, roughness: 0.6 }), M_FER2 = mat('#3b3936', { metalness: 0.6, roughness: 0.65 });   // du fer brut, terne
+const GEO_FUSEE = new THREE.CylinderGeometry(0.035, 0.045, 0.34, 6).rotateX(Math.PI / 2);
+// l'armure : des tôles soudées autour d'un torse en tonneau, un casque de soudeur, un réacteur qui luit sur la poitrine. Au bras droit,
+// la grosse mitrailleuse ; sous chaque poignet, un lance-flammes (les bonbonnes sont dans le dos) ; sur chaque épaule, un panier de 5 fusées
+function creerArmure(x, z, angle) {
+  const g = new THREE.Group(), bassin = new THREE.Group(), torse = new THREE.Group();
+  g.add(bassin); bassin.position.y = 1.22; bassin.add(torse); torse.position.y = 0.12;
+  const b = (geo, m, dans, x = 0, y = 0, z = 0) => { const e = new THREE.Mesh(geo, m); e.position.set(x, y, z); e.castShadow = true; dans.add(e); return e; };
+  const caisse = (l, h, p, m, dans, x, y, z, r = 0.05) => b(new RoundedBoxGeometry(l, h, p, 2, r), m, dans, x, y, z);
+  caisse(0.84, 0.36, 0.6, M_FER2, bassin, 0, 0, 0, 0.1);
+  b(new THREE.CylinderGeometry(0.56, 0.46, 0.95, 14).scale(1, 1, 0.8), M_FER, torse, 0, 0.6, 0);            // le torse : un tonneau
+  caisse(0.9, 0.52, 0.2, M_ROUILLE, torse, 0, 0.72, 0.36, 0.06);                                            // le plastron, en tôle rouillée
+  caisse(1, 0.16, 0.74, M_FER2, torse, 0, 0.16, 0, 0.05);                                                   // la ceinture
+  const reacteur = b(new THREE.CylinderGeometry(0.11, 0.11, 0.05, 16).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#dff4ff', emissive: '#8fd8ff', emissiveIntensity: 0.6 }), torse, 0, 0.76, 0.47);
+  reacteur.castShadow = false;
+  b(new THREE.TorusGeometry(0.125, 0.025, 6, 16), M_FER2, torse, 0, 0.76, 0.475);
+  for (const s of [-1, 1]) b(new THREE.CylinderGeometry(0.13, 0.13, 0.75, 10), M_FER2, torse, s * 0.2, 0.62, -0.47);   // les deux bonbonnes des lance-flammes, dans le dos
+  // la tête : un casque rond, une plaque devant, deux fentes pour les yeux et une pour la bouche
+  const tete = new THREE.Group(); tete.position.set(0, 1.26, 0.04); torse.add(tete);
+  b(new THREE.SphereGeometry(0.24, 14, 10).scale(1, 1.12, 1.05), M_FER, tete);
+  caisse(0.34, 0.36, 0.1, M_FER2, tete, 0, -0.03, 0.2, 0.04);
+  for (const s of [-1, 1]) b(new THREE.BoxGeometry(0.1, 0.03, 0.02), M_NOIR, tete, s * 0.08, 0.04, 0.252);
+  b(new THREE.BoxGeometry(0.16, 0.025, 0.02), M_NOIR, tete, 0, -0.11, 0.252);
+  // les bras : une grosse épaulière, le haut du bras, et l'avant-bras (b.arme), qui se lève vers là où l'on vise
+  const buses = [], bras = [1, -1].map(s => {
+    const epaule = new THREE.Group(); epaule.position.set(s * 0.72, 0.98, 0); torse.add(epaule);
+    b(new THREE.SphereGeometry(0.27, 12, 10).scale(1, 0.9, 1.1), M_FER, epaule); caisse(0.26, 0.5, 0.28, M_FER2, epaule, 0, -0.32, 0);
+    const arme = new THREE.Group(); arme.position.y = -0.58; epaule.add(arme);
+    b(new THREE.SphereGeometry(0.16, 10, 8), M_FER2, arme);                                                 // le coude
+    caisse(0.3, 0.3, 0.62, M_FER, arme, 0, 0, 0.3, 0.06); caisse(0.2, 0.2, 0.2, M_FER2, arme, 0, 0, 0.68, 0.05);   // l'avant-bras et le poing
+    buses.push(b(new THREE.CylinderGeometry(0.045, 0.06, 0.3, 8).rotateX(Math.PI / 2), M_NOIR, arme, 0, -0.2, 0.62));   // la buse du lance-flammes, sous le poignet
+    return { epaule, arme };
+  });
+  // la grosse mitrailleuse, sur l'avant-bras droit : quatre canons qui tournent
+  const canons = new THREE.Group(); canons.position.set(-0.24, 0.02, 0.3); bras[1].arme.add(canons);
+  b(new THREE.CylinderGeometry(0.11, 0.11, 0.36, 12).rotateX(Math.PI / 2), M_FER2, canons, 0, 0, -0.1);
+  for (let k = 0; k < 4; k++) b(new THREE.CylinderGeometry(0.03, 0.03, 0.62, 6).rotateX(Math.PI / 2), M_METAL, canons, Math.cos(k * Math.PI / 2) * 0.055, Math.sin(k * Math.PI / 2) * 0.055, 0.25);
+  b(new THREE.BoxGeometry(0.2, 0.26, 0.3), mat('#3a3a2a'), bras[1].arme, -0.22, -0.2, 0.15);                // la boîte de balles
+  // les paniers de fusées, sur les épaules : 5 tubes chacun
+  const paniers = [1, -1].map(s => {
+    const p = new THREE.Group(); p.position.set(s * 0.5, 1.3, -0.18); p.rotation.x = -0.5; torse.add(p);
+    caisse(0.36, 0.2, 0.42, M_FER2, p, 0, 0, 0, 0.03);
+    for (let k = 0; k < 5; k++) b(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 8).rotateX(Math.PI / 2), M_NOIR, p, (k % 3 - 1) * 0.1, k < 3 ? 0.04 : -0.04, 0.21);
+    return p;
+  });
+  // les jambes : la cuisse, le genou, le tibia, un gros pied
+  const jambes = [-1, 1].map(s => {
+    const hanche = new THREE.Group(); hanche.position.set(s * 0.25, -0.05, 0); bassin.add(hanche);
+    caisse(0.32, 0.5, 0.36, M_FER, hanche, 0, -0.28, 0, 0.07);
+    const genou = new THREE.Group(); genou.position.y = -0.55; hanche.add(genou);
+    b(new THREE.SphereGeometry(0.17, 10, 8), M_FER2, genou); caisse(0.26, 0.22, 0.1, M_ROUILLE, genou, 0, 0.02, 0.17, 0.03);   // le genou et sa genouillère
+    caisse(0.3, 0.48, 0.34, M_FER, genou, 0, -0.29, 0, 0.07);
+    const pied = new THREE.Group(); pied.position.y = -0.55; genou.add(pied);
+    caisse(0.36, 0.14, 0.6, M_FER2, pied, 0, 0, 0.09, 0.04);
+    return { hanche, genou, pied };
+  });
+  const r = { armure: true, m: { g, bassin, torse, tete, bras, jambes, canons, buses, paniers, reacteur }, x, z, y: hauteurSol(x, z), angle, pilote: null, phase: 0,
+    points: ARMURE.points, fusees: ARMURE.fusees.nombre, recharge: 0, tFlammes: 0, munitions: { lourde: Infinity }, cdJ: { lourde: 0 } };
+  g.traverse(e => e.userData.robot = r);
+  g.position.set(r.x, r.y, r.z); g.rotation.y = angle;
+  for (const q of bras) q.arme.rotation.x = 1.35;   // vide, ses bras pendent
+  scene.add(g); robots.push(r);
+  return r;
+}
+// elle marche d'un pas lourd, qui résonne. Vide, ses bras pendent ; pilotée, ses avant-bras se lèvent vers là où l'on vise (tangage)
+function animerArmure(r, vitesse, dt, tangage = 0) {
+  const m = r.m, avant = Math.sin(r.phase), pilotee = r === J.robot;
+  r.phase += dt * vitesse * 1.7;
+  const s = Math.sin(r.phase), a = vitesse > 0.2 ? 0.5 : 0;
+  m.jambes.forEach((j, k) => {
+    const sg = k ? -1 : 1;
+    j.hanche.rotation.x = -sg * s * a; j.genou.rotation.x = Math.max(0, sg * Math.cos(r.phase)) * a * 1.3; j.pied.rotation.x = -j.hanche.rotation.x - j.genou.rotation.x;
+  });
+  m.bassin.position.y = 1.22 - Math.abs(s) * a * 0.07;
+  m.torse.rotation.y = s * a * 0.14;   // elle se dandine
+  if (a && Math.sign(s) !== Math.sign(avant)) { const d = dist(r, J); bruit(0.3 * clamp(1 - d / 60, 0, 1), 260, 0.14); if (pilotee) J.secousse = Math.max(J.secousse || 0, 0.02); }
+  for (const b of m.bras) { b.epaule.rotation.x = pilotee ? -0.3 : 0; b.arme.rotation.x = pilotee ? 0.3 - clamp(tangage, -0.8, 0.8) : 1.35; }
+  m.canons.rotation.z += dt * (r.tire ? 30 : 0);
+  m.reacteur.material.emissiveIntensity = pilotee ? 2.5 + Math.sin(temps * 6) * 0.5 : 0.5;
+}
+// une balle ou une explosion sur l'armure : c'est elle qui encaisse tout, à la place de B.J. À 0 point, elle casse
+function toucherArmure(r, degats) {
+  r.points -= degats;
+  $('rouge').style.opacity = 0.45; bip(900, 300, 0.07, 'square', 0.1);   // ça résonne sur la tôle
+  if (r.points <= 0) casserArmure(r);
+}
+function casserArmure(r) {
+  const pos = V3(r.x, r.y + 1.4, r.z);
+  r.points = 0;
+  if (r === J.robot) sortirRobot();
+  r.supprimer = true; if (camp?.armure === r) camp.armure = null;
+  // elle part en morceaux, dans une boule de feu qui ne blesse personne
+  const s = new THREE.Sprite(M_FLASH.clone()); s.position.copy(pos); scene.add(s); effets.push({ o: s, vie: 0.6, boule: 2.2 });
+  lumiereBoum.color.set('#ff8030'); lumiereBoum.position.copy(pos); lumiereBoum.intensity = 3000;
+  bruit(1, 350, 1.2); bip(700, 80, 0.6, 'sawtooth', 0.15); etincelles(pos, 14, 6);
+  for (let k = 0; k < 9; k++) { // des bouts de tôle volent
+    const e = new THREE.Mesh(new THREE.BoxGeometry(entre(0.2, 0.5), entre(0.1, 0.4), entre(0.05, 0.2)), k % 3 ? M_FER : M_FER2);
+    e.position.copy(pos).add(V3(entre(-0.4, 0.4), entre(-0.8, 0.8), entre(-0.4, 0.4))); e.castShadow = true; scene.add(e);
+    lancerDebris(e, V3(entre(-5, 5), entre(2, 7), entre(-5, 5)), entre(6, 12), true);
+  }
+  annonce(tr('ARMURE DÉTRUITE !'), tr("Continue à pied : une armure neuve t'attendra devant le camp quand tu te seras éloigné"), 4);
+}
+// le vacarme d'une arme : les piétons s'enfuient, les soldats, les vigiles et les gangs sont alertés, la police réagit
+function vacarme() {
+  for (const p of personnes) {
+    if (p.vie <= 0) continue;
+    const d = dist(p, J);
+    if (p.type === 'pieton' && d < 40) p.peur = 8;
+    if ((NAZIS.includes(p.type) || VIGILES.includes(p.type)) && d < 50) alerter(p);
+    if (p.type === 'flic' && d < 30 && etoiles === 0) crime(1);
+  }
+}
+// un ennemi : un nazi ou un militaire, un vigile, un chien ou un gang en alerte, un policier quand on est recherché
+const ennemi = p => p.vie > 0 && (NAZIS.includes(p.type) || (VIGILES.includes(p.type) && p.alerte) || (p.type === 'flic' && etoiles > 0));
+// les armes de l'armure, à chaque image : la mitrailleuse (clic gauche), les lance-flammes (clic droit), et les fusées qui se rechargent
+function armesArmure(r, dt) {
+  if (sourisG && r.cdJ.lourde <= 0) tirer(ARMURE.mitrailleuse);
+  lanceFlammes(r, dt);
+  if (r.fusees < ARMURE.fusees.nombre && (r.recharge -= dt) <= 0) { r.fusees = ARMURE.fusees.nombre; bip(900, 1300, 0.12, 'sine', 0.12); }
+}
+// les deux lance-flammes : tant qu'on garde le clic droit enfoncé, deux jets de feu partent des poignets, vers là où l'on regarde.
+// Tous ceux qui sont dans les flammes brûlent (ARMURE.flammes.degats par seconde), et les voitures prennent feu. Un mur arrête les flammes
+function lanceFlammes(r, dt) {
+  const F = ARMURE.flammes;
+  if (!visee) { r.tFlammes = 0; return; }
+  r.m.g.updateMatrixWorld(true);
+  const dir = V3(Math.sin(J.lacet) * Math.cos(J.tangage), Math.sin(J.tangage), Math.cos(J.lacet) * Math.cos(J.tangage)), cone = Math.tan(F.angle * Math.PI / 180);
+  for (const buse of r.m.buses) {
+    const depart = buse.getWorldPosition(V3()), l = F.portee * butee(depart, depart.clone().addScaledVector(dir, F.portee));
+    for (let k = 0; k < 3; k++) { // trois flammes par jet à chaque image, au hasard le long du jet : de plus en plus grosses, de plus en plus écartées
+      const t = Math.random(), e = t * l * cone, s = new THREE.Sprite(M_FLASH);
+      s.position.copy(depart).addScaledVector(dir, t * l).add(V3(entre(-e, e), entre(-e, e) * 0.6, entre(-e, e)));
+      s.scale.setScalar(0.4 + 2.6 * t); scene.add(s); effets.push({ o: s, vie: 0.09 });
+    }
+    lumiereTir.position.copy(depart).addScaledVector(dir, l * 0.4); lumiereTir.intensity = 60;
+  }
+  if ((r.tFlammes -= dt) > 0) return;
+  r.tFlammes = 0.1;   // dix fois par seconde : ce qui brûle
+  bruit(0.25, 500, 0.2);
+  const o = V3(r.x, r.y + 1.6, r.z), yeux = { x: r.x, y: r.y, z: r.z };
+  // dans le jet : devant l'armure, à moins de « portee » mètres, et pas trop loin de l'axe (le jet s'élargit en s'éloignant)
+  const dedans = (x, y, z, marge = 0) => { const v = V3(x, y, z).sub(o), t = v.dot(dir); return t > 0 && t < F.portee + marge && v.addScaledVector(dir, -t).length() < 0.9 + t * cone + marge; };
+  for (const p of personnes) if (p.vie > 0 && dedans(p.x, p.y + 1, p.z) && voit(yeux, p)) blesser(p, F.degats * 0.1);
+  for (const v of voitures) if (v !== J.voiture && !pasDeTole(v) && !estBlindee(v) && dedans(v.x, v.y + 0.7, v.z, v.rayon)) allumer(v);
+  for (const q of robots) if (q.pilote === 'police' && dedans(q.x, q.y + 3, q.z, 1.5)) toucherRobot(q, F.degats * 0.1);
+  vacarme();
+}
+// la touche F : toutes les fusées partent d'un coup, réparties sur les ennemis qu'on voit (les plus proches d'abord), et se dirigent toutes seules
+const fuseesVol = [];
+function tirerFusees(r) {
+  const F = ARMURE.fusees, yeux = { x: r.x, y: r.y + 1, z: r.z };
+  if (r.fusees <= 0) { bip(300, 200, 0.1, 'square', 0.1); annonce('', tr('Fusées : encore {n} s', { n: Math.ceil(r.recharge) }), 1); return; }
+  const cibles = [...personnes.filter(p => ennemi(p) && dist(p, r) < F.portee && voit(yeux, p)), ...robots.filter(q => q.pilote === 'police' && dist(q, r) < F.portee)]
+    .sort((a, b) => dist(a, r) - dist(b, r));
+  if (!cibles.length) { bip(300, 200, 0.1, 'square', 0.1); annonce('', tr('Fusées : aucun ennemi en vue'), 1.2); return; }
+  r.m.g.updateMatrixWorld(true);
+  for (let k = 0; k < r.fusees; k++) { // une fusée toutes les 5 centièmes de seconde, d'un panier puis de l'autre
+    const m = new THREE.Mesh(GEO_FUSEE, M_KAKI), cote = k % 2 ? -1 : 1;
+    const feu = new THREE.Sprite(M_FLASH); feu.position.z = -0.25; feu.scale.setScalar(0.35); m.add(feu);
+    m.position.copy(r.m.paniers[k % 2].localToWorld(V3(((k >> 1) % 3 - 1) * 0.1, 0, 0.3)));
+    // elle part vers le haut et un peu de côté, puis tourne vers sa cible
+    const dir = V3(Math.sin(r.angle) * 0.5 + Math.cos(r.angle) * 0.35 * cote, 1, Math.cos(r.angle) * 0.5 - Math.sin(r.angle) * 0.35 * cote).normalize();
+    fuseesVol.push({ m, dir, cible: cibles[k % cibles.length], attente: k * 0.05, age: 0, fumee: 0 });
+  }
+  r.fusees = 0; r.recharge = F.recharge;
+  vacarme();
+}
+const cibleVivante = c => c.m?.g ? c.pilote === 'police' && !c.supprimer : c.vie > 0;   // (un personnage, ou le heavy robot de la police)
+function majFusees(dt) {
+  const F = ARMURE.fusees;
+  for (const f of fuseesVol) {
+    if ((f.attente -= dt) > 0) continue;
+    const pos = f.m.position;
+    if (!f.partie) { f.partie = true; scene.add(f.m); bruit(0.3 * clamp(1.2 - dist(pos, J) / 80, 0, 1), 2400, 0.25); }
+    f.age += dt;
+    if (!cibleVivante(f.cible)) { // sa cible est déjà tombée : elle prend l'ennemi le plus proche d'elle qu'elle voit (sinon, elle continue tout droit)
+      const oeil = { x: pos.x, y: pos.y - 1.5, z: pos.z };
+      const autre = personnes.filter(p => ennemi(p) && dist(p, pos) < 40 && voit(oeil, p)).reduce((m, p) => !m || dist(p, pos) < dist(m, pos) ? p : m, null);
+      if (autre) f.cible = autre;
+    }
+    const c = f.cible, vise = cibleVivante(c), but = V3(c.x, c.y + (c.m?.g ? 3 : 1.1), c.z), vers = but.clone().sub(pos), d = vers.length();
+    if (vise && f.age > 0.15) f.dir.lerp(vers.normalize(), Math.min(1, dt * (5 + f.age * 8))).normalize();   // elle tourne de plus en plus sec
+    const pas = F.vitesse * dt, suite = pos.clone().addScaledVector(f.dir, pas), t = butee(pos, suite), touche = vise && d < pas + 0.9;
+    if (touche) pos.copy(but); else pos.lerp(suite, t);
+    f.m.lookAt(pos.clone().add(f.dir));
+    if ((f.fumee -= dt) <= 0) { f.fumee = 0.04; const s = new THREE.Sprite(M_FUMEE.clone()); s.position.copy(pos); scene.add(s); effets.push({ o: s, vie: 0.6, fumee: 0.6, taille: 0.4 }); }
+    const sol = hauteurSol(pos.x, pos.z, pos.y);
+    if (!touche && t >= 1 && pos.y > sol && f.age < 5) continue;
+    pos.y = Math.max(pos.y, sol + 0.1);
+    f.finie = true; scene.remove(f.m);
+    exploser(pos, F.explosion, F.degats, 0);   // (elle ne blesse pas B.J.)
+  }
+  for (let k = fuseesVol.length - 1; k >= 0; k--) if (fuseesVol[k].finie) fuseesVol.splice(k, 1);
+}
+// chacun son tour, au camp aussi : un militaire à d mètres ne peut te toucher que si moins de CAMP.tireurs militaires plus proches te voient
+// (CAMP.tireursArmure quand tu es dans l'armure : elle est bien plus grosse que toi)
+function aSonTourCamp(d) {
+  let devant = 0;
+  for (const q of personnes) if (q.type === 'militaire' && q.voitJ && q.vie > 0 && dist(q, J) < d) devant++;
+  return devant < (J.robot?.armure ? CAMP.tireursArmure : CAMP.tireurs);
+}
+// combien de militaires il reste à éliminer (ceux qu'on voit, et ceux qui attendent dans les baraques)
+const resteCamp = () => camp ? Math.max(0, CAMP.militaires - camp.tues) : 0;
+// le bouton rouge, sur son pupitre dans le bureau de la commandante, et la porte blindée du bunker secret, avec son voyant
+const M_BOUTON = new THREE.MeshStandardMaterial({ color: '#c01010', emissive: '#ff2010', emissiveIntensity: 0.6 }), M_BOUTON_OK = new THREE.MeshStandardMaterial({ color: '#10a030', emissive: '#20ff50', emissiveIntensity: 1.2 });
+if (camp) {
+  const q = camp.bouton;
+  camp.boutonM = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.1, 20), M_BOUTON); camp.boutonM.position.set(q.x, q.y + q.h + 0.09, q.z); scene.add(camp.boutonM);
+  const socle = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.08, 20), mat('#e0c020', { roughness: 0.5 })); socle.position.set(q.x, q.y + q.h + 0.04, q.z); scene.add(socle);
+  camp.alerte = -1e9;
+  camp.armure = creerArmure(camp.poste.x, camp.poste.z, camp.poste.angle);
+}
+if (bunkerSecret) {
+  const B = bunkerSecret, p = B.porte;
+  B.hBouchon = B.bouchon.h;
+  B.porteM = new THREE.Mesh(new THREE.BoxGeometry(0.3, p.h + 0.1, p.l + 0.1), M_PORTE_COFFRE); B.porteM.castShadow = true; scene.add(B.porteM);
+  for (let k = -1; k <= 1; k++) { const barre = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.25, p.l), M_ACIER); barre.position.set(-0.18, k * 1.2, 0); B.porteM.add(barre); }   // trois barres de renfort
+  B.voyant = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.3, 1.4), M_BOUTON); B.voyant.position.set(p.x - 0.3, p.y + p.h + 0.5, p.z); scene.add(B.voyant);
+  B.porteM.traverse(e => e.userData.mur = true); batiments.push(B.porteM);   // elle arrête les balles, comme un mur
+  B.porteM.position.set(p.x, p.y + p.h / 2, p.z);
+}
+const boutonProche = () => camp && Math.hypot(camp.bouton.x - J.x, camp.bouton.z - J.z) < 2.6 && Math.abs(camp.bouton.y - J.y) < 1.5;
+// E devant le bouton rouge : il ne marche que quand il ne reste plus un seul militaire dans le camp. La porte du bunker secret s'ouvre alors
+function appuyerBouton() {
+  const n = resteCamp();
+  if (n > 0) { bip(300, 200, 0.2, 'square', 0.2); annonce(tr('BOUTON VERROUILLÉ'), tr("Élimine d'abord tous les militaires du camp : il en reste {n}", { n }), 3); return; }
+  camp.ouvert = true;
+  bip(500, 1000, 0.4, 'sine', 0.3); bruit(0.5, 200, 1.5);
+  annonce(tr('BUNKER OUVERT !'), tr('Sa porte blindée descend, un peu plus haut dans la montagne (? sur la carte)'), 5);
+}
+// le camp, à chaque image : l'armure revient à son poste, les militaires sortent des baraques, la porte du bunker descend
+function majCamp(dt) {
+  if (!camp) return;
+  const d = dist(J, camp), a = camp.armure;
+  // l'armure : cassée, ou laissée loin derrière lui (abîmée, ou ailleurs qu'à son poste), une neuve revient devant la porte du camp
+  if (a && a !== J.robot && dist(a, J) > 250 && (a.points < ARMURE.points || dist(a, camp.poste) > 1)) { a.supprimer = true; camp.armure = null; }
+  if (!camp.armure && dist(J, camp.poste) > 150) camp.armure = creerArmure(camp.poste.x, camp.poste.z, camp.poste.angle);
+  // les militaires : jamais plus de CAMP.ensemble à la fois (de plus en plus nombreux à mesure qu'on en élimine). Tant que B.J. est loin,
+  // ils se tiennent à leur poste, dans la cour ; pendant le combat, les renforts sortent des baraques, un par un, par une porte qu'il ne voit pas
+  const vivants = personnes.filter(p => p.type === 'militaire' && p.vie > 0), [e0, e1 = e0] = CAMP.ensemble, loin = d > 160;
+  const max = Math.min(resteCamp(), Math.round(lerp(e0, e1, clamp(camp.tues / (CAMP.militaires || 1), 0, 1))));
+  if (loin) for (const p of vivants) p.alerte = false;   // B.J. est parti : ils se calment
+  camp.t -= dt;
+  if (vivants.length < max && (loin || camp.t <= 0)) {
+    camp.t = CAMP.renfort;
+    let q;
+    if (loin) q = camp.postes.find(s => !vivants.some(p => dist(p, s) < 1.5)) || hasard(camp.postes);
+    else { const cachees = camp.sorties.filter(s => !voit(s, J)); q = cachees.length ? hasard(cachees) : camp.sorties.reduce((m, s) => dist(s, J) > dist(m, J) ? s : m); }
+    const p = creerPersonne('militaire', q.x + entre(-0.5, 0.5), q.z + entre(-0.5, 0.5));
+    p.angle = angleVers(p, loin ? camp.poste : J);
+    if (!loin && temps - camp.alerte < 30) p.alerte = true;   // en plein combat : il sort en courant, l'arme à la main
+  }
+  camp.boutonM.material = camp.ouvert ? M_BOUTON_OK : M_BOUTON;
+  camp.boutonM.position.y = camp.bouton.y + camp.bouton.h + (camp.ouvert ? 0.05 : 0.09);
+  M_BOUTON.emissiveIntensity = resteCamp() ? 0.6 : 1.5 + Math.sin(temps * 6);   // le camp est vide : le bouton clignote
+  const B = bunkerSecret;
+  if (!B) return;
+  const db = dist(J, B);
+  if (camp.ouvert && B.ouverture < 1) { // la porte blindée descend dans le sol, en 4 secondes, dans un grondement
+    B.ouverture = Math.min(1, B.ouverture + dt / 4);
+    if ((B.tBruit = (B.tBruit || 0) - dt) <= 0) { B.tBruit = 0.25; bruit(0.5 * clamp(1.2 - db / 80, 0, 1), 140, 0.3); }
+    if (B.ouverture > 0.85) B.bouchon.h = -Infinity;
+  }
+  B.porteM.position.y = B.porte.y + B.porte.h / 2 - B.ouverture * (B.porte.h + 0.15);
+  B.porteM.visible = B.voyant.visible = db < 400;
+  B.voyant.material = camp.ouvert ? M_BOUTON_OK : M_BOUTON;
+  // la DeLorean : s'il n'y en a plus une seule dans le pays (explosée, coulée), une neuve revient dans le bunker quand B.J. est loin
+  if (db > 150 && !voitures.some(v => v.type.nom === 'DeLorean' && !v.detruite && !v.coule && !v.supprimer)) creerVoiture(B.garage.x, B.garage.z, B.garage.a, false, typeNomme('DeLorean'));
+}
+// le code de triche MISSION11 : le camp repart de zéro. Tous les militaires sont revenus, la commandante aussi, le bunker est refermé
+// (avec la DeLorean dedans), et une armure neuve attend devant la porte
+function reinitialiserCamp() {
+  if (!camp) return;
+  Object.assign(camp, { tues: 0, ouvert: false, alerte: -1e9, t: 0 });
+  for (const p of personnes) if (p.type === 'militaire') p.supprimer = true;
+  if (!personnes.some(p => p.type === 'engel' && p.vie > 0)) { const e = camp.engel; creerPersonne('engel', e.x, e.z, undefined, e.y).zone = e.zone; }
+  if (J.robot?.armure) Object.assign(J.robot, { points: ARMURE.points, fusees: ARMURE.fusees.nombre });
+  else { if (camp.armure) camp.armure.supprimer = true; camp.armure = creerArmure(camp.poste.x, camp.poste.z, camp.poste.angle); }
+  const B = bunkerSecret;
+  if (!B) return;
+  B.ouverture = 0; B.bouchon.h = B.hBouchon;
+  if (J.voiture?.type.nom === 'DeLorean') return;   // (il est dedans : on la lui laisse)
+  for (const v of voitures) if (v.type.nom === 'DeLorean') v.supprimer = true;
+  creerVoiture(B.garage.x, B.garage.z, B.garage.a, false, typeNomme('DeLorean'));
+}
+
 // repère de mission : colonne lumineuse (ou flèche au-dessus de la cible)
-const repere = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 5, 24, 1, true),
+const repere =new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 5, 24, 1, true),
   new THREE.MeshBasicMaterial({ color: '#ffd23a', transparent: true, opacity: 0.35, side: THREE.DoubleSide, depthWrite: false, fog: false }));
 scene.add(repere);
 const fleche = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.7, 4).rotateX(Math.PI), new THREE.MeshBasicMaterial({ color: '#ffd23a', fog: false }));
@@ -6760,6 +7208,7 @@ const touches = {};
 pnjDepart.forEach(p => {
   const q = creerPersonne(p.type, p.x, p.z, undefined, p.y);
   q.braquage = p.braquage;
+  if (p.zone) q.zone = p.zone;   // (la commandante du camp : elle reste dans son bureau)
   if (p.arme !== undefined) { q.armeIdx = p.arme; donnerArme(q.h, p.arme); if (ARMES[p.arme].auto) q.rafale = 0; }   // un vigile, avec son arme
 });
 GANGS.forEach(creerGang);
@@ -6805,7 +7254,8 @@ addEventListener('keydown', e => {
   suite = (suite + e.code + ' ').slice(-SUITE_DANSE.length);
   if (suite === SUITE_DANSE) { suite = ''; danser(); }
   if (e.key === 'Shift') { tapesMaj = [...tapesMaj, temps].slice(-3); if (tapesMaj[2] - tapesMaj[0] < R_.tripleMaj) { tapesMaj = []; decoller(); } else if (J.superman) J.superman.crans++; }
-  if (e.code === 'KeyE' || e.code === 'KeyF') action();
+  if (e.code === 'KeyF' && J.robot?.armure) tirerFusees(J.robot);   // dans l'armure, F tire les fusées
+  else if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
   if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
@@ -7119,6 +7569,7 @@ function action() {
   if (tl) return;
   if (J.voiture?.enVol) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }   // pas en plein vol
   if (J.voiture) { if (!J.voiture.rail) sortirVoiture(); return; }   // pas en plein looping. En plein accident (tonneaux, tête-à-queue), on peut : B.J. saute, et tombe par terre
+  if (boutonProche() && !camp.ouvert && (!J.robot || J.robot.armure)) { appuyerBouton(); return; }   // le bouton rouge du camp militaire (même depuis l'armure)
   if (J.robot) { sortirRobot(); return; }
   const s = standProche();
   if (s) { acheter(s); return; }
@@ -7314,7 +7765,7 @@ function tirer(a = ARMES[J.arme]) {
   const cibles = [...batiments, ...personnes.filter(p => p.vie > 0 && dist(p, J) < a.portee + 5 && p.h.g.visible).map(p => p.h.g), ...voitures.filter(v => v.m.visible).map(v => v.m),
     ...robots.filter(r => r !== rb && r.m.g.visible).map(r => r.m.g), ...braquages.filter(B => dist(B, J) < 150).flatMap(B => B.tourelles.filter(t => t.vie > 0 && t.sortie > 0).map(t => t.m))];
   raycaster.far = a.portee;
-  raycaster.near = rb ? camera.position.distanceTo(vTmp2.set(rb.x, rb.y + 3.4, rb.z)) + 1 : J.vue === 3 ? camera.position.distanceTo(vTmp2.set(J.x, J.y + 1.5, J.z)) : 0;
+  raycaster.near = rb ? camera.position.distanceTo(vTmp2.set(rb.x, rb.y + (rb.armure ? 1.8 : 3.4), rb.z)) + (rb.armure ? 0.6 : 1) : J.vue === 3 ? camera.position.distanceTo(vTmp2.set(J.x, J.y + 1.5, J.z)) : 0;
   for (let k = 0; k < (a.plombs || 1); k++) {
     const d = (a.dispersion || 0.004) * (visee ? 0.5 : 1) * (J.vitesse > 5 ? 2 : 1);
     raycaster.setFromCamera(new THREE.Vector2(entre(-d, d), entre(-d, d)), camera);
@@ -7358,14 +7809,7 @@ function tirer(a = ARMES[J.arme]) {
     else if (a.modele === 'lourde') balleLourde(depart, point); else traceur(depart, point);
   }
   if (jet) return;   // un batarang, un filet : personne n'entend rien (ceux qui sont touchés, eux, le sentent : voir blesser)
-  // le bruit fait fuir les piétons et alerte soldats, vigiles et policiers
-  for (const p of personnes) {
-    if (p.vie <= 0) continue;
-    const d = dist(p, J);
-    if (p.type === 'pieton' && d < 40) p.peur = 8;
-    if ((NAZIS.includes(p.type) || VIGILES.includes(p.type)) && d < 50) alerter(p);
-    if (p.type === 'flic' && d < 30 && etoiles === 0) crime(1);
-  }
+  vacarme();   // le bruit fait fuir les piétons et alerte soldats, vigiles et policiers
 }
 function frapper(a) {
   J.frappe = 1;
@@ -7385,6 +7829,7 @@ function frapper(a) {
 function alerter(p) {
   p.alerte = true; declencherAlarme(p.braquage);
   if (p.gang) for (const q of personnes) if (q.gang === p.gang) q.alerte = true;
+  if (p.type === 'militaire' && camp) { camp.alerte = temps; for (const q of personnes) if (q.type === 'militaire') q.alerte = true; }   // tout le camp est en alerte
 }
 // parJoueur = false quand c'est Hitler qui le blesse : pas d'étoile pour B.J.
 function blesser(p, degats, parJoueur = true) {
@@ -7403,6 +7848,14 @@ function blesser(p, degats, parJoueur = true) {
   if (p.type === 'soldat') creerObjet({ type: 'arme', arme: Math.random() < 0.5 ? 3 : 5, x: p.x, z: p.z , y: p.y });
   if (p.type === 'boss') { creerObjet({ type: 'arme', arme: 4, x: p.x + 1, z: p.z , y: p.y }); creerObjet({ type: 'argent', montant: 1000, x: p.x - 1, z: p.z , y: p.y }); }
   if (p.type === 'hitler') { creerObjet({ type: 'arme', arme: 6, x: p.x + 1, z: p.z , y: p.y }); creerObjet({ type: 'argent', montant: 2000, x: p.x - 1, z: p.z , y: p.y }); }
+  if (p.type === 'engel') { creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x + 1, z: p.z, y: p.y }); creerObjet({ type: 'argent', montant: 3000, x: p.x - 1, z: p.z, y: p.y }); }
+  if (p.type === 'militaire' && camp) { // un de moins dans le camp. Une fois sur quatre, il lâche sa mitraillette
+    camp.tues++;
+    const n = resteCamp();
+    if (Math.random() < 0.25) creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z, y: p.y });
+    if (!n) { annonce(tr('CAMP VIDÉ !'), tr('Appuie sur le bouton rouge, dans le bureau de la commandante'), 4); bip(500, 1500, 0.5, 'triangle', 0.3); }
+    else if (n % 25 === 0) annonce('', tr('Militaires : il en reste {n}', { n }), 2);
+  }
 }
 // une balle ou une explosion dans une voiture touche aussi celui qui la conduit : il a autant de vie qu'à pied.
 // Tué, il tombe de la voiture, et ça compte comme un piéton ou un policier abattu (une étoile)
@@ -7421,6 +7874,7 @@ const abrite = () => J.voiture && !J.voiture.forme.ouvert;   // une carrosserie 
 // gilet = false : le gilet pare-balles ne protège pas (une chute, une roulade)
 function blesserJoueur(degats, gilet = true) {
   if (J.mort || estBlindee(J.voiture) || invincible()) return;   // dans une voiture blindée, rien ne passe
+  if (J.robot?.armure) { toucherArmure(J.robot, degats); return; }   // dans l'armure : c'est elle qui encaisse tout, jusqu'à ce qu'elle casse
   const d = degats * (abrite() ? R_.protectionVoiture : J.robot ? R_.protectionRobot : 1), g = gilet ? Math.min(J.gilet, d) : 0; // le gilet prend les dégâts en premier
   J.gilet -= g; J.vie -= d - g;
   J.dernierDegat = temps;
@@ -8821,7 +9275,7 @@ function tirEnnemi(p, d) {
   if (J.accroupi) chance *= 0.5;
   if (J.vitesse > 6) chance *= 0.6;
   if (abrite()) chance *= 0.7;
-  const reussi = Math.random() < chance && (p.type !== 'flic' || aSonTour(d));
+  const reussi = Math.random() < chance && (p.type !== 'flic' || aSonTour(d)) && (p.type !== 'militaire' || aSonTourCamp(d));
   p.h.g.updateMatrixWorld(true);
   const depart = boutDuCanon(p.h, new THREE.Vector3());
   const arrivee = new THREE.Vector3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
@@ -9152,7 +9606,7 @@ function apparaitrePersonne(type) {
   const [bi, bj] = blocEn(J.x, J.z);
   for (let essai = 0; essai < 20; essai++) {
     const i = bi + Math.floor(entre(-2, 3)), j = bj + Math.floor(entre(-2, 3));
-    if (!typeBloc(i, j)) continue;
+    if (!typeBloc(i, j) || (type === 'pieton' && '%?'.includes(car(i, j)))) continue;   // (personne ne se promène autour du camp militaire, ni du bunker secret)
     const p = coin(i, j, Math.floor(Math.random() * 4)), d = dist(p, J);
     if (d < 45 || d > 170 || (type === 'pieton' && derriere(p)) || (d < 110 && voit(p, J))) continue;
     return creerPersonne(type, p.x, p.z);
@@ -9219,6 +9673,9 @@ function police(dt) {
 // =====================================================================
 // B.J. est-il arrivé au lieu ? À moins de 4 m. Un lieu dans un bâtiment (la planque) a son rayon à lui, plus petit : il faut être dedans, pas sur le toit
 const arrive = l => l.rayon ? dist(J, l) < l.rayon && Math.abs(J.y - l.y) < 2 : dist(J, l) < 4;
+// combien d'ennemis de cette sorte il reste à éliminer : ceux qui sont là, et les militaires du camp qui attendent encore dans les baraques
+const vivantsType = type => personnes.filter(p => p.type === type && p.vie > 0).length;
+const resteAEliminer = type => type === 'militaire' && camp ? Math.max(resteCamp(), vivantsType(type)) : vivantsType(type);
 function etapeFinie(et) {
   switch (et.type) {
     case 'aller': return arrive(lieuProche(et.lieu, J)) && (!et.sansPolice || etoiles === 0);   // sansPolice : 0 étoile
@@ -9226,7 +9683,9 @@ function etapeFinie(et) {
       return !!v && dist(J, lieuProche(et.lieu, J)) < 7 && (!et.rapide || v.type.vitesse >= R_.vitesseBlindable) && (!et.blindee || estBlindee(v)) && (!et.sansPolice || etoiles === 0); }
     case 'blindage': return voitures.some(v => v.blindee && !v.detruite);
     case 'voler': return !butins.some(o => o.B.lettre === et.lieu && !o.outil && !o.pris);
-    case 'eliminer': return !personnes.some(p => p.type === et.cible && p.vie > 0);
+    case 'eliminer': return !resteAEliminer(et.cible);
+    case 'bouton': return !!camp?.ouvert;   // le bouton rouge du camp militaire est enfoncé
+    case 'conduire': return J.voiture?.type.nom === et.voiture;
     case 'etoiles': return etoiles >= et.nombre;
     case 'semer': return etoiles === 0;
     case 'arme': return J.possede[indexArme(et.arme)];
@@ -9241,8 +9700,10 @@ function cibleMission() {
     return proche(dispo.length ? dispo : reste) || lieuProche(et.lieu, J);
   }
   if (et.type === 'blindage') return proche(garagistes);
+  if (et.type === 'bouton' && camp) return camp.bouton;
+  if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule));
   if (et.lieu) return lieuProche(et.lieu, J);
-  if (et.type === 'eliminer') return personnes.find(p => p.type === et.cible && p.vie > 0) || null;
+  if (et.type === 'eliminer') return personnes.find(p => p.type === et.cible && p.vie > 0) || (resteAEliminer(et.cible) ? camp : null);   // (les renforts ne sont pas encore sortis : le camp)
   if (et.type === 'arme') return objets.filter(o => o.type === 'stand' && o.arme === indexArme(et.arme)).reduce((m, o) => !m || dist(o, J) < dist(m, J) ? o : m, null) || lieuProche('A', J);
   return null;
 }
@@ -9262,6 +9723,7 @@ const montant = n => `${n.toLocaleString(langue === 'gsw' ? 'de-CH' : langue)} $
 function sauterMission(n) {
   missionIndex = clamp(Math.round(n) - 1, 0, MISSIONS.length); etapeIndex = 0; J.sac = 0;
   const m = MISSIONS[missionIndex];
+  if (m?.etapes.some(e => e.cible === 'militaire' || e.type === 'bouton')) reinitialiserCamp();   // la mission du camp militaire : il repart de zéro
   if (m?.etapes.some(e => e.blindee) && !voitures.some(v => v.blindee && !v.detruite) && !J.voiture) {
     const v = garerPres(typeNomme('Porsche'));
     if (v) { v.blindee = true; habillerVoiture(v); }
@@ -9328,7 +9790,7 @@ function majCamera(dt) {
   J.lacetCam = v && !enAvion(v) ? v.angle + J.decalage : J.lacet;
   const tangage = J.tangage + (v?.type.glisse ? v.tangage * 0.8 : 0);   // à ski, la caméra plonge avec la pente : sinon, dans une pente raide, on ne verrait que le ciel
   const dir = new THREE.Vector3(Math.sin(J.lacetCam) * Math.cos(tangage), Math.sin(tangage), Math.cos(J.lacetCam) * Math.cos(tangage));
-  joueurH.g.visible = (!v || !!v.forme.siege) && J.vue !== 1;   // en voiture on ne voit pas B.J., sauf sur un tricycle
+  joueurH.g.visible = (!v || !!v.forme.siege) && J.vue !== 1 && !J.robot?.armure;   // en voiture on ne voit pas B.J., sauf sur un tricycle ; dans l'armure non plus
   if (J.mort) {
     joueurH.g.visible = !v || !!v.forme.siege;
     placerCamera(new THREE.Vector3(J.x, J.y + 0.5, J.z), new THREE.Vector3(0.3, -0.9, 0.3).normalize(), 5, 0);
@@ -9342,7 +9804,9 @@ function majCamera(dt) {
     else placerCamera(new THREE.Vector3(v.x, v.y + v.forme.hauteur + 0.35 - (v.amorti || 0), v.z), dir, v.forme.longueur + 3.6 + Math.abs(v.vitesse) * 0.08, 0); // plus la voiture est grande, plus on recule (à ski, elle ne saute pas à chaque bosse)
   } else if (J.robot) { // dans le heavy robot : derrière son épaule, ou dans la cabine
     const r = J.robot;
-    if (J.vue === 1) { r.m.g.updateMatrixWorld(true); camera.position.copy(r.m.torse.localToWorld(V3(0, 1.5, 0.75))); }
+    if (J.vue === 1 && r.armure) camera.position.set(r.x + Math.sin(J.lacet) * 0.55, r.y + 2.45, r.z + Math.cos(J.lacet) * 0.55);   // par les fentes du casque
+    else if (r.armure) placerCamera(new THREE.Vector3(r.x, r.y + 2.7, r.z), dir, 5, 1);
+    else if (J.vue === 1) { r.m.g.updateMatrixWorld(true); camera.position.copy(r.m.torse.localToWorld(V3(0, 1.5, 0.75))); }
     else placerCamera(new THREE.Vector3(r.x, r.y + 4.4, r.z), dir, 7.5, 1.4);
   } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
   else placerCamera(new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z), dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
@@ -9361,7 +9825,8 @@ const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital
   K: ['#1a7a3a', '$', 'Banque'], S: ['#0a7a3a', 'S', 'Supérette'], E: ['#c01818', 'E', 'Station-service'], Z: ['#801010', 'Z', 'Tour Maze Bank'],
   L: ['#2a9a2a', 'F', 'Maison de Franklin'], O: ['#2a6ad8', 'M', 'Villa de Michael'], R: ['#e07a10', 'T', 'Caravane de Trevor'], J: ['#b89a10', 'Y', 'Yellow Jack'],
   B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'], Y: ['#1a7ad8', '❄', 'Station de ski'],
-  U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'] };
+  U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'],
+  '%': ['#4a5a2a', '★', 'Camp militaire'], '?': ['#3a3a44', '?', 'Bunker secret'] };
 const LEGENDE = [...Object.values(ICONES), ['#d8501a', 'C', 'Piste de cascades'], ['#0a9a9a', 'N', 'Navette des pistes']];   // les ronds de la légende de la grande carte
 const REPERES = [];   // [lieu, couleur, lettre, nom]
 for (const [c, [fond, lettre, nom]] of Object.entries(ICONES)) for (const p of lieux[c] || []) REPERES.push([p, fond, lettre, nom]);
@@ -9392,7 +9857,7 @@ function dessinerPlan(g) {
   g.strokeStyle = '#1a3a6a'; g.lineWidth = 6; g.setLineDash([24, 12]); g.beginPath();   // les remontées : un trait tireté
   for (const l of TELESIEGES) { g.moveTo(l.bas.x, l.bas.z); g.lineTo(l.haut.x, l.haut.z); }
   g.stroke(); g.setLineDash([]);
-  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', F: '#5a7040', R: '#8a7a5a' };
+  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', F: '#5a7040', R: '#8a7a5a', '%': '#5a5a44', '?': '#4a4a52' };
   for (const [c, o] of PLAN.pates) { g.fillStyle = couleurs[c] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
   g.globalAlpha = 0.65; for (const gang of GANGS) { const o = origine(gang.col, gang.ligne); g.fillStyle = gang.couleur; g.fillRect(o.x - R / 2, o.z - R / 2, S + R, S + R); } g.globalAlpha = 1;   // le quartier des gangs
   g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
@@ -9412,7 +9877,7 @@ function pointsCarte(point) {
   const gyro = Math.sin(performance.now() / 80) > 0 ? '#f33' : '#39f';
   for (const p of personnes) if (p.vie > 0 && p.alerte && (p.type !== 'flic' || etoiles > 0)) point(p.x, p.z, p.type === 'flic' ? gyro : '#e33');
   for (const v of voitures) if (v.police && v.conducteur) point(v.x, v.z, gyro, 4);
-  for (const r of robots) if (r !== J.robot) point(r.x, r.z, r.pilote === 'police' ? gyro : '#aaa', 6);   // le heavy robot : un gros point
+  for (const r of robots) if (r !== J.robot) point(r.x, r.z, r.pilote === 'police' ? gyro : r.armure ? '#e8b030' : '#aaa', r.armure ? 4 : 6);   // le heavy robot : un gros point ; l'armure : un point doré
 }
 // la mini-carte garde une image toute faite du pays, à un point pour 2 mètres
 const ECHELLE_IMG = 0.5, carteImg = document.createElement('canvas');
@@ -9521,11 +9986,14 @@ function majHUD(dt) {
   $('argent').textContent = montant(J.argent);
   [...$('etoiles').children].forEach((e, i) => e.classList.toggle('on', i < etoiles));
   $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
-  const a = ARMES[J.arme], rb = J.robot;
-  $('arme').textContent = rb ? 'Heavy robot' : tr(a.nom);
-  $('munitions').textContent = rb ? `${tr('{n} balles', { n: rb.munitions.lourde })} · ${tr('{n} roquettes', { n: rb.munitions.roquettes })}` : a.corps || pouvoirArme(a) ? '' : tr(a.explosion ? '{n} roquettes' : '{n} balles', { n: J.balles[J.arme] });
-  const m = MISSIONS[missionIndex];
-  $('objectif').textContent = tr(m ? m.etapes[etapeIndex].texte : 'Pays libre : fais ce que tu veux !');
+  const a = ARMES[J.arme], rb = J.robot, ar = rb?.armure ? rb : null;   // ar : l'armure, quand il est dedans
+  $('barre-armure').style.display = ar ? 'block' : 'none';
+  if (ar) $('barre-armure').firstChild.style.width = `${clamp(ar.points / ARMURE.points, 0, 1) * 100}%`;
+  $('arme').textContent = ar ? tr('Armure') : rb ? 'Heavy robot' : tr(a.nom);
+  $('munitions').textContent = ar ? `${tr('{n} points', { n: Math.ceil(ar.points) })} · ${ar.fusees > 0 ? tr('{n} fusées', { n: ar.fusees }) : tr('Fusées : encore {n} s', { n: Math.ceil(ar.recharge) })}`
+    : rb ? `${tr('{n} balles', { n: rb.munitions.lourde })} · ${tr('{n} roquettes', { n: rb.munitions.roquettes })}` : a.corps || pouvoirArme(a) ? '' : tr(a.explosion ? '{n} roquettes' : '{n} balles', { n: J.balles[J.arme] });
+  const m = MISSIONS[missionIndex], et = m?.etapes[etapeIndex];
+  $('objectif').textContent = tr(m ? et.texte : 'Pays libre : fais ce que tu veux !', et?.type === 'eliminer' ? { n: resteAEliminer(et.cible) } : {});
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
   $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !(J.superman && a.corps) && !dansLunette() && (J.vue === 1 || visee || !a.corps || rb) ? 'block' : 'none';
   $('fumee').style.opacity = J.fumee * (J.masque ? 0.25 : 0.8);   // la fumée toxique brouille la vue (moins avec le masque)
@@ -9537,14 +10005,18 @@ function majHUD(dt) {
   const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
   const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40), ech = aPied && !J.echelle && echelles.find(e => dist(e, J) < 1.5 && Math.abs(J.y - e.bas) < 1);
   const tl = telesiegeProche(), nav = aPied && navetteProche();
+  const bouton = boutonProche() && !camp.ouvert && (aPied || ar);
   const aide = J.telesiege ? tr(J.telesiege.l.cabines ? 'Appuie sur <b>E</b> pour sauter de la cabine' : 'Appuie sur <b>E</b> pour sauter du télésiège')
     : tl ? tr(tl.cabines ? 'Appuie sur <b>E</b> pour prendre la télécabine' : 'Appuie sur <b>E</b> pour prendre le télésiège')
+    : bouton ? tr('Appuie sur <b>E</b> pour appuyer sur le bouton rouge')
+    : ar ? tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · <b>F</b> : fusées · <b>E</b> : sortir')
     : !aPied ? '' : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
       : J.possede[s.arme] ? tr('Appuie sur <b>E</b> pour acheter : {arme} (munitions {prix} $)', { arme: tr(ARMES[s.arme].nom), prix: Math.round(ARMES[s.arme].prix / 2) })
       : tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr(ARMES[s.arme].nom), prix: ARMES[s.arme].prix }))
     : g ? tr('Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max ({prix})', { prix: montant(R_.prixBlindage) })
     : o ? (o.outil === 'perceuse' ? tr('Appuie sur <b>E</b> pour poser la perceuse thermique sur la porte du coffre-fort') : o.outil === 'charge' ? tr("Appuie sur <b>E</b> pour coller l'explosif sur la grille") : tr('Appuie sur <b>E</b> pour voler {objet}', { objet: tr(o.nom) }))
-    : r && r.pilote === 'police' && r.vieVitre <= 0 ? tr('Appuie sur <b>E</b> pour éjecter le pilote du robot') : r && !r.pilote ? tr('Appuie sur <b>E</b> pour monter dans le heavy robot')
+    : r && r.pilote === 'police' && r.vieVitre <= 0 ? tr('Appuie sur <b>E</b> pour éjecter le pilote du robot')
+    : r && !r.pilote ? tr(r.armure ? "Appuie sur <b>E</b> pour monter dans l'armure" : 'Appuie sur <b>E</b> pour monter dans le heavy robot')
     : asc ? tr(asc.monte ? "Appuie sur <b>E</b> pour prendre l'ascenseur (monter sur le toit)" : "Appuie sur <b>E</b> pour prendre l'ascenseur (redescendre)")
     : nav ? tr('Appuie sur <b>E</b> pour prendre la navette : {arret}', { arret: tr(nav.vers.nom) }) : v ? tr('Appuie sur <b>E</b> pour monter : {vehicule}', { vehicule: tr(v.type.nom) })
     : perce ? tr('Perceuse thermique : {n} %. Tiens bon !', { n: Math.floor(perce.perceuse / R_.dureePerceuse * 100) })
@@ -9590,8 +10062,11 @@ function mettreAJour(dt) {
     J.cooldown -= dt; J.frappe = Math.max(0, J.frappe - dt * 3.3); J.recul = Math.max(0, J.recul - dt * 8);
     if (J.robot) { // dans le heavy robot : clic gauche = la mitrailleuse, clic droit = les roquettes
       const r = J.robot; for (const k in r.cdJ) r.cdJ[k] -= dt;
-      if (sourisG && r.cdJ.lourde <= 0) tirer(ARMES_ROBOT.lourde);
-      if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
+      if (r.armure) armesArmure(r, dt);   // dans l'armure : la mitrailleuse, les lance-flammes, et les fusées (touche F)
+      else {
+        if (sourisG && r.cdJ.lourde <= 0) tirer(ARMES_ROBOT.lourde);
+        if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
+      }
     } else if (sourisG && !J.voiture && !J.telesiege && !J.nage && !J.roule && !(J.superman && ARMES[J.arme].corps) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
@@ -9602,7 +10077,7 @@ function mettreAJour(dt) {
   for (const p of personnes) majPersonne(p, dt);
   for (const v of voitures) majVoiture(v, dt);
   for (const r of robots) majRobot(r, dt);
-  majBraquages(dt); majTelesieges(); majBoardercross();
+  majBraquages(dt); majTelesieges(); majBoardercross(); majCamp(dt);
   for (const o of objets) {
     if (o.cache) { o.cache -= dt; if (o.cache <= 0) { o.cache = 0; o.m.visible = true; } continue; }
     o.m.rotation.y += dt * 1.5; o.m.position.y = o.base + Math.sin(temps * 2 + o.x) * 0.1;
@@ -9632,7 +10107,7 @@ function mettreAJour(dt) {
     if (o.cachette) { o.cachette.pris = temps; o.cachette.objet = null; }
     if (o.reapparait) { o.cache = o.delai || 60; o.m.visible = false; } else o.supprimer = true;
   }
-  majRoquettes(dt); majLances(dt); majDebris(dt); majLampadaires(dt); majCachettes();
+  majRoquettes(dt); majFusees(dt); majLances(dt); majDebris(dt); majLampadaires(dt); majCachettes();
   J.energie = Math.max(0, J.energie - dt);
   // au garage LS Customs, une voiture abîmée est réparée (gratuitement)
   if (J.voiture?.abimee && lieux.G && dist(J.voiture, lieuProche('G', J)) < 9) { habillerVoiture(J.voiture); annonce('LS CUSTOMS', tr('Voiture réparée !'), 2.5); bip(600, 1200, 0.3, 'sine', 0.3); }
@@ -9649,7 +10124,7 @@ function mettreAJour(dt) {
   for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); personnes.splice(k, 1); }
   for (let k = voitures.length - 1; k >= 0; k--) if (voitures[k].supprimer && voitures[k] !== J.voiture) { scene.remove(voitures[k].m); voitures.splice(k, 1); }
   for (let k = objets.length - 1; k >= 0; k--) if (objets[k].supprimer) { scene.remove(objets[k].m); objets[k].m.traverse(o => o.geometry?.dispose()); objets.splice(k, 1); }
-  for (let k = robots.length - 1; k >= 0; k--) if ((robots[k].supprimer || (!robots[k].pilote && dist(robots[k], J) > 600)) && robots[k] !== J.robot) { scene.remove(robots[k].m.g); robots.splice(k, 1); }
+  for (let k = robots.length - 1; k >= 0; k--) if ((robots[k].supprimer || (!robots[k].pilote && !robots[k].armure && dist(robots[k], J) > 600)) && robots[k] !== J.robot) { scene.remove(robots[k].m.g); robots.splice(k, 1); }
   for (let k = effets.length - 1; k >= 0; k--) if (effets[k].vie <= 0) effets.splice(k, 1);
   // sons : ton moteur, celui de la voiture qui passe le plus près, le roulement, les pneus et la sirène
   if (audio) {
@@ -9702,7 +10177,7 @@ function boucle(t) {
   if (vm.userData.arme?.userData.sceptre) { vm.position.x -= 0.52; vm.position.y -= 0.1; vm.rotation.x = -J.recul * 0.25; }   // le sceptre : dans la main gauche, et il part en avant à chaque éclair
   renderer.clear();
   renderer.render(scene, camera);
-  if (J.vue === 1 && !J.voiture && !J.mort && !dansLunette()) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
+  if (J.vue === 1 && !J.voiture && !J.mort && !dansLunette() && !J.robot?.armure) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
   requestAnimationFrame(boucle);
 }
 // premier placement du joueur
@@ -9718,6 +10193,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   braquages, butins, robots, creerRobot, voler, butinProche, sauterMission, declencherAlarme, validerTriche, garagistes, payerBlindage, MISSIONS, typeBlinde, creerElite, apparaitreRobot, toucherRobot, R_,
   dansBatiment, pourBoites, resoudre, majJoueur, accrocher, attraper, tenirPrise, prendre, liberer, lancer, lances, filets, feux, arriver, murDevant, cable, garerPres, amenerVoiture, rappelerVoiture, pouvoir, creerArme, raycaster,
   crochetCable, ouvrirFilet, oterFilet, deployerAiles, rendreInvisible, invisible, policeVoit,
+  camp, bunkerSecret, CAMP, ARMURE, creerArmure, monterRobot, sortirRobot, tirerFusees, fuseesVol, majCamp, reinitialiserCamp, appuyerBouton, boutonProche, resteCamp, casserArmure, toucherArmure, etapeFinie, majHUD,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
