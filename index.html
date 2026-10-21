@@ -18,6 +18,7 @@
   #barre-armure { position: absolute; left: 30px; bottom: 38px; width: 214px; height: 8px; background: rgba(0,0,0,.55); display: none; }
   #barre-armure > div { height: 100%; background: #d8a030; transition: width .15s; }
   #haut-droite { position: absolute; right: 28px; top: 18px; text-align: right; }
+  #heure { font: 24px 'Anton', Impact, sans-serif; color: #f0e6c0; }   /* l'heure de la journée : ☀ le jour, ☾ la nuit */
   #argent { font: 38px 'Anton', Impact, sans-serif; color: #7fcf6f; }
   #etoiles { font-size: 32px; letter-spacing: 3px; }
   #etoiles span { color: rgba(255,255,255,.2); }
@@ -36,6 +37,8 @@
                          radial-gradient(circle, transparent 38vh, #000 38.5vh); }
   #fumee { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(165,180,135,.6), rgba(110,125,85,.95)); opacity: 0; }
   #rouge { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 45%, rgba(190,0,0,.75)); opacity: 0; }
+  #sommeil { position: absolute; inset: 0; background: #000; opacity: 0; display: flex; align-items: center; justify-content: center;   /* B.J. dort : l'écran devient noir */
+             font: 72px 'Anton', Impact, sans-serif; color: #b8c4ff; letter-spacing: 8px; }
   #wasted { position: absolute; top: 38%; left: 0; right: 0; text-align: center; font: 100px 'Anton', Impact, sans-serif; color: #c0392b; letter-spacing: 8px; display: none; }
   #grande-carte { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
   #triche { position: absolute; top: 60%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.75); padding: 8px 18px; font-size: 26px; display: none; }
@@ -93,6 +96,7 @@
   <div id="barre-gilet"><div></div></div>
   <div id="barre-armure"><div></div></div>
   <div id="haut-droite">
+    <div id="heure"></div>
     <div id="argent">0 $</div>
     <div id="etoiles"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
     <div id="arme"></div>
@@ -104,6 +108,7 @@
   <div id="viseur"></div>
   <div id="fumee"></div>
   <div id="rouge"></div>
+  <div id="sommeil">Zzz…</div>
   <div id="wasted">WASTED</div>
   <div id="vitesse"></div>
   <canvas id="grande-carte"></canvas>
@@ -144,7 +149,7 @@
     <tr><td>Ctrl ou C</td><td>s'accroupir</td></tr>
     <tr><td>À ski</td><td>Espace : sauter (plus haut sur une bosse) · Maj + Q ou D : déraper · R : peaux des skis de rando</td></tr>
     <tr><td>En l'air, à ski</td><td>Q D : vrilles (180, 360…) · S : backflip · Z : frontflip · S + Q ou D : cork · clics : grabs</td></tr>
-    <tr><td>E</td><td>monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes</td></tr>
+    <tr><td>E</td><td>monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)</td></tr>
     <tr><td>V</td><td>vue 1re / 3e personne</td></tr>
     <tr><td>1 à 8 ou molette</td><td>changer d'arme</td></tr>
     <tr><td>M ou Tab</td><td>carte du pays (molette : zoom)</td></tr>
@@ -262,7 +267,8 @@ const TRADUCTIONS = {
   'sauter (frein à main en voiture)': { de: 'springen (im Auto: Handbremse)', en: 'jump (in a car: handbrake)', gsw: 'gumpe (im Auto: Handbremse)' },
   'Ctrl ou C':                { de: 'Strg oder C', en: 'Ctrl or C', gsw: 'Strg oder C' },
   "s'accroupir":              { de: 'ducken', en: 'crouch', gsw: 'sich ducke' },
-  'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes': { de: 'einsteigen / aussteigen (Auto, Boot, Flugzeug), kaufen, Aufzug, Skibus', en: 'get in / out (car, boat, plane), buy, elevator, ski shuttle', gsw: 'iistiige / uusstiige (Auto, Boot, Flüüger), chaufe, Lift, Skibus' },
+  'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)': { de: 'einsteigen / aussteigen (Auto, Boot, Flugzeug), kaufen, Aufzug, Skibus, schlafen (am Bett deiner Villa)',
+    en: 'get in / out (car, boat, plane), buy, elevator, ski shuttle, sleep (by the bed in your villa)', gsw: 'iistiige / uusstiige (Auto, Boot, Flüüger), chaufe, Lift, Skibus, schlafe (bim Bett vo dinere Villa)' },
   'À ski':                    { de: 'Auf Ski', en: 'On skis', gsw: 'Uf de Ski' },
   'Espace : sauter (plus haut sur une bosse) · Maj + Q ou D : déraper · R : peaux des skis de rando': { de: 'Leertaste: springen (höher auf einem Buckel) · Shift + A oder D: driften · R: Felle der Tourenski',
     en: 'Space: jump (higher off a bump) · Shift + A or D: skid · R: touring ski skins', gsw: 'Läärtaschte: gumpe (höcher uf eme Buckel) · Shift + A oder D: rutsche · R: Fäll vo de Tuureski' },
@@ -589,6 +595,18 @@ const TRADUCTIONS = {
   'Appuie sur <b>E</b> pour sauter du télésiège': { de: 'Drücke <b>E</b>, um vom Sessellift zu springen', en: 'Press <b>E</b> to jump off the chairlift', gsw: 'Drück <b>E</b>, zum vom Sesselilift abegumpe' },
   'Appuie sur <b>E</b> pour prendre la télécabine': { de: 'Drücke <b>E</b> für die Gondelbahn', en: 'Press <b>E</b> to take the gondola', gsw: 'Drück <b>E</b> für d Gondelbahn' },
   'Appuie sur <b>E</b> pour sauter de la cabine': { de: 'Drücke <b>E</b>, um aus der Gondel zu springen', en: 'Press <b>E</b> to jump out of the gondola', gsw: 'Drück <b>E</b>, zum us de Gondle gumpe' },
+  // le jour et la nuit : dormir dans une villa de B.J.
+  "Appuie sur <b>E</b> pour dormir jusqu'au coucher du soleil": { de: 'Drücke <b>E</b>, um bis zum Sonnenuntergang zu schlafen', en: 'Press <b>E</b> to sleep until sunset', gsw: 'Drück <b>E</b>, zum bis zum Sunneundergang schlafe' },
+  "Appuie sur <b>E</b> pour dormir jusqu'à la nuit": { de: 'Drücke <b>E</b>, um bis zur Nacht zu schlafen', en: 'Press <b>E</b> to sleep until night', gsw: 'Drück <b>E</b>, zum bis i d Nacht schlafe' },
+  "Appuie sur <b>E</b> pour dormir jusqu'au lever du soleil": { de: 'Drücke <b>E</b>, um bis zum Sonnenaufgang zu schlafen', en: 'Press <b>E</b> to sleep until sunrise', gsw: 'Drück <b>E</b>, zum bis zum Sunneufgang schlafe' },
+  "Appuie sur <b>E</b> pour dormir jusqu'au matin": { de: 'Drücke <b>E</b>, um bis zum Morgen zu schlafen', en: 'Press <b>E</b> to sleep until morning', gsw: 'Drück <b>E</b>, zum bis am Morge schlafe' },
+  "Sème d'abord la police, puis reviens dormir": { de: 'Häng zuerst die Polizei ab, dann komm zurück zum Schlafen', en: 'Lose the cops first, then come back to sleep', gsw: 'Häng zerscht d Polizei ab, denn chunsch go schlafe' },
+  "Sème d'abord la police !": { de: 'Häng zuerst die Polizei ab!', en: 'Lose the cops first!', gsw: 'Häng zerscht d Polizei ab!' },
+  'Bien dormi !':     { de: 'Gut geschlafen!', en: 'Slept well!', gsw: 'Guet gschlafe!' },
+  "C'est le matin":   { de: 'Es ist Morgen', en: "It's morning", gsw: 'Es isch Morge' },
+  'Le soleil se couche': { de: 'Die Sonne geht unter', en: 'The sun is setting', gsw: 'D Sunne gaht unde' },
+  "C'est la nuit":    { de: 'Es ist Nacht', en: "It's night", gsw: 'Es isch Nacht' },
+  'Le soleil se lève': { de: 'Die Sonne geht auf', en: 'The sun is rising', gsw: 'D Sunne gaht uf' },
   // les pistes de ski et le boardercross
   'DÉPART':           { de: 'START', en: 'START', gsw: 'START' },
   'ARRIVÉE':          { de: 'ZIEL', en: 'FINISH', gsw: 'ZIIL' },
@@ -625,6 +643,7 @@ const TRADUCTIONS = {
   'Tour Maze Bank':   { de: 'Maze Bank Tower', en: 'Maze Bank Tower', gsw: 'Maze Bank Tower' },
   'Maison de Franklin': { de: 'Franklins Haus', en: "Franklin's house", gsw: 'Em Franklin sis Huus' },
   'Villa de Michael': { de: 'Michaels Villa', en: "Michael's villa", gsw: 'Em Michael sini Villa' },
+  'Ta villa (pour dormir)': { de: 'Deine Villa (zum Schlafen)', en: 'Your villa (to sleep)', gsw: 'Dini Villa (zum Schlafe)' },
   'Caravane de Trevor': { de: 'Trevors Wohnwagen', en: "Trevor's trailer", gsw: 'Em Trevor sin Wohnwage' },
   'Château Wolfenstein': { de: 'Schloss Wolfenstein', en: 'Castle Wolfenstein', gsw: 'Schloss Wolfenstein' },
   "Musée d'art":      { de: 'Kunstmuseum', en: 'Art museum', gsw: 'Kunschtmuseum' },
@@ -828,6 +847,18 @@ const REGLAGES = {
   retourTresors: 600,        // secondes : un objet pris revient à sa place au bout de 10 minutes
   dureeEnergie: 30,          // secondes : la boisson énergisante fait courir plus vite...
   vitesseEnergie: 1.4,       // ...40 % plus vite
+  // le jour et la nuit. Les durées se comptent à l'horloge, en secondes (300 = 5 minutes à ta montre), même si vitesseJeu ralentit le jeu.
+  // Pour passer tout de suite au moment suivant : dors dans une de tes villas (v dans la CARTE), touche E près du lit
+  dureeJour: 300,            // le jour : le soleil se lève à l'est, monte, puis redescend à l'ouest
+  dureeCrepuscule: 60,       // le coucher du soleil : le ciel devient orange, puis bleu foncé, puis noir
+  dureeNuit: 360,            // la nuit : la lune, les étoiles, les lampadaires, les fenêtres allumées et les phares
+  dureeLever: 30,            // le lever du soleil
+  clairDeLune: 0.3,          // la lumière de la lune : 0 = une nuit toute noire, 1 = une nuit bien claire
+  lumieresNuit: 8,           // la nuit, les lampadaires (et les lampes de la maison où tu es) qui éclairent vraiment autour de toi : les autres brillent seulement. Mets 0 si le jeu rame (puis F5)
+  pietonsNuit: 0.3,          // la nuit, il ne reste que 30 % des piétons de la foule choisie dans le menu...
+  voituresNuit: 0.4,         // ...et 40 % des voitures
+  gangsNuit: 2,              // la nuit, les gangs sont 2 fois plus nombreux dans leur quartier...
+  rodeursNuit: 6,            // ...et autant de leurs membres se promènent dans les rues, par deux (ils attaquent comme les autres : si on les provoque)
 };
 
 // =====================================================================
@@ -1067,11 +1098,13 @@ const IRONMAN = {
 //  Les lettres sont des pâtés de maisons : les rues sont ajoutées toutes seules autour.
 //    T tours          I immeubles (on entre dans certains : REGLAGES.immeublesVisitables)
 //    M maisons        P parc            . place (entourée de bornes en béton)
-//    X départ du joueur                 a b c d ... lieux de mission (des places)
+//    X départ du joueur                 a b c d ... lieux de mission (des places ; sauf v : une villa, plus bas)
 //  Les pâtés où l'on peut entrer (* = avec un étage ou un toit où monter) :
 //    A armurerie      H hôpital         C commissariat*   S supérette       G garage LS Customs
 //    K banque         Z gratte-ciel (ascenseur jusqu'au toit)                 E station-service
 //    L maison de Franklin*              O villa de Michael*                   R caravane de Trevor
+//    v une villa de B.J.* (avec piscine) : il dort dans sa chambre, à l'étage (touche E près du lit), jusqu'au moment suivant de la journée.
+//      Mets-en où tu veux : en ville, sur une colline (elle est à plat, à la hauteur de la plus basse des cases autour), au bord de la mer
 //    J bar Yellow Jack                  F ferme*          D docks du port   N hangar d'avions
 //    B bunker nazi    W château Wolfenstein* (repaire d'Hitler)
 //    % camp militaire de la commandante Irene Engel : il lui faut 4 cases en carré (2 de large, 2 de haut), réunies derrière une même enceinte.
@@ -1098,13 +1131,13 @@ const CARTE = [
   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 1
   "~~~~~~~~~~~~~~~~~~~~~_~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 2
   "~~~~~~~~~~~~~~~~~~~~_,,~~~~~~~~~~~~~~~~~~~~~~~~~~___________~~~~~~~~~~~~~~",  // 3
-  "~~~~~~~~~~~~~~~~~~~~,,,,_~~~~~~~~~~~~~~~~~~~~~~__***********__~~~~~~~~~~~~",  // 4
+  "~~~~~~~~~~~~~~~~~~~~,,,,_~~~~~~~~~~~~~~~~~~~~~~__****v******__~~~~~~~~~~~~",  // 4
   "~~~~~~~~~~~~~~~~~~~_,__,,,_~~~~~~~~~~~~~~~~~~__*******========__~~~~~~~~~~",  // 5
-  "~~~~~~~~~~~~~~~~~~&,MMSM_,,,_______~~~~~~~~__=========,,,,,,**==__~~~~~~~~",  // 6
+  "~~~~~~~~~~~~~~~~~~&,vMSM_,,,_______~~~~~~~~__=========,,,,,,**==__~~~~~~~~",  // 6
   "~~~~~~~~~~~~~~~~~~_MIHAME=======,,,,___~~~_,=,*,,,,,,,,,,,,,,,=*%%_~~~~~~~",  // 7
   "~~~~~~~~~~~~~~~~~~2MMIGM55431,,,===,,,,,~_,=,,,,,,,,,,,,,,,,,,=*%%*_~~~~~~",  // 8
   "~~~~~~~~~~~~~~~~~1=44356776531,,,,,=,,,,,,=,,,,,,,,,,,,,,,,,,?,,,***_~~~~~",  // 9
-  "~~~~~~~~~~~~~~~~~=344567887652,,,,,,======,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 10
+  "~~~~~~~~~~~~~~~~~=34v567887652,,,,,,======,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 10
   "~~~~~~~~~~~~~~~~*=233678998763,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 11
   "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 12
   "~~~~~~~~~~~~~~3=2***3678998W=3,,,,,,,2=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 13
@@ -1117,14 +1150,14 @@ const CARTE = [
   "~~~~~~~~=,,,,12~~~~~~~~~~~~~~~~~~~~,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 20
   "~~~~~~~=***,134431,,~~~~~~~~~~~~~~~,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 21
   "~~~~~~=****,356653,,,~~~~~~~~~~~~~~::=:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 22
-  "~~~~~#,,,,,,356653,,,,,~~~::~~~&~::::=:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 23
+  "~~~~~#,,,,,,35v653,,,,,~~~::~~~&~::::=:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 23
   "~~~~~=,,,,,,356653,,,,,::::::MRJSM::=::,1221,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 24
-  "~~~~=,,,,,,2234431,,,,,::::::MHCAM::=2:135531,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 25
+  "~~~~=,,,,,,2234431,,,,,::::::vHCAM::=2:135531,,,,,,,,,,,,,,,,,,,,,,,,v*_~~",  // 25
   "~~~_=NIB,,2442221,,,,,,::::::::::=:=22:256652,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 26
   "~~~_=!!!d,2442,,,,,,,,,::::::!^!!==::::256652,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 27
   "~~~_=,,,,,,22,,,,,,,,,,::::::======::::13553,,,,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 28
   "~~~_=,,,,,,,,,,,,,,,,,,::ES==:::::=::::,1221,,,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 29
-  "~~~_=,,,,,,,,,,,,,,,,,===:::::::::=::::333,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 30
+  "~~~_=v,,,,,,,,,,,,,,,,===:::::::::=::::333,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 30
   "~~~~#~~~~~~~~~~~~~##==,:::::::::::=:::24542,,,,,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 31
   "~~~_====,,,,,,23==,=,,,,,,,,1111,,=,,,2454,,,,,,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 32
   "~~~_=,,,========431=1221,,,,1221,=,,,,,333_,,,*,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 33
@@ -1132,18 +1165,18 @@ const CARTE = [
   "~~~_=,,,2332**2332,=2332,,,,1111==,,,,,,,~~~~_**,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 35
   "~~~_=,,2=E432,,11,,=1221***,,,,,=,===E,,,~~~~~_*,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 36
   "~~~_=,,345543,,,,11=11,****,,,,=,,,,,121,~~~~~_*,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 37
-  "~~~_=,,345543,,,,22=22,,,,,,,,,=,,,,,343,~~~~~~_*,,,,,,,,,,,,,,,,,*_~~~~~~",  // 38
+  "~~~_=,,345v43,,,,22=22,,,,,,,,,=,,,,,343,~~~~~~_*,,,,,,,,,,,,,,,,,*_~~~~~~",  // 38
   "~~~_=,,234432,,,123=3~1221,,,,,=,,,,,343,~~~~~~_*,,,,,,,,,,,,,,,,,*_~~~~~~",  // 39
   "~~~_M=,,2332,,,,123=322332,,,,,=,,111121,~~~~~~~_*,,,,,,,,,,,,,,,*_~~~~~~~",  // 40
   "~~&_S=,,,,,,,,,,,22L222332,,,,,=,133331,,~~~~~~~_**,,,,,,,,,,,,,**_~~~~~~~",  // 41
-  "~~~_,=2,,,,,,,,,,11=111221,,,,=,13444431,~~~~~~~~_**,,,,,,,,,,,**_~~~~~~~~",  // 42
+  "~~~_,=2,,,,,,,,,,11=111221,,,,=,134v4431,~~~~~~~~_**,,,,,,,,,,,**_~~~~~~~~",  // 42
   "~~~_,=2,,,,,,,,,,,,=,,,,,,,,,=,,13455431,~~~~~~~~~__**,,,,,,,**__~~~~~~~~~",  // 43
-  "~~~~,,=,,,,,_MMMOMMIIPIIMMMM=,,,1~~55431,~~~~~~~~~~~__*******__~~~~~~~~~~~",  // 44
+  "~~~~,,=,,,,,_MvMOMMIIPIIMMMM=,,,1~~55431,~~~~~~~~~~~__*******__~~~~~~~~~~~",  // 44
   "~~~~~,=,,,,,_MMMMMIIIXITIIIMM,,,1~~44431,~~~~~~~~~~~~~_______~~~~~~~~~~~~~",  // 45
   "~~~~~~_=,,,,_IMPMIIHIIITIIUMMM,,,~~3331,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 46
   "~~~~~~~~=====IIMIIIIITIIIII~~~~~~~~111,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 47
   "~~~~~~~~~,,_IIIIVIIIATTTIII~IIM,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 48
-  "~~~~~~~~~~,_IIIMIIIITTZKTTI~IIM,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 49
+  "~~~~~~~~~~,_IIIMIIIITTZKTTI~IIv,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 49
   "~~~~~~~~~~~,_IIIIIaTTQTTCTT+IIM,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 50
   "~~~~~~~~~~&__IIPIIIITTTbTTI~III,,,,121,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 51
   "~~~~~~~~~~~_,_IIIIIIITTTTII~IMM,,,23332,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 52
@@ -2395,25 +2428,36 @@ const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, Ma
 camera.rotation.order = 'YXZ';
 scene.add(camera);
 
-// ciel réaliste avec nuages + reflets sur les vitres et les voitures
+// ciel réaliste avec nuages + reflets sur les vitres et les voitures. Le soleil tourne autour du pays (voir « Le jour et la nuit », vers la fin)
 const soleilDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(50), THREE.MathUtils.degToRad(140));
 const ciel = new Sky();
 ciel.scale.setScalar(1000);
+ciel.renderOrder = -2;   // dessiné le tout premier, puis les étoiles et la lune, puis tout le reste par-dessus
 ciel.material.uniforms.turbidity.value = 3;
 ciel.material.uniforms.rayleigh.value = 1.5;
 ciel.material.uniforms.mieCoefficient.value = 0.004;
 ciel.material.uniforms.mieDirectionalG.value = 0.8;
 ciel.material.uniforms.sunPosition.value.copy(soleilDir);
-{
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const s = new THREE.Scene(); s.add(ciel);
-  ciel.material.uniforms.showSunDisc.value = 0;   // pas de disque du soleil dans les reflets : la lumière « soleil » éclaire déjà
-  scene.environment = pmrem.fromScene(s).texture;
-  ciel.material.uniforms.showSunDisc.value = 1;
-  scene.environmentIntensity = 0.7;
-  scene.add(ciel);
+{ // on retouche le programme du ciel : eclat l'assombrit après le coucher du soleil (1 = le ciel de Three.js, 0 = noir), fondNuit lui donne un fond bleu nuit
+  const avant = 'gl_FragColor = vec4( texColor, 1.0 );', m = ciel.material;
+  if (!m.fragmentShader.includes(avant)) alert('Ciel : le programme « Sky » de Three.js a changé !');
+  m.fragmentShader = 'uniform float eclat;\nuniform vec3 fondNuit;\n' + m.fragmentShader.replace(avant, 'gl_FragColor = vec4( texColor * eclat + fondNuit, 1.0 );');
+  Object.assign(m.uniforms, { eclat: { value: 1 }, fondNuit: { value: new THREE.Color(0, 0, 0) } });
 }
-scene.add(new THREE.HemisphereLight(0xcfe4ff, 0x5a5040, 0.35));
+// les reflets : le ciel, photographié tout autour (sans le disque du soleil : la lumière « soleil » éclaire déjà). On le refait quand le soleil a bougé
+const pmrem = new THREE.PMREMGenerator(renderer), scenePhoto = new THREE.Scene();
+let reflets = null;
+function photographierCiel() {
+  const u = ciel.material.uniforms, avant = ciel.position.clone();
+  scenePhoto.add(ciel); ciel.position.set(0, 0, 0); u.showSunDisc.value = 0;
+  const r = pmrem.fromScene(scenePhoto);
+  u.showSunDisc.value = 1; ciel.position.copy(avant); scene.add(ciel);
+  reflets?.dispose(); reflets = r; scene.environment = r.texture;
+}
+photographierCiel();
+scene.environmentIntensity = 0.7;
+const ambiance = new THREE.HemisphereLight(0xcfe4ff, 0x5a5040, 0.35);   // la lumière du ciel (en haut) et du sol (en bas)
+scene.add(ambiance);
 const soleil = new THREE.DirectionalLight(0xfff1dd, 4.5);
 soleil.castShadow = true;
 soleil.shadow.mapSize.set(2048, 2048);
@@ -2452,18 +2496,30 @@ function vitre(g, x, y, w, h, [r, v, b] = [60, 90, 120]) {
   g.fillStyle = gr; g.fillRect(x, y, w, h);
   if (Math.random() < 0.25) { g.fillStyle = 'rgba(235,225,200,.55)'; g.fillRect(x, y, w, h * entre(0.3, 0.7)); }
   if (g.reflets) { g.reflets.fillStyle = '#001ae6'; g.reflets.fillRect(x, y, w, h); }   // une vitre : lisse et brillante comme un miroir
+  // la nuit, la lumière des pièces : ce dessin couvre 3 × 3 fois la façade (sinon on verrait les mêmes fenêtres allumées tous les 12 m) ;
+  // dans chacune, cette vitre est allumée une fois sur 2 environ (g.allumees), d'un jaune chaud, d'un blanc ou du bleu d'une télé
+  if (g.lumieres) for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) if (Math.random() < g.allumees) {
+    const X = (x + a * g.largeur) / 3, Y = (y + b * g.hauteur) / 3, d = g.lumieres.createLinearGradient(0, Y, 0, Y + h / 3), c = hasard(['#ffc070', '#ffd890', '#ffb060', '#fff0d0', '#ffcf80', '#9ab8ff']);
+    d.addColorStop(0, c); d.addColorStop(1, c + '99');   // (plus clair en haut, près de la lampe)
+    g.lumieres.fillStyle = d; g.lumieres.fillRect(X, Y, w / 3, h / 3);
+  }
 }
-function facade(fond, cols, rangs, fenetre, avant, hauteur = 256) {
+// une façade : son fond, ses fenêtres (cols × rangs, dessinées par fenetre), ce qu'on dessine avant (avant) ; allumees : la part des fenêtres
+// éclairées la nuit (de 0 à 1)
+function facade(fond, cols, rangs, fenetre, avant, hauteur = 256, allumees = 0.45) {
   // un deuxième dessin, invisible, dit où ça brille (vert = rugueux, bleu = métal) : les murs sont mats, les vitres reflètent le ciel
   const reflets = toile(256, hauteur, (g, l, h) => { g.fillStyle = '#00e000'; g.fillRect(0, 0, l, h); });
   reflets.colorSpace = THREE.NoColorSpace;
+  // un troisième, les fenêtres allumées la nuit, en noir partout ailleurs (voir vitre)
+  const lumieres = toile(256, hauteur, (g, l, h) => { g.fillStyle = '#000'; g.fillRect(0, 0, l, h); });
+  lumieres.repeat.set(1 / 3, 1 / 3);
   const t = toile(256, hauteur, (g, l, h) => {
-    g.reflets = reflets.image.getContext('2d');
+    Object.assign(g, { reflets: reflets.image.getContext('2d'), lumieres: lumieres.image.getContext('2d'), allumees, largeur: l, hauteur: h });
     g.fillStyle = fond; g.fillRect(0, 0, l, h); grain(g, l, h, 3000, 0.06);
     if (avant) avant(g, l, h);
     for (let r = 0; r < rangs; r++) for (let c = 0; c < cols; c++) fenetre(g, c * l / cols, r * h / rangs, l / cols, h / rangs);
   });
-  t.reflets = reflets;
+  Object.assign(t, { reflets, lumieres });
   return t;
 }
 const TEX = {
@@ -2486,6 +2542,9 @@ const TEX = {
   verre: facade('#1d2c3a', 6, 4, (g, x, y, w, h) => vitre(g, x + 1.5, y + 1.5, w - 3, h - 3, [40, 90, 125])),
   verre2: facade('#3a3320', 6, 4, (g, x, y, w, h) => vitre(g, x + 1.5, y + 1.5, w - 3, h - 3, [115, 98, 60])),
   maison: facade('#e8dcc0', 2, 2, (g, x, y, w, h) => { g.fillStyle = '#fff'; g.fillRect(x + w * .3 - 4, y + h * .25 - 4, w * .4 + 8, h * .45 + 8); vitre(g, x + w * .3, y + h * .25, w * .4, h * .45); g.fillStyle = '#3b5b3b'; g.fillRect(x + w * .3 - 18, y + h * .25 - 4, 12, h * .45 + 8); g.fillRect(x + w * .7 + 6, y + h * .25 - 4, 12, h * .45 + 8); }),
+  // une villa de B.J. : un enduit blanc, de grandes baies vitrées encadrées de gris foncé, au rez-de-chaussée et à l'étage ; au-dessus (le
+  // garde-fou du toit), rien. La nuit, ses fenêtres sont presque toutes allumées
+  villa: facade('#ecebe4', 2, 3, (g, x, y, w, h) => { if (y < 1) return; g.fillStyle = '#3a3c40'; g.fillRect(x + w * .08 - 3, y + h * .1 - 3, w * .84 + 6, h * .8 + 6); vitre(g, x + w * .08, y + h * .1, w * .84, h * .8, [45, 75, 100]); }, null, 288, 0.8),
   hopital: facade('#f2f2ee', 1, 4, (g, x, y, w, h) => vitre(g, 0, y + h * .3, w, h * .45, [50, 90, 140])),
   magasin: facade('#4a2a22', 4, 2, (g, x, y, w, h) => { if (y > 0) { g.fillStyle = '#222'; g.fillRect(x, y + 8, w, h - 8); vitre(g, x + 4, y + 14, w - 8, h - 20, [70, 60, 50]); } else vitre(g, x + w * .2, y + h * .25, w * .6, h * .5); }, null, 128),
   bunker: toile(256, 256, (g, l, h) => { g.fillStyle = '#6e6e66'; g.fillRect(0, 0, l, h); grain(g, l, h, 6000, 0.1); g.fillStyle = 'rgba(0,0,0,.3)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 64, 0, 2, h); g.fillRect(0, k * 64, l, 2); } for (let i = 0; i < 12; i++) { g.fillStyle = 'rgba(40,35,20,.15)'; g.fillRect(Math.random() * l, Math.random() * h, 6, entre(20, 80)); } }),
@@ -2620,9 +2679,16 @@ const visage = (peau, fille) => cacheVisage[peau + (fille ? ' fille' : '')] ||= 
 TEX.lignes.repeat.set(1, S / 12);
 TEX.feuilles.repeat.set(4, 3);
 
-// le dessin sert aussi de relief (clair = bosse, foncé = creux)
-const std = (map, o = {}) => new THREE.MeshStandardMaterial({ map, roughness: 0.85, bumpMap: map, bumpScale: 0.15,
-  ...(map?.reflets && { roughnessMap: map.reflets, metalnessMap: map.reflets, roughness: 1, metalness: 1 }), ...o });
+// le dessin sert aussi de relief (clair = bosse, foncé = creux). Une façade a des fenêtres qui s'allument la nuit : MATS_FENETRES les garde
+// toutes, pour les allumer (voir « Le jour et la nuit »)
+const MATS_FENETRES = [];
+const std = (map, o = {}) => {
+  const m = new THREE.MeshStandardMaterial({ map, roughness: 0.85, bumpMap: map, bumpScale: 0.15,
+    ...(map?.reflets && { roughnessMap: map.reflets, metalnessMap: map.reflets, roughness: 1, metalness: 1 }),
+    ...(map?.lumieres && { emissiveMap: map.lumieres, emissive: '#fff', emissiveIntensity: 0 }), ...o });
+  if (map?.lumieres) MATS_FENETRES.push(m);
+  return m;
+};
 const MAT = {
   route: std(TEX.route, { roughness: 0.95 }),
   lignes: std(TEX.lignes, { transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
@@ -2631,7 +2697,7 @@ const MAT = {
   trottoir: std(TEX.trottoir), herbe: std(TEX.herbe, { roughness: 1 }), paves: std(TEX.paves),
   toit: std(TEX.toit, { roughness: 1 }), tuiles: std(TEX.tuiles), ardoise: std(TEX.tuiles, { color: '#667' }),
   brique: std(TEX.brique), beton: std(TEX.beton), moderne: std(TEX.moderne), verre: std(TEX.verre), verre2: std(TEX.verre2),
-  maison1: std(TEX.maison), maison2: std(TEX.maison, { color: '#cfe0ff' }), maison3: std(TEX.maison, { color: '#ffc8b0' }),
+  maison1: std(TEX.maison), maison2: std(TEX.maison, { color: '#cfe0ff' }), maison3: std(TEX.maison, { color: '#ffc8b0' }), villa: std(TEX.villa),
   hopital: std(TEX.hopital), magasin: std(TEX.magasin), bunker: std(TEX.bunker, { roughness: 1 }),
   metal: std(null, { color: '#8a8d90', metalness: 0.6, roughness: 0.4 }), sacs: std(null, { color: '#8a7a5a', roughness: 1 }),
   pierre: std(null, { color: '#b8b2a6' }), eau: std(null, { color: '#2a5a7a', metalness: 0.3, roughness: 0.05 }),
@@ -2671,7 +2737,7 @@ const MAT = {
 MAT.dalle = MAT.platre;   // la dalle du toit d'un bâtiment où l'on entre : comme le plâtre, mais elle fait de l'ombre
 // taille (en mètres) couverte par une répétition de chaque texture
 const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [12, 12], verre2: [12, 12], hopital: [12, 12],
-  maison1: [6, 6], maison2: [6, 6], maison3: [6, 6], magasin: [12, 6], bunker: [8, 8], toit: [8, 8], trottoir: [4, 4],
+  maison1: [6, 6], maison2: [6, 6], maison3: [6, 6], villa: [8, 9], magasin: [12, 6], bunker: [8, 8], toit: [8, 8], trottoir: [4, 4],
   herbe: [6, 6], paves: [4, 4], chateau: [4, 4], carrelage: [2, 2], parquet: [3, 3], planches: [3, 3], grange: [6, 6], tole: [6, 6],
   conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2],
   marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2] };
@@ -2780,9 +2846,12 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
   const B = (m, u, y, w, lu, h, lw, coll = true) => { const [X, Z] = P(u, w); return boite(m, X, y, Z, b ? lw : lu, h, b ? lu : lw, coll); };
   const Plan = (m, u, y, w, lu, lw) => { const [X, Z] = P(u, w); sol(m, X, y, Z, b ? lw : lu, b ? lu : lw); };
   const y0 = 0.2 + bas, niveau = k => y0 + 0.05 + k * hEtage, hVisite = etages * hEtage + 0.05, hMur = hVisite + (toit ? 1.1 : 0);
-  const moi = { x, z, geos: {} }, dedans = f => { const avant = interieur; interieur = moi; f(); interieur = avant; };   // ce qui est dedans ne se voit que de près
+  const moi = { x, z, geos: {}, lampes: [] }, dedans = f => { const avant = interieur; interieur = moi; f(); interieur = avant; };   // ce qui est dedans ne se voit que de près
   interieurs.push(moi);
   const iu = l / 2 - E, iw = p / 2 - E, g1 = decalagePorte - largeurPorte / 2, g2 = decalagePorte + largeurPorte / 2, pe = 0.02;
+  // où il est (pour savoir si B.J. est dedans), et ses lampes : la nuit, celles de la maison où est B.J. éclairent vraiment (voir « Le jour et la nuit »)
+  { const [xa, za] = P(-l / 2, -p / 2), [xb, zb] = P(l / 2, p / 2); Object.assign(moi, { x1: Math.min(xa, xb), x2: Math.max(xa, xb), z1: Math.min(za, zb), z2: Math.max(za, zb), y1: Y0 + y0, y2: Y0 + y0 + hVisite }); }
+  const noterLampe = (u, k, w) => { const [X, Z] = P(u, w); moi.lampes.push({ x: X, y: Y0 + niveau(k + 1) - 0.5, z: Z, dedans: true }); };   // une lampe au plafond de l'étage k
   // les murs (au-dessus du toit, ils font un garde-fou), et leur peau à l'intérieur
   B(mat, 0, y0, -p / 2 + E / 2, l, hMur, E); B(mat, -l / 2 + E / 2, y0, 0, E, hMur, p - 2 * E); B(mat, l / 2 - E / 2, y0, 0, E, hMur, p - 2 * E);
   // le mur de la porte, en 3 morceaux : le dessin de chacun reprend là où s'arrêtent celui de gauche et celui d'en dessous
@@ -2820,9 +2889,9 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
     boite('toit', X, y0 + hVisite + plein * 3, Z, (b ? p : l) + 0.5, 0.6, (b ? l : p) + 0.5, true);
   } else if (!toit) B('toit', 0, y0 + hVisite, 0, l + 0.5, 0.4, p + 0.5);
   // des lampes au plafond
-  if (lampes) dedans(() => { for (let k = 0; k < etages; k++) for (const u of [-iu / 2, iu / 2]) for (const w of [-iw / 2, iw / 2])
-    B('lampe', u, niveau(k + 1) - 0.36, w, 1.2, 0.06, 0.3, false); });
-  return { B, P, niveau, iu, iw, dedans,
+  if (lampes) dedans(() => { for (let k = 0; k < etages; k++) for (const u of [-iu / 2, iu / 2]) for (const w of [-iw / 2, iw / 2]) {
+    B('lampe', u, niveau(k + 1) - 0.36, w, 1.2, 0.06, 0.3, false); noterLampe(u, k, w); } });
+  return { B, P, niveau, iu, iw, dedans, noterLampe,
     meuble: (m, u, k, w, lu, h, lw, dy = 0) => dedans(() => B(m, u, niveau(k) + dy, w, lu, h, lw)),   // posé sur le plancher de l'étage k
     point: (u, k, w) => { const [X, Z] = P(u, w); return { x: X, z: Z, y: Y0 + niveau(k) }; } };
 }
@@ -2859,9 +2928,11 @@ function immeubleI(mat, x, z, l, p, etages, porte, cote, rnd) {
 // Les étages d'un immeuble où l'on entre, tirés au hasard : un appartement (derrière des cloisons, une chambre et une salle de bain ;
 // de l'autre côté, un salon avec la télé, une cuisine et la table à manger), un loft (pareil, sans cloisons) ou des bureaux.
 // Le chemin de la porte à l'escalier reste libre : tout droit vers le fond, puis à gauche le long de l'escalier.
-// Sur certains meubles, un objet à voler ou un bonus attend (cachettes)
+// Sur certains meubles, un objet à voler ou un bonus attend (cachettes).
+// plan : la sorte de chaque étage, au lieu du hasard (une villa de B.J. : 'villaBas', puis 'villaHaut' ; chez lui, rien à voler).
+// Si b.lits est une liste, chaque lit y note sa place (le milieu du lit, sur le plancher)
 const cachettes = [];   // { x, y, z : où il attend (y : le dessus du meuble) ; type, tresor : ce que c'est ; objet : l'objet, quand B.J. est près ; pris : quand il l'a pris }
-function meubler(b, n, rnd) {
+function meubler(b, n, rnd, plan) {
   const { iu, iw } = b, profond = iw > 7, large = iu > 15;
   const wS = -iw + 3.3, wF = wS + 1.6;   // l'escalier est au fond à gauche, avant wS ; de wS à wF, le passage qui y mène
   let k = 0, r = rnd, caches = [];
@@ -2873,7 +2944,7 @@ function meubler(b, n, rnd) {
   const pose = (m, u, w, f, larg, h, prof, av = 0, lat = 0, dy = 0, coll = true) => M(m, ...ou(u, w, f, av, lat), f[0] ? prof : larg, h, f[0] ? larg : prof, dy, coll);
   const cache = (u, w, dy) => caches.push({ ...b.point(u, k, w), dy });   // un objet pourra attendre là, sur un meuble haut de dy
   const boule = (m, u, w, rayon, dy) => { const [X, Z] = b.P(u, w); b.dedans(() => ajouterGeo(m, new THREE.SphereGeometry(rayon, 8, 6).translate(X, Y0 + b.niveau(k) + dy, Z))); };
-  const lampe = (u, w) => b.dedans(() => b.B('lampe', u, b.niveau(k + 1) - 0.36, w, 0.8, 0.06, 0.8, false));
+  const lampe = (u, w) => { b.dedans(() => b.B('lampe', u, b.niveau(k + 1) - 0.36, w, 0.8, 0.06, 0.8, false)); b.noterLampe(u, k, w); };
   const cloison = (u1, w1, u2, w2) => M('platre', (u1 + u2) / 2, (w1 + w2) / 2, Math.max(0.12, u2 - u1), 2.7, Math.max(0.12, w2 - w1));
   const tapis = (u, w, lu, lw, m) => M(m, u, w, lu, 0.012, lw, 0.004, false);
   const tableau = (u, w, f) => pose(hasardR(['paysage', 'portrait'], r), u, w, f, 1.2, 0.8, 0.04, 0, 0, 1.3, false);
@@ -2888,6 +2959,7 @@ function meubler(b, n, rnd) {
     pose('bois', u, w, f, 1.7, 1, 0.08, -1.06);   // la tête de lit
     for (const c of [-1, 1]) { pose('bois', u, w, f, 0.45, 0.5, 0.4, -0.85, c * 1.1); pose('lampe', u, w, f, 0.15, 0.22, 0.15, -0.85, c * 1.1, 0.5, false); }
     cache(...ou(u, w, f, -0.85, -1.1), 0.5);
+    b.lits?.push(b.point(u, k, w));
   };
   const armoire = (u, w, f) => { pose('bois', u, w, f, 1.6, 2.1, 0.6); pose('boisClair', u, w, f, 0.04, 1.9, 0.02, 0.3, 0, 0.1, false); };
   const commode = (u, w, f) => { pose('boisClair', u, w, f, 1.2, 0.85, 0.5); pose('miroir', u, w, f, 0.8, 0.9, 0.03, -0.23, 0, 1, false); cache(u, w, 0.85); };
@@ -2956,7 +3028,7 @@ function meubler(b, n, rnd) {
   for (; k < n; k++) {
     r = graine(Math.floor(rnd() * 1e9) ^ Math.floor(rnd() * 2e9));   // deux tirages par étage, comme avant : le reste du pays ne change pas
     caches = [];
-    const t = r(), sorte = profond && t < 0.5 ? 'appartement' : t < (profond ? 0.75 : 0.6) ? 'loft' : 'bureaux';
+    const t = r(), sorte = plan?.[k] || (profond && t < 0.5 ? 'appartement' : t < (profond ? 0.75 : 0.6) ? 'loft' : 'bureaux');
     (b.sortes ||= []).push(sorte);   // (pour les essais)
     if (sorte === 'appartement') {
       const xC = -1.3, wC = wF + 4, uB = iu > 12 ? -9.3 : -iu;   // la cloison du couloir ; celle entre la salle de bain et la chambre ; le bout de la salle de bain
@@ -2981,6 +3053,14 @@ function meubler(b, n, rnd) {
       chambre(large ? -U : -iu, wF, iw);
       salon(wM, iw, large ? U : iu); salleAManger(-iw, wM, large ? U : iu);
       if (large) { chambreEnfant(wF, iw); salleDeJeux(-iw, iw); }
+    } else if (sorte === 'villaBas') { // le bas d'une villa de B.J. : à droite, le salon devant, la cuisine et la table au fond ; à gauche, un billard
+      salon(-0.2, iw, iu); salleAManger(-iw, -0.2, iu);
+      tapis(-5.5, 2.4, 3.6, 4.4, 'tapis2'); M('bois', -5.5, 2.4, 1.5, 0.72, 2.6); M('billard', -5.5, 2.4, 1.3, 0.06, 2.4, 0.72); lampe(-5.5, 2.4);
+      plante(-iu + 0.5, iw - 0.5);
+    } else if (sorte === 'villaHaut') { // l'étage : la chambre de B.J. à gauche (il dort dans son lit), un coin télé devant à droite, deux bornes d'arcade au fond
+      chambre(-iu, wF, iw); salon(-0.2, iw, iu);
+      for (const dw of [-1.2, 0.2]) { pose('noirMeuble', iu - 0.4, -iw + 3 + dw, [-1, 0], 0.7, 1.8, 0.6); pose('ecran', iu - 0.4, -iw + 3 + dw, [-1, 0], 0.5, 0.4, 0.02, 0.31, 0, 1.1, false); }
+      plante(2.6, -iw + 0.5); lampe(iu - 3, -iw + 2.5);
     } else { // des bureaux en rangées, des armoires à dossiers, une fontaine à eau et des plantes
       for (let u = 2.8; u < iu - 1.2; u += 3.4) for (let w = -iw + 1.2; w < iw - 1.4; w += 3.2) bureau(u, w, [0, 1]);
       for (let u = -iu + 1.5; u < -2.2; u += 3.4) for (let w = wF + 1.2; w < iw - 1.4; w += 3.2) bureau(u, w, [0, 1]);
@@ -2990,7 +3070,7 @@ function meubler(b, n, rnd) {
       for (const u of [-iu / 2, iu / 2]) for (const w of [-iw / 2, iw / 2]) lampe(u, w);
     }
     // un objet à voler (ou un bonus) sur un meuble, un étage sur deux environ ; parfois deux
-    for (let q = 0; q < 2 && caches.length; q++) {
+    for (let q = 0; q < 2 && caches.length && !plan; q++) {
       if (r() > (q ? 0.25 : 0.6)) break;
       const c = caches.splice(Math.floor(r() * caches.length), 1)[0], tresor = r() < 0.65 && TRESORS.length > 0;
       cachettes.push({ x: c.x, y: c.y + c.dy, z: c.z, type: tresor ? 'tresor' : hasardR(['soin', 'munitions', 'energie', 'potDeVin', 'gilet'], r), tresor: Math.floor(r() * TRESORS.length) });
@@ -3025,6 +3105,7 @@ const CONTENEURS = ['conteneur1', 'conteneur2', 'conteneur3', 'conteneur4'];
 
 const stands = [], soins = [], pnjDepart = [], voituresGarees = [], pickupsDepart = [], ascenseurs = [], bateauxDepart = [], hopitaux = [];
 const garagistes = [], braquages = [], butinsDepart = [];
+const lits = [];   // les lits des villas de B.J. (v dans la CARTE) : il y dort (voir « Le jour et la nuit »)
 let chateau = null, bunker = null;
 let camp = null, bunkerSecret = null;   // le camp militaire (%) et le bunker secret (?) : voir « Le camp militaire », plus bas
 function genererBloc(i, j) {
@@ -3166,6 +3247,15 @@ function genererBloc(i, j) {
       for (const x of [8, 52]) arbre(X(x), Z(52), 1.1, Y0 + 0.2, 'palmier');
       voituresGarees.push({ x: X(48), z: Z(20), a: 0, type: 'Porsche' });
     } else voituresGarees.push({ x: X(46), z: Z(24), a: 0, type: 'Classique' });
+  } else if (c === 'v') { // une villa de B.J. : un jardin, une terrasse, une piscine, des palmiers et une voiture de sport. À l'étage, sa chambre : il y dort
+    herbe();
+    const b = batiment({ x: X(30), z: Z(21), l: 22, p: 14, mat: 'villa', etages: 2, toit: true, sol: 'parquet', largeurPorte: 2.4 });
+    b.lits = []; meubler(b, 2, rnd, ['villaBas', 'villaHaut']); lits.push(...b.lits);
+    sol('paves', X(30), 0.215, Z(31), 22, 6);                                          // la terrasse, devant la porte
+    for (const [x, z, l, p] of [[30, 37.8, 15.6, 0.6], [30, 46.2, 15.6, 0.6], [22.5, 42, 0.6, 9], [37.5, 42, 0.6, 9]]) boite('pierre', X(x), 0.2, Z(z), l, 0.3, p, true);
+    sol('piscine', X(30), 0.4, Z(42), 14.4, 7.8);
+    for (const [x, z] of [[9, 9], [51, 9], [9, 51], [51, 51], [14, 42]]) arbre(X(x), Z(z), 0.9 + rnd() * 0.4, Y0 + 0.2, 'palmier');
+    voituresGarees.push({ x: X(48), z: Z(24), a: 0, type: hasardR(['Porsche', 'Lamborghini', 'Audi TT', 'Rolls-Royce'], rnd) });
   } else if (c === 'R') { // la caravane de Trevor : la planque des braquages
     const b = batiment({ x: X(30), z: Z(28), l: 11, p: 5, mat: 'maison2', hEtage: 2.6, largeurPorte: 1.1, hauteurPorte: 2.1, sol: 'moquette', decalagePorte: 2 });
     // le lieu des missions est dedans, au milieu de la pièce. rayon : il faut arriver à moins de 2,5 m (donc entrer, à pied)
@@ -3962,6 +4052,7 @@ GEO_ARBRE.sapinNeige = GEO_ARBRE.sapin;
 const GEO_POTEAU = mergeGeometries([new THREE.CylinderGeometry(0.07, 0.11, 7, 6).translate(0, 3.5, 0), new THREE.BoxGeometry(0.1, 0.1, 1.8).translate(0, 7, 0.85)]);
 const GEO_LAMPE = new THREE.BoxGeometry(0.35, 0.12, 0.7).translate(0, 6.92, 1.6);
 const MAT_POTEAU = std(null, { color: '#333', metalness: 0.6, roughness: 0.5 }), MAT_LAMPE = std(null, { color: '#ffe', emissive: '#ffe8b0', emissiveIntensity: 0.4 });
+const MAT_LAMPE_CASSEE = std(null, { color: '#bbb' });   // la lampe d'un lampadaire renversé : éteinte
 // arbres et lampadaires « instanciés » : un seul objet pour tous ceux d'un morceau
 function instances(dans, geo, mat, liste, placer) {
   if (!liste.length || !geo) return;
@@ -4026,9 +4117,10 @@ function faucher(v, c, vx, vz) {
 function renverserLampadaire(e, vx, vz) {
   e.boite.h = -Infinity;   // plus d'obstacle
   for (const im of e.dessins) { im.setMatrixAt(e.k, new THREE.Matrix4().makeScale(0, 0, 0)); im.instanceMatrix.needsUpdate = true; }   // on cache celui qui était debout
+  haloLampadaire(e, false);   // (et sa lumière, la nuit)
   const g = new THREE.Group(), tige = new THREE.Group();   // g : au pied, tourné vers où il tombe ; tige : ce qui bascule
   g.position.set(e.x, e.y, e.z); g.rotation.y = Math.atan2(vx, vz); g.add(tige); scene.add(g);
-  for (const [geo, m] of [[GEO_POTEAU, MAT_POTEAU], [GEO_LAMPE, MAT_LAMPE]]) { const p = new THREE.Mesh(geo, m); p.rotation.y = e.a - g.rotation.y; p.castShadow = true; tige.add(p); }
+  for (const [geo, m] of [[GEO_POTEAU, MAT_POTEAU], [GEO_LAMPE, MAT_LAMPE_CASSEE]]) { const p = new THREE.Mesh(geo, m); p.rotation.y = e.a - g.rotation.y; p.castShadow = true; tige.add(p); }
   lampadairesTombes.push({ e, g, tige, vitesse: Math.hypot(vx, vz) / 8 });
   const fort = clamp(1.3 - dist(e, J) / 60, 0, 1);
   bruit(0.5 * fort, 1500, 0.4); bip(420, 260, 0.5, 'triangle', 0.12 * fort);   // clang !
@@ -4042,6 +4134,7 @@ function majLampadaires(dt) {
     scene.remove(t.g); t.e.boite.h = t.e.y + 7; t.fini = true;
     const o = new THREE.Object3D(); o.position.set(t.e.x, t.e.y, t.e.z); o.rotation.y = t.e.a; o.updateMatrix();
     for (const im of t.e.dessins) { im.setMatrixAt(t.e.k, o.matrix); im.instanceMatrix.needsUpdate = true; }
+    haloLampadaire(t.e, true);
   }
   for (let k = lampadairesTombes.length - 1; k >= 0; k--) if (lampadairesTombes[k].fini) lampadairesTombes.splice(k, 1);
 }
@@ -6049,14 +6142,29 @@ function creerElite(x, z) {
   piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#2a2d33', p.h.haut, 0, 0.4, 0);   // son gilet pare-balles
   return p;
 }
-// un gang (tableau GANGS) : ses membres traînent en rond au milieu de leur pâté, entre les maisons, et se font face
-function creerGang(g) {
-  const c = centre(g.col, g.ligne), arme = indexArme(g.arme);
-  for (let k = 0; k < g.membres; k++) {
-    const a = k * 2 * Math.PI / g.membres, p = creerPersonne('gang', c.x + Math.sin(a) * 3.5, c.z - 7 + Math.cos(a) * 3.5, TENUES.gang(g.couleur));
+// un gang (tableau GANGS) : ses n membres traînent en rond au milieu de leur pâté, entre les maisons, et se font face (la nuit, ils sont plus
+// nombreux : REGLAGES.gangsNuit, et le rond est plus grand)
+function creerGang(g, n = g.membres) {
+  const c = centre(g.col, g.ligne), arme = indexArme(g.arme), r = Math.max(3.5, n * 0.6);
+  for (let k = 0; k < n; k++) {
+    const a = k * 2 * Math.PI / n, p = creerPersonne('gang', c.x + Math.sin(a) * r, c.z - 7 + Math.cos(a) * r, TENUES.gang(g.couleur));
     p.gang = g; p.armeIdx = arme; p.angle = a + Math.PI; donnerArme(p.h, arme);
     if (ARMES[arme].auto) p.rafale = 0;   // à la mitraillette, en rafales
   }
+}
+// la nuit, deux membres d'un gang au hasard se promènent ensemble sur les trottoirs, comme des piétons (REGLAGES.rodeursNuit) : le deuxième
+// suit le premier. Ils attaquent comme les autres, si on les provoque
+function apparaitreRodeurs() {
+  const g = hasard(GANGS), arme = indexArme(g.arme), chef = apparaitrePersonne('gang', TENUES.gang(g.couleur));
+  if (!chef) return;
+  const ami = creerPersonne('gang', chef.x + 1, chef.z, TENUES.gang(g.couleur));
+  resoudre(ami, 0.35);
+  for (const p of [chef, ami]) {
+    Object.assign(p, { gang: g, rodeur: true, zone: null, armeIdx: arme }); donnerArme(p.h, arme);
+    if (ARMES[arme].auto) p.rafale = 0;
+    initChemin(p);
+  }
+  ami.suit = chef;
 }
 // un chien de garde (un berger allemand) : il regarde vers +Z, comme les personnages
 function creerChien() {
@@ -8217,7 +8325,7 @@ function majBoardercross() {
 }
 // E (ou F) : ce qu'il y a à faire là. Renvoie false s'il n'y avait rien à faire (dans l'armure d'Iron Man, E tire alors de la main droite)
 function action() {
-  if (J.mort || J.roule) return true;
+  if (J.mort || J.roule || sommeil) return true;
   if (J.telesiege) { // en plein trajet : il saute du siège... et retombe de haut !
     const v = J.voiture;
     J.telesiege = null; J.vy = 0; J.sol = false;
@@ -8231,6 +8339,7 @@ function action() {
   if (J.voiture) { if (!J.voiture.rail) sortirVoiture(); return true; }   // pas en plein looping. En plein accident (tonneaux, tête-à-queue), on peut : B.J. saute, et tombe par terre
   if (boutonProche() && !camp.ouvert && (!J.robot || J.robot.armure)) { appuyerBouton(); return true; }   // le bouton rouge du camp militaire (même depuis l'armure)
   if (J.robot) { sortirRobot(); return true; }
+  if (litProche()) { dormir(); return true; }   // dans une villa de B.J. : dormir jusqu'au moment suivant de la journée
   const s = standProche();
   if (s) { acheter(s); return true; }
   const g = garagisteProche();
@@ -9890,17 +9999,12 @@ function majPersonne(p, dt) {
         else p.cooldown = entre(...fiche(p).tir);
         tirEnnemi(p, d);
       }
-    }
+    } else if (p.rodeur) vitesse = marcher(p, dt);   // un membre de gang qui se promène, la nuit, tant qu'on ne le provoque pas
   } else if (p.peur > 0) {
     if (Math.random() < dt * 2) p.angle = angleVers(J, p) + entre(-0.6, 0.6);
     vitesse = 5;
     if (p.peur - dt <= 0) initChemin(p);
-  } else if (p.bloc) {
-    let c = coin(p.bloc[0], p.bloc[1], p.coin);
-    if (dist(p, c) < 0.8) { coinSuivant(p); c = coin(p.bloc[0], p.bloc[1], p.coin); }
-    p.angle = lerpAngle(p.angle, angleVers(p, c), 6 * dt);
-    vitesse = 1.4;
-  }
+  } else if (p.bloc) vitesse = marcher(p, dt);
   if (vitesse) {
     const ax = p.x, az = p.z;
     p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt;
@@ -9915,6 +10019,24 @@ function majPersonne(p, dt) {
     animerHumain(p.h, Math.abs(vitesse), dt, { arme, touche: p.touche / 0.3 });
     membresMous(p.h, dt, p.touche > 0 ? { raideur: 12, sol: p.y, jambes: false } : { sol: p.y });   // un coup : le haut du corps part et revient, la tête et les bras suivent
   }
+}
+// un piéton marche de coin en coin sur les trottoirs ; un membre de gang qui rôde la nuit aussi, ou bien il suit son copain (p.suit) dans
+// ses pas, à 1,50 m derrière lui : le copain laisse une trace (p.trace, ses 4 derniers pas de 40 cm), qui contourne les obstacles. Distancé de
+// plus de 10 m, il se promène tout seul. Renvoie sa vitesse
+function marcher(p, dt) {
+  const s = p.suit;
+  if (s && dist(p, s) > 10) p.suit = null;
+  else if (s && s.vie > 0 && !s.supprimer && !s.vol && !s.alerte) {
+    const c = s.trace?.[0] || s, d = dist(p, c);
+    if (d < 0.3) { p.angle = lerpAngle(p.angle, s.angle, 6 * dt); return 0; }
+    p.angle = lerpAngle(p.angle, angleVers(p, c), 6 * dt);
+    return d > 3 ? 3 : 1.4;
+  }
+  if (p.rodeur) { const t = p.trace ||= []; if (!t.length || dist(t.at(-1), p) > 0.4) { t.push({ x: p.x, z: p.z }); if (t.length > 4) t.shift(); } }
+  let c = coin(p.bloc[0], p.bloc[1], p.coin);
+  if (dist(p, c) < 0.8) { coinSuivant(p); c = coin(p.bloc[0], p.bloc[1], p.coin); }
+  p.angle = lerpAngle(p.angle, angleVers(p, c), 6 * dt);
+  return 1.4;
 }
 // un personnage projeté (renversé par une voiture, soufflé par une explosion, bousculé par B.J. qui court) : (vx, vy, vz) sa vitesse,
 // w : combien il tourne (radians par seconde ; plus de 0 : la tête part vers ce qui l'a poussé, comme quand une voiture fauche les jambes)
@@ -10350,9 +10472,21 @@ function majVoiture(v, dt) {
 // quand B.J. roule vite (plus de 10 m/s : plus vite qu'en courant), ce qui est derrière lui ne sert à rien : il s'en éloigne.
 // Les piétons et les voitures apparaissent alors devant lui, et ceux qu'il a laissés loin derrière disparaissent plus tôt
 const derriere = p => Math.hypot(elan.x, elan.z) > 10 && (p.x - J.x) * elan.x + (p.z - J.z) * elan.z < 0;
+// les voitures n'apparaissent pas dans le tour d'un pâté tout seul, relié à aucune route (une villa de B.J. sur une colline) : elles y tourneraient
+// en rond. RESEAU : les points du réseau des routes qui sont reliés à plus de 4 points
+const RESEAU = new Set();
+{
+  const vu = new Set();
+  for (let k = 0; k < NOEUDS.length; k++) {
+    if (vu.has(k)) continue;
+    const groupe = [k]; vu.add(k);
+    for (let q = 0; q < groupe.length; q++) for (const n of NOEUDS[groupe[q]].voisins) if (!vu.has(n)) { vu.add(n); groupe.push(n); }
+    if (groupe.length > 4) for (const n of groupe) RESEAU.add(n);
+  }
+}
 function apparaitreVoiture(police, type) {
   const proches = [];
-  NOEUDS.forEach((n, k) => { const d = Math.hypot(n.x - J.x, n.z - J.z); if (d > 40 && d < 240 && n.voisins.length) proches.push(k); });
+  NOEUDS.forEach((n, k) => { const d = Math.hypot(n.x - J.x, n.z - J.z); if (d > 40 && d < 240 && n.voisins.length && RESEAU.has(k)) proches.push(k); });
   for (let essai = 0; essai < 20 && proches.length; essai++) {
     const a = hasard(proches), r = { a, b: hasard(NOEUDS[a].voisins), t: 0 };
     r.t = entre(0, longueurRoute(r));
@@ -10363,14 +10497,14 @@ function apparaitreVoiture(police, type) {
     return v;
   }
 }
-function apparaitrePersonne(type) {
+function apparaitrePersonne(type, tenue) {
   const [bi, bj] = blocEn(J.x, J.z);
   for (let essai = 0; essai < 20; essai++) {
     const i = bi + Math.floor(entre(-2, 3)), j = bj + Math.floor(entre(-2, 3));
-    if (!typeBloc(i, j) || (type === 'pieton' && '%?'.includes(car(i, j)))) continue;   // (personne ne se promène autour du camp militaire, ni du bunker secret)
+    if (!typeBloc(i, j) || (type !== 'flic' && '%?v'.includes(car(i, j)))) continue;   // (personne ne se promène autour du camp militaire, du bunker secret ni des villas de B.J.)
     const p = coin(i, j, Math.floor(Math.random() * 4)), d = dist(p, J);
     if (d < 45 || d > 170 || (type === 'pieton' && derriere(p)) || (d < 110 && voit(p, J))) continue;
-    return creerPersonne(type, p.x, p.z);
+    return creerPersonne(type, p.x, p.z, tenue);
   }
 }
 function peupler(dt) {
@@ -10379,19 +10513,33 @@ function peupler(dt) {
   tPeupler = 0.5;
   if (dernierJ) elan = { x: (J.x - dernierJ.x) / 0.5, z: (J.z - dernierJ.z) / 0.5 };
   dernierJ = { x: J.x, z: J.z };
-  for (const p of personnes) if (p.type === 'pieton' && (dist(p, J) > 200 || (dist(p, J) > 60 && derriere(p)))) p.supprimer = true;
-  // un gang dont des membres sont tombés revient au complet quand B.J. est loin (à plus de 250 m)
-  for (const g of GANGS) if (dist(J, centre(g.col, g.ligne)) > 250 && personnes.filter(p => p.gang === g && p.vie > 0 && !p.supprimer).length < g.membres) {
-    for (const p of personnes) if (p.gang === g) p.supprimer = true;
-    creerGang(g);
+  for (const p of personnes) if ((p.type === 'pieton' || p.rodeur) && (dist(p, J) > 200 || (dist(p, J) > 60 && derriere(p)))) p.supprimer = true;
+  for (const p of personnes) if (p.rodeur && !estNuit() && !p.alerte && dist(p, J) > 80) p.supprimer = true;   // au lever du jour, les gangs rentrent chez eux
+  // un gang dont des membres sont tombés revient au complet quand B.J. est loin (à plus de 250 m) ; de même quand la nuit tombe (ils sont
+  // plus nombreux) ou que le jour se lève
+  for (const g of GANGS) {
+    const voulus = Math.round(g.membres * (estNuit() ? R_.gangsNuit : 1));
+    if (dist(J, centre(g.col, g.ligne)) > 250 && personnes.filter(p => p.gang === g && !p.rodeur && p.vie > 0 && !p.supprimer).length !== voulus) {
+      for (const p of personnes) if (p.gang === g && !p.rodeur) p.supprimer = true;
+      creerGang(g, voulus);
+    }
   }
+  if (estNuit() && GANGS.length && personnes.filter(p => p.rodeur && p.vie > 0 && !p.supprimer).length < R_.rodeursNuit) apparaitreRodeurs();
   // autant que choisi dans le menu (FOULES). Il en apparaît jusqu'à un huitième à la fois : en voiture, la ville se remplit devant B.J.
   // aussi vite qu'elle se vide derrière lui (mais pas tout d'un coup, ce qui ferait sauter l'image)
   const pietons = personnes.filter(p => p.type === 'pieton').length, civiles = voitures.filter(v => v.conducteur === 'civil').length;
-  const { pietons: voulus } = FOULES[foule.pietons], { voitures: voulues } = FOULES[foule.voitures];
+  // (la nuit, il y en a moins : REGLAGES.pietonsNuit et voituresNuit)
+  const voulus = Math.round(FOULES[foule.pietons].pietons * lerp(1, R_.pietonsNuit, lumiere.nuit)), voulues = Math.round(FOULES[foule.voitures].voitures * lerp(1, R_.voituresNuit, lumiere.nuit));
   if (voitures.filter(v => v.ski).length < R_.skieurs) creerSkieur();   // les autres skieurs : un de plus à la fois, sur une piste au hasard
   TELESIEGES.forEach(garnir);   // les skis, les snowboards et les luges pris aux gares reviennent
   for (let k = pietons; k < Math.min(voulus, pietons + Math.ceil(voulus / 8)); k++) apparaitrePersonne('pieton');
+  // des piétons en trop (la nuit tombe, ou on a choisi moins de monde) rentrent chez eux, un huitième à la fois : ceux qu'on ne voit pas
+  // (derrière la caméra, ou à plus de 120 m)
+  camera.getWorldDirection(vTmp);
+  for (let n = Math.min(pietons - voulus, Math.ceil(voulus / 8) + 1), k = 0; n > 0 && k < personnes.length; k++) {
+    const p = personnes[k], dx = p.x - camera.position.x, dz = p.z - camera.position.z, d = Math.hypot(dx, dz);
+    if (p.type === 'pieton' && !p.supprimer && p.vie > 0 && (d > 120 || (d > 30 && dx * vTmp.x + dz * vTmp.z < 0))) { p.supprimer = true; n--; }
+  }
   for (let k = civiles; k < Math.min(voulues, civiles + Math.ceil(voulues / 8)); k++) apparaitreVoiture(false);
 }
 function police(dt) {
@@ -10588,7 +10736,7 @@ const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital
   L: ['#2a9a2a', 'F', 'Maison de Franklin'], O: ['#2a6ad8', 'M', 'Villa de Michael'], R: ['#e07a10', 'T', 'Caravane de Trevor'], J: ['#b89a10', 'Y', 'Yellow Jack'],
   B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'], Y: ['#1a7ad8', '❄', 'Station de ski'],
   U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'],
-  '%': ['#4a5a2a', '★', 'Camp militaire'], '?': ['#3a3a44', '?', 'Bunker secret'] };
+  '%': ['#4a5a2a', '★', 'Camp militaire'], '?': ['#3a3a44', '?', 'Bunker secret'], v: ['#d89a18', '⌂', 'Ta villa (pour dormir)'] };
 const LEGENDE = [...Object.values(ICONES), ['#d8501a', 'C', 'Piste de cascades'], ['#0a9a9a', 'N', 'Navette des pistes']];   // les ronds de la légende de la grande carte
 const REPERES = [];   // [lieu, couleur, lettre, nom]
 for (const [c, [fond, lettre, nom]] of Object.entries(ICONES)) for (const p of lieux[c] || []) REPERES.push([p, fond, lettre, nom]);
@@ -10619,7 +10767,7 @@ function dessinerPlan(g) {
   g.strokeStyle = '#1a3a6a'; g.lineWidth = 6; g.setLineDash([24, 12]); g.beginPath();   // les remontées : un trait tireté
   for (const l of TELESIEGES) { g.moveTo(l.bas.x, l.bas.z); g.lineTo(l.haut.x, l.haut.z); }
   g.stroke(); g.setLineDash([]);
-  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', F: '#5a7040', R: '#8a7a5a', '%': '#5a5a44', '?': '#4a4a52' };
+  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', v: '#4d6b44', F: '#5a7040', R: '#8a7a5a', '%': '#5a5a44', '?': '#4a4a52' };
   for (const [c, o] of PLAN.pates) { g.fillStyle = couleurs[c] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
   g.globalAlpha = 0.65; for (const gang of GANGS) { const o = origine(gang.col, gang.ligne); g.fillStyle = gang.couleur; g.fillRect(o.x - R / 2, o.z - R / 2, S + R, S + R); } g.globalAlpha = 1;   // le quartier des gangs
   g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
@@ -10746,6 +10894,8 @@ function majHUD(dt) {
   $('barre-gilet').style.display = J.gilet > 0 ? 'block' : 'none'; giletBJ.visible = J.gilet > 0;
   $('barre-gilet').firstChild.style.width = `${J.gilet / R_.giletMax * 100}%`;
   $('argent').textContent = montant(J.argent);
+  const { heure } = ouEnEst(), hh = Math.floor(heure), mm = Math.floor((heure - hh) * 12) * 5;   // l'heure de la journée, à 5 minutes près
+  $('heure').textContent = `${lumiere.hauteur > 0 ? '☀' : '☾'} ${hh}:${String(mm).padStart(2, '0')}`;
   [...$('etoiles').children].forEach((e, i) => e.classList.toggle('on', i < etoiles));
   $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
   const a = ARMES[J.arme], rb = J.robot, ar = rb?.armure ? rb : null;   // ar : l'armure, quand il est dedans
@@ -10766,13 +10916,15 @@ function majHUD(dt) {
     + (J.chrono?.t0 != null ? ` · ${(temps - J.chrono.t0).toFixed(1)} s` : '');   // sur le boardercross : le chronomètre
   const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
   const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40), ech = aPied && !J.echelle && echelles.find(e => dist(e, J) < 1.5 && Math.abs(J.y - e.bas) < 1);
-  const tl = telesiegeProche(), nav = aPied && navetteProche();
+  const tl = telesiegeProche(), nav = aPied && navetteProche(), lit = aPied && litProche();
   const bouton = boutonProche() && !camp.ouvert && (aPied || ar);
   const aide = J.telesiege ? tr(J.telesiege.l.cabines ? 'Appuie sur <b>E</b> pour sauter de la cabine' : 'Appuie sur <b>E</b> pour sauter du télésiège')
     : tl ? tr(tl.cabines ? 'Appuie sur <b>E</b> pour prendre la télécabine' : 'Appuie sur <b>E</b> pour prendre le télésiège')
     : bouton ? tr('Appuie sur <b>E</b> pour appuyer sur le bouton rouge')
     : ar ? tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · <b>F</b> : fusées · <b>E</b> : sortir')
-    : !aPied ? (faitFigures(J.voiture) ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping') : '') : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
+    : !aPied ? (faitFigures(J.voiture) ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping') : '')
+    : lit ? (sommeil ? '' : etoiles > 0 ? tr("Sème d'abord la police, puis reviens dormir") : tr(MOMENTS[journee.moment].dormir))   // dans sa villa, près du lit
+    : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
       : J.possede[s.arme] ? tr('Appuie sur <b>E</b> pour acheter : {arme} (munitions {prix} $)', { arme: tr(ARMES[s.arme].nom), prix: Math.round(ARMES[s.arme].prix / 2) })
       : tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr(ARMES[s.arme].nom), prix: ARMES[s.arme].prix }))
     : g ? tr('Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max ({prix})', { prix: montant(R_.prixBlindage) })
@@ -10798,10 +10950,226 @@ function majHUD(dt) {
 }
 
 // =====================================================================
+//  Le jour et la nuit
+// =====================================================================
+// Les 4 moments de la journée, l'un après l'autre (leurs durées sont dans REGLAGES). a : où est le soleil au début du moment, un angle autour
+// du pays (0 = il se lève à l'est, π / 2 = midi, au sud, π = il se couche à l'ouest ; ensuite, il passe sous la terre) ; heure : l'heure de la
+// montre au début ; dormir : ce que dit l'aide près du lit ; reveil : ce qu'on lit en se réveillant au début de ce moment
+const MOMENTS = [
+  { duree: () => R_.dureeJour,       a: 0.1,                heure: 7,    dormir: "Appuie sur <b>E</b> pour dormir jusqu'au coucher du soleil", reveil: "C'est le matin" },
+  { duree: () => R_.dureeCrepuscule, a: Math.PI - 0.06,     heure: 19,   dormir: "Appuie sur <b>E</b> pour dormir jusqu'à la nuit",           reveil: 'Le soleil se couche' },
+  { duree: () => R_.dureeNuit,       a: Math.PI + 0.16,     heure: 20.5, dormir: "Appuie sur <b>E</b> pour dormir jusqu'au lever du soleil",  reveil: "C'est la nuit" },
+  { duree: () => R_.dureeLever,      a: 2 * Math.PI - 0.12, heure: 30,   dormir: "Appuie sur <b>E</b> pour dormir jusqu'au matin",            reveil: 'Le soleil se lève' },   // (30 h : 6 h du matin, le lendemain)
+];
+const journee = { moment: 0, t: 0 };   // le moment de la journée (son numéro dans MOMENTS) et depuis combien de secondes il dure. On commence au matin
+const dureeMoment = k => Math.max(0, MOMENTS[k].duree()) || 0;
+// le temps passe (dt : des secondes de l'horloge) ; un moment qui dure 0 seconde est sauté
+function avancerJournee(dt) {
+  journee.t += dt;
+  for (let n = 0; n < 4 && journee.t >= dureeMoment(journee.moment); n++) { journee.t -= dureeMoment(journee.moment); journee.moment = (journee.moment + 1) % 4; }
+  if (journee.t >= dureeMoment(journee.moment)) journee.t = 0;   // (toutes les durées à 0 : le temps s'arrête)
+}
+// où on en est : l'angle du soleil (a) et l'heure de la montre, entre le début de ce moment et celui du suivant
+function ouEnEst() {
+  const k = journee.moment, d = dureeMoment(k), f = d > 0 ? clamp(journee.t / d, 0, 1) : 1, s = MOMENTS[(k + 1) % 4];
+  const fin = k === 3 ? { a: s.a + 2 * Math.PI, heure: s.heure + 24 } : s;
+  return { a: lerp(MOMENTS[k].a, fin.a, f), heure: lerp(MOMENTS[k].heure, fin.heure, f) % 24 };
+}
+// de 0 (quand x vaut a) à 1 (quand x vaut b), en douceur ; a peut être plus grand que b
+const doux = (x, a, b) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+// le soleil tourne sur un cercle penché : il se lève à l'est, passe au sud à midi, 56° au-dessus de l'horizon (90° moins LATITUDE), et se couche
+// à l'ouest. La lune est toujours à l'opposé : elle se lève quand il se couche. Les étoiles tournent avec eux, autour de l'étoile polaire, au nord
+const LATITUDE = 0.6;
+const AXE_CIEL = new THREE.Vector3(0, -Math.sin(LATITUDE), Math.cos(LATITUDE));
+// lumiere.hauteur : le soleil au-dessus de l'horizon, en degrés (moins de 0 : il est couché) ; jour : 1 en plein jour, 0 la nuit ;
+// nuit : 1 quand les lampadaires, les fenêtres et les phares sont tout allumés (dès que le soleil est à 6° sous l'horizon), 0 le jour
+const lumiere = { hauteur: 40, jour: 1, nuit: 0 };
+const estNuit = () => lumiere.nuit > 0.5;   // pour la foule et les gangs
+const directionLumiere = new THREE.Vector3(), soleilPhoto = new THREE.Vector3(0, -1, 0);   // d'où vient la lumière (le soleil ou la lune) ; le soleil de la dernière photo du ciel
+// les couleurs, de la nuit au jour
+const C = { soleilBas: new THREE.Color('#ff8a40'), soleil: new THREE.Color('#fff1dd'), lune: new THREE.Color('#9fb4ff'),
+  cielNuit: new THREE.Color('#34436e'), cielJour: new THREE.Color('#cfe4ff'), solNuit: new THREE.Color('#0d0d14'), solJour: new THREE.Color('#5a5040'),
+  fondNuit: new THREE.Color().setRGB(0.0005, 0.0008, 0.0018), halo: new THREE.Color('#ffd49a'), faisceau: new THREE.Color('#fff0d0') };
+// la brume prend la couleur du ciel près de l'horizon : [hauteur du soleil en degrés, couleur]
+const BRUME = [[-12, '#010205'], [-6, '#070a14'], [-2, '#2e2a40'], [1, '#a07a70'], [5, '#c8a48a'], [12, '#b8bccb'], [20, '#a9c4e0']].map(([h, c]) => [h, new THREE.Color(c)]);
+function couleurBrume(h, c) {
+  const k = BRUME.findIndex(([b]) => b > h);
+  if (k < 0) return c.copy(BRUME.at(-1)[1]);
+  if (k === 0) return c.copy(BRUME[0][1]);
+  const [h0, c0] = BRUME[k - 1], [h1, c1] = BRUME[k];
+  return c.copy(c0).lerp(c1, (h - h0) / (h1 - h0));
+}
+// les étoiles : des points sur une grande boule autour de la caméra (comme le ciel), qu'on ne voit que la nuit. Dessinées juste après le ciel
+// et avant tout le reste (renderOrder), elles ne passent jamais devant une montagne
+const cielEtoile = (() => {
+  const n = 1800, pos = new Float32Array(n * 3), coul = new Float32Array(n * 3);
+  for (let k = 0; k < n; k++) {
+    const y = entre(-0.05, 1), r = Math.sqrt(1 - y * y), a = entre(0, 2 * Math.PI), b = entre(0.2, 1) ** 2;   // b : son éclat (beaucoup de petites, peu de grosses)
+    pos.set([r * Math.cos(a) * 400, y * 400, r * Math.sin(a) * 400], k * 3);
+    coul.set(hasard([[1, 1, 1], [0.8, 0.88, 1], [1, 0.92, 0.8]]).map(c => c * b), k * 3);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(coul, 3));
+  const e = new THREE.Points(g, new THREE.PointsMaterial({ size: 2, sizeAttenuation: false, vertexColors: true, color: '#000', fog: false, depthWrite: false, blending: THREE.AdditiveBlending }));
+  e.renderOrder = -1; e.frustumCulled = false; scene.add(e);
+  return e;
+})();
+// la lune : une image toujours tournée vers la caméra, pleine, avec ses taches grises et une lueur autour
+const lune = (() => {
+  const t = toile(128, 128, (g) => {
+    const l = g.createRadialGradient(64, 64, 14, 64, 64, 64); l.addColorStop(0, 'rgba(150,170,220,.5)'); l.addColorStop(1, 'rgba(150,170,220,0)');
+    g.fillStyle = l; g.fillRect(0, 0, 128, 128);
+    g.fillStyle = '#f2f0e6'; g.beginPath(); g.arc(64, 64, 17, 0, 7); g.fill();
+    g.fillStyle = 'rgba(120,120,128,.45)'; for (const [x, y, r] of [[58, 58, 5], [70, 62, 4], [62, 72, 3.5], [72, 52, 2.5], [55, 68, 2]]) { g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+  });
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, color: '#000', fog: false, depthWrite: false, blending: THREE.AdditiveBlending }));
+  s.scale.setScalar(80); s.renderOrder = -1; s.frustumCulled = false; scene.add(s);
+  return s;
+})();
+
+// les lampadaires : un halo autour de chaque lampe, la nuit (un seul objet par morceau du pays, comme les lampadaires)
+const TEX_HALO = toile(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,245,220,1)'); r.addColorStop(0.12, 'rgba(255,215,150,.6)'); r.addColorStop(0.45, 'rgba(255,170,90,.12)'); r.addColorStop(1, 'rgba(255,150,60,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
+const M_HALO = new THREE.PointsMaterial({ map: TEX_HALO, size: 4.5, color: '#000', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+for (const m of morceaux.values()) if (m.lampadaires.length) {
+  const pos = new Float32Array(m.lampadaires.length * 3);
+  m.lampadaires.forEach((e, k) => { e.tete = { x: e.x + Math.sin(e.a) * 1.6, y: e.y + 6.75, z: e.z + Math.cos(e.a) * 1.6 }; pos.set([e.tete.x, e.tete.y, e.tete.z], k * 3); });   // (sa lampe : au bout du bras, à 1,60 m du poteau)
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.computeBoundingSphere();
+  const halos = new THREE.Points(g, M_HALO); m.g.add(halos);
+  m.lampadaires.forEach((e, k) => { e.halo = { halos, k }; });
+}
+// un lampadaire renversé s'éteint (son halo s'en va sous la terre), et se rallume quand il se relève
+function haloLampadaire(e, allume) {
+  if (!e.halo) return;
+  const p = e.halo.halos.geometry.attributes.position;
+  p.setY(e.halo.k, allume ? e.tete.y : -1e4); p.needsUpdate = true;
+}
+// la nuit, quelques vraies lumières (REGLAGES.lumieresNuit) éclairent le sol, les murs, les voitures et les gens : celles des lampadaires
+// les plus proches de B.J., ou, s'il est dans une maison, celles des lampes de son étage. Toutes les 0,25 s, on les pose sur les plus proches ;
+// une lumière garde sa lampe tant qu'elle reste parmi les plus proches, et s'éteint doucement quand elle s'éloigne (on ne la voit pas sauter)
+const lumieresNuit = Array.from({ length: clamp(Math.round(R_.lumieresNuit) || 0, 0, 16) }, () => {
+  const l = new THREE.PointLight('#ffcf90', 0, 35, 1.4); scene.add(l);
+  return { l, source: null, force: 0 };
+});
+let tSources = 0, sourcesNuit = [], dLoin = Infinity;   // les lampes choisies ; dLoin : la distance de la première qui n'a pas de lumière
+function choisirSources() {
+  const dedans = interieurs.find(d => J.x > d.x1 && J.x < d.x2 && J.z > d.z1 && J.z < d.z2 && J.y > d.y1 - 0.5 && J.y < d.y2 - 0.3);
+  let l = [];
+  if (dedans) l = dedans.lampes.filter(q => q.y > J.y && q.y < J.y + 4.5);   // les lampes au plafond de son étage
+  else {
+    const cx = Math.floor(J.x / MORCEAU), cz = Math.floor(J.z / MORCEAU);
+    for (let a = cx - 1; a <= cx + 1; a++) for (let b = cz - 1; b <= cz + 1; b++)
+      for (const e of morceaux.get(a * 100 + b)?.lampadaires || []) if (e.boite.h > -Infinity && Math.abs(e.tete.x - J.x) < 80 && Math.abs(e.tete.z - J.z) < 80) l.push(e.tete);
+  }
+  for (const q of l) q.d = Math.hypot(q.x - J.x, q.y - J.y, q.z - J.z);
+  l.sort((p, q) => p.d - q.d);
+  sourcesNuit = l.slice(0, lumieresNuit.length);
+  dLoin = Math.min(l[lumieresNuit.length]?.d ?? Infinity, 80);
+  for (const n of lumieresNuit) if (!sourcesNuit.includes(n.source)) n.source = null;
+  for (const q of sourcesNuit) if (!lumieresNuit.some(n => n.source === q)) { const n = lumieresNuit.find(n => !n.source); n.source = q; n.force = 0; }
+}
+function majLumieresNuit(dt) {
+  if (lumiere.nuit > 0 && (tSources -= dt) <= 0) { tSources = 0.25; choisirSources(); }
+  for (const n of lumieresNuit) {
+    const q = n.source, d = q ? Math.hypot(q.x - J.x, q.y - J.y, q.z - J.z) : 0;
+    const voulue = q ? lumiere.nuit * (q.dedans ? 10 : 60) * doux(d, dLoin, dLoin - 4) : 0;   // (une lampe de maison éclaire moins loin et moins fort)
+    n.force += (voulue - n.force) * Math.min(1, dt * 5);
+    n.l.intensity = n.force;
+    if (q) { n.l.position.set(q.x, q.y - (q.dedans ? 0 : 0.15), q.z); n.l.distance = q.dedans ? 10 : 35; }
+  }
+}
+// les phares : la voiture de B.J. éclaire vraiment la route devant elle ; les autres y posent une tache de lumière (un faisceau dessiné par terre)
+const phares = new THREE.SpotLight('#fff2d8', 0, 90, 0.5, 0.55, 1.2);
+scene.add(phares, phares.target);
+const TEX_FAISCEAU = toile(64, 128, (g) => { // vu du ciel : la voiture est en haut, la lumière s'élargit et s'efface vers le bas
+  const d = g.createLinearGradient(0, 0, 0, 128); d.addColorStop(0, 'rgba(255,255,255,.9)'); d.addColorStop(0.35, 'rgba(255,255,255,.45)'); d.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = d; g.beginPath(); g.moveTo(22, 0); g.lineTo(42, 0); g.lineTo(64, 128); g.lineTo(0, 128); g.closePath(); g.fill();
+});
+const M_FAISCEAU = new THREE.MeshBasicMaterial({ map: TEX_FAISCEAU, color: '#000', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -4 });
+const GEO_FAISCEAU = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+const pharesAllumes = v => v.parts?.phares && v.parts.phares.material === M_PHARE && !v.coule && !v.detruite && !v.accident;   // (des phares cassés n'éclairent plus)
+const M_PHARE_ETEINT = M_PHARE.clone();   // les phares d'une voiture garée : comme ceux d'une voiture qui roule le jour, mais ils ne s'allument pas la nuit
+function majPhares() {
+  const v = J.voiture;
+  for (const o of voitures) { // quelqu'un la conduit : ses phares sont allumés ; garée, ils sont éteints (cassés, ils le restent)
+    const p = o.parts?.phares;
+    if (p && (p.material === M_PHARE || p.material === M_PHARE_ETEINT)) p.material = o.conducteur || o === v ? M_PHARE : M_PHARE_ETEINT;
+  }
+  const allumes = v && pharesAllumes(v) && lumiere.nuit > 0;
+  phares.intensity = allumes ? 400 * lumiere.nuit : 0;
+  if (allumes) {
+    v.m.updateMatrixWorld();
+    phares.position.set(0, 0.8, v.forme.longueur / 2).applyMatrix4(v.m.matrixWorld);
+    phares.target.position.set(0, -0.8, v.forme.longueur / 2 + 25).applyMatrix4(v.m.matrixWorld);
+  }
+  M_FAISCEAU.color.copy(C.faisceau).multiplyScalar(0.45 * lumiere.nuit);
+  for (const o of voitures) {
+    const voir = lumiere.nuit > 0.05 && o !== v && o.conducteur && pharesAllumes(o) && !o.enVol && !o.type.vole && !o.type.bateau && o.m.visible;
+    if (voir && o.faisceau?.parent !== o.m) { // (la voiture a été refaite au garage : un faisceau neuf)
+      o.faisceau = new THREE.Mesh(GEO_FAISCEAU, M_FAISCEAU);
+      o.faisceau.scale.set(o.forme.largeur * 2.2, 1, 16); o.faisceau.position.set(0, 0.06, o.forme.longueur / 2 + 7.5);
+      o.faisceau.raycast = () => {};   // les balles passent à travers
+      o.m.add(o.faisceau);
+    }
+    if (o.faisceau) o.faisceau.visible = voir;
+  }
+}
+// à chaque image : le soleil, la lune, le ciel, la brume, les lumières et les fenêtres
+function majCiel(dt) {
+  const { a } = ouEnEst(), u = ciel.material.uniforms;
+  soleilDir.set(Math.cos(a), Math.sin(a) * Math.cos(LATITUDE), Math.sin(a) * Math.sin(LATITUDE));
+  const h = THREE.MathUtils.radToDeg(Math.asin(soleilDir.y));
+  Object.assign(lumiere, { hauteur: h, jour: doux(h, -6, 6), nuit: doux(h, 2, -6) });
+  // le ciel : son soleil ne descend pas à plus de 0,8° sous l'horizon (il en reste une lueur bleue et rouge), mais tout s'éteint jusqu'à 10° dessous
+  u.sunPosition.value.copy(soleilDir);
+  if (h < -0.8) { const r = Math.cos(THREE.MathUtils.degToRad(0.8)) / Math.hypot(soleilDir.x, soleilDir.z); u.sunPosition.value.set(soleilDir.x * r, -Math.sin(THREE.MathUtils.degToRad(0.8)), soleilDir.z * r); }
+  u.eclat.value = doux(h, -10, -0.8);
+  u.fondNuit.value.copy(C.fondNuit).multiplyScalar(lumiere.nuit);
+  u.cloudCoverage.value = lerp(0.4, 0.15, lumiere.nuit);   // la nuit, le ciel se dégage
+  // la lumière qui fait les ombres : le soleil (orange quand il est bas), puis la lune quand il est couché
+  if (h > -0.5) { soleil.intensity = 4.5 * doux(h, -1, 5); soleil.color.copy(C.soleilBas).lerp(C.soleil, doux(h, 0, 18)); directionLumiere.copy(soleilDir); }
+  else { soleil.intensity = 1.2 * R_.clairDeLune * doux(h, -1, -8); soleil.color.copy(C.lune); directionLumiere.copy(soleilDir).negate(); }
+  soleil.position.set(J.x + directionLumiere.x * 200, J.y + directionLumiere.y * 200, J.z + directionLumiere.z * 200);
+  soleil.target.position.set(J.x, J.y, J.z);
+  ambiance.intensity = lerp(0.02 + 0.1 * R_.clairDeLune, 0.35, lumiere.jour);
+  ambiance.color.copy(C.cielNuit).lerp(C.cielJour, lumiere.jour); ambiance.groundColor.copy(C.solNuit).lerp(C.solJour, lumiere.jour);
+  scene.environmentIntensity = 0.7 * (0.04 + 0.96 * lumiere.jour);
+  couleurBrume(h, scene.fog.color);
+  // les reflets : on rephotographie le ciel quand le soleil a bougé de 2° (pas en pleine nuit : il n'y a plus rien à refléter)
+  if (soleilDir.angleTo(soleilPhoto) > 0.035 && (h > -10 || THREE.MathUtils.radToDeg(Math.asin(soleilPhoto.y)) > -10)) { photographierCiel(); soleilPhoto.copy(soleilDir); }
+  // les étoiles et la lune, autour de la caméra
+  cielEtoile.position.copy(camera.position); cielEtoile.quaternion.setFromAxisAngle(AXE_CIEL, a);
+  cielEtoile.material.color.setScalar(doux(h, -3, -10));
+  lune.position.copy(camera.position).addScaledVector(soleilDir, -380);
+  lune.material.color.setScalar(lumiere.nuit * doux(-soleilDir.y, -0.05, 0.02));   // (sous l'horizon, on ne la voit pas)
+  // ce qui s'allume : les fenêtres, les lampadaires, les phares et les feux arrière
+  for (const m of MATS_FENETRES) m.emissiveIntensity = 1.1 * lumiere.nuit;
+  MAT_LAMPE.emissiveIntensity = 0.4 + 6 * lumiere.nuit;
+  M_HALO.color.copy(C.halo).multiplyScalar(lumiere.nuit);
+  M_PHARE.emissiveIntensity = 1.5 + 4 * lumiere.nuit; M_FEU.emissiveIntensity = 1 + 2 * lumiere.nuit;
+  majLumieresNuit(dt); majPhares();
+}
+// dormir dans une villa de B.J. : on passe au début du moment suivant de la journée, avec toute sa vie
+let sommeil = null;   // { t : depuis combien de secondes il dort (à l'horloge), fait : le moment suivant est arrivé }
+const litProche = () => !J.voiture && !J.robot && !J.mort && lits.find(l => Math.hypot(l.x - J.x, l.z - J.z) < 2.4 && Math.abs(l.y - J.y) < 1.2);
+function dormir() {
+  if (etoiles > 0) { annonce('', tr("Sème d'abord la police !"), 2); bip(300, 200, 0.2, 'square', 0.2); return; }
+  sommeil = { t: 0 }; J.danse = 0; J.accroupi = false;
+}
+// l'écran devient noir (1 s), le moment suivant arrive, puis l'écran se rallume (1 s)
+function majSommeil(dt) {
+  if (!sommeil) return;
+  sommeil.t += dt;
+  if (sommeil.t > 1.2 && !sommeil.fait) { sommeil.fait = true; journee.moment = (journee.moment + 1) % 4; journee.t = 0; J.vie = R_.viesJoueur; }
+  $('sommeil').style.opacity = clamp(Math.min(sommeil.t, 3.2 - sommeil.t), 0, 1);
+  if (sommeil.t > 3.2) { sommeil = null; annonce(tr('Bien dormi !'), tr(MOMENTS[journee.moment].reveil), 3); bip(500, 900, 0.3, 'sine', 0.15); }
+}
+
+// =====================================================================
 //  Boucle principale
 // =====================================================================
 function mettreAJour(dt) {
   temps += dt;
+  const horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0;   // le même temps, à l'horloge : le jour et la nuit le suivent
+  avancerJournee(horloge); majSommeil(horloge);
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
   if (J.mort || J.voiture || J.robot || J.telesiege) J.grappin = J.balance = J.mur = J.plane = J.lance = null;   // ni grappin, ni toile, ni mur, ni cape
   if (J.biceps && (J.mort || J.voiture || J.robot || J.telesiege || J.superman || J.roule || J.echelle || accroche())) finirBiceps();   // et on ne montre son biceps que debout
@@ -10821,7 +11189,7 @@ function mettreAJour(dt) {
     }
     if (J.mort > 3.5) reapparaitre();
   }
-  else {
+  else if (!sommeil) { // (quand il dort, il ne bouge plus)
     if (J.telesiege) { monterTelesiege(dt); J.danse = 0; } else if (J.voiture) conduire(J.voiture, dt); else if (J.robot) piloterRobot(J.robot, dt); else majJoueur(dt);
     J.cooldown -= dt; J.frappe = Math.max(0, J.frappe - dt * 3.3); J.recul = Math.max(0, J.recul - dt * 8);
     if (J.robot) { // dans le heavy robot : clic gauche = la mitrailleuse, clic droit = les roquettes
@@ -10933,8 +11301,7 @@ function boucle(t) {
   if (carte.ouverte) { dessinerGrandeCarte(dt); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
   if (enJeu) mettreAJour(dt); else dessinerApercu(dt);   // dans le menu : l'aperçu du héros
   majCamera(dt); majRepere(dt); majHUD(dt); majLaser(dt);
-  soleil.position.set(J.x + soleilDir.x * 200, J.y + soleilDir.y * 200, J.z + soleilDir.z * 200);
-  soleil.target.position.set(J.x, J.y, J.z);
+  majCiel(dt);   // le soleil (ou la lune), le ciel, la brume, les lumières de la nuit
   majMorceaux();
   TEX.vagues.offset.set(t / 60000, t / 90000);   // l'eau ondule
   ciel.position.copy(camera.position);
@@ -10966,6 +11333,8 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   majIronman, viserMains, lueursIronman, rayonPlastron, tendreBras, matIronman, armureComplete,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
+  journee, lumiere, MOMENTS, ouEnEst, avancerJournee, majCiel, lits, litProche, dormir, lumieresNuit, interieurs, estNuit, phares, cielEtoile, lune, apparaitreRodeurs, RESEAU, M_HALO, MATS_FENETRES, ambiance,
+  get sommeil() { return sommeil; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
