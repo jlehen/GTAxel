@@ -602,6 +602,8 @@ const TRADUCTIONS = {
   "Appuie sur <b>E</b> pour dormir jusqu'au matin": { de: 'Drücke <b>E</b>, um bis zum Morgen zu schlafen', en: 'Press <b>E</b> to sleep until morning', gsw: 'Drück <b>E</b>, zum bis am Morge schlafe' },
   "Sème d'abord la police, puis reviens dormir": { de: 'Häng zuerst die Polizei ab, dann komm zurück zum Schlafen', en: 'Lose the cops first, then come back to sleep', gsw: 'Häng zerscht d Polizei ab, denn chunsch go schlafe' },
   "Sème d'abord la police !": { de: 'Häng zuerst die Polizei ab!', en: 'Lose the cops first!', gsw: 'Häng zerscht d Polizei ab!' },
+  "Ce lit n'est pas à toi : dors dans une de tes villas (⌂ sur la carte), chez Michael ou chez Franklin": { de: 'Das ist nicht dein Bett: Schlaf in einer deiner Villen (⌂ auf der Karte), bei Michael oder bei Franklin',
+    en: "This isn't your bed: sleep in one of your villas (⌂ on the map), at Michael's or at Franklin's", gsw: 'Das isch nöd dis Bett: Schlaf i einere vo dine Ville (⌂ uf de Charte), bim Michael oder bim Franklin' },
   'Bien dormi !':     { de: 'Gut geschlafen!', en: 'Slept well!', gsw: 'Guet gschlafe!' },
   "C'est le matin":   { de: 'Es ist Morgen', en: "It's morning", gsw: 'Es isch Morge' },
   'Le soleil se couche': { de: 'Die Sonne geht unter', en: 'The sun is setting', gsw: 'D Sunne gaht unde' },
@@ -1134,20 +1136,20 @@ const CARTE = [
   "~~~~~~~~~~~~~~~~~~~~,,,,_~~~~~~~~~~~~~~~~~~~~~~__****v******__~~~~~~~~~~~~",  // 4
   "~~~~~~~~~~~~~~~~~~~_,__,,,_~~~~~~~~~~~~~~~~~~__*******========__~~~~~~~~~~",  // 5
   "~~~~~~~~~~~~~~~~~~&,vMSM_,,,_______~~~~~~~~__=========,,,,,,**==__~~~~~~~~",  // 6
-  "~~~~~~~~~~~~~~~~~~_MIHAME=======,,,,___~~~_,=,*,,,,,,,,,,,,,,,=*%%_~~~~~~~",  // 7
-  "~~~~~~~~~~~~~~~~~~2MMIGM55431,,,===,,,,,~_,=,,,,,,,,,,,,,,,,,,=*%%*_~~~~~~",  // 8
+  "~~~~~~~~~~~~~~~~~~_MIHAME=======,,,,___~~~_v=,*,,,,,,,,,,,,,,,=*%%_~~~~~~~",  // 7
+  "~~~~~~~~~~~~~~~~~~2MMIGv55431,,,===,,,,,~_,=,,,,,,,,,,,,,,,,,,=*%%*_~~~~~~",  // 8
   "~~~~~~~~~~~~~~~~~1=44356776531,,,,,=,,,,,,=,,,,,,,,,,,,,,,,,,?,,,***_~~~~~",  // 9
   "~~~~~~~~~~~~~~~~~=34v567887652,,,,,,======,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 10
   "~~~~~~~~~~~~~~~~*=233678998763,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 11
-  "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 12
+  "~~~~~~~~~~~~~~~*=**14678998764,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*v_~~~~",  // 12
   "~~~~~~~~~~~~~~3=2***3678998W=3,,,,,,,2=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 13
   "~~~~~~~~~~~~~3=432**256788765=,,,,,,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~~",  // 14
   "~~~~~~~~~~~~3=5543**1356776531====;;;;==,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 15
-  "~~~~~~~~~~~,=45543***13455431,,,;;MF;;=Y,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 16
+  "~~~~~~~~~~~,=45543***13455431,,,;;vF;;=Y,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 16
   "~~~~~~~~~~,=234432***,,1221,,,,,;;SF;;=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 17
   "~~~~~~~~~_=,,2332****,,,,,,,,~~~;;;;;;=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 18
-  "~~~~~~~~~#~~~~~~****__,~~~,~~~~~~~;;;;=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 19
-  "~~~~~~~~=,,,,12~~~~~~~~~~~~~~~~~~~~,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 20
+  "~~~~~~~~~#~~~~~~****__,~~~v~~~~~~~;;;;=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 19
+  "~~~~~~~~=,,,,12~~~~~~~~~~~~~~~~~~~~,,,=,v,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 20
   "~~~~~~~=***,134431,,~~~~~~~~~~~~~~~,,,=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 21
   "~~~~~~=****,356653,,,~~~~~~~~~~~~~~::=:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 22
   "~~~~~#,,,,,,35v653,,,,,~~~::~~~&~::::=:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**_~~",  // 23
@@ -1158,29 +1160,29 @@ const CARTE = [
   "~~~_=,,,,,,22,,,,,,,,,,::::::======::::13553,,,,,,,,,,,,,,,,,,,,,,,**_~~~~",  // 28
   "~~~_=,,,,,,,,,,,,,,,,,,::ES==:::::=::::,1221,,,,,,,,,,,,,,,,,,,,,,***_~~~~",  // 29
   "~~~_=v,,,,,,,,,,,,,,,,===:::::::::=::::333,,,,,,,,,,,,,,,,,,,,,,,,**_~~~~~",  // 30
-  "~~~~#~~~~~~~~~~~~~##==,:::::::::::=:::24542,,,,,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 31
+  "~~~~#~~~~~~~~~~~~~##==,:::::::::::=:::24v42,,,,,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 31
   "~~~_====,,,,,,23==,=,,,,,,,,1111,,=,,,2454,,,,,,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 32
   "~~~_=,,,========431=1221,,,,1221,=,,,,,333_,,,*,,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 33
   "~~~_=,,,,,,**134431=2332,,,,1221,=,,,,,,,~~__,**,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 34
-  "~~~_=,,,2332**2332,=2332,,,,1111==,,,,,,,~~~~_**,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 35
+  "~~~_=v,,2332**2332,=2332,,,,1111==,,,,,,,~~~~_**,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 35
   "~~~_=,,2=E432,,11,,=1221***,,,,,=,===E,,,~~~~~_*,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 36
   "~~~_=,,345543,,,,11=11,****,,,,=,,,,,121,~~~~~_*,,,,,,,,,,,,,,,,,,,*_~~~~~",  // 37
   "~~~_=,,345v43,,,,22=22,,,,,,,,,=,,,,,343,~~~~~~_*,,,,,,,,,,,,,,,,,*_~~~~~~",  // 38
-  "~~~_=,,234432,,,123=3~1221,,,,,=,,,,,343,~~~~~~_*,,,,,,,,,,,,,,,,,*_~~~~~~",  // 39
-  "~~~_M=,,2332,,,,123=322332,,,,,=,,111121,~~~~~~~_*,,,,,,,,,,,,,,,*_~~~~~~~",  // 40
+  "~~~_=,,234432,,,123=3~1221,,,,,=,,,,,343,~~~~~~_*,,,,,,,,,,,,,,,,,v_~~~~~~",  // 39
+  "~~~_v=,,2332,,,,123=322332,,,,,=,,111121,~~~~~~~_*,,,,,,,,,,,,,,,*_~~~~~~~",  // 40
   "~~&_S=,,,,,,,,,,,22L222332,,,,,=,133331,,~~~~~~~_**,,,,,,,,,,,,,**_~~~~~~~",  // 41
   "~~~_,=2,,,,,,,,,,11=111221,,,,=,134v4431,~~~~~~~~_**,,,,,,,,,,,**_~~~~~~~~",  // 42
   "~~~_,=2,,,,,,,,,,,,=,,,,,,,,,=,,13455431,~~~~~~~~~__**,,,,,,,**__~~~~~~~~~",  // 43
-  "~~~~,,=,,,,,_MvMOMMIIPIIMMMM=,,,1~~55431,~~~~~~~~~~~__*******__~~~~~~~~~~~",  // 44
+  "~~~~,,=,,,,,_MvMOMMIIPIIMMvM=,,,1~~55431,~~~~~~~~~~~__*******__~~~~~~~~~~~",  // 44
   "~~~~~,=,,,,,_MMMMMIIIXITIIIMM,,,1~~44431,~~~~~~~~~~~~~_______~~~~~~~~~~~~~",  // 45
-  "~~~~~~_=,,,,_IMPMIIHIIITIIUMMM,,,~~3331,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 46
+  "~~~~~~_=,,,,_IMPMIIHIIITIIUMMv,,,~~3331,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 46
   "~~~~~~~~=====IIMIIIIITIIIII~~~~~~~~111,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 47
-  "~~~~~~~~~,,_IIIIVIIIATTTIII~IIM,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 48
+  "~~~~~~~~~,,_vIIIVIIIATTTIII~IIM,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 48
   "~~~~~~~~~~,_IIIMIIIITTZKTTI~IIv,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 49
   "~~~~~~~~~~~,_IIIIIaTTQTTCTT+IIM,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 50
   "~~~~~~~~~~&__IIPIIIITTTbTTI~III,,,,121,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 51
   "~~~~~~~~~~~_,_IIIIIIITTTTII~IMM,,,23332,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 52
-  "~~~~~~~~~~~~,_IISIIIIIIPIII~IIP,,,24442~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 53
+  "~~~~~~~~~~~~,_vISIIIIIIPIII~IIP,,,24442~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 53
   "~~~~~~~~~~~~___IIIIIMMMIIII+IIM,,,24442~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 54
   "~~~~~~~~~~~~_,_IIMMMMIIIIII~IIM,,,23332~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 55
   "~~~~~~~~~~~~_,_IPIIMMMMSIII~III,,,,121~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 56
@@ -1192,7 +1194,7 @@ const CARTE = [
   "~~~~~~~~~~~_,,!!!!^!!!!!.DD~DD,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 62
   "~~~~~~~~~~~_,,_!!!!!!!!@.D~~~D~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 63
   "~~~~~~~~~~~_,,,_IN!!!!!!.DD~DD&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 64
-  "~~~~~~~~~~~~_,,,___!!!!!_DD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 65
+  "~~~~~~~~~~~~_,v,___!!!!!_DD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 65
   "~~~~~~~~~~~~~~________,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 66
   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 67
   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 68
@@ -2849,8 +2851,11 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
   const moi = { x, z, geos: {}, lampes: [] }, dedans = f => { const avant = interieur; interieur = moi; f(); interieur = avant; };   // ce qui est dedans ne se voit que de près
   interieurs.push(moi);
   const iu = l / 2 - E, iw = p / 2 - E, g1 = decalagePorte - largeurPorte / 2, g2 = decalagePorte + largeurPorte / 2, pe = 0.02;
-  // où il est (pour savoir si B.J. est dedans), et ses lampes : la nuit, celles de la maison où est B.J. éclairent vraiment (voir « Le jour et la nuit »)
-  { const [xa, za] = P(-l / 2, -p / 2), [xb, zb] = P(l / 2, p / 2); Object.assign(moi, { x1: Math.min(xa, xb), x2: Math.max(xa, xb), z1: Math.min(za, zb), z2: Math.max(za, zb), y1: Y0 + y0, y2: Y0 + y0 + hVisite }); }
+  // où il est (pour savoir si B.J. est dedans), et ses lampes : la nuit, celles de la maison où est B.J. éclairent vraiment (voir « Le jour et la nuit »).
+  // Sa porte : un point juste dedans et un point juste dehors (un passant coincé dans le bâtiment en sort par là : voir marcher)
+  { const [xa, za] = P(-l / 2, -p / 2), [xb, zb] = P(l / 2, p / 2), pt = (u, w) => { const [X, Z] = P(u, w); return { x: X, z: Z }; };
+    Object.assign(moi, { x1: Math.min(xa, xb), x2: Math.max(xa, xb), z1: Math.min(za, zb), z2: Math.max(za, zb), y1: Y0 + y0, y2: Y0 + y0 + hVisite,
+      porte: { dedans: pt(decalagePorte, p / 2 - 1), dehors: pt(decalagePorte, p / 2 + 1.5) } }); }
   const noterLampe = (u, k, w) => { const [X, Z] = P(u, w); moi.lampes.push({ x: X, y: Y0 + niveau(k + 1) - 0.5, z: Z, dedans: true }); };   // une lampe au plafond de l'étage k
   // les murs (au-dessus du toit, ils font un garde-fou), et leur peau à l'intérieur
   B(mat, 0, y0, -p / 2 + E / 2, l, hMur, E); B(mat, -l / 2 + E / 2, y0, 0, E, hMur, p - 2 * E); B(mat, l / 2 - E / 2, y0, 0, E, hMur, p - 2 * E);
@@ -2895,6 +2900,8 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
     meuble: (m, u, k, w, lu, h, lw, dy = 0) => dedans(() => B(m, u, niveau(k) + dy, w, lu, h, lw)),   // posé sur le plancher de l'étage k
     point: (u, k, w) => { const [X, Z] = P(u, w); return { x: X, z: Z, y: Y0 + niveau(k) }; } };
 }
+// le bâtiment où l'on entre où est o (B.J. ou un personnage) : dans ses murs, entre son sol et son toit (sinon, undefined)
+const interieurDe = o => interieurs.find(d => o.x > d.x1 && o.x < d.x2 && o.z > d.z1 && o.z < d.z2 && o.y > d.y1 - 0.5 && o.y < d.y2 - 0.3);
 // un immeuble des pâtés I. La plupart sont pleins, avec une porte fermée sur la rue. Certains se visitent (REGLAGES.immeublesVisitables) :
 // on entre par la porte, un escalier monte d'étage en étage, et on arrive sur le toit par cet escalier, par une échelle ou par un escalier
 // de secours, dehors ; ou bien sur une terrasse, par l'intérieur ou par dehors, avec un étage plus petit posé dessus.
@@ -2930,7 +2937,7 @@ function immeubleI(mat, x, z, l, p, etages, porte, cote, rnd) {
 // Le chemin de la porte à l'escalier reste libre : tout droit vers le fond, puis à gauche le long de l'escalier.
 // Sur certains meubles, un objet à voler ou un bonus attend (cachettes).
 // plan : la sorte de chaque étage, au lieu du hasard (une villa de B.J. : 'villaBas', puis 'villaHaut' ; chez lui, rien à voler).
-// Si b.lits est une liste, chaque lit y note sa place (le milieu du lit, sur le plancher)
+// Chaque lit note sa place (le milieu du lit, sur le plancher) dans b.lits, si c'est une liste (chez B.J.), sinon dans autresLits
 const cachettes = [];   // { x, y, z : où il attend (y : le dessus du meuble) ; type, tresor : ce que c'est ; objet : l'objet, quand B.J. est près ; pris : quand il l'a pris }
 function meubler(b, n, rnd, plan) {
   const { iu, iw } = b, profond = iw > 7, large = iu > 15;
@@ -2959,7 +2966,7 @@ function meubler(b, n, rnd, plan) {
     pose('bois', u, w, f, 1.7, 1, 0.08, -1.06);   // la tête de lit
     for (const c of [-1, 1]) { pose('bois', u, w, f, 0.45, 0.5, 0.4, -0.85, c * 1.1); pose('lampe', u, w, f, 0.15, 0.22, 0.15, -0.85, c * 1.1, 0.5, false); }
     cache(...ou(u, w, f, -0.85, -1.1), 0.5);
-    b.lits?.push(b.point(u, k, w));
+    (b.lits || autresLits).push(b.point(u, k, w));
   };
   const armoire = (u, w, f) => { pose('bois', u, w, f, 1.6, 2.1, 0.6); pose('boisClair', u, w, f, 0.04, 1.9, 0.02, 0.3, 0, 0.1, false); };
   const commode = (u, w, f) => { pose('boisClair', u, w, f, 1.2, 0.85, 0.5); pose('miroir', u, w, f, 0.8, 0.9, 0.03, -0.23, 0, 1, false); cache(u, w, 0.85); };
@@ -3105,7 +3112,8 @@ const CONTENEURS = ['conteneur1', 'conteneur2', 'conteneur3', 'conteneur4'];
 
 const stands = [], soins = [], pnjDepart = [], voituresGarees = [], pickupsDepart = [], ascenseurs = [], bateauxDepart = [], hopitaux = [];
 const garagistes = [], braquages = [], butinsDepart = [];
-const lits = [];   // les lits des villas de B.J. (v dans la CARTE) : il y dort (voir « Le jour et la nuit »)
+const lits = [];   // les lits où B.J. dort (voir « Le jour et la nuit ») : ceux de ses villas (v dans la CARTE), de la villa de Michael et de la maison de Franklin
+const autresLits = [];   // les autres (appartements, caravane de Trevor, hôpital) : l'aide dit d'aller dormir dans une de ses villas
 let chateau = null, bunker = null;
 let camp = null, bunkerSecret = null;   // le camp militaire (%) et le bunker secret (?) : voir « Le camp militaire », plus bas
 function genererBloc(i, j) {
@@ -3159,7 +3167,7 @@ function genererBloc(i, j) {
     sol('paves', X(30), 0.21, Z(46), 40, 16);
     b.meuble('blanc', 0, 0, 4, 8, 1.1, 1.2);                                          // l'accueil
     for (let k = 0; k < 4; k++) for (const w of [2, 5]) b.meuble('bleu', -15 + k * 1.6, 0, w, 1.2, 0.5, 0.6);   // les chaises
-    for (let k = 0; k < 4; k++) { b.meuble('blanc', 5 + k * 3.2, 0, -9.5, 1.2, 0.6, 2.4); b.meuble('blanc', 5 + k * 3.2, 0, -10.4, 1, 0.2, 0.5, 0.6); }   // les lits et leur oreiller
+    for (let k = 0; k < 4; k++) { b.meuble('blanc', 5 + k * 3.2, 0, -9.5, 1.2, 0.6, 2.4); b.meuble('blanc', 5 + k * 3.2, 0, -10.4, 1, 0.2, 0.5, 0.6); autresLits.push(b.point(5 + k * 3.2, 0, -9.5)); }   // les lits et leur oreiller
     soins.push(b.point(-5, 0, -4), b.point(3, 0, -4));
     voituresGarees.push({ x: X(14), z: Z(46), a: 0 });
   } else if (c === 'A') { // l'armurerie : les armes sont dans la boutique
@@ -3239,7 +3247,8 @@ function genererBloc(i, j) {
     b.meuble('cuir', cu - 2, 0, 1.5, 4, 0.8, 1.2); b.meuble('boisClair', cu - 2, 0, -0.3, 2, 0.4, 1);   // le canapé et la table basse
     b.meuble('noirMeuble', cu - 2, 0, -2.4, 3, 0.5, 0.5); b.meuble('ecran', cu - 2, 0, -2.4, 2.4, 1.3, 0.08, 0.5);   // la télé
     b.meuble('blanc', b.iu - 1, 0, 1, 1.4, 0.95, 4);                                  // la cuisine
-    b.meuble('blanc', cu, 1, 1, 2.2, 0.55, 2.4); b.meuble('blanc', cu, 1, 0, 1.6, 0.2, 0.5, 0.55);   // le lit, en haut
+    b.meuble('blanc', cu, 1, 1, 2.2, 0.55, 2.4); b.meuble('blanc', cu, 1, 0, 1.6, 0.2, 0.5, 0.55);   // le lit, en haut : B.J. peut y dormir
+    lits.push(b.point(cu, 1, 1));
     b.meuble('bois', b.iu - 0.5, 1, -1, 0.8, 1.2, 2);
     if (villa) {
       for (const [x, z, l, p] of [[30, 38.2, 16, 0.6], [30, 46.8, 16, 0.6], [22.3, 42.5, 0.6, 8], [37.7, 42.5, 0.6, 8]]) boite('pierre', X(x), 0.2, Z(z), l, 0.3, p, true);
@@ -3260,7 +3269,7 @@ function genererBloc(i, j) {
     const b = batiment({ x: X(30), z: Z(28), l: 11, p: 5, mat: 'maison2', hEtage: 2.6, largeurPorte: 1.1, hauteurPorte: 2.1, sol: 'moquette', decalagePorte: 2 });
     // le lieu des missions est dedans, au milieu de la pièce. rayon : il faut arriver à moins de 2,5 m (donc entrer, à pied)
     Object.assign(lieux[c].find(q => q.x === X(30) && q.z === Z(30)), b.point(0, 0, 0), { rayon: 2.5 });
-    b.meuble('blanc', -3.8, 0, -0.3, 2.6, 0.5, 3.4); b.meuble('boisClair', 1, 0, -1.3, 1.2, 0.75, 1.2); b.meuble('boisClair', 4.2, 0, -1.4, 0.7, 0.6, 0.7);
+    b.meuble('blanc', -3.8, 0, -0.3, 2.6, 0.5, 3.4); autresLits.push(b.point(-3.8, 0, -0.3)); b.meuble('boisClair', 1, 0, -1.3, 1.2, 0.75, 1.2); b.meuble('boisClair', 4.2, 0, -1.4, 0.7, 0.6, 0.7);
     boite('cuir', X(20), 0.2, Z(38), 2.5, 0.8, 1, true);                              // un vieux canapé dehors
     for (let k = 0; k < 4; k++) boite('metal', X(38 + k * 1.2), 0.2, Z(38 + (k % 2)), 0.8, 1.1, 0.8, true);   // des fûts
     voituresGarees.push({ x: X(46), z: Z(40), a: 0.3, type: '4x4 du désert' });
@@ -8339,7 +8348,8 @@ function action() {
   if (J.voiture) { if (!J.voiture.rail) sortirVoiture(); return true; }   // pas en plein looping. En plein accident (tonneaux, tête-à-queue), on peut : B.J. saute, et tombe par terre
   if (boutonProche() && !camp.ouvert && (!J.robot || J.robot.armure)) { appuyerBouton(); return true; }   // le bouton rouge du camp militaire (même depuis l'armure)
   if (J.robot) { sortirRobot(); return true; }
-  if (litProche()) { dormir(); return true; }   // dans une villa de B.J. : dormir jusqu'au moment suivant de la journée
+  if (litProche()) { dormir(); return true; }   // dans une villa de B.J. (ou chez Michael, chez Franklin) : dormir jusqu'au moment suivant de la journée
+  if (autreLitProche()) { annonce('', tr("Ce lit n'est pas à toi : dors dans une de tes villas (⌂ sur la carte), chez Michael ou chez Franklin"), 3); return true; }
   const s = standProche();
   if (s) { acheter(s); return true; }
   const g = garagisteProche();
@@ -10013,10 +10023,12 @@ function majPersonne(p, dt) {
     const y = hauteurSol(p.x, p.z, p.y);
     if (EAU - y > 0.9) { p.x = ax; p.z = az; p.angle += Math.PI * 0.5; }   // personne d'autre que B.J. ne va dans l'eau profonde
     else p.y = y;
-  }
+    // contre un mur, il n'avance presque plus : p.coince compte depuis combien de temps. Au bout de 0,3 s, il s'arrête de marcher sur place
+    p.coince = Math.hypot(p.x - ax, p.z - az) < Math.abs(vitesse) * dt * 0.3 ? (p.coince || 0) + dt : 0;
+  } else p.coince = 0;
   if (p.h.g.visible) {
     p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle;
-    animerHumain(p.h, Math.abs(vitesse), dt, { arme, touche: p.touche / 0.3 });
+    animerHumain(p.h, p.coince > 0.3 ? 0 : Math.abs(vitesse), dt, { arme, touche: p.touche / 0.3 });
     membresMous(p.h, dt, p.touche > 0 ? { raideur: 12, sol: p.y, jambes: false } : { sol: p.y });   // un coup : le haut du corps part et revient, la tête et les bras suivent
   }
 }
@@ -10033,9 +10045,23 @@ function marcher(p, dt) {
     return d > 3 ? 3 : 1.4;
   }
   if (p.rodeur) { const t = p.trace ||= []; if (!t.length || dist(t.at(-1), p) > 0.4) { t.push({ x: p.x, z: p.z }); if (t.length > 4) t.shift(); } }
+  // bloqué contre un meuble ou un mur depuis 1 s (p.coince : voir majPersonne) : il le contourne, de côté, pendant 0,8 s
+  if (p.coince > 1) { p.contour = 0.8; p.sensContour = Math.random() < 0.5 ? 1 : -1; p.coince = 0; }
+  p.contour = Math.max(0, (p.contour || 0) - dt);
+  const cap = c => angleVers(p, c) + (p.contour > 0 ? p.sensContour * Math.PI / 2 : 0);
+  // dans un bâtiment (il y a suivi B.J. pendant une poursuite, ou s'y est enfui) : il en sort par la porte, puis reprend son chemin. À l'étage,
+  // il ne sait pas descendre l'escalier : il attend (et s'en va quand on ne le voit plus : voir peupler)
+  if ((p.tDedans = (p.tDedans ?? 0) - dt) <= 0) { p.tDedans = 0.5; const d = interieurDe(p); if (p.dedans && !d) { p.versPorte = false; initChemin(p); } p.dedans = d; }
+  if (p.dedans) {
+    const d = p.dedans;
+    if (p.y > d.y1 + 1.5) return 0;
+    if (dist(p, d.porte.dedans) < 0.8) p.versPorte = true;
+    p.angle = lerpAngle(p.angle, cap(p.versPorte ? d.porte.dehors : d.porte.dedans), 6 * dt);
+    return 1.4;
+  }
   let c = coin(p.bloc[0], p.bloc[1], p.coin);
   if (dist(p, c) < 0.8) { coinSuivant(p); c = coin(p.bloc[0], p.bloc[1], p.coin); }
-  p.angle = lerpAngle(p.angle, angleVers(p, c), 6 * dt);
+  p.angle = lerpAngle(p.angle, cap(c), 6 * dt);
   return 1.4;
 }
 // un personnage projeté (renversé par une voiture, soufflé par une explosion, bousculé par B.J. qui court) : (vx, vy, vz) sa vitesse,
@@ -10472,6 +10498,13 @@ function majVoiture(v, dt) {
 // quand B.J. roule vite (plus de 10 m/s : plus vite qu'en courant), ce qui est derrière lui ne sert à rien : il s'en éloigne.
 // Les piétons et les voitures apparaissent alors devant lui, et ceux qu'il a laissés loin derrière disparaissent plus tôt
 const derriere = p => Math.hypot(elan.x, elan.z) > 10 && (p.x - J.x) * elan.x + (p.z - J.z) * elan.z < 0;
+// quelqu'un qu'on ne voit pas : derrière la caméra (à plus de 25 m), ou à plus de 120 m. On peut le faire disparaître sans que ça se voie
+const vVue = new THREE.Vector3();
+function horsDeVue(p) {
+  camera.getWorldDirection(vVue);
+  const dx = p.x - camera.position.x, dz = p.z - camera.position.z, d = Math.hypot(dx, dz);
+  return d > 120 || (d > 25 && dx * vVue.x + dz * vVue.z < 0);
+}
 // les voitures n'apparaissent pas dans le tour d'un pâté tout seul, relié à aucune route (une villa de B.J. sur une colline) : elles y tourneraient
 // en rond. RESEAU : les points du réseau des routes qui sont reliés à plus de 4 points
 const RESEAU = new Set();
@@ -10515,6 +10548,10 @@ function peupler(dt) {
   dernierJ = { x: J.x, z: J.z };
   for (const p of personnes) if ((p.type === 'pieton' || p.rodeur) && (dist(p, J) > 200 || (dist(p, J) > 60 && derriere(p)))) p.supprimer = true;
   for (const p of personnes) if (p.rodeur && !estNuit() && !p.alerte && dist(p, J) > 80) p.supprimer = true;   // au lever du jour, les gangs rentrent chez eux
+  // la police semée, les policiers venus en renfort s'en vont, dès qu'on ne les voit plus ; de même, un passant qui attend à l'étage d'un bâtiment
+  // (il ne sait pas descendre l'escalier : voir marcher)
+  for (const p of personnes) if (p.vie > 0 && horsDeVue(p) && ((p.type === 'flic' && p.renfort && etoiles === 0)
+    || (p.dedans && p.y > p.dedans.y1 + 1.5 && (p.type === 'pieton' || p.rodeur || (p.type === 'flic' && etoiles === 0))))) p.supprimer = true;
   // un gang dont des membres sont tombés revient au complet quand B.J. est loin (à plus de 250 m) ; de même quand la nuit tombe (ils sont
   // plus nombreux) ou que le jour se lève
   for (const g of GANGS) {
@@ -10534,11 +10571,9 @@ function peupler(dt) {
   TELESIEGES.forEach(garnir);   // les skis, les snowboards et les luges pris aux gares reviennent
   for (let k = pietons; k < Math.min(voulus, pietons + Math.ceil(voulus / 8)); k++) apparaitrePersonne('pieton');
   // des piétons en trop (la nuit tombe, ou on a choisi moins de monde) rentrent chez eux, un huitième à la fois : ceux qu'on ne voit pas
-  // (derrière la caméra, ou à plus de 120 m)
-  camera.getWorldDirection(vTmp);
   for (let n = Math.min(pietons - voulus, Math.ceil(voulus / 8) + 1), k = 0; n > 0 && k < personnes.length; k++) {
-    const p = personnes[k], dx = p.x - camera.position.x, dz = p.z - camera.position.z, d = Math.hypot(dx, dz);
-    if (p.type === 'pieton' && !p.supprimer && p.vie > 0 && (d > 120 || (d > 30 && dx * vTmp.x + dz * vTmp.z < 0))) { p.supprimer = true; n--; }
+    const p = personnes[k];
+    if (p.type === 'pieton' && !p.supprimer && p.vie > 0 && horsDeVue(p)) { p.supprimer = true; n--; }
   }
   for (let k = civiles; k < Math.min(voulues, civiles + Math.ceil(voulues / 8)); k++) apparaitreVoiture(false);
 }
@@ -10916,7 +10951,7 @@ function majHUD(dt) {
     + (J.chrono?.t0 != null ? ` · ${(temps - J.chrono.t0).toFixed(1)} s` : '');   // sur le boardercross : le chronomètre
   const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
   const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40), ech = aPied && !J.echelle && echelles.find(e => dist(e, J) < 1.5 && Math.abs(J.y - e.bas) < 1);
-  const tl = telesiegeProche(), nav = aPied && navetteProche(), lit = aPied && litProche();
+  const tl = telesiegeProche(), nav = aPied && navetteProche(), lit = aPied && litProche(), autreLit = aPied && autreLitProche();
   const bouton = boutonProche() && !camp.ouvert && (aPied || ar);
   const aide = J.telesiege ? tr(J.telesiege.l.cabines ? 'Appuie sur <b>E</b> pour sauter de la cabine' : 'Appuie sur <b>E</b> pour sauter du télésiège')
     : tl ? tr(tl.cabines ? 'Appuie sur <b>E</b> pour prendre la télécabine' : 'Appuie sur <b>E</b> pour prendre le télésiège')
@@ -10924,6 +10959,7 @@ function majHUD(dt) {
     : ar ? tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · <b>F</b> : fusées · <b>E</b> : sortir')
     : !aPied ? (faitFigures(J.voiture) ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping') : '')
     : lit ? (sommeil ? '' : etoiles > 0 ? tr("Sème d'abord la police, puis reviens dormir") : tr(MOMENTS[journee.moment].dormir))   // dans sa villa, près du lit
+    : autreLit ? tr("Ce lit n'est pas à toi : dors dans une de tes villas (⌂ sur la carte), chez Michael ou chez Franklin")
     : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
       : J.possede[s.arme] ? tr('Appuie sur <b>E</b> pour acheter : {arme} (munitions {prix} $)', { arme: tr(ARMES[s.arme].nom), prix: Math.round(ARMES[s.arme].prix / 2) })
       : tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr(ARMES[s.arme].nom), prix: ARMES[s.arme].prix }))
@@ -10963,11 +10999,13 @@ const MOMENTS = [
 ];
 const journee = { moment: 0, t: 0 };   // le moment de la journée (son numéro dans MOMENTS) et depuis combien de secondes il dure. On commence au matin
 const dureeMoment = k => Math.max(0, MOMENTS[k].duree()) || 0;
-// le temps passe (dt : des secondes de l'horloge) ; un moment qui dure 0 seconde est sauté
+// le temps passe (dt : des secondes de l'horloge) ; un moment qui dure 0 seconde est sauté. Un nouveau moment s'annonce : « Le soleil se couche »...
 function avancerJournee(dt) {
+  const avant = journee.moment;
   journee.t += dt;
   for (let n = 0; n < 4 && journee.t >= dureeMoment(journee.moment); n++) { journee.t -= dureeMoment(journee.moment); journee.moment = (journee.moment + 1) % 4; }
   if (journee.t >= dureeMoment(journee.moment)) journee.t = 0;   // (toutes les durées à 0 : le temps s'arrête)
+  if (journee.moment !== avant && !sommeil) annonce('', tr(MOMENTS[journee.moment].reveil), 3);
 }
 // où on en est : l'angle du soleil (a) et l'heure de la montre, entre le début de ce moment et celui du suivant
 function ouEnEst() {
@@ -11051,7 +11089,7 @@ const lumieresNuit = Array.from({ length: clamp(Math.round(R_.lumieresNuit) || 0
 });
 let tSources = 0, sourcesNuit = [], dLoin = Infinity;   // les lampes choisies ; dLoin : la distance de la première qui n'a pas de lumière
 function choisirSources() {
-  const dedans = interieurs.find(d => J.x > d.x1 && J.x < d.x2 && J.z > d.z1 && J.z < d.z2 && J.y > d.y1 - 0.5 && J.y < d.y2 - 0.3);
+  const dedans = interieurDe(J);
   let l = [];
   if (dedans) l = dedans.lampes.filter(q => q.y > J.y && q.y < J.y + 4.5);   // les lampes au plafond de son étage
   else {
@@ -11149,7 +11187,9 @@ function majCiel(dt) {
 }
 // dormir dans une villa de B.J. : on passe au début du moment suivant de la journée, avec toute sa vie
 let sommeil = null;   // { t : depuis combien de secondes il dort (à l'horloge), fait : le moment suivant est arrivé }
-const litProche = () => !J.voiture && !J.robot && !J.mort && lits.find(l => Math.hypot(l.x - J.x, l.z - J.z) < 2.4 && Math.abs(l.y - J.y) < 1.2);
+const presDe = l => Math.hypot(l.x - J.x, l.z - J.z) < 2.4 && Math.abs(l.y - J.y) < 1.2;
+const litProche = () => !J.voiture && !J.robot && !J.mort && lits.find(presDe);
+const autreLitProche = () => !J.voiture && !J.robot && !J.mort && autresLits.find(presDe);   // un lit où il ne dort pas
 function dormir() {
   if (etoiles > 0) { annonce('', tr("Sème d'abord la police !"), 2); bip(300, 200, 0.2, 'square', 0.2); return; }
   sommeil = { t: 0 }; J.danse = 0; J.accroupi = false;
@@ -11166,9 +11206,9 @@ function majSommeil(dt) {
 // =====================================================================
 //  Boucle principale
 // =====================================================================
-function mettreAJour(dt) {
+// dt : le pas de temps du jeu ; horloge : le vrai temps écoulé, en secondes (le jour et la nuit le suivent, même si le jeu rame)
+function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   temps += dt;
-  const horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0;   // le même temps, à l'horloge : le jour et la nuit le suivent
   avancerJournee(horloge); majSommeil(horloge);
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
   if (J.mort || J.voiture || J.robot || J.telesiege) J.grappin = J.balance = J.mur = J.plane = J.lance = null;   // ni grappin, ni toile, ni mur, ni cape
@@ -11297,9 +11337,10 @@ function majRepere(dt) {
 let dernier = performance.now();
 function boucle(t) {
   const dt = clamp((t - dernier) / 1000 * R_.vitesseJeu, 0, 0.05);   // (REGLAGES.vitesseJeu ralentit tout le jeu)
+  const horloge = R_.vitesseJeu > 0 ? clamp((t - dernier) / 1000, 0, 1) : 0;   // le vrai temps écoulé : la journée dure ce qu'il faut, même si le jeu rame
   dernier = t;
   if (carte.ouverte) { dessinerGrandeCarte(dt); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
-  if (enJeu) mettreAJour(dt); else dessinerApercu(dt);   // dans le menu : l'aperçu du héros
+  if (enJeu) mettreAJour(dt, horloge); else dessinerApercu(dt);   // dans le menu : l'aperçu du héros
   majCamera(dt); majRepere(dt); majHUD(dt); majLaser(dt);
   majCiel(dt);   // le soleil (ou la lune), le ciel, la brume, les lumières de la nuit
   majMorceaux();
@@ -11333,7 +11374,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   majIronman, viserMains, lueursIronman, rayonPlastron, tendreBras, matIronman, armureComplete,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
-  journee, lumiere, MOMENTS, ouEnEst, avancerJournee, majCiel, lits, litProche, dormir, lumieresNuit, interieurs, estNuit, phares, cielEtoile, lune, apparaitreRodeurs, RESEAU, M_HALO, MATS_FENETRES, ambiance,
+  journee, lumiere, MOMENTS, ouEnEst, avancerJournee, majCiel, lits, autresLits, litProche, autreLitProche, interieurDe, horsDeVue, dormir, lumieresNuit, interieurs, estNuit, phares, cielEtoile, lune, apparaitreRodeurs, RESEAU, M_HALO, MATS_FENETRES, ambiance,
   get sommeil() { return sommeil; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
