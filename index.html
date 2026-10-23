@@ -86,6 +86,31 @@
   #reglages.change > summary { border-color: #f0c850; }   /* au moins un réglage changé dans le menu */
   #reglages input.change { background: rgba(240,200,80,.3); border-color: #f0c850; }   /* changé dans le menu : ne suit plus le code */
   #reglages input.faux { border-color: #e04040; }   /* ce n'est pas un nombre : pas pris en compte */
+  #menu .partie button.nouvelle { border-style: dashed; }   /* « Nouvelle partie » : efface tout */
+  /* les chapitres de super-héros : les victimes, à la place des étoiles (dès la 3e, une amende) */
+  #victimes { font: 22px 'Anton', Impact, sans-serif; color: #ff8a6a; }
+  /* les bulles d'aide du début d'un chapitre */
+  #bulle { position: absolute; left: 24px; top: 36%; max-width: 360px; background: #fffdf4; color: #151515; text-shadow: none; border: 3px solid #151515;
+           border-radius: 18px; padding: 10px 16px 12px; font-size: 19px; opacity: 0; transition: opacity .35s; box-shadow: 4px 4px 0 rgba(0,0,0,.45); }
+  #bulle::after { content: ''; position: absolute; left: 28px; bottom: -16px; border: 8px solid transparent; border-top: 10px solid #151515; }   /* la pointe de la bulle */
+  #bulle h3 { margin: 0 0 2px; font: 24px 'Anton', Impact, sans-serif; letter-spacing: 1px; color: #c8141c; }
+  /* le tableau de bord de la DeLorean, comme dans le film : la destination (rouge), le présent (vert), le départ précédent (jaune) */
+  #tableau { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: rgba(20,20,22,.88); border: 2px solid #555; border-radius: 6px; padding: 6px 12px;
+             display: none; text-shadow: none; }   /* en haut, au milieu : là, il ne cache rien */
+  #tableau .ligne { display: flex; align-items: baseline; gap: 10px; margin: 2px 0; }
+  #tableau .nom { width: 128px; font-size: 13px; font-weight: 700; color: #bbb; text-align: right; letter-spacing: 1px; }
+  #tableau .val { min-width: 210px; font: 19px 'Anton', Impact, sans-serif; letter-spacing: 2px; background: #0a0a0a; padding: 0 8px; border-radius: 3px; }
+  #tableau .dest .val { color: #ff5a2a; text-shadow: 0 0 8px #ff3a10; }
+  #tableau .present .val { color: #4cff6a; text-shadow: 0 0 8px #10c030; }
+  #tableau .depart .val { color: #ffc02a; text-shadow: 0 0 8px #e09010; }
+  #tableau .mph { display: flex; align-items: center; gap: 10px; margin-top: 4px; font: 22px 'Anton', Impact, sans-serif; color: #9fd8ff; }
+  #tableau .barre { flex: 1; height: 10px; background: #222; border-radius: 5px; overflow: hidden; }
+  #tableau .barre > div { height: 100%; width: 0; background: linear-gradient(90deg, #4a8cff, #e8f4ff); }
+  #tableau .aide { font-size: 15px; color: #ddd; margin-top: 4px; }
+  #voile { position: absolute; inset: 0; background: #fff; opacity: 0; }   /* la DeLorean est partie : tout devient blanc */
+  /* l'écran du chapitre : le logo du héros, « Chapitre 2 », puis il s'en va */
+  #ecran-chapitre { position: fixed; inset: 0; display: none; cursor: pointer; }
+  #ecran-chapitre canvas { width: 100%; height: 100%; }
 </style>
 </head>
 <body>
@@ -99,6 +124,7 @@
     <div id="heure"></div>
     <div id="argent">0 $</div>
     <div id="etoiles"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+    <div id="victimes"></div>
     <div id="arme"></div>
     <div id="munitions"></div>
   </div>
@@ -111,6 +137,15 @@
   <div id="sommeil">Zzz…</div>
   <div id="wasted">WASTED</div>
   <div id="vitesse"></div>
+  <div id="bulle"></div>
+  <div id="tableau">
+    <div class="ligne dest"><span class="nom">DESTINATION</span><span class="val"></span></div>
+    <div class="ligne present"><span class="nom">PRÉSENT</span><span class="val"></span></div>
+    <div class="ligne depart"><span class="nom">DÉPART PRÉCÉDENT</span><span class="val"></span></div>
+    <div class="mph"><span></span><div class="barre"><div></div></div></div>
+    <div class="aide"></div>
+  </div>
+  <div id="voile"></div>
   <canvas id="grande-carte"></canvas>
   <div id="triche"></div>
 </div>
@@ -125,6 +160,7 @@
       <div class="heros" data-heros="cheveux"><span>Cheveux :</span></div>
       <div class="foule" data-foule="pietons"><span>Piétons :</span></div>
       <div class="foule" data-foule="voitures"><span>Voitures :</span></div>
+      <div class="partie"><span>Chapitre :</span></div>
     </div>
   </div>
   <details id="reglages">
@@ -153,10 +189,12 @@
     <tr><td>V</td><td>vue 1re / 3e personne</td></tr>
     <tr><td>1 à 8 ou molette</td><td>changer d'arme</td></tr>
     <tr><td>M ou Tab</td><td>carte du pays (molette : zoom)</td></tr>
+    <tr><td>T</td><td>DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)</td></tr>
     <tr><td>Entrée</td><td>code de triche</td></tr>
     <tr><td>Échap</td><td>pause</td></tr>
   </table>
 </div>
+<div id="ecran-chapitre"><canvas></canvas></div>
 
 <script>
 // =====================================================================
@@ -190,6 +228,79 @@ for (const k in heros) {
   try { if (CHOIX_HEROS[k].includes(localStorage['heros-' + k])) heros[k] = localStorage['heros-' + k]; } catch {}
   if (!CHOIX_HEROS[k].includes(heros[k])) heros[k] = CHOIX_HEROS[k][0];   // si tu as renommé ou enlevé le choix du premier lancement
 }
+
+// =====================================================================
+//  LES CHAPITRES : le jeu se joue en chapitres, un par héros. À la fin d'un chapitre, la DeLorean emmène au suivant : il faut tenir
+//  88 miles à l'heure (142 km/h) pendant 3 secondes. Elle ramène aussi aux chapitres d'avant (dedans, la touche T choisit où aller).
+//  Les missions sont dans MISSIONS (le chapitre 1) et MISSIONS_CHAPITRES (les autres), plus bas.
+//  ville : où ça se passe. Pour l'instant, tous les chapitres sont dans le pays de la CARTE : Malibu, Gotham, Metropolis et New York arrivent bientôt
+//  heros, heroine : ton nom, avec le garçon ou la fille du menu (sans : celui de HEROS) ; super, superFille : le nom de super-héros
+//  triche : le code de triche du héros, allumé pendant tout le chapitre. Les codes des autres super-héros n'y marchent pas
+//  logo : le dessin de l'écran du chapitre, et sa façon de s'en aller : 'wolfenstein' (il brûle), 'ironman' (un tir de répulseur le brise),
+//    'batman' (il s'envole en chauves-souris), 'superman' (il part comme une fusée), 'spiderman' (une toile l'arrache)
+//  heure : l'heure ne bouge plus (13 = 1 h de l'après-midi, 1 = 1 h du matin) ; sans heure, le jour et la nuit tournent
+//  cachette : où la DeLorean attend qu'on la retrouve, à la fin du chapitre : une lettre de la CARTE ('?' : le bunker secret)
+//  sansReproche: true : un héros sans reproche. La police est de son côté (jamais d'étoiles), mais il ne doit pas tuer de passants :
+//    dès la 3e victime, une amende (voir amende, dans REGLAGES)
+//  bulles : les bulles d'aide du début du chapitre, l'une après l'autre ({super} : son nom de super-héros ; <b>A</b> : la lettre en gras)
+// =====================================================================
+const CHAPITRES = [
+  { ville: 'Los Santos', logo: 'wolfenstein', cachette: '?', bulles: [
+    'Suis le <b>point jaune</b> de la mini-carte : il te mène à ta mission.',
+    '<b>E</b> : monter dans une voiture (ou la voler !). <b>M</b> : la carte du pays.',
+    'Si tu fais des bêtises, la police te poursuit : cache-toi pour la semer.',
+    'À la fin du chapitre, la <b>DeLorean</b> t\'emmène au chapitre suivant !',
+  ]},
+  { ville: 'Malibu', heros: 'Tony Stark', heroine: 'Pepper Potts', super: 'Iron Man', superFille: 'Rescue', triche: 'IRONMAN', logo: 'ironman', heure: 13, cachette: 'a', sansReproche: true, bulles: [
+    'Tu es <b>{super}</b> ! Ton armure arrive en volant, pièce par pièce.',
+    '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.',
+    '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.',
+    '<b>A Z E</b>, l\'une après l\'autre : sortir de l\'armure, ou la rappeler. <b>M</b> : le masque.',
+    'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
+    'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
+  ]},
+  { ville: 'Gotham', heros: 'Bruce Wayne', heroine: 'Barbara Gordon', super: 'Batman', superFille: 'Batgirl', triche: 'BATMAN', logo: 'batman', heure: 1, cachette: 'b', sansReproche: true, bulles: [
+    'Tu es <b>{super}</b> ! Ta Batmobile t\'attend à côté de toi : <b>B</b> la rappelle, <b>R</b> la fait voler.',
+    '<b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.',
+    'En l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.',
+    '<b>9</b> : le grappin, les batarangs et les filets.',
+    'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
+    'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
+  ]},
+  { ville: 'Metropolis', heros: 'Clark Kent', heroine: 'Kara Danvers', super: 'Superman', superFille: 'Supergirl', triche: 'SUPERMAN', logo: 'superman', heure: 12, cachette: 'd', sansReproche: true, bulles: [
+    'Tu es <b>{super}</b> ! <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.',
+    'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.',
+    '<b>9</b> : les yeux laser.',
+    'Tomber de très haut ne te fait rien : tout s\'écrase autour de toi !',
+    'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
+    'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
+  ]},
+  { ville: 'New York', heros: 'Peter Parker', heroine: 'Gwen Stacy', super: 'Spiderman', superFille: 'Spider-Gwen', triche: 'SPIDERMAN', logo: 'spiderman', cachette: 'a', sansReproche: true, bulles: [
+    'Tu es <b>{super}</b> ! <b>G</b> (ou clic gauche) : une toile, pour te balancer d\'immeuble en immeuble.',
+    'Avance contre un mur : tu grimpes. <b>Espace</b> : sauter du mur.',
+    'Une toile sur une voiture : garde le bouton enfoncé pour la faire tourner, lâche-le pour la lancer !',
+    '<b>9</b> : les filets. Tomber de haut ne te fait pas mal.',
+    'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
+    'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
+  ]},
+];
+
+// la partie : le navigateur se souvient du chapitre où tu en es, de tes missions, de ton argent et des armes de chaque chapitre
+// (le jeu l'écrit toutes les 2 secondes : voir sauverPartie). « Nouvelle partie », dans le menu, efface tout.
+// chapitre : celui où l'on est (1 = le premier) ; ouvert : le plus loin où l'on est allé ; missions : où on en est dans chaque chapitre ;
+// trouvee : les chapitres dont on a retrouvé la DeLorean ; precedent : d'où l'on vient ; ecran, arrivee : on vient d'arriver (l'écran du
+// chapitre, puis la DeLorean qui apparaît dans trois éclairs)
+let sauvee = null;
+try { sauvee = JSON.parse(localStorage.partie || 'null'); } catch {}
+const nouvellePartie = !sauvee?.chapitre;   // tout premier lancement (ou « Nouvelle partie ») : l'écran du chapitre 1 s'affichera au premier clic
+const partie = { chapitre: 1, ouvert: 1, argent: null, missions: {}, armes: {}, trouvee: {}, precedent: 0, ecran: false, arrivee: false, ...sauvee };
+partie.chapitre = Math.min(CHAPITRES.length, Math.max(1, Math.round(partie.chapitre) || 1));   // (un chapitre enlevé du tableau : le dernier)
+partie.ouvert = Math.min(CHAPITRES.length, Math.max(partie.chapitre, Math.round(partie.ouvert) || 1));
+const CHAPITRE = CHAPITRES[partie.chapitre - 1];   // le chapitre où l'on est (on en change en rechargeant la page)
+// ton nom dans ce chapitre (Tony Stark, Pepper Potts...), et ton nom de super-héros (Iron Man, Rescue...)
+const fille = () => !!HEROS[heros.genre].fille;
+const nomHeros = () => (fille() ? CHAPITRE.heroine : CHAPITRE.heros) || HEROS[heros.genre].nom;
+const nomSuper = () => (fille() ? CHAPITRE.superFille : CHAPITRE.super) || nomHeros();
 
 // =====================================================================
 //  LA FOULE : combien de piétons et de voitures vivent autour de toi. On le choisit dans le menu.
@@ -665,6 +776,93 @@ const TRADUCTIONS = {
   'BANQUE':           { de: 'BANK', en: 'BANK', gsw: 'BANK' },
   'ESSENCE':          { de: 'TANKSTELLE', en: 'GAS', gsw: 'TANKSTELL' },
   "MUSÉE D'ART DE LOS SANTOS": { de: 'KUNSTMUSEUM LOS SANTOS', en: 'LOS SANTOS ART MUSEUM', gsw: 'KUNSCHTMUSEUM LOS SANTOS' },
+  // les chapitres : le menu, l'écran du chapitre, les bulles d'aide, l'amende, la DeLorean
+  'Chapitre :':       { de: 'Kapitel:', en: 'Chapter:', gsw: 'Kapitel:' },
+  '↺ Nouvelle partie': { de: '↺ Neues Spiel', en: '↺ New game', gsw: '↺ Neus Spiil' },
+  'Tout recommencer au chapitre 1 ? Ton argent, tes armes et tes chapitres seront perdus.': { de: 'Alles neu ab Kapitel 1 beginnen? Dein Geld, deine Waffen und deine Kapitel gehen verloren.',
+    en: 'Start over from chapter 1? Your money, your weapons and your chapters will be lost.', gsw: 'Alles vo vorne im Kapitel 1 aafange? Dis Gäld, dini Waffe und dini Kapitel sind dänn wäg.' },
+  'Bienvenue à {ville}, {nom} ! Tu es {super} : la police est de ton côté. Retrouve la DeLorean pour aller plus loin !': {
+    de: 'Willkommen in {ville}, {nom}! Du bist {super}: Die Polizei ist auf deiner Seite. Finde den DeLorean, um weiterzukommen!',
+    en: 'Welcome to {ville}, {nom}! You are {super}: the police are on your side. Find the DeLorean to go further!',
+    gsw: 'Willkomme z {ville}, {nom}! Du bisch {super}: d Polizei isch uf dinere Siite. Find de DeLorean, zum wiiterchoo!' },
+  'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)': { de: 'DeLorean: das Kapitel wählen, in das du reist (drinnen), oder ihn herholen (fertiges Kapitel)',
+    en: 'DeLorean: choose the chapter to go to (inside), or call it to you (finished chapter)', gsw: 'DeLorean: s Kapitel uuswähle, wo du hii wotsch (dinne), oder en härhole (fertigs Kapitel)' },
+  'CHAPITRE {n}':     { de: 'KAPITEL {n}', en: 'CHAPTER {n}', gsw: 'KAPITEL {n}' },
+  'Suis le <b>point jaune</b> de la mini-carte : il te mène à ta mission.': { de: 'Folge dem <b>gelben Punkt</b> auf der Minikarte: Er führt dich zu deiner Mission.',
+    en: 'Follow the <b>yellow dot</b> on the minimap: it leads you to your mission.', gsw: 'Gang em <b>gääle Punkt</b> uf de Minicharte nah: Er füehrt di zu dinere Mission.' },
+  '<b>E</b> : monter dans une voiture (ou la voler !). <b>M</b> : la carte du pays.': { de: '<b>E</b>: in ein Auto steigen (oder es klauen!). <b>M</b>: die Landkarte.',
+    en: '<b>E</b>: get into a car (or steal it!). <b>M</b>: the map of the country.', gsw: '<b>E</b>: in es Auto iistiige (oder s chlaue!). <b>M</b>: d Landcharte.' },
+  'Si tu fais des bêtises, la police te poursuit : cache-toi pour la semer.': { de: 'Wenn du Unsinn machst, verfolgt dich die Polizei: Versteck dich, um sie abzuhängen.',
+    en: 'If you get up to mischief, the police will chase you: hide to shake them off.', gsw: 'Wänn du Seich machsch, verfolgt di d Polizei: Versteck di, zum si abhänke.' },
+  'À la fin du chapitre, la <b>DeLorean</b> t\'emmène au chapitre suivant !': { de: 'Am Ende des Kapitels bringt dich der <b>DeLorean</b> ins nächste Kapitel!',
+    en: 'At the end of the chapter, the <b>DeLorean</b> takes you to the next chapter!', gsw: 'Am Änd vom Kapitel bringt di de <b>DeLorean</b> is nächschte Kapitel!' },
+  'Tu es <b>{super}</b> ! Ton armure arrive en volant, pièce par pièce.': { de: 'Du bist <b>{super}</b>! Deine Rüstung fliegt herbei, Stück für Stück.',
+    en: 'You are <b>{super}</b>! Your armor flies in, piece by piece.', gsw: 'Du bisch <b>{super}</b>! Dini Rüschtig flüügt här, Stuck für Stuck.' },
+  '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.': { de: '<b>Q</b> und <b>E</b>: die Repulsoren deiner Hände. <b>R</b>: der Strahl der Brustplatte.',
+    en: '<b>Q</b> and <b>E</b>: the repulsors in your hands. <b>R</b>: the chest beam.', gsw: '<b>Q</b> und <b>E</b>: d Repulsore vo dine Händ. <b>R</b>: de Strahl vo de Bruschtplatte.' },
+  '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.': { de: '<b>F</b>: fliegen, und noch einmal <b>F</b> zum Landen. Im Flug, <b>Shift</b>: schneller.',
+    en: '<b>F</b>: fly, and <b>F</b> again to land. While flying, <b>Shift</b>: faster.', gsw: '<b>F</b>: flüüge, und nomal <b>F</b> zum Lande. Im Flug, <b>Shift</b>: schnäller.' },
+  '<b>A Z E</b>, l\'une après l\'autre : sortir de l\'armure, ou la rappeler. <b>M</b> : le masque.': { de: '<b>Q W E</b>, nacheinander: aus der Rüstung steigen oder sie rufen. <b>M</b>: die Maske.',
+    en: '<b>Q W E</b>, one after the other: step out of the armor, or call it back. <b>M</b>: the mask.', gsw: '<b>Q W E</b>, eis nach em andere: us de Rüschtig uusstiige oder si rüefe. <b>M</b>: d Maske.' },
+  'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !': {
+    de: 'Du bist ein Held: Die Polizei ist auf deiner Seite. Aber pass auf die Passanten auf: Ab dem 3. Opfer zahlst du eine Strafe!',
+    en: 'You are a hero: the police are on your side. But watch out for passers-by: from the 3rd victim on, you pay a fine!',
+    gsw: 'Du bisch en Held: d Polizei isch uf dinere Siite. Aber pass uf d Passante uf: Ab em 3. Opfer gits e Buess!' },
+  'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.': {
+    de: 'Der DeLorean ist verschwunden: Finde ihn (gelber Punkt) und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
+    en: 'The DeLorean has vanished: find it (yellow dot), then hold 88 miles per hour for 3 seconds.',
+    gsw: 'De DeLorean isch verschwunde: Find en (gääle Punkt) und heb dänn 3 Sekunde lang 88 Meile pro Stund.' },
+  'Tu es <b>{super}</b> ! Ta Batmobile t\'attend à côté de toi : <b>B</b> la rappelle, <b>R</b> la fait voler.': { de: 'Du bist <b>{super}</b>! Dein Batmobil wartet neben dir: <b>B</b> ruft es, <b>R</b> lässt es fliegen.',
+    en: 'You are <b>{super}</b>! Your Batmobile is waiting next to you: <b>B</b> calls it, <b>R</b> makes it fly.', gsw: 'Du bisch <b>{super}</b>! Dis Batmobil wartet näbe dir: <b>B</b> rüeft s, <b>R</b> laht s flüüge.' },
+  '<b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.': { de: '<b>G</b> (oder Linksklick): der Enterhaken, um auf die Dächer zu kommen.',
+    en: '<b>G</b> (or left click): the grappling hook, to get onto the roofs.', gsw: '<b>G</b> (oder Linkschlick): de Änterhake, zum uf d Dächer cho.' },
+  'En l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.': { de: 'In der Luft halte <b>Shift</b> gedrückt: Du gleitest mit deinem Umhang.',
+    en: 'In the air, hold <b>Shift</b>: you glide with your cape.', gsw: 'I de Luft heb <b>Shift</b> druckt: Du gleitisch mit dim Umhang.' },
+  '<b>9</b> : le grappin, les batarangs et les filets.': { de: '<b>9</b>: Enterhaken, Batarangs und Netze.', en: '<b>9</b>: grappling hook, batarangs and nets.', gsw: '<b>9</b>: Änterhake, Batarangs und Netz.' },
+  'Tu es <b>{super}</b> ! <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.': { de: 'Du bist <b>{super}</b>! 3-mal schnell <b>Shift</b>: Du fliegst los. Noch 3-mal: Du hörst auf zu fliegen.',
+    en: 'You are <b>{super}</b>! <b>Shift</b> 3 times, fast: you take off. 3 more times: you stop flying.', gsw: 'Du bisch <b>{super}</b>! 3 Mal schnäll <b>Shift</b>: Du flüügsch los. Nomal 3 Mal: Du hörsch uf flüüge.' },
+  'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.': { de: 'Im Flug macht dich jedes Drücken auf <b>Shift</b> schneller. <b>Shift</b> + A oder D: eine Fassrolle.',
+    en: 'While flying, each press of <b>Shift</b> makes you faster. <b>Shift</b> + A or D: a barrel roll.', gsw: 'Im Flug macht di jede Druck uf <b>Shift</b> schnäller. <b>Shift</b> + A oder D: e Fassrolle.' },
+  '<b>9</b> : les yeux laser.': { de: '<b>9</b>: die Laseraugen.', en: '<b>9</b>: laser eyes.', gsw: '<b>9</b>: d Laserauge.' },
+  'Tomber de très haut ne te fait rien : tout s\'écrase autour de toi !': { de: 'Ein Sturz aus großer Höhe tut dir nichts: Alles um dich herum wird zerquetscht!',
+    en: 'Falling from very high does nothing to you: everything around you gets crushed!', gsw: 'Vo ganz höch abegheie macht dir nüüt: Alles um di ume wird verdrückt!' },
+  'Tu es <b>{super}</b> ! <b>G</b> (ou clic gauche) : une toile, pour te balancer d\'immeuble en immeuble.': { de: 'Du bist <b>{super}</b>! <b>G</b> (oder Linksklick): ein Netz, um dich von Haus zu Haus zu schwingen.',
+    en: 'You are <b>{super}</b>! <b>G</b> (or left click): a web, to swing from building to building.', gsw: 'Du bisch <b>{super}</b>! <b>G</b> (oder Linkschlick): es Netz, zum di vo Huus zu Huus schwinge.' },
+  'Avance contre un mur : tu grimpes. <b>Espace</b> : sauter du mur.': { de: 'Geh gegen eine Wand: Du kletterst. <b>Leertaste</b>: von der Wand springen.',
+    en: 'Walk into a wall: you climb. <b>Space</b>: jump off the wall.', gsw: 'Lauf gäge e Wand: Du chlätterisch. <b>Läärtaschte</b>: vo de Wand gumpe.' },
+  'Une toile sur une voiture : garde le bouton enfoncé pour la faire tourner, lâche-le pour la lancer !': { de: 'Ein Netz auf ein Auto: Halte die Taste gedrückt, um es herumzuschleudern, lass los, um es zu werfen!',
+    en: 'A web on a car: hold the button to swing it around, let go to throw it!', gsw: 'Es Netz uf es Auto: Heb de Chnopf druckt, zum s umeschwinge, lahn los, zum s wärfe!' },
+  '<b>9</b> : les filets. Tomber de haut ne te fait pas mal.': { de: '<b>9</b>: die Netze. Ein Sturz aus der Höhe tut dir nicht weh.', en: '<b>9</b>: the nets. Falling from high up does not hurt you.', gsw: '<b>9</b>: d Netz. Vo höch abegheie tuet dir nöd weh.' },
+  'Pars au chapitre 2 : tiens 88 miles à l\'heure (142 km/h) pendant 3 secondes ! Il te faut une longue ligne droite': {
+    de: 'Ab ins Kapitel 2: Halte 3 Sekunden lang 88 Meilen pro Stunde (142 km/h)! Du brauchst eine lange Gerade',
+    en: 'Off to chapter 2: hold 88 miles per hour (142 km/h) for 3 seconds! You need a long straight road',
+    gsw: 'Ab is Kapitel 2: Heb 3 Sekunde lang 88 Meile pro Stund (142 km/h)! Du bruuchsch e langi Graadi' },
+  'La DeLorean a disparu': { de: 'Der DeLorean ist verschwunden', en: 'The DeLorean has vanished', gsw: 'De DeLorean isch verschwunde' },
+  'La DeLorean est repartie toute seule : retrouve-la (point jaune) et monte dedans': { de: 'Der DeLorean ist von allein weggefahren: Finde ihn (gelber Punkt) und steig ein',
+    en: 'The DeLorean left on its own: find it (yellow dot) and get in', gsw: 'De DeLorean isch elei abgfahre: Find en (gääle Punkt) und stiig ii' },
+  'Tiens 88 miles à l\'heure (142 km/h) pendant 3 secondes pour partir au chapitre suivant (T : choisir le chapitre)': {
+    de: 'Halte 3 Sekunden lang 88 Meilen pro Stunde (142 km/h), um ins nächste Kapitel zu reisen (T: Kapitel wählen)',
+    en: 'Hold 88 miles per hour (142 km/h) for 3 seconds to travel to the next chapter (T: choose the chapter)',
+    gsw: 'Heb 3 Sekunde lang 88 Meile pro Stund (142 km/h), zum is nächschte Kapitel reise (T: Kapitel uuswähle)' },
+  'Attention aux passants ! Victimes : {n}': { de: 'Pass auf die Passanten auf! Opfer: {n}', en: 'Watch out for passers-by! Victims: {n}', gsw: 'Pass uf d Passante uf! Opfer: {n}' },
+  'AMENDE !':         { de: 'STRAFE!', en: 'FINE!', gsw: 'BUESS!' },
+  '-{prix} : {n} victimes. Un héros protège les passants !': { de: '-{prix}: {n} Opfer. Ein Held beschützt die Passanten!', en: '-{prix}: {n} victims. A hero protects passers-by!', gsw: '-{prix}: {n} Opfer. En Held schützt d Passante!' },
+  '⚠ Victimes : {n}': { de: '⚠ Opfer: {n}', en: '⚠ Victims: {n}', gsw: '⚠ Opfer: {n}' },
+  "Retrouve d'abord la DeLorean de ce chapitre pour voyager": { de: 'Finde zuerst den DeLorean dieses Kapitels, um zu reisen', en: "Find this chapter's DeLorean first to travel", gsw: 'Find zersch de DeLorean vo dem Kapitel, zum reise' },
+  "La DeLorean est cachée quelque part : retrouve-la d'abord !": { de: 'Der DeLorean ist irgendwo versteckt: Finde ihn zuerst!', en: 'The DeLorean is hidden somewhere: find it first!', gsw: 'De DeLorean isch irgendwo versteckt: Find en zersch!' },
+  'Tiens bon : encore {n} secondes...': { de: 'Halt durch: noch {n} Sekunden...', en: 'Hold on: {n} more seconds...', gsw: 'Heb dure: no {n} Sekunde...' },
+  "Trop lent ! Il faut tenir 88 miles à l'heure": { de: 'Zu langsam! Du musst 88 Meilen pro Stunde halten', en: 'Too slow! You have to hold 88 miles per hour', gsw: 'Z langsam! Du muesch 88 Meile pro Stund hebe' },
+  'LA DELOREAN EST REPARTIE !': { de: 'DER DELOREAN IST WEG!', en: 'THE DELOREAN IS GONE!', gsw: 'DE DELOREAN ISCH WÄG!' },
+  'Elle est cachée quelque part : retrouve-la pour finir le chapitre': { de: 'Er ist irgendwo versteckt: Finde ihn, um das Kapitel abzuschließen', en: 'It is hidden somewhere: find it to finish the chapter', gsw: 'Er isch irgendwo versteckt: Find en, zum s Kapitel fertigmache' },
+  'CHAPITRE {n} · {ville}': { de: 'KAPITEL {n} · {ville}', en: 'CHAPTER {n} · {ville}', gsw: 'KAPITEL {n} · {ville}' },
+  'DESTINATION':      { de: 'ZIEL', en: 'DESTINATION', gsw: 'ZIIL' },
+  'PRÉSENT':          { de: 'GEGENWART', en: 'PRESENT', gsw: 'GÄGEWART' },
+  'DÉPART PRÉCÉDENT': { de: 'LETZTE ABFAHRT', en: 'LAST DEPARTED', gsw: 'LETSCHTI ABFAHRT' },
+  '<b>T</b> : changer de destination · 88 MPH pendant {n} s : partir': { de: '<b>T</b>: Ziel ändern · {n} s lang 88 MPH: losfahren', en: '<b>T</b>: change destination · 88 MPH for {n} s: go', gsw: '<b>T</b>: Ziil wächsle · {n} s lang 88 MPH: abfahre' },
+  '« Tiens, {super} : je te la prête ! »': { de: '„Hier, {super}, ich leihe es dir!“', en: '"Here, {super}, you can borrow it!"', gsw: '«Da, {super}, ich lehne dir s!»' },
+  'Tu es déjà {super} !': { de: 'Du bist schon {super}!', en: 'You are already {super}!', gsw: 'Du bisch scho {super}!' },
+  'Pas dans ce chapitre !': { de: 'Nicht in diesem Kapitel!', en: 'Not in this chapter!', gsw: 'Nöd i dem Kapitel!' },
+  'Va dans un chapitre : CHAPITRE2 pour le chapitre 2 (Iron Man)': { de: 'Geht in ein Kapitel: CHAPITRE2 für Kapitel 2 (Iron Man)', en: 'Goes to a chapter: CHAPITRE2 for chapter 2 (Iron Man)', gsw: 'Gaht in es Kapitel: CHAPITRE2 für s Kapitel 2 (Iron Man)' },
 };
 
 // la langue choisie : le navigateur s'en souvient pour la prochaine fois
@@ -675,10 +873,10 @@ function tr(texte, valeurs = {}) {
   return ((TRADUCTIONS[texte] || {})[langue] || texte).replace(/\{(\w+)\}/g, (_, k) => valeurs[k]);
 }
 // le menu : ses textes en français sont gardés dans data-fr, pour pouvoir changer de langue autant qu'on veut
-// ({nom}, dans l'histoire : le nom du héros choisi)
+// ({nom}, dans l'histoire : le nom du héros choisi ; {super} : son nom de super-héros ; {ville} : la ville du chapitre)
 function traduireMenu() {
-  const nom = HEROS[heros.genre].nom;
-  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, .heros span, .heros button:not(.pastille), #menu .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent, { nom });
+  const nom = nomHeros();
+  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, .heros span, .heros button:not(.pastille), .partie span, #menu .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent, { nom, super: nomSuper(), ville: tr(CHAPITRE.ville) });
   for (const b of document.querySelectorAll('.pastille')) b.title = tr(b.dataset.fr);   // le nom de la couleur
   document.getElementById('nom-heros').textContent = nom;
   for (const b of document.querySelectorAll('#langues button')) b.classList.toggle('on', b.dataset.langue === langue);
@@ -709,6 +907,24 @@ for (const ligne of document.querySelectorAll('.foule')) for (const nom in FOULE
   b.onclick = e => { e.stopPropagation(); foule[k] = nom; try { localStorage['foule-' + k] = nom; } catch {} traduireMenu(); };
   ligne.append(b);
 }
+// la ligne des chapitres : un bouton par chapitre déjà ouvert (on y va tout de suite, sans la DeLorean ; ses missions recommencent s'il était fini),
+// et « Nouvelle partie », qui efface tout. Le jeu est prévenu par un évènement (« chapitre », « nouvellePartie ») : c'est lui qui sauve la partie
+{
+  const ligne = document.querySelector('.partie');
+  for (let n = 1; n <= partie.ouvert; n++) {
+    const b = document.createElement('button');
+    b.textContent = `${n} · ${CHAPITRES[n - 1].ville}`; b.classList.toggle('on', n === partie.chapitre);
+    b.onclick = e => { e.stopPropagation(); if (n !== partie.chapitre) dispatchEvent(new CustomEvent('chapitre', { detail: n })); };
+    ligne.append(b);
+  }
+  const b = document.createElement('button');
+  b.className = 'tr nouvelle'; b.textContent = '↺ Nouvelle partie';
+  b.onclick = e => { e.stopPropagation(); if (confirm(tr('Tout recommencer au chapitre 1 ? Ton argent, tes armes et tes chapitres seront perdus.'))) dispatchEvent(new Event('nouvellePartie')); };
+  ligne.append(b);
+  ligne.style.display = nouvellePartie ? 'none' : '';   // (au tout premier lancement, il n'y a rien à effacer)
+}
+// l'histoire du menu : celle du chapitre où l'on est
+if (partie.chapitre > 1) document.getElementById('histoire').dataset.fr = 'Bienvenue à {ville}, {nom} ! Tu es {super} : la police est de ton côté. Retrouve la DeLorean pour aller plus loin !';
 traduireMenu();
 // le numéro de version : le nombre de commits du jeu sur GitHub. Il augmente tout seul à chaque mise en ligne.
 // GitHub donne la liste des commits par pages (ici, d'un commit chacune) : le numéro de la dernière page, c'est leur nombre
@@ -718,6 +934,262 @@ try { afficherVersion(localStorage.version); } catch {}
 fetch('https://api.github.com/repos/jlehen/GTAxel/commits?sha=main&per_page=1')
   .then(r => { const n = r.headers.get('Link')?.match(/page=(\d+)>; rel="last"/)?.[1]; afficherVersion(n); if (n) try { localStorage.version = n; } catch {} })
   .catch(() => {});   // GitHub ne répond pas : on garde le numéro d'avant (ou rien, la première fois), le jeu marche quand même
+
+// =====================================================================
+//  L'écran du chapitre : le logo du héros en grand, « CHAPITRE 2 » dessous, puis il s'en va, chaque héros à sa façon.
+//  Il s'affiche à l'arrivée dans un chapitre (pendant que le pays se construit : « Clique pour jouer » quand c'est prêt),
+//  et au tout début d'une partie (2,2 s, sans clic). Le jeu le lance et le fait partir (voir debutChapitre)
+// =====================================================================
+// visible : l'écran est là ; n : le chapitre ; t : depuis combien de secondes il est là ; sortie : depuis combien de secondes il s'en va
+// (-1 : pas encore) ; attend : il attend un clic (texte : ce qu'on lit en bas) ; sons : { bip, bruit }, donnés par le jeu ;
+// parts, eclats, image : les flammes, les chauves-souris, la fumée, les éclats du logo pendant qu'il s'en va
+const ecranChapitre = { visible: false, n: 1, t: 0, sortie: -1, attend: false, texte: '', clic: null, sons: null, parts: [], eclats: null, image: null, avant: 0,
+  bloque() { return this.visible && this.sortie < 0.5; } };   // le jeu attend : le fond est encore tout noir
+const divEcran = document.getElementById('ecran-chapitre'), toileEcran = divEcran.querySelector('canvas');
+divEcran.onclick = () => ecranChapitre.clic?.();
+const auHasard = (a, b) => a + Math.random() * (b - a), entre01 = x => Math.min(1, Math.max(0, x));
+// la chauve-souris de Batman : le côté droit, du haut de la tête (0, -0.17) jusqu'au bout de la queue (0, 0.6), x de 0 à 1, y vers le bas.
+// [x, y] : un trait jusqu'à ce point ; [cx, cy, x, y] : une courbe jusqu'à (x, y), tirée vers (cx, cy) (le haut des ailes, et leurs creux en bas).
+// Le côté gauche est le même, à l'envers
+const CHAUVE_SOURIS = [[0.04, -0.2], [0.075, -0.46], [0.115, -0.2], [0.2, -0.16], [0.55, -0.1, 1, -0.5], [0.84, -0.3, 0.8, -0.04], [0.66, -0.13, 0.58, 0.07],
+  [0.42, 0.01, 0.34, 0.27], [0.2, 0.2, 0.1, 0.42], [0, 0.6]];
+function chauveSouris(g, l) { // l : sa demi-largeur
+  const P = [[0, -0.17], ...CHAUVE_SOURIS.map(p => p.slice(-2))], C = [null, ...CHAUVE_SOURIS.map(p => p.length === 4 ? p : null)];
+  g.beginPath(); g.moveTo(0, P[0][1] * l);
+  for (let k = 1; k < P.length; k++) C[k] ? g.quadraticCurveTo(C[k][0] * l, C[k][1] * l, P[k][0] * l, P[k][1] * l) : g.lineTo(P[k][0] * l, P[k][1] * l);
+  for (let k = P.length - 1; k > 0; k--) C[k] ? g.quadraticCurveTo(-C[k][0] * l, C[k][1] * l, -P[k - 1][0] * l, P[k - 1][1] * l) : g.lineTo(-P[k - 1][0] * l, P[k - 1][1] * l);
+  g.closePath();
+}
+// l'araignée de Spiderman : la tête, le ventre et les 8 pattes pliées [départ, coude x, coude y, bout x, bout y] (comme sur son costume)
+function araignee(g, e) {
+  g.save(); g.scale(e, e); g.fillStyle = g.strokeStyle = '#101014'; g.lineWidth = 5; g.lineCap = g.lineJoin = 'round';
+  g.beginPath(); g.ellipse(0, -10, 9, 11, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(0, 14, 11, 19, 0, 0, 7); g.fill();
+  for (const c of [-1, 1]) for (const [y0, x1, y1, x2, y2] of [[-8, 24, -22, 34, -42], [-4, 30, -8, 47, -18], [2, 30, 12, 47, 26], [6, 22, 26, 30, 50]]) {
+    g.beginPath(); g.moveTo(0, y0); g.lineTo(x1 * c, y1); g.lineTo(x2 * c, y2); g.stroke(); }
+  g.restore();
+}
+// passe(s, dt, x) : le moment x vient de passer (pour faire un bruit une seule fois)
+const passe = (s, dt, x) => s - dt < x && s >= x;
+const son = (quoi, ...a) => ecranChapitre.sons?.[quoi](...a);
+// Les logos : chacun se dessine au milieu (0, 0), dans un carré de 400 de côté, puis s'en va (sortie, en « duree » secondes ;
+// s : depuis combien de secondes il s'en va, dt : le temps depuis l'image d'avant, E : l'écran, B : les bords de l'écran autour du logo)
+const LOGOS = {
+  // le W du château Wolfenstein, blanc, sur un rond rouge cerclé d'or et de noir (comme sur les bannières). Il brûle de bas en haut
+  wolfenstein: { couleur: '#ff4a20', duree: 1.7,
+    dessin(g) {
+      g.beginPath(); g.arc(0, 0, 192, 0, 7); g.fillStyle = '#111'; g.fill();
+      g.beginPath(); g.arc(0, 0, 176, 0, 7); g.fillStyle = '#c8a040'; g.fill();
+      const d = g.createRadialGradient(0, -50, 20, 0, 0, 165); d.addColorStop(0, '#d8301c'); d.addColorStop(1, '#6a0806');
+      g.beginPath(); g.arc(0, 0, 164, 0, 7); g.fillStyle = d; g.fill();
+      g.beginPath(); for (const [x, y] of [[-140, -95], [-88, -95], [-48, 45], [-18, -40], [18, -40], [48, 45], [88, -95], [140, -95], [78, 105], [34, 105], [0, 25], [-34, 105], [-78, 105]]) g.lineTo(x, y);
+      g.closePath(); g.fillStyle = '#f4f0e6'; g.fill(); g.lineWidth = 7; g.strokeStyle = '#151515'; g.lineJoin = 'miter'; g.stroke();
+    },
+    depart() { son('bruit', 0.5, 900, 1.5); },
+    sortie(g, s, dt, E) {
+      const yb = 215 - s / 1.3 * 450, vague = x => 10 * Math.sin(x * 0.045 + s * 9) + 6 * Math.sin(x * 0.11 - s * 13);   // la ligne du feu monte
+      g.save(); g.beginPath(); g.moveTo(-240, -260); g.lineTo(240, -260);
+      for (let x = 240; x >= -240; x -= 10) g.lineTo(x, yb + vague(x));
+      g.closePath(); g.clip(); this.dessin(g); g.restore();   // ce qui n'a pas encore brûlé
+      const large = Math.sqrt(Math.max(0, 192 ** 2 - yb ** 2));   // la largeur du rond à cette hauteur
+      if (large > 0) { // le bord qui brûle, et les flammes qui en partent
+        g.save(); g.globalCompositeOperation = 'lighter'; g.strokeStyle = '#ff9a30'; g.lineWidth = 7; g.shadowColor = '#ff5000'; g.shadowBlur = 24;
+        g.beginPath(); for (let x = -large; x <= large; x += 8) g.lineTo(x, yb + vague(x)); g.stroke(); g.restore();
+        for (let k = 0; k < 7; k++) { const x = auHasard(-large, large); E.parts.push({ x, y: yb + vague(x), vx: auHasard(-25, 25), vy: auHasard(-200, -80), vie: auHasard(0.45, 0.9), age: 0, r: auHasard(10, 24) }); }
+      }
+      g.save(); g.globalCompositeOperation = 'lighter';
+      for (const p of E.parts) {
+        p.age += dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        const f = 1 - p.age / p.vie, r = p.r * (0.5 + f);
+        if (f <= 0) continue;
+        const d = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, r); d.addColorStop(0, `rgba(255,230,140,${f})`); d.addColorStop(0.4, `rgba(255,120,30,${0.8 * f})`); d.addColorStop(1, 'rgba(200,30,0,0)');
+        g.fillStyle = d; g.fillRect(p.x - r, p.y - r, 2 * r, 2 * r);
+      }
+      g.restore();
+      E.parts = E.parts.filter(p => p.age < p.vie);
+    } },
+  // le masque doré d'Iron Man, dans son casque rouge, avec ses yeux qui brillent. Un tir de répulseur le fait voler en éclats
+  ironman: { couleur: '#ffcf50', duree: 1.6,
+    dessin(g) {
+      const cote = (pts, fermer = true) => { g.beginPath(); for (const c of [1, -1]) for (const [x, y] of c > 0 ? pts : [...pts].reverse()) g.lineTo(x * c, y); if (fermer) g.closePath(); };
+      cote([[0, -192], [96, -170], [152, -112], [170, -10], [158, 80], [126, 150], [66, 190], [0, 198]]);   // le casque
+      let d = g.createLinearGradient(0, -190, 0, 200); d.addColorStop(0, '#e8261c'); d.addColorStop(1, '#6e0806');
+      g.fillStyle = d; g.fill(); g.lineWidth = 6; g.strokeStyle = '#2a0402'; g.stroke();
+      cote([[0, -150], [80, -132], [116, -70], [122, 10], [110, 72], [80, 128], [40, 166], [0, 172]]);      // le masque
+      d = g.createLinearGradient(-120, -150, 120, 170); d.addColorStop(0, '#fff0a0'); d.addColorStop(0.45, '#e2b030'); d.addColorStop(1, '#8a5a10');
+      g.fillStyle = d; g.fill(); g.lineWidth = 4; g.strokeStyle = '#5a3a08'; g.stroke();
+      g.lineWidth = 3; g.strokeStyle = 'rgba(90,58,8,.8)';
+      g.beginPath(); g.moveTo(-112, -62); g.quadraticCurveTo(0, -92, 112, -62); g.stroke();                  // le bord du front
+      for (const c of [-1, 1]) { g.beginPath(); g.moveTo(108 * c, -20); g.lineTo(92 * c, 72); g.lineTo(58 * c, 130); g.stroke(); }   // les joues
+      g.save(); g.shadowColor = '#7ae4ff'; g.shadowBlur = 28; g.fillStyle = '#eefaff';                     // les yeux qui brillent
+      for (const c of [-1, 1]) { g.beginPath(); for (const [x, y] of [[20, -38], [96, -52], [98, -34], [28, -20]]) g.lineTo(x * c, y); g.closePath(); g.fill(); }
+      g.restore();
+      g.lineWidth = 6; g.strokeStyle = '#4a2c06'; g.beginPath(); g.moveTo(-46, 112); g.lineTo(46, 112); g.stroke();   // la bouche
+    },
+    depart(E) { // le logo, en image, et sa grille d'éclats (des triangles, qui partiront du milieu vers le bord)
+      const q = 2, img = document.createElement('canvas'); img.width = img.height = 440 * q;
+      const o = img.getContext('2d'); o.scale(q, q); o.translate(220, 220); this.dessin(o);
+      const n = 6, G = [], P = (i, j) => G[j * (n + 1) + i];   // les coins des triangles : une grille, un peu de travers (sauf au bord)
+      for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) { const b = i === 0 || j === 0 || i === n || j === n; G.push([-220 + 440 * i / n + (b ? 0 : auHasard(-20, 20)), -220 + 440 * j / n + (b ? 0 : auHasard(-20, 20))]); }
+      E.image = img; E.eclats = [];
+      for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) for (const tri of [[P(i, j), P(i + 1, j), P(i + 1, j + 1)], [P(i, j), P(i + 1, j + 1), P(i, j + 1)]]) {
+        const m = [(tri[0][0] + tri[1][0] + tri[2][0]) / 3, (tri[0][1] + tri[1][1] + tri[2][1]) / 3], l = Math.hypot(...m) || 1, v = auHasard(250, 700);
+        E.eclats.push({ tri, m, v: [m[0] / l * v + auHasard(-80, 80), m[1] / l * v + auHasard(-80, 80)], w: auHasard(-7, 7) });
+      }
+      son('bip', 500, 2600, 0.3, 'sine', 0.15);   // le répulseur se charge
+    },
+    sortie(g, s, dt, E, B) {
+      const tir = 0.3;
+      if (s < tir) { // le répulseur se charge : une boule blanche et bleue grossit au milieu
+        this.dessin(g);
+        const r = 12 + 80 * s / tir, d = g.createRadialGradient(0, 0, 0, 0, 0, r); d.addColorStop(0, '#fff'); d.addColorStop(0.35, 'rgba(160,220,255,.9)'); d.addColorStop(1, 'rgba(60,140,255,0)');
+        g.fillStyle = d; g.fillRect(-r, -r, 2 * r, 2 * r);
+        return;
+      }
+      const t = s - tir;
+      if (passe(t, dt, 0) || t === 0) { son('bruit', 0.9, 1500, 0.6); son('bip', 1200, 200, 0.4, 'sawtooth', 0.15); }
+      g.globalAlpha = entre01(1 - t / 1.2);
+      for (const e of E.eclats) { // chaque éclat part tout droit en tournant, et tombe
+        g.save(); g.translate(e.m[0] + e.v[0] * t, e.m[1] + e.v[1] * t + 500 * t * t); g.rotate(e.w * t);
+        g.beginPath(); for (const [x, y] of e.tri) g.lineTo(x - e.m[0], y - e.m[1]); g.closePath(); g.clip();
+        g.drawImage(E.image, -220 - e.m[0], -220 - e.m[1], 440, 440); g.restore();
+      }
+      g.globalAlpha = 1;
+      if (t < 0.4) { g.fillStyle = `rgba(225,242,255,${0.85 * (1 - t / 0.4)})`; g.fillRect(-B.x, -B.haut, 2 * B.x, B.haut + B.bas); }   // l'éclair du tir
+    } },
+  // la chauve-souris noire dans son ovale jaune. Elle s'envole en une nuée de chauves-souris
+  batman: { couleur: '#f2c81e', duree: 1.9,
+    dessin(g) {
+      g.beginPath(); g.ellipse(0, 0, 196, 122, 0, 0, 7); g.fillStyle = '#f2c81e'; g.fill(); g.lineWidth = 10; g.strokeStyle = '#111'; g.stroke();
+      g.save(); g.translate(0, -8); chauveSouris(g, 172); g.fillStyle = '#111'; g.fill(); g.restore();
+    },
+    depart(E) {
+      E.parts = [];
+      for (let k = 0; k < 60; k++) {
+        let x, y; do { x = auHasard(-1, 1); y = auHasard(-1, 1); } while (x * x + y * y > 1);
+        const a = Math.atan2(y, x);
+        E.parts.push({ x: x * 175, y: y * 105, vx: Math.cos(a) * auHasard(150, 500), vy: Math.sin(a) * auHasard(80, 300) - auHasard(350, 750), d: auHasard(0, 0.3), p: auHasard(0, 6), l: auHasard(22, 46) });
+      }
+      son('bruit', 0.35, 4000, 0.9);   // le froissement des ailes
+    },
+    sortie(g, s, dt, E) {
+      const f = entre01(1 - s / 0.4);
+      if (f > 0) { g.save(); g.globalAlpha = f; g.scale(1 + s * 0.3, 1 + s * 0.3); this.dessin(g); g.restore(); }
+      for (const k of [0.15, 0.4, 0.7]) if (passe(s, dt, k)) son('bip', auHasard(2600, 3400), auHasard(3800, 4800), 0.06, 'sine', 0.05);   // des petits cris
+      for (const b of E.parts) { // chacune bat des ailes en s'envolant
+        const t = s - b.d;
+        if (t < 0) continue;
+        g.save(); g.globalAlpha = entre01((1.9 - s) / 0.5); g.translate(b.x + b.vx * t, b.y + b.vy * t - 120 * t * t);
+        g.scale(1, 0.3 + 0.7 * Math.abs(Math.sin(t * 24 + b.p)));
+        chauveSouris(g, b.l); g.fillStyle = '#16141c'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = '#f2c81e'; g.stroke(); g.restore();
+      }
+    } },
+  // l'écusson de Superman : cinq côtés, jaune bordé de rouge, avec le « S » (comme sur son costume). Il tremble, puis part comme une fusée
+  superman: { couleur: '#ff3a2a', duree: 1.5,
+    dessin(g) {
+      g.save(); g.scale(3.3, 3.3); g.translate(0, -64);
+      g.beginPath(); for (const [x, y] of [[-38, 14], [38, 14], [58, 44], [0, 120], [-58, 44]]) g.lineTo(x, y); g.closePath();
+      g.fillStyle = '#f2cc1e'; g.fill(); g.lineWidth = 8; g.lineJoin = 'round'; g.strokeStyle = '#c8141c'; g.stroke();
+      g.fillStyle = '#c8141c'; g.font = 'bold 82px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('S', 0, 57);
+      g.restore();
+    },
+    depart() { son('bruit', 0.4, 300, 0.45); },   // il gronde...
+    sortie(g, s, dt, E) {
+      const lance = 0.35;
+      if (s < lance) { const f = s / lance * 7; g.save(); g.translate(auHasard(-f, f), auHasard(-f, f)); this.dessin(g); g.restore(); return; }
+      const t = s - lance, dy = -0.5 * 5600 * t * t;
+      if (passe(t, dt, 0) || t === 0) { son('bruit', 0.6, 1600, 1); son('bip', 200, 1400, 0.8, 'sawtooth', 0.08); }   // ...et décolle
+      for (let k = 0; k < 4; k++) E.parts.push({ x: auHasard(-70, 70), y: dy + 190, r: auHasard(16, 30), age: 0, vie: auHasard(0.5, 0.9), vx: auHasard(-60, 60) });   // la fumée, en bas
+      const d = g.createLinearGradient(0, dy + 150, 0, 260); d.addColorStop(0, 'rgba(255,250,220,.95)'); d.addColorStop(0.3, 'rgba(255,170,40,.7)'); d.addColorStop(1, 'rgba(200,30,20,0)');
+      g.fillStyle = d; g.fillRect(-42, dy + 150, 84, 260 - dy - 150);   // la traînée de feu
+      for (const p of E.parts) {
+        p.age += dt; p.x += p.vx * dt; const f = 1 - p.age / p.vie, r = p.r * (1 + 2 * p.age);
+        if (f > 0) { g.fillStyle = `rgba(190,190,195,${0.45 * f})`; g.beginPath(); g.arc(p.x, p.y, r, 0, 7); g.fill(); }
+      }
+      E.parts = E.parts.filter(p => p.age < p.vie);
+      g.save(); g.translate(0, dy); g.scale(1 - Math.min(0.15, t * 0.5), 1 + Math.min(0.35, t)); this.dessin(g); g.restore();
+    } },
+  // l'araignée noire de Spiderman, sur un rond rouge tissé de toile. Une toile part du coin de l'écran, l'attrape et l'arrache
+  spiderman: { couleur: '#ff3030', duree: 1.4,
+    dessin(g) {
+      g.beginPath(); g.arc(0, 0, 186, 0, 7); g.fillStyle = '#c8141c'; g.fill(); g.lineWidth = 8; g.strokeStyle = '#151515'; g.stroke();
+      g.save(); g.beginPath(); g.arc(0, 0, 182, 0, 7); g.clip(); g.strokeStyle = 'rgba(10,10,14,.85)'; g.lineWidth = 2.5;
+      const n = 12;
+      for (let k = 0; k < n; k++) { const a = k / n * 2 * Math.PI; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a) * 190, Math.sin(a) * 190); g.stroke(); }   // les rayons de la toile
+      for (const r of [40, 75, 112, 150, 188]) { // les fils qui font le tour, en creux entre deux rayons
+        g.beginPath();
+        for (let k = 0; k <= n; k++) { const a = k / n * 2 * Math.PI, b = (k - 0.5) / n * 2 * Math.PI; if (k === 0) g.moveTo(r, 0); else g.quadraticCurveTo(Math.cos(b) * r * 0.86, Math.sin(b) * r * 0.86, Math.cos(a) * r, Math.sin(a) * r); }
+        g.stroke();
+      }
+      g.restore();
+      araignee(g, 2.6);
+    },
+    depart() { son('bruit', 0.45, 6000, 0.12); },   // « tchouip ! »
+    sortie(g, s, dt, E, B) {
+      const ancre = [B.x + 80, -B.haut - 80], tir = 0.16, tire = 0.32;   // la toile part du coin en haut à droite, hors de l'écran
+      let x = 0, y = 0, rot = 0, z = 1;
+      if (s > tire) { const k = Math.min(1, (s - tire) / 0.75) ** 2; x = ancre[0] * 1.2 * k; y = ancre[1] * 1.2 * k; rot = 2.4 * k; z = 1 - 0.45 * k; }
+      if (passe(s, dt, tire)) son('bruit', 0.35, 2500, 0.35);
+      const f = Math.min(1, s / tir);
+      g.strokeStyle = '#f4f4f4'; g.lineWidth = 5; g.beginPath(); g.moveTo(...ancre); g.lineTo(ancre[0] + (x - ancre[0]) * f, ancre[1] + (y - ancre[1]) * f); g.stroke();   // le fil
+      g.save(); g.translate(x, y); g.rotate(rot); g.scale(z, z); this.dessin(g);
+      if (s >= tir) { // la toile collée sur le logo
+        g.strokeStyle = '#f8f8f8'; g.lineWidth = 3.5;
+        const rayons = [...Array(9)].map((_, k) => k / 9 * 2 * Math.PI + 0.3);
+        for (const a of rayons) { g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a) * 95, Math.sin(a) * 95); g.stroke(); }
+        for (const r of [35, 70]) { g.beginPath(); rayons.forEach((a, k) => g[k ? 'lineTo' : 'moveTo'](Math.cos(a) * r, Math.sin(a) * r)); g.closePath(); g.stroke(); }
+      }
+      g.restore();
+    } },
+};
+function dessinerEcran(dt) {
+  const E = ecranChapitre, c = toileEcran, g = c.getContext('2d'), q = devicePixelRatio || 1, l = innerWidth, h = innerHeight;
+  if (c.width !== Math.round(l * q) || c.height !== Math.round(h * q)) { c.width = Math.round(l * q); c.height = Math.round(h * q); }
+  g.setTransform(q, 0, 0, q, 0, 0); g.clearRect(0, 0, l, h);
+  const C = CHAPITRES[E.n - 1], L = LOGOS[C.logo] || LOGOS.wolfenstein, s = E.sortie, k = Math.min(l, h) / 780, cy = h / 2 - 75 * k;   // k : une unité du logo, en pixels (il fait la moitié de l'écran)
+  g.fillStyle = `rgba(0,0,0,${s < 0 ? 1 : entre01(1 - (s - 0.5) / 0.8)})`; g.fillRect(0, 0, l, h);   // le fond noir s'efface : on voit le jeu
+  // les textes : « CHAPITRE 2 », la ville, et en bas ce qu'il faut faire. Ils s'en vont les premiers
+  const a = s < 0 ? Math.min(1, E.t / 0.5) : entre01(1 - s / 0.3);
+  if (a > 0) {
+    g.globalAlpha = a; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    const y = cy + 300 * k, d = g.createLinearGradient(0, y - 90 * k, 0, y);
+    d.addColorStop(0.4, '#fff'); d.addColorStop(1, '#f0c850');
+    g.font = `${Math.round(100 * k)}px Anton, Impact, sans-serif`; g.fillStyle = d; g.fillText(tr('CHAPITRE {n}', { n: E.n }), l / 2, y);
+    g.font = `${Math.round(34 * k)}px 'Roboto Condensed', Arial, sans-serif`; g.fillStyle = '#ddd'; g.fillText(tr(C.ville), l / 2, y + 48 * k);
+    if (E.texte && s < 0) { g.globalAlpha = a * (0.65 + 0.35 * Math.sin(E.t * 4)); g.fillStyle = '#f0c850'; g.fillText(tr(E.texte), l / 2, h - 40 * k); }
+    g.globalAlpha = 1;
+  }
+  g.save(); g.translate(l / 2, cy); g.scale(k, k);
+  if (s < 0) { // il arrive : un peu plus gros, puis à sa taille, avec un halo de sa couleur derrière
+    const e = Math.min(1, E.t / 0.45), z = 1 + 0.25 * (1 - e) ** 3, d = g.createRadialGradient(0, 0, 60, 0, 0, 330);
+    d.addColorStop(0, L.couleur + '55'); d.addColorStop(1, L.couleur + '00');
+    g.globalAlpha = e; g.fillStyle = d; g.fillRect(-330, -330, 660, 660); g.scale(z, z); L.dessin(g);
+  } else L.sortie(g, s, dt, E, { x: l / 2 / k, haut: cy / k, bas: (h - cy) / k });
+  g.restore();
+}
+function animerEcran(t) {
+  const E = ecranChapitre;
+  if (!E.visible) return;
+  const dt = E.avant ? Math.min(0.05, (t - E.avant) / 1000) : 0; E.avant = t;
+  E.t += dt;
+  if (!E.attend && E.sortie < 0 && E.t > 2.2) sortirEcran();   // sans clic : le logo reste 2,2 s, puis s'en va
+  if (E.sortie >= 0) E.sortie += dt;
+  if (E.sortie > (LOGOS[CHAPITRES[E.n - 1].logo] || LOGOS.wolfenstein).duree) { E.visible = false; divEcran.style.display = 'none'; return; }
+  dessinerEcran(dt);
+  requestAnimationFrame(animerEcran);
+}
+// n : le chapitre ; attend : jusqu'à un clic (texte : ce qu'on lit en bas), sinon 2,2 s ; sons : { bip, bruit }
+function montrerEcran(n, attend, texte = '', sons = null) {
+  Object.assign(ecranChapitre, { visible: true, n, t: 0, sortie: -1, attend, texte, sons, avant: 0, parts: [], eclats: null, image: null });
+  divEcran.style.display = 'block'; requestAnimationFrame(animerEcran);
+}
+function sortirEcran(sons = ecranChapitre.sons) {
+  const E = ecranChapitre;
+  if (!E.visible || E.sortie >= 0) return;
+  E.sons = sons; E.sortie = 0; E.texte = '';
+  (LOGOS[CHAPITRES[E.n - 1].logo] || LOGOS.wolfenstein).depart?.(E);
+}
+// on arrive dans un chapitre (la DeLorean, le menu, un code de triche) : son écran s'affiche pendant que le pays se construit
+if (partie.ecran) { document.getElementById('menu').style.display = 'none'; montrerEcran(partie.chapitre, true, 'Chargement… (il faut une connexion Internet)'); }
 </script>
 
 <script type="importmap">
@@ -861,6 +1333,13 @@ const REGLAGES = {
   voituresNuit: 0.4,         // ...et 40 % des voitures
   gangsNuit: 2,              // la nuit, les gangs sont 2 fois plus nombreux dans leur quartier...
   rodeursNuit: 6,            // ...et autant de leurs membres se promènent dans les rues, par deux (ils attaquent comme les autres : si on les provoque)
+  // les chapitres (tableau CHAPITRES, tout en haut). Un héros sans reproche (Iron Man, Batman...) n'a jamais d'étoiles, mais chaque passant
+  // ou policier qu'il tue est une victime : à partir de la 3e, une amende, qui double à chaque victime de plus
+  amendeVictimes: 3,         // la victime qui coûte la première amende
+  amende: 200,               // dollars : la première amende (puis 400, 800, 1 600...)
+  amendeMax: 100000,         // dollars : l'amende ne dépasse jamais ça. L'argent peut devenir négatif !
+  pardon: 120,               // secondes sans victime : une victime est oubliée
+  dureeVoyage: 3,            // secondes à 88 miles à l'heure (142 km/h) dans la DeLorean pour partir dans un autre chapitre
 };
 
 // =====================================================================
@@ -1289,6 +1768,7 @@ const GANGS = [
 //  etoiles (nombre) · semer · arme (le nom d'une arme à posséder)
 //  blindage (avoir une voiture blindée par le garagiste) · voler (lieu : tout le butin de ce pâté est dans le sac)
 //  bouton (le bouton rouge du camp militaire est enfoncé) · conduire (voiture : être au volant d'une voiture de ce nom)
+//  voyager (partir dans un autre chapitre avec la DeLorean : 88 miles à l'heure pendant 3 secondes)
 //  Dans le texte d'une étape « eliminer », {n} est remplacé par le nombre d'ennemis qu'il reste.
 //  Pour « voiture », on peut exiger : rapide: true (une voiture rapide), blindee: true, sansPolice: true (0 étoile)
 //  Pour « aller », on peut exiger sansPolice: true. Le lieu 'R' est dans la caravane de Trevor : il faut y entrer, à pied.
@@ -1342,8 +1822,28 @@ const MISSIONS = [
     { type: 'eliminer', cible: 'militaire', texte: 'Monte dans la grosse armure, devant la porte (touche E), et élimine tous les militaires du camp : il en reste {n}' },
     { type: 'bouton', lieu: '%', texte: 'Appuie sur le bouton rouge, dans le bureau de la commandante Irene Engel (touche E)' },
     { type: 'conduire', voiture: 'DeLorean', texte: 'Le bunker secret est ouvert, un peu plus haut dans la montagne (? sur la carte) : monte dans la DeLorean' },
+    { type: 'voyager', texte: 'Pars au chapitre 2 : tiens 88 miles à l\'heure (142 km/h) pendant 3 secondes ! Il te faut une longue ligne droite' },
   ]},
 ];
+
+// =====================================================================
+//  LES MISSIONS DES AUTRES CHAPITRES (voir CHAPITRES, tout en haut du fichier) : une liste par chapitre, comme MISSIONS.
+//  Pour l'instant, chaque chapitre n'a qu'une mission : retrouver la DeLorean, cachée dans la ville (sa cachette, dans CHAPITRES),
+//  puis repartir avec. Les vraies missions d'Iron Man, de Batman, de Superman et de Spiderman arrivent bientôt !
+// =====================================================================
+const RETROUVER_DELOREAN = { nom: 'La DeLorean a disparu', recompense: 1000, etapes: [
+  { type: 'conduire', voiture: 'DeLorean', texte: 'La DeLorean est repartie toute seule : retrouve-la (point jaune) et monte dedans' },
+  { type: 'voyager', texte: 'Tiens 88 miles à l\'heure (142 km/h) pendant 3 secondes pour partir au chapitre suivant (T : choisir le chapitre)' },
+]};
+const MISSIONS_CHAPITRES = {
+  2: [RETROUVER_DELOREAN],
+  3: [RETROUVER_DELOREAN],
+  4: [RETROUVER_DELOREAN],
+  5: [RETROUVER_DELOREAN],
+};
+// les missions d'un chapitre (1 = le premier), et celles du chapitre où l'on est
+const missionsDu = n => n === 1 ? MISSIONS : MISSIONS_CHAPITRES[n] || [];
+const chapitre = partie.chapitre, MISSIONS_CH = missionsDu(chapitre);
 
 // =====================================================================
 //  LES CASCADES : des pistes pour faire le fou en voiture, comme dans le jeu « Stunts » (1990)
@@ -1736,6 +2236,8 @@ const TRICHES = [
   { code: 'RICHE',       texte: 'Riche ! +100 000 $',   action: () => { J.argent += 100000; } },
   // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
   { code: 'MISSION',     texte: 'Saute à une mission : MISSION8 pour la mission 8', action: n => sauterMission(n) },
+  // pour tester un chapitre : CHAPITRE2 y va tout de suite, avec la DeLorean (les chapitres d'avant sont alors finis : on peut y revenir)
+  { code: 'CHAPITRE',    texte: 'Va dans un chapitre : CHAPITRE2 pour le chapitre 2 (Iron Man)', action: n => sauterChapitre(n) },
 ];
 // la liste des codes (🎮 dans le menu) : une ligne par code, avec ses autres noms et son texte
 const boiteTriches = document.getElementById('triches');
@@ -2035,9 +2537,10 @@ GANGS.forEach(g => {
   if (!estBloc(car(g.col, g.ligne))) alert(`Gang "${g.nom}" : la case ${g.col}, ${g.ligne} de la CARTE n'est pas un pâté !`);
   if (indexArme(g.arme) < 0) alert(`Gang "${g.nom}" : l'arme "${g.arme}" n'existe pas !`);
 });
-MISSIONS.forEach(m => m.etapes.forEach(e => {
+MISSIONS_CH.forEach(m => m.etapes.forEach(e => {
   if (e.lieu && !lieux[e.lieu]) alert(`Mission "${m.nom}" : le lieu "${e.lieu}" n'est pas sur la carte !`);
 }));
+if (!lieux[CHAPITRE.cachette]) alert(`Chapitre ${chapitre} : la cachette de la DeLorean, "${CHAPITRE.cachette}", n'est pas sur la carte !`);
 
 // les rues des villes suivent les lignes entre les cases : rueH(i, j) va du carrefour (i, j) à (i + 1, j), rueV(i, j) de (i, j) à (i, j + 1)
 const bordeRue = c => estBloc(c) || c === '+';
@@ -3468,7 +3971,7 @@ function genererBloc(i, j) {
     for (const [u, w] of [[-10.5, -9], [-9.2, -9], [-10.5, -7.6], [10.5, -9], [10.5, -7.6]]) b.meuble('boisClair', u, 0, w, 1.2, 1.2, 1.2);   // des caisses
     for (const u of [-11, 11]) b.meuble('jaune', u, 0, 2, 0.8, 1.6, 0.8);              // deux gros accumulateurs dorés
     for (const [a, z, l, p] of [[40, 18, 1, 6], [40, 42, 1, 6]]) boite('sacs', X(a), 0.2, Z(z), l, 1.1, p, true);
-    voituresGarees.push({ ...b.point(0, 0, -3), a: Math.PI / 2, type: 'DeLorean' });    // la seule DeLorean du pays, le nez vers la porte
+    if (cachetteDeLorean('?')) voituresGarees.push({ ...b.point(0, 0, -3), a: Math.PI / 2, type: 'DeLorean' });    // la seule DeLorean du pays, le nez vers la porte
     // la porte blindée (9 × 4 m), à l'est : fermée, un bouchon de collision. Elle descend dans le sol quand on appuie sur le bouton
     const y = Y0 + 0.25;
     bunkerSecret = { x: X(30), z: Z(30), y, porte: { x: X(31.85), z: Z(30), y, l: 9, h: 4 }, bouchon: ajouterCollision(X(31.6), Z(25.5), X(32.1), Z(34.5), y + 4.1, Y0),
@@ -5951,6 +6454,9 @@ const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, 
   dernierMouvement: 0, frappe: 0, recul: 0, vitesse: 0, mort: 0, gilet: 0, danse: 0, angleDanse: 0,
   robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null, laser: 0, biceps: null,   // atterri, genou, roule : voir retomber (roule : il roule par terre, en roulade ou en chute : voir commencerRoulade et commencerChute) ; superman : voir decoller ; laser : voir majLaser ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege ; biceps : voir poserBiceps
   grappin: null, plane: null, balance: null, mur: null, lance: null, prise: null, sansMur: 0 };   // les codes BATMAN et SPIDERMAN. grappin : voir accrocher ; plane : voir planer ; balance : voir balancer ; mur : celui où il grimpe (escalader) ; lance : son élan en l'air (majJoueur) ; prise : la voiture au bout de sa toile (attraper)
+// la partie sauvegardée : l'argent (le même dans tous les chapitres) et les armes de ce chapitre (voir chargerArmes)
+if (partie.argent != null) J.argent = partie.argent;
+chargerArmes();
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 joueurH.g.traverse(o => o.userData.habit = o.material);   // sa tenue normale, pour la lui remettre après les codes de triche
 scene.add(joueurH.g);
@@ -7576,7 +8082,7 @@ function majCamp(dt) {
   B.porteM.visible = B.voyant.visible = db < 400;
   B.voyant.material = camp.ouvert ? M_BOUTON_OK : M_BOUTON;
   // la DeLorean : s'il n'y en a plus une seule dans le pays (explosée, coulée), une neuve revient dans le bunker quand B.J. est loin
-  if (db > 150 && !voitures.some(v => v.type.nom === 'DeLorean' && !v.detruite && !v.coule && !v.supprimer)) creerVoiture(B.garage.x, B.garage.z, B.garage.a, false, typeNomme('DeLorean'));
+  if (db > 150 && cachetteDeLorean('?') && !deLoreanLa()) creerVoiture(B.garage.x, B.garage.z, B.garage.a, false, typeNomme('DeLorean'));
 }
 // le code de triche MISSION11 : le camp repart de zéro. Tous les militaires sont revenus, la commandante aussi, le bunker est refermé
 // (avec la DeLorean dedans), et une armure neuve attend devant la porte
@@ -7590,7 +8096,7 @@ function reinitialiserCamp() {
   const B = bunkerSecret;
   if (!B) return;
   B.ouverture = 0; B.bouchon.h = B.hBouchon;
-  if (J.voiture?.type.nom === 'DeLorean') return;   // (il est dedans : on la lui laisse)
+  if (J.voiture?.type.nom === 'DeLorean' || !cachetteDeLorean('?')) return;   // (il est dedans : on la lui laisse ; ou bien elle est déjà à lui, ou cachée ailleurs)
   for (const v of voitures) if (v.type.nom === 'DeLorean') v.supprimer = true;
   creerVoiture(B.garage.x, B.garage.z, B.garage.a, false, typeNomme('DeLorean'));
 }
@@ -7964,7 +8470,8 @@ function majIronman(dt) {
 let etoiles = 0, tempsCalme = 0, vuParPolice = false, tVu = 0, tRenfort = 0, tVoiturePolice = 0, tRobot = 15, tPeupler = 0, temps = 0;
 let elan = { x: 0, z: 0 }, dernierJ = null;   // où va B.J., en m/s (peupler le mesure toutes les demi-secondes)
 let saisie = null; // code de triche en cours de frappe
-let missionIndex = 0, etapeIndex = 0, enJeu = false, visee = false, sourisG = false, dejaTire = false, tempsAnnonce = 0;
+let missionIndex = Math.min(MISSIONS_CH.length, Math.max(0, Math.round(partie.missions[chapitre]) || 0)), etapeIndex = 0;   // (on reprend la mission où on en était, à sa première étape)
+let enJeu = false, visee = false, sourisG = false, dejaTire = false, tempsAnnonce = 0;
 const touches = {};
 pnjDepart.forEach(p => {
   const q = creerPersonne(p.type, p.x, p.z, undefined, p.y);
@@ -7991,7 +8498,7 @@ TELESIEGES.forEach(garnir);
 
 const $ = id => document.getElementById(id);
 function annonce(titre, sous = '', duree = 3) { $('annonce').innerHTML = `${titre}${sous ? `<small>${sous}</small>` : ''}`; $('annonce').style.opacity = 1; tempsAnnonce = duree; }
-function crime(n) { etoiles = Math.min(5, etoiles + n); tempsCalme = 0; }
+function crime(n) { if (!CHAPITRE.sansReproche) { etoiles = Math.min(5, etoiles + n); tempsCalme = 0; } }   // (un héros sans reproche n'a jamais d'étoiles : la police est de son côté)
 const policeVoit = () => !invisible() && (personnes.some(p => p.type === 'flic' && p.vie > 0 && dist(p, J) < 50 && voit(p, J)) || voitures.some(v => v.police && v.conducteur && dist(v, J) < 50));
 
 // =====================================================================
@@ -8028,6 +8535,7 @@ addEventListener('keydown', e => {
   else if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
   if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
   if (e.code === 'KeyB') rappelerVoiture();   // Batman rappelle sa Batmobile
+  if (e.code === 'KeyT' && !voyage) appuyerT();   // la DeLorean : choisir le chapitre où aller (dedans), ou la faire venir
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
   if (e.code.startsWith('Digit') && !J.robot) choisirArme((+e.code.slice(5) + 9) % 10);
 });
@@ -8062,13 +8570,16 @@ addEventListener('mousemove', e => {
   J.tangage = clamp(J.tangage - e.movementY * s, -1.3, 1.2);
   J.dernierMouvement = temps;
 });
-$('menu').addEventListener('click', () => {
+// on clique pour jouer : dans le menu, ou sur l'écran du chapitre
+function lancerJeu() {
   enJeu = true; $('menu').style.display = 'none';
   for (const o of objets) if (o.etiquette && o.langue !== langue) etiqueter(o);   // on a peut-être changé de langue dans le menu
   majEnseignes();
   initAudio(); audio.resume();
   renderer.domElement.requestPointerLock?.();
-});
+  debutChapitre();   // la première fois : l'écran du chapitre s'en va, la DeLorean arrive, les bulles d'aide
+}
+$('menu').addEventListener('click', lancerJeu);
 function validerTriche() {
   if (saisie === null) { // on ouvre la saisie
     saisie = ''; for (const k in touches) touches[k] = false;
@@ -8080,7 +8591,13 @@ function validerTriche() {
   const n = t && +saisie.slice(t.code.length);
   saisie = null; $('triche').style.display = 'none';
   if (!t) { annonce('', tr('Code inconnu'), 1.5); return; }
-  if (t.action) { t.action(n); if (t.code !== 'MISSION') annonce('', tr(t.texte), 2.5); return; }
+  if (t.action) { t.action(n); if (t.code !== 'MISSION' && t.code !== 'CHAPITRE') annonce('', tr(t.texte), 2.5); return; }
+  // dans un chapitre de super-héros, son code est toujours allumé, et ceux des autres super-héros ne marchent pas
+  if (CHAPITRE.triche && CHAPITRES.some(c => c.triche === t.code)) { annonce('', t.code === CHAPITRE.triche ? tr('Tu es déjà {super} !', { super: nomSuper() }) : tr('Pas dans ce chapitre !'), 2); return; }
+  basculerTriche(t);
+}
+// allume un code de triche, ou l'éteint s'il était allumé (dire : l'annoncer). Le jeu allume aussi celui du héros du chapitre (CHAPITRES : triche)
+function basculerTriche(t, dire = true) {
   t.actif = !t.actif; // retaper un code annule son effet
   if (t.ironman) { if (t.actif) mettreIronman(); else enleverIronman(); }   // l'armure d'Iron Man arrive en volant, ou s'en va
   rhabillerBJ();
@@ -8094,7 +8611,7 @@ function validerTriche() {
   if (!pouvoir('toile')) J.balance = J.prise = null;
   if (!pouvoir('grimpe')) J.mur = null;
   if (!pouvoir('cape')) J.plane = null;
-  annonce('', t.actif ? tr(t.texte) : tr('{effet} (annulé)', { effet: tr(t.texte) }), 2);
+  if (dire) annonce('', t.actif ? tr(t.texte) : tr('{effet} (annulé)', { effet: tr(t.texte) }), 2);
 }
 // La pose du culturiste (un code de triche qui a « biceps: 1.3 » : le nombre de secondes) : B.J. se tourne vers la caméra et gonfle son
 // biceps droit. On le regarde de dehors, le temps de la pose. Seulement à pied ; bouger, sauter, s'accroupir, tirer ou viser l'arrête
@@ -8370,7 +8887,7 @@ function action() {
 // la voiture dans laquelle on peut monter : la plus proche, si on est à moins de 1,30 m de son bout
 function voitureProche() {
   let v = null, best = Infinity;
-  for (const o of voitures) { const d = dist(o, J); if (d < best && d < o.forme.longueur / 2 + 1.3 && !o.detruite && !o.coule && !o.accident && Math.abs(o.y - J.y) < 2.5) { best = d; v = o; } }
+  for (const o of voitures) { const d = dist(o, J); if (d < best && d < o.forme.longueur / 2 + 1.3 && !o.detruite && !o.coule && !o.accident && !o.fantome && Math.abs(o.y - J.y) < 2.5) { best = d; v = o; } }   // (pas la DeLorean qui va repartir toute seule)
   return v;
 }
 const garagisteProche = () => garagistes.find(g => dist(g, J) < 2.5 && Math.abs(g.y - J.y) < 1.5);
@@ -8405,10 +8922,11 @@ function acheter(s) {
   changerArme(s.arme);
 }
 function entrerVoiture(v) {
+  const prete = CHAPITRE.sansReproche && !!v.conducteur;   // un héros sans reproche ne vole pas : le conducteur lui prête sa voiture
   if (v.conducteur) { // on sort le conducteur !
     const p = local(v, v.rayon + 0.8, 0.3), c = creerPersonne(v.police ? 'flic' : 'pieton', p.x, p.z, v.pilote?.tenue);
     resoudre(c, 0.35);
-    if (v.police) c.alerte = true; else c.peur = 8;
+    if (prete) v.volee = true; else if (v.police) c.alerte = true; else c.peur = 8;   // (il descend tranquillement)
     v.conducteur = null;
   }
   if (!v.volee && !v.type.glisse) { v.volee = true; if (v.police || policeVoit()) crime(1); }   // (les skis de la station sont à tout le monde)
@@ -8420,6 +8938,7 @@ function entrerVoiture(v) {
     annonce(tr(v.type.nom).toUpperCase(), v.type.vole === 'avion' ? tr('Z : accélérer · S : ralentir · la souris dirige (ou Q D, Espace et C)') : tr('Espace : monter · C : descendre · Z Q S D : avancer · la souris tourne'), 5);
   } else if (v.type.vitesseVol) annonce(tr(v.type.nom).toUpperCase(), tr("R : déployer les ailes et s'envoler"), 4);   // la Batmobile
   else annonce(tr(v.type.nom).toUpperCase(), !v.type.glisse ? '' : v.forme.rando ? tr(TEXTES_RANDO[!!v.montee]) : tr('Z : pousser · S : freiner · Espace : sauter · Maj : déraper'), v.type.glisse ? 4 : 2);   // le nom du véhicule dans lequel on monte
+  if (prete) annonce(tr(v.type.nom).toUpperCase(), tr('« Tiens, {super} : je te la prête ! »', { super: nomSuper() }), 2.5);
   if (v.filet) oterFilet(v);   // prise dans un filet : B.J. l'arrache
 }
 function sortirVoiture() {
@@ -8624,7 +9143,8 @@ function blesser(p, degats, parJoueur = true) {
   // il tombe (à la renverse si B.J. est devant lui, sur le ventre s'il est derrière) et lâche quelque chose. Pris dans un filet : il en sort
   liberer(p);
   p.mort = 0.001; p.chute = Math.cos(angleVers(p, J) - p.angle) > 0 ? -1 : 1;
-  if (p.type === 'pieton') { if (parJoueur) crime(1); if (Math.random() < 0.6) creerObjet({ type: 'argent', montant: 10 + Math.floor(Math.random() * 60), x: p.x, z: p.z , y: p.y }); }
+  if (CHAPITRE.sansReproche && parJoueur && ['pieton', 'flic', 'garde'].includes(p.type)) victime();   // un héros sans reproche : une victime (voir l'amende)
+  if (p.type === 'pieton') { if (parJoueur) crime(1); if (!CHAPITRE.sansReproche && Math.random() < 0.6) creerObjet({ type: 'argent', montant: 10 + Math.floor(Math.random() * 60), x: p.x, z: p.z , y: p.y }); }   // (un héros ne fait pas les poches)
   if (p.type === 'flic') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
   if (p.type === 'garde') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
   if (p.type === 'gang') { creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z, y: p.y }); creerObjet({ type: 'argent', montant: 20 + Math.floor(Math.random() * 80), x: p.x + 0.8, z: p.z, y: p.y }); }   // pas d'étoile
@@ -8656,7 +9176,7 @@ function blesserConducteur(v, degats, parJoueur = true) {
 const abrite = () => J.voiture && !J.voiture.forme.ouvert;   // une carrosserie protège, pas un tricycle
 // gilet = false : le gilet pare-balles ne protège pas (une chute, une roulade)
 function blesserJoueur(degats, gilet = true) {
-  if (J.mort || estBlindee(J.voiture) || invincible()) return;   // dans une voiture blindée, rien ne passe
+  if (J.mort || voyage || estBlindee(J.voiture) || invincible()) return;   // dans une voiture blindée, rien ne passe (ni quand il est parti dans un autre chapitre)
   if (J.robot?.armure) { toucherArmure(J.robot, degats); return; }   // dans l'armure : c'est elle qui encaisse tout, jusqu'à ce qu'elle casse
   const d = degats * (abrite() ? R_.protectionVoiture : J.robot ? R_.protectionRobot : armureIronman() ? IRONMAN.protection : 1), g = gilet ? Math.min(J.gilet, d) : 0; // le gilet prend les dégâts en premier (l'armure d'Iron Man en prend la plus grosse part)
   J.gilet -= g; J.vie -= d - g;
@@ -8667,7 +9187,7 @@ function blesserJoueur(degats, gilet = true) {
 }
 function mourir() { J.vie = 0; J.mort = 0.001; $('wasted').style.display = 'block'; renderer.domElement.style.filter = 'grayscale(1) brightness(.7)'; bip(200, 50, 1.5, 'sine', 0.4); }
 function reapparaitre() {
-  J.mort = 0; J.vie = R_.viesJoueur; J.argent = Math.max(0, J.argent - 100);
+  J.mort = 0; J.vie = R_.viesJoueur; J.argent = Math.min(J.argent, Math.max(0, J.argent - 100));   // (sans descendre sous 0 ; mais une dette d'amendes reste)
   if (J.voiture) { J.voiture.vitesse = 0; sortirVoiture(); }   // arrêté d'abord : on ne roule pas par terre en se réveillant
   if (J.robot) sortirRobot();
   const h = hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);   // l'hôpital le plus proche
@@ -9389,11 +9909,7 @@ function conduire(v, dt) {
   else if (v.rail || entrerRail(v)) roulerRail(v, dt); else bougerVoiture(v, dt, true);
   if (J.voiture !== v) return;   // éjecté (un accident de moto) : il roule déjà par terre
   J.x = v.x; J.z = v.z; J.y = v.y; J.vitesse = Math.abs(v.vitesse);
-  if (v.type.modele === 'delorean') { // 88 miles à l'heure (39,3 m/s, 142 km/h) : un éclair, un grand boum, et deux traînées de feu derrière elle
-    if (Math.abs(v.vitesse) >= 39.3 && !v.flux) { v.flux = 1.5; lumiereBoum.position.set(v.x, v.y + 1, v.z); lumiereBoum.intensity = 8000; bruit(0.9, 900, 0.6); bip(1500, 200, 0.5, 'sawtooth', 0.3); annonce(tr('88 MILES À L\'HEURE !'), tr('Retour vers le futur !'), 3); }
-    if (v.flux > 0) { v.flux -= dt; for (const c of [-1, 1]) { const f = new THREE.Sprite(M_FLASH.clone()), p = local(v, c * 0.72, -1.3); f.position.set(p.x, v.y + 0.25, p.z); scene.add(f); effets.push({ o: f, vie: 0.6, boule: 0.5 }); } }
-    else if (Math.abs(v.vitesse) < 35) v.flux = 0;
-  }
+  if (v.type.modele === 'delorean') majDeLorean(v, dt);   // 88 miles à l'heure (39,3 m/s, 142 km/h) : elle voyage dans un autre chapitre
   if (v.forme.siege) { // sur un tricycle, une moto, un Segway, un bateau ou à ski, on voit B.J. : sa pose (majVoiture le place ensuite)
     const g = v.forme.glisse;
     animerHumain(joueurH, 0, dt, g ? poseGlisse(v) : v.forme.debout ? { tenir: true } : { assis: true });
@@ -10630,14 +11146,15 @@ function etapeFinie(et) {
     case 'eliminer': return !resteAEliminer(et.cible);
     case 'bouton': return !!camp?.ouvert;   // le bouton rouge du camp militaire est enfoncé
     case 'conduire': return J.voiture?.type.nom === et.voiture;
+    case 'voyager': return !!voyage;   // la DeLorean est partie (voir partir)
     case 'etoiles': return etoiles >= et.nombre;
     case 'semer': return etoiles === 0;
     case 'arme': return J.possede[indexArme(et.arme)];
   }
 }
 function cibleMission() {
-  const m = MISSIONS[missionIndex];
-  if (!m) return null;
+  const m = MISSIONS_CH[missionIndex];
+  if (!m || voyage) return null;
   const et = m.etapes[etapeIndex], proche = l => l.reduce((m, o) => !m || dist(o, J) < dist(m, J) ? o : m, null);
   if (et.type === 'voler') { // ce qu'on peut prendre (ou actionner) tout de suite, sinon la suite
     const reste = butins.filter(o => o.B.lettre === et.lieu && !o.pris), dispo = reste.filter(o => !o.apres || o.B[o.apres]);
@@ -10645,28 +11162,30 @@ function cibleMission() {
   }
   if (et.type === 'blindage') return proche(garagistes);
   if (et.type === 'bouton' && camp) return camp.bouton;
-  if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule));
+  if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule && !v.fantome));
   if (et.lieu) return lieuProche(et.lieu, J);
   if (et.type === 'eliminer') return personnes.find(p => p.type === et.cible && p.vie > 0) || (resteAEliminer(et.cible) ? camp : null);   // (les renforts ne sont pas encore sortis : le camp)
   if (et.type === 'arme') return objets.filter(o => o.type === 'stand' && o.arme === indexArme(et.arme)).reduce((m, o) => !m || dist(o, J) < dist(m, J) ? o : m, null) || lieuProche('A', J);
   return null;
 }
 function missions() {
-  const m = MISSIONS[missionIndex];
-  if (!m || !etapeFinie(m.etapes[etapeIndex])) return;
+  const m = MISSIONS_CH[missionIndex], et = m?.etapes[etapeIndex];
+  if (!m || !etapeFinie(et)) return;
+  if (et.type === 'conduire' && et.voiture === 'DeLorean') partie.trouvee[chapitre] = true;   // la DeLorean de ce chapitre est retrouvée : elle peut voyager
   bip(500, 1500, 0.5, 'triangle', 0.3);
   if (++etapeIndex < m.etapes.length) return;
   J.argent += m.recompense; J.sac = 0;   // le butin est livré à la planque
   missionIndex++; etapeIndex = 0;
-  const fini = missionIndex >= MISSIONS.length;
+  const fini = missionIndex >= MISSIONS_CH.length;
   annonce(tr(fini ? 'BRAVO !' : 'MISSION RÉUSSIE'), fini ? tr('Toutes les missions sont finies !') : m.recompense ? tr('{mission} : +{argent}', { mission: tr(m.nom), argent: montant(m.recompense) }) : tr(m.nom), 4);
+  sauverPartie();
 }
 // 250000 → « 250 000 $ » en français, « 250.000 $ » en allemand. Chrome ne connaît pas les nombres en züritüütsch (gsw) : on prend ceux de la Suisse
 const montant = n => `${n.toLocaleString(langue === 'gsw' ? 'de-CH' : langue)} $`;
 // le code de triche MISSION8 : on saute à la mission 8. Si elle a besoin d'une voiture blindée, il y en a une à côté
 function sauterMission(n) {
-  missionIndex = clamp(Math.round(n) - 1, 0, MISSIONS.length); etapeIndex = 0; J.sac = 0;
-  const m = MISSIONS[missionIndex];
+  missionIndex = clamp(Math.round(n) - 1, 0, MISSIONS_CH.length); etapeIndex = 0; J.sac = 0;
+  const m = MISSIONS_CH[missionIndex];
   if (m?.etapes.some(e => e.cible === 'militaire' || e.type === 'bouton')) reinitialiserCamp();   // la mission du camp militaire : il repart de zéro
   if (m?.etapes.some(e => e.blindee) && !voitures.some(v => v.blindee && !v.detruite) && !J.voiture) {
     const v = garerPres(typeNomme('Porsche'));
@@ -10696,9 +11215,10 @@ function amenerVoiture(nom) {
   v.triche = nom; v.volee = true; bip(300, 900, 0.3, 'sawtooth', 0.08);
   return v;
 }
-// la touche B : Batman rappelle sa Batmobile (la « voiture » du code de triche actif), où qu'elle soit, même en morceaux. Seulement à pied
-function rappelerVoiture() {
-  const nom = TRICHES.find(t => t.actif && t.voiture)?.voiture, type = typeNomme(nom);
+// la touche B : Batman rappelle sa Batmobile (la « voiture » du code de triche actif), où qu'elle soit, même en morceaux. Seulement à pied.
+// (La touche T fait pareil avec la DeLorean, dans un chapitre fini : voir appuyerT)
+function rappelerVoiture(nom = TRICHES.find(t => t.actif && t.voiture)?.voiture) {
+  const type = typeNomme(nom);
   if (!type || J.mort || J.telesiege || J.voiture?.triche === nom) return;   // (il est déjà dedans)
   if (J.voiture || J.robot) { annonce('', tr("Descends d'abord !"), 1.5); return; }
   if (amenerVoiture(nom)) annonce('', tr('{voiture} : à côté de toi !', { voiture: tr(nom) }), 1.5);
@@ -10729,6 +11249,7 @@ function placerCamera(pivot, direction, distance, epaule) {
 }
 const DEMI_TOUR = new THREE.Quaternion().setFromAxisAngle(V3(0, 1, 0), Math.PI);   // la caméra regarde vers -z, la voiture vers +z
 function majCamera(dt) {
+  if (voyage) { joueurH.g.visible = false; camera.lookAt(voyage.cible); return; }   // la DeLorean a disparu : la caméra reste là, à regarder les traces en feu
   const v = J.voiture;
   if (v?.accident) J.decalage = diffAngle(v.angle, J.lacetCam);   // la voiture tourne sur elle-même : la caméra, elle, ne tourne pas avec
   J.lacetCam = v && !enAvion(v) ? v.angle + J.decalage : J.lacet;
@@ -10760,6 +11281,246 @@ function majCamera(dt) {
   if (J.secousse > 0.005) { camera.position.x += entre(-1, 1) * J.secousse; camera.position.y += entre(-1, 1) * J.secousse; J.secousse *= Math.pow(0.01, dt); }   // les pas du robot font trembler
   const fov = dansLunette() ? 70 / ARMES[J.arme].zoom : visee && !v && !J.robot ? 45 : 70;
   if (Math.abs(camera.fov - fov) > 0.1) { camera.fov += (fov - camera.fov) * Math.min(1, dt * 10); camera.updateProjectionMatrix(); }
+}
+
+// =====================================================================
+//  Les chapitres : la partie sauvegardée, l'amende des héros sans reproche, la DeLorean qui voyage d'un chapitre à l'autre
+// =====================================================================
+// la DeLorean de ce chapitre attend-elle encore dans sa cachette (la lettre l de la CARTE) ? Oui, tant qu'on ne l'a pas retrouvée.
+// Ensuite, elle est à lui : elle arrive avec lui dans le chapitre, et la touche T la fait venir
+function cachetteDeLorean(l) { return CHAPITRE.cachette === l && !partie.trouvee[chapitre]; }
+// y a-t-il une DeLorean dans le pays (pas explosée, pas coulée, pas celle qui repart toute seule à l'arrivée) ?
+function deLoreanLa() { return voitures.some(v => v.type.nom === 'DeLorean' && !v.detruite && !v.coule && !v.supprimer && !v.fantome); }
+
+// --- la partie sauvegardée (partie, tout en haut du fichier) ---
+let partieCoupee = false, dejaJoue = false, tSauve = 0;   // partieCoupee : on change de chapitre, plus rien ne s'écrit
+// les armes de ce chapitre : chaque chapitre garde les siennes (un chapitre neuf : les poings et le couteau, comme au tout début)
+function chargerArmes() {
+  const a = partie.armes[chapitre];
+  if (!a?.possede) return;
+  ARMES.forEach((w, i) => { if (pouvoirArme(w)) return; J.possede[i] = i < 2 || a.possede.includes(w.nom); if (!w.corps) J.balles[i] = a.balles?.[w.nom] || 0; });
+  J.gilet = a.gilet || 0; J.masque = !!a.masque;
+}
+// le navigateur retient où on en est : toutes les 2 secondes, et quand on ferme la page
+function sauverPartie() {
+  if (partieCoupee) return;
+  partie.argent = J.argent; partie.missions[chapitre] = missionIndex;
+  partie.armes[chapitre] = { possede: ARMES.filter((w, i) => J.possede[i] && !pouvoirArme(w)).map(w => w.nom), gilet: J.gilet, masque: J.masque,
+    balles: Object.fromEntries(ARMES.map((w, i) => [w.nom, J.balles[i]]).filter(([, n]) => Number.isFinite(n) && n > 0)) };
+  try { localStorage.partie = JSON.stringify(partie); } catch {}
+}
+// on change de chapitre : on sauve celui-ci, puis la page se recharge dans l'autre (chaque chapitre construit sa ville).
+// S'il était fini, ses missions recommencent. arrivee : on vient avec la DeLorean (elle apparaîtra dans trois éclairs)
+function allerAuChapitre(n, arrivee = false) {
+  sauverPartie();
+  if ((partie.missions[n] || 0) >= missionsDu(n).length) partie.missions[n] = 0;
+  Object.assign(partie, { precedent: chapitre, chapitre: n, ouvert: Math.max(partie.ouvert, n), ecran: true, arrivee });
+  try { localStorage.partie = JSON.stringify(partie); } catch {}
+  partieCoupee = true;
+  location.reload();
+}
+// le code de triche CHAPITRE3 : on y va tout de suite. Les chapitres d'avant sont alors finis (leur DeLorean est retrouvée) : on peut y revenir
+function sauterChapitre(n) {
+  n = Math.min(CHAPITRES.length, Math.max(1, Math.round(n) || 1));
+  for (let k = 1; k < n; k++) partie.trouvee[k] = true;
+  partie.missions[n] = 0;
+  allerAuChapitre(n, true);
+}
+// « Nouvelle partie », dans le menu : on efface tout, et on recommence au chapitre 1
+function recommencer() {
+  partieCoupee = true;
+  try { localStorage.partie = JSON.stringify({ chapitre: 1, ecran: true }); } catch {}
+  location.reload();
+}
+addEventListener('chapitre', e => allerAuChapitre(e.detail));   // un bouton de chapitre, dans le menu
+addEventListener('nouvellePartie', recommencer);
+addEventListener('pagehide', () => { if (dejaJoue) sauverPartie(); });
+
+// --- un héros sans reproche (CHAPITRES : sansReproche) ---
+// La police est de son côté : jamais d'étoiles (voir crime). Mais chaque passant, policier ou vigile qu'il tue est une victime : à partir
+// de la 3e (amendeVictimes), une amende, qui double à chaque victime de plus (amende, amendeMax). L'argent peut devenir négatif.
+// Une victime est oubliée au bout de 2 minutes sans en faire d'autre (pardon)
+let victimes = 0, tPardon = 0;
+function victime() {
+  victimes++; tPardon = 0;
+  const n = victimes - R_.amendeVictimes;
+  if (n < 0) { annonce('', tr('Attention aux passants ! Victimes : {n}', { n: victimes }), 2.5); return; }
+  const prix = Math.min(R_.amendeMax, Math.round(R_.amende * 2 ** n));
+  J.argent -= prix;
+  annonce(tr('AMENDE !'), tr('-{prix} : {n} victimes. Un héros protège les passants !', { prix: montant(prix), n: victimes }), 3.5);
+  bip(400, 150, 0.5, 'square', 0.15);
+}
+function pardonner(dt) { if (victimes > 0 && (tPardon += dt) >= R_.pardon) { victimes--; tPardon = 0; } }
+
+// --- la DeLorean qui voyage ---
+// les chapitres où elle peut aller d'ici : ceux qu'on a déjà ouverts, et le suivant. Aucun, tant qu'on n'a pas retrouvé celle de ce chapitre
+function destinations() {
+  if (!partie.trouvee[chapitre]) return [];
+  const d = [];
+  for (let n = 1; n <= CHAPITRES.length; n++) if (n !== chapitre && (n <= partie.ouvert || n === chapitre + 1)) d.push(n);
+  return d;
+}
+// la destination, sur le tableau de bord : le chapitre suivant, d'abord. La touche T passe au chapitre d'après (suivante = true)
+let destination = 0;
+function choisirDestination(suivante = false) {
+  const d = destinations();
+  if (!d.length) destination = 0;
+  else if (suivante) destination = d[(d.indexOf(destination) + 1) % d.length];
+  else if (!d.includes(destination)) destination = d.includes(chapitre + 1) ? chapitre + 1 : d.at(-1);
+}
+// la touche T : dans la DeLorean, changer de destination ; à pied, dans un chapitre fini, faire venir la DeLorean (comme la Batmobile)
+function appuyerT() {
+  if (J.voiture?.type.nom === 'DeLorean') {
+    choisirDestination(true);
+    if (destination) bip(900, 1300, 0.08, 'square', 0.08); else annonce('', tr("Retrouve d'abord la DeLorean de ce chapitre pour voyager"), 2);
+  } else if (!partie.trouvee[chapitre]) annonce('', tr("La DeLorean est cachée quelque part : retrouve-la d'abord !"), 2);
+  else rappelerVoiture('DeLorean');
+}
+// À 88 miles à l'heure (39,3 m/s, 142 km/h), quand elle peut voyager, il faut tenir cette vitesse pendant 3 secondes (dureeVoyage) :
+// des éclairs bleus courent sur la carrosserie, de plus en plus, puis le nez prend feu... et elle disparaît dans un éclair, en laissant
+// deux traces de pneus en feu derrière elle (voir partir). Sinon, comme avant : un éclair, un boum, et deux traînées de feu
+const MPH88 = 39.3;
+function majDeLorean(v, dt) {
+  choisirDestination();
+  (v.traces ||= []).push([local(v, 0.72, -1.3), local(v, -0.72, -1.3), v.y]);   // où passent les roues arrière (les 90 dernières images : 60 m à 88 miles à l'heure)
+  if (v.traces.length > 90) v.traces.shift();
+  if (!destination) {
+    if (Math.abs(v.vitesse) >= MPH88 && !v.flux) { v.flux = 1.5; lumiereBoum.position.set(v.x, v.y + 1, v.z); lumiereBoum.intensity = 8000; bruit(0.9, 900, 0.6); bip(1500, 200, 0.5, 'sawtooth', 0.3); annonce(tr('88 MILES À L\'HEURE !'), tr('Retour vers le futur !'), 3); }
+    if (v.flux > 0) { v.flux -= dt; for (const c of [-1, 1]) { const f = new THREE.Sprite(M_FLASH.clone()), p = local(v, c * 0.72, -1.3); f.position.set(p.x, v.y + 0.25, p.z); scene.add(f); effets.push({ o: f, vie: 0.6, boule: 0.5 }); } }
+    else if (Math.abs(v.vitesse) < 35) v.flux = 0;
+    return;
+  }
+  if (v.vitesse >= MPH88 && !v.accident) {
+    if (!v.charge) { annonce(tr('88 MILES À L\'HEURE !'), tr('Tiens bon : encore {n} secondes...', { n: R_.dureeVoyage }), 2); bruit(0.6, 900, 0.5); bip(300, 900, R_.dureeVoyage, 'sawtooth', 0.05); }
+    v.charge = (v.charge || 0) + dt; v.sous = 0;
+  } else if (v.charge && (v.sous = (v.sous || 0) + dt) > 0.3) { v.charge = 0; annonce('', tr("Trop lent ! Il faut tenir 88 miles à l'heure"), 2); }   // (un dos d'âne ne suffit pas à tout arrêter)
+  if (!v.charge) return;
+  const k = Math.min(1, v.charge / R_.dureeVoyage), L = v.forme.longueur / 2;
+  v.m.updateMatrixWorld();
+  const surTole = (x, y, z) => { const p = local(v, x, z); return v.m.worldToLocal(V3(p.x, v.y + y, p.z)); };   // un point de la carrosserie, accroché à la voiture
+  // des lueurs bleues sur la carrosserie, de plus en plus nombreuses, et des éclairs (un peu en avant : la voiture file)
+  for (let n = Math.floor(dt * (20 + 70 * k) + Math.random()); n > 0; n--) {
+    const s = new THREE.Sprite(M_FLASH_FOUDRE); s.position.copy(surTole(entre(-1, 1), entre(0.3, 1.3), entre(-L, L))); s.scale.setScalar(entre(0.8, 1.8) * (0.6 + k));
+    v.m.add(s); effets.push({ o: s, vie: 0.08, dans: v.m });
+  }
+  if (Math.random() < dt * (8 + 25 * k)) {
+    const devant = v.vitesse * 0.04, a = local(v, entre(-0.9, 0.9), entre(-L, L) + devant), b = local(v, entre(-0.9, 0.9), entre(-L, L) + devant);
+    foudre(V3(a.x, v.y + entre(0.4, 1.2), a.z), V3(b.x, v.y + entre(0.4, 1.2), b.z), 0.25, 0.06, 1); bruit(0.1 + 0.25 * k, 5000, 0.06);
+  }
+  if (k > 0.45) for (let i = 0; i < 2; i++) { // le nez prend feu
+    const f = new THREE.Sprite(M_FLASH.clone()); f.position.copy(surTole(entre(-0.75, 0.75), entre(0.3, 0.75), L + 0.15));
+    v.m.add(f); effets.push({ o: f, vie: 0.3, boule: 0.3 + 0.5 * k, dans: v.m });
+  }
+  if (v.charge >= R_.dureeVoyage) partir(v);
+}
+// elle disparaît : un grand éclair blanc et bleu, un boum, et derrière elle, deux traces de pneus en feu. La caméra reste là, à les regarder
+// brûler, puis tout devient blanc... et la page se recharge dans le chapitre de destination (voir majVoyage)
+let voyage = null, traces = [];   // voyage : { t, dest, cible : où regarde la caméra } ; traces : les flammes des pneus { o, vie, taille }
+function partir(v) {
+  const dir = V3(Math.sin(v.angle), 0, Math.cos(v.angle)), p = V3(v.x, v.y + 0.8, v.z);
+  lumiereBoum.position.copy(p); lumiereBoum.intensity = 15000; bruit(1, 700, 1.5); bip(1800, 120, 0.9, 'sawtooth', 0.3);
+  for (const t of [3, 6, 10]) { const s = new THREE.Sprite(M_FLASH_FOUDRE.clone()); s.position.copy(p); scene.add(s); effets.push({ o: s, vie: 0.6, boule: t }); }
+  let avant = null;
+  for (const [d, g, y] of v.traces) for (const [q, cote] of [[d, 0], [g, 1]]) { // une flamme tous les 80 cm, de chaque côté
+    if (avant?.[cote] && dist(avant[cote], q) < 0.8) continue;
+    (avant ||= [])[cote] = q;
+    const s = new THREE.Sprite(M_FLASH.clone()), taille = entre(0.7, 1.1); s.position.set(q.x, y + 0.35, q.z); scene.add(s);
+    traces.push({ o: s, vie: entre(5, 7), taille });
+  }
+  const debut = v.traces[0]?.[0] || p;
+  voyage = { t: 0, dest: destination, cible: p.clone() };
+  // la caméra : derrière, au début des traces, un peu en hauteur ; elle regarde là où la DeLorean a disparu
+  camera.position.set(debut.x - dir.x * 6, 0, debut.z - dir.z * 6);
+  camera.position.y = Math.max(hauteurTerrain(camera.position.x, camera.position.z), EAU, v.y) + 3.5;
+  J.voiture = null; v.supprimer = true; J.x = v.x; J.z = v.z; J.y = v.y; J.vitesse = 0;
+  annonce('', '', 0);
+}
+function majVoyage(dt) {
+  for (const f of traces) { // les flammes des traces : elles dansent, puis s'éteignent
+    f.vie -= dt; f.o.scale.setScalar(f.taille * entre(0.75, 1.2) * Math.min(1, f.vie));
+    if (f.vie <= 0) { scene.remove(f.o); f.o.material.dispose(); }
+  }
+  traces = traces.filter(f => f.vie > 0);
+  if (!voyage) return;
+  voyage.t += dt;
+  $('voile').style.opacity = clamp((voyage.t - 2.3) / 0.8, 0, 1);   // tout devient blanc...
+  if (voyage.t > 3.3 && !voyage.fini) { voyage.fini = true; allerAuChapitre(voyage.dest, true); }   // ...et on arrive dans l'autre chapitre
+}
+// on arrive avec la DeLorean : trois éclairs, puis elle est là, à côté de B.J., toute fumante. Si on n'a pas encore retrouvé celle de ce
+// chapitre, elle repart toute seule au bout de 3,6 s (un éclair) : elle est cachée dans la ville (cachette, dans CHAPITRES)
+let arrivee = null;   // { t, v }
+function majArrivee(dt) {
+  const a = arrivee, t0 = a.t;
+  a.t += dt;
+  if (!a.v) { // elle est là tout de suite, mais toute petite (invisible) jusqu'au 3e éclair
+    a.v = amenerVoiture('DeLorean');
+    if (!a.v) { arrivee = null; return; }   // pas de place à côté de lui
+    a.v.m.scale.setScalar(0.001); a.v.fantome = !partie.trouvee[chapitre];
+  }
+  const v = a.v, p = V3(v.x, v.y + 0.8, v.z);
+  for (const k of [0, 1, 2]) if (t0 <= k * 0.3 && a.t > k * 0.3) { // trois éclairs, trois boums
+    for (const t of [2, 4]) { const s = new THREE.Sprite(M_FLASH_FOUDRE.clone()); s.position.copy(p); scene.add(s); effets.push({ o: s, vie: 0.4, boule: t }); }
+    lumiereBoum.position.copy(p); lumiereBoum.intensity = 9000; bruit(0.9, 800, 0.6); bip(1600, 150, 0.4, 'sawtooth', 0.2);
+    if (k === 2) v.m.scale.setScalar(1);
+  }
+  if (a.t > 0.6 && a.t < 5 && Math.random() < dt * 8) { // la vapeur qui s'en échappe, comme dans le film
+    const f = new THREE.Sprite(M_FUMEE.clone()), q = local(v, entre(-1, 1), entre(-2, 2)); f.material.color.set('#e4eef6');
+    f.position.set(q.x, v.y + entre(0.6, 1.4), q.z); scene.add(f); effets.push({ o: f, vie: 1.4, fumee: 1.4 });
+  }
+  if (v.fantome && t0 < 3.6 && a.t >= 3.6) { // elle repart toute seule : la voilà cachée
+    for (const t of [3, 5]) { const s = new THREE.Sprite(M_FLASH_FOUDRE.clone()); s.position.copy(p); scene.add(s); effets.push({ o: s, vie: 0.5, boule: t }); }
+    bruit(0.9, 700, 0.8); v.supprimer = true;
+    if (J.voiture === v) sortirVoiture();
+    cacherDeLorean();
+    annonce(tr('LA DELOREAN EST REPARTIE !'), tr('Elle est cachée quelque part : retrouve-la pour finir le chapitre'), 4);
+  }
+  if (a.t > 6) arrivee = null;
+}
+// la DeLorean de ce chapitre, dans sa cachette (une place de la ville). Le bunker secret du chapitre 1 s'occupe de la sienne (voir majCamp).
+// Si elle a explosé ou coulé avant qu'on la retrouve, une neuve y revient quand B.J. est à plus de « loin » mètres
+function cacherDeLorean(loin = 0) {
+  const c = CHAPITRE.cachette !== '?' && cachetteDeLorean(CHAPITRE.cachette) && lieuProche(CHAPITRE.cachette, J);
+  if (c && !deLoreanLa() && dist(J, c) >= loin) creerVoiture(c.x, c.z, 0, false, typeNomme('DeLorean'));
+}
+// les bulles d'aide du début d'un chapitre (CHAPITRES : bulles), l'une après l'autre : chacune reste le temps de la lire
+let bulles = null;   // { liste, k : la suivante, t : combien de temps encore, montree : une bulle est affichée }
+function majBulles(dt) {
+  const b = bulles;
+  if (!b || (b.t -= dt) > 0) return;
+  if (b.montree) { $('bulle').style.opacity = 0; b.montree = false; b.t = 0.5; return; }   // un petit moment sans bulle entre deux
+  if (b.k >= b.liste.length) { bulles = null; return; }
+  const texte = tr(b.liste[b.k++], { super: nomSuper() });
+  $('bulle').innerHTML = `<h3>${nomSuper()}</h3>${texte}`; $('bulle').style.opacity = 1;
+  b.montree = true; b.t = 2.5 + texte.replace(/<[^>]+>/g, '').length * 0.05;
+}
+// le début du chapitre, au premier clic : l'écran du chapitre s'en va (ou, pour une toute nouvelle partie, celui du chapitre 1 s'affiche
+// 2,2 s), la DeLorean arrive si on est venu avec elle, et les bulles d'aide suivent. Une partie qu'on reprend commence tout de suite
+let commence = false;
+function debutChapitre() {
+  if (commence) return;
+  commence = dejaJoue = true;
+  const sons = { bip, bruit };
+  if (ecranChapitre.visible) sortirEcran(sons);
+  else if (nouvellePartie) montrerEcran(chapitre, false, '', sons);
+  else return;
+  if (partie.arrivee) arrivee = { t: 0, v: null };
+  bulles = { liste: CHAPITRE.bulles || [], k: 0, t: partie.arrivee ? 5 : 2, montree: false };
+  partie.ecran = partie.arrivee = false;
+  sauverPartie();
+}
+// le tableau de bord de la DeLorean (comme dans le film) : la destination, le présent, le départ précédent ; sa vitesse en miles à
+// l'heure, et la barre qui se remplit pendant les 3 secondes à 88
+function majTableau() {
+  const v = J.voiture, el = $('tableau'), dedans = v?.type.nom === 'DeLorean' && !voyage;
+  el.style.display = dedans ? 'block' : 'none';
+  if (!dedans) return;
+  const nom = n => n ? tr('CHAPITRE {n} · {ville}', { n, ville: tr(CHAPITRES[n - 1].ville).toUpperCase() }) : '– – –';
+  for (const [c, texte, n] of [['dest', 'DESTINATION', destination], ['present', 'PRÉSENT', chapitre], ['depart', 'DÉPART PRÉCÉDENT', partie.precedent]]) {
+    el.querySelector(`.${c} .nom`).textContent = tr(texte); el.querySelector(`.${c} .val`).textContent = nom(n);
+  }
+  el.querySelector('.mph span').textContent = `${Math.round(Math.abs(v.vitesse) * 2.237)} MPH`;   // (1 m/s = 2,237 miles à l'heure)
+  el.querySelector('.barre div').style.width = `${Math.min(1, (v.charge || 0) / R_.dureeVoyage) * 100}%`;
+  el.querySelector('.aide').innerHTML = destination ? tr('<b>T</b> : changer de destination · 88 MPH pendant {n} s : partir', { n: R_.dureeVoyage }) : tr("Retrouve d'abord la DeLorean de ce chapitre pour voyager");
 }
 
 // =====================================================================
@@ -10928,19 +11689,22 @@ function majHUD(dt) {
   $('barre-vie').firstChild.style.background = J.vie < 30 ? '#c0392b' : '#56b24c';
   $('barre-gilet').style.display = J.gilet > 0 ? 'block' : 'none'; giletBJ.visible = J.gilet > 0;
   $('barre-gilet').firstChild.style.width = `${J.gilet / R_.giletMax * 100}%`;
-  $('argent').textContent = montant(J.argent);
+  $('argent').textContent = montant(J.argent); $('argent').style.color = J.argent < 0 ? '#ff6a5a' : '';   // (des amendes : l'argent en négatif, en rouge)
   const { heure } = ouEnEst(), hh = Math.floor(heure), mm = Math.floor((heure - hh) * 12) * 5;   // l'heure de la journée, à 5 minutes près
   $('heure').textContent = `${lumiere.hauteur > 0 ? '☀' : '☾'} ${hh}:${String(mm).padStart(2, '0')}`;
   [...$('etoiles').children].forEach((e, i) => e.classList.toggle('on', i < etoiles));
   $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
+  $('etoiles').style.display = CHAPITRE.sansReproche ? 'none' : '';   // un héros sans reproche : pas d'étoiles, mais ses victimes
+  $('victimes').textContent = CHAPITRE.sansReproche && victimes ? tr('⚠ Victimes : {n}', { n: victimes }) : '';
+  majTableau();
   const a = ARMES[J.arme], rb = J.robot, ar = rb?.armure ? rb : null;   // ar : l'armure, quand il est dedans
   $('barre-armure').style.display = ar ? 'block' : 'none';
   if (ar) $('barre-armure').firstChild.style.width = `${clamp(ar.points / ARMURE.points, 0, 1) * 100}%`;
   $('arme').textContent = ar ? tr('Armure') : rb ? 'Heavy robot' : tr(a.nom);
   $('munitions').textContent = ar ? `${tr('{n} points', { n: Math.ceil(ar.points) })} · ${ar.fusees > 0 ? tr('{n} fusées', { n: ar.fusees }) : tr('Fusées : encore {n} s', { n: Math.ceil(ar.recharge) })}`
     : rb ? `${tr('{n} balles', { n: rb.munitions.lourde })} · ${tr('{n} roquettes', { n: rb.munitions.roquettes })}` : a.corps || pouvoirArme(a) ? '' : tr(a.explosion ? '{n} roquettes' : '{n} balles', { n: J.balles[J.arme] });
-  const m = MISSIONS[missionIndex], et = m?.etapes[etapeIndex];
-  $('objectif').textContent = tr(m ? et.texte : 'Pays libre : fais ce que tu veux !', et?.type === 'eliminer' ? { n: resteAEliminer(et.cible) } : {});
+  const m = MISSIONS_CH[missionIndex], et = m?.etapes[etapeIndex];
+  $('objectif').textContent = voyage ? '' : tr(m ? et.texte : 'Pays libre : fais ce que tu veux !', et?.type === 'eliminer' ? { n: resteAEliminer(et.cible) } : {});
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
   $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !dansLunette() && (ironmanLibre() || (!(J.superman && a.corps) && (J.vue === 1 || visee || !a.corps || rb))) ? 'block' : 'none';   // (Iron Man vise avec ses mains)
   $('fumee').style.opacity = J.fumee * (J.masque ? 0.25 : 0.8);   // la fumée toxique brouille la vue (moins avec le masque)
@@ -11000,12 +11764,22 @@ const MOMENTS = [
 const journee = { moment: 0, t: 0 };   // le moment de la journée (son numéro dans MOMENTS) et depuis combien de secondes il dure. On commence au matin
 const dureeMoment = k => Math.max(0, MOMENTS[k].duree()) || 0;
 // le temps passe (dt : des secondes de l'horloge) ; un moment qui dure 0 seconde est sauté. Un nouveau moment s'annonce : « Le soleil se couche »...
+// Dans un chapitre qui a une heure (CHAPITRES : heure), le temps ne passe pas : Gotham reste toujours dans la nuit
 function avancerJournee(dt) {
+  if (CHAPITRE.heure != null) { fixerHeure(CHAPITRE.heure); return; }
   const avant = journee.moment;
   journee.t += dt;
   for (let n = 0; n < 4 && journee.t >= dureeMoment(journee.moment); n++) { journee.t -= dureeMoment(journee.moment); journee.moment = (journee.moment + 1) % 4; }
   if (journee.t >= dureeMoment(journee.moment)) journee.t = 0;   // (toutes les durées à 0 : le temps s'arrête)
   if (journee.moment !== avant && !sommeil) annonce('', tr(MOMENTS[journee.moment].reveil), 3);
+}
+// l'heure h de la montre (de 0 à 24) : le moment de la journée où elle tombe, et depuis combien de temps il dure
+function fixerHeure(h) {
+  const H = h < MOMENTS[0].heure ? h + 24 : h;   // (avant le matin : la fin de la nuit d'avant)
+  for (let k = 0; k < 4; k++) {
+    const debut = MOMENTS[k].heure, fin = k === 3 ? MOMENTS[0].heure + 24 : MOMENTS[k + 1].heure;
+    if (H >= debut && H < fin) { journee.moment = k; journee.t = (H - debut) / (fin - debut) * dureeMoment(k); return; }
+  }
 }
 // où on en est : l'angle du soleil (a) et l'heure de la montre, entre le début de ce moment et celui du suivant
 function ouEnEst() {
@@ -11210,6 +11984,10 @@ function majSommeil(dt) {
 function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   temps += dt;
   avancerJournee(horloge); majSommeil(horloge);
+  // les chapitres : la DeLorean qui part (et ses traces en feu) ou qui arrive, les bulles d'aide, les victimes oubliées, la sauvegarde
+  majVoyage(dt); if (arrivee) majArrivee(dt); majBulles(dt);
+  if (CHAPITRE.sansReproche) pardonner(dt);
+  if ((tSauve -= dt) <= 0) { tSauve = 2; sauverPartie(); cacherDeLorean(150); }
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
   if (J.mort || J.voiture || J.robot || J.telesiege) J.grappin = J.balance = J.mur = J.plane = J.lance = null;   // ni grappin, ni toile, ni mur, ni cape
   if (J.biceps && (J.mort || J.voiture || J.robot || J.telesiege || J.superman || J.roule || J.echelle || accroche())) finirBiceps();   // et on ne montre son biceps que debout
@@ -11229,7 +12007,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
     }
     if (J.mort > 3.5) reapparaitre();
   }
-  else if (!sommeil) { // (quand il dort, il ne bouge plus)
+  else if (!sommeil && !voyage) { // (quand il dort, ou que la DeLorean vient de disparaître avec lui, il ne bouge plus)
     if (J.telesiege) { monterTelesiege(dt); J.danse = 0; } else if (J.voiture) conduire(J.voiture, dt); else if (J.robot) piloterRobot(J.robot, dt); else majJoueur(dt);
     J.cooldown -= dt; J.frappe = Math.max(0, J.frappe - dt * 3.3); J.recul = Math.max(0, J.recul - dt * 8);
     if (J.robot) { // dans le heavy robot : clic gauche = la mitrailleuse, clic droit = les roquettes
@@ -11327,7 +12105,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   }
 }
 function majRepere(dt) {
-  const cible = cibleMission(), et = MISSIONS[missionIndex]?.etapes[etapeIndex];
+  const cible = cibleMission(), et = MISSIONS_CH[missionIndex]?.etapes[etapeIndex];
   const surCible = et?.type === 'eliminer' || et?.type === 'voler';   // une flèche au-dessus de la cible, ou du butin
   repere.visible = !!cible && !surCible;
   fleche.visible = !!cible && surCible;
@@ -11340,7 +12118,7 @@ function boucle(t) {
   const horloge = R_.vitesseJeu > 0 ? clamp((t - dernier) / 1000, 0, 1) : 0;   // le vrai temps écoulé : la journée dure ce qu'il faut, même si le jeu rame
   dernier = t;
   if (carte.ouverte) { dessinerGrandeCarte(dt); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
-  if (enJeu) mettreAJour(dt, horloge); else dessinerApercu(dt);   // dans le menu : l'aperçu du héros
+  if (enJeu && !ecranChapitre.bloque()) mettreAJour(dt, horloge); else if (!enJeu) dessinerApercu(dt);   // dans le menu : l'aperçu du héros (et le jeu attend que l'écran du chapitre s'en aille)
   majCamera(dt); majRepere(dt); majHUD(dt); majLaser(dt);
   majCiel(dt);   // le soleil (ou la lune), le ciel, la brume, les lumières de la nuit
   majMorceaux();
@@ -11360,6 +12138,12 @@ function boucle(t) {
 majJoueur(0);
 requestAnimationFrame(boucle);
 etat('Clique pour jouer');
+// le chapitre où l'on est : son heure, la DeLorean dans sa cachette, le code de son héros (allumé tout le chapitre),
+// et son écran, qui attendait que le pays soit construit
+if (CHAPITRE.heure != null) fixerHeure(CHAPITRE.heure);
+cacherDeLorean();
+{ const t = TRICHES.find(t => t.code === CHAPITRE.triche); if (t && !t.actif) basculerTriche(t, false); }
+if (ecranChapitre.visible) { ecranChapitre.texte = 'Clique pour jouer'; ecranChapitre.clic = lancerJeu; }
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   TELESIEGES, SOMMETS, neigeSous, telesiegeProche, sommetEn, REMONTEES, PISTES_SKI, pisteSkiEn, neigeEn, siegeEn, siegeLibre, reliefSki, creerSkieur, TENUES_GLISSE, rhabillerBJ, entrerVoiture, sortirVoiture, animerHumain, blesserConducteur,
@@ -11376,6 +12160,10 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   journee, lumiere, MOMENTS, ouEnEst, avancerJournee, majCiel, lits, autresLits, litProche, autreLitProche, interieurDe, horsDeVue, dormir, lumieresNuit, interieurs, estNuit, phares, cielEtoile, lune, apparaitreRodeurs, RESEAU, M_HALO, MATS_FENETRES, ambiance,
   get sommeil() { return sommeil; },
+  partie, CHAPITRES, CHAPITRE, chapitre, MISSIONS_CH, MISSIONS_CHAPITRES, allerAuChapitre, sauterChapitre, sauverPartie, chargerArmes, destinations, choisirDestination, majDeLorean, partir,
+  majVoyage, majArrivee, victime, pardonner, fixerHeure, ecranChapitre, montrerEcran, sortirEcran, debutChapitre, lancerJeu, appuyerT, cacherDeLorean, deLoreanLa, majTableau, majBulles, basculerTriche,
+  get destination() { return destination; }, set destination(v) { destination = v; }, get voyage() { return voyage; }, get arrivee() { return arrivee; }, set arrivee(v) { arrivee = v; },
+  get traces() { return traces; }, get victimes() { return victimes; }, set victimes(v) { victimes = v; }, get bulles() { return bulles; }, set bulles(v) { bulles = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
