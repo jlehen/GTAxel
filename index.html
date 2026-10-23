@@ -3246,6 +3246,66 @@ const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [
   herbe: [6, 6], paves: [4, 4], chateau: [4, 4], carrelage: [2, 2], parquet: [3, 3], planches: [3, 3], grange: [6, 6], tole: [6, 6],
   conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2],
   marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2] };
+// Les trous que B.J. fait dans un toit ou un plancher en tombant de très haut (voir trouer). On ne peut pas enlever un morceau de dalle
+// de son dessin : toutes les formes d'une même matière sont fusionnées en une seule. Alors on retouche le programme qui dessine les matières
+// des bâtiments : un point qui tombe dans un trou n'est pas dessiné, et on voit au travers (les étages du dessus, le ciel).
+// Le programme ne connaît que les MAX_TROUS trous les plus proches de la caméra (majTrous)
+const trous = [];   // { x, z : le milieu ; a : la taille ; graine : la forme du bord ; x1, z1, x2, z2 : le bord de la dalle, que le trou ne dépasse pas ; bas, haut }
+const MAX_TROUS = 8;
+// le bord du trou, un carré tout cabossé : dans la direction t (un angle autour du milieu), il est à a × bordTrou(t, graine) du milieu
+const bordTrou = (t, g) => (1.07 + 0.07 * Math.sin(5 * t + g) + 0.05 * Math.sin(11 * t + 2.3 * g) + 0.03 * Math.sin(19 * t + 4.1 * g)) / Math.max(Math.abs(Math.cos(t)), Math.abs(Math.sin(t)));
+const dansTrou = (o, p) => p.y > o.bas && p.y < o.haut && p.x > o.x1 && p.x < o.x2 && p.z > o.z1 && p.z < o.z2
+  && Math.hypot(p.x - o.x, p.z - o.z) < o.a * bordTrou(Math.atan2(p.z - o.z, p.x - o.x), o.graine);
+const dansUnTrou = p => trous.some(o => dansTrou(o, p));
+const U_TROUS = { nTrous: { value: 0 }, trouBoite: { value: [...Array(MAX_TROUS)].map(() => new THREE.Vector4()) },
+  trouForme: { value: [...Array(MAX_TROUS)].map(() => new THREE.Vector4()) }, trouHaut: { value: [...Array(MAX_TROUS)].map(() => new THREE.Vector2()) } };
+// percer(m) : la matière m ne se dessine pas dans les trous
+const percer = (() => {
+  const commun = `
+uniform int nTrous;
+uniform vec4 trouBoite[ ${MAX_TROUS} ], trouForme[ ${MAX_TROUS} ];
+uniform vec2 trouHaut[ ${MAX_TROUS} ];
+varying vec3 vMonde;
+float bordTrou( float t, float g ) { return ( 1.07 + 0.07 * sin( 5.0 * t + g ) + 0.05 * sin( 11.0 * t + 2.3 * g ) + 0.03 * sin( 19.0 * t + 4.1 * g ) ) / max( abs( cos( t ) ), abs( sin( t ) ) ); }
+`;
+  // où est ce point dans le monde
+  const sommet = `#include <project_vertex>
+	vec4 pMonde = vec4( transformed, 1.0 );
+	#ifdef USE_INSTANCING
+		pMonde = instanceMatrix * pMonde;
+	#endif
+	vMonde = ( modelMatrix * pMonde ).xyz;`;
+  // dans un trou (dans la dalle, et dans le bord cabossé), on ne le dessine pas
+  const point = `#include <clipping_planes_fragment>
+	for ( int i = 0; i < ${MAX_TROUS}; i ++ ) {
+		if ( i >= nTrous ) break;
+		vec4 b = trouBoite[ i ], f = trouForme[ i ];
+		vec2 d = vMonde.xz - f.xy;
+		if ( vMonde.y > trouHaut[ i ].x && vMonde.y < trouHaut[ i ].y && vMonde.x > b.x && vMonde.x < b.z && vMonde.z > b.y && vMonde.z < b.w
+		     && ( length( d ) < 0.8 * f.z || length( d ) < f.z * bordTrou( atan( d.y, d.x ), f.w ) ) ) discard;
+	}`;
+  const retouche = s => {
+    if (!s.vertexShader.includes('#include <project_vertex>') || !s.fragmentShader.includes('#include <clipping_planes_fragment>')) alert('Trous : le programme des matières de Three.js a changé !');
+    Object.assign(s.uniforms, U_TROUS);
+    s.vertexShader = 'varying vec3 vMonde;\n' + s.vertexShader.replace('#include <project_vertex>', sommet);
+    s.fragmentShader = commun + s.fragmentShader.replace('#include <clipping_planes_fragment>', point);
+  };
+  return m => { m.onBeforeCompile = retouche; return m; };
+})();
+for (const m of Object.values(MAT)) percer(m);
+// les trous les plus proches de la caméra, pour le programme (à chaque image)
+function majTrous() {
+  const c = camera.position, d = o => Math.hypot(o.x - c.x, o.z - c.z);
+  const proches = trous.length > MAX_TROUS ? [...trous].sort((p, q) => d(p) - d(q)).slice(0, MAX_TROUS) : trous;
+  U_TROUS.nTrous.value = proches.length;
+  proches.forEach((o, k) => { U_TROUS.trouBoite.value[k].set(o.x1, o.z1, o.x2, o.z2); U_TROUS.trouForme.value[k].set(o.x, o.z, o.a, o.graine); U_TROUS.trouHaut.value[k].set(o.bas, o.haut); });
+}
+// une balle, une roquette ou le grappin passent par un trou : on oublie ce que le rayon touche dans un trou (voir fusionner)
+function raycastTroue(rayon, liste) {
+  const n = liste.length;
+  THREE.Mesh.prototype.raycast.call(this, rayon, liste);
+  if (trous.length) for (let k = liste.length - 1; k >= n; k--) if (dansUnTrou(liste[k].point)) liste.splice(k, 1);
+}
 
 // =====================================================================
 //  Construction du pays
@@ -4581,6 +4641,7 @@ function fusionner(geos, g, ombre = true) {   // ombre = false : rien ne fait d'
   for (const [nom, liste] of Object.entries(geos)) {
     const mesh = new THREE.Mesh(mergeGeometries(liste), MAT[nom]);
     mesh.castShadow = ombre && !SANS_OMBRE.includes(nom); mesh.receiveShadow = true;
+    mesh.raycast = raycastTroue;   // (les rayons passent par les trous des toits et des planchers)
     g.add(mesh);
     if (!PAS_UN_MUR.includes(nom)) { batiments.push(mesh); mesh.userData.mur = true; }   // mur : une balle y laisse un impact
     liste.forEach(f => f.dispose());
@@ -4658,6 +4719,7 @@ function majMorceaux() {
     if (m.loin) m.loin.visible = !m.g.visible && d < VUE_RELIEF;   // (plus loin encore, la brume cache tout)
   }
   for (const d of interieurs) d.g.visible = Math.hypot(d.x - camera.position.x, d.z - camera.position.z) < 100;   // l'intérieur des bâtiments, seulement de près
+  majTrous();
 }
 
 // =====================================================================
@@ -9368,20 +9430,20 @@ function dallesSous() {
   return bas - hauteurSol(J.x, J.z, bas - PASMAX - 0.05) >= 1.8 ? pile : null;
 }
 // B.J. casse ces dalles autour de (x, z) : un trou carré de 2 × a mètres de côté. Chaque boîte de collision devient quatre boîtes autour du trou,
-// pour de bon : on peut y retomber. Le toit dessiné, lui, n'est pas percé : on pose dessus une forme noire aux bords déchiquetés,
-// et la même sous le plafond, claire (le jour qui entre)
-const M_TROU = new THREE.MeshBasicMaterial({ color: '#08080a', side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
-const M_JOUR = new THREE.MeshBasicMaterial({ color: '#cfe6ff', side: THREE.DoubleSide, toneMapped: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+// pour de bon : on peut y retomber. Le dessin, lui, est percé d'un trou aux bords cabossés, un peu plus grand (voir trous, avec les matières) :
+// on voit au travers les étages du dessus et le ciel. Tout autour, la tranche de la dalle : du béton cassé
+const M_TRANCHE = new THREE.MeshStandardMaterial({ color: '#7a756c', roughness: 1, side: THREE.DoubleSide });
 function trouer(dalles, x, z, a) {
   const dessus = dalles[0].h, dessous = dalles.at(-1).y0;
-  // le bord du trou : un carré tout cabossé, qui ne dépasse d'aucune des dalles
-  const X1 = Math.max(...dalles.map(b => b.x1)), X2 = Math.min(...dalles.map(b => b.x2)), Z1 = Math.max(...dalles.map(b => b.z1)), Z2 = Math.min(...dalles.map(b => b.z2));
-  const bord = new THREE.Shape([...Array(16)].map((_, k) => {
-    const t = k / 16 * 2 * Math.PI, d = a * entre(0.95, 1.2) / Math.max(Math.abs(Math.cos(t)), Math.abs(Math.sin(t)));
-    return new THREE.Vector2(clamp(x + Math.cos(t) * d, X1, X2), clamp(z + Math.sin(t) * d, Z1, Z2));
-  }));
-  const geo = new THREE.ShapeGeometry(bord).rotateX(Math.PI / 2);   // à plat
-  for (const [m, y] of [[M_TROU, dessus + 0.03], [M_JOUR, dessous - 0.02]]) { const t = new THREE.Mesh(geo, m); t.position.y = y; scene.add(t); }
+  // le trou ne dépasse d'aucune des dalles ; il prend toute leur épaisseur, et 40 cm au-dessus : le sol posé dessus (un parquet, un tapis),
+  // les fissures et les plaques soulevées (voir fissurer), le bas d'un meuble qui dépasse au-dessus du trou
+  const o = { x, z, a, graine: entre(0, 2 * Math.PI), x1: Math.max(...dalles.map(b => b.x1)), x2: Math.min(...dalles.map(b => b.x2)),
+    z1: Math.max(...dalles.map(b => b.z1)), z2: Math.min(...dalles.map(b => b.z2)), bas: dessous - 0.005, haut: dessus + 0.4 };
+  trous.push(o);
+  const N = 120, pos = [], bord = k => { const t = k / N * 2 * Math.PI, d = a * bordTrou(t, o.graine); return [clamp(x + Math.cos(t) * d, o.x1, o.x2), clamp(z + Math.sin(t) * d, o.z1, o.z2)]; };
+  for (let k = 0; k < N; k++) { const [u1, w1] = bord(k), [u2, w2] = bord(k + 1); pos.push(u1, dessous, w1, u2, dessous, w2, u2, dessus + 0.005, w2, u1, dessous, w1, u2, dessus + 0.005, w2, u1, dessus + 0.005, w1); }
+  const tranche = new THREE.BufferGeometry(); tranche.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); tranche.computeVertexNormals();
+  scene.add(new THREE.Mesh(tranche, M_TRANCHE));
   for (const b of dalles) {
     const { x1: bx1, x2: bx2, z1: bz1, z2: bz2, h, y0 } = b, x1 = Math.max(bx1, x - a), x2 = Math.min(bx2, x + a), z1 = Math.max(bz1, z - a), z2 = Math.min(bz2, z + a);
     const morceau = (u1, w1, u2, w2) => { if (u2 - u1 > 0.01 && w2 - w1 > 0.01) ajouterCollision(u1, w1, u2, w2, h, y0); };
@@ -9395,10 +9457,10 @@ function trouer(dalles, x, z, a) {
 }
 // le sol fissuré : un rond de rayon r posé sur le sol (il en suit les marches et les pentes), des plaques soulevées autour, des gravats
 // qui volent et de la poussière. Il s'efface au bout de 2 minutes
-const GEO_GRAVAT = new THREE.BoxGeometry(1, 0.2, 0.7), M_GRAVAT = mat('#6a665e', { roughness: 1 });
+const GEO_GRAVAT = new THREE.BoxGeometry(1, 0.2, 0.7), M_GRAVAT = percer(mat('#6a665e', { roughness: 1 }));   // (au bord d'un trou, les plaques s'arrêtent net)
 // les fissures : comme une toile d'araignée. 13 traits sombres en zigzag partent du milieu, de plus en plus fins, et d'autres vont de l'un
 // à son voisin (le sol s'est enfoncé par plaques), autour d'un creux noirci. Là où rien n'est dessiné, on voit le sol
-const M_FISSURES = new THREE.MeshStandardMaterial({ transparent: true, depthWrite: false, roughness: 1, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+const M_FISSURES = percer(new THREE.MeshStandardMaterial({ transparent: true, depthWrite: false, roughness: 1, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
   map: toile(256, 256, g => {
     const d = g.createRadialGradient(128, 128, 0, 128, 128, 120);
     d.addColorStop(0, 'rgba(20,18,16,0.85)'); d.addColorStop(0.4, 'rgba(30,27,24,0.45)'); d.addColorStop(1, 'rgba(30,27,24,0)');
@@ -9414,7 +9476,7 @@ const M_FISSURES = new THREE.MeshStandardMaterial({ transparent: true, depthWrit
       return pts;
     });
     fissures.forEach((pts, k) => { for (const i of [2, 4]) if (Math.random() < 0.8) trait(...pts[i], ...fissures[(k + 1) % 13][i + (Math.random() < 0.3 ? 1 : 0)], 1.3); });
-  }) });
+  }) }));
 function fissurer(x, y, z, r) {
   const sol = (px, pz) => { const h = hauteurSol(px, pz, y + 0.3); return (Math.abs(h - y) < 0.7 ? h : y) + 0.04; };   // au bord d'un toit, il ne plonge pas dans la rue
   // le rond : un point au milieu, puis 3 cercles de 16 points, chacun à la hauteur du sol
@@ -11231,6 +11293,7 @@ function rappelerVoiture(nom = TRICHES.find(t => t.actif && t.voiture)?.voiture)
 // la caméra recule du pivot vers là où on la veut, mais s'arrête à MARGE_CAMERA des murs, des planchers et des meubles :
 // plus près, le bord de l'image passe à travers, et on voit un instant la pièce d'à côté ou celle du dessus
 const MARGE_CAMERA = 0.25;
+let tropPres = false;   // à pied, la caméra est tout contre la tête de B.J. : on ne le dessine plus (voir majCamera)
 function placerCamera(pivot, direction, distance, epaule) {
   const droite = new THREE.Vector3(-Math.cos(J.lacetCam), 0, Math.sin(J.lacetCam));
   const voulu = pivot.clone().addScaledVector(direction, -distance).addScaledVector(droite, epaule);
@@ -11256,6 +11319,7 @@ function majCamera(dt) {
   const tangage = J.tangage + (v?.type.glisse ? v.tangage * 0.8 : 0);   // à ski, la caméra plonge avec la pente : sinon, dans une pente raide, on ne verrait que le ciel
   const dir = new THREE.Vector3(Math.sin(J.lacetCam) * Math.cos(tangage), Math.sin(tangage), Math.cos(J.lacetCam) * Math.cos(tangage));
   joueurH.g.visible = (!v || !!v.forme.siege) && J.vue !== 1 && !J.robot?.armure;   // en voiture on ne voit pas B.J., sauf sur un tricycle ; dans l'armure non plus
+  const avant = tropPres; tropPres = false;
   if (J.mort) {
     joueurH.g.visible = !v || !!v.forme.siege;
     placerCamera(new THREE.Vector3(J.x, J.y + 0.5, J.z), new THREE.Vector3(0.3, -0.9, 0.3).normalize(), 5, 0);
@@ -11274,7 +11338,15 @@ function majCamera(dt) {
     else if (J.vue === 1) { r.m.g.updateMatrixWorld(true); camera.position.copy(r.m.torse.localToWorld(V3(0, 1.5, 0.75))); }
     else placerCamera(new THREE.Vector3(r.x, r.y + 4.4, r.z), dir, 7.5, 1.4);
   } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
-  else placerCamera(new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z), dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
+  else {
+    const pivot = new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z);
+    placerCamera(pivot, dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
+    // dans une petite pièce, dos au mur ou dans un coin, la caméra n'a pas la place de reculer : elle arrive dans la tête de B.J., et on ne
+    // voit plus que son cou. Alors, à moins de 60 cm de sa tête, on ne le dessine plus : on voit la pièce et son arme, comme à la 1re personne.
+    // (Il ne revient qu'à 80 cm : sinon, il clignoterait en longeant un mur)
+    tropPres = camera.position.distanceTo(pivot) < (avant ? 0.8 : 0.6);
+    if (tropPres) joueurH.g.visible = false;
+  }
   const fig = J.vue === 1 && !J.robot ? v || J.superman : null;   // en volant, à la 1re personne (Superman, l'avion, la Batmobile) : on fait le looping et le tonneau avec lui
   camera.rotation.set(tangage + J.recul * 0.03 + (fig ? angleLooping(fig) : 0), J.lacetCam + Math.PI, fig ? -angleTonneau(fig) : 0);
   if (v && v.quat && J.vue === 1) camera.quaternion.copy(v.quat).multiply(DEMI_TOUR);
@@ -11798,12 +11870,13 @@ const AXE_CIEL = new THREE.Vector3(0, -Math.sin(LATITUDE), Math.cos(LATITUDE));
 const lumiere = { hauteur: 40, jour: 1, nuit: 0 };
 const estNuit = () => lumiere.nuit > 0.5;   // pour la foule et les gangs
 const directionLumiere = new THREE.Vector3(), soleilPhoto = new THREE.Vector3(0, -1, 0);   // d'où vient la lumière (le soleil ou la lune) ; le soleil de la dernière photo du ciel
-// les couleurs, de la nuit au jour
+// les couleurs, de la nuit au jour. fondNuit (le fond du ciel) et brumeNuit : en pleine nuit, quand la lune éclaire le plus (clairDeLune = 1)
 const C = { soleilBas: new THREE.Color('#ff8a40'), soleil: new THREE.Color('#fff1dd'), lune: new THREE.Color('#9fb4ff'),
-  cielNuit: new THREE.Color('#34436e'), cielJour: new THREE.Color('#cfe4ff'), solNuit: new THREE.Color('#0d0d14'), solJour: new THREE.Color('#5a5040'),
-  fondNuit: new THREE.Color().setRGB(0.0005, 0.0008, 0.0018), halo: new THREE.Color('#ffd49a'), faisceau: new THREE.Color('#fff0d0') };
-// la brume prend la couleur du ciel près de l'horizon : [hauteur du soleil en degrés, couleur]
-const BRUME = [[-12, '#010205'], [-6, '#070a14'], [-2, '#2e2a40'], [1, '#a07a70'], [5, '#c8a48a'], [12, '#b8bccb'], [20, '#a9c4e0']].map(([h, c]) => [h, new THREE.Color(c)]);
+  cielNuit: new THREE.Color('#6a7ab0'), cielJour: new THREE.Color('#cfe4ff'), solNuit: new THREE.Color('#1a1c28'), solJour: new THREE.Color('#5a5040'),
+  fondNuit: new THREE.Color().setRGB(0.067, 0.1, 0.3), brumeNuit: new THREE.Color('#1a2440'), halo: new THREE.Color('#ffd49a'), faisceau: new THREE.Color('#fff0d0') };
+// la brume prend la couleur du ciel près de l'horizon : [hauteur du soleil en degrés, couleur]. La nuit, elle devient bleu nuit (brumeNuit)
+const BRUME = [[-6, '#070a14'], [-2, '#2e2a40'], [1, '#a07a70'], [5, '#c8a48a'], [12, '#b8bccb'], [20, '#a9c4e0']].map(([h, c]) => [h, new THREE.Color(c)]);
+const brumeNuit = new THREE.Color();
 function couleurBrume(h, c) {
   const k = BRUME.findIndex(([b]) => b > h);
   if (k < 0) return c.copy(BRUME.at(-1)[1]);
@@ -11934,17 +12007,18 @@ function majCiel(dt) {
   u.sunPosition.value.copy(soleilDir);
   if (h < -0.8) { const r = Math.cos(THREE.MathUtils.degToRad(0.8)) / Math.hypot(soleilDir.x, soleilDir.z); u.sunPosition.value.set(soleilDir.x * r, -Math.sin(THREE.MathUtils.degToRad(0.8)), soleilDir.z * r); }
   u.eclat.value = doux(h, -10, -0.8);
-  u.fondNuit.value.copy(C.fondNuit).multiplyScalar(lumiere.nuit);
+  const lueur = Math.max(0, R_.clairDeLune || 0);   // la nuit, la lune éclaire le pays et le ciel : on y voit les formes, en bleu (0 : tout noir)
+  u.fondNuit.value.copy(C.fondNuit).multiplyScalar(lumiere.nuit * lueur);
   u.cloudCoverage.value = lerp(0.4, 0.15, lumiere.nuit);   // la nuit, le ciel se dégage
   // la lumière qui fait les ombres : le soleil (orange quand il est bas), puis la lune quand il est couché
   if (h > -0.5) { soleil.intensity = 4.5 * doux(h, -1, 5); soleil.color.copy(C.soleilBas).lerp(C.soleil, doux(h, 0, 18)); directionLumiere.copy(soleilDir); }
-  else { soleil.intensity = 1.2 * R_.clairDeLune * doux(h, -1, -8); soleil.color.copy(C.lune); directionLumiere.copy(soleilDir).negate(); }
+  else { soleil.intensity = 4 * lueur * doux(h, -1, -8); soleil.color.copy(C.lune); directionLumiere.copy(soleilDir).negate(); }
   soleil.position.set(J.x + directionLumiere.x * 200, J.y + directionLumiere.y * 200, J.z + directionLumiere.z * 200);
   soleil.target.position.set(J.x, J.y, J.z);
-  ambiance.intensity = lerp(0.02 + 0.1 * R_.clairDeLune, 0.35, lumiere.jour);
+  ambiance.intensity = lerp(0.02 + 3 * lueur, 0.35, lumiere.jour);   // (la nuit, sa couleur est bien plus sombre : il en faut plus)
   ambiance.color.copy(C.cielNuit).lerp(C.cielJour, lumiere.jour); ambiance.groundColor.copy(C.solNuit).lerp(C.solJour, lumiere.jour);
   scene.environmentIntensity = 0.7 * (0.04 + 0.96 * lumiere.jour);
-  couleurBrume(h, scene.fog.color);
+  couleurBrume(h, scene.fog.color).lerp(brumeNuit.copy(C.brumeNuit).multiplyScalar(lueur), lumiere.nuit);
   // les reflets : on rephotographie le ciel quand le soleil a bougé de 2° (pas en pleine nuit : il n'y a plus rien à refléter)
   if (soleilDir.angleTo(soleilPhoto) > 0.035 && (h > -10 || THREE.MathUtils.radToDeg(Math.asin(soleilPhoto.y)) > -10)) { photographierCiel(); soleilPhoto.copy(soleilDir); }
   // les étoiles et la lune, autour de la caméra
@@ -12131,7 +12205,7 @@ function boucle(t) {
   if (vm.userData.arme?.userData.sceptre) { vm.position.x -= 0.52; vm.position.y -= 0.1; vm.rotation.x = -J.recul * 0.25; }   // le sceptre : dans la main gauche, et il part en avant à chaque éclair
   renderer.clear();
   renderer.render(scene, camera);
-  if (J.vue === 1 && !J.voiture && !J.mort && !dansLunette() && !J.robot?.armure) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
+  if ((J.vue === 1 || tropPres) && !J.voiture && !J.mort && !dansLunette() && !J.robot?.armure) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
   requestAnimationFrame(boucle);
 }
 // premier placement du joueur
@@ -12159,7 +12233,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
   journee, lumiere, MOMENTS, ouEnEst, avancerJournee, majCiel, lits, autresLits, litProche, autreLitProche, interieurDe, horsDeVue, dormir, lumieresNuit, interieurs, estNuit, phares, cielEtoile, lune, apparaitreRodeurs, RESEAU, M_HALO, MATS_FENETRES, ambiance,
-  get sommeil() { return sommeil; },
+  get sommeil() { return sommeil; }, trous, dansUnTrou, majTrous, get tropPres() { return tropPres; },
   partie, CHAPITRES, CHAPITRE, chapitre, MISSIONS_CH, MISSIONS_CHAPITRES, allerAuChapitre, sauterChapitre, sauverPartie, chargerArmes, destinations, choisirDestination, majDeLorean, partir,
   majVoyage, majArrivee, victime, pardonner, fixerHeure, ecranChapitre, montrerEcran, sortirEcran, debutChapitre, lancerJeu, appuyerT, cacherDeLorean, deLoreanLa, majTableau, majBulles, basculerTriche,
   get destination() { return destination; }, set destination(v) { destination = v; }, get voyage() { return voyage; }, get arrivee() { return arrivee; }, set arrivee(v) { arrivee = v; },
