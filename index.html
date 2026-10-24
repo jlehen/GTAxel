@@ -190,6 +190,7 @@
     <tr><td>1 à 8 ou molette</td><td>changer d'arme</td></tr>
     <tr><td>M ou Tab</td><td>carte du pays (molette : zoom)</td></tr>
     <tr><td>T</td><td>DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)</td></tr>
+    <tr><td>H, J</td><td>Iron Man (chapitre 2) : appeler ton armure ou en sortir · J : en choisir une autre</td></tr>
     <tr><td>Entrée</td><td>code de triche</td></tr>
     <tr><td>Échap</td><td>pause</td></tr>
   </table>
@@ -260,6 +261,7 @@ const CHAPITRES = [
     '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.',
     '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.',
     '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>M</b> : le masque.',
+    'Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d\'autres armures et des améliorations. <b>J</b> : changer d\'armure.',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'Le Mandarin a caché la DeLorean dans son repaire : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
@@ -292,12 +294,13 @@ const CHAPITRES = [
 // la partie : le navigateur se souvient du chapitre où tu en es, de tes missions, de ton argent et des armes de chaque chapitre
 // (le jeu l'écrit toutes les 2 secondes : voir sauverPartie). « Nouvelle partie », dans le menu, efface tout.
 // chapitre : celui où l'on est (1 = le premier) ; ouvert : le plus loin où l'on est allé ; missions : où on en est dans chaque chapitre ;
-// trouvee : les chapitres dont on a retrouvé la DeLorean ; precedent : d'où l'on vient ; ecran, arrivee : on vient d'arriver (l'écran du
+// magasin : ce qu'on a acheté au magasin de chaque chapitre (les armures d'Iron Man...) ; trouvee : les chapitres dont on a retrouvé la DeLorean ;
+// precedent : d'où l'on vient ; ecran, arrivee : on vient d'arriver (l'écran du
 // chapitre, puis la DeLorean qui apparaît dans trois éclairs)
 let sauvee = null;
 try { sauvee = JSON.parse(localStorage.partie || 'null'); } catch {}
 const nouvellePartie = !sauvee?.chapitre;   // tout premier lancement (ou « Nouvelle partie ») : l'écran du chapitre 1 s'affichera au premier clic
-const partie = { chapitre: 1, ouvert: 1, argent: null, missions: {}, armes: {}, trouvee: {}, precedent: 0, ecran: false, arrivee: false, ...sauvee };
+const partie = { chapitre: 1, ouvert: 1, argent: null, missions: {}, armes: {}, magasin: {}, trouvee: {}, precedent: 0, ecran: false, arrivee: false, ...sauvee };
 partie.chapitre = Math.min(CHAPITRES.length, Math.max(1, Math.round(partie.chapitre) || 1));   // (un chapitre enlevé du tableau : le dernier)
 partie.ouvert = Math.min(CHAPITRES.length, Math.max(partie.chapitre, Math.round(partie.ouvert) || 1));
 const CHAPITRE = CHAPITRES[partie.chapitre - 1];   // le chapitre où l'on est (on en change en rechargeant la page)
@@ -590,6 +593,49 @@ const TRADUCTIONS = {
   'Répulseurs':       { de: 'Repulsoren', en: 'Repulsors', gsw: 'Repulsore' },
   'Plastron':         { de: 'Brustplatte', en: 'Chest beam', gsw: 'Bruschtplatte' },
   'Plastron : encore {n} s': { de: 'Brustplatte: noch {n} s', en: 'Chest beam: {n} s to go', gsw: 'Bruschtplatte: no {n} s' },
+  // le magasin de Stark Industries, et les autres armures d'Iron Man (chapitre 2)
+  '<b>A</b> : bouclier · <b>E</b> : canon': { de: '<b>Q</b>: Schild · <b>E</b>: Kanone', en: '<b>Q</b>: shield · <b>E</b>: cannon', gsw: '<b>Q</b>: Schild · <b>E</b>: Kanone' },
+  '<b>A</b> : bouclier · <b>E</b> : répulseur': { de: '<b>Q</b>: Schild · <b>E</b>: Repulsor', en: '<b>Q</b>: shield · <b>E</b>: repulsor', gsw: '<b>Q</b>: Schild · <b>E</b>: Repulsor' },
+  '<b>A</b> : répulseur · <b>E</b> : canon': { de: '<b>Q</b>: Repulsor · <b>E</b>: Kanone', en: '<b>Q</b>: repulsor · <b>E</b>: cannon', gsw: '<b>Q</b>: Repulsor · <b>E</b>: Kanone' },
+  '<b>A</b> <b>E</b> : répulseurs': { de: '<b>Q</b> <b>E</b>: Repulsoren', en: '<b>Q</b> <b>E</b>: repulsors', gsw: '<b>Q</b> <b>E</b>: Repulsore' },
+  '<b>R</b> : plastron': { de: '<b>R</b>: Brustplatte', en: '<b>R</b>: chest beam', gsw: '<b>R</b>: Bruschtplatte' },
+  '<b>R</b> : mitrailleuse': { de: '<b>R</b>: Maschinengewehr', en: '<b>R</b>: machine gun', gsw: '<b>R</b>: Maschinegwehr' },
+  '<b>F</b> : voler': { de: '<b>F</b>: fliegen', en: '<b>F</b>: fly', gsw: '<b>F</b>: flüüge' },
+  '<b>G</b> : missiles': { de: '<b>G</b>: Raketen', en: '<b>G</b>: missiles', gsw: '<b>G</b>: Rakete' },
+  '<b>X</b> : laser': { de: '<b>X</b>: Laser', en: '<b>X</b>: laser', gsw: '<b>X</b>: Laser' },
+  '<b>M</b> : masque': { de: '<b>M</b>: Maske', en: '<b>M</b>: mask', gsw: '<b>M</b>: Maske' },
+  "<b>J</b> : changer d'armure": { de: '<b>J</b>: Rüstung wechseln', en: '<b>J</b>: switch armor', gsw: '<b>J</b>: Rüschtig wächsle' },
+  '<b>H</b> : sortir': { de: '<b>H</b>: aussteigen', en: '<b>H</b>: step out', gsw: '<b>H</b>: uusstiige' },
+  "Tu n'as que cette armure : les autres s'achètent au magasin de Stark Industries (⚙ sur la carte)": { de: 'Du hast nur diese Rüstung: Die anderen kaufst du im Laden von Stark Industries (⚙ auf der Karte)', en: 'You only have this armor: the others are sold at the Stark Industries store (⚙ on the map)', gsw: 'Du häsch nur die Rüschtig: di andere chaufsch im Lade vo Stark Industries (⚙ uf de Charte)' },
+  'H : elle arrive': { de: 'H: Sie kommt', en: 'H: it comes', gsw: 'H: Si chunnt' },
+  "H : elle arrive · J : changer d'armure": { de: 'H: Sie kommt · J: Rüstung wechseln', en: 'H: it comes · J: switch armor', gsw: 'H: Si chunnt · J: Rüschtig wächsle' },
+  "C'est l'armure que tu portes": { de: 'Das ist die Rüstung, die du trägst', en: "That's the armor you're wearing", gsw: 'Das isch d Rüschtig, wo du treisch' },
+  'H : tu sors de ton armure, et la {armure} arrive': { de: 'H: Du steigst aus deiner Rüstung, und die {armure} kommt', en: 'H: you step out of your armor, and the {armure} comes', gsw: 'H: Du stiigsch us dinere Rüschtig, und d {armure} chunnt' },
+  "Les mini-missiles s'achètent au magasin de Stark Industries (⚙ sur la carte)": { de: 'Die Mini-Raketen kaufst du im Laden von Stark Industries (⚙ auf der Karte)', en: 'The mini-missiles are sold at the Stark Industries store (⚙ on the map)', gsw: 'D Mini-Rakete chaufsch im Lade vo Stark Industries (⚙ uf de Charte)' },
+  "Le laser des bras s'achète au magasin de Stark Industries (⚙ sur la carte)": { de: 'Den Armlaser kaufst du im Laden von Stark Industries (⚙ auf der Karte)', en: 'The arm laser is sold at the Stark Industries store (⚙ on the map)', gsw: 'De Armlaser chaufsch im Lade vo Stark Industries (⚙ uf de Charte)' },
+  'Mini-missiles': { de: 'Mini-Raketen', en: 'Mini-missiles', gsw: 'Mini-Rakete' },
+  'Laser des bras': { de: 'Armlaser', en: 'Arm laser', gsw: 'Armlaser' },
+  'Réacteur': { de: 'Reaktor', en: 'Reactor', gsw: 'Reaktor' },
+  'Missiles': { de: 'Raketen', en: 'Missiles', gsw: 'Rakete' },
+  'Laser': { de: 'Laser', en: 'Laser', gsw: 'Laser' },
+  '{nom} : encore {n} s': { de: '{nom}: noch {n} s', en: '{nom}: {n} s to go', gsw: '{nom}: no {n} s' },
+  '{nom} : à toi': { de: '{nom}: gehört dir', en: '{nom}: yours', gsw: '{nom}: ghört dir' },
+  '{nom} : à toi !': { de: '{nom}: gehört dir!', en: '{nom}: yours!', gsw: '{nom}: ghört dir!' },
+  '{nom} : déjà à toi': { de: '{nom}: gehört schon dir', en: '{nom}: already yours', gsw: '{nom}: ghört scho dir' },
+  '{nom} : déjà à toi (dans ton armure, <b>G</b>)': { de: '{nom}: gehört schon dir (in deiner Rüstung, <b>G</b>)', en: '{nom}: already yours (in your armor, <b>G</b>)', gsw: '{nom}: ghört scho dir (i dinere Rüschtig, <b>G</b>)' },
+  '{nom} : déjà à toi (dans ton armure, <b>X</b>)': { de: '{nom}: gehört schon dir (in deiner Rüstung, <b>X</b>)', en: '{nom}: already yours (in your armor, <b>X</b>)', gsw: '{nom}: ghört scho dir (i dinere Rüschtig, <b>X</b>)' },
+  '{nom} : niveau maximum': { de: '{nom}: höchste Stufe', en: '{nom}: top level', gsw: '{nom}: höchschti Stufe' },
+  '{nom} niveau {n}': { de: '{nom} Stufe {n}', en: '{nom} level {n}', gsw: '{nom} Stufe {n}' },
+  'Appuie sur <b>E</b> pour choisir : {armure}': { de: 'Drücke <b>E</b> zum Wählen: {armure}', en: 'Press <b>E</b> to choose: {armure}', gsw: 'Drück <b>E</b> zum Uuswähle: {armure}' },
+  "{armure} : c'est l'armure que tu as choisie (<b>H</b> pour l'appeler)": { de: '{armure}: Das ist die Rüstung, die du gewählt hast (<b>H</b>, um sie zu rufen)', en: "{armure}: that's the armor you chose (<b>H</b> to call it)", gsw: '{armure}: Das isch d Rüschtig, wo du uusgwählt häsch (<b>H</b> zum si rüefe)' },
+  '{armure} achetée !': { de: '{armure} gekauft!', en: '{armure} bought!', gsw: '{armure} gchauft!' },
+  'Réacteur niveau {n} !': { de: 'Reaktor Stufe {n}!', en: 'Reactor level {n}!', gsw: 'Reaktor Stufe {n}!' },
+  'Ton réacteur est déjà au niveau maximum': { de: 'Dein Reaktor ist schon auf der höchsten Stufe', en: 'Your reactor is already at the top level', gsw: 'Din Reaktor isch scho uf de höchschte Stufe' },
+  'Tu prends moins de dégâts, tes répulseurs font plus mal, et tu voles plus vite': { de: 'Du nimmst weniger Schaden, deine Repulsoren treffen härter, und du fliegst schneller', en: 'You take less damage, your repulsors hit harder, and you fly faster', gsw: 'Du nimmsch weniger Schade, dini Repulsore träffed härter, und du flüügsch schnäller' },
+  'Dans ton armure, G : ils partent de tes épaules et suivent les ennemis': { de: 'In deiner Rüstung, G: Sie starten von deinen Schultern und verfolgen die Feinde', en: 'In your armor, G: they launch from your shoulders and chase the enemies', gsw: 'I dinere Rüschtig, G: Si started vo dine Schultere und verfolged d Feind' },
+  'Dans ton armure, X : un genou à terre, tu tournes sur toi-même, et le laser coupe tout autour de toi': { de: 'In deiner Rüstung, X: Ein Knie am Boden drehst du dich um dich selbst, und der Laser schneidet alles um dich herum', en: 'In your armor, X: one knee down, you spin around, and the laser cuts everything around you', gsw: 'I dinere Rüschtig, X: Es Chnüü am Bode, du drähsch di um di sälber, und de Laser schniidt alles um di ume' },
+  "Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d'autres armures et des améliorations. <b>J</b> : changer d'armure.": { de: 'Der Laden von <b>Stark Industries</b> (⚙ auf der Karte) verkauft andere Rüstungen und Verbesserungen. <b>J</b>: Rüstung wechseln.', en: 'The <b>Stark Industries</b> store (⚙ on the map) sells other armors and upgrades. <b>J</b>: switch armor.', gsw: 'De Lade vo <b>Stark Industries</b> (⚙ uf de Charte) verchauft anderi Rüschtige und Verbesserige. <b>J</b>: Rüschtig wächsle.' },
+  'Iron Man (chapitre 2) : appeler ton armure ou en sortir · J : en choisir une autre': { de: 'Iron Man (Kapitel 2): deine Rüstung rufen oder aussteigen · J: eine andere wählen', en: 'Iron Man (chapter 2): call your armor or step out · J: choose another one', gsw: 'Iron Man (Kapitel 2): dini Rüschtig rüefe oder uusstiige · J: en anderi uuswähle' },
   'M ou Tab':         { de: 'M oder Tab', en: 'M or Tab', gsw: 'M oder Tab' },
   '{voiture} : à côté de toi !': { de: '{voiture}: gleich neben dir!', en: '{voiture}: right next to you!', gsw: '{voiture}: grad näb dir!' },
   '{voiture} : pas de place ici !': { de: '{voiture}: kein Platz hier!', en: '{voiture}: no room here!', gsw: '{voiture}: kei Platz da!' },
@@ -2138,29 +2184,43 @@ const PEAU_BJ = TENUE_BJ.peau;
 // en volant. Chacune vole jusqu'à un morceau de B.J. (son ancre), puis l'habille : revetir change la matière d'un morceau ('rouge', 'or',
 // 'acier', ou 'plastron' : le torse rouge, aux abdominaux en or), plaque y ajoute une pièce de métal ou de lumière (sa forme, sa matière,
 // le morceau qui la porte, et où : x vers sa gauche, y vers le haut, z vers l'avant), flamme celle d'un réacteur, quand il vole.
-// Change les couleurs, ou l'ordre des pièces !
+// Change les couleurs, ou l'ordre des pièces ! (Les autres armures de Tony Stark, et leurs couleurs : ARMURES_STARK, juste après les pièces)
 const COULEURS_IRONMAN = { rouge: '#a3141c', or: '#9a6a12', acier: '#3a3c42', lumiere: '#d8f8ff' };
 // l'armure Rescue de Pepper Potts (la fille du menu, dans le chapitre d'Iron Man) : du bleu à la place du rouge, du violet à la place de l'or.
 // Elle a aussi deux ailes dans le dos (elles s'ouvrent quand elle vole)
 const COULEURS_RESCUE = { rouge: '#26399e', or: '#6c36a8', acier: '#5a5e6e', lumiere: '#d8f0ff' };
 const rescue = () => fille() && CHAPITRE.superFille === 'Rescue';
-const gantIronman = m => { revetir(m.bas, 'rouge'); revetir(m.main, 'rouge'); plaque(GEO.paume, 'lumiere', m.main, 0, -0.005, -0.057); flamme(m.pli, 0, -0.32, 0, 'main'); };   // avec le répulseur, au creux de la main
-const brasIronman = m => { revetir(m.haut, 'or'); plaque(GEO.epauliere, 'rouge', m, 0, 0.015, 0); };   // avec l'épaulière
-const botteIronman = j => { revetir(j.bas, 'rouge'); revetir(j.chaussure, 'rouge'); plaque(GEO.genouillere, 'acier', j.pli, 0, 0, 0.035); flamme(j.pli, 0, -0.49, 0.02, 'botte'); };   // avec la genouillère
+// ce que chaque pièce pose, pour toutes les armures. A : l'armure qu'on habille (une ligne d'ARMURES_STARK) ; une armure massive (la Hulkbuster)
+// a en plus de grosses plaques ; avec un canon ou un bouclier, la main droite ou la main gauche en a un, caché, qui sort quand on tire (A, E)
+const gantIronman = (m, A, droite) => {   // avec le répulseur, au creux de la main
+  revetir(m.bas, 'rouge'); revetir(m.main, 'rouge'); plaque(GEO.paume, 'lumiere', m.main, 0, -0.005, -0.057); flamme(m.pli, 0, -0.32, 0, 'main');
+  if (A.massive) { plaque(GEO.avantBrasHulk, 'rouge', m.pli, 0, -0.13, 0); plaque(GEO.poingHulk, 'rouge', m.main, 0, 0, 0); plaque(GEO.paume, 'lumiere', m.main, 0, 0, -0.142); }
+  if (A.canon && droite) armeDeMain(m, 'canon', [[GEO.canonNano, 'rouge'], [GEO.boucheCanon, 'lumiere']], -0.29);
+  if (A.bouclier && !droite) armeDeMain(m, 'bouclier', [[GEO.bouclierNano, 'masque'], [GEO.bordBouclier, 'rouge']], -0.36);
+};
+const brasIronman = (m, A) => { revetir(m.haut, 'or'); plaque(GEO.epauliere, 'rouge', m, 0, 0.015, 0);   // avec l'épaulière
+  if (A.massive) { plaque(GEO.epauliereHulk, 'rouge', m, 0, 0.02, 0); plaque(GEO.brasHulk, 'or', m, 0, -0.15, 0); } };
+const botteIronman = (j, A) => { revetir(j.bas, 'rouge'); revetir(j.chaussure, 'rouge'); plaque(GEO.genouillere, 'acier', j.pli, 0, 0, 0.035); flamme(j.pli, 0, -0.49, 0.02, 'botte');   // avec la genouillère
+  if (A.massive) { plaque(GEO.tibiaHulk, 'rouge', j.pli, 0, -0.2, 0); plaque(GEO.piedHulk, 'rouge', j.chaussure, 0, 0.01, 0); } };
+const cuisseIronman = (j, A) => { revetir(j.haut, 'or'); if (A.massive) plaque(GEO.cuisseHulk, 'or', j, 0, -0.22, 0); };
 const PIECES_IRONMAN = [
-  { nom: 'Gant droit',    ancre: b => b.brasD.pli,  poser: b => gantIronman(b.brasD) },
-  { nom: 'Gant gauche',   ancre: b => b.brasG.pli,  poser: b => gantIronman(b.brasG) },
-  { nom: 'Bras droit',    ancre: b => b.brasD,      poser: b => brasIronman(b.brasD) },
-  { nom: 'Bras gauche',   ancre: b => b.brasG,      poser: b => brasIronman(b.brasG) },
-  { nom: 'Botte droite',  ancre: b => b.jambeD.pli, poser: b => botteIronman(b.jambeD) },
-  { nom: 'Botte gauche',  ancre: b => b.jambeG.pli, poser: b => botteIronman(b.jambeG) },
-  { nom: 'Cuisse droite', ancre: b => b.jambeD,     poser: b => revetir(b.jambeD.haut, 'or') },
-  { nom: 'Cuisse gauche', ancre: b => b.jambeG,     poser: b => revetir(b.jambeG.haut, 'or') },
-  { nom: 'Bassin',        ancre: b => b.haut,       poser: b => { revetir(b.bassin, 'rouge'); revetir(b.ceinture, 'acier'); } },
-  // le plastron, avec le réacteur qui brille au milieu de la poitrine (c'est de là que part le rayon de la touche R)
-  { nom: 'Plastron',      ancre: b => b.torse,      poser: b => { revetir(b.torse, 'plastron'); revetir(b.cou, 'acier');
-      plaque(GEO.reacteur, 'lumiere', b.torse, 0, 0.13, 0.14); plaque(GEO.bagueReacteur, 'acier', b.torse, 0, 0.13, 0.143);
-      if (rescue()) for (const c of [-1, 1]) { const a = plaque(GEO.aileRescue, 'or', b.torse, 0.07 * c, 0.25, -0.13); a.userData.cote = c; a.rotation.z = 0.2 * c; b.ironman.ailes.push(a); } } },   // les ailes de Rescue
+  { nom: 'Gant droit',    ancre: b => b.brasD.pli,  poser: (b, A) => gantIronman(b.brasD, A, true) },
+  { nom: 'Gant gauche',   ancre: b => b.brasG.pli,  poser: (b, A) => gantIronman(b.brasG, A, false) },
+  { nom: 'Bras droit',    ancre: b => b.brasD,      poser: (b, A) => brasIronman(b.brasD, A) },
+  { nom: 'Bras gauche',   ancre: b => b.brasG,      poser: (b, A) => brasIronman(b.brasG, A) },
+  { nom: 'Botte droite',  ancre: b => b.jambeD.pli, poser: (b, A) => botteIronman(b.jambeD, A) },
+  { nom: 'Botte gauche',  ancre: b => b.jambeG.pli, poser: (b, A) => botteIronman(b.jambeG, A) },
+  { nom: 'Cuisse droite', ancre: b => b.jambeD,     poser: (b, A) => cuisseIronman(b.jambeD, A) },
+  { nom: 'Cuisse gauche', ancre: b => b.jambeG,     poser: (b, A) => cuisseIronman(b.jambeG, A) },
+  { nom: 'Bassin',        ancre: b => b.haut,       poser: (b, A) => { revetir(b.bassin, 'rouge'); revetir(b.ceinture, 'acier'); if (A.massive) plaque(GEO.bassinHulk, 'rouge', b.bassin, 0, 0, 0); } },
+  // le plastron, avec le réacteur qui brille au milieu de la poitrine (c'est de là que part le rayon de la touche R),
+  // les ailes de Rescue, et la mitrailleuse d'épaule de War Machine
+  { nom: 'Plastron',      ancre: b => b.torse,      poser: (b, A) => { revetir(b.torse, 'plastron'); revetir(b.cou, 'acier');
+      const z = A.massive ? 0.21 : 0.14;   // (sur la grosse plaque de la Hulkbuster, le réacteur est plus en avant)
+      if (A.massive) { plaque(GEO.plastronHulk, 'rouge', b.torse, 0, 0, 0); plaque(GEO.colHulk, 'acier', b.torse, 0, 0, 0); }
+      plaque(GEO.reacteur, 'lumiere', b.torse, 0, 0.13, z); plaque(GEO.bagueReacteur, 'acier', b.torse, 0, 0.13, z + 0.003);
+      if (A.ailes) for (const c of [-1, 1]) { const a = plaque(GEO.aileRescue, 'or', b.torse, 0.07 * c, 0.25, -0.13); a.userData.cote = c; a.rotation.z = 0.2 * c; b.ironman.ailes.push(a); }
+      if (A.mitrailleuse) mitrailleuseEpaule(b); } },
   // le casque cache les cheveux, les oreilles (et les lunettes de soleil de Tony Stark), mais pas le visage : c'est le masque qui le cache
   { nom: 'Casque',        ancre: b => b.tete,       poser: b => {
       if (b.cheveux) b.cheveux.visible = false;
@@ -2171,11 +2231,53 @@ const PIECES_IRONMAN = [
   // il glisse sur le haut du casque
   { nom: 'Masque',        ancre: b => b.tete,       poser: b => {
       const v = b.ironman.visiere = new THREE.Group(); v.name = 'accessoire'; b.tete.add(v);
-      plaque(GEO.masqueIronman, 'or', v, 0, 0, 0);
+      plaque(GEO.masqueIronman, 'masque', v, 0, 0, 0);
       for (const c of [-1, 1]) plaque(GEO.oeilIronman, 'lumiere', v, 0.043 * c, 0.016, 0.137).rotation.set(0, 0.32 * c, 0.14 * c);
       plaque(GEO.boucheIronman, 'acier', v, 0, -0.07, 0.131);
     } },
 ];
+// LES ARMURES DE TONY STARK, au chapitre d'Iron Man : tu as la première dès le début ; les autres s'achètent au magasin de l'usine
+// Stark Industries ($ sur la carte de Malibu), avec les AMELIORATIONS_STARK (juste en dessous). J : choisir une de tes armures ;
+// H : elle arrive (si tu en portes une autre, tu en sors d'abord). Au chapitre 1, le code IRONMAN donne toujours la première.
+//  nom, prix (0 : tu l'as dès le début) ; fille : ce qui change avec la fille du menu (Pepper Potts : l'armure Rescue)
+//  couleurs : rouge (le plus gros de l'armure), or (le reste), acier (les jointures), lumiere (les yeux, le réacteur, les répulseurs),
+//    masque (sans : comme or) ;
+//    ailes: true : des ailes dans le dos, qui s'ouvrent quand on vole (comme celles de Rescue)
+//  arrivee : comment elle arrive. 'pieces' : les pièces volent jusqu'à toi, une à une ; 'valise' : une valise tombe à tes pieds, s'ouvre, et
+//    l'armure se déplie autour de toi ; 'nano' : elle coule de ton réacteur, de ta poitrine jusqu'au bout de tes doigts ; 'debout' : elle arrive
+//    du ciel tout entière, se pose derrière toi et s'ouvre, et tu recules dedans ; 'capsule' : une capsule tombe du ciel en feu, s'ouvre, et
+//    les pièces en sortent
+//  protection : la part des dégâts que tu prends dedans (0.3 = 30 % ; sans protection : celle du tableau IRONMAN)
+//  vol : sa vitesse en volant (1 = celle de Superman ; 0.5 = deux fois moins vite) ; taille : 1 = ta taille, 1.4 = 40 % plus grande ;
+//  massive: true : de grosses plaques, comme la Hulkbuster ; poings : tes coups de poing font tant de fois plus mal, et envoient tout valser
+//  Ce qu'elle a en plus (des armes, comme celles du tableau ARMES) :
+//    canon : la main droite (E) devient un canon, qui tire des obus qui explosent (à la place du répulseur)
+//    bouclier : la main gauche (A) devient un bouclier, qui arrête les balles et les explosions qui viennent de devant (à la place du répulseur)
+//    mitrailleuse : une mitrailleuse sur l'épaule droite, qui tire tant que tu gardes R enfoncé (à la place du plastron)
+//  Invente ton armure ! Par exemple, donne une mitrailleuse à la Hulkbuster, ou fais une armure toute rose...
+const ARMURES_STARK = [
+  { nom: 'Mark 85', prix: 0, couleurs: COULEURS_IRONMAN, arrivee: 'pieces', fille: { nom: 'Rescue', couleurs: COULEURS_RESCUE, ailes: true } },
+  { nom: 'Mark V', prix: 8000, couleurs: { rouge: '#a8121a', or: '#aab0b8', acier: '#3a3c42', lumiere: '#d8f8ff' }, arrivee: 'valise', protection: 0.35 },
+  { nom: 'War Machine', prix: 25000, couleurs: { rouge: '#3d4046', or: '#8e9298', acier: '#26282c', lumiere: '#d8f8ff' }, arrivee: 'debout', protection: 0.25, vol: 0.9,
+    mitrailleuse: { nom: "Mitrailleuse d'épaule", modele: 'lourde', degats: 26, cadence: 0.07, portee: 130, dispersion: 0.015 } },
+  { nom: 'Mark 50', prix: 60000, couleurs: { rouge: '#b3121c', or: '#5a0a10', acier: '#18181e', lumiere: '#e0faff', masque: '#c99a2a' }, arrivee: 'nano', protection: 0.2, vol: 1.25,
+    canon: { degats: 200, explosion: 3.5, cadence: 0.7, portee: 180, charge: 0.25 }, bouclier: { angle: 70 } },
+  { nom: 'Hulkbuster', prix: 120000, couleurs: { rouge: '#3d9a2e', or: '#245a22', acier: '#3a3c42', lumiere: '#eaffd8' }, arrivee: 'capsule', protection: 0.1, vol: 0.5,
+    taille: 1.4, massive: true, poings: 6 },
+];
+// LES AMÉLIORATIONS du magasin de Stark Industries : elles vont sur toutes tes armures
+//  missiles (G) : « nombre » mini-missiles partent de tes épaules et filent vers les ennemis que tu vois (sans ennemi : là où tu vises).
+//    Il faut ensuite « recharge » secondes. degats : au centre de l'explosion · explosion : son rayon · vitesse : en m/s · portee : en mètres
+//  laser (X) : le laser des bras de la Mark VI. Tu poses un genou à terre, les bras en croix, et tu tournes sur toi-même : un rayon part de
+//    chaque poignet et coupe tout ce qui est autour de toi, à « portee » mètres. degats : à chacun · tour : la durée du tour, en secondes ·
+//    recharge : les secondes avant le suivant
+//  reacteur : un meilleur réacteur, niveau par niveau (prix : celui de chaque niveau, du 2 au 5). À chaque niveau, tu prends moins de dégâts
+//    (la protection est multipliée par ça), tes répulseurs, ton canon et ton plastron font plus mal, et tu voles plus vite
+const AMELIORATIONS_STARK = {
+  missiles: { nom: 'Mini-missiles', prix: 15000, nombre: 8, recharge: 6, degats: 160, explosion: 3, vitesse: 34, portee: 120 },
+  laser:    { nom: 'Laser des bras', prix: 20000, degats: 300, portee: 22, tour: 0.9, recharge: 8 },
+  reacteur: { nom: 'Réacteur', prix: [10000, 25000, 50000, 100000], protection: 0.85, degats: 1.25, vol: 1.1 },
+};
 const TRICHES = [
   // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel. IDDQD : comme dans Doom.
   // B.J. est en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags (les autres codes s'ajoutent par-dessus).
@@ -2305,7 +2407,7 @@ const TRICHES = [
   // au-dessus). A et E : les répulseurs des mains gauche et droite ; R : le rayon du plastron ; F : voler ; M : lever le masque ; A Z E : sortir de
   // l'armure (elle reste debout, vide), et encore A Z E pour la rappeler. Dans l'armure, il prend moins de dégâts, et tomber de haut ne lui fait rien
   { code: 'IRONMAN', texte: "Iron Man ! A et E : répulseurs · R : plastron · F : voler · M : masque · A Z E : sortir de l'armure ou la rappeler", ironman: true,
-    effet: b => habillerIronman(b, J.ironman?.pieces || []) },
+    effet: b => habillerIronman(b, J.ironman?.pieces || [], J.ironman?.armure || 0) },
   { code: 'SLIP',        texte: 'En slip !',            effet: b => { habiller(b.bassin, '#fff'); b.ceinture.visible = false; habillerMembre(b.jambeD, PEAU_BJ); habillerMembre(b.jambeG, PEAU_BJ); } },
   { code: 'CHAUSSURE',   texte: 'Une chaussure perdue', effet: b => habiller(b.jambeG.chaussure, '#eee') },   // il reste la chaussette
   { code: 'SOUTIF',      texte: 'Torse nu en soutien-gorge', effet: b => {
@@ -3846,6 +3948,7 @@ const CONTENEURS = ['conteneur1', 'conteneur2', 'conteneur3', 'conteneur4'];
 const stands = [], soins = [], pnjDepart = [], voituresGarees = [], pickupsDepart = [], ascenseurs = [], bateauxDepart = [], hopitaux = [];
 const garagistes = [], braquages = [], butinsDepart = [];
 const presentoirs = [];   // les vitrines de l'atelier de Tony Stark : une armure debout dans chacune (voir exposerArmures)
+const standsStark = [];   // le magasin de Stark Industries : une armure (k) ou une amélioration sur chaque stand (voir ouvrirMagasin)
 const lits = [];   // les lits où B.J. dort (voir « Le jour et la nuit ») : ceux de ses villas (v dans la CARTE), de la villa de Michael et de la maison de Franklin
 const autresLits = [];   // les autres (appartements, caravane de Trevor, hôpital) : l'aide dit d'aller dormir dans une de ses villas
 let chateau = null, bunker = null;
@@ -4369,6 +4472,13 @@ function genererBloc(i, j) {
       b.meuble('metal', 0, 0, w, 30, 0.9, 2);
       for (let u = -13; u <= 13; u += 4.3) { b.meuble(hasardR(['rouge', 'jaune'], rnd), u, 0, w, 0.9, 0.5, 0.7, 0.9); b.meuble('grue', u + 2, 0, w - 1.6, 0.3, 2.2, 0.3); }
     }
+    // le magasin d'Iron Man : ses armures (ARMURES_STARK), debout sur des plateaux qui tournent, en rang devant la chaîne de montage, face à la
+    // porte ; ses améliorations (AMELIORATIONS_STARK), sur des socles, près de la porte, à gauche en entrant. On ne passe pas à travers une armure
+    ARMURES_STARK.forEach((A, k) => {
+      const u = ARMURES_STARK.length > 1 ? -14 + 28 * k / (ARMURES_STARK.length - 1) : 0, q = b.point(u, 0, 5.5);
+      standsStark.push({ k, ...q }); ajouterCollision(q.x - 0.6, q.z - 0.6, q.x + 0.6, q.z + 0.6, q.y + 3, Y0);
+    });
+    Object.keys(AMELIORATIONS_STARK).forEach((c, i) => standsStark.push({ amelioration: c, ...b.point(-18 + 4 * i, 0, 10.5) }));
     for (const x of [10, 18]) geoBloc('metal', new THREE.CylinderGeometry(1.1, 1.5, 22, 12).translate(X(x), 0.2 + 11, Z(4)));   // les cheminées
     boite('verre', X(50), 0.2, Z(47), 14, 10, 12, true); boite('toit', X(50), 10.2, Z(47), 14.5, 0.5, 12.5, true);              // les bureaux
     for (const x of [12, 22, 32]) voituresGarees.push({ x: X(x), z: Z(50), a: 0 });
@@ -5301,6 +5411,21 @@ const GEO = {
   // une aile de Rescue : deux lames plates, une longue et une plus courte, qui pendent de leur bout du haut (elle tourne autour de lui)
   aileRescue: mergeGeometries([[0, 0.8, 0.07], [0.06, 0.58, 0.055]].map(([x, l, e]) => new THREE.ExtrudeGeometry(new THREE.Shape([[0, 0], [e, -0.03], [e * 0.6, -l * 0.8], [0, -l], [-e * 0.4, -l * 0.5]]
     .map(([a, b]) => new THREE.Vector2(a, b))), { depth: 0.012, bevelEnabled: false }).translate(x, -0.02, -0.006))),
+  // une armure massive, comme la Hulkbuster (ARMURES_STARK : massive) : de grosses plaques par-dessus l'armure, et un col autour du cou
+  plastronHulk: new RoundedBoxGeometry(0.56, 0.44, 0.4, 2, 0.07).translate(0, 0.1, 0.02), colHulk: new THREE.CylinderGeometry(0.15, 0.21, 0.1, 14).translate(0, 0.36, 0),
+  bassinHulk: new RoundedBoxGeometry(0.46, 0.24, 0.3, 2, 0.06),
+  epauliereHulk: new THREE.SphereGeometry(0.17, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.55).scale(1.1, 0.9, 1.1),
+  brasHulk: new THREE.CylinderGeometry(0.095, 0.085, 0.26, 10), avantBrasHulk: new THREE.CylinderGeometry(0.12, 0.095, 0.27, 10),
+  poingHulk: new RoundedBoxGeometry(0.2, 0.13, 0.28, 2, 0.03),   // (sur la main, qui est aplatie : on dirait un gros cube)
+  cuisseHulk: new THREE.CylinderGeometry(0.14, 0.12, 0.4, 10), tibiaHulk: new THREE.CylinderGeometry(0.13, 0.115, 0.4, 10),
+  piedHulk: new RoundedBoxGeometry(0.19, 0.12, 0.34, 2, 0.04),
+  // le canon de la main droite (un tube, et sa bouche qui brille) et le bouclier de la main gauche (à six côtés), quand ARMURES_STARK en donne
+  canonNano: new THREE.CylinderGeometry(0.06, 0.078, 0.34, 12).translate(0, -0.12, 0), boucheCanon: new THREE.TorusGeometry(0.05, 0.014, 6, 14).rotateX(Math.PI / 2).translate(0, -0.29, 0),
+  bouclierNano: new THREE.CylinderGeometry(0.42, 0.42, 0.025, 6), bordBouclier: new THREE.TorusGeometry(0.42, 0.028, 4, 6).rotateX(Math.PI / 2).rotateY(Math.PI / 6),
+  // la mitrailleuse d'épaule de War Machine : son support, son corps, et ses six canons, qui tournent quand elle tire (elle vise vers +z)
+  supportMitrailleuse: new THREE.BoxGeometry(0.09, 0.14, 0.12), corpsMitrailleuse: new THREE.CylinderGeometry(0.058, 0.058, 0.24, 10).rotateX(Math.PI / 2),
+  canonsMitrailleuse: mergeGeometries([0, 1, 2, 3, 4, 5].map(k => new THREE.CylinderGeometry(0.012, 0.012, 0.36, 5).rotateX(Math.PI / 2)
+    .translate(Math.sin(k * Math.PI / 3) * 0.032, Math.cos(k * Math.PI / 3) * 0.032, 0.26))),
   // Tony Stark en civil (CHAPITRES : civil) : ses lunettes de soleil (deux verres un peu tournés vers les côtés, le pont, les branches) ;
   // sa barbiche (la moustache, un trait de chaque côté de la bouche, et la touffe du menton)
   lunettes: mergeGeometries([new THREE.BoxGeometry(0.026, 0.006, 0.006).translate(0, 0.008, 0.002),
@@ -7212,7 +7337,8 @@ function creerObjet(o) {
   if (o.type === 'soin') g.add(new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), M_SOIN));
   if (o.type === 'gilet') g.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.25), mat('#243a5a')));
   if (o.type === 'argent') for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.15), M_BILLET); b.position.y = k * 0.05; b.rotation.y = k; g.add(b); }
-  if (o.type === 'arme' || o.type === 'stand') { const a = o.masque ? creerMasque() : creerArme(o.arme); a.scale.setScalar(2.2); g.add(a); }
+  if (o.stark) g.add(vitrineStark(o));   // un stand du magasin de Stark Industries
+  else if (o.type === 'arme' || o.type === 'stand') { const a = o.masque ? creerMasque() : creerArme(o.arme); a.scale.setScalar(2.2); g.add(a); }
   if (o.type === 'tresor') g.add(formeTresor(TRESORS[o.tresor].forme));
   if (o.type === 'munitions') { // une caisse kaki, des cartouches dessus
     g.add(new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.25, 0.3), M_KAKI));
@@ -7232,10 +7358,11 @@ function creerObjet(o) {
   anneau.position.y = -0.8;
   g.add(anneau);
   if (o.type === 'stand') {
-    const piedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal); piedestal.position.y = -0.6; piedestal.castShadow = true; g.add(piedestal);
-    anneau.position.y = -1.08;
+    const armure = o.stark && o.k !== undefined;   // une armure du magasin de Stark Industries : sur son plateau, pas sur un socle
+    if (!armure) { const piedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal); piedestal.position.y = -0.6; piedestal.castShadow = true; g.add(piedestal); }
+    anneau.position.y = armure ? -0.82 : -1.08;
     o.etiquette = new THREE.Sprite(new THREE.SpriteMaterial()); etiqueter(o);
-    o.etiquette.scale.set(2.4, 0.6, 1); o.etiquette.position.y = 1; g.add(o.etiquette);
+    o.etiquette.scale.set(2.4, 0.6, 1); o.etiquette.position.y = armure ? 1.2 + 2.1 * ((armureDe(o.k).taille || 1) - 1) : 1; g.add(o.etiquette);
   }
   o.m = g; o.base = (o.type === 'stand' ? 1.1 : 0.85) + (o.y ?? hauteurSol(o.x, o.z));
   g.position.set(o.x, o.base, o.z);
@@ -7265,9 +7392,9 @@ function majCachettes() {
     else if (c.objet && d > 90) { c.objet.supprimer = true; c.objet = null; }
   }
 }
-// le prix au-dessus d'un stand de l'armurerie, dans la langue choisie
+// le prix au-dessus d'un stand de l'armurerie (ou du magasin de Stark Industries), dans la langue choisie
 function etiqueter(o) {
-  const texte = o.masque ? `${tr('Masque à gaz')} ${R_.prixMasque} $` : `${tr(ARMES[o.arme].nom)} ${ARMES[o.arme].prix} $`;
+  const texte = o.stark ? texteStark(o) : o.masque ? `${tr('Masque à gaz')} ${R_.prixMasque} $` : `${tr(ARMES[o.arme].nom)} ${ARMES[o.arme].prix} $`;
   o.etiquette.material.map?.dispose(); o.langue = langue;
   o.etiquette.material.map = toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(texte, 128, 42, 248); });
 }
@@ -7323,7 +7450,7 @@ function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null, foudre = f
     if (p.vie > 0 && p !== tireur && d < rayon) { blesser(p, degatsPNJ * k, !tireur); projeter(p, dx / l * (3 + 9 * k), 3 + 6 * k, dz / l * (3 + 9 * k), -3 - 8 * k); }
   }
   const d = Math.hypot(J.x - pos.x, J.y + 1 - pos.y, J.z - pos.z);
-  if (d < rayon && degatsJoueur) blesserJoueur(degatsJoueur * (1 - d / rayon));   // (degatsJoueur = 0 : les fusées de l'armure, qui épargnent B.J.)
+  if (d < rayon && degatsJoueur) blesserJoueur(degatsJoueur * (1 - d / rayon), true, pos);   // (degatsJoueur = 0 : les fusées de l'armure, qui épargnent B.J.)
   for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v, pos, !tireur);
   // le heavy robot : l'explosion casse la vitre de sa cabine, puis blesse son pilote
   for (const r of robots) { const d = Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z); if (r !== tireur && d < rayon + 1.5) toucherRobot(r, degatsPNJ * (1 - d / (rayon + 1.5)), null, !tireur); }
@@ -7906,7 +8033,7 @@ function majTourelles(B, dt) {
     const arrive = balleArrive(bout, depart, cible, !reussi);   // un mur entre elle et toi arrête la balle
     traceur(depart, cible); flash(depart, 0.45); lumiereTir.position.copy(depart); lumiereTir.intensity = 40;
     bruit(0.35 * clamp(1 - d / 80, 0.2, 1), 3200, 0.08);
-    if (reussi && arrive) blesserJoueur(R_.degatsMitrailleuse * parTriche('balles'));
+    if (reussi && arrive) blesserJoueur(R_.degatsMitrailleuse * parTriche('balles'), true, t);
   }
 }
 // le coffre-fort : la perceuse perce, la porte s'ouvre, l'explosif compte à rebours
@@ -8101,7 +8228,7 @@ function tirRobot(r, d) {
   balleLourde(depart, arrivee); flash(depart, 1.1);
   bruit(0.6 * clamp(1 - d / 150, 0.1, 1), 1100, 0.2);
   if (!reussi || !arrive) return;
-  blesserJoueur(ENNEMIS.robot.degats * parTriche('balles'));
+  blesserJoueur(ENNEMIS.robot.degats * parTriche('balles'), true, r);
   const v = J.voiture;   // la balle cabosse la voiture où tu es
   if (v) { const D = versLocal(v, J.x - r.x, J.z - r.z), l = Math.hypot(D.x, D.z) || 1; abimer(v, V3(-D.x / l * v.forme.largeur / 2, 0.8, -D.z / l * v.forme.longueur / 2), V3(D.x / l, 0, D.z / l), ENNEMIS.robot.degats / 400, true); }
 }
@@ -8356,8 +8483,8 @@ function tirerFusees(r) {
 }
 const cibleVivante = c => c.m?.g ? c.pilote === 'police' && !c.supprimer : c.vie > 0;   // (un personnage, ou le heavy robot de la police)
 function majFusees(dt) {
-  const F = ARMURE.fusees;
   for (const f of fuseesVol) {
+    const F = f.F || ARMURE.fusees;   // (les mini-missiles d'Iron Man ont leurs nombres à eux : AMELIORATIONS_STARK)
     if ((f.attente -= dt) > 0) continue;
     const pos = f.m.position;
     if (!f.partie) { f.partie = true; scene.add(f.m); bruit(0.3 * clamp(1.2 - dist(pos, J) / 80, 0, 1), 2400, 0.25); }
@@ -8583,18 +8710,23 @@ const fleche = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.7, 4).rotateX(Math.
 scene.add(fleche);
 
 // =====================================================================
-//  L'armure d'Iron Man (le code de triche IRONMAN)
+//  L'armure d'Iron Man (le code de triche IRONMAN), et les autres armures de Tony Stark (ARMURES_STARK, au chapitre d'Iron Man)
 //  Ses nombres sont dans le tableau IRONMAN (après ARMURE), ses couleurs et ses pièces dans PIECES_IRONMAN (juste avant les codes de triche).
-//  J.ironman, tant que le code est allumé : pieces (les numéros des pièces qu'il porte), anim (l'armure qui arrive, ou dont il sort),
-//  masque (levé ?) et ouvert (de 0, baissé, à 1, levé), vide (l'armure vide qu'il a laissée debout), mains (ses deux répulseurs),
-//  plastron (le rayon de sa poitrine, en cours), recharge (les secondes avant le suivant) et ailes (celles de Rescue : de 0, fermées, à 1, ouvertes)
+//  J.ironman, tant que le code est allumé : armure (le numéro, dans ARMURES_STARK, de celle qu'il porte), pieces (les numéros des pièces
+//  qu'il porte), anim (l'armure qui arrive, ou dont il sort), masque (levé ?) et ouvert (de 0, baissé, à 1, levé), vide (l'armure vide qu'il a
+//  laissée debout), mains (ses deux répulseurs), plastron (le rayon de sa poitrine, en cours), recharge (les secondes avant le suivant),
+//  ailes (celles de Rescue : de 0, fermées, à 1, ouvertes), cdMitrailleuse (celle de War Machine), missiles et laser (les secondes avant
+//  les suivants) et tour (le laser des bras, en cours)
 // =====================================================================
 const cacheIronman = {};
-// une matière de l'armure : 'rouge', 'or', 'acier' (du métal qui brille), 'lumiere' (ce qui s'allume : les yeux, le réacteur, les répulseurs),
+// l'armure k (son numéro dans ARMURES_STARK) ; avec la fille du menu, au chapitre d'Iron Man, ce que « fille » y change (Rescue)
+const armureDe = k => { const a = ARMURES_STARK[k] || ARMURES_STARK[0]; return a.fille && rescue() ? { ...a, ...a.fille } : a; };
+let armurePosee = 0;   // l'armure qu'on est en train d'habiller (voir habillerIronman)
+// une matière de l'armure k : 'rouge', 'or', 'masque', 'acier' (du métal qui brille), 'lumiere' (ce qui s'allume : les yeux, le réacteur, les répulseurs),
 // ou 'plastron' : le torse rouge, avec les abdominaux en or (le devant du torse est au bord gauche de l'image, et au bord droit)
-function matIronman(nom) {
-  const C = rescue() ? COULEURS_RESCUE : COULEURS_IRONMAN;
-  return cacheIronman[(rescue() ? 'rescue ' : '') + nom] ||= nom === 'lumiere' ? new THREE.MeshBasicMaterial({ color: C.lumiere, toneMapped: false })
+function matIronman(nom, k = armurePosee) {
+  const A = armureDe(k), C = A.couleurs;
+  return cacheIronman[A.nom + ' ' + nom] ||= nom === 'lumiere' ? new THREE.MeshBasicMaterial({ color: C.lumiere, toneMapped: false })
     : nom === 'plastron' ? std(toile(128, 128, (g, l, h) => {
         g.fillStyle = C.rouge; g.fillRect(0, 0, l, h);
         g.fillStyle = C.or;
@@ -8606,7 +8738,7 @@ function matIronman(nom) {
           g.beginPath(); g.moveTo(x, 78); g.lineTo(x, 106); g.stroke();
         }
       }), { metalness: 0.8, roughness: 0.3, bumpScale: 0.03 })
-    : mat(C[nom], { metalness: nom === 'acier' ? 0.6 : 0.8, roughness: nom === 'acier' ? 0.45 : 0.3, side: THREE.DoubleSide });
+    : mat(nom === 'masque' ? C.masque || C.or : C[nom], { metalness: nom === 'acier' ? 0.6 : 0.8, roughness: nom === 'acier' ? 0.45 : 0.3, side: THREE.DoubleSide });
 }
 // Les morceaux d'une pièce sont marqués de son numéro (userData.piece) : on la retrouve sur l'armure vide, pour la cacher et la faire voler
 let pieceEnCours = 0, corpsEnCours = null;
@@ -8622,117 +8754,257 @@ function flamme(parent, x, y, z, ou) {
   m.material = M_JET; m.castShadow = false; m.visible = false; m.userData.ou = ou;
   corpsEnCours.ironman.flammes.push(m);
 }
-// habille b (B.J., ou une armure vide) des pièces de la liste (leurs numéros dans PIECES_IRONMAN), dans l'ordre du tableau.
-// b.ironman garde les flammes des réacteurs, le masque (visiere), qui se lève, et les ailes de Rescue
-function habillerIronman(b, liste) {
-  b.ironman = { flammes: [], visiere: null, ailes: [] }; corpsEnCours = b;
-  PIECES_IRONMAN.forEach((p, k) => { if (liste.includes(k)) { pieceEnCours = k; p.poser(b); } });
+// le canon ou le bouclier d'une main (ARMURES_STARK : canon, bouclier) : caché, il sort du bout du bras quand on tire (voir majIronman).
+// formes : ses morceaux [forme, matière] ; y : où il est, au bout de l'avant-bras
+function armeDeMain(m, sorte, formes, y) {
+  const g = new THREE.Group(); g.name = 'accessoire'; g.position.y = y; g.scale.setScalar(0.001); m.pli.add(g);
+  for (const [geo, nom] of formes) plaque(geo, nom, g, 0, 0, 0);
+  corpsEnCours.ironman[sorte] = g;
+}
+// la mitrailleuse d'épaule de War Machine, sur son épaule droite (un peu en arrière) : elle tourne vers là où il vise, et ses canons tournent quand elle tire
+function mitrailleuseEpaule(b) {
+  const g = new THREE.Group(); g.name = 'accessoire'; g.position.set(-0.2, 0.36, -0.07); b.torse.add(g);
+  plaque(GEO.supportMitrailleuse, 'acier', b.torse, -0.2, 0.3, -0.07);
+  plaque(GEO.corpsMitrailleuse, 'rouge', g, 0, 0.04, 0.02);
+  b.ironman.mitrailleuse = g; b.ironman.canons = plaque(GEO.canonsMitrailleuse, 'acier', g, 0, 0.04, 0);
+}
+// habille b (B.J., ou une armure vide) des pièces de la liste (leurs numéros dans PIECES_IRONMAN), dans l'ordre du tableau, avec l'armure k
+// (son numéro dans ARMURES_STARK). b.ironman garde les flammes des réacteurs, le masque (visiere), qui se lève, les ailes de Rescue, le canon
+// et le bouclier des mains, la mitrailleuse d'épaule. Une armure plus grande que lui (la Hulkbuster) le grandit, pièce après pièce
+function habillerIronman(b, liste, k = 0) {
+  b.ironman = { flammes: [], visiere: null, ailes: [], armure: k }; corpsEnCours = b; armurePosee = k;
+  const A = armureDe(k);
+  PIECES_IRONMAN.forEach((p, i) => { if (liste.includes(i)) { pieceEnCours = i; p.poser(b, A); } });
+  b.g.scale.multiplyScalar(1 + ((A.taille || 1) - 1) * liste.length / PIECES_IRONMAN.length);
 }
 const toutesLesPieces = () => PIECES_IRONMAN.map((p, k) => k);
 const nouvelleMain = () => ({ charge: 0, cd: 0, leve: 0, dernier: -9, bloque: false });   // un répulseur : voir majIronman
 // porte-t-il toute l'armure ? Peut-il s'en servir (à pied : ni en voiture, ni dans un robot, ni sur une remontée) ? Lève-t-il une main
 // pour tirer, ou tire-t-il le rayon de son plastron (il se tourne alors vers le viseur) ?
 const armureIronman = () => !!J.ironman && J.ironman.pieces.length === PIECES_IRONMAN.length;
-const ironmanLibre = () => armureIronman() && !J.ironman.anim && !J.voiture && !J.robot && !J.telesiege && !J.mort;
-const ironmanVise = () => !!J.ironman && (J.ironman.mains.G.leve > 0.05 || J.ironman.mains.D.leve > 0.05 || !!J.ironman.plastron);
+const ironmanLibre = () => armureIronman() && !J.ironman.anim && !J.ironman.tour && !J.voiture && !J.robot && !J.telesiege && !J.mort;
+const ironmanVise = () => !!J.ironman && (J.ironman.mains.G.leve > 0.05 || J.ironman.mains.D.leve > 0.05 || !!J.ironman.plastron || J.ironman.tirEpaule > 0);
+// Le magasin de Stark Industries, au chapitre d'Iron Man : ce qu'il y a acheté (la partie s'en souvient, voir sauverPartie).
+// armures : leurs numéros dans ARMURES_STARK (la première, il l'a dès le début) ; choisie : celle que H appelle (J en choisit une autre) ;
+// missiles, laser : les AMELIORATIONS_STARK qu'il a ; reacteur : le niveau de son réacteur (de 1 à 5). Au chapitre 1, rien de tout ça
+const chezStark = CHAPITRE.triche === 'IRONMAN';
+const stark = { armures: [0], choisie: 0, missiles: false, laser: false, reacteur: 1 };
+if (chezStark) { // (les armures par leur nom : on peut en ajouter une au tableau sans tout casser)
+  const m = partie.magasin?.[chapitre] || {}, numero = nom => ARMURES_STARK.findIndex(a => a.nom === nom);
+  stark.armures = [...new Set([0, ...(m.armures || []).map(numero).filter(k => k > 0)])].sort((a, b) => a - b);
+  stark.choisie = Math.max(0, stark.armures.includes(numero(m.choisie)) ? numero(m.choisie) : 0);
+  for (const c in AMELIORATIONS_STARK) stark[c] = c === 'reacteur' ? clamp(Math.round(m.reacteur) || 1, 1, AMELIORATIONS_STARK.reacteur.prix.length + 1) : !!m[c];
+}
+const armureChoisie = () => chezStark ? stark.choisie : 0;
+// ce que son réacteur change (AMELIORATIONS_STARK.reacteur) : 'protection', 'degats' ou 'vol', multiplié une fois par niveau au-dessus du 1er
+const reacteur = cle => chezStark ? AMELIORATIONS_STARK.reacteur[cle] ** (stark.reacteur - 1) : 1;
+// dans son armure : la part des dégâts qu'il prend, et sa vitesse en volant (1 : celle de Superman)
+const protectionIronman = () => (armureDe(J.ironman?.armure).protection ?? IRONMAN.protection) * reacteur('protection');
+const volIronman = () => armureIronman() ? (armureDe(J.ironman.armure).vol ?? 1) * reacteur('vol') : 1;
+const tailleIronman = () => armureIronman() ? armureDe(J.ironman.armure).taille || 1 : 1;   // (la Hulkbuster le grandit : la caméra monte avec lui)
 // le code IRONMAN, tapé : l'armure arrive en volant, ou tout de suite s'il ne peut pas l'attendre (en voiture, en l'air, dans l'eau...).
 // civil : au début du chapitre d'Iron Man, Tony Stark est en civil. Il a le code, mais pas encore l'armure : la touche H l'appellera
 function mettreIronman(civil = false) {
-  J.ironman = { pieces: [], anim: null, masque: false, ouvert: 0, vide: null, plastron: null, recharge: 0, ailes: 0, mains: { G: nouvelleMain(), D: nouvelleMain() } };
+  J.ironman = { armure: armureChoisie(), pieces: [], anim: null, masque: false, ouvert: 0, vide: null, plastron: null, recharge: 0, ailes: 0, mains: { G: nouvelleMain(), D: nouvelleMain() },
+    cdMitrailleuse: 0, tirEpaule: 0, missiles: 0, laser: 0, tour: null };
   if (!civil && !appelerArmure()) J.ironman.pieces = toutesLesPieces();
 }
-// H : il met son armure (elle arrive en volant), ou il en sort. Comme A Z E, mais d'une seule touche
+// H : il met son armure (elle arrive à sa façon), ou il en sort. Comme A Z E, mais d'une seule touche. S'il en porte une autre que celle
+// qu'il a choisie (touche J), il en sort, et la nouvelle arrive aussitôt
 function costume() {
-  if (!J.ironman || J.ironman.anim) return;
+  if (!J.ironman || J.ironman.anim || J.ironman.tour) return;
   if (!surPlace() && !J.superman) { annonce('', tr('Sois à pied, debout par terre !'), 2); return; }
   basculerArmure();
 }
-// le code IRONMAN, retapé : l'armure s'en va d'un coup (celle qu'il porte, les pièces qui volent, et l'armure vide)
+// J, au chapitre d'Iron Man : il choisit une autre de ses armures (celles qu'il a achetées au magasin de Stark Industries). H la fera venir
+function changerArmure() {
+  if (!J.ironman || !chezStark) return;
+  const l = stark.armures;
+  if (l.length < 2) { annonce('', tr("Tu n'as que cette armure : les autres s'achètent au magasin de Stark Industries (⚙ sur la carte)"), 3); bip(300, 200, 0.1, 'square', 0.1); return; }
+  stark.choisie = l[(l.indexOf(stark.choisie) + 1) % l.length];
+  annonceChoix();
+  bip(600, 900, 0.12, 'sine', 0.06);
+}
+// ce que fera la touche H, avec l'armure qu'il vient de choisir
+function annonceChoix() {
+  const nom = armureDe(stark.choisie).nom;
+  annonce(nom.toUpperCase(), !armureIronman() ? tr('H : elle arrive') : J.ironman.armure === stark.choisie ? tr("C'est l'armure que tu portes")
+    : tr('H : tu sors de ton armure, et la {armure} arrive', { armure: nom }), 2.5);
+}
+// le code IRONMAN, retapé : l'armure s'en va d'un coup (celle qu'il porte, les pièces qui volent, ce qui les apporte, et l'armure vide)
 function enleverIronman() {
   const I = J.ironman;
   if (!I) return;
-  if (I.anim) { for (const p of I.anim.vols || []) if (p.g) scene.remove(p.g); J.vue = I.anim.vue; }
+  if (I.anim) { nettoyerArrivee(I.anim); J.vue = I.anim.vue; }
   if (I.vide) scene.remove(I.vide.h.g);
-  J.ironman = null;
+  for (const c of capsules) scene.remove(c.g);
+  capsules.length = 0; J.ironman = null;
 }
-// une armure complète, qu'on ne voit pas : c'est d'elle que partent les pièces qui arrivent du ciel. Elle a le corps du héros du menu
-// (les pièces posées sur la poitrine suivent ses bosses, comme sur B.J. : voir rhabillerBJ)
-function armureComplete() {
+// une armure complète (k : son numéro dans ARMURES_STARK), qu'on ne voit pas : c'est d'elle que partent les pièces qui arrivent du ciel.
+// Elle a le corps du héros du menu (les pièces posées sur la poitrine suivent ses bosses, comme sur B.J. : voir rhabillerBJ)
+function armureComplete(k = 0) {
   const h = creerHumain(TENUE_BJ);
   corpsHeros(h); chausser(h, false);
   for (const p of h.jupe) p.visible = false;
-  habillerIronman(h, toutesLesPieces());
+  habillerIronman(h, toutesLesPieces(), k);
   const T = torseHeros(HEROS[heros.genre]);
   for (const o of h.torse.children) if (o.position.z > 0.05) o.position.z += bosse(T.B, o.position.x, o.position.y);
   return h;
 }
-// les armures de l'atelier de Tony Stark, debout dans leurs vitrines (presentoirs : la villa < de Malibu). Chacune est fusionnée en quelques
-// formes (une par matière), rangées dans l'intérieur de la villa : on ne les dessine que de près
-function exposerArmures() {
-  for (const p of presentoirs) {
-    const h = armureComplete();
-    animerHumain(h, 0, 0); h.g.position.set(p.x, p.y + 0.15, p.z); h.g.rotation.y = p.a; h.g.updateMatrixWorld(true);
-    const parMatiere = new Map();
-    h.g.traverse(o => { if (o.isMesh && o.visible) (parMatiere.get(o.material) || parMatiere.set(o.material, []).get(o.material)).push(o.geometry.clone().applyMatrix4(o.matrixWorld)); });
-    for (const [m, l] of parMatiere) { // (on ne garde que ce que toutes les formes ont : la position, et peut-être le sens des faces et le dessin)
-      const gs = l.map(g => g.index ? g.toNonIndexed() : g), garde = ['position', 'normal', 'uv'].filter(k => gs.every(g => g.attributes[k]));
-      for (const g of gs) for (const k in g.attributes) if (!garde.includes(k)) g.deleteAttribute(k);
-      const o = new THREE.Mesh(mergeGeometries(gs), m); o.castShadow = true; p.dans.g.add(o);
-    }
+// une armure k debout, sans personne dedans, fusionnée en quelques formes (une par matière) : dans une vitrine de l'atelier de Tony Stark,
+// ou sur un stand du magasin de Stark Industries. Elle regarde vers +z, les pieds en (0, 0, 0)
+function statueArmure(k) {
+  const h = armureComplete(k), g = new THREE.Group(), parMatiere = new Map();
+  animerHumain(h, 0, 0); h.g.updateMatrixWorld(true);
+  h.g.traverse(o => { if (o.isMesh && o.visible) (parMatiere.get(o.material) || parMatiere.set(o.material, []).get(o.material)).push(o.geometry.clone().applyMatrix4(o.matrixWorld)); });
+  for (const [m, l] of parMatiere) { // (on ne garde que ce que toutes les formes ont : la position, et peut-être le sens des faces et le dessin)
+    const gs = l.map(g => g.index ? g.toNonIndexed() : g), garde = ['position', 'normal', 'uv'].filter(k => gs.every(g => g.attributes[k]));
+    for (const g of gs) for (const k in g.attributes) if (!garde.includes(k)) g.deleteAttribute(k);
+    const o = new THREE.Mesh(mergeGeometries(gs), m); o.castShadow = true; g.add(o);
   }
+  return g;
+}
+// les armures de l'atelier de Tony Stark, debout dans leurs vitrines (presentoirs : la villa < de Malibu), rangées dans l'intérieur de la
+// villa : on ne les dessine que de près
+function exposerArmures() {
+  for (const p of presentoirs) { const g = statueArmure(p.k || 0); g.position.set(p.x, p.y + 0.15, p.z); g.rotation.y = p.a; p.dans.g.add(g); }
 }
 exposerArmures();
-// il sort de son armure : elle reste là, debout, vide, les bras en croix, le masque levé (dedans, tout est noir). Un peu plus grande que lui
-function laisserArmure() {
-  const h = armureComplete();
+// une armure vide : la tête est toute noire (personne dedans), et le masque levé
+function viderArmure(h) {
   h.tete.material = mat('#0b0b0d'); for (const o of h.tete.children) if (o.geometry === GEO.nez || o.geometry === GEO.barbiche) o.visible = false;
-  h.g.scale.setScalar(1.04); h.g.position.set(J.x, J.y, J.z); h.g.rotation.y = J.angleCorps;
-  animerHumain(h, 0, 0, { croix: 1 });
   h.ironman.visiere.rotation.x = -1.65; h.ironman.visiere.position.y = 0.025;
-  scene.add(h.g);
-  J.ironman.vide = { h, x: J.x, y: J.y, z: J.z };
 }
-// la pièce k de l'armure h, à faire voler : ses morceaux, placés par rapport à son ancre (le morceau du corps où elle se pose)
-function copierPiece(h, k) {
+// il sort de son armure : elle reste là, debout, vide, les bras en croix, le masque levé. Un peu plus grande que lui. Il n'en laisse qu'une
+function laisserArmure() {
+  const I = J.ironman, h = armureComplete(I.armure);
+  h.g.scale.multiplyScalar(1.04); h.g.position.set(J.x, J.y, J.z); h.g.rotation.y = J.angleCorps;
+  animerHumain(h, 0, 0, { croix: 1 });
+  viderArmure(h);
+  scene.add(h.g);
+  if (I.vide) scene.remove(I.vide.h.g);
+  I.vide = { h, x: J.x, y: J.y, z: J.z, k: I.armure };
+}
+// la pièce k de l'armure h, à faire voler : ses morceaux, placés par rapport à son ancre (le morceau du corps où elle se pose).
+// matiere : pour toute la pièce, sauf ce qui brille (le métal liquide de la Mark 50)
+function copierPiece(h, k, matiere = null) {
   const g = new THREE.Group(), inv = PIECES_IRONMAN[k].ancre(h).matrixWorld.clone().invert();
   h.g.traverse(o => {
     if (!o.isMesh || o.userData.piece !== k || !o.visible) return;
-    const c = new THREE.Mesh(o.geometry, o.material); c.castShadow = o.castShadow;
+    const c = new THREE.Mesh(o.geometry, matiere && !o.material.isMeshBasicMaterial ? matiere : o.material); c.castShadow = o.castShadow;
     c.matrixAutoUpdate = false; c.matrix.multiplyMatrices(inv, o.matrixWorld); g.add(c);
   });
   return g;
 }
 // peut-il attendre son armure, ou en sortir ? Debout, à pied, sur le sol (pas en l'air, ni dans l'eau, ni sur une échelle, ni accroché)
 const surPlace = () => !J.mort && !J.voiture && !J.robot && !J.telesiege && !J.superman && J.sol && !J.nage && !J.roule && !J.echelle && !accroche();
-// A Z E (IRONMAN.touches : Q W E sur un clavier anglais) : l'armure arrive, ou il en sort
+// A Z E (IRONMAN.touches : Q W E sur un clavier anglais) : l'armure arrive, ou il en sort (et, s'il en a choisi une autre, elle arrive ensuite)
 function basculerArmure() {
   const I = J.ironman;
-  if (!I || I.anim) return;
+  if (!I || I.anim || I.tour) return;
   if (J.superman) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }
-  if (armureIronman()) sortirArmure(); else appelerArmure();
+  if (armureIronman()) sortirArmure(I.armure !== armureChoisie()); else appelerArmure();
 }
-// L'armure arrive, comme dans Iron Man 3 : une pièce part vers lui toutes les IRONMAN.arrivee secondes, dans l'ordre de PIECES_IRONMAN, vole
-// en arc en tournoyant, et se referme sur son morceau, clac ! Elle part de l'armure vide s'il en a laissé une à moins de 100 m (qui disparaît
-// pièce après pièce) ; sinon, les pièces arrivent du ciel, de partout. Il attend, les bras écartés : on le voit de dehors.
-// Renvoie false s'il ne peut pas l'attendre là
+// L'armure choisie arrive, à sa façon (ARMURES_STARK : arrivee). Il l'attend, les bras écartés : on le voit de dehors.
+//  'pieces', comme dans Iron Man 3 : une pièce part vers lui toutes les IRONMAN.arrivee secondes, dans l'ordre de PIECES_IRONMAN, vole en arc
+//    en tournoyant, et se referme sur son morceau, clac ! Elle part de l'armure vide s'il a laissé là la même (à moins de 100 m), qui disparaît
+//    pièce après pièce ; sinon, les pièces arrivent du ciel, de partout.
+//  'valise' : une valise tombe du ciel devant ses pieds et s'ouvre en deux ; les pièces en sortent toutes pliées, et se déplient sur lui, de bas en haut.
+//  'nano' : les pièces poussent sur lui, en métal liquide, du réacteur jusqu'au bout de ses doigts et de ses pieds.
+//  'debout' : l'armure arrive tout entière en volant (de l'armure vide, si elle est là), se pose derrière lui et s'ouvre ; il recule dedans.
+//  'capsule' : une capsule tombe du ciel en feu, s'écrase devant lui et s'ouvre ; les pièces en sortent, et il grandit à chacune.
+// Le masque arrive toujours en dernier. Renvoie false s'il ne peut pas l'attendre là
+const capsules = [];   // les capsules vides de la Hulkbuster, qui repartent dans le ciel
+const M_NANO = new THREE.MeshStandardMaterial({ color: '#24242c', metalness: 1, roughness: 0.2, emissive: '#3a7aff', emissiveIntensity: 0.5 });
 function appelerArmure() {
   const I = J.ironman;
   if (!surPlace()) return false;
   if (J.biceps) finirBiceps();
-  const vide = I.vide && Math.hypot(I.vide.x - J.x, I.vide.z - J.z) < 100 ? I.vide : null;
-  if (I.vide && !vide) { scene.remove(I.vide.h.g); I.vide = null; }   // trop loin : elle s'en va, et une autre arrive du ciel
-  I.anim = { type: 'arrivee', t: 0, vue: J.vue, source: vide ? vide.h : armureComplete(), vide, vols: PIECES_IRONMAN.map((p, k) => ({ k, depart: k * IRONMAN.arrivee })) };
-  Object.assign(I, { pieces: [], masque: false, ouvert: 0, plastron: null });
+  const k = armureChoisie(), mode = ['valise', 'nano', 'debout', 'capsule'].includes(armureDe(k).arrivee) ? armureDe(k).arrivee : 'pieces';
+  const ici = I.vide && I.vide.k === k && Math.hypot(I.vide.x - J.x, I.vide.z - J.z) < 100, vole = mode === 'pieces' || mode === 'debout';
+  if (I.vide && I.vide.k === k && !(ici && vole)) { scene.remove(I.vide.h.g); I.vide = null; }   // trop loin (ou elle ne vole pas jusqu'à lui) : elle s'en va
+  const vide = ici && vole ? I.vide : null, src = vide && mode === 'pieces' ? vide.h : armureComplete(k);
+  const A = I.anim = { type: 'arrivee', mode, k, t: 0, vue: J.vue, source: src, vide: mode === 'pieces' ? vide : null, vols: [] };
+  const avant = V3(Math.sin(J.angleCorps), 0, Math.cos(J.angleCorps));
+  if (mode === 'valise') { // elle tombe de 14 m, juste devant lui
+    A.valise = creerValise(k); A.pose = Math.sqrt(14 / 15);
+    A.valise.position.set(J.x, 0, J.z).addScaledVector(avant, 0.85); A.solValise = hauteurSol(A.valise.position.x, A.valise.position.z, J.y + 0.5);
+    A.valise.rotation.y = J.angleCorps; A.valise.position.y = A.solValise + 14;
+  }
+  if (mode === 'capsule') { // elle arrive du ciel, de loin derrière là où elle tombe : à 6 m devant lui
+    A.capsule = creerCapsule(k); A.pose = 1.3;
+    const P = A.posCapsule = V3(J.x, 0, J.z).addScaledVector(avant, 6); P.y = hauteurSol(P.x, P.z, J.y + 2);
+    A.departCapsule = P.clone().addScaledVector(avant, 70).add(V3(0, 220, 0)); A.capsule.position.copy(A.departCapsule);
+    A.capsule.rotation.y = J.angleCorps + Math.PI;   // (sa porte vers lui)
+    bip(1800, 300, 1.3, 'sine', 0.05);   // elle siffle en tombant
+  }
+  if (mode === 'debout') { // elle vole tout entière jusqu'à 1,1 m derrière lui, ouverte, et ses réacteurs allumés
+    const F = vide ? vide.h : armureComplete(k);
+    if (vide) I.vide = null; else { viderArmure(F); F.g.scale.multiplyScalar(1.04); scene.add(F.g); }
+    const P1 = V3(J.x, J.y, J.z).addScaledVector(avant, -1.1);
+    const P0 = vide ? F.g.position.clone() : P1.clone().addScaledVector(avant, -45).add(V3(entre(-15, 15), 40, entre(-15, 15)));
+    const d = P0.distanceTo(P1);
+    A.debout = { F, P0, P1, C: P0.clone().lerp(P1, 0.5).add(V3(0, 3 + d * 0.15, 0)), duree: clamp(d / 28, 1.2, 4), posee: 0 };
+    F.g.position.copy(P0);
+  }
+  if (mode !== 'debout') { // les pièces, l'une après l'autre (le masque en dernier)
+    const ordre = mode === 'pieces' ? toutesLesPieces() : ordreArrivee(src, mode);
+    const debut = { pieces: 0, valise: A.pose + 0.15, nano: 0.2, capsule: A.pose + 0.5 }[mode], pas = { pieces: IRONMAN.arrivee, valise: 0.07, nano: 0.1, capsule: 0.1 }[mode];
+    A.vols = ordre.map((p, i) => ({ k: p, depart: debut + i * pas }));
+  }
+  Object.assign(I, { armure: k, pieces: [], masque: false, ouvert: 0, plastron: null });
+  rhabillerBJ();
   J.vue = 3; J.danse = 0; J.accroupi = false;
   bip(300, 900, 0.5, 'sine', 0.06);
+  if (mode === 'nano') { bip(200, 1200, 1.4, 'sine', 0.05); bruit(0.2, 6000, 1.4); }   // le métal liquide coule en chuintant
   return true;
 }
-// A Z E dans l'armure : il écarte les bras en croix, le masque se lève, l'armure s'ouvre, il fait un pas en avant et en sort
-function sortirArmure() {
+// l'ordre des pièces : de bas en haut (pour la valise), ou du réacteur jusqu'au bout des membres (le métal liquide). Le masque toujours en dernier
+function ordreArrivee(src, mode) {
+  const n = PIECES_IRONMAN.length, ks = [...Array(n - 1).keys()];
+  src.g.updateMatrixWorld(true);
+  const pos = k => PIECES_IRONMAN[k].ancre(src).getWorldPosition(new THREE.Vector3()), centre = src.torse.getWorldPosition(new THREE.Vector3());
+  if (mode === 'valise') ks.sort((a, b) => pos(a).y - pos(b).y);
+  else ks.sort((a, b) => pos(a).distanceTo(centre) - pos(b).distanceTo(centre));
+  return [...ks, n - 1];
+}
+// la valise de la Mark V : deux moitiés en métal, avec une bande de la couleur de l'armure et une poignée. Elles s'ouvrent autour de leur
+// charnière, en bas (moities[0] : celle de derrière, moities[1] : celle de devant)
+const M_VALISE = mat('#c4c8ce', { metalness: 0.85, roughness: 0.3 });
+function creerValise(k) {
+  const g = new THREE.Group();
+  g.moities = [-1, 1].map(c => {
+    const m = new THREE.Group(); g.add(m);
+    const b = new THREE.Mesh(new RoundedBoxGeometry(0.5, 0.42, 0.08, 2, 0.02), M_VALISE); b.position.set(0, 0.21, 0.04 * c); b.castShadow = true; m.add(b);
+    const r = new THREE.Mesh(new THREE.BoxGeometry(0.51, 0.06, 0.084), matIronman('rouge', k)); r.position.set(0, 0.3, 0.04 * c); m.add(r);
+    return m;
+  });
+  const p = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.012, 6, 12, Math.PI), M_VALISE); p.position.set(0, 0.42, -0.04); g.moities[0].add(p);   // la poignée
+  scene.add(g);
+  return g;
+}
+// la capsule de la Hulkbuster : un gros cylindre coiffé d'un dôme, avec une bande de la couleur de l'armure. Le dos ne bouge pas ; l'avant
+// (vers +z) est fait de deux portes (portes[0] à gauche, portes[1] à droite), qui s'ouvrent comme celles d'une armoire, autour de leur charnière
+const M_CAPSULE = mat('#4a4e56', { metalness: 0.7, roughness: 0.4, side: THREE.DoubleSide });   // (ouverte, on voit dedans)
+function creerCapsule(k) {
+  const g = new THREE.Group();
+  // un morceau du cylindre, de l'angle t0 à t0 + l (0 : devant, Math.PI / 2 : à gauche), avec son dôme et sa bande, dans le groupe p
+  const morceau = (p, t0, l, x) => {
+    for (const [geo, matiere, y] of [[new THREE.CylinderGeometry(1, 1, 3.2, 16, 1, false, t0, l), M_CAPSULE, 1.6], [new THREE.SphereGeometry(1, 16, 6, t0, l, 0, Math.PI / 2), M_CAPSULE, 3.2],
+      [new THREE.CylinderGeometry(1.02, 1.02, 0.3, 16, 1, true, t0, l), matIronman('rouge', k), 2.5]]) { const m = new THREE.Mesh(geo, matiere); m.position.set(x, y, 0); m.castShadow = true; p.add(m); }
+  };
+  morceau(g, Math.PI / 2, Math.PI, 0);   // le dos
+  g.portes = [1, -1].map(c => { const pivot = new THREE.Group(); pivot.position.x = c; g.add(pivot); morceau(pivot, c > 0 ? 0 : 1.5 * Math.PI, Math.PI / 2, -c); return pivot; });
+  scene.add(g);
+  return g;
+}
+// A Z E dans l'armure : il écarte les bras en croix, le masque se lève, l'armure s'ouvre, il fait un pas en avant et en sort.
+// ensuite : l'armure qu'il a choisie (touche J) arrive aussitôt après
+function sortirArmure(ensuite = false) {
   const I = J.ironman;
   if (!surPlace()) return;
   if (J.biceps) finirBiceps();
-  I.anim = { type: 'sortie', t: 0, vue: J.vue };
+  I.anim = { type: 'sortie', t: 0, vue: J.vue, ensuite };
   I.plastron = null; J.vue = 3; J.danse = 0; J.accroupi = false;
   bip(700, 400, 0.3, 'triangle', 0.05);
 }
@@ -8741,11 +9013,14 @@ const vCible = new THREE.Vector3(), qCible = new THREE.Quaternion(), sCible = ne
 function animerIronman(dt) {
   const I = J.ironman, A = I.anim, h = joueurH;
   A.t += dt; J.vy = 0; J.vitesse = 0; J.pasX = J.pasZ = 0;
+  if (A.type === 'arrivee' && A.mode === 'debout') { arriveeDebout(A, dt); return; }
   if (A.type === 'arrivee') {
     h.g.position.set(J.x, J.y, J.z); h.g.rotation.y = J.angleCorps;
     animerHumain(h, 0, dt, { attend: Math.min(1, A.t * 4) });
     membresMous(h, dt, { sol: J.y });
     h.g.updateMatrixWorld(true);
+    if (A.valise) majValise(A);
+    if (A.capsule) majCapsule(A);
     for (const p of A.vols) if (!p.fini && A.t >= p.depart) volerPiece(A, p);
     if (A.vols.every(p => p.fini)) finirArrivee();
     return;
@@ -8758,50 +9033,122 @@ function animerIronman(dt) {
   h.g.position.set(J.x, J.y, J.z); h.g.rotation.y = J.angleCorps;
   animerHumain(h, marche ? 1.4 : 0, dt, { croix: Math.min(1, A.t / 0.35) * (1 - clamp((A.t - 1.2) / 0.35, 0, 1)) });
   membresMous(h, dt, { sol: J.y });
-  if (A.t >= 1.6) { J.vue = A.vue; I.anim = null; }
+  if (A.t >= 1.6) { J.vue = A.vue; I.anim = null; if (A.ensuite) appelerArmure(); }
 }
-// une pièce en vol : elle part (de l'armure vide, ou du ciel), vole en arc jusqu'à son morceau de B.J. en tournoyant de moins en moins, et s'y pose
+// la valise tombe (14 m en un peu moins d'une seconde), se pose avec un bruit sourd et s'ouvre en deux ; vide, elle se replie et disparaît
+function majValise(A) {
+  const v = A.valise;
+  v.position.y = A.t < A.pose ? A.solValise + 14 - 15 * A.t * A.t : A.solValise;
+  if (A.t >= A.pose && !A.boum) { A.boum = true; bruit(0.4, 900, 0.25); bip(160, 70, 0.15, 'sine', 0.2); etincelles(v.position.clone(), 4, 1.5); }
+  const o = clamp((A.t - A.pose - 0.05) / 0.2, 0, 1);
+  v.moities[0].rotation.x = -1.4 * o; v.moities[1].rotation.x = 1.4 * o;
+  v.scale.setScalar(A.vols.every(p => p.g) ? Math.max(0.01, 1 - (A.t - A.vols.at(-1).depart) * 3) : 1);
+}
+// la capsule tombe du ciel en feu, en laissant de la fumée ; elle s'écrase (boum !), puis s'ouvre
+function majCapsule(A) {
+  const c = A.capsule, P = A.posCapsule;
+  if (A.t < A.pose) {
+    c.position.lerpVectors(A.departCapsule, P, A.t / A.pose);
+    for (let k = 0; k < 3; k++) { // le feu dessous, la fumée derrière
+      const f = new THREE.Sprite(M_FLASH); f.position.copy(c.position).add(V3(entre(-0.8, 0.8), entre(-0.3, 0.6), entre(-0.8, 0.8))); f.scale.setScalar(entre(1.5, 2.8));
+      scene.add(f); effets.push({ o: f, vie: 0.12 });
+    }
+    const s = new THREE.Sprite(M_FUMEE.clone()); s.position.copy(c.position).add(V3(0, 3, 0)); scene.add(s); effets.push({ o: s, vie: 1.5, fumee: 1.5, taille: 2.2 });
+  } else if (!A.boum) { A.boum = true; c.position.copy(P); impactCapsule(P); }
+  const o = clamp((A.t - A.pose - 0.15) / 0.35, 0, 1);
+  c.portes[0].rotation.y = 1.7 * o; c.portes[1].rotation.y = -1.7 * o;
+}
+// la capsule s'écrase : un éclair, un gros boum, la terre tremble, de la poussière, un cratère noirci, et les gens autour sont renversés
+function impactCapsule(P) {
+  flash(P.clone().add(V3(0, 1, 0)), 4); lumiereBoum.color.set('#ff9040'); lumiereBoum.position.copy(P); lumiereBoum.intensity = 3000;
+  bruit(1, 300, 1.2); bip(110, 35, 0.9, 'sine', 0.35); J.secousse = Math.max(J.secousse || 0, 0.2);
+  impactSol(P, C_BRULE, 5);
+  for (let k = 0; k < 14; k++) { const s = new THREE.Sprite(M_FUMEE.clone()); s.position.copy(P).add(V3(entre(-2.5, 2.5), entre(0, 1.5), entre(-2.5, 2.5))); scene.add(s); effets.push({ o: s, vie: 1.6, fumee: 1.6, taille: 2.5 }); }
+  for (const p of personnes) { const d = dist(p, P); if (p.vie > 0 && d < 7 && d > 0) { blesser(p, 0); projeter(p, (p.x - P.x) / d * 7, 4, (p.z - P.z) / d * 7, -5); } }
+}
+// War Machine arrive tout entière : elle vole jusque derrière lui, se pose (boum !) et s'ouvre, les bras en croix. Il écarte les bras et
+// recule dedans ; elle se referme sur lui, et son masque se baisse
+function arriveeDebout(A, dt) {
+  const I = J.ironman, D = A.debout, F = D.F, h = joueurH;
+  if (!D.posee) {
+    const u = Math.min(1, A.t / D.duree), e = u * u * (3 - 2 * u), k = 1 - e;
+    F.g.position.set(0, 0, 0).addScaledVector(D.P0, k * k).addScaledVector(D.C, 2 * k * e).addScaledVector(D.P1, e * e);
+    F.g.rotation.y = lerpAngle(F.g.rotation.y, J.angleCorps, Math.min(1, 4 * dt));
+    animerHumain(F, 0, dt, { attend: 1 });
+    for (const f of F.ironman.flammes) { f.visible = f.userData.ou === 'botte'; f.scale.set(0.22, entre(0.8, 1.15), 0.22); }
+    if (u >= 1) { // elle se pose
+      D.posee = A.t; F.g.position.copy(D.P1); F.g.rotation.y = J.angleCorps;
+      for (const f of F.ironman.flammes) f.visible = false;
+      bruit(0.6, 600, 0.4); bip(140, 60, 0.3, 'sine', 0.2); J.secousse = Math.max(J.secousse || 0, 0.06);
+    }
+  }
+  const t = D.posee ? A.t - D.posee : -1, recule = t > 0.35 && t < 1.15;   // t : depuis qu'elle s'est posée
+  if (D.posee) animerHumain(F, 0, dt, { croix: clamp(t / 0.3, 0, 1) });
+  if (recule) { J.x -= Math.sin(J.angleCorps) * 1.4 * dt; J.z -= Math.cos(J.angleCorps) * 1.4 * dt; resoudre(J, 0.35); J.y = hauteurSol(J.x, J.z, J.y); }
+  h.g.position.set(J.x, J.y, J.z); h.g.rotation.y = J.angleCorps;
+  animerHumain(h, recule ? 1.4 : 0, dt, t < 0 ? { attend: Math.min(1, A.t * 4) } : { croix: clamp(t / 0.3, 0, 1) });
+  membresMous(h, dt, { sol: J.y });
+  if (t >= 1.2) { I.masque = false; I.ouvert = 1; bip(1300, 420, 0.09, 'square', 0.07); bruit(0.4, 4000, 0.15); finirArrivee(); }   // il est dedans : elle se referme
+}
+// une pièce en vol : elle part (de l'armure vide, du ciel, de la valise ou de la capsule), vole en arc jusqu'à son morceau de B.J. en
+// tournoyant de moins en moins, et s'y pose. En métal liquide (la Mark 50), elle pousse sur place, de rien du tout à sa taille
 function volerPiece(A, p) {
   PIECES_IRONMAN[p.k].ancre(joueurH).matrixWorld.decompose(vCible, qCible, sCible);   // là où elle va
   if (!p.g) {
-    const src = A.source;
+    const src = A.source, nano = A.mode === 'nano';
     if (A.vide && src.ironman.visiere) { src.ironman.visiere.rotation.x = 0; src.ironman.visiere.position.y = 0; }   // (le masque part baissé)
     src.g.updateMatrixWorld(true);
-    p.g = copierPiece(src, p.k); scene.add(p.g);
-    p.P0 = new THREE.Vector3(); p.Q0 = new THREE.Quaternion(); p.S0 = sCible.clone();
+    p.g = copierPiece(src, p.k, nano ? M_NANO : null); scene.add(p.g);
+    p.P0 = new THREE.Vector3(); p.Q0 = new THREE.Quaternion(); p.S0 = sCible.clone(); p.tours = entre(3, 7);
     if (A.vide) { // elle quitte l'armure vide
       PIECES_IRONMAN[p.k].ancre(src).matrixWorld.decompose(p.P0, p.Q0, p.S0);
       src.g.traverse(o => { if (o.userData.piece === p.k) o.visible = false; });
       if (A.vols.every(q => q.g)) { scene.remove(src.g); J.ironman.vide = null; }   // sa dernière pièce est partie
+    } else if (nano) { // elle pousse sur son morceau du corps, sans voler ni tourner
+      p.P0.copy(vCible); p.Q0.copy(qCible); p.S0.multiplyScalar(0.02); p.tours = 0; p.duree = 0.3;
+    } else if (A.valise || A.capsule) { // elle sort de la valise, toute pliée, ou de la capsule
+      p.P0.copy((A.valise || A.capsule).position).add(A.valise ? V3(entre(-0.15, 0.15), 0.3, entre(-0.15, 0.15)) : V3(entre(-0.5, 0.5), entre(0.8, 2.4), entre(-0.5, 0.5)));
+      p.Q0.setFromEuler(new THREE.Euler(entre(-3, 3), entre(-3, 3), entre(-3, 3)));
+      if (A.valise) { p.S0.multiplyScalar(0.3); p.tours = entre(1, 2); p.duree = 0.3; }
     } else { // elle arrive de loin, du ciel
       const a = entre(0, 2 * Math.PI), d = entre(14, 24);
       p.P0.set(J.x + Math.sin(a) * d, J.y + entre(3, 12), J.z + Math.cos(a) * d);
       p.Q0.setFromEuler(new THREE.Euler(entre(-3, 3), entre(-3, 3), entre(-3, 3)));
     }
     const d = p.P0.distanceTo(vCible);
-    p.duree = clamp(d / IRONMAN.vitessePieces, 0.45, 2.5);
-    p.C = p.P0.clone().lerp(vCible, 0.5); p.C.y += 1 + d * 0.25;   // elle vole en arc
-    p.axe = V3(entre(-1, 1), entre(-1, 1), entre(-1, 1)).normalize(); p.tours = entre(3, 7);
-    bruit(0.15, 3000, 0.2);
+    p.duree ??= clamp(d / IRONMAN.vitessePieces, 0.45, 2.5);
+    p.C = p.P0.clone().lerp(vCible, 0.5); p.C.y += nano ? 0 : A.valise ? 0.3 : 1 + d * 0.25;   // elle vole en arc
+    p.axe = V3(entre(-1, 1), entre(-1, 1), entre(-1, 1)).normalize();
+    if (!nano) bruit(0.15, 3000, 0.2);
   }
   const u = Math.min(1, (A.t - p.depart) / p.duree), e = u * u * (3 - 2 * u), k = 1 - e;
   p.g.position.set(0, 0, 0).addScaledVector(p.P0, k * k).addScaledVector(p.C, 2 * k * e).addScaledVector(vCible, e * e);
   p.g.quaternion.slerpQuaternions(p.Q0, qCible, e).multiply(qTour.setFromAxisAngle(p.axe, p.tours * k));
   p.g.scale.lerpVectors(p.S0, sCible, e);
   if (u < 1) return;
-  // arrivée : elle se referme sur lui, clac !
+  // arrivée : elle se referme sur lui, clac ! (le métal liquide, lui, se fige dans un chuintement, en jetant des étincelles)
   scene.remove(p.g); p.fini = true;
   J.ironman.pieces.push(p.k); rhabillerBJ();
-  bip(1300, 420, 0.09, 'square', 0.07); bruit(0.25, 5000, 0.08); etincelles(vCible.clone(), 3, 1.5);
+  if (A.mode === 'nano') { bip(2200, 900, 0.08, 'sine', 0.04); etincelles(vCible.clone(), 4, 1); }
+  else { bip(1300, 420, 0.09, 'square', 0.07); bruit(0.25, 5000, 0.08); etincelles(vCible.clone(), 3, 1.5); }
+}
+// ce qui apporte l'armure s'en va : les pièces qui volent encore, la valise, l'armure qui vole jusqu'à lui. La capsule, elle, se referme et
+// repart dans le ciel (voir majIronman)
+function nettoyerArrivee(A) {
+  for (const p of A.vols) if (!p.fini) { if (p.g) scene.remove(p.g); p.fini = true; }
+  if (A.valise) scene.remove(A.valise);
+  if (A.debout) scene.remove(A.debout.F.g);
+  if (A.capsule) capsules.push({ g: A.capsule, t: 0, v: 0 });
+  A.valise = A.debout = A.capsule = null;
 }
 // toutes les pièces sont là (ou on n'attend plus : il est mort, monté en voiture...) : ses yeux s'allument
 function finirArrivee() {
   const I = J.ironman, A = I.anim;
-  for (const p of A.vols) if (!p.fini) { if (p.g) scene.remove(p.g); p.fini = true; }
+  nettoyerArrivee(A);
   if (A.vide) { scene.remove(A.vide.h.g); if (I.vide === A.vide) I.vide = null; }
   I.pieces = toutesLesPieces(); I.anim = null; J.vue = A.vue;
   rhabillerBJ();
-  if (!J.mort) { annonce(tr(rescue() ? 'RESCUE !' : 'IRON MAN !'), '', 2); bip(500, 1500, 0.35, 'sine', 0.08); }
+  if (!J.mort) { annonce(tr(rescue() && !A.k ? 'RESCUE !' : 'IRON MAN !'), A.k ? armureDe(A.k).nom : '', 2); bip(500, 1500, 0.35, 'sine', 0.08); }
 }
 // A Z E pendant que l'armure arrive, ou qu'il en sort, ne fait rien. Mais s'il meurt, monte en voiture... ça se finit tout de suite
 function interrompreIronman() {
@@ -8852,22 +9199,23 @@ function rayonIronman(a, b, large, vie = 0, g = new THREE.Group()) {
   return g;
 }
 // Les répulseurs (A : la main gauche, E : la main droite) : un éclair bleu et blanc part de la paume jusqu'au viseur. Celui qui est touché vole
-// en arrière, une voiture est poussée et cabossée, un mur ou le sol garde une marque noire. cote : 1 à gauche, -1 à droite
+// en arrière, une voiture est poussée et cabossée, un mur ou le sol garde une marque noire. cote : 1 à gauche, -1 à droite.
+// Un meilleur réacteur (AMELIORATIONS_STARK) les rend plus forts
 function repulseur(cote) {
-  const R = IRONMAN.repulseurs, b = cote > 0 ? joueurH.brasG : joueurH.brasD;
+  const R = IRONMAN.repulseurs, b = cote > 0 ? joueurH.brasG : joueurH.brasD, degats = R.degats * reacteur('degats');
   joueurH.g.updateMatrixWorld(true);
   const depart = J.vue === 1 ? camera.localToWorld(V3(-0.22 * cote, -0.2, -0.55)) : b.main.localToWorld(V3(0, -0.005, -0.08));
   const v = viser(R.portee, 0.004), { hit, point, dir } = v;
   if (hit || v.sol) {
     const u = hit?.object.userData || {}, p = u.personne, vc = !p && u.voiture;
-    if (p) { blesser(p, R.degats); projeter(p, dir.x * R.recul, 2 + R.recul * 0.25, dir.z * R.recul, -4); }
+    if (p) { blesser(p, degats); projeter(p, dir.x * R.recul, 2 + R.recul * 0.25, dir.z * R.recul, -4); }
     else if (vc) { // une voiture : cabossée, son conducteur touché, et poussée
-      abimer(vc, vc.m.worldToLocal(point.clone()), dir.clone().applyQuaternion(vc.m.quaternion.clone().invert()), R.degats / 150, true);
-      if (!estBlindee(vc)) blesserConducteur(vc, R.degats);
+      abimer(vc, vc.m.worldToLocal(point.clone()), dir.clone().applyQuaternion(vc.m.quaternion.clone().invert()), degats / 150, true);
+      if (!estBlindee(vc)) blesserConducteur(vc, degats);
       heurter(vc, point, dir.clone().multiplyScalar(R.recul * 0.6));
     }
-    else if (u.robot) toucherRobot(u.robot, R.degats, hit.object);
-    if (!p && !vc && u.tourelle && (u.tourelle.vie -= R.degats) <= 0) { u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4); }
+    else if (u.robot) toucherRobot(u.robot, degats, hit.object);
+    if (!p && !vc && u.tourelle && (u.tourelle.vie -= degats) <= 0) { u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4); }
     marqueIronman(v, 1.5); etincelles(point, 5, 3);
   }
   rayonIronman(depart, point, 1.4, 0.1);
@@ -8875,19 +9223,125 @@ function repulseur(cote) {
   bip(1900, 380, 0.22, 'sawtooth', 0.06); bruit(0.4, 3500, 0.18);
   vacarme();
 }
+// Le canon de la main droite (une armure qui a un « canon » dans ARMURES_STARK, comme la Mark 50) : un gros obus de lumière part de la bouche
+// du canon jusqu'au viseur, et explose là où il touche, comme le plastron (sans blesser B.J.)
+function tirerCanon() {
+  const C = armureDe(J.ironman.armure).canon, c = joueurH.ironman?.canon;
+  joueurH.g.updateMatrixWorld(true);
+  const depart = J.vue === 1 || !c ? camera.localToWorld(V3(0.22, -0.2, -0.6)) : c.localToWorld(V3(0, -0.3, 0));
+  const v = viser(C.portee, 0.003);
+  if (v.hit || v.sol) { exploser(v.point, C.explosion, C.degats * reacteur('degats'), 0, null, true); marqueIronman(v, 2.5); }
+  rayonIronman(depart, v.point, 3, 0.15);
+  flash(depart, J.vue === 1 ? 0.5 : 1, scene, M_FLASH_FOUDRE);
+  bip(900, 120, 0.35, 'sawtooth', 0.09); bruit(0.7, 1800, 0.3);
+  J.recul = 1; vacarme();
+}
 // R : le rayon du plastron. Il se charge (le réacteur brille de plus en plus fort, ça siffle), puis part du réacteur jusqu'au viseur pendant une
-// demi-seconde, et explose là où il touche, en blanc et bleu, comme la foudre (sans blesser B.J.). Ensuite, IRONMAN.plastron.recharge secondes d'attente
+// demi-seconde, et explose là où il touche, en blanc et bleu, comme la foudre (sans blesser B.J.). Ensuite, IRONMAN.plastron.recharge secondes d'attente.
+// (Une armure qui a une mitrailleuse d'épaule, comme War Machine, n'a pas de rayon : R tire à la mitrailleuse, voir majIronman)
 const rayonPlastron = rayonIronman(V3(), V3(0, 0, 1), 1); rayonPlastron.visible = false; scene.add(rayonPlastron);
 function tirerPlastron() {
   const I = J.ironman, P = IRONMAN.plastron;
-  if (I.plastron || J.nage || J.roule || J.echelle || accroche() || J.superman?.looping) return;
+  if (armureDe(I.armure).mitrailleuse || I.plastron || J.nage || J.roule || J.echelle || accroche() || J.superman?.looping) return;
   if (I.recharge > 0) { bip(300, 200, 0.1, 'square', 0.1); annonce('', tr('Plastron : encore {n} s', { n: Math.ceil(I.recharge) }), 1); return; }
   I.plastron = { t: 0 }; I.recharge = P.charge + P.recharge; J.danse = 0;
   bip(160, 2400, P.charge, 'sine', 0.07);
 }
-const reacteurMonde = v => J.vue === 1 ? camera.localToWorld(v.set(0, -0.3, -0.45)) : joueurH.torse.localToWorld(v.set(0, 0.13, 0.15));   // d'où part le rayon du plastron
+const reacteurMonde = v => J.vue === 1 ? camera.localToWorld(v.set(0, -0.3, -0.45)) : joueurH.torse.localToWorld(v.set(0, 0.13, armureDe(J.ironman?.armure).massive ? 0.22 : 0.15));   // d'où part le rayon du plastron
 // la pose du plastron, de 0 à 1 (voir animerHumain) : il la prend vite, et la quitte à la fin du rayon
 const posePlastron = () => { const q = J.ironman?.plastron; return q ? clamp(Math.min(q.t * 8, (IRONMAN.plastron.charge + 0.5 - q.t) / 0.15), 0, 1) : 0; };
+// G : les mini-missiles (AMELIORATIONS_STARK.missiles, s'il les a achetés). Ils partent de ses épaules, l'un après l'autre, montent, puis filent
+// vers les ennemis qu'il voit (les plus proches d'abord) ; s'il n'y en a pas, vers là où il vise. Ce sont les fusées de l'armure du camp militaire
+const M_MISSILE = mat('#e4e4e8', { metalness: 0.6, roughness: 0.35 });
+function tirerMissiles() {
+  const I = J.ironman, M = AMELIORATIONS_STARK.missiles;
+  if (!stark.missiles) { annonce('', tr("Les mini-missiles s'achètent au magasin de Stark Industries (⚙ sur la carte)"), 2.5); return; }
+  if (I.missiles > 0) { bip(300, 200, 0.1, 'square', 0.1); annonce('', tr('{nom} : encore {n} s', { nom: tr('Missiles'), n: Math.ceil(I.missiles) }), 1); return; }
+  const yeux = { x: J.x, y: J.y + 1, z: J.z };
+  const cibles = [...personnes.filter(p => ennemi(p) && dist(p, J) < M.portee && voit(yeux, p)), ...robots.filter(q => q.pilote === 'police' && dist(q, J) < M.portee)]
+    .sort((a, b) => dist(a, J) - dist(b, J));
+  if (!cibles.length) { const v = viser(M.portee, 0); cibles.push({ x: v.point.x, y: v.point.y - 1.1, z: v.point.z, vie: 1 }); }   // (un point : il « vit » toujours)
+  joueurH.g.updateMatrixWorld(true);
+  for (let k = 0; k < M.nombre; k++) {
+    const cote = k % 2 ? -1 : 1, m = new THREE.Mesh(GEO_FUSEE, M_MISSILE);
+    const feu = new THREE.Sprite(M_FLASH); feu.position.z = -0.25; feu.scale.setScalar(0.3); m.add(feu);
+    m.position.copy((cote > 0 ? joueurH.brasG : joueurH.brasD).localToWorld(V3(0, 0.12, -0.04)));
+    const a = J.angleCorps, dir = V3(Math.sin(a) * 0.4 + Math.cos(a) * 0.4 * cote, 1, Math.cos(a) * 0.4 - Math.sin(a) * 0.4 * cote).normalize();   // vers le haut, un peu de côté
+    fuseesVol.push({ m, dir, cible: cibles[k % cibles.length], attente: k * 0.06, age: 0, fumee: 0, F: M });
+  }
+  I.missiles = M.recharge;
+  vacarme();
+}
+// X : le laser des bras (AMELIORATIONS_STARK.laser, s'il l'a acheté), comme la Mark VI dans Iron Man 2. Il pose un genou à terre et écarte
+// les bras en croix, puis fait un tour sur lui-même : un rayon rouge part de chaque poignet, à l'horizontale, et coupe tout ce qu'il croise
+function lancerLaser() {
+  const I = J.ironman, L = AMELIORATIONS_STARK.laser;
+  if (!stark.laser) { annonce('', tr("Le laser des bras s'achète au magasin de Stark Industries (⚙ sur la carte)"), 2.5); return; }
+  if (I.tour || J.nage || J.roule || J.echelle || accroche()) return;
+  if (J.superman || !J.sol) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }
+  if (I.laser > 0) { bip(300, 200, 0.1, 'square', 0.1); annonce('', tr('{nom} : encore {n} s', { nom: tr('Laser'), n: Math.ceil(I.laser) }), 1); return; }
+  I.tour = { t: 0, a0: J.angleCorps, a: null, touches: new Set() };
+  I.laser = L.recharge; J.danse = 0; J.accroupi = false;
+  bip(400, 2600, 0.25, 'sine', 0.06);
+}
+// les deux rayons du laser des bras : un fil rouge dans son halo, comme les yeux laser
+const rayonsBras = [0, 1].map(() => {
+  const g = new THREE.Group(); g.visible = false; scene.add(g);
+  g.add(new THREE.Mesh(GEO_BALLE, M_LASER), new THREE.Mesh(GEO_BALLE, M_HALO_LASER)); g.children[0].scale.set(0.3, 0.3, 1);
+  return g;
+});
+// le tour du laser, à chaque image (à la place de majJoueur) : 0,25 s pour se mettre à genou, le tour (AMELIORATIONS_STARK.laser.tour secondes),
+// 0,3 s pour se relever. Pendant le tour, chacun de ceux que les rayons croisent (à « portee » mètres, à hauteur d'homme, sans mur au milieu)
+// prend « degats » une fois : les gens tombent, les voitures prennent feu, le heavy robot est touché
+function tournerLaser(dt) {
+  const I = J.ironman, T = I.tour, L = AMELIORATIONS_STARK.laser, h = joueurH;
+  T.t += dt; J.vy = 0; J.vitesse = 0; J.pasX = J.pasZ = 0;
+  const fin = 0.25 + L.tour + 0.3, e = clamp(Math.min(T.t / 0.25, (fin - T.t) / 0.3), 0, 1), u = clamp((T.t - 0.25) / L.tour, 0, 1);
+  J.angleCorps = T.a0 + 2 * Math.PI * u;
+  h.g.position.set(J.x, J.y, J.z); h.g.rotation.y = J.angleCorps;
+  animerHumain(h, 0, dt, { genou: e, croix: e, penche: 0.08 * e });
+  for (const [b, c] of [[h.brasD, -1], [h.brasG, 1]]) { b.rotation.set(lerp(b.rotation.x, 0, e), 0, lerp(b.rotation.z, 1.5 * c, e)); b.pli.rotation.x = lerp(b.pli.rotation.x, 0, e); }
+  membresMous(h, dt, { sol: J.y });
+  for (const r of rayonsBras) r.visible = false;
+  const allume = u > 0 && u < 1;
+  if (allume) {
+    if (!T.son) { T.son = true; bip(1100, 900, L.tour, 'sawtooth', 0.05); bruit(0.3, 7000, L.tour); vacarme(); }
+    h.g.updateMatrixWorld(true);
+    const a = [J.angleCorps - Math.PI / 2, J.angleCorps + Math.PI / 2];   // le bras droit, puis le bras gauche
+    [h.brasD, h.brasG].forEach((b, k) => { // le rayon, du poignet jusqu'au premier mur, à « portee » mètres au plus
+      const depart = b.main.getWorldPosition(V3()), bout = depart.clone().add(V3(Math.sin(a[k]) * L.portee, 0, Math.cos(a[k]) * L.portee));
+      const t = butee(depart, bout), r = rayonsBras[k];
+      bout.lerpVectors(depart, bout, t);
+      r.visible = true; r.position.copy(depart); r.lookAt(bout); r.scale.set(1.3, 1.3, depart.distanceTo(bout));
+      if (t < 1 && Math.random() < 0.5) etincelles(bout, 2, 2);
+    });
+    // ceux que les rayons ont croisés depuis l'image d'avant
+    const avant = T.a ?? a[0], dans = phi => [0, Math.PI].some(c => ((phi - avant - c) % (2 * Math.PI) + 4 * Math.PI) % (2 * Math.PI) <= a[0] - avant + 0.02);
+    const croise = (o, haut) => !T.touches.has(o) && dist(o, J) < L.portee && o.y < J.y + 2.4 && o.y + haut > J.y + 0.6 && dans(Math.atan2(o.x - J.x, o.z - J.z))
+      && butee(V3(J.x, J.y + 1.2, J.z), V3(o.x, J.y + 1.2, o.z)) >= 1;
+    for (const p of personnes) if (p.vie > 0 && croise(p, 1.8)) { T.touches.add(p); blesser(p, L.degats); projeter(p, 0, 2, 0, -4); etincelles(V3(p.x, J.y + 1.2, p.z), 4, 2); }
+    for (const v of voitures) if (v !== J.voiture && !v.detruite && !pasDeTole(v) && croise(v, 1.5)) {
+      T.touches.add(v); etincelles(V3(v.x, J.y + 1.2, v.z), 8, 3);
+      if (!estBlindee(v)) { allumer(v); blesserConducteur(v, L.degats); }
+    }
+    for (const q of robots) if (croise(q, 5)) { T.touches.add(q); toucherRobot(q, L.degats); }
+    T.a = a[0];
+  }
+  if (T.t >= fin) { I.tour = null; J.angleCorps = T.a0; }
+}
+// War Machine (une armure qui a une « mitrailleuse » dans ARMURES_STARK) : tant qu'on garde R enfoncé, la mitrailleuse de son épaule tourne
+// vers le viseur et tire, ses six canons qui tournent ; elle ne manque jamais de munitions. Sinon, elle revient droit devant
+function mitrailleuseIronman(dt, peut) {
+  const I = J.ironman, M = armureDe(I.armure).mitrailleuse, g = joueurH.ironman?.mitrailleuse;
+  I.cdMitrailleuse -= dt; I.tirEpaule = Math.max(0, I.tirEpaule - dt);
+  if (!M || !g) return;
+  const tire = peut && !!touches.KeyR;
+  if (tire) {
+    camera.getWorldDirection(vVise).multiplyScalar(60).add(camera.position); g.lookAt(vVise);   // vers un point à 60 m, droit dans le viseur
+    joueurH.ironman.canons.rotation.z += 30 * dt; I.tirEpaule = 0.5; J.danse = 0;
+    if (I.cdMitrailleuse <= 0) { I.cdMitrailleuse = M.cadence; g.updateMatrixWorld(true); tirer(M, joueurH.ironman.canons.localToWorld(V3(0, 0, 0.45))); }
+  } else g.quaternion.slerp(Q_.identity(), Math.min(1, 6 * dt));
+}
 // la lueur bleue d'un répulseur qui se charge (G, D), et celle du réacteur (P)
 const lueursIronman = Object.fromEntries(['G', 'D', 'P'].map(k => { const s = new THREE.Sprite(M_FLASH_FOUDRE); s.visible = false; scene.add(s); return [k, s]; }));
 // les bras qui tirent (ou vont tirer) se tendent vers le viseur, la paume en avant (le poignet plié). À appeler après animerHumain
@@ -8899,37 +9353,56 @@ function viserMains(h) {
   h.g.updateMatrixWorld(true); h.g.worldToLocal(vVise);
   for (const [m, b] of [[M.G, h.brasG], [M.D, h.brasD]]) if (m.leve > 0) { tendreBras(h, b, vVise.x, vVise.y, vVise.z, m.leve); b.main.rotation.x = -Math.PI / 2 * m.leve; h.brasPris = true; }
 }
+// le bouclier de la main gauche est-il levé (A, avec une armure qui a un « bouclier ») ? Il arrête ce qui arrive de devant (voir blesserJoueur)
+const bouclierLeve = () => ironmanLibre() && !!armureDe(J.ironman.armure).bouclier && J.ironman.mains.G.leve > 0.7 && !!touches.KeyQ;
 // À chaque image : l'armure qui arrive, si on ne l'attend plus (il est mort, monté en voiture...) ; le masque qui se lève ou se baisse ;
-// les répulseurs (tant qu'on garde A ou E enfoncé, la main se lève, se charge, puis tire tous les IRONMAN.repulseurs.cadence secondes) ;
-// le rayon du plastron ; les flammes des réacteurs quand il vole ; et les lueurs de ce qui se charge
+// les répulseurs (tant qu'on garde A ou E enfoncé, la main se lève, se charge, puis tire tous les IRONMAN.repulseurs.cadence secondes),
+// ou le canon et le bouclier qui sortent des mains ; le rayon du plastron, ou la mitrailleuse d'épaule ; les missiles et le laser qui se
+// rechargent ; les flammes des réacteurs quand il vole ; les lueurs de ce qui se charge ; et les capsules vides qui repartent dans le ciel
 function majIronman(dt) {
   for (const k in lueursIronman) lueursIronman[k].visible = false;
   rayonPlastron.visible = false;
-  for (const o of vm.children.slice(0, 2)) o.material = armureIronman() ? matIronman('rouge') : mat('#e0b090');   // à la 1re personne : son bras, dans le gant rouge
+  if (!J.ironman?.tour) for (const r of rayonsBras) r.visible = false;   // (le tour du laser des bras a peut-être été interrompu)
+  for (const o of vm.children.slice(0, 2)) o.material = armureIronman() ? matIronman('rouge', J.ironman.armure) : mat('#e0b090');   // à la 1re personne : son bras, dans le gant rouge
+  for (const c of capsules) { // elle se referme, puis repart vers le ciel sur ses flammes
+    c.t += dt; for (const p of c.g.portes) p.rotation.y *= Math.pow(0.002, dt);
+    if (c.t > 0.5) { c.v += 30 * dt; c.g.position.y += c.v * dt; const f = new THREE.Sprite(M_FLASH); f.position.copy(c.g.position).add(V3(entre(-0.5, 0.5), -0.3, entre(-0.5, 0.5))); f.scale.setScalar(entre(1.2, 2.2)); scene.add(f); effets.push({ o: f, vie: 0.1 }); }
+    if (c.t > 0.5 && c.t - dt <= 0.5) bruit(0.6, 900, 1.5);
+  }
+  for (let k = capsules.length - 1; k >= 0; k--) if (capsules[k].t > 6) { scene.remove(capsules[k].g); capsules.splice(k, 1); }
   const I = J.ironman;
   if (!I) return;
   if (I.anim && (J.mort || J.voiture || J.robot || J.telesiege)) interrompreIronman();
-  const b = joueurH.ironman, R = IRONMAN.repulseurs, P = IRONMAN.plastron, dehors = J.vue !== 1;
+  if (I.tour && (J.mort || J.voiture || J.robot || J.telesiege)) I.tour = null;
+  const b = joueurH.ironman, R = IRONMAN.repulseurs, P = IRONMAN.plastron, dehors = J.vue !== 1, A = armureDe(I.armure);
   I.ouvert = clamp(I.ouvert + (I.masque ? 3 : -3) * dt, 0, 1);
   if (b?.visiere) { b.visiere.rotation.x = -1.65 * I.ouvert; b.visiere.position.y = 0.025 * I.ouvert; }
   joueurH.g.updateMatrixWorld(true);
-  // les répulseurs : la main gauche (A) et la main droite (E)
+  if (I.anim?.mode === 'nano' && dehors) { const s = lueursIronman.P; s.visible = true; s.position.copy(reacteurMonde(V3())); s.scale.setScalar(0.3 + 0.15 * Math.sin(temps * 25)); }   // le métal liquide sort du réacteur
+  M_NANO.emissiveIntensity = 0.45 + 0.3 * Math.sin(temps * 18);
+  // les répulseurs : la main gauche (A) et la main droite (E). Ou le canon (la main droite) et le bouclier (la main gauche)
   const peut = ironmanLibre() && !J.nage && !J.roule && !J.echelle && !accroche() && !J.superman?.looping;
   for (const [cote, m, code, k] of [[1, I.mains.G, 'KeyQ', 'G'], [-1, I.mains.D, 'KeyE', 'D']]) {
+    const canon = cote < 0 && A.canon, garde = cote > 0 && !!A.bouclier, C = canon || R;   // (C : sa charge et sa cadence)
     m.cd -= dt;
     const tient = peut && !!touches[code] && !m.bloque;
     if (!tient) m.charge = 0;
     else {
-      if (!m.charge) { bip(500, 1700, R.charge + 0.05, 'sine', 0.035); J.danse = 0; }   // la main se lève, et le répulseur se charge en sifflant
+      if (!m.charge) { if (garde) { bruit(0.25, 6000, 0.25); bip(300, 700, 0.2, 'triangle', 0.04); } else bip(canon ? 300 : 500, canon ? 1100 : 1700, C.charge + 0.05, 'sine', 0.035); J.danse = 0; }   // la main se lève, et le répulseur se charge en sifflant (le bouclier sort en chuintant)
       m.charge += dt;
-      if (m.charge >= R.charge && m.cd <= 0) { repulseur(cote); m.cd = R.cadence; m.dernier = temps; }
+      if (garde) m.dernier = temps;
+      else if (m.charge >= C.charge && m.cd <= 0) { if (canon) tirerCanon(); else repulseur(cote); m.cd = C.cadence; m.dernier = temps; }
     }
     m.leve = peut ? clamp(m.leve + (tient || temps - m.dernier < 0.4 ? 8 : -4) * dt, 0, 1) : 0;
+    const objet = cote < 0 ? b?.canon : b?.bouclier;   // le canon ou le bouclier sort du bout du bras, quand la main se lève
+    if (objet) objet.scale.setScalar(Math.max(0.001, m.leve));
     const s = lueursIronman[k], main = cote > 0 ? joueurH.brasG.main : joueurH.brasD.main;
-    if (dehors && m.leve > 0.5) { s.visible = true; main.localToWorld(s.position.set(0, -0.005, -0.07)); s.scale.setScalar(tient ? 0.15 + 0.25 * Math.min(1, m.charge / (R.charge || 1)) : 0.15); }
+    if (dehors && m.leve > 0.5 && !garde) { s.visible = true; main.localToWorld(s.position.set(0, -0.005, canon ? -0.6 : -0.07)); s.scale.setScalar(tient ? 0.15 + 0.25 * Math.min(1, m.charge / (C.charge || 1)) : 0.15); }
   }
-  // le plastron : il se charge, puis le rayon part (une seule fois), et dure une demi-seconde
+  // le plastron : il se charge, puis le rayon part (une seule fois), et dure une demi-seconde. Ou, avec War Machine, la mitrailleuse d'épaule
+  mitrailleuseIronman(dt, peut);
   if (I.recharge > 0 && (I.recharge -= dt) <= 0) bip(900, 1300, 0.12, 'sine', 0.12);   // le plastron est rechargé
+  for (const cle of ['missiles', 'laser']) if (I[cle] > 0 && (I[cle] -= dt) <= 0) bip(1000, 1400, 0.12, 'sine', 0.1);   // les missiles, le laser : rechargés
   const q = I.plastron;
   if (q && !peut) I.plastron = null;
   else if (q) {
@@ -8939,7 +9412,7 @@ function majIronman(dt) {
     if (q.t >= P.charge && !q.point) { // il part !
       const v = viser(P.portee, 0.002);
       q.point = v.point;
-      if (v.hit || v.sol) { exploser(v.point, P.explosion, P.degats, 0, null, true); marqueIronman(v, 3); }
+      if (v.hit || v.sol) { exploser(v.point, P.explosion, P.degats * reacteur('degats'), 0, null, true); marqueIronman(v, 3); }
       flash(depart, 1.5, scene, M_FLASH_FOUDRE);
       bruit(1, 2000, 0.7); bip(700, 110, 0.7, 'sawtooth', 0.12);
       J.recul = 1; J.secousse = Math.max(J.secousse || 0, 0.05);
@@ -8963,6 +9436,91 @@ function majIronman(dt) {
   I.ailes = clamp(I.ailes + (vole ? 2 : -2) * dt, 0, 1);
   for (const a of b?.ailes || []) a.rotation.z = a.userData.cote * (0.2 + 1 * I.ailes);
 }
+
+// --- Le magasin de Stark Industries (l'usine $ de Malibu, au chapitre d'Iron Man) ---
+// Ses stands (standsStark, voir genererBloc) : une armure d'ARMURES_STARK debout sur un plateau qui tourne, ou une des AMELIORATIONS_STARK
+// qui flotte au-dessus de son socle, avec son prix au-dessus. E près d'un stand : l'acheter, ou choisir une armure qu'on a déjà
+const M_PLATEAU = mat('#2a2c32', { metalness: 0.7, roughness: 0.35 });
+function vitrineStark(o) {
+  const g = new THREE.Group();
+  if (o.k !== undefined) { // (le groupe de l'objet est à 1,10 m au-dessus du sol)
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.92, 0.25, 28), M_PLATEAU); p.position.y = -1.1 + 0.125; p.castShadow = p.receiveShadow = true; g.add(p);
+    const a = statueArmure(o.k); a.position.y = -1.1 + 0.25; g.add(a);
+    return g;
+  }
+  const m = (geo, matiere, x = 0, y = 0, z = 0) => { const e = new THREE.Mesh(geo, matiere); e.position.set(x, y, z); e.castShadow = true; g.add(e); return e; };
+  if (o.amelioration === 'missiles') { // le boîtier d'épaule, ouvert, et ses six missiles
+    m(new THREE.BoxGeometry(0.34, 0.24, 0.4), matIronman('rouge', 0));
+    for (let i = 0; i < 6; i++) m(GEO_FUSEE, M_MISSILE, (i % 3 - 1) * 0.1, i < 3 ? 0.06 : -0.06, 0.14);
+  } else if (o.amelioration === 'laser') { // le gant de la Mark VI, et le laser rouge qui sort de son poignet
+    m(new THREE.CylinderGeometry(0.07, 0.06, 0.32, 12), matIronman('rouge', 0)).rotation.z = Math.PI / 2;
+    m(new THREE.SphereGeometry(0.08, 10, 8), matIronman('or', 0), -0.2, 0, 0);
+    m(new THREE.CylinderGeometry(0.012, 0.012, 0.6, 6), M_LASER, 0.46, 0, 0).rotation.z = Math.PI / 2;
+  } else { // le réacteur, en grand (ou une amélioration qu'on a inventée)
+    m(GEO.reacteur, matIronman('lumiere', 0)).scale.setScalar(3.5); m(GEO.bagueReacteur, matIronman('acier', 0)).scale.setScalar(3.5);
+  }
+  g.scale.setScalar(2);   // (deux fois plus grand que nature, comme les armes de l'armurerie)
+  return g;
+}
+// ce qu'on lit au-dessus d'un stand : le nom et le prix, ou « à toi », ou le niveau du réacteur
+function texteStark(o) {
+  const n = x => `${x.toLocaleString(langue === 'gsw' ? 'de-CH' : langue)} $`;
+  if (o.k !== undefined) { const A = armureDe(o.k); return stark.armures.includes(o.k) ? tr('{nom} : à toi', { nom: A.nom }) : `${A.nom} ${n(A.prix)}`; }
+  const c = o.amelioration, U = AMELIORATIONS_STARK[c];
+  if (c === 'reacteur') { const prix = U.prix[stark.reacteur - 1]; return prix === undefined ? tr('{nom} : niveau maximum', { nom: tr(U.nom) }) : `${tr('{nom} niveau {n}', { nom: tr(U.nom), n: stark.reacteur + 1 })} ${n(prix)}`; }
+  return stark[c] ? tr('{nom} : à toi', { nom: tr(U.nom) }) : `${tr(U.nom)} ${n(U.prix)}`;
+}
+// l'aide, près d'un stand (« Appuie sur E pour acheter... »)
+function aideStark(s) {
+  const acheter = (arme, prix) => tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme, prix: prix.toLocaleString(langue === 'gsw' ? 'de-CH' : langue) });   // (le prix, les milliers séparés)
+  if (s.k !== undefined) {
+    const A = armureDe(s.k);
+    if (!stark.armures.includes(s.k)) return acheter(A.nom, A.prix);
+    return stark.choisie === s.k ? tr("{armure} : c'est l'armure que tu as choisie (<b>H</b> pour l'appeler)", { armure: A.nom }) : tr('Appuie sur <b>E</b> pour choisir : {armure}', { armure: A.nom });
+  }
+  const c = s.amelioration, U = AMELIORATIONS_STARK[c];
+  if (c === 'reacteur') { const prix = U.prix[stark.reacteur - 1]; return prix === undefined ? tr('{nom} : niveau maximum', { nom: tr(U.nom) }) : acheter(tr('{nom} niveau {n}', { nom: tr(U.nom), n: stark.reacteur + 1 }), prix); }
+  if (!stark[c]) return acheter(tr(U.nom), U.prix);
+  return c === 'missiles' ? tr('{nom} : déjà à toi (dans ton armure, <b>G</b>)', { nom: tr(U.nom) }) : c === 'laser' ? tr('{nom} : déjà à toi (dans ton armure, <b>X</b>)', { nom: tr(U.nom) }) : tr('{nom} : déjà à toi', { nom: tr(U.nom) });
+}
+// E près d'un stand : il achète l'armure (elle devient celle que H appelle), ou il choisit une armure qu'il a déjà ; il achète une amélioration,
+// ou le niveau suivant du réacteur. Les prix au-dessus des stands changent, et la partie s'en souvient tout de suite
+function acheterStark(s) {
+  const paye = prix => {
+    if (J.argent < prix) { annonce(tr("Pas assez d'argent"), tr('Il te faut {prix} $', { prix: prix.toLocaleString(langue === 'gsw' ? 'de-CH' : langue) }), 2); bip(300, 200, 0.2, 'square', 0.2); return false; }
+    J.argent -= prix; bip(700, 1400, 0.2, 'sine', 0.3); return true;
+  };
+  if (s.k !== undefined) {
+    const A = armureDe(s.k), neuve = !stark.armures.includes(s.k);
+    if (neuve && !paye(A.prix)) return;
+    if (neuve) stark.armures = [...stark.armures, s.k].sort((a, b) => a - b);
+    stark.choisie = s.k;
+    if (neuve) annonce(tr('{armure} achetée !', { armure: A.nom }), !armureIronman() ? tr('H : elle arrive · J : changer d\'armure')
+      : J.ironman.armure === s.k ? '' : tr('H : tu sors de ton armure, et la {armure} arrive', { armure: A.nom }), 3.5);
+    else { annonceChoix(); bip(600, 900, 0.12, 'sine', 0.06); }
+  } else if (s.amelioration === 'reacteur') {
+    const U = AMELIORATIONS_STARK.reacteur, prix = U.prix[stark.reacteur - 1];
+    if (prix === undefined) { annonce('', tr('Ton réacteur est déjà au niveau maximum'), 2); return; }
+    if (!paye(prix)) return;
+    stark.reacteur++;
+    annonce(tr('Réacteur niveau {n} !', { n: stark.reacteur }), tr('Tu prends moins de dégâts, tes répulseurs font plus mal, et tu voles plus vite'), 3.5);
+  } else {
+    const c = s.amelioration, U = AMELIORATIONS_STARK[c];
+    if (stark[c]) { annonce('', tr('{nom} : déjà à toi', { nom: tr(U.nom) }), 2); return; }
+    if (!paye(U.prix)) return;
+    stark[c] = true;
+    annonce(tr('{nom} : à toi !', { nom: tr(U.nom) }), c === 'missiles' ? tr('Dans ton armure, G : ils partent de tes épaules et suivent les ennemis')
+      : c === 'laser' ? tr('Dans ton armure, X : un genou à terre, tu tournes sur toi-même, et le laser coupe tout autour de toi') : '', 3.5);
+  }
+  for (const o of objets) if (o.stark) etiqueter(o);
+  sauverPartie();
+}
+// au chapitre d'Iron Man, le magasin ouvre ses stands
+function ouvrirMagasin() {
+  if (!chezStark) return;
+  for (const s of standsStark) creerObjet({ type: 'stand', stark: true, k: s.k, amelioration: s.amelioration, x: s.x, y: s.y, z: s.z, fixe: s.k !== undefined });
+}
+ouvrirMagasin();
 
 // =====================================================================
 //  État du jeu
@@ -9021,8 +9579,9 @@ addEventListener('keydown', e => {
   if (e.key.toLowerCase() === 'm' || e.code === 'Tab') { ouvrirCarte(!carte.ouverte); return; } // ...sinon, la lettre M (quel que soit le clavier) ouvre la carte, comme Tab
   if (carte.ouverte) return;
   if (J.ironman && suiteIronman(e.code)) return;   // A Z E (Q W E sur un clavier anglais) : l'armure d'Iron Man arrive, ou il en sort
-  if (J.ironman?.anim && e.code !== 'KeyV') return;   // pendant ce temps, il ne fait rien d'autre
+  if ((J.ironman?.anim || J.ironman?.tour) && e.code !== 'KeyV') return;   // pendant ce temps (et pendant le tour du laser des bras), il ne fait rien d'autre
   if (e.code === 'KeyH') costume();   // H : l'armure d'Iron Man arrive, ou il en sort
+  if (e.code === 'KeyJ') changerArmure();   // J : il choisit une autre armure d'Iron Man (celles du magasin de Stark Industries)
   suite = (suite + e.code + ' ').slice(-SUITE_DANSE.length);
   if (suite === SUITE_DANSE) { suite = ''; danser(); }
   if (e.key === 'Shift') { tapesMaj = [...tapesMaj, temps].slice(-3); if (tapesMaj[2] - tapesMaj[0] < R_.tripleMaj) { tapesMaj = []; decoller(); } else if (J.superman) J.superman.appui = true; }   // en volant : cet appui le fera aller plus vite quand on relâchera Maj, sauf s'il a servi à une figure
@@ -9034,7 +9593,9 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if (e.code === 'KeyR' && im) tirerPlastron();   // Iron Man : le rayon du plastron
   else if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
-  if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
+  if (e.code === 'KeyG' && im && chezStark) tirerMissiles();   // Iron Man, au chapitre d'Iron Man : les mini-missiles
+  else if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
+  if (e.code === 'KeyX' && im && chezStark) lancerLaser();   // Iron Man, au chapitre d'Iron Man : le laser des bras
   if (e.code === 'KeyB') rappelerVoiture();   // Batman rappelle sa Batmobile
   if (e.code === 'KeyT' && !voyage) appuyerT();   // la DeLorean : choisir le chapitre où aller (dedans), ou la faire venir
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
@@ -9409,6 +9970,7 @@ function payerBlindage(g) {
   annonce(tr('MAD MAX !'), tr('Ta {voiture} est blindée : les balles ne passent plus, et elle tient {n} roquettes', { voiture: tr(v.type.nom), n: R_.roquettesBlindage }), 4);
 }
 function acheter(s) {
+  if (s.stark) { acheterStark(s); return; }   // le magasin de Stark Industries
   if (s.masque) { // le masque à gaz : on n'en a besoin que d'un
     if (J.masque) { annonce('', tr('Tu as déjà un masque à gaz'), 2); return; }
     if (J.argent < R_.prixMasque) { annonce(tr("Pas assez d'argent"), tr('Il te faut {prix} $', { prix: R_.prixMasque }), 2); bip(300, 200, 0.2, 'square', 0.2); return; }
@@ -9546,15 +10108,16 @@ function tenirPrise(dt) {
 // et les mitrailleuses de la banque
 const ciblesTir = (portee, rb = null) => [...batiments, ...personnes.filter(p => p.vie > 0 && dist(p, J) < portee + 5 && p.h.g.visible).map(p => p.h.g), ...voitures.filter(v => v.m.visible).map(v => v.m),
   ...robots.filter(r => r !== rb && r.m.g.visible).map(r => r.m.g), ...braquages.filter(B => dist(B, J) < 150).flatMap(B => B.tourelles.filter(t => t.vie > 0 && t.sortie > 0).map(t => t.m))];
-// a : l'arme (dans le heavy robot, sa mitrailleuse ou ses roquettes : ARMES_ROBOT)
-function tirer(a = ARMES[J.arme]) {
-  const rb = J.robot, stock = rb ? rb.munitions : J.balles, k = rb ? a.modele : J.arme;
-  if (rb) rb.cdJ[a.modele] = a.cadence; else { J.cooldown = a.cadence; J.angleCorps = J.lacet; }
+// a : l'arme (dans le heavy robot, sa mitrailleuse ou ses roquettes : ARMES_ROBOT). depart : d'où part la balle, pour une arme qui n'est pas
+// dans ses mains (la mitrailleuse d'épaule de War Machine : elle ne manque jamais de munitions)
+function tirer(a = ARMES[J.arme], depart0 = null) {
+  const rb = J.robot, stock = rb ? rb.munitions : depart0 ? { [J.arme]: Infinity } : J.balles, k = rb ? a.modele : J.arme;
+  if (rb) rb.cdJ[a.modele] = a.cadence; else if (!depart0) { J.cooldown = a.cadence; J.angleCorps = J.lacet; }
   if (a.corps) { frapper(a); return; }
   if (a.grappin || a.toile) { accrocher(a, true); return; }   // le grappin, la toile : voir accrocher
   if (stock[k] <= 0) { bip(1000, 900, 0.05, 'square', 0.15); annonce('', tr('Plus de munitions'), 1); if (!rb) J.cooldown = 0.3; return; }
   stock[k]--;
-  const depart = rb ? boutRobot(rb, a.explosion) : positionTir().clone();
+  const depart = rb ? boutRobot(rb, a.explosion) : depart0 || positionTir().clone();
   const jet = a.batarang || a.filet;   // ça se lance (un batarang, un filet) : ça ne fait presque pas de bruit
   if (a.laser) bip(2400, 1700, 0.08, 'sawtooth', 0.04);   // les yeux laser grésillent : ni coup de feu, ni recul, ni éclair
   else if (jet) { J.recul = 1; bruit(0.3, 5000, 0.12); }   // ça siffle
@@ -9564,7 +10127,7 @@ function tirer(a = ARMES[J.arme]) {
   } else {
     J.recul = 1;
     bruit(...SON_ARME[a.modele]);
-    if (J.vue === 1 && !rb) flash(vTmp2.set(0, 0.03, -0.75).applyMatrix4(vm.matrixWorld), 0.25, vmScene); else flash(depart, rb ? 1.1 : 0.6);
+    if (J.vue === 1 && !rb && !depart0) flash(vTmp2.set(0, 0.03, -0.75).applyMatrix4(vm.matrixWorld), 0.25, vmScene); else flash(depart, rb ? 1.1 : 0.6);
     lumiereTir.position.copy(depart); lumiereTir.intensity = 70;
   }
   const cibles = ciblesTir(a.portee, rb);
@@ -9615,8 +10178,11 @@ function tirer(a = ARMES[J.arme]) {
   if (jet) return;   // un batarang, un filet : personne n'entend rien (ceux qui sont touchés, eux, le sentent : voir blesser)
   vacarme();   // le bruit fait fuir les piétons et alerte soldats, vigiles et policiers
 }
+// un coup de poing ou de couteau. Dans une armure d'Iron Man qui a des « poings » (la Hulkbuster), un coup de poing fait tant de fois plus mal,
+// envoie valser celui qu'il touche, et cabosse et pousse la voiture qui est devant lui
 function frapper(a) {
   J.frappe = 1;
+  const fort = !a.modele && armureIronman() ? armureDe(J.ironman.armure).poings || 1 : 1;
   bruit(0.15, a.modele ? 6000 : 800, 0.1);
   let cible = null, best = a.portee + 0.5;
   for (const p of personnes) {
@@ -9624,10 +10190,21 @@ function frapper(a) {
     const d = dist(p, J);
     if (d < best && Math.abs(diffAngle(J.lacet, angleVers(J, p))) < 0.9) { best = d; cible = p; }
   }
+  const sx = Math.sin(J.lacet), sz = Math.cos(J.lacet);
   if (cible) {
-    blesser(cible, a.degats); bip(160, 60, 0.12, 'sine', 0.5);
-    cible.x += Math.sin(J.lacet) * 0.5; cible.z += Math.cos(J.lacet) * 0.5;
+    blesser(cible, a.degats * fort); bip(160, 60, 0.12, 'sine', 0.5);
+    if (fort > 1) projeter(cible, sx * 3 * fort, 2 + fort, sz * 3 * fort, -6); else { cible.x += sx * 0.5; cible.z += sz * 0.5; }
   }
+  if (fort <= 1) return;
+  // la voiture devant lui (à 1,60 m de sa carrosserie au plus) : cabossée, et poussée
+  const devant = o => o.cercles.some(lz => { const c = local(o, 0, lz); return dist(c, J) < o.rayon + 1.6 && Math.abs(diffAngle(J.lacet, angleVers(J, c))) < 0.9; });
+  const v = voitures.find(o => !o.detruite && !pasDeTole(o) && Math.abs(o.y - J.y) < 2 && devant(o));
+  if (v) {
+    const P = V3(J.x + sx * 1.2, J.y + 1, J.z + sz * 1.2), D = V3(sx, 0.3, sz);
+    abimer(v, v.m.worldToLocal(P.clone()), D.clone().applyQuaternion(v.m.quaternion.clone().invert()), fort * 0.15, false);
+    heurter(v, P, V3(sx * 2.5 * fort, 0.8 * fort, sz * 2.5 * fort)); bruit(0.6, 1200, 0.3); etincelles(P, 6, 3);
+  }
+  if (cible || v) J.secousse = Math.max(J.secousse || 0, 0.04);
 }
 // p devient hostile : l'alarme de son braquage sonne, ou tout son gang attaque
 function alerter(p) {
@@ -9676,11 +10253,16 @@ function blesserConducteur(v, degats, parJoueur = true) {
   blesser(c, c.vie, parJoueur);
 }
 const abrite = () => J.voiture && !J.voiture.forme.ouvert;   // une carrosserie protège, pas un tricycle
-// gilet = false : le gilet pare-balles ne protège pas (une chute, une roulade)
-function blesserJoueur(degats, gilet = true) {
+// gilet = false : le gilet pare-balles ne protège pas (une chute, une roulade). de : d'où vient le coup (le tireur, l'explosion), s'il vient de
+// quelque part : le bouclier d'Iron Man arrête ce qui vient de devant lui
+function blesserJoueur(degats, gilet = true, de = null) {
   if (J.mort || voyage || estBlindee(J.voiture) || invincible()) return;   // dans une voiture blindée, rien ne passe (ni quand il est parti dans un autre chapitre)
   if (J.robot?.armure) { toucherArmure(J.robot, degats); return; }   // dans l'armure : c'est elle qui encaisse tout, jusqu'à ce qu'elle casse
-  const d = degats * (abrite() ? R_.protectionVoiture : J.robot ? R_.protectionRobot : armureIronman() ? IRONMAN.protection : 1), g = gilet ? Math.min(J.gilet, d) : 0; // le gilet prend les dégâts en premier (l'armure d'Iron Man en prend la plus grosse part)
+  if (de && bouclierLeve() && Math.abs(diffAngle(J.lacet, angleVers(J, de))) < armureDe(J.ironman.armure).bouclier.angle * Math.PI / 180) { // le bouclier, levé vers là d'où ça vient
+    joueurH.ironman?.bouclier?.getWorldPosition(vTmp2); etincelles(vTmp2.clone(), 5, 3); bip(2400, 1500, 0.1, 'sine', 0.05);
+    return;
+  }
+  const d = degats * (abrite() ? R_.protectionVoiture : J.robot ? R_.protectionRobot : armureIronman() ? protectionIronman() : 1), g = gilet ? Math.min(J.gilet, d) : 0; // le gilet prend les dégâts en premier (l'armure d'Iron Man en prend la plus grosse part)
   J.gilet -= g; J.vie -= d - g;
   J.dernierDegat = temps;
   $('rouge').style.opacity = 0.9;
@@ -9707,6 +10289,7 @@ function reapparaitre() {
 // =====================================================================
 function majJoueur(dt) {
   if (J.ironman?.anim) { animerIronman(dt); return; }   // l'armure d'Iron Man arrive, ou il en sort
+  if (J.ironman?.tour) { tournerLaser(dt); return; }   // le laser des bras : un genou à terre, il fait un tour sur lui-même
   if (J.superman) { superman(dt); return; }
   if (J.grappin) { grappiner(dt); return; }            // Batman, tiré par son grappin
   if (J.balance && balancer(dt)) return;               // Spiderman, au bout de sa toile
@@ -9761,7 +10344,7 @@ function majJoueur(dt) {
   }
   for (const o of robots) { const d = dist(o, J), r = 1.6; if (d < r && d > 0 && Math.abs(o.y - J.y) < 4) { J.x = o.x + (J.x - o.x) / d * r; J.z = o.z + (J.z - o.z) / d * r; } }   // ni à travers le robot
   const vide = J.ironman?.vide;   // ni à travers l'armure vide d'Iron Man
-  if (vide && Math.abs(vide.y - J.y) < 2) { const d = dist(vide, J), r = 0.75; if (d < r && d > 0) { J.x = vide.x + (J.x - vide.x) / d * r; J.z = vide.z + (J.z - vide.z) / d * r; } }
+  if (vide && Math.abs(vide.y - J.y) < 2) { const d = dist(vide, J), r = 0.72 * vide.h.g.scale.x; if (d < r && d > 0) { J.x = vide.x + (J.x - vide.x) / d * r; J.z = vide.z + (J.z - vide.z) / d * r; } }
   // on bouscule les passants : en marchant, on les pousse et ils vacillent ; en courant, on les renverse (pas le Kommandant ni Hitler)
   for (const p of personnes) {
     if (p.vie <= 0 || p.vol || p.releve !== undefined || p.h.chien || Math.abs(p.y - J.y) > 1) continue;
@@ -10112,7 +10695,7 @@ function superman(dt) {
   } else {
     const dx = Math.sin(J.lacet) * ct * av - Math.cos(J.lacet) * lat, dy = Math.sin(J.tangage) * av + monte, dz = Math.cos(J.lacet) * ct * av + Math.sin(J.lacet) * lat;
     if (!av && !lat && !monte) f.crans = 0;   // il s'arrête : il repart à la vitesse normale
-    const v = Math.min(R_.vitesseVolMax, R_.vitesseVol + f.crans * R_.vitesseVolMaj) / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ
+    const v = Math.min(R_.vitesseVolMax, R_.vitesseVol + f.crans * R_.vitesseVolMaj) * volIronman() / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
     f.vx += (dx * v - f.vx) * k; J.vy += (dy * v - J.vy) * k; f.vz += (dz * v - f.vz) * k;
   }
   J.x += f.vx * dt; J.y += J.vy * dt; J.z += f.vz * dt;
@@ -10147,7 +10730,7 @@ function superman(dt) {
   joueurH.g.quaternion.setFromEuler(new THREE.Euler(bascule, J.angleCorps, f.roulis, 'YZX'));
   // le tonneau : il tourne autour de son corps, de la tête aux pieds (couché, c'est un tonneau ; debout, sur place, une pirouette)
   if (f.tonneau) joueurH.g.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(V3(0, 1, 0), angleTonneau(f)));
-  poserCorps(joueurH, J.x, J.y + 0.95, J.z, 0.95);   // il bascule autour de son bassin
+  poserCorps(joueurH, J.x, J.y + 0.95 * joueurH.g.scale.y, J.z, 0.95);   // il bascule autour de son bassin (plus haut dans la Hulkbuster, qui le grandit)
   viserMains(joueurH);   // Iron Man : la main qui tire se tend vers le viseur, même couché
   membresMous(joueurH, dt, { raideur: 25, sol: hs, vx: f.vx, vy: J.vy, vz: f.vz });   // ses membres traînent un peu quand il tourne
 }
@@ -11175,7 +11758,7 @@ function majChien(p, dt, d) {
     p.angle = lerpAngle(p.angle, angleVers(p, J), 10 * dt);
     const dedans = J.voiture || J.robot;   // il ne mord pas à travers la carrosserie
     if (d > (dedans ? 3 : 1.1)) vitesse = ENNEMIS.chien.vitesse;
-    else if (!dedans && p.cooldown <= 0) { p.cooldown = entre(...ENNEMIS.chien.tir); blesserJoueur(ENNEMIS.chien.degats); aboyer(p); }
+    else if (!dedans && p.cooldown <= 0) { p.cooldown = entre(...ENNEMIS.chien.tir); blesserJoueur(ENNEMIS.chien.degats, true, p); aboyer(p); }
     if ((p.tAboie = (p.tAboie ?? entre(0.3, 1)) - dt) <= 0) { p.tAboie = entre(0.6, 1.4); aboyer(p); }
   }
   if (vitesse) {
@@ -11216,7 +11799,7 @@ function tirEnnemi(p, d) {
   const arrive = balleArrive(p, depart, arrivee, !reussi);   // un mur entre lui et toi arrête la balle
   traceur(depart, arrivee); flash(depart, 0.4);
   bruit(0.4 * clamp(1 - d / 120, 0, 1), 1800, 0.18);
-  if (reussi && arrive) blesserJoueur(degats * parTriche('balles'));
+  if (reussi && arrive) blesserJoueur(degats * parTriche('balles'), true, p);
 }
 
 // voitures qui roulent toutes seules : elles suivent une "carotte" qui avance sur la voie de droite du réseau des routes.
@@ -11777,10 +12360,10 @@ function majCamera(dt) {
     else if (r.armure) placerCamera(new THREE.Vector3(r.x, r.y + 2.7, r.z), dir, 5, 1);
     else if (J.vue === 1) { r.m.g.updateMatrixWorld(true); camera.position.copy(r.m.torse.localToWorld(V3(0, 1.5, 0.75))); }
     else placerCamera(new THREE.Vector3(r.x, r.y + 4.4, r.z), dir, 7.5, 1.4);
-  } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65), J.z);
+  } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65) * tailleIronman(), J.z);
   else {
-    const pivot = new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6), J.z);
-    placerCamera(pivot, dir, visee ? 1.8 : 3.8, visee ? 0.6 : 0.5);
+    const t = tailleIronman(), pivot = new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6) * t, J.z);   // (t : dans la Hulkbuster, plus haut et plus loin)
+    placerCamera(pivot, dir, (visee ? 1.8 : 3.8) * t, (visee ? 0.6 : 0.5) * t);
     // dans une petite pièce, dos au mur ou dans un coin, la caméra n'a pas la place de reculer : elle arrive dans la tête de B.J., et on ne
     // voit plus que son cou. Alors, à moins de 60 cm de sa tête, on ne le dessine plus : on voit la pièce et son arme, comme à la 1re personne.
     // (Il ne revient qu'à 80 cm : sinon, il clignoterait en longeant un mur)
@@ -11819,6 +12402,8 @@ function sauverPartie() {
   partie.argent = J.argent; partie.missions[chapitre] = missionIndex;
   partie.armes[chapitre] = { possede: ARMES.filter((w, i) => J.possede[i] && !pouvoirArme(w)).map(w => w.nom), gilet: J.gilet, masque: J.masque,
     balles: Object.fromEntries(ARMES.map((w, i) => [w.nom, J.balles[i]]).filter(([, n]) => Number.isFinite(n) && n > 0)) };
+  if (chezStark) partie.magasin = { ...partie.magasin, [chapitre]: { armures: stark.armures.map(k => ARMURES_STARK[k].nom), choisie: ARMURES_STARK[stark.choisie].nom,
+    ...Object.fromEntries(Object.keys(AMELIORATIONS_STARK).map(c => [c, stark[c]])) } };   // le magasin de Stark Industries (les armures par leur nom)
   try { localStorage.partie = JSON.stringify(partie); } catch {}
 }
 // on change de chapitre : on sauve celui-ci, puis la page se recharge dans l'autre (chaque chapitre construit sa ville).
@@ -12202,6 +12787,14 @@ function dessinerGrandeCarte(dt) {
   texteCarte(g, tr('Tu es dans la colonne {col}, ligne {ligne} de la CARTE', { col: ci, ligne: cj }), l - 24, 40, 17, 'right');
   texteCarte(g, tr('Molette : zoom   ·   Souris ou flèches : se déplacer   ·   M : fermer'), l / 2, h - 19, 19);
 }
+// dans l'armure d'Iron Man, à pied : ses touches. Au chapitre d'Iron Man, celles de l'armure qu'il porte, et de ce qu'il a acheté chez Stark Industries
+function aideIronman() {
+  if (!chezStark) return tr("<b>A</b> <b>E</b> : répulseurs · <b>R</b> : plastron · <b>F</b> : voler · <b>M</b> : masque · <b>A Z E</b> : sortir de l'armure");
+  const A = armureDe(J.ironman.armure);
+  return [A.bouclier && A.canon ? tr('<b>A</b> : bouclier · <b>E</b> : canon') : A.canon ? tr('<b>A</b> : répulseur · <b>E</b> : canon') : A.bouclier ? tr('<b>A</b> : bouclier · <b>E</b> : répulseur') : tr('<b>A</b> <b>E</b> : répulseurs'),
+    A.mitrailleuse ? tr('<b>R</b> : mitrailleuse') : tr('<b>R</b> : plastron'), tr('<b>F</b> : voler'), stark.missiles && tr('<b>G</b> : missiles'), stark.laser && tr('<b>X</b> : laser'),
+    tr('<b>M</b> : masque'), stark.armures.length > 1 && tr("<b>J</b> : changer d'armure"), tr('<b>H</b> : sortir')].filter(Boolean).join(' · ');
+}
 function majHUD(dt) {
   $('barre-vie').firstChild.style.width = `${J.vie / R_.viesJoueur * 100}%`;
   $('barre-vie').firstChild.style.background = J.vie < 30 ? '#c0392b' : '#56b24c';
@@ -12221,6 +12814,10 @@ function majHUD(dt) {
   $('arme').textContent = ar ? tr('Armure') : rb ? 'Heavy robot' : tr(a.nom);
   $('munitions').textContent = ar ? `${tr('{n} points', { n: Math.ceil(ar.points) })} · ${ar.fusees > 0 ? tr('{n} fusées', { n: ar.fusees }) : tr('Fusées : encore {n} s', { n: Math.ceil(ar.recharge) })}`
     : rb ? `${tr('{n} balles', { n: rb.munitions.lourde })} · ${tr('{n} roquettes', { n: rb.munitions.roquettes })}` : a.corps || pouvoirArme(a) ? '' : tr(a.explosion ? '{n} roquettes' : '{n} balles', { n: J.balles[J.arme] });
+  if (chezStark && armureIronman() && !J.voiture && !rb) { // dans l'armure d'Iron Man, au chapitre d'Iron Man : son nom, et ce qui se recharge
+    const I = J.ironman, pret = (c, nom) => I[c] > 0 ? tr('{nom} : encore {n} s', { nom, n: Math.ceil(I[c]) }) : nom;
+    $('munitions').textContent = [$('munitions').textContent, armureDe(I.armure).nom, stark.missiles && pret('missiles', tr('Missiles')), stark.laser && pret('laser', tr('Laser'))].filter(Boolean).join(' · ');
+  }
   const m = MISSIONS_CH[missionIndex], et = m?.etapes[etapeIndex];
   $('objectif').textContent = voyage ? '' : tr(m ? et.texte : 'Pays libre : fais ce que tu veux !', et?.type === 'eliminer' ? { n: resteAEliminer(et.cible) } : {});
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
@@ -12242,7 +12839,7 @@ function majHUD(dt) {
     : !aPied ? (faitFigures(J.voiture) ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping') : '')
     : lit ? (sommeil ? '' : etoiles > 0 ? tr("Sème d'abord la police, puis reviens dormir") : tr(MOMENTS[journee.moment].dormir))   // dans sa villa, près du lit
     : autreLit ? tr("Ce lit n'est pas à toi : dors dans une de tes villas (⌂ sur la carte), chez Michael ou chez Franklin")
-    : s ? (s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
+    : s ? (s.stark ? aideStark(s) : s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
       : J.possede[s.arme] ? tr('Appuie sur <b>E</b> pour acheter : {arme} (munitions {prix} $)', { arme: tr(ARMES[s.arme].nom), prix: Math.round(ARMES[s.arme].prix / 2) })
       : tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr(ARMES[s.arme].nom), prix: ARMES[s.arme].prix }))
     : g ? tr('Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max ({prix})', { prix: montant(R_.prixBlindage) })
@@ -12259,7 +12856,7 @@ function majHUD(dt) {
     : J.prise ? tr(J.prise.souris ? 'Lâche le bouton pour lancer la voiture là où tu regardes' : 'Lâche <b>G</b> pour lancer la voiture là où tu regardes') : J.grappin ? tr('<b>Espace</b> : lâcher le grappin')
     : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape')
     : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping')   // en volant : les figures
-    : ironmanLibre() ? tr("<b>A</b> <b>E</b> : répulseurs · <b>R</b> : plastron · <b>F</b> : voler · <b>M</b> : masque · <b>A Z E</b> : sortir de l'armure") : '';   // dans l'armure d'Iron Man
+    : ironmanLibre() ? aideIronman() : '';   // dans l'armure d'Iron Man
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
@@ -12552,6 +13149,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   majBraquages(dt); majTelesieges(); majBoardercross(); majCamp(dt);
   for (const o of objets) {
     if (o.cache) { o.cache -= dt; if (o.cache <= 0) { o.cache = 0; o.m.visible = true; } continue; }
+    if (o.fixe) { o.m.rotation.y += dt * 0.5; continue; }   // une armure du magasin de Stark Industries : elle tourne doucement sur son plateau
     o.m.rotation.y += dt * 1.5; o.m.position.y = o.base + Math.sin(temps * 2 + o.x) * 0.1;
     if (o.type === 'stand' || J.mort || dist(o, J) > 1.6 || Math.abs(o.base - 0.85 - J.y) > 1.6) continue;
     if (o.type === 'soin') { if (J.vie >= R_.viesJoueur) continue; J.vie = Math.min(R_.viesJoueur, J.vie + 50); annonce('', tr('+50 vie'), 1.5); }
@@ -12675,7 +13273,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   dansBatiment, pourBoites, resoudre, majJoueur, accrocher, attraper, tenirPrise, prendre, liberer, lancer, lances, filets, feux, arriver, murDevant, cable, garerPres, amenerVoiture, rappelerVoiture, pouvoir, creerArme, raycaster,
   crochetCable, ouvrirFilet, oterFilet, deployerAiles, rendreInvisible, invisible, policeVoit,
   camp, bunkerSecret, CAMP, ARMURE, tirEnnemi, boutDuCanon, balleArrive, aSonTourCamp, champCamp, capCamp, declencherAlarmeCamp, creerArmure, monterRobot, sortirRobot, tirerFusees, fuseesVol, majCamp, reinitialiserCamp, appuyerBouton, boutonProche, resteCamp, casserArmure, toucherArmure, etapeFinie, majHUD,
-  IRONMAN, PIECES_IRONMAN, mettreIronman, enleverIronman, appelerArmure, sortirArmure, basculerArmure, suiteIronman, repulseur, tirerPlastron, leverMasque, armureIronman, ironmanLibre,
+  IRONMAN, PIECES_IRONMAN, ARMURES_STARK, AMELIORATIONS_STARK, stark, standsStark, armureDe, nettoyerArrivee, decoller, changerArmure, costume, acheterStark, tirerMissiles, lancerLaser, tirerCanon, bouclierLeve, protectionIronman, volIronman, capsules, mettreIronman, enleverIronman, appelerArmure, sortirArmure, basculerArmure, suiteIronman, repulseur, tirerPlastron, leverMasque, armureIronman, ironmanLibre,
   majIronman, viserMains, lueursIronman, rayonPlastron, tendreBras, matIronman, armureComplete,
   exploser, blesserJoueur, cibleMission, V3, TRICHES, apercu, dessinerApercu, ecraser, effets, capeBJ, rayonsLaser, majLaser, foudre, choisirArme, poserBiceps, bicepsBJ, vm, vmScene, vmCamera, ARMES_ROBOT, ARMES, ENNEMIS, robotProche, ENSEIGNES, dosH, dosV, noeud, GANGS, immeubles, echelles,
   get etapeIndex() { return etapeIndex; }, set etapeIndex(v) { etapeIndex = v; }, set missionIndex(v) { missionIndex = v; }, get saisie() { return saisie; }, set saisie(v) { saisie = v; },
