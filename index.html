@@ -233,8 +233,10 @@ for (const k in heros) {
 //  LES CHAPITRES : le jeu se joue en chapitres, un par héros. À la fin d'un chapitre, la DeLorean emmène au suivant : il faut tenir
 //  88 miles à l'heure (142 km/h) pendant 3 secondes. Elle ramène aussi aux chapitres d'avant (dedans, la touche T choisit où aller).
 //  Les missions sont dans MISSIONS (le chapitre 1) et MISSIONS_CHAPITRES (les autres), plus bas.
-//  ville : où ça se passe. Pour l'instant, tous les chapitres sont dans le pays de la CARTE : Malibu, Gotham, Metropolis et New York arrivent bientôt
+//  ville : où ça se passe. Sa carte est dans VILLES (plus bas), sinon c'est le pays de la CARTE (Los Santos). Gotham, Metropolis et New York arrivent bientôt
 //  heros, heroine : ton nom, avec le garçon ou la fille du menu (sans : celui de HEROS) ; super, superFille : le nom de super-héros
+//  civil, civilFille : ta tenue de tous les jours (le héros, l'héroïne), avant de mettre ton costume (touche H) : veste, chemise, pantalon (ou jupe),
+//    chaussures (ou talons), cheveux (sans : ceux du menu), lunettes : la couleur des verres de tes lunettes de soleil, barbiche: true : comme Tony Stark
 //  triche : le code de triche du héros, allumé pendant tout le chapitre. Les codes des autres super-héros n'y marchent pas
 //  logo : le dessin de l'écran du chapitre, et sa façon de s'en aller : 'wolfenstein' (il brûle), 'ironman' (un tir de répulseur le brise),
 //    'batman' (il s'envole en chauves-souris), 'superman' (il part comme une fusée), 'spiderman' (une toile l'arrache)
@@ -242,7 +244,7 @@ for (const k in heros) {
 //  cachette : où la DeLorean attend qu'on la retrouve, à la fin du chapitre : une lettre de la CARTE ('?' : le bunker secret)
 //  sansReproche: true : un héros sans reproche. La police est de son côté (jamais d'étoiles), mais il ne doit pas tuer de passants :
 //    dès la 3e victime, une amende (voir amende, dans REGLAGES)
-//  bulles : les bulles d'aide du début du chapitre, l'une après l'autre ({super} : son nom de super-héros ; <b>A</b> : la lettre en gras)
+//  bulles : les bulles d'aide du début du chapitre, l'une après l'autre ({heros} : ton nom ; {super} : ton nom de super-héros ; <b>A</b> : la lettre en gras)
 // =====================================================================
 const CHAPITRES = [
   { ville: 'Los Santos', logo: 'wolfenstein', cachette: '?', bulles: [
@@ -251,13 +253,15 @@ const CHAPITRES = [
     'Si tu fais des bêtises, la police te poursuit : cache-toi pour la semer.',
     'À la fin du chapitre, la <b>DeLorean</b> t\'emmène au chapitre suivant !',
   ]},
-  { ville: 'Malibu', heros: 'Tony Stark', heroine: 'Pepper Potts', super: 'Iron Man', superFille: 'Rescue', triche: 'IRONMAN', logo: 'ironman', heure: 13, cachette: 'a', sansReproche: true, bulles: [
-    'Tu es <b>{super}</b> ! Ton armure arrive en volant, pièce par pièce.',
+  { ville: 'Malibu', heros: 'Tony Stark', heroine: 'Pepper Potts', super: 'Iron Man', superFille: 'Rescue', triche: 'IRONMAN', logo: 'ironman', heure: 13, cachette: '>', sansReproche: true,
+    civil: { veste: '#2b2d34', chemise: '#ececf0', pantalon: '#2b2d34', chaussures: '#141418', cheveux: '#3b2717', lunettes: '#8a2c14', barbiche: true },
+    civilFille: { veste: '#ece2d0', chemise: '#ffffff', jupe: '#ece2d0', talons: '#cdb48c', cheveux: '#d08a4e' }, bulles: [
+    'Tu es <b>{heros}</b>. <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !',
     '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.',
     '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.',
-    '<b>A Z E</b>, l\'une après l\'autre : sortir de l\'armure, ou la rappeler. <b>M</b> : le masque.',
+    '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>M</b> : le masque.',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
-    'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
+    'Le Mandarin a caché la DeLorean dans son repaire : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
   { ville: 'Gotham', heros: 'Bruce Wayne', heroine: 'Barbara Gordon', super: 'Batman', superFille: 'Batgirl', triche: 'BATMAN', logo: 'batman', heure: 1, cachette: 'b', sansReproche: true, bulles: [
     'Tu es <b>{super}</b> ! Ta Batmobile t\'attend à côté de toi : <b>B</b> la rappelle, <b>R</b> la fait voler.',
@@ -579,6 +583,9 @@ const TRADUCTIONS = {
   "<b>A</b> <b>E</b> : répulseurs · <b>R</b> : plastron · <b>F</b> : voler · <b>M</b> : masque · <b>A Z E</b> : sortir de l'armure": { de: '<b>Q</b> <b>E</b>: Repulsoren · <b>R</b>: Brustplatte · <b>F</b>: fliegen · <b>M</b>: Maske · <b>Q W E</b>: aussteigen',
     en: '<b>Q</b> <b>E</b>: repulsors · <b>R</b>: chest beam · <b>F</b>: fly · <b>M</b>: mask · <b>Q W E</b>: step out', gsw: '<b>Q</b> <b>E</b>: Repulsore · <b>R</b>: Bruschtplatte · <b>F</b>: flüüge · <b>M</b>: Maske · <b>Q W E</b>: uusstiige' },
   'IRON MAN !':       { de: 'IRON MAN!', en: 'IRON MAN!', gsw: 'IRON MAN!' },
+  'RESCUE !':         { de: 'RESCUE!', en: 'RESCUE!', gsw: 'RESCUE!' },
+  'Rescue !':         { de: 'Rescue!', en: 'Rescue!', gsw: 'Rescue!' },
+  'Sois à pied, debout par terre !': { de: 'Sei zu Fuß und steh auf dem Boden!', en: 'Be on foot, standing on the ground!', gsw: 'Sig z Fuess und stand uf em Bode!' },
   'Iron Man !':       { de: 'Iron Man!', en: 'Iron Man!', gsw: 'Iron Man!' },
   'Répulseurs':       { de: 'Repulsoren', en: 'Repulsors', gsw: 'Repulsore' },
   'Plastron':         { de: 'Brustplatte', en: 'Chest beam', gsw: 'Bruschtplatte' },
@@ -740,6 +747,20 @@ const TRADUCTIONS = {
   'Aéroport':         { de: 'Flughafen', en: 'Airport', gsw: 'Flughafe' },
   'Port':             { de: 'Hafen', en: 'Port', gsw: 'Hafe' },
   'Collines de Vinewood': { de: 'Vinewood Hills', en: 'Vinewood Hills', gsw: 'Vinewood Hills' },
+  'Pointe de Malibu': { de: 'Malibu Point', en: 'Malibu Point', gsw: 'Malibu Point' },
+  'Villa de Tony Stark': { de: 'Villa von Tony Stark', en: "Tony Stark's villa", gsw: 'Villa vom Tony Stark' },
+  'Tour Stark':       { de: 'Stark Tower', en: 'Stark Tower', gsw: 'Stark Tower' },
+  'Repaire du Mandarin': { de: 'Versteck des Mandarins', en: "The Mandarin's lair", gsw: 'Versteck vom Mandarin' },
+  'Grotte des Dix Anneaux': { de: 'Höhle der Zehn Ringe', en: 'Cave of the Ten Rings', gsw: 'Höhli vo de Zäh Ring' },
+  'Route des falaises': { de: 'Klippenstraße', en: 'Cliff Road', gsw: 'Klippestrass' },
+  'Montagnes de Santa Monica': { de: 'Santa Monica Mountains', en: 'Santa Monica Mountains', gsw: 'Santa Monica Mountains' },
+  'Jetée de Santa Monica': { de: 'Santa Monica Pier', en: 'Santa Monica Pier', gsw: 'Santa Monica Pier' },
+  'CENTRE-VILLE':     { de: 'INNENSTADT', en: 'DOWNTOWN', gsw: 'INNESTADT' },
+  'Collines d\'Hollywood': { de: 'Hollywood Hills', en: 'Hollywood Hills', gsw: 'Hollywood Hills' },
+  'Vallée de San Fernando': { de: 'San-Fernando-Tal', en: 'San Fernando Valley', gsw: 'San-Fernando-Tal' },
+  'Désert de Mojave': { de: 'Mojave-Wüste', en: 'Mojave Desert', gsw: 'Mojave-Wüeschti' },
+  'Base aérienne Edwards': { de: 'Luftwaffenstützpunkt Edwards', en: 'Edwards Air Force Base', gsw: 'Luftwaffebasis Edwards' },
+  'Île de Catalina':  { de: 'Catalina-Insel', en: 'Catalina Island', gsw: 'Catalina-Insle' },
   'Désert de Grand Senora': { de: 'Grand-Senora-Wüste', en: 'Grand Senora Desert', gsw: 'Grand-Senora-Wüeschti' },
   'Mont Josiah':      { de: 'Mount Josiah', en: 'Mount Josiah', gsw: 'Mount Josiah' },
   'Mont Chiliad':     { de: 'Mount Chiliad', en: 'Mount Chiliad', gsw: 'Mount Chiliad' },
@@ -796,18 +817,22 @@ const TRADUCTIONS = {
     en: 'If you get up to mischief, the police will chase you: hide to shake them off.', gsw: 'Wänn du Seich machsch, verfolgt di d Polizei: Versteck di, zum si abhänke.' },
   'À la fin du chapitre, la <b>DeLorean</b> t\'emmène au chapitre suivant !': { de: 'Am Ende des Kapitels bringt dich der <b>DeLorean</b> ins nächste Kapitel!',
     en: 'At the end of the chapter, the <b>DeLorean</b> takes you to the next chapter!', gsw: 'Am Änd vom Kapitel bringt di de <b>DeLorean</b> is nächschte Kapitel!' },
-  'Tu es <b>{super}</b> ! Ton armure arrive en volant, pièce par pièce.': { de: 'Du bist <b>{super}</b>! Deine Rüstung fliegt herbei, Stück für Stück.',
-    en: 'You are <b>{super}</b>! Your armor flies in, piece by piece.', gsw: 'Du bisch <b>{super}</b>! Dini Rüschtig flüügt här, Stuck für Stuck.' },
+  'Tu es <b>{heros}</b>. <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !': { de: 'Du bist <b>{heros}</b>. <b>H</b>: Deine Rüstung fliegt herbei, und du wirst <b>{super}</b>!',
+    en: 'You are <b>{heros}</b>. <b>H</b>: your armor flies in, and you become <b>{super}</b>!', gsw: 'Du bisch <b>{heros}</b>. <b>H</b>: Dini Rüschtig flüügt här, und du wirsch <b>{super}</b>!' },
   '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.': { de: '<b>Q</b> und <b>E</b>: die Repulsoren deiner Hände. <b>R</b>: der Strahl der Brustplatte.',
     en: '<b>Q</b> and <b>E</b>: the repulsors in your hands. <b>R</b>: the chest beam.', gsw: '<b>Q</b> und <b>E</b>: d Repulsore vo dine Händ. <b>R</b>: de Strahl vo de Bruschtplatte.' },
   '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.': { de: '<b>F</b>: fliegen, und noch einmal <b>F</b> zum Landen. Im Flug, <b>Shift</b>: schneller.',
     en: '<b>F</b>: fly, and <b>F</b> again to land. While flying, <b>Shift</b>: faster.', gsw: '<b>F</b>: flüüge, und nomal <b>F</b> zum Lande. Im Flug, <b>Shift</b>: schnäller.' },
-  '<b>A Z E</b>, l\'une après l\'autre : sortir de l\'armure, ou la rappeler. <b>M</b> : le masque.': { de: '<b>Q W E</b>, nacheinander: aus der Rüstung steigen oder sie rufen. <b>M</b>: die Maske.',
-    en: '<b>Q W E</b>, one after the other: step out of the armor, or call it back. <b>M</b>: the mask.', gsw: '<b>Q W E</b>, eis nach em andere: us de Rüschtig uusstiige oder si rüefe. <b>M</b>: d Maske.' },
+  '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>M</b> : le masque.': { de: '<b>H</b> noch einmal: Du steigst aus der Rüstung (sie bleibt stehen). <b>M</b>: die Maske.',
+    en: '<b>H</b> again: you step out of the armor (it stays standing). <b>M</b>: the mask.', gsw: '<b>H</b> nomal: Du stiigsch us de Rüschtig (si blibt stah). <b>M</b>: d Maske.' },
   'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !': {
     de: 'Du bist ein Held: Die Polizei ist auf deiner Seite. Aber pass auf die Passanten auf: Ab dem 3. Opfer zahlst du eine Strafe!',
     en: 'You are a hero: the police are on your side. But watch out for passers-by: from the 3rd victim on, you pay a fine!',
     gsw: 'Du bisch en Held: d Polizei isch uf dinere Siite. Aber pass uf d Passante uf: Ab em 3. Opfer gits e Buess!' },
+  'Le Mandarin a caché la DeLorean dans son repaire : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.': {
+    de: 'Der Mandarin hat den DeLorean in seinem Versteck versteckt: Finde ihn (gelber Punkt) und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
+    en: 'The Mandarin has hidden the DeLorean in his lair: find it (yellow dot), then hold 88 miles per hour for 3 seconds.',
+    gsw: 'De Mandarin hät de DeLorean i sim Versteck versteckt: Find en (gääle Punkt) und heb dänn 3 Sekunde lang 88 Meile pro Stund.' },
   'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.': {
     de: 'Der DeLorean ist verschwunden: Finde ihn (gelber Punkt) und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
     en: 'The DeLorean has vanished: find it (yellow dot), then hold 88 miles per hour for 3 seconds.',
@@ -838,6 +863,11 @@ const TRADUCTIONS = {
     en: 'Off to chapter 2: hold 88 miles per hour (142 km/h) for 3 seconds! You need a long straight road',
     gsw: 'Ab is Kapitel 2: Heb 3 Sekunde lang 88 Meile pro Stund (142 km/h)! Du bruuchsch e langi Graadi' },
   'La DeLorean a disparu': { de: 'Der DeLorean ist verschwunden', en: 'The DeLorean has vanished', gsw: 'De DeLorean isch verschwunde' },
+  'Le repaire du Mandarin': { de: 'Das Versteck des Mandarins', en: "The Mandarin's lair", gsw: 'S Versteck vom Mandarin' },
+  'Le Mandarin a caché la DeLorean dans son repaire : va la reprendre (point jaune)': {
+    de: 'Der Mandarin hat den DeLorean in seinem Versteck versteckt: Hol ihn zurück (gelber Punkt)',
+    en: 'The Mandarin has hidden the DeLorean in his lair: go and take it back (yellow dot)',
+    gsw: 'De Mandarin hät de DeLorean i sim Versteck versteckt: Hol en zrugg (gääle Punkt)' },
   'La DeLorean est repartie toute seule : retrouve-la (point jaune) et monte dedans': { de: 'Der DeLorean ist von allein weggefahren: Finde ihn (gelber Punkt) und steig ein',
     en: 'The DeLorean left on its own: find it (yellow dot) and get in', gsw: 'De DeLorean isch elei abgfahre: Find en (gääle Punkt) und stiig ii' },
   'Tiens 88 miles à l\'heure (142 km/h) pendant 3 secondes pour partir au chapitre suivant (T : choisir le chapitre)': {
@@ -1606,8 +1636,9 @@ const IRONMAN = {
 //    ^ piste avec un avion à piloter    @ hélistation avec un hélicoptère
 //  Une ville posée dans la montagne est à plat, à la hauteur de la montagne autour d'elle.
 //  Une route (=) doit toucher le coin d'un pâté pour se brancher sur les rues d'une ville.
+//  C'est la carte de Los Santos. Les autres chapitres ont leur ville : voir VILLES, après les gangs.
 // =====================================================================
-const CARTE = [
+let CARTE = [
   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 0
   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 1
   "~~~~~~~~~~~~~~~~~~~~~_~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 2
@@ -1687,7 +1718,7 @@ const CARTE = [
 //  Pour la même hauteur, plus le rayon est petit, plus les pentes sont raides... et plus on descend vite !
 //  Le nom s'écrit sur la grande carte. Une station de ski (Y dans la CARTE) fait monter un télésiège au sommet le plus proche.
 // =====================================================================
-const SOMMETS = [
+let SOMMETS = [
   { nom: 'Mont Gordo',   col: 54, ligne: 20, hauteur: 900, rayon: 17 },
   { nom: 'San Chianski', col: 57, ligne: 34, hauteur: 650, rayon: 11 },
 ];
@@ -1696,7 +1727,7 @@ const SOMMETS = [
 //  de, vers : [colonne, ligne] de la gare du bas et de la gare du haut dans la CARTE. On peut mettre des virgules : 48.5 = le milieu
 //  entre les colonnes 48 et 49.     cabines: true = une télécabine (des cabines à la place des sièges)
 // =====================================================================
-const REMONTEES = [
+let REMONTEES = [
   { nom: 'Télécabine des Marmottes', de: [39, 15.7], vers: [48.5, 14.5], cabines: true },
   { nom: 'Télésiège du San Chianski', de: [56.42, 28.88], vers: [56.93, 33.4] },
   { nom: 'Télésiège du Col', de: [55.44, 29.1], vers: [54.3, 22] },
@@ -1712,7 +1743,7 @@ const REMONTEES = [
 //  boardercross: true = une piste étroite avec des virages relevés et des bosses, chronométrée du portique de départ à l'arrivée.
 //  Fais partir une piste près du haut d'une remontée, et arriver près du bas d'une autre : les skieurs enchaînent !
 // =====================================================================
-const PISTES_SKI = [
+let PISTES_SKI = [
   { nom: 'La Gordo', couleur: 'noire', points: [[53, 20.3], [50, 19.6], [46, 18.5], [42.5, 17.5], [40.3, 16.9], [39.45, 16.3]],
     kickers: [250, 520, 900], bosses: [120, 640], vagues: [380, 780] },
   { nom: 'Les Crêtes', couleur: 'rouge', points: [[53.1, 19.5], [52.95, 18.2], [52.85, 17], [51.9, 16.3], [50.6, 15.6], [49.5, 15], [48.9, 14.75]],
@@ -1734,12 +1765,12 @@ const PISTES_SKI = [
 //  angle : vers où regarde le bus : 0 = le sud, 90 = l'est, 180 = le nord, 270 = l'ouest. On descend du côté de sa porte, à sa droite
 //  abri: true = un abribus avec un banc, en face de la porte
 // =====================================================================
-const NAVETTE = [
+let NAVETTE = [
   { nom: 'Los Santos', col: 21, ligne: 45, x: 30, z: 17, angle: 90 },                       // sur la place du départ (X), juste devant B.J.
   { nom: 'Station de ski', col: 39, ligne: 16, x: 14, z: 47, angle: 90, abri: true },       // au pied des pistes (Y)
 ];
 // les noms écrits sur la grande carte : [texte, colonne, ligne]
-const NOMS_LIEUX = [
+let NOMS_LIEUX = [
   ['LOS SANTOS', 21, 55], ['Vinewood', 21, 44], ['Vespucci', 12, 53], ['Aéroport', 16, 63], ['Port', 27, 64],
   ['Collines de Vinewood', 20, 38], ['Chumash', 4, 40], ['Fort Zancudo', 7, 25], ['Harmony', 26, 30],
   ['Désert de Grand Senora', 30, 31], ['SANDY SHORES', 31, 26], ['Alamo Sea', 27, 21], ['Mont Josiah', 15, 24],
@@ -1747,6 +1778,10 @@ const NOMS_LIEUX = [
   ['Réservoir Land Act', 35, 48], ['Tataviam', 37, 42], ['Palomino', 37, 55],
   ...SOMMETS.map(s => [s.nom, s.col, s.ligne + 1]),   // le nom de chaque sommet, juste en dessous
 ];
+// les grandes lettres blanches posées sur les collines (comme HOLLYWOOD à Malibu : voir VILLES) ; à Los Santos, aucune
+let PANNEAUX = [];
+// les palmiers poussent sur les plages à partir de cette ligne de la CARTE (plus au nord, il n'y a rien sur le sable)
+let PALMIERS = 41;
 
 // =====================================================================
 //  LES GANGS : ils traînent dans leur quartier, et te laissent tranquille... sauf si tu en frappes un,
@@ -1754,12 +1789,111 @@ const NOMS_LIEUX = [
 //  col, ligne : leur pâté dans la CARTE (la grande carte te dit où tu es). arme : un nom du tableau ARMES.
 //  Sur les cartes, leur quartier est de leur couleur.
 // =====================================================================
-const GANGS = [
+let GANGS = [
   { nom: 'Families', couleur: '#22b04a', col: 18, ligne: 55, membres: 5, arme: 'Pistolet' },
   { nom: 'Ballas',   couleur: '#7a2a9a', col: 22, ligne: 56, membres: 5, arme: 'Mitraillette' },
   { nom: 'Vagos',    couleur: '#e0b820', col: 30, ligne: 54, membres: 5, arme: 'Pistolet' },
   { nom: 'Lost MC',  couleur: '#1a1a1a', col: 33, ligne: 24, membres: 4, arme: 'Fusil à pompe' },
 ];
+
+// =====================================================================
+//  LES AUTRES VILLES : chaque chapitre se joue dans sa ville (CHAPITRES, tout en haut du fichier : ville). Los Santos, c'est la CARTE et
+//  les tableaux juste au-dessus. Une autre ville a les siens ici, avec les mêmes noms : ils remplacent ceux de Los Santos quand on y joue.
+//  Ce qu'elle n'a pas, elle ne l'a pas : sans SOMMETS, pas de neige ; sans GANGS, pas de gangs... Pour inventer une ville : copie Malibu !
+//  PANNEAUX : les grandes lettres blanches posées sur une colline : texte, col, ligne (le milieu du mot), angle (vers où elles regardent :
+//    0 = le sud, 90 = l'est, 180 = le nord, 270 = l'ouest). Écris ton nom sur la colline !
+//  PALMIERS : les palmiers poussent sur les plages à partir de cette ligne de la carte (0 : sur toutes les plages)
+// =====================================================================
+const VILLES = {
+  // Malibu, au chapitre 2 (Iron Man). Dans sa CARTE, les signes de Los Santos, et ceux de Malibu (* = avec un étage ou un toit où monter) :
+  //    < villa de Tony Stark*, au bout de la pointe, sur la falaise : son atelier en bas, le salon en haut
+  //    | tour Stark* : un ascenseur monte jusqu'au toit, où Iron Man se pose        $ usine Stark Industries : on y entre
+  //    ( Stark Expo : son grand globe, au milieu d'un parc        > repaire du Mandarin, sur la falaise : la DeLorean y est cachée
+  //    ) grotte des Dix Anneaux, creusée dans la montagne
+  //    - jetée en planches, sur la mer ; du côté de la terre, la grande roue et les montagnes russes
+  'Malibu': {
+    CARTE: [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 0
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 1
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 2
+      "~~~~~_~__~_~2~~22~~1__11~1~~~~_~____~~~__~_1~23~3332~1~__~_~____~_11111~~~",  // 3
+      "~~~~11111112233333221112222211___,,________12334443321_______::__112221~~~",  // 4
+      "~~~1222221223444443221223332211,,,,,,,,,,,,12334543321:::::::::::12333~~~~",  // 5
+      "~~~~2333222344555443223334333211,,,,,,,,,,,12334443321:::::::::::123432~~~",  // 6
+      "~~~~3343332345666543223444443221,,,,,,,,,,,12233333221:::::::::::123332~~~",  // 7
+      "~~~~4444432345676543233455543321,,,,,,,,,,,112233:::::::::::::::::::221~~~",  // 8
+      "~~~~4555433345666543234456544321,,,,,,,,,,,,11222:NNIHNN::::::::::::111~~~",  // 9
+      "~~~44565443344555443233455543321,,,,,,,,,,,,,1111:!!!!!^!!!!!^!!!!!::_~~~~",  // 10
+      "~~~~4555433234444432223444443221,,,,,,,,,,,,,:::::!!@!!!!!!!!!!!!@!::__~~~",  // 11
+      "~~~~4444432223333332223334333211;,,;,;,,,,;,;:::::NNE::::::::::::::::__~~~",  // 12
+      "~~~~334333223334443332223332211,,,;;,,,,,,;,,::===:::=:::::::::::::::_~~~~",  // 13
+      "~~~~23332223344555443322222211;;;;,,,,,,,;;;;:=:::::::=::::::::::::::__~~~",  // 14
+      "~~~12222222344555554432211111,,,,,,,;,,,,,;,;=:::::::::=:::::::::::::_~~~~",  // 15
+      "~~~~2223333345666665433211111,,,,,,,;;;,,;,,=:::::::::::=::::::::::::_~~~~",  // 16
+      "~~~223333334556777655432222211,,;;,MMIMM,;;=;::::::::::::=:::::::::::_~~~~",  // 17
+      "~~~2334444445567876554323332211,;,;MSPIM,,=,,:::::::::::::=::::::::::__~~~",  // 18
+      "~~~~3445554455677765543334333211;,=IMHMM==,,,::::::::::::::=:::::::::_~~~~",  // 19
+      "~~~~4455655445666665433444443221;=;MMEMI,,,,,:::::::::11111=::1::::::_~~~~",  // 20
+      "~~~34556665544555554433455543321=,,,,=,,;,,,;:::::::::122211=22211:::__~~~",  // 21
+      "~~~3456676654445554433445654432=;,;;;=,,;,,;,:::::::::123211=333211::__~~~",  // 22
+      "~~~~45566655433444333334555433=1,;,,,,=;,,;;;:::::::::1222123=44321::_~~~~",  // 23
+      "~~~34455655443333332223444443=21,;11111=1,,;;:::::::::1111234=54432::__~~~",  // 24
+      "~~~3344555443322222212333433=211,1122222=1,,,::::::::::::12345=5432211_~~~",  // 25
+      "~~~233444443=====1122222333=211,112333332=111111::::::::::2345=54333221~~~",  // 26
+      "~~~22333333=2221,==2333222=211,,123344433=1222221:::::::::1235)53444322~~~",  // 27
+      "~~~~222333=33322112==4432=111111123455543=22333221::::::::1125554555432~~~",  // 28
+      "~~~~11222=34443211234==3=1,*1122223456543=234443211111:::::11234556554~~~~",  // 29
+      "~~~__111=23454321123444=21,,1233323455543=2345432122211::11112345676543~~~",  // 30
+      "~~~~***=12344432112233=221**1234323344433=23444322232211112222345565543~~~",  // 31
+      "~~~_*,=*122333221*122=221,,,1233322333332=22333222333221122333234555432~~~",  // 32
+      "~~~~*=,**1222221,,,1=111*,*,1122211222221=12222223343321233343333444322~~~",  // 33
+      "~~~_=222222222222222=222222,,111111111111=,111112233322223444443233322~~~~",  // 34
+      "~~~_===========MMSMIMEMHMMM,,,,,,,,,,,,,,=,,,,,11223221233455543322211~~~~",  // 35
+      "~~~~~~~~333=333MIMMMIMMMIMM=__,,,,,,,,,,,=,,,,,,1122211234456544321,,_~~~~",  // 36
+      "~~~~~~~~333=333____________~==__,,,,,,,,,=,,,,,,,111111233455543321,,_~~~~",  // 37
+      "~~~~~~~~333X333~~~~&~~~~~~~~~_MMIMPMM,,,,=,,,,,,,,,,,,1223444443221,,__~~~",  // 38
+      "~~~~~~~~~33<33~~~~~~~~~~~~~~~_IIMIMMIM,,,MIIIIIIIM,,,,1123334333211,,__~~~",  // 39
+      "~~~~~~~~~~333~~~~~~~~~~~~~~~~_IHIIMIMMPMMIIITTIICIII,,,11223332211,,,_~~~~",  // 40
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_IIPIIMPMMMPITTTTIIPPPII,,,112222211,,,,_~~~~",  // 41
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_IMIISMMPMMMITT|TTIIP(PI,,,,1111111,,,,,__~~~",  // 42
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_IIIMIIPMMPMITTTTTIIPPPIM,,,,,,,,,,,,,,,,_~~~",  // 43
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_IIIIMIMMMMPHITTIIIIIIEII,,,,,,,,,,,,,,,,_~~~",  // 44
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_MIIIIMMPMMMIIIIIIIII$III,,,,,,,,,,,,,,,,_~~~",  // 45
+      "~~~~~~~~~~~~~~~~~~~~~~~------.IPIICIMMMPMIIIIPIIIIIIIM,,,,,,,,,,,,,,,,_~~~",  // 46
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_IIIIIMMMPMMMIIIIIIIIIIM=,,,,,,,,,,,,,,,,_~~~",  // 47
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_MIIIMMPMMMPMMIIMIIEIM,,,==,,,,,,,,,,,,,,_~~~",  // 48
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_IIEIMMMMPMMMMMIMIIIIMM,,,,==,,,,,,,,,,,__~~~",  // 49
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_MIIIIMPMMMMPMMMMIIIIMMI,,,,,==,,,,,,,,,_~~~~",  // 50
+      "~~~~~~~~~~~____~~~~~~~~~~~~~~_IPMIIMMMPMM,,,HMMMPMI,,,,,,,,,==,,,,,,,__~~~",  // 51
+      "~~~~~~~~11111,____~~~~~~~~~~~_IIIMMSMMMMP,,,,MMIIII,,,,,,,,,,,==,,2222_~~~",  // 52
+      "~~~~~~~_12221,111__~~~~~~~~~~_MIIIMMM,,,,,,,,,EMIIDD,,,,,,,,,,,,===>22_~~~",  // 53
+      "~~~~~~__12321,121,__~~~~~~~~~_IIMMMMM,,,,,,,,,,IDDDDD,,,,,,,,,,,,,2222_~~~",  // 54
+      "~~~~~~__12221,MS1,__~~~~~~~~~_MMMIMMM,,,,,,,,,,,DDDDD,,,,,,,,,,,,,,,,,_~~~",  // 55
+      "~~~~~~~_11111,M.,__~~~~~~~~~~_______________DDDDDDDDDDDDD,,____________~~~",  // 56
+      "~~~~~~~~____,,__&_~~~~~~~~~~~_______________DD~~DDD~~DD~D_,_~~~~~~~~~~~~~~",  // 57
+      "~~~~~~~~~~~____~~~~~~~~~~~~~~~&~~~~~~~~~~~~~DD~~DDD~~DD~~_,_~~~~~~~~~~~~~~",  // 58
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DDD~~~~~~___~~~~~~~~~~~~~~",  // 59
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 60
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 61
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 62
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 63
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 64
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 65
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 66
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 67
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 68
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 69
+    ],
+    NOMS_LIEUX: [
+      ['MALIBU', 20, 33], ['Pointe de Malibu', 11, 42], ['Route des falaises', 7, 37], ['Malibu Canyon', 25, 31], ['Montagnes de Santa Monica', 14, 21],
+      ['SANTA MONICA', 33, 48], ['Jetée de Santa Monica', 25, 44], ['Venice', 35, 57], ['CENTRE-VILLE', 46, 38], ['Port', 50, 60],
+      ['Collines d\'Hollywood', 41, 27], ['Vallée de San Fernando', 37, 14], ['Burbank', 37, 22], ['Désert de Mojave', 58, 19],
+      ['Base aérienne Edwards', 58, 7], ['Île de Catalina', 12, 50],
+    ],
+    PANNEAUX: [{ texte: 'HOLLYWOOD', col: 37, ligne: 31, angle: 0 }],
+    PALMIERS: 0,
+  },
+};
 
 // =====================================================================
 //  LES MISSIONS : invente les tiennes !
@@ -1835,8 +1969,13 @@ const RETROUVER_DELOREAN = { nom: 'La DeLorean a disparu', recompense: 1000, eta
   { type: 'conduire', voiture: 'DeLorean', texte: 'La DeLorean est repartie toute seule : retrouve-la (point jaune) et monte dedans' },
   { type: 'voyager', texte: 'Tiens 88 miles à l\'heure (142 km/h) pendant 3 secondes pour partir au chapitre suivant (T : choisir le chapitre)' },
 ]};
+// au chapitre 2, c'est le Mandarin qui l'a cachée, dans son repaire (> dans la carte de Malibu)
+const DELOREAN_MANDARIN = { nom: 'Le repaire du Mandarin', recompense: 1000, etapes: [
+  { type: 'conduire', voiture: 'DeLorean', texte: 'Le Mandarin a caché la DeLorean dans son repaire : va la reprendre (point jaune)' },
+  RETROUVER_DELOREAN.etapes[1],
+]};
 const MISSIONS_CHAPITRES = {
-  2: [RETROUVER_DELOREAN],
+  2: [DELOREAN_MANDARIN],
   3: [RETROUVER_DELOREAN],
   4: [RETROUVER_DELOREAN],
   5: [RETROUVER_DELOREAN],
@@ -1859,7 +1998,7 @@ const chapitre = partie.chapitre, MISSIONS_CH = missionsDu(chapitre);
 //    { type: 'pont', hauteur: 5, longueur: 30 }            une rampe, un pont avec des rambardes, une rampe
 //    { type: 'bosses', nombre: 4, hauteur: 1.2 }           des bosses, pour faire des petits sauts
 // =====================================================================
-const CASCADES = [
+let CASCADES = [
   { nom: 'Stunt Park de Palomino', col: 32, ligne: 49, vers: 'e', voiture: 'Porsche', morceaux: [
     { type: 'droit', longueur: 30 },
     { type: 'tremplin', hauteur: 2.5, saut: 16 },
@@ -2001,6 +2140,10 @@ const PEAU_BJ = TENUE_BJ.peau;
 // le morceau qui la porte, et où : x vers sa gauche, y vers le haut, z vers l'avant), flamme celle d'un réacteur, quand il vole.
 // Change les couleurs, ou l'ordre des pièces !
 const COULEURS_IRONMAN = { rouge: '#a3141c', or: '#9a6a12', acier: '#3a3c42', lumiere: '#d8f8ff' };
+// l'armure Rescue de Pepper Potts (la fille du menu, dans le chapitre d'Iron Man) : du bleu à la place du rouge, du violet à la place de l'or.
+// Elle a aussi deux ailes dans le dos (elles s'ouvrent quand elle vole)
+const COULEURS_RESCUE = { rouge: '#26399e', or: '#6c36a8', acier: '#5a5e6e', lumiere: '#d8f0ff' };
+const rescue = () => fille() && CHAPITRE.superFille === 'Rescue';
 const gantIronman = m => { revetir(m.bas, 'rouge'); revetir(m.main, 'rouge'); plaque(GEO.paume, 'lumiere', m.main, 0, -0.005, -0.057); flamme(m.pli, 0, -0.32, 0, 'main'); };   // avec le répulseur, au creux de la main
 const brasIronman = m => { revetir(m.haut, 'or'); plaque(GEO.epauliere, 'rouge', m, 0, 0.015, 0); };   // avec l'épaulière
 const botteIronman = j => { revetir(j.bas, 'rouge'); revetir(j.chaussure, 'rouge'); plaque(GEO.genouillere, 'acier', j.pli, 0, 0, 0.035); flamme(j.pli, 0, -0.49, 0.02, 'botte'); };   // avec la genouillère
@@ -2016,11 +2159,12 @@ const PIECES_IRONMAN = [
   { nom: 'Bassin',        ancre: b => b.haut,       poser: b => { revetir(b.bassin, 'rouge'); revetir(b.ceinture, 'acier'); } },
   // le plastron, avec le réacteur qui brille au milieu de la poitrine (c'est de là que part le rayon de la touche R)
   { nom: 'Plastron',      ancre: b => b.torse,      poser: b => { revetir(b.torse, 'plastron'); revetir(b.cou, 'acier');
-      plaque(GEO.reacteur, 'lumiere', b.torse, 0, 0.13, 0.14); plaque(GEO.bagueReacteur, 'acier', b.torse, 0, 0.13, 0.143); } },
-  // le casque cache les cheveux et les oreilles, mais pas le visage : c'est le masque qui le cache
+      plaque(GEO.reacteur, 'lumiere', b.torse, 0, 0.13, 0.14); plaque(GEO.bagueReacteur, 'acier', b.torse, 0, 0.13, 0.143);
+      if (rescue()) for (const c of [-1, 1]) { const a = plaque(GEO.aileRescue, 'or', b.torse, 0.07 * c, 0.25, -0.13); a.userData.cote = c; a.rotation.z = 0.2 * c; b.ironman.ailes.push(a); } } },   // les ailes de Rescue
+  // le casque cache les cheveux, les oreilles (et les lunettes de soleil de Tony Stark), mais pas le visage : c'est le masque qui le cache
   { nom: 'Casque',        ancre: b => b.tete,       poser: b => {
       if (b.cheveux) b.cheveux.visible = false;
-      for (const o of b.tete.children) if (o.geometry === GEO.oreille) o.visible = false;
+      for (const o of b.tete.children) if (o.geometry === GEO.oreille || o.geometry === GEO.lunettes) o.visible = false;   // (pas la barbiche de Tony)
       plaque(GEO.casqueIronman, 'rouge', b.tete, 0, 0, 0);
     } },
   // le masque, en or, avec ses deux yeux qui brillent et la fente de la bouche. Il tourne autour du milieu de la tête : levé (touche M),
@@ -2343,6 +2487,9 @@ const pouvoirArme = a => POUVOIRS_ARMES.find(k => a[k]) || null;
 const S = 60, R = 14, PAS = S + R, VOIE = 3.2;
 const EAU = -1;                // la hauteur de l'eau : mer, lacs et rivières
 const PASMAX = 0.6;            // la plus haute marche qu'on monte sans sauter
+// le pays du chapitre : Los Santos (la CARTE et ses tableaux), ou la ville du chapitre (VILLES), dont les tableaux les remplacent
+if (VILLES[CHAPITRE.ville]) ({ CARTE, SOMMETS, REMONTEES, PISTES_SKI, NAVETTE, NOMS_LIEUX, GANGS, CASCADES, PANNEAUX, PALMIERS } =
+  { SOMMETS: [], REMONTEES: [], PISTES_SKI: [], NAVETTE: [], NOMS_LIEUX: [], GANGS: [], CASCADES: [], PANNEAUX: [], PALMIERS: 0, ...VILLES[CHAPITRE.ville] });
 const NBX = CARTE[0].length, NBZ = CARTE.length;
 const TAILLE_X = NBX * PAS + R, TAILLE_Z = NBZ * PAS + R;
 CARTE.forEach((l, i) => { if (l.length !== NBX) alert(`Carte : la ligne ${i} n'a pas la bonne longueur !`); });
@@ -2351,16 +2498,16 @@ const centre = (i, j) => ({ x: i * PAS + R + S / 2, z: j * PAS + R + S / 2 });
 const noeud = (i, j) => ({ x: i * PAS + R / 2, z: j * PAS + R / 2 });        // carrefour
 const blocEn = (x, z) => [clamp(Math.floor((x - R / 2) / PAS), 0, NBX - 1), clamp(Math.floor((z - R / 2) / PAS), 0, NBZ - 1)];
 const car = (i, j) => (i >= 0 && j >= 0 && i < NBX && j < NBZ) ? CARTE[j][i] : '~';
-const estBloc = c => /[A-Za-z.%?]/.test(c);        // un pâté, avec des rues autour
+const estBloc = c => /[A-Za-z.%?<>|$()]/.test(c);   // un pâté, avec des rues autour
 const estPiste = c => '!^@'.includes(c);          // une piste d'aéroport (avec un avion ou un hélicoptère, ou rien)
 const estPlat = c => estBloc(c) || estPiste(c);    // le terrain y est aplani
 const estRoute = c => c === '=' || c === '#';
-const surEau = (i, j) => '~#&+'.includes(car(i, j));
+const surEau = (i, j) => '~#&+-'.includes(car(i, j));
 const typeBloc = (i, j) => estBloc(car(i, j)) ? car(i, j) : null;
 const V8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 
 // la hauteur de chaque sorte de case, en mètres (les chiffres : REGLAGES.hauteurMontagnes par chiffre)
-const ALTITUDE = { '~': -9, '#': -9, '&': -9, '+': -9, '_': 0.3, ',': 1.5, ';': 1, ':': 3, '*': 4, '!': 0, '^': 0, '@': 0 };
+const ALTITUDE = { '~': -9, '#': -9, '&': -9, '+': -9, '-': -9, '_': 0.3, ',': 1.5, ';': 1, ':': 3, '*': 4, '!': 0, '^': 0, '@': 0 };
 const alt = CARTE.map(l => [...l].map(c => /[0-9]/.test(c) ? +c * R_.hauteurMontagnes : ALTITUDE[c] ?? 1.5));
 // les très hautes montagnes (tableau SOMMETS) : ce qu'elles ajoutent au terrain en (x, z), et u : à quelle distance du sommet le plus proche
 // on est (0 au sommet, 1 au pied). lisse : la montagne toute simple, raide en haut et douce en bas. h : la même avec ses replats et ses murs
@@ -3027,6 +3174,8 @@ function facade(fond, cols, rangs, fenetre, avant, hauteur = 256, allumees = 0.4
   Object.assign(t, { reflets, lumieres });
   return t;
 }
+// les lettres et les chiffres des grandes lettres sur les collines (PANNEAUX) : une autre lettre fait un trou
+const LETTRES_PANNEAUX = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?&-';
 const TEX = {
   route: toile(256, 256, (g, l, h) => { g.fillStyle = '#3a3a3c'; g.fillRect(0, 0, l, h); grain(g, l, h, 8000, 0.07); }),
   lignes: toile(64, 256, (g) => { g.fillStyle = '#eee'; g.fillRect(30, 0, 4, 80); g.fillRect(3, 0, 3, 256); g.fillRect(58, 0, 3, 256); }),
@@ -3053,6 +3202,22 @@ const TEX = {
   hopital: facade('#f2f2ee', 1, 4, (g, x, y, w, h) => vitre(g, 0, y + h * .3, w, h * .45, [50, 90, 140])),
   magasin: facade('#4a2a22', 4, 2, (g, x, y, w, h) => { if (y > 0) { g.fillStyle = '#222'; g.fillRect(x, y + 8, w, h - 8); vitre(g, x + 4, y + 14, w - 8, h - 20, [70, 60, 50]); } else vitre(g, x + w * .2, y + h * .25, w * .6, h * .5); }, null, 128),
   bunker: toile(256, 256, (g, l, h) => { g.fillStyle = '#6e6e66'; g.fillRect(0, 0, l, h); grain(g, l, h, 6000, 0.1); g.fillStyle = 'rgba(0,0,0,.3)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 64, 0, 2, h); g.fillRect(0, k * 64, l, 2); } for (let i = 0; i < 12; i++) { g.fillStyle = 'rgba(40,35,20,.15)'; g.fillRect(Math.random() * l, Math.random() * h, 6, entre(20, 80)); } }),
+  // Malibu : la façade de la tour Stark (du verre bleu sombre, de fines lames d'acier entre les vitres)
+  stark: facade('#18222e', 8, 4, (g, x, y, w, h) => { vitre(g, x + 1.5, y + 1, w - 3, h - 2, [30, 64, 96]); g.fillStyle = '#a8b2bc'; g.fillRect(x, y, 1.5, h); }),
+  // la bannière des Dix Anneaux (chez le Mandarin, à la grotte) : rouge bordée d'or, avec dix anneaux d'or en cercle autour d'un rond d'or
+  dixAnneaux: toile(128, 256, (g) => {
+    g.fillStyle = '#8c0f12'; g.fillRect(0, 0, 128, 256); g.strokeStyle = '#d8a830'; g.lineWidth = 6; g.strokeRect(6, 6, 116, 244);
+    g.lineWidth = 3; for (let k = 0; k < 10; k++) { const a = k * Math.PI / 5; g.beginPath(); g.arc(64 + Math.cos(a) * 36, 110 + Math.sin(a) * 36, 8, 0, 7); g.stroke(); }
+    g.fillStyle = '#d8a830'; g.beginPath(); g.arc(64, 110, 13, 0, 7); g.fill();
+  }),
+  // les grandes lettres des PANNEAUX (HOLLYWOOD) : toutes en blanc, 10 par rangée (là où rien n'est dessiné, on voit à travers)
+  lettres: toile(640, 512, (g) => {
+    g.fillStyle = '#f4f4ee'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = 'bold 120px Arial, sans-serif';
+    [...LETTRES_PANNEAUX].forEach((l, k) => {
+      const x = (k % 10) * 64 + 32, y = Math.floor(k / 10) * 128 + 68, w = g.measureText(l).width;
+      g.save(); g.translate(x, y); g.scale(Math.min(1, 58 / w), 1); g.fillText(l, 0, 0); g.restore();
+    });
+  }),
   pierres: toile(256, 256, (g, l, h) => { g.fillStyle = '#4a4744'; g.fillRect(0, 0, l, h); for (let y = 0; y < 8; y++) for (let x = 0; x < 5; x++) { g.fillStyle = `hsl(30,${entre(3, 8)}%,${entre(38, 52)}%)`; g.fillRect(x * 64 + (y % 2) * 32 - 32 + 2, y * 32 + 2, 60, 28); } grain(g, l, h, 5000, 0.08); }),
   banniere: toile(128, 256, (g) => { g.fillStyle = '#a01010'; g.fillRect(0, 0, 128, 256); g.fillStyle = '#eee'; g.beginPath(); g.arc(64, 100, 44, 0, 7); g.fill(); g.fillStyle = '#111'; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText('W', 64, 123); }),
   croix: toile(128, 128, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#d42020'; g.fillRect(44, 14, 40, 100); g.fillRect(14, 44, 100, 40); }),
@@ -3238,6 +3403,11 @@ const MAT = {
   paysage: std(TEX.paysage, { roughness: 0.7, bumpScale: 0.05 }), portrait: std(TEX.portrait, { roughness: 0.7, bumpScale: 0.05 }), coffres: std(TEX.coffres, { metalness: 0.6, roughness: 0.4 }),
   vitrine: std(null, { color: '#cfe6f0', metalness: 0.2, roughness: 0.02, transparent: true, opacity: 0.25, depthWrite: false }),
   enseigneMusee: enseigne('MUSÉE D\'ART DE LOS SANTOS', '#3a2a10', '#e8dcc0'), vangelico: enseigne('VANGELICO', '#e8c060'), pacific: enseigne('PACIFIC STANDARD', '#fff', '#1a3a2a'),
+  // Malibu
+  stark: std(TEX.stark), starkEnseigne: enseigne('STARK', '#e6f6ff', '#0b1018'), starkIndustries: enseigne('STARK INDUSTRIES', '#fff', '#2a2e36'),
+  starkExpo: enseigne('STARK EXPO', '#fff', '#a01616'), dixAnneaux: std(TEX.dixAnneaux, { side: THREE.DoubleSide, bumpScale: 0.02 }),
+  lettres: std(TEX.lettres, { alphaTest: 0.5, side: THREE.DoubleSide, bumpMap: null, roughness: 0.7 }),
+  tente: std(null, { color: '#9a8a62', roughness: 1, side: THREE.DoubleSide }), roche: std(null, { color: '#7d756a', roughness: 1, flatShading: true, side: THREE.DoubleSide }),
 };
 MAT.dalle = MAT.platre;   // la dalle du toit d'un bâtiment où l'on entre : comme le plâtre, mais elle fait de l'ombre
 // taille (en mètres) couverte par une répétition de chaque texture
@@ -3245,7 +3415,7 @@ const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [
   maison1: [6, 6], maison2: [6, 6], maison3: [6, 6], villa: [8, 9], magasin: [12, 6], bunker: [8, 8], toit: [8, 8], trottoir: [4, 4],
   herbe: [6, 6], paves: [4, 4], chateau: [4, 4], carrelage: [2, 2], parquet: [3, 3], planches: [3, 3], grange: [6, 6], tole: [6, 6],
   conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2],
-  marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2] };
+  marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2], stark: [12, 12] };
 // Les trous que B.J. fait dans un toit ou un plancher en tombant de très haut (voir trouer). On ne peut pas enlever un morceau de dalle
 // de son dessin : toutes les formes d'une même matière sont fusionnées en une seule. Alors on retouche le programme qui dessine les matières
 // des bâtiments : un point qui tombe dans un trou n'est pas dessiné, et on voit au travers (les étages du dessus, le ciel).
@@ -3675,6 +3845,7 @@ const CONTENEURS = ['conteneur1', 'conteneur2', 'conteneur3', 'conteneur4'];
 
 const stands = [], soins = [], pnjDepart = [], voituresGarees = [], pickupsDepart = [], ascenseurs = [], bateauxDepart = [], hopitaux = [];
 const garagistes = [], braquages = [], butinsDepart = [];
+const presentoirs = [];   // les vitrines de l'atelier de Tony Stark : une armure debout dans chacune (voir exposerArmures)
 const lits = [];   // les lits où B.J. dort (voir « Le jour et la nuit ») : ceux de ses villas (v dans la CARTE), de la villa de Michael et de la maison de Franklin
 const autresLits = [];   // les autres (appartements, caravane de Trevor, hôpital) : l'aide dit d'aller dormir dans une de ses villas
 let chateau = null, bunker = null;
@@ -4143,6 +4314,125 @@ function genererBloc(i, j) {
     garde(B, 5, b.point(-10, 0, 8)); garde(B, 4, b.point(10, 0, 8)); garde(B, 2, b.point(3, 0, 14));
     B.gyros.push({ x: X(22), y: Y0 + 6.2, z: Z(43.2) }, { x: X(38), y: Y0 + 6.2, z: Z(43.2) }, { ...P(0, -6), y: Y0 + sol0 + 3.3 });
     B.lumiere = { ...P(0, -6), y: Y0 + sol0 + 2.5 };
+  } else if (c === '<') { // la villa de Tony Stark, au bout de la pointe. En bas, l'atelier : la grande porte du garage donne sur la rue (au nord), avec
+    // deux de ses voitures, ses établis, ses écrans, Dum-E (son robot) et ses armures dans leurs vitrines. En haut, le salon, avec la vue sur la mer.
+    // Sur le toit, la plateforme où il se pose ; derrière, une terrasse et une piscine au-dessus de la falaise ; à l'ouest, le salon rond
+    herbe();
+    const b = batiment({ x: X(30), z: Z(25), l: 40, p: 22, mat: 'villa', porte: 'n', etages: 2, hEtage: 3.6, toit: true, sol: 'parquet', largeurPorte: 7, hauteurPorte: 3.2 });
+    const atelier = interieurs.at(-1);
+    sol('paves', X(30), 0.215, Z(10), 24, 8);                                          // devant la porte du garage
+    // l'atelier (u : vers l'ouest ; w : vers la porte, au nord)
+    for (const u of [-5, 0, 5]) { // les vitrines des armures, au fond, face à la porte
+      b.meuble('metal', u, 0, -9.2, 1.8, 0.15, 1.6); b.meuble('vitrine', u, 0, -9.2, 1.8, 2.7, 1.6, 0.15);
+      presentoirs.push({ ...b.point(u, 0, -9.2), a: Math.PI, dans: atelier });
+    }
+    for (const w of [-4, 2]) { b.meuble('metal', 18.4, 0, w, 1.4, 0.9, 4.5); b.meuble('ecran', 19.3, 0, w, 0.08, 1.3, 3.6, 1.2); }   // les établis et leurs écrans
+    b.meuble('noirMeuble', -6, 0, 3, 3.2, 0.9, 2); b.meuble('ecran', -6, 0, 3, 2.8, 0.04, 1.6, 0.92);                                // la table des hologrammes
+    b.meuble('jaune', 14, 0, 6, 0.9, 0.5, 0.9); b.meuble('jaune', 14, 0, 6, 0.22, 1.7, 0.22, 0.5); b.meuble('jaune', 14, 0, 5.4, 0.2, 0.2, 1.2, 2.1);   // Dum-E
+    voituresGarees.push({ ...b.point(0, 0, 3), a: Math.PI, type: 'Audi TT' }, { ...b.point(9, 0, 1), a: Math.PI, type: 'Lamborghini' });
+    // le salon, en haut
+    b.meuble('blanc', 3, 1, -6.5, 7, 0.8, 1.6); b.meuble('blanc', -1, 1, -4.5, 1.6, 0.8, 4);   // le grand canapé, face à la mer
+    b.meuble('boisClair', 3, 1, -3.8, 2.6, 0.4, 1.4); b.meuble('noirMeuble', 13, 1, 4, 2.2, 1, 1.4); b.meuble('bois', -12, 1, 7.5, 6, 1.1, 1);   // la table basse, le piano, le bar
+    soins.push(b.point(-8, 1, 6));
+    sol('helipad', X(30), b.niveau(2) + 0.02, Z(25), 14, 14);                         // sur le toit, là où il se pose
+    // la terrasse, la piscine et leurs garde-corps, au-dessus de la falaise
+    sol('paves', X(30), 0.215, Z(46), 44, 18);
+    for (const [x, z, l, p] of [[30, 42.8, 18.6, 0.6], [30, 51.2, 18.6, 0.6], [21, 47, 0.6, 9], [39, 47, 0.6, 9]]) boite('pierre', X(x), 0.2, Z(z), l, 0.3, p, true);
+    sol('piscine', X(30), 0.4, Z(47), 17.4, 7.8);
+    for (const x of [8, 52]) boite('rambarde', X(x), 0.2, Z(46), 0.08, 1.1, 18, true);
+    boite('rambarde', X(30), 0.2, Z(55), 44, 1.1, 0.08, true);
+    // le salon rond, à l'ouest
+    geoBloc('villa', new THREE.CylinderGeometry(5.5, 5.5, 7.4, 28, 1, true).translate(X(54), 0.2 + 3.7, Z(28)));
+    geoBloc('toit', new THREE.CylinderGeometry(5.9, 5.9, 0.4, 28).translate(X(54), 7.8, Z(28)));
+    ajouterCollision(X(48.5), Z(22.5), X(59.5), Z(33.5), Y0 + 8, Y0);
+    for (const [x, z] of [[6, 8], [54, 8], [5, 40], [55, 40]]) arbre(X(x), Z(z), 1, Y0 + 0.2, 'palmier');
+  } else if (c === '|') { // la tour Stark : du verre sombre, STARK en lettres lumineuses sur les quatre côtés de sa couronne, un ascenseur jusqu'au toit,
+    // et la plateforme d'Iron Man, accrochée au côté est, tout en haut
+    const plein = 42, b = batiment({ x: X(30), z: Z(30), l: 32, p: 32, mat: 'stark', hEtage: 6, plein, largeurPorte: 6, hauteurPorte: 4 });
+    const haut = 0.2 + 6.05 + plein * 3 + 0.6;
+    sol('paves', X(30), 0.21, Z(52), 56, 12);
+    b.meuble('blanc', 0, 0, 3, 10, 1.1, 1.2);                                         // l'accueil
+    for (const u of [-3, 3]) b.meuble('metal', u, 0, -15.62, 2, 3, 0.1);             // les portes de l'ascenseur
+    boite('stark', X(30), haut, Z(33), 22, 10, 22, true); boite('toit', X(30), haut + 10, Z(33), 22.5, 0.5, 22.5, true);   // la couronne
+    for (let a = 0; a < 4; a++) geoBloc('starkEnseigne', new THREE.PlaneGeometry(18, 4.2).translate(0, 0, 11.06).rotateY(a * Math.PI / 2).translate(X(30), haut + 5, Z(33)));
+    boite('metal', X(30), haut + 10.5, Z(33), 0.8, 24, 0.8, true);                    // l'antenne
+    for (const [x, z, l, p] of [[30, 13.75, 32.5, 0.5], [30, 46.25, 32.5, 0.5], [13.75, 30, 0.5, 32.5], [46.25, 30, 0.5, 32.5]]) boite('beton', X(x), haut, Z(z), l, 1.2, p, true);   // le garde-fou
+    boite('beton', X(30), haut, Z(17), 5, 3, 3, true);                                // la cabine de l'ascenseur, en haut
+    ascenseurs.push({ bas: b.point(0, 0, -14.4), haut: { x: X(30), z: Z(19.5), y: Y0 + haut } });
+    boite('metal', X(52), haut - 4.6, Z(30), 12, 0.6, 10, true); sol('helipad', X(52), haut - 3.98, Z(30), 9, 9);   // la plateforme d'Iron Man
+    for (const z of [25.5, 34.5]) boite('lampe', X(57.6), haut - 4, Z(z), 0.3, 0.2, 0.3);
+  } else if (c === '$') { // l'usine Stark Industries : un grand hall en tôle (on y entre), où l'on fabrique des armures, deux cheminées, des bureaux en verre
+    sol('beton2', X(30), 0.21, Z(30), S - 4, S - 4);
+    const b = batiment({ x: X(28), z: Z(22), l: 44, p: 26, mat: 'tole', porte: 's', hEtage: 9, largeurPorte: 9, hauteurPorte: 6, sol: 'beton2', mur: 'metal' });
+    panneau('starkIndustries', X(28), 7.7, Z(35.06), 24, 2.6);
+    for (const w of [-6, 1]) { // la chaîne de montage : de longues tables, des pièces d'armure rouges et dorées, des bras robots
+      b.meuble('metal', 0, 0, w, 30, 0.9, 2);
+      for (let u = -13; u <= 13; u += 4.3) { b.meuble(hasardR(['rouge', 'jaune'], rnd), u, 0, w, 0.9, 0.5, 0.7, 0.9); b.meuble('grue', u + 2, 0, w - 1.6, 0.3, 2.2, 0.3); }
+    }
+    for (const x of [10, 18]) geoBloc('metal', new THREE.CylinderGeometry(1.1, 1.5, 22, 12).translate(X(x), 0.2 + 11, Z(4)));   // les cheminées
+    boite('verre', X(50), 0.2, Z(47), 14, 10, 12, true); boite('toit', X(50), 10.2, Z(47), 14.5, 0.5, 12.5, true);              // les bureaux
+    for (const x of [12, 22, 32]) voituresGarees.push({ x: X(x), z: Z(50), a: 0 });
+  } else if (c === '(') { // la Stark Expo : un grand globe en acier (ses méridiens, ses parallèles et ses continents) au milieu d'un bassin, dans un parc,
+    // et l'arche de l'entrée, au sud, avec STARK EXPO en lettres lumineuses
+    herbe();
+    sol('paves', X(30), 0.215, Z(30), 40, 40); sol('paves', X(30), 0.216, Z(52), 8, 16);
+    geoBloc('eau', new THREE.CircleGeometry(15, 48).rotateX(-Math.PI / 2).translate(X(30), 0.5, Z(30)));
+    geoBloc('pierre', new THREE.TorusGeometry(15, 0.45, 6, 48).rotateX(Math.PI / 2).translate(X(30), 0.55, Z(30)));
+    const r0 = 11, y = 0.2 + 3.5 + r0, globe = [];
+    for (let k = 0; k < 12; k++) globe.push(new THREE.TorusGeometry(r0, 0.16, 5, 48).rotateY(k * Math.PI / 12));   // les méridiens
+    for (const l of [-60, -40, -20, 0, 20, 40, 60]) { const a = l * Math.PI / 180; globe.push(new THREE.TorusGeometry(r0 * Math.cos(a), 0.16, 5, 40).rotateX(Math.PI / 2).translate(0, r0 * Math.sin(a), 0)); }   // les parallèles
+    for (const [p0, pl, t0, tl] of [[4.3, 0.9, 0.5, 1.2], [5.3, 0.6, 0.7, 0.8], [0.1, 1.6, 0.4, 0.6], [0.4, 0.6, 1.2, 0.7], [1.9, 0.5, 1.5, 0.4]])
+      globe.push(new THREE.SphereGeometry(r0 + 0.05, 10, 6, p0, pl, t0, tl));   // les continents
+    globe.push(new THREE.CylinderGeometry(0.6, 1.2, 4.2, 10).translate(0, -r0 - 1.7, 0));   // le pied, et ses trois jambes
+    for (const a of [0, 2.1, 4.2]) globe.push(new THREE.CylinderGeometry(0.35, 0.35, 6.5, 6).translate(0, -3.2, 0).rotateX(0.55).rotateY(a).translate(0, -r0 + 2.4, 0));
+    geoBloc('metal', mergeGeometries(globe).translate(X(30), y, Z(30)));
+    ajouterCollision(X(29), Z(29), X(31), Z(31), Y0 + y - r0, Y0);
+    for (const x of [19, 41]) boite('beton', X(x), 0.2, Z(56), 1.6, 9, 1.6, true);   // l'arche de l'entrée
+    boite('beton', X(30), 9.2, Z(56), 24, 1.2, 1.6, true); panneau('starkExpo', X(30), 7.4, Z(56.82), 18, 2.8);
+    for (const [x, z] of [[12, 12], [48, 12], [12, 48], [48, 48]]) { // des mâts avec leurs drapeaux, et des arbres
+      boite('metal', X(x), 0.2, Z(z), 0.15, 9, 0.15); boite(hasardR(['rouge', 'bleu', 'jaune'], rnd), X(x + 0.95), 7.6, Z(z), 1.8, 1.2, 0.05);
+      arbre(X(x + (x < 30 ? -6 : 6)), Z(z), 1);
+    }
+    soins.push({ x: X(30), z: Z(50) });
+  } else if (c === '>') { // le repaire du Mandarin, sur la falaise : un grand mur avec sa porte à l'ouest, les bannières rouges des Dix Anneaux,
+    // une villa blanche, une piscine... et, dans la cour, devant la porte, la DeLorean qu'il a cachée (le lieu des missions)
+    herbe(); sol('paves', X(30), 0.215, Z(30), 48, 48);
+    const mur = (x, z, l, p) => boite('pierre', X(x), 0.2, Z(z), l, 4.5, p, true);
+    mur(30, 4, 52, 1.2); mur(30, 56, 52, 1.2); mur(56, 30, 1.2, 52);                   // le nord, le sud, l'est
+    mur(4, 13.75, 1.2, 19.5); mur(4, 46.25, 1.2, 19.5);                               // l'ouest, avec la porte (12 m) au milieu
+    for (const z of [22.6, 37.4]) { boite('pierre', X(4), 0.2, Z(z), 2.4, 6, 2.4, true); boite('jaune', X(4), 6.2, Z(z), 1.2, 1.2, 1.2); }   // les piliers de la porte
+    const banniere = (x, y, z, l, h, a) => geoBloc('dixAnneaux', new THREE.PlaneGeometry(l, h).rotateY(a).translate(X(x), y, Z(z)));
+    for (const z of [17, 43]) banniere(3.35, 2.6, z, 2.4, 4, -Math.PI / 2);          // sur le mur, de chaque côté de la porte
+    const b = batiment({ x: X(38), z: Z(20), l: 26, p: 16, mat: 'villa', porte: 'o', etages: 2, toit: true, sol: 'marbre', largeurPorte: 3 });
+    for (const z of [11, 29]) banniere(29.85, 4.6, z, 3, 6, -Math.PI / 2);          // sur la façade de la villa
+    b.meuble('rouge', 0, 0, -6, 2.4, 1.8, 1.4); b.meuble('tapis', 0, 0, 0, 6, 0.02, 8);   // le trône du Mandarin, et son tapis
+    for (const [x, z, l, p] of [[42, 41.8, 15.6, 0.6], [42, 50.2, 15.6, 0.6], [34.5, 46, 0.6, 9], [49.5, 46, 0.6, 9]]) boite('pierre', X(x), 0.2, Z(z), l, 0.3, p, true);
+    sol('piscine', X(42), 0.4, Z(46), 14.4, 7.8);
+    for (const [x, z] of [[10, 8], [10, 52], [52, 52], [26, 52]]) arbre(X(x), Z(z), 1, Y0 + 0.2, 'palmier');
+    Object.assign(lieux[c].find(q => q.x === X(30) && q.z === Z(30)), { x: X(16), z: Z(30), a: -Math.PI / 2 });   // la DeLorean, le nez vers la porte
+  } else if (c === ')') { // la grotte des Dix Anneaux : une salle creusée dans la roche (sous un dôme de rochers, fendu devant l'entrée), éclairée par
+    // des lampes, avec un établi et une forge. Devant, le camp des Dix Anneaux : des tentes, des caisses, un feu, une jeep et leur bannière
+    sol('sacs', X(30), 0.21, Z(30), S - 2, S - 2);
+    const b = batiment({ x: X(30), z: Z(20), l: 22, p: 16, mat: 'roche', mur: 'roche', sol: 'sacs', porte: 's', hEtage: 4.5, largeurPorte: 4, hauteurPorte: 3.4, lampes: false });
+    b.dedans(() => { // un plafond de roche, et des stalactites qui en pendent
+      b.B('roche', 0, b.niveau(1) - 0.62, 0, 2 * b.iu, 0.3, 2 * b.iw, false);
+      const e = (a, c) => a + rnd() * (c - a);
+      for (let k = 0; k < 14; k++) { const [x, z] = b.P(e(-b.iu + 1, b.iu - 1), e(-b.iw + 1, b.iw - 1)), h = e(0.4, 1.3); geoBloc('roche', new THREE.ConeGeometry(e(0.15, 0.35), h, 5).rotateX(Math.PI).translate(x, b.niveau(1) - 0.62 - h / 2, z)); }
+    });
+    b.meuble('bois', -6, 0, -5.5, 4, 0.9, 1.5); b.meuble('rouge', 6, 0, -5.5, 1.6, 1, 1.6); b.meuble('lampe', 6, 0, -5.5, 1.2, 0.05, 1.2, 1);   // l'établi, la forge et ses braises
+    b.meuble('tissu', -8.5, 0, 3.5, 2, 0.5, 0.9); for (const [u, w] of [[8, 4], [9.2, 4], [8.6, 2.8]]) b.meuble('boisClair', u, 0, w, 1.1, 0.9, 1.1);   // un lit de camp, des caisses
+    // le dôme de roche : un demi-œuf tout cabossé, ouvert devant la porte (au sud), et des bords où l'on se cogne
+    const dome = new THREE.SphereGeometry(1, 30, 12, Math.PI / 2 + 0.3, Math.PI * 2 - 0.6, 0, Math.PI / 2).scale(18, 10, 15), p = dome.attributes.position;
+    for (let k = 0; k < p.count; k++) { const e = 1 + 0.1 * bruitDoux(p.getX(k) * 0.35 + i, p.getZ(k) * 0.35 + p.getY(k) * 0.3 + j); p.setXYZ(k, p.getX(k) * e, p.getY(k) * e, p.getZ(k) * e); }
+    dome.computeVertexNormals();
+    geoBloc('roche', dome.translate(X(30), 0.1, Z(20)));
+    for (const [x1, z1, x2, z2, h] of [[14, 5, 46, 10, 6], [12, 8, 19, 32, 5], [41, 8, 48, 32, 5], [14, 28, 26, 34, 4], [34, 28, 46, 34, 4]]) ajouterCollision(X(x1), Z(z1), X(x2), Z(z2), Y0 + h, Y0);
+    for (const [x, z] of [[14, 42], [46, 42], [20, 53]]) geoBloc('tente', new THREE.ConeGeometry(3.2, 3.4, 4, 1, true).rotateY(Math.PI / 4).translate(X(x), 0.2 + 1.7, Z(z)));   // les tentes
+    for (const [x, z] of [[36, 46], [37.5, 46], [36.7, 47.6]]) boite('boisClair', X(x), 0.2, Z(z), 1.4, 1, 1.2, true);   // des caisses
+    for (let k = 0; k < 7; k++) boite('roche', X(30 + Math.cos(k) * 1.4), 0.2, Z(46 + Math.sin(k) * 1.4), 0.5, 0.35, 0.5);   // le feu de camp : des pierres...
+    boite('lampe', X(30), 0.2, Z(46), 1.2, 0.15, 1.2);                                                                     // ...et ses braises
+    boite('metal', X(24), 0.2, Z(36), 0.15, 7, 0.15); geoBloc('dixAnneaux', new THREE.PlaneGeometry(2, 3.4).translate(X(25.1), 5.2, Z(36)));   // la bannière, sur son mât
+    voituresGarees.push({ x: X(46), z: Z(52), a: Math.PI, type: '4x4 du désert' });
   } else if (c === 'Y') { // une station de ski : une place enneigée et un chalet, derrière la gare du télésiège (construite avec le télésiège)
     sol('neige', X(30), 0.21, Z(30), S, S);
     const l = TELESIEGES.find(q => q.bas.x === X(30) && q.bas.z === Z(30));
@@ -4288,6 +4578,93 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
     bateauxDepart.push({ x: debut.x - dx * d + (dx ? 0 : s), z: debut.z - dz * d + (dz ? 0 : s), a: angle, type });
   });
 }
+// La jetée (- dans la carte de Malibu) : un ponton en planches sur des pilotis, de 18 m de large, avec des rambardes et des lampadaires,
+// qui prolonge la rue. La case qui touche la terre est plus large (44 m) : la grande roue et les montagnes russes (voir majFete)
+const jetees = [];   // le pont de chaque case de jetée [x, z, l, p] : pour les cartes
+const fete = [];   // les manèges qui bougent : la grande roue { roue, nacelles, c : son centre, u : le sens de la jetée }, le train { train, courbe, t, v }
+for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
+  if (car(i, j) !== '-') continue;
+  const long = car(i - 1, j) === '-' || car(i + 1, j) === '-' || estBloc(car(i - 1, j)) || estBloc(car(i + 1, j));   // la jetée va d'ouest en est (sinon, du nord au sud)
+  const terre = [[1, 0], [-1, 0], [0, 1], [0, -1]].find(([a, b]) => estBloc(car(i + a, j + b)));
+  const m = centre(i, j), y = (terre ? baseCase[j + terre[1]][i + terre[0]] : 0) + 0.05, L = PAS, W = terre ? 44 : 18;
+  const u = long ? { x: 1, z: 0 } : { x: 0, z: 1 }, v = { x: u.z, z: u.x };   // u : le long de la jetée ; v : en travers
+  const cx = m.x, cz = m.z;   // (la case, rue comprise : de carrefour à carrefour, PAS mètres)
+  boite('planches', cx, y - 0.4, cz, long ? L : W, 0.4, long ? W : L, true);
+  jetees.push([cx, cz, long ? L : W, long ? W : L]);
+  for (let k = -L / 2 + 4; k < L / 2; k += 8) for (const s of [-1, 1]) {   // les pilotis
+    const q = { x: cx + u.x * k + v.x * s * (W / 2 - 1), z: cz + u.z * k + v.z * s * (W / 2 - 1) };
+    boite('bois', q.x, EAU - 3, q.z, 0.5, y - 0.4 - EAU + 3, 0.5);
+  }
+  for (const s of [-1, 1]) { // les rambardes (pas au bout qui touche la terre), et les lampadaires
+    const q = { x: cx + v.x * s * (W / 2 - 0.1), z: cz + v.z * s * (W / 2 - 0.1) };
+    boite('rambarde', q.x, y, q.z, long ? L : 0.1, 1.1, long ? 0.1 : L, true);
+    for (const k of [-L / 4, L / 4]) { const p = { x: q.x + u.x * k - v.x * s * 0.6, z: q.z + u.z * k - v.z * s * 0.6 }; boite('metal', p.x, y, p.z, 0.18, 5, 0.18); boite('lampe', p.x, y + 5, p.z, 0.5, 0.3, 0.5); }
+  }
+  if (!car(i - u.x, j - u.z).match(/[-A-Za-z.]/) && !terre) boite('rambarde', cx - u.x * (L / 2 - 0.1), y, cz - u.z * (L / 2 - 0.1), long ? 0.1 : W, 1.1, long ? W : 0.1, true);
+  if (!car(i + u.x, j + u.z).match(/[-A-Za-z.]/) && !terre) boite('rambarde', cx + u.x * (L / 2 - 0.1), y, cz + u.z * (L / 2 - 0.1), long ? 0.1 : W, 1.1, long ? W : 0.1, true);
+  if (!terre) continue;
+  // la grande roue, d'un côté de la jetée : 26 m de haut, 16 nacelles, elle tourne doucement
+  const c = { x: cx + v.x * 11, y: y + 15.5, z: cz + v.z * 11 }, Rr = 13, axe = long ? 'z' : 'x';
+  const pied = [];
+  for (const s of [-1, 1]) for (const e of [-1, 1]) pied.push(new THREE.CylinderGeometry(0.25, 0.35, 16.5, 6).translate(0, -8.25, 0).rotateZ(-e * 0.42).translate(0, 0, s * 1.6));   // les deux pieds en A
+  pied.push(new THREE.CylinderGeometry(0.5, 0.5, 4, 10).rotateX(Math.PI / 2));   // l'axe
+  ajouterGeo('rambarde', mergeGeometries(pied).rotateY(long ? 0 : Math.PI / 2).translate(c.x, c.y, c.z));
+  const rayons = [];
+  for (const s of [-0.9, 0.9]) rayons.push(new THREE.TorusGeometry(Rr, 0.2, 6, 48).translate(0, 0, s));
+  for (let k = 0; k < 16; k++) rayons.push(new THREE.BoxGeometry(Rr * 2, 0.12, 0.12).rotateZ(k * Math.PI / 16));
+  const roue = new THREE.Mesh(mergeGeometries(rayons).rotateY(long ? 0 : Math.PI / 2), MAT.rambarde);
+  roue.position.set(c.x, c.y, c.z); roue.castShadow = true; scene.add(roue);
+  const nacelles = new THREE.InstancedMesh(new THREE.BoxGeometry(1.6, 1.8, 1.4), MAT.rouge, 16); nacelles.castShadow = true; nacelles.frustumCulled = false; scene.add(nacelles);
+  fete.push({ roue, nacelles, c, u, axe, Rr });
+  // les montagnes russes, de l'autre côté : une boucle qui monte et descend sur ses poteaux, et leur train de trois wagons
+  const o = { x: cx - v.x * 11, z: cz - v.z * 11 }, pts = [[-17, 3, 0], [-12, 13, -6], [-2, 6, -7], [8, 15, -6], [16, 4, 0], [10, 9, 6], [0, 3.5, 7], [-10, 8, 6]];
+  const courbe = new THREE.CatmullRomCurve3(pts.map(([a, h, b]) => new THREE.Vector3(o.x + u.x * a + v.x * b, y + h, o.z + u.z * a + v.z * b)), true);
+  ajouterGeo('rouge', new THREE.TubeGeometry(courbe, 200, 0.3, 6, true));
+  for (let k = 0; k < 28; k++) { const p = courbe.getPointAt(k / 28); boite('rambarde', p.x, y, p.z, 0.25, p.y - y - 0.3, 0.25); }
+  const train = new THREE.Group();
+  for (let k = 0; k < 3; k++) { const w = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.9, 2), MAT.jaune); w.castShadow = true; train.add(w); }
+  scene.add(train);
+  fete.push({ train, courbe, t: 0, haut: Math.max(...pts.map(q => q[1])) + y });
+}
+// les manèges de la jetée, à chaque image : la grande roue tourne (ses nacelles restent droites), le train des montagnes russes roule,
+// vite dans les descentes et lentement dans les montées
+const mFete = new THREE.Matrix4(), vFete = new THREE.Vector3();
+function majFete(dt) {
+  for (const f of fete) {
+    if (f.roue) {
+      f.roue.rotation[f.axe] += dt * 0.12;
+      for (let k = 0; k < 16; k++) {
+        const a = f.roue.rotation[f.axe] * (f.axe === 'z' ? 1 : -1) + k * Math.PI / 8, s = Math.cos(a) * f.Rr;
+        f.nacelles.setMatrixAt(k, mFete.makeTranslation(f.c.x + f.u.x * s, f.c.y + Math.sin(a) * f.Rr - 1.1, f.c.z + f.u.z * s));
+      }
+      f.nacelles.instanceMatrix.needsUpdate = true;
+    } else {
+      const p = f.courbe.getPointAt(f.t), v = 4 + Math.sqrt(2 * 9.8 * Math.max(0, f.haut - p.y));
+      f.t = (f.t + v * dt / f.courbe.getLength()) % 1;
+      f.train.children.forEach((w, k) => {
+        const t = (f.t - k * 0.012 + 1) % 1;
+        f.courbe.getPointAt(t, w.position); w.position.y += 0.6;
+        w.lookAt(f.courbe.getPointAt((t + 0.004) % 1, vFete).setY(vFete.y + 0.6));
+      });
+    }
+  }
+}
+// Les grandes lettres des PANNEAUX (HOLLYWOOD, sur la colline de Malibu) : chacune est une plaque blanche découpée, de 13,5 m de haut,
+// debout sur la pente, tenue par deux poteaux derrière elle. Elles se suivent de gauche à droite, vues de devant
+for (const p of PANNEAUX) {
+  const texte = p.texte.toUpperCase(), a = (p.angle || 0) * Math.PI / 180, f = { x: Math.sin(a), z: Math.cos(a) }, d = { x: Math.cos(a), z: -Math.sin(a) }, c = centre(p.col, p.ligne);
+  [...texte].forEach((l, k) => {
+    const n = LETTRES_PANNEAUX.indexOf(l);
+    if (n < 0) return;   // (une espace : un trou entre deux mots)
+    const s = (k - (texte.length - 1) / 2) * 10.5, x = c.x + d.x * s, z = c.z + d.z * s, y = hauteurTerrain(x, z) - 1.5;
+    const g = new THREE.PlaneGeometry(9, 13.5), uv = g.attributes.uv, u0 = (n % 10) / 10, v0 = 1 - (Math.floor(n / 10) + 1) / 4;
+    for (let q = 0; q < uv.count; q++) uv.setXY(q, u0 + uv.getX(q) / 10, v0 + uv.getY(q) / 4);
+    ajouterGeo('lettres', g.rotateY(a).translate(x, y + 6.75, z));
+    for (const e of [-2.8, 2.8]) boite('metal', x + d.x * e - f.x * 0.6, y, z + d.z * e - f.z * 0.6, 0.25, 12.5, 0.25);   // les poteaux, derrière
+    const ex = Math.abs(d.x) * 4.5 + 0.4, ez = Math.abs(d.z) * 4.5 + 0.4;
+    ajouterCollision(x - ex, z - ez, x + ex, z + ez, y + 13.5, y);
+  });
+}
 // les pistes d'aéroport : du goudron, des tirets blancs au milieu ; un avion (^), ou une hélistation avec son hélicoptère (@)
 for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
   const c = car(i, j);
@@ -4377,14 +4754,14 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
 // le terrain : un morceau de grille par morceau du pays, colorié selon le sol (herbe, sable, désert, roche...)
 const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du ciel, pour les cartes
 {
-  // pour une colline ou une route, le sol est celui qu'on trouve le plus autour
+  // pour une colline ou une route, le sol est celui qu'on trouve le plus autour (mais jamais du sable : la plage, c'est au bord de l'eau)
   const SOLS = ',;:*_';
   const solCase = CARTE.map((l, j) => [...l].map((c, i) => {
     if (SOLS.includes(c)) return c;
     if (estPlat(c)) return ',';
-    if ('~#&+'.includes(c)) return '~';
+    if ('~#&+-'.includes(c)) return '~';
     const n = {};
-    for (let b = -3; b <= 3; b++) for (let a = -3; a <= 3; a++) { const q = car(i + a, j + b); if (SOLS.includes(q)) n[q] = (n[q] || 0) + 1; }
+    for (let b = -3; b <= 3; b++) for (let a = -3; a <= 3; a++) { const q = car(i + a, j + b); if (SOLS.includes(q) && q !== '_') n[q] = (n[q] || 0) + 1; }
     return Object.keys(n).sort((p, q) => n[q] - n[p])[0] || ',';
   }));
   const C = s => new THREE.Color(s);
@@ -4468,7 +4845,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
     if (s === '*') { n = 12; sorte = 'sapin'; }
     else if (s === ':') { n = 1; sorte = 'cactus'; }
     else if (s === ',') { n = chiffre ? (chiffre >= 7 ? 2 : 5) : 2; sorte = chiffre || rnd() < 0.3 ? 'sapin' : 'feuillu'; }
-    else if (s === '_' && j > 40) { n = 2; sorte = 'palmier'; }   // les plages de Los Santos
+    else if (s === '_' && j >= PALMIERS) { n = 2; sorte = 'palmier'; }   // les plages du sud (PALMIERS)
     if (chiffre && s === '*') n = chiffre >= 7 ? 3 : 8;
     for (let k = 0; k < n; k++) {
       const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z);
@@ -4921,6 +5298,17 @@ const GEO = {
   epauliere: new THREE.SphereGeometry(0.1, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.55).scale(1.05, 0.85, 1.1),
   reacteur: new THREE.CylinderGeometry(0.042, 0.042, 0.02, 20).rotateX(Math.PI / 2), bagueReacteur: new THREE.TorusGeometry(0.05, 0.011, 6, 20),
   paume: new THREE.CircleGeometry(0.03, 14).rotateY(Math.PI), genouillere: new THREE.SphereGeometry(0.07, 12, 8).scale(1, 1.1, 0.75),
+  // une aile de Rescue : deux lames plates, une longue et une plus courte, qui pendent de leur bout du haut (elle tourne autour de lui)
+  aileRescue: mergeGeometries([[0, 0.8, 0.07], [0.06, 0.58, 0.055]].map(([x, l, e]) => new THREE.ExtrudeGeometry(new THREE.Shape([[0, 0], [e, -0.03], [e * 0.6, -l * 0.8], [0, -l], [-e * 0.4, -l * 0.5]]
+    .map(([a, b]) => new THREE.Vector2(a, b))), { depth: 0.012, bevelEnabled: false }).translate(x, -0.02, -0.006))),
+  // Tony Stark en civil (CHAPITRES : civil) : ses lunettes de soleil (deux verres un peu tournés vers les côtés, le pont, les branches) ;
+  // sa barbiche (la moustache, un trait de chaque côté de la bouche, et la touffe du menton)
+  lunettes: mergeGeometries([new THREE.BoxGeometry(0.026, 0.006, 0.006).translate(0, 0.008, 0.002),
+    ...[-1, 1].flatMap(c => [new THREE.BoxGeometry(0.066, 0.036, 0.008).rotateY(0.3 * c).translate(0.044 * c, 0, 0),
+      new THREE.BoxGeometry(0.005, 0.006, 0.115).rotateY(-0.2 * c).translate(0.092 * c, 0.008, -0.068)])]),
+  barbiche: mergeGeometries([new THREE.BoxGeometry(0.07, 0.016, 0.02).translate(0, -0.055, 0.116),
+    ...[-1, 1].map(c => new THREE.BoxGeometry(0.009, 0.04, 0.012).translate(0.033 * c, -0.08, 0.099)),
+    new THREE.SphereGeometry(0.024, 10, 8).scale(1.1, 1.3, 0.7).translate(0, -0.112, 0.082)]),
 };
 // Les talons hauts : le pied est sur la pointe, le talon levé de 5,5 cm (TALONS : le personnage est grandi d'autant, voir animerHumain).
 // Le bout rond de la jambe fait le talon du pied. La chaussure : le bout, à plat par terre ; le dessus du pied, qui descend vers lui ;
@@ -6580,22 +6968,46 @@ function majCape(dt) {
 // fine : une queue de cheval, des cils, un peu de poitrine, une jupe, les jambes nues, des talons hauts. Le reste ne change pas :
 // même taille (aux talons près), mêmes forces
 const vetir = (m, matiere) => { m.material = m.userData.habit = matiere; };   // la tenue normale d'une pièce (rhabillerBJ la lui remet)
+// Dans un chapitre de héros, il est en civil (CHAPITRES : civil, civilFille) : Tony Stark en costume sombre et chemise blanche, avec ses
+// lunettes de soleil et sa barbiche ; Pepper Potts en tailleur clair. Sa veste, ouverte sur la chemise, a des manches longues
+const tenueCivile = () => (fille() ? CHAPITRE.civilFille : CHAPITRE.civil) || {};
+const enCivil = () => Object.keys(tenueCivile()).length > 0;   // commence-t-il le chapitre en civil ?
+const cacheVestes = {};
+const veste = C => cacheVestes[C.veste + C.chemise] ||= std(toile(128, 128, (g, l, h) => {
+  g.fillStyle = C.veste; g.fillRect(0, 0, l, h);
+  for (const x of [0, l]) { // le devant (au bord gauche de l'image, et au bord droit) : la chemise, dans l'ouverture de la veste, les revers et deux boutons
+    g.fillStyle = C.chemise || '#fff'; g.beginPath(); g.moveTo(x - 17, 0); g.lineTo(x + 17, 0); g.lineTo(x, 66); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 2;
+    for (const c of [-1, 1]) { g.beginPath(); g.moveTo(x + 17 * c, 0); g.lineTo(x + 26 * c, 30); g.lineTo(x + 7 * c, 50); g.stroke(); }
+    g.fillStyle = 'rgba(0,0,0,.6)'; for (const y of [76, 92]) { g.beginPath(); g.arc(x + 3, y, 2.2, 0, 7); g.fill(); }
+  }
+}), { roughness: 0.85, bumpScale: 0.01 });
 function corpsHeros(h) {
-  const H = HEROS[heros.genre], peau = mat(PEAU_BJ), bas = H.jupe ? peau : mat(TENUE_BJ.bas);
+  const H = HEROS[heros.genre], C = tenueCivile(), jupe = H.jupe && (C.jupe || H.jupe), talons = H.talons && (C.talons || H.talons);
+  const peau = mat(PEAU_BJ), bas = jupe ? peau : mat(C.pantalon || TENUE_BJ.bas), cheveux = C.cheveux || CHEVEUX[heros.cheveux];
   h.cheveux.geometry = H.fille ? GEO.cheveuxFille : GEO.cheveux;
-  vetir(h.cheveux, mat(CHEVEUX[heros.cheveux])); vetir(h.tete, visage(PEAU_BJ, H.fille));
+  vetir(h.cheveux, mat(cheveux)); vetir(h.tete, visage(PEAU_BJ, H.fille));
   h.torse.geometry = torseHeros(H).torse; h.torse.scale.x = H.epaules; h.cou.scale.set(H.cou, 1, H.cou);
-  for (const [m, c] of [[h.brasD, -1], [h.brasG, 1]]) { m.position.x = 0.255 * c * H.epaules; m.haut.scale.set(H.bras, 1, H.bras); m.bas.scale.set(H.avantBras, 1, H.avantBras); }
+  vetir(h.torse, C.veste ? veste(C) : mat(TENUE_BJ.haut));
+  for (const [m, c] of [[h.brasD, -1], [h.brasG, 1]]) {
+    m.position.x = 0.255 * c * H.epaules; m.haut.scale.set(H.bras, 1, H.bras); m.bas.scale.set(H.avantBras, 1, H.avantBras);
+    vetir(m.haut, mat(C.veste || TENUE_BJ.haut)); vetir(m.bas, C.veste ? mat(C.veste) : peau);
+  }
   // la jupe : une pièce sur le bassin, une sur chaque cuisse ; on ne la voit que si le héros en porte une
   h.jupe ||= [piece(GEO.jupe, '#000', h.bassin, 0, 0, 0), ...[h.jambeD, h.jambeG].map(j => piece(GEO.jupeCuisse, '#000', j, 0, 0, 0))];
-  for (const p of h.jupe) { p.material = mat(H.jupe || '#000', { side: THREE.DoubleSide }); p.visible = !!H.jupe; }
-  vetir(h.bassin, mat(H.jupe || TENUE_BJ.bas));
+  for (const p of h.jupe) { p.material = mat(jupe || '#000', { side: THREE.DoubleSide }); p.visible = !!jupe; }
+  vetir(h.bassin, mat(jupe || C.pantalon || TENUE_BJ.bas));
   for (const j of [h.jambeD, h.jambeG]) {
     // une grosse cuisse grossit en largeur, vers l'autre jambe : les hanches ne s'élargissent pas, et elle ne perce pas le slip (codes SLIP, SUPERMAN)
     j.haut.scale.x = H.cuisses; j.haut.position.x = -j.position.x * (H.cuisses - 1);
-    vetir(j.haut, bas); vetir(j.bas, bas); vetir(j.chaussure, mat(H.talons || TENUE_BJ.chaussures));
+    vetir(j.haut, bas); vetir(j.bas, bas); vetir(j.chaussure, mat(talons || C.chaussures || TENUE_BJ.chaussures));
   }
-  chausser(h, !!H.talons);
+  chausser(h, !!talons);
+  // ses lunettes de soleil et sa barbiche, s'il en a (le casque d'Iron Man cache les lunettes : voir PIECES_IRONMAN)
+  h.lunettes ||= piece(GEO.lunettes, '#000', h.tete, 0, 0.026, 0.124); h.barbiche ||= piece(GEO.barbiche, '#000', h.tete, 0, 0, 0);
+  for (const [o, m] of [[h.lunettes, C.lunettes && mat(C.lunettes, { metalness: 0.6, roughness: 0.15 })], [h.barbiche, C.barbiche && mat(cheveux)]]) {
+    if (m) { vetir(o, m); h.tete.add(o); } else o.removeFromParent();
+  }
 }
 // des talons hauts, ou les chaussures de tout le monde : leur forme, et de combien ils grandissent (h.talons, voir animerHumain)
 function chausser(h, talons) {
@@ -8175,14 +8587,14 @@ scene.add(fleche);
 //  Ses nombres sont dans le tableau IRONMAN (après ARMURE), ses couleurs et ses pièces dans PIECES_IRONMAN (juste avant les codes de triche).
 //  J.ironman, tant que le code est allumé : pieces (les numéros des pièces qu'il porte), anim (l'armure qui arrive, ou dont il sort),
 //  masque (levé ?) et ouvert (de 0, baissé, à 1, levé), vide (l'armure vide qu'il a laissée debout), mains (ses deux répulseurs),
-//  plastron (le rayon de sa poitrine, en cours) et recharge (les secondes avant le suivant)
+//  plastron (le rayon de sa poitrine, en cours), recharge (les secondes avant le suivant) et ailes (celles de Rescue : de 0, fermées, à 1, ouvertes)
 // =====================================================================
 const cacheIronman = {};
 // une matière de l'armure : 'rouge', 'or', 'acier' (du métal qui brille), 'lumiere' (ce qui s'allume : les yeux, le réacteur, les répulseurs),
 // ou 'plastron' : le torse rouge, avec les abdominaux en or (le devant du torse est au bord gauche de l'image, et au bord droit)
 function matIronman(nom) {
-  const C = COULEURS_IRONMAN;
-  return cacheIronman[nom] ||= nom === 'lumiere' ? new THREE.MeshBasicMaterial({ color: C.lumiere, toneMapped: false })
+  const C = rescue() ? COULEURS_RESCUE : COULEURS_IRONMAN;
+  return cacheIronman[(rescue() ? 'rescue ' : '') + nom] ||= nom === 'lumiere' ? new THREE.MeshBasicMaterial({ color: C.lumiere, toneMapped: false })
     : nom === 'plastron' ? std(toile(128, 128, (g, l, h) => {
         g.fillStyle = C.rouge; g.fillRect(0, 0, l, h);
         g.fillStyle = C.or;
@@ -8211,9 +8623,9 @@ function flamme(parent, x, y, z, ou) {
   corpsEnCours.ironman.flammes.push(m);
 }
 // habille b (B.J., ou une armure vide) des pièces de la liste (leurs numéros dans PIECES_IRONMAN), dans l'ordre du tableau.
-// b.ironman garde les flammes des réacteurs, et le masque (visiere), qui se lève
+// b.ironman garde les flammes des réacteurs, le masque (visiere), qui se lève, et les ailes de Rescue
 function habillerIronman(b, liste) {
-  b.ironman = { flammes: [], visiere: null }; corpsEnCours = b;
+  b.ironman = { flammes: [], visiere: null, ailes: [] }; corpsEnCours = b;
   PIECES_IRONMAN.forEach((p, k) => { if (liste.includes(k)) { pieceEnCours = k; p.poser(b); } });
 }
 const toutesLesPieces = () => PIECES_IRONMAN.map((p, k) => k);
@@ -8223,10 +8635,17 @@ const nouvelleMain = () => ({ charge: 0, cd: 0, leve: 0, dernier: -9, bloque: fa
 const armureIronman = () => !!J.ironman && J.ironman.pieces.length === PIECES_IRONMAN.length;
 const ironmanLibre = () => armureIronman() && !J.ironman.anim && !J.voiture && !J.robot && !J.telesiege && !J.mort;
 const ironmanVise = () => !!J.ironman && (J.ironman.mains.G.leve > 0.05 || J.ironman.mains.D.leve > 0.05 || !!J.ironman.plastron);
-// le code IRONMAN, tapé : l'armure arrive en volant, ou tout de suite s'il ne peut pas l'attendre (en voiture, en l'air, dans l'eau...)
-function mettreIronman() {
-  J.ironman = { pieces: [], anim: null, masque: false, ouvert: 0, vide: null, plastron: null, recharge: 0, mains: { G: nouvelleMain(), D: nouvelleMain() } };
-  if (!appelerArmure()) J.ironman.pieces = toutesLesPieces();
+// le code IRONMAN, tapé : l'armure arrive en volant, ou tout de suite s'il ne peut pas l'attendre (en voiture, en l'air, dans l'eau...).
+// civil : au début du chapitre d'Iron Man, Tony Stark est en civil. Il a le code, mais pas encore l'armure : la touche H l'appellera
+function mettreIronman(civil = false) {
+  J.ironman = { pieces: [], anim: null, masque: false, ouvert: 0, vide: null, plastron: null, recharge: 0, ailes: 0, mains: { G: nouvelleMain(), D: nouvelleMain() } };
+  if (!civil && !appelerArmure()) J.ironman.pieces = toutesLesPieces();
+}
+// H : il met son armure (elle arrive en volant), ou il en sort. Comme A Z E, mais d'une seule touche
+function costume() {
+  if (!J.ironman || J.ironman.anim) return;
+  if (!surPlace() && !J.superman) { annonce('', tr('Sois à pied, debout par terre !'), 2); return; }
+  basculerArmure();
 }
 // le code IRONMAN, retapé : l'armure s'en va d'un coup (celle qu'il porte, les pièces qui volent, et l'armure vide)
 function enleverIronman() {
@@ -8247,10 +8666,26 @@ function armureComplete() {
   for (const o of h.torse.children) if (o.position.z > 0.05) o.position.z += bosse(T.B, o.position.x, o.position.y);
   return h;
 }
+// les armures de l'atelier de Tony Stark, debout dans leurs vitrines (presentoirs : la villa < de Malibu). Chacune est fusionnée en quelques
+// formes (une par matière), rangées dans l'intérieur de la villa : on ne les dessine que de près
+function exposerArmures() {
+  for (const p of presentoirs) {
+    const h = armureComplete();
+    animerHumain(h, 0, 0); h.g.position.set(p.x, p.y + 0.15, p.z); h.g.rotation.y = p.a; h.g.updateMatrixWorld(true);
+    const parMatiere = new Map();
+    h.g.traverse(o => { if (o.isMesh && o.visible) (parMatiere.get(o.material) || parMatiere.set(o.material, []).get(o.material)).push(o.geometry.clone().applyMatrix4(o.matrixWorld)); });
+    for (const [m, l] of parMatiere) { // (on ne garde que ce que toutes les formes ont : la position, et peut-être le sens des faces et le dessin)
+      const gs = l.map(g => g.index ? g.toNonIndexed() : g), garde = ['position', 'normal', 'uv'].filter(k => gs.every(g => g.attributes[k]));
+      for (const g of gs) for (const k in g.attributes) if (!garde.includes(k)) g.deleteAttribute(k);
+      const o = new THREE.Mesh(mergeGeometries(gs), m); o.castShadow = true; p.dans.g.add(o);
+    }
+  }
+}
+exposerArmures();
 // il sort de son armure : elle reste là, debout, vide, les bras en croix, le masque levé (dedans, tout est noir). Un peu plus grande que lui
 function laisserArmure() {
   const h = armureComplete();
-  h.tete.material = mat('#0b0b0d'); for (const o of h.tete.children) if (o.geometry === GEO.nez) o.visible = false;
+  h.tete.material = mat('#0b0b0d'); for (const o of h.tete.children) if (o.geometry === GEO.nez || o.geometry === GEO.barbiche) o.visible = false;
   h.g.scale.setScalar(1.04); h.g.position.set(J.x, J.y, J.z); h.g.rotation.y = J.angleCorps;
   animerHumain(h, 0, 0, { croix: 1 });
   h.ironman.visiere.rotation.x = -1.65; h.ironman.visiere.position.y = 0.025;
@@ -8366,7 +8801,7 @@ function finirArrivee() {
   if (A.vide) { scene.remove(A.vide.h.g); if (I.vide === A.vide) I.vide = null; }
   I.pieces = toutesLesPieces(); I.anim = null; J.vue = A.vue;
   rhabillerBJ();
-  if (!J.mort) { annonce(tr('IRON MAN !'), '', 2); bip(500, 1500, 0.35, 'sine', 0.08); }
+  if (!J.mort) { annonce(tr(rescue() ? 'RESCUE !' : 'IRON MAN !'), '', 2); bip(500, 1500, 0.35, 'sine', 0.08); }
 }
 // A Z E pendant que l'armure arrive, ou qu'il en sort, ne fait rien. Mais s'il meurt, monte en voiture... ça se finit tout de suite
 function interrompreIronman() {
@@ -8524,6 +8959,9 @@ function majIronman(dt) {
     const l = main ? 0.45 : 0.75 + 0.25 * Math.min(1, J.vitesse / 30) + 0.4 * clamp(J.vy / 8, 0, 1);   // plus longue quand il va vite, ou qu'il monte
     f.scale.set(main ? 0.16 : 0.22, l * entre(0.85, 1.15), main ? 0.16 : 0.22);
   }
+  // les ailes de Rescue : repliées dans son dos, elles s'ouvrent quand elle vole
+  I.ailes = clamp(I.ailes + (vole ? 2 : -2) * dt, 0, 1);
+  for (const a of b?.ailes || []) a.rotation.z = a.userData.cote * (0.2 + 1 * I.ailes);
 }
 
 // =====================================================================
@@ -8584,6 +9022,7 @@ addEventListener('keydown', e => {
   if (carte.ouverte) return;
   if (J.ironman && suiteIronman(e.code)) return;   // A Z E (Q W E sur un clavier anglais) : l'armure d'Iron Man arrive, ou il en sort
   if (J.ironman?.anim && e.code !== 'KeyV') return;   // pendant ce temps, il ne fait rien d'autre
+  if (e.code === 'KeyH') costume();   // H : l'armure d'Iron Man arrive, ou il en sort
   suite = (suite + e.code + ' ').slice(-SUITE_DANSE.length);
   if (suite === SUITE_DANSE) { suite = ''; danser(); }
   if (e.key === 'Shift') { tapesMaj = [...tapesMaj, temps].slice(-3); if (tapesMaj[2] - tapesMaj[0] < R_.tripleMaj) { tapesMaj = []; decoller(); } else if (J.superman) J.superman.appui = true; }   // en volant : cet appui le fera aller plus vite quand on relâchera Maj, sauf s'il a servi à une figure
@@ -8658,10 +9097,11 @@ function validerTriche() {
   if (CHAPITRE.triche && CHAPITRES.some(c => c.triche === t.code)) { annonce('', t.code === CHAPITRE.triche ? tr('Tu es déjà {super} !', { super: nomSuper() }) : tr('Pas dans ce chapitre !'), 2); return; }
   basculerTriche(t);
 }
-// allume un code de triche, ou l'éteint s'il était allumé (dire : l'annoncer). Le jeu allume aussi celui du héros du chapitre (CHAPITRES : triche)
-function basculerTriche(t, dire = true) {
+// allume un code de triche, ou l'éteint s'il était allumé (dire : l'annoncer). Le jeu allume aussi celui du héros du chapitre (CHAPITRES : triche),
+// en civil s'il a une tenue de tous les jours (CHAPITRES : civil) : il mettra son armure avec la touche H
+function basculerTriche(t, dire = true, civil = false) {
   t.actif = !t.actif; // retaper un code annule son effet
-  if (t.ironman) { if (t.actif) mettreIronman(); else enleverIronman(); }   // l'armure d'Iron Man arrive en volant, ou s'en va
+  if (t.ironman) { if (t.actif) mettreIronman(civil); else enleverIronman(); }   // l'armure d'Iron Man arrive en volant (pas en civil), ou s'en va
   rhabillerBJ();
   ARMES.forEach((a, i) => { const don = pouvoirArme(a); if (don) J.possede[i] = pouvoir(don); });   // les yeux laser, le sceptre de foudre : on ne les a que tant qu'un code actif les donne
   if (!J.possede[J.arme]) changerArme(0);
@@ -8765,7 +9205,7 @@ function decoller() {
   // bascule : debout (0) ou couché ; tonneau, sensTonneau : le tonneau en cours (voir figuresVol, qui y ajoute « looping », le looping en cours)
   J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0, bascule: 0, tonneau: 0, sensTonneau: 0 }; J.vy = 8;
   J.sol = J.nage = J.saute = J.accroupi = false; J.roule = J.echelle = J.grappin = J.balance = J.mur = J.plane = J.lance = null; J.danse = J.genou = J.atterri = 0;
-  annonce('', tr(armureIronman() ? 'Iron Man !' : 'Superman !'), 2);   // (dans l'armure d'Iron Man : la touche F)
+  annonce('', tr(!armureIronman() ? 'Superman !' : rescue() ? 'Rescue !' : 'Iron Man !'), 2);   // (dans l'armure d'Iron Man : la touche F)
 }
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
@@ -11145,7 +11585,7 @@ function peupler(dt) {
   const pietons = personnes.filter(p => p.type === 'pieton').length, civiles = voitures.filter(v => v.conducteur === 'civil').length;
   // (la nuit, il y en a moins : REGLAGES.pietonsNuit et voituresNuit)
   const voulus = Math.round(FOULES[foule.pietons].pietons * lerp(1, R_.pietonsNuit, lumiere.nuit)), voulues = Math.round(FOULES[foule.voitures].voitures * lerp(1, R_.voituresNuit, lumiere.nuit));
-  if (voitures.filter(v => v.ski).length < R_.skieurs) creerSkieur();   // les autres skieurs : un de plus à la fois, sur une piste au hasard
+  if (PISTES_SKI.length && voitures.filter(v => v.ski).length < R_.skieurs) creerSkieur();   // les autres skieurs : un de plus à la fois, sur une piste au hasard
   TELESIEGES.forEach(garnir);   // les skis, les snowboards et les luges pris aux gares reviennent
   for (let k = pietons; k < Math.min(voulus, pietons + Math.ceil(voulus / 8)); k++) apparaitrePersonne('pieton');
   // des piétons en trop (la nuit tombe, ou on a choisi moins de monde) rentrent chez eux, un huitième à la fois : ceux qu'on ne voit pas
@@ -11552,7 +11992,7 @@ function majArrivee(dt) {
 // Si elle a explosé ou coulé avant qu'on la retrouve, une neuve y revient quand B.J. est à plus de « loin » mètres
 function cacherDeLorean(loin = 0) {
   const c = CHAPITRE.cachette !== '?' && cachetteDeLorean(CHAPITRE.cachette) && lieuProche(CHAPITRE.cachette, J);
-  if (c && !deLoreanLa() && dist(J, c) >= loin) creerVoiture(c.x, c.z, 0, false, typeNomme('DeLorean'));
+  if (c && !deLoreanLa() && dist(J, c) >= loin) creerVoiture(c.x, c.z, c.a || 0, false, typeNomme('DeLorean'));
 }
 // les bulles d'aide du début d'un chapitre (CHAPITRES : bulles), l'une après l'autre : chacune reste le temps de la lire
 let bulles = null;   // { liste, k : la suivante, t : combien de temps encore, montree : une bulle est affichée }
@@ -11561,7 +12001,7 @@ function majBulles(dt) {
   if (!b || (b.t -= dt) > 0) return;
   if (b.montree) { $('bulle').style.opacity = 0; b.montree = false; b.t = 0.5; return; }   // un petit moment sans bulle entre deux
   if (b.k >= b.liste.length) { bulles = null; return; }
-  const texte = tr(b.liste[b.k++], { super: nomSuper() });
+  const texte = tr(b.liste[b.k++], { super: nomSuper(), heros: nomHeros() });
   $('bulle').innerHTML = `<h3>${nomSuper()}</h3>${texte}`; $('bulle').style.opacity = 1;
   b.montree = true; b.t = 2.5 + texte.replace(/<[^>]+>/g, '').length * 0.05;
 }
@@ -11604,8 +12044,12 @@ const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital
   L: ['#2a9a2a', 'F', 'Maison de Franklin'], O: ['#2a6ad8', 'M', 'Villa de Michael'], R: ['#e07a10', 'T', 'Caravane de Trevor'], J: ['#b89a10', 'Y', 'Yellow Jack'],
   B: ['#2a2a2a', 'B', 'Bunker'], W: ['#8a1010', 'W', 'Château Wolfenstein'], Y: ['#1a7ad8', '❄', 'Station de ski'],
   U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'],
-  '%': ['#4a5a2a', '★', 'Camp militaire'], '?': ['#3a3a44', '?', 'Bunker secret'], v: ['#d89a18', '⌂', 'Ta villa (pour dormir)'] };
-const LEGENDE = [...Object.values(ICONES), ['#d8501a', 'C', 'Piste de cascades'], ['#0a9a9a', 'N', 'Navette des pistes']];   // les ronds de la légende de la grande carte
+  '%': ['#4a5a2a', '★', 'Camp militaire'], '?': ['#3a3a44', '?', 'Bunker secret'], v: ['#d89a18', '⌂', 'Ta villa (pour dormir)'],
+  '<': ['#b8141c', '⌂', 'Villa de Tony Stark'], '|': ['#2a5ab8', 'T', 'Tour Stark'], '$': ['#6a6e76', '⚙', 'Stark Industries'],
+  '(': ['#1a8aa8', '◉', 'Stark Expo'], '>': ['#b8860b', '◎', 'Repaire du Mandarin'], ')': ['#6a4a2a', '∩', 'Grotte des Dix Anneaux'] };
+// les ronds de la légende de la grande carte : seulement ce qu'il y a dans la ville du chapitre
+const LEGENDE = [...Object.entries(ICONES).filter(([c]) => lieux[c]).map(([, v]) => v),
+  ...CASCADES.length ? [['#d8501a', 'C', 'Piste de cascades']] : [], ...arrets.length ? [['#0a9a9a', 'N', 'Navette des pistes']] : []];
 const REPERES = [];   // [lieu, couleur, lettre, nom]
 for (const [c, [fond, lettre, nom]] of Object.entries(ICONES)) for (const p of lieux[c] || []) REPERES.push([p, fond, lettre, nom]);
 for (const c of CASCADES) REPERES.push([c.depart, '#d8501a', 'C', c.nom]);   // le départ des pistes de cascades
@@ -11630,12 +12074,14 @@ function dessinerPlan(g) {
   g.fillStyle = '#9a9a9a'; for (const [x, z, l, p] of PLAN.pistes) g.fillRect(x, z, l, p);
   g.strokeStyle = '#c8603a'; g.lineWidth = LARGEUR_PISTE; g.beginPath(); for (const r of PISTES) { g.moveTo(r.pts[0].p.x, r.pts[0].p.z); for (const q of r.pts) g.lineTo(q.p.x, q.p.z); } g.stroke();
   g.fillStyle = '#8c9196'; for (const [x, z, l, p] of PLAN.rues) g.fillRect(x, z, l, p);
+  g.fillStyle = '#9a7a52'; for (const [x, z, l, p] of jetees) g.fillRect(x - l / 2, z - p / 2, l, p);   // les jetées en planches
   g.lineWidth = 9;   // les pistes de ski, chacune de sa couleur
   for (const p of PISTES_SKI) { g.strokeStyle = COULEURS_PISTES[p.couleur] || COULEURS_PISTES.rouge; g.beginPath(); for (const q of p.pts) g.lineTo(q.x, q.z); g.stroke(); }
   g.strokeStyle = '#1a3a6a'; g.lineWidth = 6; g.setLineDash([24, 12]); g.beginPath();   // les remontées : un trait tireté
   for (const l of TELESIEGES) { g.moveTo(l.bas.x, l.bas.z); g.lineTo(l.haut.x, l.haut.z); }
   g.stroke(); g.setLineDash([]);
-  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', v: '#4d6b44', F: '#5a7040', R: '#8a7a5a', '%': '#5a5a44', '?': '#4a4a52' };
+  const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', v: '#4d6b44', F: '#5a7040', R: '#8a7a5a', '%': '#5a5a44', '?': '#4a4a52',
+    '<': '#4d6b44', '(': '#3f6b3a', '>': '#4d6b44', ')': '#7a6a52' };
   for (const [c, o] of PLAN.pates) { g.fillStyle = couleurs[c] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
   g.globalAlpha = 0.65; for (const gang of GANGS) { const o = origine(gang.col, gang.ligne); g.fillStyle = gang.couleur; g.fillRect(o.x - R / 2, o.z - R / 2, S + R, S + R); } g.globalAlpha = 1;   // le quartier des gangs
   g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
@@ -11713,8 +12159,8 @@ function legendeCarte(g, h) {
   const rond = (couleur, x, y) => { g.fillStyle = couleur; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill(); };
   const trait = (couleur, tirets = []) => (x, y) => { g.strokeStyle = couleur; g.lineWidth = 4; g.setLineDash(tirets); g.beginPath(); g.moveTo(x - 9, y); g.lineTo(x + 9, y); g.stroke(); g.setLineDash([]); };
   const lignes = [...LEGENDE.map(([fond, lettre, nom]) => [nom, (x, y) => icone(g, x, y, fond, lettre, 8)]),
-    ['Piste bleue', trait(COULEURS_PISTES.bleue)], ['Piste rouge', trait(COULEURS_PISTES.rouge)], ['Piste noire', trait(COULEURS_PISTES.noire)],
-    ['Hors-piste', trait(COULEURS_PISTES.jaune)], ['Remontée', trait('#1a3a6a', [5, 3])],
+    ...PISTES_SKI.length ? [['Piste bleue', trait(COULEURS_PISTES.bleue)], ['Piste rouge', trait(COULEURS_PISTES.rouge)], ['Piste noire', trait(COULEURS_PISTES.noire)],
+      ['Hors-piste', trait(COULEURS_PISTES.jaune)]] : [], ...TELESIEGES.length ? [['Remontée', trait('#1a3a6a', [5, 3])]] : [],
     ['Objectif', (x, y) => { g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); g.stroke(); }],
     ['Toi', (x, y) => flecheJoueur(g, x, y, 0, 0.9)],
     ['Police', (x, y) => { rond('#f33', x - 3, y); rond('#39f', x + 3, y); }],
@@ -12095,6 +12541,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
   tenirPrise(dt);   // la voiture que Spiderman fait tourner au bout de sa toile
+  majFete(dt);      // la grande roue et les montagnes russes de la jetée (Malibu)
   majIronman(dt);   // l'armure d'Iron Man : son masque, ses répulseurs, son plastron, ses réacteurs
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
   auraBJ.material.map.offset.y -= dt * 1.5; auraBJ.material.opacity = (0.45 + Math.random() * 0.25) * (auraBJ.userData.avantInvisible ? 0.15 : 1);   // l'aura monte et tremble (on la voit à peine quand il est invisible)
@@ -12216,7 +12663,7 @@ etat('Clique pour jouer');
 // et son écran, qui attendait que le pays soit construit
 if (CHAPITRE.heure != null) fixerHeure(CHAPITRE.heure);
 cacherDeLorean();
-{ const t = TRICHES.find(t => t.code === CHAPITRE.triche); if (t && !t.actif) basculerTriche(t, false); }
+{ const t = TRICHES.find(t => t.code === CHAPITRE.triche); if (t && !t.actif) basculerTriche(t, false, enCivil()); }
 if (ecranChapitre.visible) { ecranChapitre.texte = 'Clique pour jouer'; ecranChapitre.clic = lancerJeu; }
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
