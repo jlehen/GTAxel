@@ -108,6 +108,11 @@
   #tableau .barre > div { height: 100%; width: 0; background: linear-gradient(90deg, #4a8cff, #e8f4ff); }
   #tableau .aide { font-size: 15px; color: #ddd; margin-top: 4px; }
   #voile { position: absolute; inset: 0; background: #fff; opacity: 0; }   /* la DeLorean est partie : tout devient blanc */
+  /* les missions d'Iron Man : le givre de l'armure (« Le premier vol » : l'écran se couvre de glace sur les bords), et la barre de vie d'Iron Monger */
+  #givre { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 35%, rgba(215,240,255,.9)); opacity: 0; }
+  #boss { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(420px, 60%); text-align: center; display: none; font: 22px 'Anton', Impact, sans-serif; letter-spacing: 2px; }
+  #boss > div { height: 12px; background: rgba(0,0,0,.6); border: 2px solid #ddd; margin-top: 2px; }
+  #boss > div > div { height: 100%; width: 100%; background: linear-gradient(90deg, #c0392b, #ff7a50); transition: width .2s; }
   /* l'écran du chapitre : le logo du héros, « Chapitre 2 », puis il s'en va */
   #ecran-chapitre { position: fixed; inset: 0; display: none; cursor: pointer; }
   #ecran-chapitre canvas { width: 100%; height: 100%; }
@@ -133,6 +138,7 @@
   <div id="annonce"></div>
   <div id="viseur"></div>
   <div id="fumee"></div>
+  <div id="givre"></div>
   <div id="rouge"></div>
   <div id="sommeil">Zzz…</div>
   <div id="wasted">WASTED</div>
@@ -145,6 +151,7 @@
     <div class="mph"><span></span><div class="barre"><div></div></div></div>
     <div class="aide"></div>
   </div>
+  <div id="boss">IRON MONGER<div><div></div></div></div>
   <div id="voile"></div>
   <canvas id="grande-carte"></canvas>
   <div id="triche"></div>
@@ -235,7 +242,8 @@ for (const k in heros) {
 //  88 miles à l'heure (142 km/h) pendant 3 secondes. Elle ramène aussi aux chapitres d'avant (dedans, la touche T choisit où aller).
 //  Les missions sont dans MISSIONS (le chapitre 1) et MISSIONS_CHAPITRES (les autres), plus bas.
 //  ville : où ça se passe. Sa carte est dans VILLES (plus bas), sinon c'est le pays de la CARTE (Los Santos). Gotham, Metropolis et New York arrivent bientôt
-//  heros, heroine : ton nom, avec le garçon ou la fille du menu (sans : celui de HEROS) ; super, superFille : le nom de super-héros
+//  heros, heroine : ton nom, avec le garçon ou la fille du menu (sans : celui de HEROS) ; super, superFille : le nom de super-héros ;
+//    ami, amiFille : qui t'aide dans les missions ({ami} dans leurs textes : avec le garçon, ami ; avec la fille, amiFille)
 //  civil, civilFille : ta tenue de tous les jours (le héros, l'héroïne), avant de mettre ton costume (touche H) : veste, chemise, pantalon (ou jupe),
 //    chaussures (ou talons), cheveux (sans : ceux du menu), lunettes : la couleur des verres de tes lunettes de soleil, barbiche: true : comme Tony Stark
 //  triche : le code de triche du héros, allumé pendant tout le chapitre. Les codes des autres super-héros n'y marchent pas
@@ -254,7 +262,7 @@ const CHAPITRES = [
     'Si tu fais des bêtises, la police te poursuit : cache-toi pour la semer.',
     'À la fin du chapitre, la <b>DeLorean</b> t\'emmène au chapitre suivant !',
   ]},
-  { ville: 'Malibu', heros: 'Tony Stark', heroine: 'Pepper Potts', super: 'Iron Man', superFille: 'Rescue', triche: 'IRONMAN', logo: 'ironman', heure: 13, cachette: '>', sansReproche: true,
+  { ville: 'Malibu', heros: 'Tony Stark', heroine: 'Pepper Potts', super: 'Iron Man', superFille: 'Rescue', ami: 'Pepper Potts', amiFille: 'Tony Stark', triche: 'IRONMAN', logo: 'ironman', heure: 13, cachette: '>', sansReproche: true,
     civil: { veste: '#2b2d34', chemise: '#ececf0', pantalon: '#2b2d34', chaussures: '#141418', cheveux: '#3b2717', lunettes: '#8a2c14', barbiche: true },
     civilFille: { veste: '#ece2d0', chemise: '#ffffff', jupe: '#ece2d0', talons: '#cdb48c', cheveux: '#d08a4e' }, bulles: [
     'Tu es <b>{heros}</b>. <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !',
@@ -263,7 +271,7 @@ const CHAPITRES = [
     '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>L</b> : le masque.',
     'Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d\'autres armures et des améliorations. <b>J</b> : changer d\'armure.',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
-    'Le Mandarin a caché la DeLorean dans son repaire : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
+    'Suis le <b>point jaune</b> : tes missions t\'attendent. À la fin, le Mandarin a caché la DeLorean : il faudra la retrouver.',
   ]},
   { ville: 'Gotham', heros: 'Bruce Wayne', heroine: 'Barbara Gordon', super: 'Batman', superFille: 'Batgirl', triche: 'BATMAN', logo: 'batman', heure: 1, cachette: 'b', sansReproche: true, bulles: [
     'Tu es <b>{super}</b> ! Ta Batmobile t\'attend à côté de toi : <b>B</b> la rappelle, <b>R</b> la fait voler.',
@@ -308,6 +316,7 @@ const CHAPITRE = CHAPITRES[partie.chapitre - 1];   // le chapitre où l'on est (
 const fille = () => !!HEROS[heros.genre].fille;
 const nomHeros = () => (fille() ? CHAPITRE.heroine : CHAPITRE.heros) || HEROS[heros.genre].nom;
 const nomSuper = () => (fille() ? CHAPITRE.superFille : CHAPITRE.super) || nomHeros();
+const nomAmi = () => (fille() ? CHAPITRE.amiFille : CHAPITRE.ami) || '';   // qui t'aide dans les missions (Pepper Potts...)
 
 // =====================================================================
 //  LA FOULE : combien de piétons et de voitures vivent autour de toi. On le choisit dans le menu.
@@ -875,10 +884,10 @@ const TRADUCTIONS = {
     de: 'Du bist ein Held: Die Polizei ist auf deiner Seite. Aber pass auf die Passanten auf: Ab dem 3. Opfer zahlst du eine Strafe!',
     en: 'You are a hero: the police are on your side. But watch out for passers-by: from the 3rd victim on, you pay a fine!',
     gsw: 'Du bisch en Held: d Polizei isch uf dinere Siite. Aber pass uf d Passante uf: Ab em 3. Opfer gits e Buess!' },
-  'Le Mandarin a caché la DeLorean dans son repaire : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.': {
-    de: 'Der Mandarin hat den DeLorean in seinem Versteck versteckt: Finde ihn (gelber Punkt) und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
-    en: 'The Mandarin has hidden the DeLorean in his lair: find it (yellow dot), then hold 88 miles per hour for 3 seconds.',
-    gsw: 'De Mandarin hät de DeLorean i sim Versteck versteckt: Find en (gääle Punkt) und heb dänn 3 Sekunde lang 88 Meile pro Stund.' },
+  'Suis le <b>point jaune</b> : tes missions t\'attendent. À la fin, le Mandarin a caché la DeLorean : il faudra la retrouver.': {
+    de: 'Folge dem <b>gelben Punkt</b>: Deine Missionen warten auf dich. Am Ende musst du den DeLorean finden, den der Mandarin versteckt hat.',
+    en: 'Follow the <b>yellow dot</b>: your missions are waiting. At the end, you will have to find the DeLorean the Mandarin has hidden.',
+    gsw: 'Folg em <b>gääle Punkt</b>: Dini Missione warted uf di. Am Schluss muesch de DeLorean finde, wo de Mandarin versteckt hät.' },
   'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.': {
     de: 'Der DeLorean ist verschwunden: Finde ihn (gelber Punkt) und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
     en: 'The DeLorean has vanished: find it (yellow dot), then hold 88 miles per hour for 3 seconds.',
@@ -939,6 +948,104 @@ const TRADUCTIONS = {
   'Tu es déjà {super} !': { de: 'Du bist schon {super}!', en: 'You are already {super}!', gsw: 'Du bisch scho {super}!' },
   'Pas dans ce chapitre !': { de: 'Nicht in diesem Kapitel!', en: 'Not in this chapter!', gsw: 'Nöd i dem Kapitel!' },
   'Va dans un chapitre : CHAPITRE2 pour le chapitre 2 (Iron Man)': { de: 'Geht in ein Kapitel: CHAPITRE2 für Kapitel 2 (Iron Man)', en: 'Goes to a chapter: CHAPITRE2 for chapter 2 (Iron Man)', gsw: 'Gaht in es Kapitel: CHAPITRE2 für s Kapitel 2 (Iron Man)' },
+  // les missions d'Iron Man (MISSIONS_MALIBU)
+  'Combattant des Dix Anneaux': { de: 'Kämpfer der Zehn Ringe', en: 'Ten Rings fighter', gsw: 'Kämpfer vo de Zäh Ringe' },
+  'Habitant de la tour': { de: 'Bewohner des Turms', en: 'Tower resident', gsw: 'Bewohner vom Turm' },
+  'La grotte des Dix Anneaux': { de: 'Die Höhle der Zehn Ringe', en: 'The Ten Rings cave', gsw: 'D Höhli vo de Zäh Ringe' },
+  'Les Dix Anneaux ont volé des armes de Stark Industries : va à leur grotte, dans le désert (point jaune)': {
+    de: 'Die Zehn Ringe haben Waffen von Stark Industries gestohlen: Geh zu ihrer Höhle in der Wüste (gelber Punkt)',
+    en: 'The Ten Rings have stolen weapons from Stark Industries: go to their cave in the desert (yellow dot)',
+    gsw: 'D Zäh Ringe händ Waffe vo Stark Industries klaut: Gang zu ihrer Höhli i de Wüeschti (gääle Punkt)' },
+  'Dans la grotte, ta toute première armure t\'attend : monte dans la Mark I, en ferraille (touche E)': {
+    de: 'In der Höhle wartet deine allererste Rüstung: Steig in den Mark I aus Altmetall (Taste E)',
+    en: 'In the cave, your very first armour is waiting: climb into the scrap-metal Mark I (E key)',
+    gsw: 'I de Höhli wartet dini allererschti Rüschtig: Stiig in Mark I us Altmetall (Taschte E)' },
+  'Les Dix Anneaux attaquent ! Clic droit : les lance-flammes · clic gauche : la mitrailleuse · F : les fusées. Il en reste {n}': {
+    de: 'Die Zehn Ringe greifen an! Rechtsklick: Flammenwerfer · Linksklick: Maschinengewehr · F: Raketen. Noch {n}',
+    en: 'The Ten Rings attack! Right click: flamethrowers · left click: machine gun · F: rockets. {n} left',
+    gsw: 'D Zäh Ringe griifed aa! Rächtschlick: Flammewärfer · Linkschlick: Maschinegwehr · F: Rakete. Na {n}' },
+  'Le premier vol': { de: 'Der erste Flug', en: 'The first flight', gsw: 'De erscht Flug' },
+  'Ta nouvelle armure, la Mark II, est prête : rentre dans ton atelier, à la villa (point jaune)': {
+    de: 'Deine neue Rüstung, der Mark II, ist fertig: Geh in deine Werkstatt in der Villa (gelber Punkt)',
+    en: 'Your new armour, the Mark II, is ready: go back to your workshop at the villa (yellow dot)',
+    gsw: 'Dini neui Rüschtig, de Mark II, isch parat: Gang i dini Wärchstatt i de Villa (gääle Punkt)' },
+  'Mets la Mark II : touche H (si tu portes une autre armure, tu en sors d\'abord)': {
+    de: 'Zieh den Mark II an: Taste H (trägst du eine andere Rüstung, steigst du zuerst aus)',
+    en: 'Put on the Mark II: H key (if you are wearing another armour, you get out of it first)',
+    gsw: 'Leg de Mark II aa: Taschte H (wänn du en anderi Rüschtig treisch, stiigsch zersch us)' },
+  'Premier vol ! F pour t\'envoler, puis passe dans les anneaux : il en reste {n}': {
+    de: 'Erster Flug! F zum Abheben, dann flieg durch die Ringe: noch {n}',
+    en: 'First flight! F to take off, then fly through the rings: {n} left',
+    gsw: 'Erschte Flug! F zum Abhebe, dänn flüüg dur d Ring: na {n}' },
+  'Plus haut ! Monte à {h} m (tu es à {y} m) : regarde vers le ciel, Z pour avancer, Maj pour aller plus vite': {
+    de: 'Höher! Steig auf {h} m (du bist auf {y} m): Schau zum Himmel, W zum Vorwärtsfliegen, Shift für schneller',
+    en: 'Higher! Climb to {h} m (you are at {y} m): look at the sky, W to go forward, Shift to go faster',
+    gsw: 'Höcher! Stiig uf {h} m (du bisch uf {y} m): Lueg zum Himmel, W zum Vorwärtsflüüge, Shift für schnäller' },
+  'Le pompier volant': { de: 'Der fliegende Feuerwehrmann', en: 'The flying firefighter', gsw: 'De flüügend Füürwehrmaa' },
+  'Une tour brûle dans le centre-ville ! Prends les gens du toit un par un (E) et pose-les en bas, près des pompiers : il en reste {n}': {
+    de: 'Ein Turm in der Innenstadt brennt! Hol die Leute einzeln vom Dach (E) und setz sie unten bei der Feuerwehr ab: noch {n}',
+    en: 'A tower is burning downtown! Take the people off the roof one by one (E) and set them down by the firefighters: {n} left',
+    gsw: 'En Turm i de Innestadt brännt! Hol d Lüüt eis nach em andere vom Dach (E) und stell si une bi de Füürwehr ab: na {n}' },
+  '{ami} t\'attend à la villa : ton associé, Obadiah Stane, prépare un mauvais coup... (point jaune)': {
+    de: '{ami} wartet in der Villa auf dich: Dein Partner Obadiah Stane plant etwas Böses... (gelber Punkt)',
+    en: '{ami} is waiting for you at the villa: your partner, Obadiah Stane, is up to no good... (yellow dot)',
+    gsw: '{ami} wartet i de Villa uf di: Din Partner Obadiah Stane plant öppis Böses... (gääle Punkt)' },
+  'Obadiah t\'a arraché ton réacteur ! Ton ancien réacteur est au salon, en haut (point jaune) : vite, encore {t} s': {
+    de: 'Obadiah hat dir deinen Reaktor herausgerissen! Dein alter Reaktor ist oben im Wohnzimmer (gelber Punkt): schnell, noch {t} s',
+    en: 'Obadiah ripped out your reactor! Your old reactor is in the living room, upstairs (yellow dot): hurry, {t} s left',
+    gsw: 'De Obadiah hät dir din Reaktor usegrisse! Din alte Reaktor isch obe i de Stube (gääle Punkt): schnäll, na {t} s' },
+  'Iron Monger attaque Stark Industries ! Mets ton armure (H) et arrête-le, sur le toit de l\'usine (point jaune)': {
+    de: 'Iron Monger greift Stark Industries an! Zieh deine Rüstung an (H) und halte ihn auf dem Dach der Fabrik auf (gelber Punkt)',
+    en: 'Iron Monger is attacking Stark Industries! Put on your armour (H) and stop him on the factory roof (yellow dot)',
+    gsw: 'De Iron Monger griift Stark Industries aa! Leg dini Rüschtig aa (H) und halt en uf em Dach vo de Fabrik uf (gääle Punkt)' },
+  'Le givre fond : vite, F pour rallumer tes réacteurs !': { de: 'Das Eis schmilzt: schnell, F, um deine Triebwerke zu zünden!', en: 'The ice is melting: quick, F to restart your thrusters!', gsw: 'S Iis schmilzt: schnäll, F, zum dini Triebwärch aazünde!' },
+  "Ton armure gèle : ses réacteurs s'éteignent, tu tombes... attends que le givre fonde !": { de: 'Deine Rüstung vereist: Die Triebwerke gehen aus, du fällst... warte, bis das Eis schmilzt!',
+    en: 'Your armour is icing up: its thrusters cut out, you are falling... wait for the ice to melt!', gsw: 'Dini Rüschtig vereist: D Triebwärch gönd us, du gheisch abe... wart, bis s Iis schmilzt!' },
+  'Descends le poser en bas, près des pompiers (point jaune) : pose-toi à côté d\'eux. Encore {n} à sauver': {
+    de: 'Bring ihn nach unten zur Feuerwehr (gelber Punkt): Lande neben ihnen. Noch {n} zu retten',
+    en: 'Take them down to the firefighters (yellow dot): land next to them. {n} left to save',
+    gsw: 'Bring en abe zur Füürwehr (gääle Punkt): Land näbe ihne. Na {n} z rette' },
+  "Une armure toute neuve, rien qu'à toi · H : elle arrive": { de: 'Eine brandneue Rüstung, nur für dich · H: Sie kommt', en: 'A brand-new armour, all yours · H: it arrives', gsw: 'E nigelnagelneui Rüschtig, nur für di · H: si chunnt' },
+  'Anneau {k} sur {n} !': { de: 'Ring {k} von {n}!', en: 'Ring {k} of {n}!', gsw: 'Ring {k} vo {n}!' },
+  'Tous les anneaux !': { de: 'Alle Ringe!', en: 'All the rings!', gsw: 'Alli Ring!' },
+  'GIVRE !':          { de: 'VEREISUNG!', en: 'ICING!', gsw: 'IIS!' },
+  "Ton armure gèle : ses réacteurs s'éteignent !": { de: 'Deine Rüstung vereist: Die Triebwerke gehen aus!', en: 'Your armour is icing up: its thrusters cut out!', gsw: 'Dini Rüschtig vereist: D Triebwärch gönd us!' },
+  'LE GIVRE FOND !':  { de: 'DAS EIS SCHMILZT!', en: 'THE ICE IS MELTING!', gsw: 'S IIS SCHMILZT!' },
+  'Vite, F : rallume tes réacteurs !': { de: 'Schnell, F: Zünde deine Triebwerke!', en: 'Quick, F: restart your thrusters!', gsw: 'Schnäll, F: Zünd dini Triebwärch aa!' },
+  'OUF !':            { de: 'PUH!', en: 'PHEW!', gsw: 'PUH!' },
+  'Tes réacteurs sont repartis : record battu !': { de: 'Deine Triebwerke laufen wieder: Rekord gebrochen!', en: 'Your thrusters are back on: record broken!', gsw: 'Dini Triebwärch lauffed wieder: Rekord brochä!' },
+  'Ton armure a encaissé la chute : rien de cassé !': { de: 'Deine Rüstung hat den Sturz abgefangen: nichts kaputt!', en: 'Your armour took the fall: nothing broken!', gsw: 'Dini Rüschtig hät de Sturz abgfange: nüüt kaputt!' },
+  "Tu l'as lâché : il est retourné sur le toit": { de: 'Du hast ihn losgelassen: Er ist wieder auf dem Dach', en: 'You let go: they are back on the roof', gsw: 'Du häsch en los glah: Er isch wieder uf em Dach' },
+  'SAUVÉ !':          { de: 'GERETTET!', en: 'SAVED!', gsw: 'GRETTET!' },
+  '« Merci, {super} ! » Encore {n} sur le toit': { de: '„Danke, {super}!“ Noch {n} auf dem Dach', en: '"Thank you, {super}!" {n} more on the roof', gsw: '«Merci, {super}!» Na {n} uf em Dach' },
+  '« Merci, {super} ! »': { de: '„Danke, {super}!“', en: '"Thank you, {super}!"', gsw: '«Merci, {super}!»' },
+  'Mets ton armure (H) pour le porter !': { de: 'Zieh deine Rüstung an (H), um ihn zu tragen!', en: 'Put on your armour (H) to carry them!', gsw: 'Leg dini Rüschtig aa (H), zum en träge!' },
+  '« Accroche-toi ! »': { de: '„Halt dich fest!“', en: '"Hold on tight!"', gsw: '«Heb di fescht!»' },
+  'AU FEU !':         { de: 'FEUER!', en: 'FIRE!', gsw: 'FÜÜR!' },
+  'Une tour brûle dans le centre-ville : des gens sont coincés sur le toit !': { de: 'Ein Turm in der Innenstadt brennt: Leute sitzen auf dem Dach fest!',
+    en: 'A tower is burning downtown: people are trapped on the roof!', gsw: 'En Turm i de Innestadt brännt: Lüüt sitzed uf em Dach fescht!' },
+  "« Tu croyais vraiment garder tout ça pour toi ? » Il t'arrache ton réacteur !": { de: '„Dachtest du wirklich, du könntest das alles für dich behalten?“ Er reißt dir den Reaktor heraus!',
+    en: '"Did you really think you could keep all this for yourself?" He rips out your reactor!', gsw: '«Häsch würkli glaubt, du chönnsch das alles für di bhalte?» Er riisst dir de Reaktor use!' },
+  'TON CŒUR REPART !': { de: 'DEIN HERZ SCHLÄGT WIEDER!', en: 'YOUR HEART IS BEATING AGAIN!', gsw: 'DIS HERZ SCHLAAT WIEDER!' },
+  'Ton ancien réacteur marche encore · H : ton armure !': { de: 'Dein alter Reaktor funktioniert noch · H: deine Rüstung!', en: 'Your old reactor still works · H: your armour!', gsw: 'Din alte Reaktor gaht no · H: dini Rüschtig!' },
+  'TROP TARD...':     { de: 'ZU SPÄT...', en: 'TOO LATE...', gsw: 'Z SPÖT...' },
+  'Tu as perdu connaissance : la mission reprend au début': { de: 'Du hast das Bewusstsein verloren: Die Mission beginnt von vorn', en: 'You passed out: the mission starts again', gsw: 'Du bisch bewusstlos worde: D Mission fangt vo vorne aa' },
+  '« {prenom}, ta place, c\'est moi qui la prends ! »': { de: '„{prenom}, deinen Platz nehme jetzt ich!“', en: '"{prenom}, I\'m taking your place!"', gsw: '«{prenom}, din Platz nimm jetzt ich!»' },
+  'BOUM !':           { de: 'BUMM!', en: 'BOOM!', gsw: 'BUMM!' },
+  "Iron Monger s'écrase : il est sonné !": { de: 'Iron Monger stürzt ab: Er ist benommen!', en: 'Iron Monger crashes: he is stunned!', gsw: 'De Iron Monger stürzt ab: Er isch benomme!' },
+  'IRON MONGER GÈLE !': { de: 'IRON MONGER VEREIST!', en: 'IRON MONGER IS ICING UP!', gsw: 'DE IRON MONGER VEREIST!' },
+  "Son armure n'a pas été faite pour le froid : il tombe comme une pierre !": { de: 'Seine Rüstung ist nicht für die Kälte gebaut: Er fällt wie ein Stein!',
+    en: 'His armour was not built for the cold: he drops like a stone!', gsw: 'Sini Rüschtig isch nöd für d Chälti baut: Er gheit abe wie en Stei!' },
+  "Iron Monger s'envole !": { de: 'Iron Monger hebt ab!', en: 'Iron Monger takes off!', gsw: 'De Iron Monger hebt ab!' },
+  'IRON MONGER VAINCU !': { de: 'IRON MONGER BESIEGT!', en: 'IRON MONGER DEFEATED!', gsw: 'DE IRON MONGER ISCH BESIEGT!' },
+  'Obadiah Stane ne fera plus de mal à personne': { de: 'Obadiah Stane wird niemandem mehr schaden', en: 'Obadiah Stane will never hurt anyone again', gsw: 'De Obadiah Stane macht niemerem meh öppis z leid' },
+  'Sans ton réacteur, ton armure ne marche plus : vite, ton ancien réacteur !': { de: 'Ohne deinen Reaktor geht deine Rüstung nicht mehr: schnell, dein alter Reaktor!',
+    en: 'Without your reactor, your armour does not work: quick, your old reactor!', gsw: 'Ohni din Reaktor gaht dini Rüschtig nüme: schnäll, din alte Reaktor!' },
+  'Ton armure est gelée : attends que le givre fonde !': { de: 'Deine Rüstung ist vereist: Warte, bis das Eis schmilzt!', en: 'Your armour is frozen: wait for the ice to melt!', gsw: 'Dini Rüschtig isch vereist: Wart, bis s Iis schmilzt!' },
+  "Continue à pied : une Mark I neuve t'attendra dans la grotte quand tu te seras éloigné": { de: 'Geh zu Fuß weiter: Ein neuer Mark I wartet in der Höhle, wenn du weg bist',
+    en: 'Carry on on foot: a new Mark I will be waiting in the cave once you have moved away', gsw: 'Lauf z Fuess wiiter: En neue Mark I wartet i de Höhli, wänn du wäg bisch' },
+  'Appuie sur <b>E</b> pour le prendre dans tes bras': { de: 'Drück <b>E</b>, um ihn in die Arme zu nehmen', en: 'Press <b>E</b> to pick them up', gsw: 'Druck <b>E</b>, zum en i d Arme z näh' },
+  'Mets ton armure (<b>H</b>) pour le porter': { de: 'Zieh deine Rüstung an (<b>H</b>), um ihn zu tragen', en: 'Put on your armour (<b>H</b>) to carry them', gsw: 'Leg dini Rüschtig aa (<b>H</b>), zum en träge' },
 };
 
 // la langue choisie : le navigateur s'en souvient pour la prochaine fois
@@ -1590,6 +1697,12 @@ const ENNEMIS = {
   // Combien ils sont, et combien à la fois : voir CAMP, juste en dessous
   militaire: { nom: 'Militaire',     vie: 75,  arme: 3, degats: 10, precision: 0.4,  vue: 45, tir: [1.2, 2],   vitesse: 4.5 },
   engel:     { nom: 'Irene Engel',   vie: 300, arme: 2, degats: 12, precision: 0.4,  vue: 14, tir: [0.7, 1.4], vitesse: 4.5 },   // (vue : elle ne voit pas plus loin que son bureau)
+  // Malibu (le chapitre d'Iron Man) : les combattants des Dix Anneaux, au fusil d'assaut (arme 5), dans leur grotte ; et Iron Monger, la grosse
+  // armure d'Obadiah Stane. Iron Monger : degats (une balle de la mitrailleuse de son bras), degatsRoquette (un de ses missiles d'épaule),
+  // taille (combien de fois plus grand que toi), vol (sa vitesse en volant, en m/s), givre (à cette hauteur, en mètres, son armure gèle : il tombe !)
+  anneaux:   { nom: 'Combattant des Dix Anneaux', vie: 75, arme: 5, degats: 8, precision: 0.35, vue: 45, tir: [1, 2], vitesse: 4.5 },
+  monger:    { nom: 'Iron Monger',   vie: 15000, degats: 14, degatsRoquette: 45, precision: 0.45, vue: 120, tir: [1.5, 2.5], vitesse: 3.5, taille: 2.6, vol: 24, givre: 450 },
+  rescape:   { nom: 'Habitant de la tour', vie: 50 },   // ceux qu'Iron Man sauve de la tour en feu (mission « Le pompier volant »)
 };
 
 // =====================================================================
@@ -1944,12 +2057,21 @@ const VILLES = {
 // =====================================================================
 //  LES MISSIONS : invente les tiennes !
 //  lieu : une lettre de la CARTE. S'il y en a plusieurs (un garage 'G'...), c'est la plus proche qui compte.
-//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss', 'hitler', 'militaire' ou 'engel')
+//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux' ou 'monger')
 //  etoiles (nombre) · semer · arme (le nom d'une arme à posséder)
 //  blindage (avoir une voiture blindée par le garagiste) · voler (lieu : tout le butin de ce pâté est dans le sac)
 //  bouton (le bouton rouge du camp militaire est enfoncé) · conduire (voiture : être au volant d'une voiture de ce nom)
 //  voyager (partir dans un autre chapitre avec la DeLorean : 88 miles à l'heure pendant 3 secondes)
-//  Dans le texte d'une étape « eliminer », {n} est remplacé par le nombre d'ennemis qu'il reste.
+//  Et pour Iron Man (le chapitre 2), dans son armure :
+//  armure (monter dans la Mark I, l'armure en ferraille de la grotte des Dix Anneaux) · porter (armure : avoir mis l'armure de ce nom,
+//    une des ARMURES_STARK ; celle qui a « mission: true », l'étape te la donne)
+//  anneaux (passer en volant dans les anneaux, dans l'ordre : [colonne, ligne, hauteur au-dessus du sol] pour chacun)
+//  givre (hauteur : monter jusque-là en volant ; l'armure gèle et tombe... jusqu'à ce que tu la rallumes, avec F)
+//  sauver (col, ligne : une tour T de la carte, qui brûle ; nombre : les gens qui attendent sur son toit, à porter un par un, avec E,
+//    jusqu'aux pompiers, en bas) · reacteur (secondes : le temps de rejoindre ton ancien réacteur, au salon de ta villa)
+//  Pour « eliminer », nombre : ils arrivent au début de l'étape, autour du lieu (ensemble : jamais plus à la fois).
+//  Dans le texte d'une étape, {n} est remplacé par ce qu'il reste (des ennemis, des anneaux, des gens à sauver), {t} par les secondes qui
+//  restent, {h} par la hauteur à atteindre et {y} par celle où tu es, {ami} par Pepper Potts (ou par Tony Stark, avec la fille du menu).
 //  Pour « voiture », on peut exiger : rapide: true (une voiture rapide), blindee: true, sansPolice: true (0 étoile)
 //  Pour « aller », on peut exiger sansPolice: true. Le lieu 'R' est dans la caravane de Trevor : il faut y entrer, à pied.
 //  Pour tester : le code de triche MISSION8 (Entrée, MISSION8, Entrée) saute à la mission 8.
@@ -2008,8 +2130,9 @@ const MISSIONS = [
 
 // =====================================================================
 //  LES MISSIONS DES AUTRES CHAPITRES (voir CHAPITRES, tout en haut du fichier) : une liste par chapitre, comme MISSIONS.
-//  Pour l'instant, chaque chapitre n'a qu'une mission : retrouver la DeLorean, cachée dans la ville (sa cachette, dans CHAPITRES),
-//  puis repartir avec. Les vraies missions d'Iron Man, de Batman, de Superman et de Spiderman arrivent bientôt !
+//  La dernière mission de chaque chapitre : retrouver la DeLorean, cachée dans la ville (sa cachette, dans CHAPITRES), puis repartir avec.
+//  Au chapitre 2, Iron Man a déjà 4 missions avant celle-là (les autres arrivent bientôt) ; pour Batman, Superman et Spiderman, il n'y a
+//  encore que la DeLorean.
 // =====================================================================
 const RETROUVER_DELOREAN = { nom: 'La DeLorean a disparu', recompense: 1000, etapes: [
   { type: 'conduire', voiture: 'DeLorean', texte: 'La DeLorean est repartie toute seule : retrouve-la (point jaune) et monte dedans' },
@@ -2020,8 +2143,35 @@ const DELOREAN_MANDARIN = { nom: 'Le repaire du Mandarin', recompense: 1000, eta
   { type: 'conduire', voiture: 'DeLorean', texte: 'Le Mandarin a caché la DeLorean dans son repaire : va la reprendre (point jaune)' },
   RETROUVER_DELOREAN.etapes[1],
 ]};
+// les missions d'Iron Man, à Malibu, dans l'ordre des films (les étapes armure, porter, anneaux, givre, sauver et reacteur : voir MISSIONS)
+const MISSIONS_MALIBU = [
+  // Iron Man (2008) : sa toute première armure, en ferraille, fabriquée dans la grotte des Dix Anneaux. Elle a des lance-flammes !
+  { nom: 'La grotte des Dix Anneaux', recompense: 10000, etapes: [
+    { type: 'aller', lieu: ')', texte: 'Les Dix Anneaux ont volé des armes de Stark Industries : va à leur grotte, dans le désert (point jaune)' },
+    { type: 'armure', lieu: ')', texte: 'Dans la grotte, ta toute première armure t\'attend : monte dans la Mark I, en ferraille (touche E)' },
+    { type: 'eliminer', cible: 'anneaux', nombre: 12, ensemble: 6, lieu: ')', texte: 'Les Dix Anneaux attaquent ! Clic droit : les lance-flammes · clic gauche : la mitrailleuse · F : les fusées. Il en reste {n}' },
+  ]},
+  // la Mark II, argentée : le premier vol, dans des anneaux au-dessus de la pointe de Malibu... puis tout là-haut, où elle gèle
+  { nom: 'Le premier vol', recompense: 15000, etapes: [
+    { type: 'aller', lieu: '<', texte: 'Ta nouvelle armure, la Mark II, est prête : rentre dans ton atelier, à la villa (point jaune)' },
+    { type: 'porter', armure: 'Mark II', texte: 'Mets la Mark II : touche H (si tu portes une autre armure, tu en sors d\'abord)' },
+    { type: 'anneaux', anneaux: [[12, 37, 25], [16, 39, 20], [21, 39, 15], [24, 36, 45], [26, 32, 40], [20, 30, 60], [15, 33, 45], [11, 36, 30]],
+      texte: 'Premier vol ! F pour t\'envoler, puis passe dans les anneaux : il en reste {n}' },
+    { type: 'givre', hauteur: 450, texte: 'Plus haut ! Monte à {h} m (tu es à {y} m) : regarde vers le ciel, Z pour avancer, Maj pour aller plus vite' },
+  ]},
+  // des gens coincés sur le toit d'une tour en feu : Iron Man les porte un par un jusqu'aux pompiers
+  { nom: 'Le pompier volant', recompense: 25000, etapes: [
+    { type: 'sauver', col: 46, ligne: 42, nombre: 6, texte: 'Une tour brûle dans le centre-ville ! Prends les gens du toit un par un (E) et pose-les en bas, près des pompiers : il en reste {n}' },
+  ]},
+  // Obadiah Stane lui vole son réacteur pour sa grosse armure, Iron Monger : le combat finit sur le toit de Stark Industries
+  { nom: 'Iron Monger', recompense: 50000, etapes: [
+    { type: 'aller', lieu: '<', texte: '{ami} t\'attend à la villa : ton associé, Obadiah Stane, prépare un mauvais coup... (point jaune)' },
+    { type: 'reacteur', secondes: 40, texte: 'Obadiah t\'a arraché ton réacteur ! Ton ancien réacteur est au salon, en haut (point jaune) : vite, encore {t} s' },
+    { type: 'eliminer', cible: 'monger', nombre: 1, lieu: '$', texte: 'Iron Monger attaque Stark Industries ! Mets ton armure (H) et arrête-le, sur le toit de l\'usine (point jaune)' },
+  ]},
+];
 const MISSIONS_CHAPITRES = {
-  2: [DELOREAN_MANDARIN],
+  2: [...MISSIONS_MALIBU, DELOREAN_MANDARIN],
   3: [RETROUVER_DELOREAN],
   4: [RETROUVER_DELOREAN],
   5: [RETROUVER_DELOREAN],
@@ -2239,7 +2389,8 @@ const PIECES_IRONMAN = [
 // LES ARMURES DE TONY STARK, au chapitre d'Iron Man : tu as la première dès le début ; les autres s'achètent au magasin de l'usine
 // Stark Industries ($ sur la carte de Malibu), avec les AMELIORATIONS_STARK (juste en dessous). J : choisir une de tes armures ;
 // H : elle arrive (si tu en portes une autre, tu en sors d'abord). Au chapitre 1, le code IRONMAN donne toujours la première.
-//  nom, prix (0 : tu l'as dès le début) ; fille : ce qui change avec la fille du menu (Pepper Potts : l'armure Rescue)
+//  nom, prix (0 : tu l'as dès le début) ; mission: true : elle n'est pas au magasin, c'est une mission qui te la donne (la Mark II :
+//    « Le premier vol ») ; fille : ce qui change avec la fille du menu (Pepper Potts : l'armure Rescue)
 //  couleurs : rouge (le plus gros de l'armure), or (le reste), acier (les jointures), lumiere (les yeux, le réacteur, les répulseurs),
 //    masque (sans : comme or) ;
 //    ailes: true : des ailes dans le dos, qui s'ouvrent quand on vole (comme celles de Rescue)
@@ -2257,6 +2408,7 @@ const PIECES_IRONMAN = [
 //  Invente ton armure ! Par exemple, donne une mitrailleuse à la Hulkbuster, ou fais une armure toute rose...
 const ARMURES_STARK = [
   { nom: 'Mark 85', prix: 0, couleurs: COULEURS_IRONMAN, arrivee: 'pieces', fille: { nom: 'Rescue', couleurs: COULEURS_RESCUE, ailes: true } },
+  { nom: 'Mark II', mission: true, couleurs: { rouge: '#868c94', or: '#b2b7be', acier: '#3c3e44', lumiere: '#d8f8ff' }, arrivee: 'pieces', protection: 0.35, vol: 0.9 },
   { nom: 'Mark V', prix: 8000, couleurs: { rouge: '#a8121a', or: '#aab0b8', acier: '#3a3c42', lumiere: '#d8f8ff' }, arrivee: 'valise', protection: 0.35 },
   { nom: 'War Machine', prix: 25000, couleurs: { rouge: '#3d4046', or: '#8e9298', acier: '#26282c', lumiere: '#d8f8ff' }, arrivee: 'debout', protection: 0.25, vol: 0.9,
     mitrailleuse: { nom: "Mitrailleuse d'épaule", modele: 'lourde', degats: 26, cadence: 0.07, portee: 130, dispersion: 0.015 } },
@@ -2278,6 +2430,9 @@ const AMELIORATIONS_STARK = {
   laser:    { nom: 'Laser des bras', prix: 20000, degats: 300, portee: 22, tour: 0.9, recharge: 8 },
   reacteur: { nom: 'Réacteur', prix: [10000, 25000, 50000, 100000], protection: 0.85, degats: 1.25, vol: 1.1 },
 };
+// IRON MONGER, la grosse armure d'Obadiah Stane (mission « Iron Monger ») : faite comme celles de Tony Stark, mais grise, et massive comme
+// la Hulkbuster. Sa taille, sa vie et ses armes sont dans ENNEMIS (monger)
+const ARMURE_MONGER = { nom: 'Iron Monger', couleurs: { rouge: '#5c6068', or: '#8c9098', acier: '#2c2e33', lumiere: '#cfe8ff', masque: '#6e727a' }, massive: true };
 const TRICHES = [
   // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel. IDDQD : comme dans Doom.
   // B.J. est en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags (les autres codes s'ajoutent par-dessus).
@@ -2788,6 +2943,7 @@ GANGS.forEach(g => {
 });
 MISSIONS_CH.forEach(m => m.etapes.forEach(e => {
   if (e.lieu && !lieux[e.lieu]) alert(`Mission "${m.nom}" : le lieu "${e.lieu}" n'est pas sur la carte !`);
+  if (e.type === 'sauver' && car(e.col, e.ligne) !== 'T') alert(`Mission "${m.nom}" : la case ${e.col}, ${e.ligne} de la CARTE n'est pas une tour (T) !`);
 }));
 if (!lieux[CHAPITRE.cachette]) alert(`Chapitre ${chapitre} : la cachette de la DeLorean, "${CHAPITRE.cachette}", n'est pas sur la carte !`);
 
@@ -3953,6 +4109,10 @@ const lits = [];   // les lits où B.J. dort (voir « Le jour et la nuit ») : c
 const autresLits = [];   // les autres (appartements, caravane de Trevor, hôpital) : l'aide dit d'aller dormir dans une de ses villas
 let chateau = null, bunker = null;
 let camp = null, bunkerSecret = null;   // le camp militaire (%) et le bunker secret (?) : voir « Le camp militaire », plus bas
+// pour les missions d'Iron Man, à Malibu (voir « Les missions d'Iron Man », plus bas) : la grotte des Dix Anneaux, l'usine Stark Industries,
+// l'ancien réacteur de Tony Stark (au salon de sa villa), et le toit des tours (T) : toursT['46,42'] = les toits de la case colonne 46, ligne 42
+let grotte = null, usine = null, vieuxReacteur = null;
+const toursT = {};
 function genererBloc(i, j) {
   const c = CARTE[j][i], o = origine(i, j), rnd = graine(i * 7919 + j * 104729);
   const X = v => o.x + v, Z = v => o.z + v;
@@ -3974,12 +4134,13 @@ function genererBloc(i, j) {
   const chien = (B, p) => pnjDepart.push({ type: 'chien', braquage: B, ...p });
   const butin = (B, o, p) => butinsDepart.push({ B, ...o, ...p });   // ce qu'on vole (ou ce qu'on actionne) avec E
   if (c === 'T') {
-    const mats = ['verre', 'verre2', 'moderne'];
+    const mats = ['verre', 'verre2', 'moderne'], toits = toursT[i + ',' + j] = [];
+    const tour = (m, x, z, l, p, e) => { immeuble(m, x, z, l, p, e, rnd); toits.push({ x, z, l, p, y: Y0 + 0.2 + e * 3 + 0.6 }); };   // (le dessus de son toit)
     if (rnd() < 0.5) {
       const e = 20 + Math.floor(rnd() * 20), m = hasardR(mats, rnd);
-      immeuble(m, X(30), Z(30), 33, 33, e, rnd);
-      immeuble(m, X(30), Z(30), 24, 24, e + 3 + Math.floor(rnd() * 4), rnd);
-    } else for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) immeuble(hasardR(mats, rnd), X(a), Z(b), 21, 21, 12 + Math.floor(rnd() * 18), rnd);
+      tour(m, X(30), Z(30), 33, 33, e);
+      tour(m, X(30), Z(30), 24, 24, e + 3 + Math.floor(rnd() * 4));
+    } else for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) tour(hasardR(mats, rnd), X(a), Z(b), 21, 21, 12 + Math.floor(rnd() * 18));
   } else if (c === 'I') {
     const mats = ['brique', 'beton', 'moderne'];
     // la porte donne sur la rue la plus proche, au nord ou au sud ; les échelles et les escaliers de secours, sur le côté qui donne sur la rue
@@ -4436,6 +4597,7 @@ function genererBloc(i, j) {
     // le salon, en haut
     b.meuble('blanc', 3, 1, -6.5, 7, 0.8, 1.6); b.meuble('blanc', -1, 1, -4.5, 1.6, 0.8, 4);   // le grand canapé, face à la mer
     b.meuble('boisClair', 3, 1, -3.8, 2.6, 0.4, 1.4); b.meuble('noirMeuble', 13, 1, 4, 2.2, 1, 1.4); b.meuble('bois', -12, 1, 7.5, 6, 1.1, 1);   // la table basse, le piano, le bar
+    vieuxReacteur = { ...b.point(3, 1, -3.8), dy: 0.4, a: Math.PI };   // sur la table basse : son tout premier réacteur, sous verre (mission « Iron Monger »)
     soins.push(b.point(-8, 1, 6));
     sol('helipad', X(30), b.niveau(2) + 0.02, Z(25), 14, 14);                         // sur le toit, là où il se pose
     // la terrasse, la piscine et leurs garde-corps, au-dessus de la falaise
@@ -4467,6 +4629,7 @@ function genererBloc(i, j) {
   } else if (c === '$') { // l'usine Stark Industries : un grand hall en tôle (on y entre), où l'on fabrique des armures, deux cheminées, des bureaux en verre
     sol('beton2', X(30), 0.21, Z(30), S - 4, S - 4);
     const b = batiment({ x: X(28), z: Z(22), l: 44, p: 26, mat: 'tole', porte: 's', hEtage: 9, largeurPorte: 9, hauteurPorte: 6, sol: 'beton2', mur: 'metal' });
+    usine = { x: X(28), z: Z(22), y: Y0 + 0.2 + 9.05 + 0.4, l: 44, p: 26 };   // son toit, où Iron Monger attaque (mission « Iron Monger »)
     panneau('starkIndustries', X(28), 7.7, Z(35.06), 24, 2.6);
     for (const w of [-6, 1]) { // la chaîne de montage : de longues tables, des pièces d'armure rouges et dorées, des bras robots
       b.meuble('metal', 0, 0, w, 30, 0.9, 2);
@@ -4474,8 +4637,9 @@ function genererBloc(i, j) {
     }
     // le magasin d'Iron Man : ses armures (ARMURES_STARK), debout sur des plateaux qui tournent, en rang devant la chaîne de montage, face à la
     // porte ; ses améliorations (AMELIORATIONS_STARK), sur des socles, près de la porte, à gauche en entrant. On ne passe pas à travers une armure
-    ARMURES_STARK.forEach((A, k) => {
-      const u = ARMURES_STARK.length > 1 ? -14 + 28 * k / (ARMURES_STARK.length - 1) : 0, q = b.point(u, 0, 5.5);
+    const enVente = ARMURES_STARK.map((A, k) => k).filter(k => !ARMURES_STARK[k].mission);   // (une armure qu'une mission donne n'est pas au magasin)
+    enVente.forEach((k, n) => {
+      const u = enVente.length > 1 ? -14 + 28 * n / (enVente.length - 1) : 0, q = b.point(u, 0, 5.5);
       standsStark.push({ k, ...q }); ajouterCollision(q.x - 0.6, q.z - 0.6, q.x + 0.6, q.z + 0.6, q.y + 3, Y0);
     });
     Object.keys(AMELIORATIONS_STARK).forEach((c, i) => standsStark.push({ amelioration: c, ...b.point(-18 + 4 * i, 0, 10.5) }));
@@ -4531,6 +4695,10 @@ function genererBloc(i, j) {
     });
     b.meuble('bois', -6, 0, -5.5, 4, 0.9, 1.5); b.meuble('rouge', 6, 0, -5.5, 1.6, 1, 1.6); b.meuble('lampe', 6, 0, -5.5, 1.2, 0.05, 1.2, 1);   // l'établi, la forge et ses braises
     b.meuble('tissu', -8.5, 0, 3.5, 2, 0.5, 0.9); for (const [u, w] of [[8, 4], [9.2, 4], [8.6, 2.8]]) b.meuble('boisClair', u, 0, w, 1.1, 0.9, 1.1);   // un lit de camp, des caisses
+    // la Mark I, l'armure en ferraille de Tony Stark, attend au milieu de la grotte, face à l'entrée ; les Dix Anneaux arrivent des tentes,
+    // du feu de camp, de la jeep et du fond de la grotte (mission « La grotte des Dix Anneaux »)
+    grotte = { x: X(30), z: Z(30), poste: { ...b.point(0, 0, -2), angle: 0 },
+      sorties: [{ x: X(17), z: Z(44) }, { x: X(43), z: Z(44) }, { x: X(23), z: Z(51) }, { x: X(30), z: Z(51) }, { x: X(40), z: Z(50) }, b.point(9.5, 0, 0), b.point(-9.5, 0, -1)] };
     // le dôme de roche : un demi-œuf tout cabossé, ouvert devant la porte (au sud), et des bords où l'on se cogne
     const dome = new THREE.SphereGeometry(1, 30, 12, Math.PI / 2 + 0.3, Math.PI * 2 - 0.6, 0, Math.PI / 2).scale(18, 10, 15), p = dome.attributes.position;
     for (let k = 0; k < p.count; k++) { const e = 1 + 0.1 * bruitDoux(p.getX(k) * 0.35 + i, p.getZ(k) * 0.35 + p.getY(k) * 0.3 + j); p.setXYZ(k, p.getX(k) * e, p.getY(k) * e, p.getZ(k) * e); }
@@ -5796,7 +5964,7 @@ function poseMort(k, chute) {
   return { bascule: chute * Math.PI / 2 * b * b, plie: f * 0.8, penche: 0.3 * chute * f, ecarte: 0.3 * a + 0.7 * b, agite: 0.3 * f };
 }
 // couché (sur le dos ou le ventre), le corps pivote autour des pieds : on le remonte de l'épaisseur du torse
-const hauteurCouche = h => 0.13 * Math.abs(Math.sin(h.g.rotation.x));
+const hauteurCouche = h => 0.13 * h.g.scale.y * Math.abs(Math.sin(h.g.rotation.x));   // (un grand, comme Iron Monger, est plus épais)
 // Les membres mous : quand un personnage ne se tient plus (projeté, mort, en roulade, en l'air), son buste, sa tête, ses bras et ses jambes
 // ont du poids. Chaque morceau a un bout (les épaules, la tête, le coude, la main, le genou, le pied) : un point qui a sa vitesse, qui tombe,
 // et que la pose tire vers elle comme un ressort. Le morceau tourne ensuite vers son bout, sans dépasser ce que son articulation permet
@@ -7231,14 +7399,21 @@ const TENUES = {
     chaussures: hasard(['#222', '#eee', '#d01818']), bonnet: hasard(['#d01818', '#1a5ad8', '#f0c020', '#eee', '#222', '#2ab86a']), taille: entre(0.88, 1.06), carrure: entre(0.9, 1.15) }),
   // un membre de gang : le maillot et la casquette de la couleur de son gang
   gang: couleur => ({ peau: hasard(PEAUX), haut: couleur, bas: hasard(['#2a3a5a', '#222', '#4a4a4a']), chaussures: hasard(['#eee', '#222']), casquette: couleur, manchesCourtes: true }),
+  // Malibu : un combattant des Dix Anneaux (une veste couleur sable, un foulard sur la tête), et un habitant de la tour en feu
+  anneaux: () => ({ peau: hasard(PEAUX.slice(1, 4)), haut: hasard(['#7a6a4a', '#5e5a44', '#6a5238']), bas: hasard(['#3e3a2c', '#4a4232']), chaussures: '#2a2018', bonnet: hasard(['#b8a888', '#2a2a2a', '#8a2a20']) }),
+  rescape: () => TENUES.pieton(),
 };
-const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel'], VIGILES = ['garde', 'chien', 'gang'];   // ils restent dans leur pâté
+// ceux qui restent dans leur pâté (le camp, le bunker, le château, une grotte...) et attaquent dès qu'ils te voient : les nazis, les militaires
+// du camp et leur commandante, et, à Malibu, les Dix Anneaux et Iron Monger. Les vigiles, les chiens et les gangs restent aussi dans leur pâté,
+// mais n'attaquent que si on les provoque
+const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'monger'], VIGILES = ['garde', 'chien', 'gang'];
 const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
 const personnes = [];
 function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z)) {
-  const h = type === 'chien' ? creerChien() : creerHumain(tenue);
+  const h = type === 'chien' ? creerChien() : type === 'monger' ? creerMonger() : creerHumain(tenue);
   if (type === 'boss') h.g.scale.setScalar(1.15);
   const p = { type, h, x, y, z, angle: Math.random() * 6.28, vie: ENNEMIS[type]?.vie, cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
+  if (type === 'monger') p.lourd = true;   // Iron Monger : rien ne le fait voler à la renverse (voir projeter)
   if (ENNEMIS[type]?.arme !== undefined) { p.armeIdx = ENNEMIS[type].arme; donnerArme(h, p.armeIdx); }
   if (type === 'militaire' && ARMES[p.armeIdx]?.auto) p.rafale = 0;   // à la mitraillette, en rafales
   h.g.traverse(o => o.userData.personne = p);
@@ -8271,10 +8446,11 @@ function ejecterPilote(r) {
   annonce('', tr('Pilote éjecté ! Monte dans le robot (touche E)'), 3);
 }
 function monterRobot(r) {
+  if (r.armure && armureIronman()) { const I = J.ironman; laisserArmure(); I.pieces = []; I.plastron = null; rhabillerBJ(); }   // dans son armure d'Iron Man : il la laisse debout, à côté
   J.robot = r; r.pilote = 'joueur'; J.accroupi = false; J.danse = 0; J.lacet = r.angle; J.tangage = 0;
   if (r.armure) { // l'armure se referme sur lui : on ne le voit plus (voir majCamera)
     bip(300, 700, 0.3, 'sawtooth', 0.12); bruit(0.4, 400, 0.3);
-    annonce(tr('ARMURE !'), tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · F : fusées · E : sortir'), 5);
+    annonce(r.markI ? 'MARK I !' : tr('ARMURE !'), tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · F : fusées · E : sortir'), 5);
     return;
   }
   if (r.m.pilote.g.parent) r.m.torse.remove(r.m.pilote.g);   // le pilote abattu sort de la cabine
@@ -8421,7 +8597,8 @@ function casserArmure(r) {
     e.position.copy(pos).add(V3(entre(-0.4, 0.4), entre(-0.8, 0.8), entre(-0.4, 0.4))); e.castShadow = true; scene.add(e);
     lancerDebris(e, V3(entre(-5, 5), entre(2, 7), entre(-5, 5)), entre(6, 12), true);
   }
-  annonce(tr('ARMURE DÉTRUITE !'), tr("Continue à pied : une armure neuve t'attendra devant le camp quand tu te seras éloigné"), 4);
+  annonce(tr('ARMURE DÉTRUITE !'), r.markI ? tr("Continue à pied : une Mark I neuve t'attendra dans la grotte quand tu te seras éloigné")
+    : tr("Continue à pied : une armure neuve t'attendra devant le camp quand tu te seras éloigné"), 4);
 }
 // le vacarme d'une arme : les piétons s'enfuient, les soldats, les vigiles et les gangs sont alertés, la police réagit
 function vacarme() {
@@ -8726,8 +8903,9 @@ scene.add(fleche);
 //  les suivants) et tour (le laser des bras, en cours)
 // =====================================================================
 const cacheIronman = {};
-// l'armure k (son numéro dans ARMURES_STARK) ; avec la fille du menu, au chapitre d'Iron Man, ce que « fille » y change (Rescue)
-const armureDe = k => { const a = ARMURES_STARK[k] || ARMURES_STARK[0]; return a.fille && rescue() ? { ...a, ...a.fille } : a; };
+// l'armure k (son numéro dans ARMURES_STARK) ; avec la fille du menu, au chapitre d'Iron Man, ce que « fille » y change (Rescue).
+// (k peut aussi être une armure toute faite : celle d'Iron Monger)
+const armureDe = k => { if (k && typeof k === 'object') return k; const a = ARMURES_STARK[k] || ARMURES_STARK[0]; return a.fille && rescue() ? { ...a, ...a.fille } : a; };
 let armurePosee = 0;   // l'armure qu'on est en train d'habiller (voir habillerIronman)
 // une matière de l'armure k : 'rouge', 'or', 'masque', 'acier' (du métal qui brille), 'lumiere' (ce qui s'allume : les yeux, le réacteur, les répulseurs),
 // ou 'plastron' : le torse rouge, avec les abdominaux en or (le devant du torse est au bord gauche de l'image, et au bord droit)
@@ -8820,6 +8998,7 @@ function mettreIronman(civil = false) {
 // qu'il a choisie (touche J), il en sort, et la nouvelle arrive aussitôt
 function costume() {
   if (!J.ironman || J.ironman.anim || J.ironman.tour) return;
+  if (sansReacteur()) { annonce('', tr('Sans ton réacteur, ton armure ne marche plus : vite, ton ancien réacteur !'), 2); return; }   // (mission « Iron Monger »)
   if (!surPlace() && !J.superman) { annonce('', tr('Sois à pied, debout par terre !'), 2); return; }
   basculerArmure();
 }
@@ -8910,6 +9089,7 @@ function basculerArmure() {
   const I = J.ironman;
   if (!I || I.anim || I.tour) return;
   if (J.superman) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }
+  if (sansReacteur()) { annonce('', tr('Sans ton réacteur, ton armure ne marche plus : vite, ton ancien réacteur !'), 2); return; }
   if (armureIronman()) sortirArmure(I.armure !== armureChoisie()); else appelerArmure();
 }
 // L'armure choisie arrive, à sa façon (ARMURES_STARK : arrivee). Il l'attend, les bras écartés : on le voit de dehors.
@@ -9770,6 +9950,8 @@ let tapesMaj = [];   // quand on a tapé Maj les 3 dernières fois
 function decoller() {
   if (J.voiture || J.robot || J.mort || J.ironman?.anim) return;
   if (J.superman) { J.superman = null; return; }
+  if (sansReacteur()) return;   // (mission « Iron Monger » : sans son réacteur, il ne vole plus)
+  if (armureGelee() && armureIronman()) { annonce('', tr('Ton armure est gelée : attends que le givre fonde !'), 1.5); bip(300, 200, 0.1, 'square', 0.1); return; }   // (mission « Le premier vol »)
   // sa vitesse (la montée est dans J.vy) : il s'élance d'abord vers le ciel. crans : combien de fois on a tapé Maj en volant ; roulis : il penche dans ses virages ;
   // bascule : debout (0) ou couché ; tonneau, sensTonneau : le tonneau en cours (voir figuresVol, qui y ajoute « looping », le looping en cours)
   J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0, bascule: 0, tonneau: 0, sensTonneau: 0 }; J.vy = 8;
@@ -9938,6 +10120,7 @@ function action() {
   if (J.robot) { sortirRobot(); return true; }
   if (litProche()) { dormir(); return true; }   // dans une villa de B.J. (ou chez Michael, chez Franklin) : dormir jusqu'au moment suivant de la journée
   if (autreLitProche()) { annonce('', tr("Ce lit n'est pas à toi : dors dans une de tes villas (⌂ sur la carte), chez Michael ou chez Franklin"), 3); return true; }
+  if (porterSecours()) return true;   // quelqu'un à sauver, sur le toit de la tour en feu : Iron Man le prend dans ses bras
   const s = standProche();
   if (s) { acheter(s); return true; }
   const g = garagisteProche();
@@ -10232,7 +10415,9 @@ function blesser(p, degats, parJoueur = true) {
   // il tombe (à la renverse si B.J. est devant lui, sur le ventre s'il est derrière) et lâche quelque chose. Pris dans un filet : il en sort
   liberer(p);
   p.mort = 0.001; p.chute = Math.cos(angleVers(p, J) - p.angle) > 0 ? -1 : 1;
-  if (CHAPITRE.sansReproche && parJoueur && ['pieton', 'flic', 'garde'].includes(p.type)) victime();   // un héros sans reproche : une victime (voir l'amende)
+  if (CHAPITRE.sansReproche && parJoueur && ['pieton', 'flic', 'garde', 'rescape'].includes(p.type)) victime();   // un héros sans reproche : une victime (voir l'amende)
+  if (p.type === 'anneaux' && Math.random() < 0.25) creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z, y: p.y });   // une fois sur quatre, il lâche son fusil
+  if (p.type === 'monger') mongerVaincu(p);
   if (p.type === 'pieton') { if (parJoueur) crime(1); if (!CHAPITRE.sansReproche && Math.random() < 0.6) creerObjet({ type: 'argent', montant: 10 + Math.floor(Math.random() * 60), x: p.x, z: p.z , y: p.y }); }   // (un héros ne fait pas les poches)
   if (p.type === 'flic') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
   if (p.type === 'garde') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
@@ -10314,7 +10499,7 @@ function majJoueur(dt) {
   if (J.biceps && (av || lat || touches.Space || J.accroupi || sourisG || visee || J.nage || J.danse || ironmanVise())) finirBiceps();   // ...et la pose du culturiste aussi
   const moonwalk = J.danse > 0 && J.danse < R_.moonwalk[0];
   const v = (moonwalk ? R_.vitesseMoonwalk : J.nage ? (court ? R_.vitesseNageRapide : R_.vitesseNage) : J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche)
-    * parTriche('vitesse') * (J.energie > 0 ? R_.vitesseEnergie : 1);   // la boisson énergisante fait aller plus vite
+    * parTriche('vitesse') * (J.energie > 0 ? R_.vitesseEnergie : 1) * (sansReacteur() ? 0.5 : 1);   // la boisson énergisante fait aller plus vite ; sans son réacteur (mission « Iron Monger »), il avance à peine
   const robot = TRICHES.some(t => t.actif && t.robot);
   let mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat;
   if (moonwalk) { mx = -Math.sin(J.angleCorps); mz = -Math.cos(J.angleCorps); }   // le moonwalk : il recule
@@ -10357,9 +10542,11 @@ function majJoueur(dt) {
   if (vide && Math.abs(vide.y - J.y) < 2) { const d = dist(vide, J), r = 0.72 * vide.h.g.scale.x; if (d < r && d > 0) { J.x = vide.x + (J.x - vide.x) / d * r; J.z = vide.z + (J.z - vide.z) / d * r; } }
   // on bouscule les passants : en marchant, on les pousse et ils vacillent ; en courant, on les renverse (pas le Kommandant ni Hitler)
   for (const p of personnes) {
-    if (p.vie <= 0 || p.vol || p.releve !== undefined || p.h.chien || Math.abs(p.y - J.y) > 1) continue;
-    const d = dist(p, J); if (d > 0.65 || d === 0) continue;
+    if (p.vie <= 0 || p.vol || p.releve !== undefined || p.h.chien || Math.abs(p.y - J.y) > (p.lourd ? 4 : 1)) continue;
+    const d = dist(p, J), r = p.lourd ? 0.4 * p.h.g.scale.x : 0.65;   // (Iron Monger, bien plus gros : on ne le bouscule pas, on bute dessus)
+    if (d > r || d === 0) continue;
     const dx = (p.x - J.x) / d, dz = (p.z - J.z) / d;
+    if (p.lourd) { J.x = p.x - dx * r; J.z = p.z - dz * r; continue; }
     if (J.vitesse > 6 && p.type !== 'boss' && p.type !== 'hitler') { blesser(p, 0); projeter(p, dx * 3.5, 2.5, dz * 3.5, -5); bruit(0.25, 300, 0.12); }
     else { p.x = J.x + dx * 0.65; p.z = J.z + dz * 0.65; p.touche = 0.3; }
   }
@@ -11584,7 +11771,7 @@ function piloterBatmobile(v, dt, pilote) {
 // =====================================================================
 function majPersonne(p, dt) {
   const d = dist(p, J);
-  p.h.g.visible = d < 220;
+  p.h.g.visible = d < (p.lourd ? 450 : 220);   // (Iron Monger, si grand, se voit de plus loin)
   if (p.vol) { majVol(p, dt); return; }
   if (p.vie <= 0) {
     if (p.h.chien) { p.mort = Math.min(1, p.mort + dt * 3); animerChien(p.h, 0, dt, p.mort); p.h.g.position.y = p.y + p.mort * 0.15; }
@@ -11599,6 +11786,8 @@ function majPersonne(p, dt) {
   if (p.releve !== undefined) { relever(p, dt); return; }
   if (p.pris) { majPris(p, dt); return; }   // emballé dans un filet, ou paralysé
   if (p.h.chien) { majChien(p, dt, d); return; }
+  if (p.type === 'monger') { majMonger(p, dt, d); return; }   // Iron Monger : il marche, il vole, il tire (voir « Les missions d'Iron Man »)
+  if (p.secours) { majSecours(p, dt); return; }               // un habitant de la tour en feu : il attend Iron Man, ou Iron Man le porte
   p.cooldown -= dt; p.peur -= dt; p.touche = Math.max(0, (p.touche || 0) - dt);
   let vitesse = 0, arme = false;
   // un vigile (ou un membre de gang) n'attaque que si on le provoque ; un gang se calme quand B.J. est loin
@@ -11683,7 +11872,7 @@ function marcher(p, dt) {
 // un personnage projeté (renversé par une voiture, soufflé par une explosion, bousculé par B.J. qui court) : (vx, vy, vz) sa vitesse,
 // w : combien il tourne (radians par seconde ; plus de 0 : la tête part vers ce qui l'a poussé, comme quand une voiture fauche les jambes)
 function projeter(p, vx, vy, vz, w) {
-  if (p.h.chien || p.vol) return;
+  if (p.h.chien || p.vol || p.lourd || p.secours) return;   // (Iron Monger est trop lourd ; quelqu'un qu'Iron Man porte, il le tient bien)
   p.releve = undefined; p.touche = 0;
   p.angle = Math.atan2(-vx, -vz) + entre(-0.3, 0.3);   // il fait face à ce qui le pousse
   p.vol = { vx, vy, vz, w, a: 0, y: p.y + 0.95 * p.h.g.scale.y, r: 0, wr: w * entre(-0.25, 0.25) };   // y : la hauteur de son bassin, autour duquel il tourne ; r : il tourne aussi un peu de côté
@@ -12233,11 +12422,18 @@ function police(dt) {
 // =====================================================================
 // B.J. est-il arrivé au lieu ? À moins de 4 m. Un lieu dans un bâtiment (la planque) a son rayon à lui, plus petit : il faut être dedans, pas sur le toit
 const arrive = l => l.rayon ? dist(J, l) < l.rayon && Math.abs(J.y - l.y) < 2 : dist(J, l) < 4;
-// combien d'ennemis de cette sorte il reste à éliminer : ceux qui sont là, et les militaires du camp qui attendent encore dans les baraques
+// combien d'ennemis de cette sorte il reste à éliminer : ceux qui sont là, et ceux qui attendent encore d'arriver (les militaires du camp,
+// dans les baraques ; ceux d'une étape « eliminer » qui a un « nombre » : voir vague)
 const vivantsType = type => personnes.filter(p => p.type === type && p.vie > 0).length;
-const resteAEliminer = type => type === 'militaire' && camp ? Math.max(resteCamp(), vivantsType(type)) : vivantsType(type);
+const resteAEliminer = type => type === 'militaire' && camp ? Math.max(resteCamp(), vivantsType(type)) : vivantsType(type) + (vague && vague.cible === type ? vague.reste : 0);
 function etapeFinie(et) {
   switch (et.type) {
+    case 'armure': return !!J.robot?.markI;   // dans la Mark I, l'armure en ferraille de la grotte
+    case 'porter': return armureIronman() && !J.ironman.anim && armureDe(J.ironman.armure).nom === et.armure;
+    case 'anneaux': return !!anneaux && anneaux.k >= anneaux.liste.length;
+    case 'givre': return givre?.fini;
+    case 'sauver': return !!sauvetage && sauvetage.sauves >= sauvetage.nombre;
+    case 'reacteur': return !!panne?.fini;
     case 'aller': return arrive(lieuProche(et.lieu, J)) && (!et.sansPolice || etoiles === 0);   // sansPolice : 0 étoile
     case 'voiture': { const v = J.voiture;   // rapide : une voiture rapide · blindee : une voiture blindée · sansPolice : 0 étoile
       return !!v && dist(J, lieuProche(et.lieu, J)) < 7 && (!et.rapide || v.type.vitesse >= R_.vitesseBlindable) && (!et.blindee || estBlindee(v)) && (!et.sansPolice || etoiles === 0); }
@@ -12262,14 +12458,27 @@ function cibleMission() {
   }
   if (et.type === 'blindage') return proche(garagistes);
   if (et.type === 'bouton' && camp) return camp.bouton;
+  // les missions d'Iron Man : la Mark I, l'anneau suivant, la personne à sauver la plus proche (ou, s'il en porte une, les pompiers),
+  // l'ancien réacteur, Iron Monger
+  if (et.type === 'armure') return robots.find(r => r.markI && !r.supprimer) || lieuProche(et.lieu, J);
+  if (et.type === 'porter' || et.type === 'givre') return null;
+  if (et.type === 'anneaux') return anneaux?.liste[anneaux.k] || null;
+  if (et.type === 'sauver') return !sauvetage ? null : sauvetage.porte ? sauvetage.depot : proche(sauvetage.gens.filter(p => p.secours === 'attend'));
+  if (et.type === 'reacteur') return vieuxReacteur && { x: vieuxReacteur.x, y: vieuxReacteur.y, z: vieuxReacteur.z };
+  if (et.type === 'eliminer' && et.nombre) return proche(personnes.filter(p => p.type === et.cible && p.vie > 0)) || lieuProche(et.lieu, J);
   if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule && !v.fantome));
   if (et.lieu) return lieuProche(et.lieu, J);
   if (et.type === 'eliminer') return personnes.find(p => p.type === et.cible && p.vie > 0) || (resteAEliminer(et.cible) ? camp : null);   // (les renforts ne sont pas encore sortis : le camp)
   if (et.type === 'arme') return objets.filter(o => o.type === 'stand' && o.arme === indexArme(et.arme)).reduce((m, o) => !m || dist(o, J) < dist(m, J) ? o : m, null) || lieuProche('A', J);
   return null;
 }
-function missions() {
+// l'étape en cours a-t-elle commencé ? Certaines font quelque chose en commençant (des ennemis arrivent, des anneaux apparaissent, une tour prend
+// feu...) et le défont en finissant, ou quand on la quitte (MISSION8...) : voir commencerEtape, majEtape et finirEtape (« Les missions d'Iron Man »)
+let etapeVue = null;
+function missions(dt) {
   const m = MISSIONS_CH[missionIndex], et = m?.etapes[etapeIndex];
+  if (et !== etapeVue) { const avant = etapeVue; etapeVue = et; finirEtape(avant); if (et) commencerEtape(et); }
+  majEtape(et, dt);
   if (!m || !etapeFinie(et)) return;
   if (et.type === 'conduire' && et.voiture === 'DeLorean') partie.trouvee[chapitre] = true;   // la DeLorean de ce chapitre est retrouvée : elle peut voyager
   bip(500, 1500, 0.5, 'triangle', 0.3);
@@ -12391,6 +12600,427 @@ function majCamera(dt) {
   if (J.secousse > 0.005) { camera.position.x += entre(-1, 1) * J.secousse; camera.position.y += entre(-1, 1) * J.secousse; J.secousse *= Math.pow(0.01, dt); }   // les pas du robot font trembler
   const fov = dansLunette() ? 70 / ARMES[J.arme].zoom : visee && !v && !J.robot ? 45 : 70;
   if (Math.abs(camera.fov - fov) > 0.1) { camera.fov += (fov - camera.fov) * Math.min(1, dt * 10); camera.updateProjectionMatrix(); }
+}
+
+// =====================================================================
+//  Les missions d'Iron Man (MISSIONS_MALIBU, au chapitre 2) : la Mark I de la grotte et les Dix Anneaux, les anneaux et le givre du premier
+//  vol, la tour en feu, le réacteur arraché et Iron Monger. Une étape commence (commencerEtape), vit à chaque image (majEtape), puis finit
+//  (finirEtape) : quand elle est réussie, ou quand on la quitte (le code MISSION8, la mort au milieu du compte à rebours...)
+// =====================================================================
+function commencerEtape(et) {
+  if (et.type === 'eliminer' && et.nombre) commencerVague(et);
+  if (et.type === 'porter') donnerArmure(et.armure);
+  if (et.type === 'anneaux') commencerAnneaux(et);
+  if (et.type === 'givre') givre = { hauteur: et.hauteur, gel: 0, fond: false, fini: false };
+  if (et.type === 'sauver') commencerSauvetage(et);
+  if (et.type === 'reacteur') commencerPanne(et);
+}
+function majEtape(et, dt) {
+  majMarkI(); majVague(dt); majObadiah(dt);
+  if (anneaux) majAnneaux();
+  if (givre) majGivre(dt);
+  if (sauvetage) majSauvetage(dt);
+  if (panne) majPanne(dt);
+}
+function finirEtape() {
+  finirVague(); finirAnneaux(); finirSauvetage(); finirPanne();
+  givre = null; $('givre').style.opacity = 0;
+}
+// le texte de l'étape, en bas de l'écran ({n} : ce qu'il reste ; {t} : les secondes qui restent ; {h}, {y} : la hauteur à atteindre, et celle où
+// il est ; {ami} : Pepper Potts, ou Tony Stark). Pendant le givre, ou quand Iron Man porte quelqu'un, il dit ce qu'il faut faire tout de suite
+function texteEtape(et) {
+  const reste = et.type === 'anneaux' && anneaux ? anneaux.liste.length - anneaux.k : et.type === 'sauver' && sauvetage ? sauvetage.nombre - sauvetage.sauves
+    : et.type === 'eliminer' ? resteAEliminer(et.cible) : 0;
+  const texte = et.type === 'givre' && givre?.gel ? (givre.fond ? 'Le givre fond : vite, F pour rallumer tes réacteurs !' : "Ton armure gèle : ses réacteurs s'éteignent, tu tombes... attends que le givre fonde !")
+    : et.type === 'sauver' && sauvetage?.porte ? 'Descends le poser en bas, près des pompiers (point jaune) : pose-toi à côté d\'eux. Encore {n} à sauver' : et.texte;
+  return tr(texte, { n: reste, t: Math.max(0, Math.ceil(panne?.reste ?? 0)), h: et.hauteur, y: Math.max(0, Math.round(J.y)), ami: nomAmi() });
+}
+
+// --- la Mark I, dans la grotte des Dix Anneaux (mission « La grotte des Dix Anneaux ») ---
+// C'est l'armure en ferraille du camp militaire (creerArmure : sa mitrailleuse, ses lance-flammes, ses fusées), qui attend au milieu de la
+// grotte. Comme celle du camp, une neuve revient à sa place quand on l'a cassée, ou laissée ailleurs, dès qu'il est loin (à plus de 250 m
+// d'elle, et à plus de 150 m de sa place)
+let markI = null;
+function poserMarkI() { const q = grotte.poste; markI = creerArmure(q.x, q.z, q.angle); markI.markI = true; }
+if (grotte) poserMarkI();
+function majMarkI() {
+  if (!grotte) return;
+  const a = markI;
+  if (a && !a.supprimer && a !== J.robot && dist(a, J) > 250 && (a.points < ARMURE.points || dist(a, grotte.poste) > 1)) a.supprimer = true;
+  if ((!markI || markI.supprimer) && dist(J, grotte.poste) > 150) poserMarkI();
+}
+
+// --- les ennemis qui arrivent (une étape « eliminer » qui a un « nombre ») ---
+// Ils arrivent au début de l'étape, aux sorties du lieu (la grotte : ses tentes, son feu de camp, sa jeep, le fond de la grotte ; l'usine
+// Stark Industries : son toit ; ailleurs : autour du pâté), jamais plus de « ensemble » à la fois, et ils attaquent tout de suite.
+// Ceux qui sont encore là quand on quitte l'étape s'en vont
+let vague = null;   // { cible, reste : combien doivent encore arriver, ensemble, sorties, t : avant le suivant, partis : ceux qui sont arrivés }
+const sortiesDe = (l, c) => l === ')' && grotte ? grotte.sorties : l === '$' && usine ? [{ x: usine.x, z: usine.z, y: usine.y }]
+  : [[-20, -20], [20, -20], [-20, 20], [20, 20]].map(([a, b]) => ({ x: c.x + a, z: c.z + b }));
+function commencerVague(et) {
+  const c = lieuProche(et.lieu, J) || J;
+  vague = { cible: et.cible, reste: et.nombre, ensemble: et.ensemble || et.nombre, sorties: sortiesDe(et.lieu, c), t: 0, partis: [] };
+  while (vague.reste > 0 && vague.partis.length < vague.ensemble) faireArriver();
+}
+function faireArriver() {
+  const V = vague, libres = V.sorties.filter(s => !personnes.some(p => p.vie > 0 && dist(p, s) < 1.5)), s = hasard(libres.length ? libres : V.sorties);
+  const x = s.x + entre(-0.6, 0.6), z = s.z + entre(-0.6, 0.6), p = creerPersonne(V.cible, x, z, undefined, s.y ?? hauteurSol(x, z));
+  p.alerte = V.cible !== 'monger'; p.angle = angleVers(p, J);   // (Iron Monger attend, lui, qu'on vienne : voir majMonger)
+  V.reste--; V.partis.push(p); V.t = 0.8;
+}
+function majVague(dt) {
+  if (!vague) return;
+  const la = vague.partis.filter(p => p.vie > 0 && !p.supprimer).length;
+  if (vague.reste > 0 && la < vague.ensemble && (vague.t -= dt) <= 0) faireArriver();
+}
+function finirVague() {
+  if (!vague) return;
+  for (const p of vague.partis) if (p.vie > 0) p.supprimer = true;
+  vague = null;
+}
+
+// --- les armures qu'une mission donne (ARMURES_STARK : mission: true, comme la Mark II) ---
+// elle est à lui (la partie s'en souvient), et c'est celle que H appelle
+function donnerArmure(nom) {
+  const k = ARMURES_STARK.findIndex(a => a.nom === nom);
+  if (k < 0 || !chezStark) return;
+  if (!stark.armures.includes(k)) {
+    stark.armures = [...stark.armures, k].sort((a, b) => a - b);
+    annonce(nom.toUpperCase(), tr("Une armure toute neuve, rien qu'à toi · H : elle arrive"), 4); bip(500, 1500, 0.4, 'sine', 0.2);
+  }
+  stark.choisie = k;
+  sauverPartie();
+}
+
+// --- les anneaux du premier vol (mission « Le premier vol ») ---
+// Des cercles lumineux dans le ciel, à traverser en volant, l'un après l'autre : le suivant brille en or, les autres attendent, bleus et pâles.
+// Chacun est tourné vers le suivant ; il est à « hauteur » mètres au-dessus de ce qu'il y a dessous (le sol, la mer, un toit)
+let anneaux = null;   // { liste : [{ x, y, z, m }], k : le suivant }
+const GEO_ANNEAU = new THREE.TorusGeometry(5, 0.6, 8, 40);
+const M_ANNEAU = new THREE.MeshBasicMaterial({ color: '#ffd23a', transparent: true, opacity: 0.95, toneMapped: false, fog: false });
+const M_ANNEAU_LOIN = new THREE.MeshBasicMaterial({ color: '#8ac4ff', transparent: true, opacity: 0.45, toneMapped: false, fog: false });
+function commencerAnneaux(et) {
+  const pts = et.anneaux.map(([col, ligne, h]) => { const c = centre(col, ligne); return V3(c.x, Math.max(hauteurSol(c.x, c.z, 1e4), EAU) + h, c.z); });
+  anneaux = { k: 0, liste: pts.map((p, i) => {
+    const m = new THREE.Mesh(GEO_ANNEAU, M_ANNEAU_LOIN), vers = pts[i + 1] ? pts[i + 1].clone().sub(p) : p.clone().sub(pts[i - 1] || V3(J.x, J.y, J.z));
+    m.position.copy(p); m.lookAt(p.clone().add(vers)); scene.add(m);   // (son trou face au chemin)
+    return { x: p.x, y: p.y, z: p.z, m };
+  }) };
+}
+function majAnneaux() {
+  const A = anneaux, s = A.liste[A.k];
+  A.liste.forEach((q, i) => { q.m.visible = i >= A.k; q.m.material = i === A.k ? M_ANNEAU : M_ANNEAU_LOIN; q.m.scale.setScalar(i === A.k ? 1 + 0.05 * Math.sin(temps * 6) : 1); });
+  if (!s || Math.hypot(J.x - s.x, J.y + 1 - s.y, J.z - s.z) > 5.3) return;
+  A.k++;   // il est passé dedans : un ding, de plus en plus aigu
+  bip(700 + 90 * A.k, 1500 + 90 * A.k, 0.3, 'sine', 0.15); flash(V3(s.x, s.y, s.z), 3, scene, M_FLASH_FOUDRE);
+  annonce('', A.k < A.liste.length ? tr('Anneau {k} sur {n} !', { k: A.k, n: A.liste.length }) : tr('Tous les anneaux !'), 1.5);
+}
+function finirAnneaux() { for (const q of anneaux?.liste || []) scene.remove(q.m); anneaux = null; }
+
+// --- le givre (mission « Le premier vol ») ---
+// Tout là-haut (à « hauteur » mètres), l'armure gèle : ses réacteurs s'éteignent, et il tombe (F ne fait plus rien). Au bout de 3 s de chute,
+// le givre fond : F rallume les réacteurs. S'il touche le sol avant, ce n'est pas grave : son armure l'a protégé
+let givre = null;   // { hauteur, gel : depuis combien de temps l'armure est gelée (0 : pas encore), fond : le givre fond, fini }
+function majGivre(dt) {
+  const G = givre;
+  if (G.fini) return;
+  if (!G.gel) {
+    if (!J.superman || !armureIronman() || J.y < G.hauteur) return;
+    G.gel = 0.001; J.superman = null; J.vy = Math.min(J.vy, 0);
+    annonce(tr('GIVRE !'), tr("Ton armure gèle : ses réacteurs s'éteignent !"), 3); bruit(0.5, 8000, 0.8); bip(1600, 300, 0.9, 'sine', 0.1);
+  }
+  G.gel += dt;
+  $('givre').style.opacity = G.fond ? Math.max(0, 0.75 - (G.gel - 3) * 0.6) : Math.min(0.85, G.gel * 3);
+  if (Math.random() < dt * 25) { // des éclats de glace s'envolent de son armure
+    const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#eaf6ff'); s.position.set(J.x + entre(-0.6, 0.6), J.y + entre(0.3, 1.9), J.z + entre(-0.6, 0.6));
+    scene.add(s); effets.push({ o: s, vie: 0.8, fumee: 0.8, taille: 0.6 });
+  }
+  if (!G.fond && G.gel > 3) { G.fond = true; annonce(tr('LE GIVRE FOND !'), tr('Vite, F : rallume tes réacteurs !'), 2.5); bip(500, 1200, 0.3, 'square', 0.1); }
+  if (J.superman && G.fond) { G.fini = true; annonce(tr('OUF !'), tr('Tes réacteurs sont repartis : record battu !'), 3); }
+  else if (J.sol && G.gel > 0.3) { G.fini = true; annonce(tr('OUF !'), tr('Ton armure a encaissé la chute : rien de cassé !'), 3); }
+  if (G.fini) $('givre').style.opacity = 0;
+}
+const armureGelee = () => !!givre?.gel && !givre.fond && !givre.fini;   // (F ne le fait pas voler : voir decoller)
+
+// --- la tour en feu (mission « Le pompier volant ») ---
+// La tour de la case (col, ligne) brûle : des flammes aux fenêtres de ses derniers étages, une colonne de fumée noire. Sur son toit, « nombre »
+// habitants agitent le bras. E près de l'un d'eux, dans l'armure : Iron Man le prend dans ses bras. Il le pose en se posant près des pompiers,
+// dans la rue au sud de la tour : il est sauvé (il s'en va, à pied). S'il le lâche (il meurt, monte en voiture, sort de son armure), l'habitant
+// se retrouve sur le toit
+let sauvetage = null;   // { nombre, sauves, gens, porte : celui qu'il porte, depot : là où sont les pompiers, feu : les flammes, pompiers, t }
+function commencerSauvetage(et) {
+  const toits = toursT[et.col + ',' + et.ligne];
+  if (!toits?.length) { console.error(`Mission « sauver » : la case ${et.col}, ${et.ligne} n'est pas une tour (T)`); sauvetage = { nombre: 0, sauves: 0, gens: [], feu: [], pompiers: [] }; return; }
+  const toit = toits.reduce((m, t) => t.y > m.y ? t : m), o = origine(et.col, et.ligne), c = centre(et.col, et.ligne);
+  const depot = { x: c.x, z: o.z + S + R / 2 }; depot.y = hauteurSol(depot.x, depot.z);
+  const S_ = sauvetage = { nombre: et.nombre, sauves: 0, gens: [], porte: null, depot, toit, feu: [], pompiers: [], t: 0 };
+  for (let k = 0; k < et.nombre; k++) { // sur le toit, pas sur une des boîtes en métal qui y sont posées
+    let x = toit.x, z = toit.z;
+    for (let essai = 0; essai < 30; essai++) {
+      x = toit.x + entre(-1, 1) * (toit.l / 2 - 2.5); z = toit.z + entre(-1, 1) * (toit.p / 2 - 2.5);
+      if (Math.abs(hauteurSol(x, z, toit.y + 1) - toit.y) < 0.05 && !S_.gens.some(p => dist(p, { x, z }) < 2.5)) break;
+    }
+    const p = creerPersonne('rescape', x, z, undefined, toit.y);
+    p.secours = 'attend'; p.place = { x, z, y: toit.y }; p.angle = entre(0, 6.28); S_.gens.push(p);
+  }
+  // les flammes, sur les quatre côtés, aux fenêtres des derniers étages
+  for (let k = 0; k < 64; k++) {
+    const cote = k % 4, u = entre(-0.45, 0.45), y = toit.y - entre(0.5, 16);
+    const x = cote < 2 ? toit.x + u * toit.l : toit.x + (cote === 2 ? -1 : 1) * (toit.l / 2 + 0.8), z = cote < 2 ? toit.z + (cote ? 1 : -1) * (toit.p / 2 + 0.8) : toit.z + u * toit.p;
+    const s = new THREE.Sprite(M_FLASH); s.position.set(x, y, z); scene.add(s); S_.feu.push({ s, taille: entre(3.5, 7) });
+  }
+  // les pompiers, dans la rue, qui regardent la tour
+  for (const dx of [-3.5, 3.5]) {
+    const h = creerHumain({ peau: hasard(PEAUX), haut: '#a8221a', bas: '#22242a', chaussures: '#111', casque: '#e0b818' });
+    h.g.position.set(depot.x + dx, depot.y, depot.z + 1.5); h.g.rotation.y = Math.PI; animerHumain(h, 0, 0); scene.add(h.g); S_.pompiers.push(h);
+  }
+  annonce(tr('AU FEU !'), tr('Une tour brûle dans le centre-ville : des gens sont coincés sur le toit !'), 4); bip(1200, 900, 0.6, 'square', 0.08);
+}
+function majSauvetage(dt) {
+  const S_ = sauvetage, p = S_.porte;
+  for (const f of S_.feu) f.s.scale.setScalar(f.taille * entre(0.75, 1.25));   // les flammes dansent
+  if ((S_.t -= dt) <= 0 && S_.toit) { // une colonne de fumée noire monte au-dessus du toit, de plus en plus large en montant
+    S_.t = 0.06;
+    const t = S_.toit, h = entre(0, 50), s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#262628');
+    s.position.set(t.x + entre(-0.3, 0.3) * t.l + h * 0.25, t.y + 2 + h, t.z + entre(-0.3, 0.3) * t.p); scene.add(s);   // (le vent la penche un peu)
+    effets.push({ o: s, vie: 3.5, fumee: 3.5, taille: 8 + h * 0.35 });
+  }
+  if (!p) return;
+  // il le lâche : l'habitant se retrouve sur le toit, à sa place
+  if (J.mort || p.vie <= 0 || !armureIronman() || J.voiture || J.robot) {
+    S_.porte = null;
+    if (p.vie > 0) { Object.assign(p, p.place); p.secours = 'attend'; if (!J.mort) annonce('', tr("Tu l'as lâché : il est retourné sur le toit"), 2.5); }
+    return;
+  }
+  // il se pose près des pompiers : sauvé !
+  if (J.sol && !J.superman && dist(J, S_.depot) < 25 && Math.abs(J.y - S_.depot.y) < 3) {
+    S_.porte = null; S_.sauves++;
+    const a = J.angleCorps + Math.PI / 2;
+    Object.assign(p, { secours: null, type: 'pieton', x: J.x + Math.sin(a) * 1.2, z: J.z + Math.cos(a) * 1.2, angle: a, peur: 0 }); p.y = hauteurSol(p.x, p.z, J.y + 0.5);
+    p.h.g.quaternion.identity(); initChemin(p);   // il s'en va, à pied, comme un passant
+    const reste = S_.nombre - S_.sauves;
+    annonce(tr('SAUVÉ !'), reste ? tr('« Merci, {super} ! » Encore {n} sur le toit', { super: nomSuper(), n: reste }) : tr('« Merci, {super} ! »', { super: nomSuper() }), 2.5);
+    bip(600, 1300, 0.3, 'sine', 0.2);
+  }
+}
+// E près de quelqu'un qui attend sur le toit : Iron Man le prend dans ses bras (seulement dans son armure). Renvoie true s'il y avait quelqu'un
+function porterSecours() {
+  const S_ = sauvetage;
+  if (!S_ || S_.porte) return false;
+  const p = S_.gens.find(q => q.secours === 'attend' && q.vie > 0 && Math.hypot(q.x - J.x, q.z - J.z) < 2.5 && Math.abs(q.y - J.y) < 2.5);
+  if (!p) return false;
+  if (!armureIronman()) { annonce('', tr('Mets ton armure (H) pour le porter !'), 2); return true; }
+  p.secours = 'porte'; S_.porte = p;
+  annonce('', tr('« Accroche-toi ! »'), 1.5); bip(500, 800, 0.2, 'sine', 0.1);
+  return true;
+}
+const secoursProche = () => !!sauvetage && !sauvetage.porte && sauvetage.gens.some(q => q.secours === 'attend' && q.vie > 0 && Math.hypot(q.x - J.x, q.z - J.z) < 2.5 && Math.abs(q.y - J.y) < 2.5);
+// un habitant de la tour : il attend sur le toit en agitant le bras vers Iron Man, ou il est dans ses bras (couché en travers, devant sa poitrine)
+function majSecours(p, dt) {
+  if (p.secours === 'porte') {
+    joueurH.g.updateMatrixWorld(true);
+    const q = joueurH.torse.localToWorld(V3(0, -0.3, 0.45));   // (devant ses avant-bras : son bassin y est, assis à 95 cm au-dessus de ses pieds)
+    Object.assign(p, { x: q.x, y: q.y - 1.05, z: q.z });
+    p.h.g.position.set(p.x, p.y, p.z);
+    p.h.g.quaternion.copy(joueurH.g.quaternion).multiply(new THREE.Quaternion().setFromAxisAngle(V3(0, 1, 0), Math.PI / 2));
+    animerHumain(p.h, 0, dt, { assis: true });
+  } else {
+    p.angle = lerpAngle(p.angle, angleVers(p, J), 2 * dt);
+    p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.set(0, p.angle, 0);
+    animerHumain(p.h, 0, dt, { tend: 1, leve: 1.3 + 0.35 * Math.sin(temps * 9 + p.x) });   // il agite le bras : « Au secours ! »
+  }
+  membresMous(p.h, dt, { sol: p.y });
+}
+function finirSauvetage() {
+  const S_ = sauvetage;
+  if (!S_) return;
+  for (const f of S_.feu) scene.remove(f.s);
+  for (const h of S_.pompiers) scene.remove(h.g);
+  for (const p of S_.gens) if (p.secours) p.supprimer = true;   // (ceux qui attendaient encore : on a quitté la mission)
+  sauvetage = null;
+}
+
+// --- le réacteur arraché (mission « Iron Monger ») ---
+// Obadiah Stane lui prend le réacteur de sa poitrine, et s'en va avec. Son armure ne marche plus (H, A Z E), il ne vole plus, il avance à
+// peine, et son cœur bat fort. Il a « secondes » pour rejoindre son ancien réacteur, sous verre, sur la table basse du salon de sa villa.
+// Trop tard : il s'évanouit (comme une mort : -100 $), et la mission reprend au début
+let panne = null;   // { reste : les secondes, total, fini, coeur : avant le prochain battement }
+// l'ancien réacteur : un anneau qui brille, dans un petit cadre de verre (« La preuve que Tony Stark a un cœur »)
+let cadreReacteur = null;
+if (vieuxReacteur) {
+  const V = vieuxReacteur, g = cadreReacteur = new THREE.Group();
+  const verre = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.42, 0.12), new THREE.MeshStandardMaterial({ color: '#b8d8e8', metalness: 0.2, roughness: 0.05, transparent: true, opacity: 0.35 }));
+  const socle = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.06, 0.16), mat('#2a2a2e')); socle.position.y = -0.24;
+  const anneau = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.03, 8, 24), new THREE.MeshBasicMaterial({ color: '#bfefff', toneMapped: false }));
+  g.add(verre, socle, anneau); g.position.set(V.x, V.y + V.dy + 0.27, V.z); g.rotation.y = V.a; scene.add(g);
+}
+function commencerPanne(et) {
+  panne = { reste: et.secondes, total: et.secondes, fini: false, coeur: 0 };
+  const I = J.ironman;
+  if (I?.anim) interrompreIronman();
+  if (J.superman) { J.superman = null; J.vy = 0; J.y = hauteurSol(J.x, J.z, J.y); }   // (arrivé en volant : il se retrouve sur ce qui est sous lui)
+  if (armureIronman() && !J.voiture && !J.robot) { // son armure s'éteint : il en sort d'un pas, et elle reste là, debout, vide
+    laisserArmure(); I.pieces = []; I.plastron = null; rhabillerBJ();
+    J.x += Math.sin(J.angleCorps) * 1.2; J.z += Math.cos(J.angleCorps) * 1.2; resoudre(J, 0.35); J.y = hauteurSol(J.x, J.z, J.y + 0.5);
+  }
+  obadiahArrive();
+  annonce('OBADIAH STANE', tr("« Tu croyais vraiment garder tout ça pour toi ? » Il t'arrache ton réacteur !"), 4.5);
+  bip(900, 200, 0.6, 'sawtooth', 0.12);
+}
+function majPanne(dt) {
+  const P = panne, V = vieuxReacteur;
+  if (P.fini) return;
+  P.reste -= dt;
+  if ((P.coeur -= dt) <= 0) { P.coeur = 0.35 + 0.5 * clamp(P.reste / P.total, 0, 1); bip(80, 45, 0.12, 'sine', 0.4); $('rouge').style.opacity = 0.55; }   // boum-boum : de plus en plus vite
+  if (V && Math.hypot(J.x - V.x, J.z - V.z) < 1.8 && Math.abs(J.y - V.y) < 1.5) {
+    P.fini = true; if (cadreReacteur) cadreReacteur.visible = false;
+    annonce(tr('TON CŒUR REPART !'), tr('Ton ancien réacteur marche encore · H : ton armure !'), 3.5); bip(400, 1400, 0.5, 'sine', 0.2);
+    return;
+  }
+  if (P.reste <= 0 && !J.mort) { // trop tard : il s'évanouit, et la mission reprend au début
+    mourir(); etapeIndex = 0;
+    annonce(tr('TROP TARD...'), tr('Tu as perdu connaissance : la mission reprend au début'), 3.5);
+  }
+}
+const sansReacteur = () => !!panne && !panne.fini;   // (H, A Z E et F ne font rien : voir costume, basculerArmure, decoller)
+function finirPanne() { panne = null; if (cadreReacteur) cadreReacteur.visible = true; }
+// Obadiah Stane : chauve, une barbe blanche, un costume sombre. Il arrive devant lui, son réacteur à la main, puis s'en va par la porte du
+// garage, et disparaît
+let obadiah = null;   // { h, t, x, z, angle }
+function obadiahArrive() {
+  if (obadiah) scene.remove(obadiah.h.g);
+  const h = creerHumain({ peau: '#e6bc96', haut: '#26272c', bas: '#26272c', chaussures: '#111', cheveux: '#ddd' });
+  h.cheveux.visible = false; piece(GEO.barbiche, '#e4e2dc', h.tete, 0, 0, 0); piece(GEO.barbiche, '#e4e2dc', h.tete, 0, -0.02, 0.005).scale.set(1.3, 1.6, 1);
+  piece(GEO.reacteur, '#bfefff', h.brasD.main, 0, -0.06, 0.05).material = new THREE.MeshBasicMaterial({ color: '#bfefff', toneMapped: false });   // le réacteur, dans sa main
+  const a = J.angleCorps;
+  obadiah = { h, t: 0, x: J.x + Math.sin(a) * 1.6, z: J.z + Math.cos(a) * 1.6, angle: a + Math.PI };
+  resoudre(obadiah, 0.35); scene.add(h.g);
+}
+function majObadiah(dt) {
+  const O = obadiah;
+  if (!O) return;
+  O.t += dt;
+  const part = O.t > 2.5, porte = lieuProche('<', O) ? { x: lieuProche('<', O).x, z: lieuProche('<', O).z - 24 } : O;   // (la porte du garage est au nord)
+  if (part) { O.angle = lerpAngle(O.angle, angleVers(O, porte), 5 * dt); O.x += Math.sin(O.angle) * 2.2 * dt; O.z += Math.cos(O.angle) * 2.2 * dt; resoudre(O, 0.35); }
+  const y = hauteurSol(O.x, O.z, J.y + 0.5);
+  O.h.g.position.set(O.x, y, O.z); O.h.g.rotation.y = O.angle;
+  animerHumain(O.h, part ? 2.2 : 0, dt, { tend: part ? 0 : 1 });   // d'abord, il montre le réacteur
+  membresMous(O.h, dt, { sol: y });
+  if (O.t > 9) { scene.remove(O.h.g); obadiah = null; }
+}
+
+// --- Iron Monger (mission « Iron Monger ») ---
+// Son corps : une armure d'Iron Man grise et massive (ARMURE_MONGER), ENNEMIS.monger.taille fois plus grande que Tony, avec une mitrailleuse
+// sur l'avant-bras droit et des missiles sur les épaules
+function creerMonger() {
+  const h = creerHumain(TENUE_BJ);
+  habillerIronman(h, toutesLesPieces(), { ...ARMURE_MONGER, taille: ENNEMIS.monger.taille });
+  const fer = mat('#2c2e33', { metalness: 0.7, roughness: 0.4 });
+  for (let k = 0; k < 4; k++) piece(new THREE.CylinderGeometry(0.018, 0.018, 0.36, 6), '#222', h.brasD.pli, Math.cos(k * 1.57) * 0.03, -0.2, 0.09 + Math.sin(k * 1.57) * 0.03).material = fer;   // les canons
+  for (const c of [-1, 1]) piece(new THREE.BoxGeometry(0.15, 0.09, 0.2), '#222', h.torse, 0.17 * c, 0.6, -0.06).material = fer;   // les paniers de missiles
+  h.monger = true;
+  return h;
+}
+// Il attend sur le toit de l'usine, et se réveille quand Iron Man approche (à 160 m) ; alors il marche vers lui (jusqu'à 14 m) et le mitraille,
+// en rafales de 8 balles, et lui envoie un missile toutes les 5 à 8 s. S'il vole plus haut que lui, Iron Monger s'envole aussi, sur les
+// réacteurs de ses bottes (et s'il est sur un toit, il l'y rejoint)... mais, comme la Mark II, son armure gèle au-dessus de « givre » mètres :
+// il tombe comme une pierre, et s'écrase (30 % de sa vie en moins). Il ne quitte pas le pâté de l'usine, même en volant. Rien ne le fait
+// voler à la renverse (p.lourd)
+function majMonger(p, dt, d) {
+  const M = ENNEMIS.monger, h = p.h, T = h.g.scale.y;
+  p.cooldown -= dt; p.cdRoq = (p.cdRoq ?? entre(3, 5)) - dt;
+  const reveille = !J.mort && (p.alerte || d < 160);
+  if (reveille && !p.reveille) {
+    p.reveille = p.alerte = true;
+    annonce('IRON MONGER !', tr('« {prenom}, ta place, c\'est moi qui la prends ! »', { prenom: nomHeros().split(' ')[0] }), 3.5); bruit(0.7, 300, 1);
+  }
+  if ((p.vuTimer -= dt) <= 0) { p.vuTimer = 0.3; p.voitJ = reveille && d < M.vue && voitBJ({ x: p.x, y: p.y + 1.6 * T - 1.5, z: p.z }); }   // (ses yeux sont tout là-haut)
+  const sol = hauteurSol(p.x, p.z, p.y + 0.6);
+  let vitesse = 0;
+  if (p.gel) { // gelé : il tombe tout droit, et s'écrase
+    p.vy = (p.vy || 0) - R_.gravite * dt; p.y += p.vy * dt;
+    if (p.y <= sol) {
+      p.y = sol; p.vy = 0; p.gel = null; p.vole = false;
+      exploser(V3(p.x, p.y + 1, p.z), 7, 0, 25, p); J.secousse = Math.max(J.secousse || 0, 0.3 * clamp(1 - d / 80, 0, 1));
+      annonce(tr('BOUM !'), tr("Iron Monger s'écrase : il est sonné !"), 2.5);
+      blesser(p, M.vie * 0.3);
+      if (p.vie <= 0) return;
+    }
+  } else if (p.vole) { // en vol : il fonce vers Iron Man, jusqu'à 12 m, à sa hauteur
+    const v = V3(J.x - p.x, J.y - 1 - p.y, J.z - p.z), l = v.length();
+    if (l > 12) v.multiplyScalar(M.vol / l); else v.set(0, (J.y - 1 - p.y) * 2, 0);
+    p.x += v.x * dt; p.y += v.y * dt; p.z += v.z * dt; resoudre(p, 0.9, 4.5);
+    if (p.zone) { p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]); }   // (même en volant, il reste au-dessus de son pâté)
+    if (p.y < sol) p.y = sol;
+    if (p.y > M.givre) { p.gel = 0.001; p.vy = 0; annonce(tr('IRON MONGER GÈLE !'), tr("Son armure n'a pas été faite pour le froid : il tombe comme une pierre !"), 3.5); bip(1600, 300, 0.9, 'sine', 0.1); }
+    if ((J.sol || J.voiture || J.nage) && p.y - sol < 1.5) p.vole = false;   // Iron Man s'est posé : lui aussi
+  } else { // à pied : il marche vers Iron Man ; il peut tomber d'un toit (sans se faire mal)
+    p.vy = (p.vy || 0) - R_.gravite * dt; p.y += p.vy * dt;
+    if (p.y <= sol) { if (p.vy < -8) { bruit(0.6 * clamp(1 - d / 100, 0, 1), 200, 0.4); J.secousse = Math.max(J.secousse || 0, 0.2 * clamp(1 - d / 40, 0, 1)); } p.y = sol; p.vy = 0; }
+    if (reveille && (!p.voitJ || d > 14)) vitesse = M.vitesse;
+    if (vitesse) {
+      const ax = p.x, az = p.z;
+      p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt; resoudre(p, 0.9, 4.5);
+      if (p.zone) { p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]); }   // il garde son pâté
+      if (EAU - hauteurSol(p.x, p.z, p.y) > 1.5) { p.x = ax; p.z = az; }   // (pas dans la mer)
+      if ((p.tPas = (p.tPas ?? 0) - dt) <= 0) { p.tPas = 0.55; bruit(0.5 * clamp(1 - d / 100, 0, 1), 150, 0.3); J.secousse = Math.max(J.secousse || 0, 0.15 * clamp(1 - d / 40, 0, 1)); }   // ses pas font trembler le sol
+    }
+    if (reveille && J.y > p.y + 6 && !J.mort) { p.vole = true; bruit(0.6, 900, 1.2); annonce('', tr("Iron Monger s'envole !"), 2); }   // (Iron Man est en l'air, ou sur un toit : il le rejoint)
+  }
+  // il vise Iron Man, et tire : la mitrailleuse de son bras droit, en rafales, et ses missiles d'épaule
+  const vise = angleVers(p, J);
+  if (reveille) p.angle = lerpAngle(p.angle, vise, 2.5 * dt);
+  const face = Math.abs(diffAngle(p.angle, vise)) < 0.4, tire = reveille && p.voitJ && !p.gel && face;
+  if (tire) {
+    if (p.cooldown <= 0) { if ((p.rafale ??= 8) > 0) { p.rafale--; p.cooldown = 0.1; tirMonger(p, d); } else { p.rafale = 8; p.cooldown = entre(...M.tir); } }
+    if (p.cdRoq <= 0) { p.cdRoq = entre(5, 8); missileMonger(p, d); }
+  }
+  // sa pose : il marche, ou il flotte debout sur ses réacteurs (gelé : figé) ; le bras droit tendu vers Iron Man quand il tire
+  if (!h.g.visible) return;
+  const leve = Math.atan2(J.y + 1 - (p.y + 1.4 * T), Math.max(1, d));
+  h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, p.angle, 0);
+  if (!p.gel) animerHumain(h, p.vole ? 0 : vitesse, dt, p.vole ? { superman: 0, ironman: true, tend: tire ? 1 : 0, leve } : { tend: tire ? 1 : 0, leve });
+  for (const f of h.ironman.flammes) { f.visible = !!p.vole && !p.gel; if (f.visible) f.scale.set(0.22, entre(0.8, 1.2), 0.22); }
+  if (!p.gel) membresMous(h, dt, { sol: p.y });
+}
+// le bout de la mitrailleuse de son bras droit, et ses épaules (d'où partent les missiles)
+const boutMonger = p => { p.h.g.updateMatrixWorld(true); return p.h.brasD.pli.localToWorld(V3(0, -0.4, 0.09)); };
+function tirMonger(p, d) {
+  const M = ENNEMIS.monger, depart = boutMonger(p), arrivee = V3(J.x, J.y + (J.accroupi ? 0.8 : 1.2), J.z);
+  let chance = M.precision * clamp(1.2 - d / 60, 0.2, 1);
+  if (J.accroupi) chance *= 0.5; if (J.vitesse > 6) chance *= 0.6; if (abrite()) chance *= 0.7;
+  const reussi = Math.random() < chance;
+  if (!reussi) arrivee.add(V3(entre(-2.5, 2.5), entre(-1, 2), entre(-2.5, 2.5)));
+  const arrive = balleArrive(p, depart, arrivee, !reussi);   // un mur entre lui et toi arrête la balle
+  balleLourde(depart, arrivee); flash(depart, 1.1);
+  bruit(0.6 * clamp(1 - d / 150, 0.1, 1), 1100, 0.2);
+  if (reussi && arrive) blesserJoueur(M.degats * parTriche('balles'), true, p);
+}
+function missileMonger(p, d) {
+  const M = ENNEMIS.monger, depart = V3(), arrivee = V3(J.x, J.y + 1, J.z);
+  p.h.g.updateMatrixWorld(true); p.h.torse.localToWorld(depart.set(entre(-0.17, 0.17), 0.7, -0.06));
+  if (Math.random() > M.precision * clamp(1.2 - d / 60, 0.3, 1)) { const a = entre(0, 6.3), e = entre(3, 6); arrivee.set(J.x + Math.sin(a) * e, 0, J.z + Math.cos(a) * e); arrivee.y = hauteurSol(arrivee.x, arrivee.z, J.y); }
+  flash(depart, 1.5); bruit(...SON_ARME.bazooka);
+  lancerRoquette(depart, arrivee, 150, 4, 250, M.degatsRoquette, p);
+}
+// vaincu : une grosse explosion, des bouts de tôle qui volent, et il s'effondre
+function mongerVaincu(p) {
+  const pos = V3(p.x, p.y + 2, p.z);
+  exploser(pos, 8, 0, 0, p); etincelles(pos, 20, 8);
+  for (let k = 0; k < 12; k++) {
+    const e = new THREE.Mesh(new THREE.BoxGeometry(entre(0.3, 0.8), entre(0.2, 0.6), entre(0.1, 0.3)), M_FER2);
+    e.position.copy(pos).add(V3(entre(-1, 1), entre(-1.5, 2), entre(-1, 1))); e.castShadow = true; scene.add(e);
+    lancerDebris(e, V3(entre(-7, 7), entre(3, 9), entre(-7, 7)), entre(6, 12), true);
+  }
+  for (const f of p.h.ironman.flammes) f.visible = false;
+  p.gel = null; p.vole = false; p.y = hauteurSol(p.x, p.z, p.y + 0.6);   // (vaincu en plein vol : il s'écrase en dessous)
+  annonce(tr('IRON MONGER VAINCU !'), tr('Obadiah Stane ne fera plus de mal à personne'), 4);
+}
+// la barre de vie d'Iron Monger, en haut de l'écran, tant qu'il est là (et pas trop loin)
+function majBarreBoss() {
+  const p = personnes.find(q => q.type === 'monger' && q.vie > 0 && dist(q, J) < 300);
+  $('boss').style.display = p ? 'block' : 'none';
+  if (p) $('boss').firstElementChild.firstElementChild.style.width = `${clamp(p.vie / ENNEMIS.monger.vie, 0, 1) * 100}%`;
 }
 
 // =====================================================================
@@ -12703,7 +13333,7 @@ function flecheJoueur(g, x, y, angle, taille) { // angle 0 = vers le haut
 // ennemis en alerte en rouge, police qui clignote en rouge et bleu
 function pointsCarte(point) {
   const gyro = Math.sin(performance.now() / 80) > 0 ? '#f33' : '#39f';
-  for (const p of personnes) if (p.vie > 0 && p.alerte && (p.type !== 'flic' || etoiles > 0)) point(p.x, p.z, p.type === 'flic' ? gyro : '#e33');
+  for (const p of personnes) if (p.vie > 0 && p.alerte && (p.type !== 'flic' || etoiles > 0)) point(p.x, p.z, p.type === 'flic' ? gyro : '#e33', p.lourd ? 6 : 3);   // (Iron Monger : un gros point)
   for (const v of voitures) if (v.police && v.conducteur) point(v.x, v.z, gyro, 4);
   for (const r of robots) if (r !== J.robot) point(r.x, r.z, r.pilote === 'police' ? gyro : r.armure ? '#e8b030' : '#aaa', r.armure ? 4 : 6);   // le heavy robot : un gros point ; l'armure : un point doré
 }
@@ -12830,7 +13460,7 @@ function majHUD(dt) {
   const a = ARMES[J.arme], rb = J.robot, ar = rb?.armure ? rb : null;   // ar : l'armure, quand il est dedans
   $('barre-armure').style.display = ar ? 'block' : 'none';
   if (ar) $('barre-armure').firstChild.style.width = `${clamp(ar.points / ARMURE.points, 0, 1) * 100}%`;
-  $('arme').textContent = ar ? tr('Armure') : rb ? 'Heavy robot' : tr(a.nom);
+  $('arme').textContent = ar ? (ar.markI ? 'Mark I' : tr('Armure')) : rb ? 'Heavy robot' : tr(a.nom);
   $('munitions').textContent = ar ? `${tr('{n} points', { n: Math.ceil(ar.points) })} · ${ar.fusees > 0 ? tr('{n} fusées', { n: ar.fusees }) : tr('Fusées : encore {n} s', { n: Math.ceil(ar.recharge) })}`
     : rb ? `${tr('{n} balles', { n: rb.munitions.lourde })} · ${tr('{n} roquettes', { n: rb.munitions.roquettes })}` : a.corps || pouvoirArme(a) ? '' : tr(a.explosion ? '{n} roquettes' : '{n} balles', { n: J.balles[J.arme] });
   if (chezStark && armureIronman() && !J.voiture && !rb) { // dans l'armure d'Iron Man, au chapitre d'Iron Man : son nom, et ce qui se recharge
@@ -12838,20 +13468,21 @@ function majHUD(dt) {
     $('munitions').textContent = [$('munitions').textContent, armureDe(I.armure).nom, stark.missiles && pret('missiles', tr('Missiles')), stark.laser && pret('laser', tr('Laser'))].filter(Boolean).join(' · ');
   }
   const m = MISSIONS_CH[missionIndex], et = m?.etapes[etapeIndex];
-  $('objectif').textContent = voyage ? '' : tr(m ? et.texte : 'Pays libre : fais ce que tu veux !', et?.type === 'eliminer' ? { n: resteAEliminer(et.cible) } : {});
+  $('objectif').textContent = voyage ? '' : m ? texteEtape(et) : tr('Pays libre : fais ce que tu veux !');
   $('lunette').style.display = dansLunette() ? 'block' : 'none';
   $('viseur').style.display = !J.voiture && !J.mort && !J.nage && !dansLunette() && (ironmanLibre() || (!(J.superman && a.corps) && (J.vue === 1 || visee || !a.corps || rb))) ? 'block' : 'none';   // (Iron Man vise avec ses mains)
   $('fumee').style.opacity = J.fumee * (J.masque ? 0.25 : 0.8);   // la fumée toxique brouille la vue (moins avec le masque)
   const vole = J.superman || J.plane || J.balance || J.grappin;   // en volant, au bout d'une toile ou d'un grappin : sa vitesse
   $('vitesse').style.display = J.voiture || vole ? 'block' : 'none';
-  if (vole) $('vitesse').textContent = `${Math.round(J.vitesse * 3.6)} km/h`;   // Superman : chaque appui sur Maj le fait monter
+  if (vole) $('vitesse').textContent = `${Math.round(J.vitesse * 3.6)} km/h` + (givre ? ` · ${Math.max(0, Math.round(J.y))} m` : '');   // Superman : chaque appui sur Maj le fait monter ; vers le givre (mission « Le premier vol ») : sa hauteur
   if (J.voiture) $('vitesse').textContent = `${Math.round(Math.abs(J.voiture.vitesse) * 3.6)} km/h` + (J.voiture.enVol ? ` · ${Math.round(J.voiture.y - Math.max(hauteurTerrain(J.voiture.x, J.voiture.z), EAU))} m` : '')   // en vol : la hauteur
     + (J.chrono?.t0 != null ? ` · ${(temps - J.chrono.t0).toFixed(1)} s` : '');   // sur le boardercross : le chronomètre
   const aPied = !J.voiture && !rb, s = standProche(), asc = aPied && ascenseurProche(), v = aPied && voitureProche(), g = aPied && garagisteProche(), o = aPied && butinProche(), r = aPied && robotProche();
   const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40), ech = aPied && !J.echelle && echelles.find(e => dist(e, J) < 1.5 && Math.abs(J.y - e.bas) < 1);
   const tl = telesiegeProche(), nav = aPied && navetteProche(), lit = aPied && litProche(), autreLit = aPied && autreLitProche();
-  const bouton = boutonProche() && !camp.ouvert && (aPied || ar);
+  const bouton = boutonProche() && !camp.ouvert && (aPied || ar), secours = aPied && secoursProche();
   const aide = J.telesiege ? tr(J.telesiege.l.cabines ? 'Appuie sur <b>E</b> pour sauter de la cabine' : 'Appuie sur <b>E</b> pour sauter du télésiège')
+    : secours ? tr(armureIronman() ? 'Appuie sur <b>E</b> pour le prendre dans tes bras' : 'Mets ton armure (<b>H</b>) pour le porter')   // la tour en feu (mission « Le pompier volant »)
     : tl ? tr(tl.cabines ? 'Appuie sur <b>E</b> pour prendre la télécabine' : 'Appuie sur <b>E</b> pour prendre le télésiège')
     : bouton ? tr('Appuie sur <b>E</b> pour appuyer sur le bouton rouge')
     : ar ? tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · <b>F</b> : fusées · <b>E</b> : sortir')
@@ -12877,6 +13508,7 @@ function majHUD(dt) {
     : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping')   // en volant : les figures
     : ironmanLibre() ? aideIronman() : '';   // dans l'armure d'Iron Man
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
+  majBarreBoss();   // Iron Monger : sa barre de vie, en haut de l'écran
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
   if (tempsAnnonce <= 0) $('annonce').style.opacity = 0;
@@ -13208,7 +13840,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   }
   lumiereTir.intensity = Math.max(0, lumiereTir.intensity - dt * 1400);
   lumiereBoum.intensity = Math.max(0, lumiereBoum.intensity - dt * 10000);
-  police(dt); peupler(dt); missions();
+  police(dt); peupler(dt); missions(dt);
   // ménage
   for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); personnes.splice(k, 1); }
   for (let k = voitures.length - 1; k >= 0; k--) if (voitures[k].supprimer && voitures[k] !== J.voiture) { scene.remove(voitures[k].m); voitures.splice(k, 1); }
@@ -13244,10 +13876,10 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
 }
 function majRepere(dt) {
   const cible = cibleMission(), et = MISSIONS_CH[missionIndex]?.etapes[etapeIndex];
-  const surCible = et?.type === 'eliminer' || et?.type === 'voler';   // une flèche au-dessus de la cible, ou du butin
-  repere.visible = !!cible && !surCible;
+  const surCible = et?.type === 'eliminer' || et?.type === 'voler' || (et?.type === 'sauver' && !sauvetage?.porte);   // une flèche au-dessus de la cible, du butin, ou de quelqu'un à sauver
+  repere.visible = !!cible && !surCible && et?.type !== 'anneaux';   // (un anneau à traverser se voit tout seul)
   fleche.visible = !!cible && surCible;
-  if (cible) { const y = cible.y ?? hauteurSol(cible.x, cible.z); repere.position.set(cible.x, y + 2.5, cible.z); fleche.position.set(cible.x, y + 2.9 + Math.sin(temps * 4) * 0.15, cible.z); fleche.rotation.y += dt * 2; }
+  if (cible) { const y = cible.y ?? hauteurSol(cible.x, cible.z); repere.position.set(cible.x, y + 2.5, cible.z); fleche.position.set(cible.x, y + (cible.h ? 1.9 * cible.h.g.scale.y + 1 : 2.9) + Math.sin(temps * 4) * 0.15, cible.z); fleche.rotation.y += dt * 2; }   // (au-dessus de sa tête : plus haut pour Iron Monger)
 }
 
 let dernier = performance.now();
@@ -13303,6 +13935,9 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get destination() { return destination; }, set destination(v) { destination = v; }, get voyage() { return voyage; }, get arrivee() { return arrivee; }, set arrivee(v) { arrivee = v; },
   get traces() { return traces; }, get victimes() { return victimes; }, set victimes(v) { victimes = v; }, get bulles() { return bulles; }, set bulles(v) { bulles = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
+  MISSIONS_MALIBU, toursT, grotte, usine, vieuxReacteur, creerMonger, porterSecours, donnerArmure, texteEtape, commencerEtape, finirEtape, missions, monterRobot, faireArriver, majRepere, repere, fleche,
+  get markI() { return markI; }, get vague() { return vague; }, get anneaux() { return anneaux; }, get givre() { return givre; }, get sauvetage() { return sauvetage; }, get panne() { return panne; },
+  get obadiah() { return obadiah; }, sansReacteur, armureGelee,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
