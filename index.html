@@ -259,7 +259,7 @@ const CHAPITRES = [
     'Tu es <b>{heros}</b>. <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !',
     '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.',
     '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.',
-    '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>M</b> : le masque.',
+    '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>L</b> : le masque.',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'Le Mandarin a caché la DeLorean dans son repaire : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
@@ -578,10 +578,10 @@ const TRADUCTIONS = {
     en: 'Spiderman! The web to swing and the nets (key 9), climb walls, and falling from high up does not hurt', gsw: 'Spiderman! S Spinnenetz zum Schwinge und d Netz (Taschte 9), a de Wänd ufechlättere, und vo wiit obe abegheie tuet nöd weh' },
   'Invisible ! Personne ne te voit : ni la police, ni les ennemis': { de: 'Unsichtbar! Niemand sieht dich: weder die Polizei noch die Feinde', en: 'Invisible! Nobody can see you: not the police, not the enemies', gsw: 'Unsichtbar! Niemert gseht di: nöd d Polizei und nöd d Feind' },
   // Iron Man (code IRONMAN) : les touches sont les mêmes, à la même place sur le clavier (A Z E en français, Q W E en allemand et en anglais)
-  "Iron Man ! A et E : répulseurs · R : plastron · F : voler · M : masque · A Z E : sortir de l'armure ou la rappeler": { de: 'Iron Man! Q und E: Repulsoren · R: Brustplatte · F: fliegen · M: Maske · Q W E: aus der Rüstung steigen oder sie rufen',
-    en: 'Iron Man! Q and E: repulsors · R: chest beam · F: fly · M: mask · Q W E: step out of the armor or call it back', gsw: 'Iron Man! Q und E: Repulsore · R: Bruschtplatte · F: flüüge · M: Maske · Q W E: us de Rüschtig stiige oder si rüefe' },
-  "<b>A</b> <b>E</b> : répulseurs · <b>R</b> : plastron · <b>F</b> : voler · <b>M</b> : masque · <b>A Z E</b> : sortir de l'armure": { de: '<b>Q</b> <b>E</b>: Repulsoren · <b>R</b>: Brustplatte · <b>F</b>: fliegen · <b>M</b>: Maske · <b>Q W E</b>: aussteigen',
-    en: '<b>Q</b> <b>E</b>: repulsors · <b>R</b>: chest beam · <b>F</b>: fly · <b>M</b>: mask · <b>Q W E</b>: step out', gsw: '<b>Q</b> <b>E</b>: Repulsore · <b>R</b>: Bruschtplatte · <b>F</b>: flüüge · <b>M</b>: Maske · <b>Q W E</b>: uusstiige' },
+  "Iron Man ! A et E : répulseurs · R : plastron · F : voler · L : masque · A Z E : sortir de l'armure ou la rappeler": { de: 'Iron Man! Q und E: Repulsoren · R: Brustplatte · F: fliegen · L: Maske · Q W E: aus der Rüstung steigen oder sie rufen',
+    en: 'Iron Man! Q and E: repulsors · R: chest beam · F: fly · L: mask · Q W E: step out of the armor or call it back', gsw: 'Iron Man! Q und E: Repulsore · R: Bruschtplatte · F: flüüge · L: Maske · Q W E: us de Rüschtig stiige oder si rüefe' },
+  "<b>A</b> <b>E</b> : répulseurs · <b>R</b> : plastron · <b>F</b> : voler · <b>L</b> : masque · <b>A Z E</b> : sortir de l'armure": { de: '<b>Q</b> <b>E</b>: Repulsoren · <b>R</b>: Brustplatte · <b>F</b>: fliegen · <b>L</b>: Maske · <b>Q W E</b>: aussteigen',
+    en: '<b>Q</b> <b>E</b>: repulsors · <b>R</b>: chest beam · <b>F</b>: fly · <b>L</b>: mask · <b>Q W E</b>: step out', gsw: '<b>Q</b> <b>E</b>: Repulsore · <b>R</b>: Bruschtplatte · <b>F</b>: flüüge · <b>L</b>: Maske · <b>Q W E</b>: uusstiige' },
   'IRON MAN !':       { de: 'IRON MAN!', en: 'IRON MAN!', gsw: 'IRON MAN!' },
   'RESCUE !':         { de: 'RESCUE!', en: 'RESCUE!', gsw: 'RESCUE!' },
   'Rescue !':         { de: 'Rescue!', en: 'Rescue!', gsw: 'Rescue!' },
@@ -823,8 +823,8 @@ const TRADUCTIONS = {
     en: '<b>Q</b> and <b>E</b>: the repulsors in your hands. <b>R</b>: the chest beam.', gsw: '<b>Q</b> und <b>E</b>: d Repulsore vo dine Händ. <b>R</b>: de Strahl vo de Bruschtplatte.' },
   '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.': { de: '<b>F</b>: fliegen, und noch einmal <b>F</b> zum Landen. Im Flug, <b>Shift</b>: schneller.',
     en: '<b>F</b>: fly, and <b>F</b> again to land. While flying, <b>Shift</b>: faster.', gsw: '<b>F</b>: flüüge, und nomal <b>F</b> zum Lande. Im Flug, <b>Shift</b>: schnäller.' },
-  '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>M</b> : le masque.': { de: '<b>H</b> noch einmal: Du steigst aus der Rüstung (sie bleibt stehen). <b>M</b>: die Maske.',
-    en: '<b>H</b> again: you step out of the armor (it stays standing). <b>M</b>: the mask.', gsw: '<b>H</b> nomal: Du stiigsch us de Rüschtig (si blibt stah). <b>M</b>: d Maske.' },
+  '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>L</b> : le masque.': { de: '<b>H</b> noch einmal: Du steigst aus der Rüstung (sie bleibt stehen). <b>L</b>: die Maske.',
+    en: '<b>H</b> again: you step out of the armor (it stays standing). <b>L</b>: the mask.', gsw: '<b>H</b> nomal: Du stiigsch us de Rüschtig (si blibt stah). <b>L</b>: d Maske.' },
   'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !': {
     de: 'Du bist ein Held: Die Polizei ist auf deiner Seite. Aber pass auf die Passanten auf: Ab dem 3. Opfer zahlst du eine Strafe!',
     en: 'You are a hero: the police are on your side. But watch out for passers-by: from the 3rd victim on, you pay a fine!',
@@ -1592,7 +1592,7 @@ const ARMURE = {
 //    recul (en m/s : celui qui est touché vole en arrière)
 //  plastron (R) : le gros rayon qui part du réacteur, sur ta poitrine. degats : au centre de l'explosion · explosion : son rayon, en mètres ·
 //    charge : les secondes avant qu'il parte · recharge : les secondes avant le suivant
-//  Pour voler (F), c'est le vol de Superman : voir vitesseVol dans REGLAGES. M lève ou baisse le masque
+//  Pour voler (F), c'est le vol de Superman : voir vitesseVol dans REGLAGES. L lève ou baisse le masque
 // =====================================================================
 const IRONMAN = {
   touches: ['KeyQ', 'KeyW', 'KeyE'],   // A Z E sur un clavier français
@@ -1847,10 +1847,10 @@ const VILLES = {
       "~~~~***=12344432112233=221**1234323344433=23444322232211112222345565543~~~",  // 31
       "~~~_*,=*122333221*122=221,,,1233322333332=22333222333221122333234555432~~~",  // 32
       "~~~~*=,**1222221,,,1=111*,*,1122211222221=12222223343321233343333444322~~~",  // 33
-      "~~~_=222222222222222=222222,,111111111111=,111112233322223444443233322~~~~",  // 34
+      "~~~_=22222222,,,222,=,22222,,111111111111=,111112233322223444443233322~~~~",  // 34
       "~~~_===========MMSMIMEMHMMM,,,,,,,,,,,,,,=,,,,,11223221233455543322211~~~~",  // 35
-      "~~~~~~~~333=333MIMMMIMMMIMM=__,,,,,,,,,,,=,,,,,,1122211234456544321,,_~~~~",  // 36
-      "~~~~~~~~333=333____________~==__,,,,,,,,,=,,,,,,,111111233455543321,,_~~~~",  // 37
+      "~~~~~~~~333=3,,MIMMMIMMMIMM=__,,,,,,,,,,,=,,,,,,1122211234456544321,,_~~~~",  // 36
+      "~~~~~~~~333=32_____________~==__,,,,,,,,,=,,,,,,,111111233455543321,,_~~~~",  // 37
       "~~~~~~~~333X333~~~~&~~~~~~~~~_MMIMPMM,,,,=,,,,,,,,,,,,1223444443221,,__~~~",  // 38
       "~~~~~~~~~33<33~~~~~~~~~~~~~~~_IIMIMMIM,,,MIIIIIIIM,,,,1123334333211,,__~~~",  // 39
       "~~~~~~~~~~333~~~~~~~~~~~~~~~~_IHIIMIMMPMMIIITTIICIII,,,11223332211,,,_~~~~",  // 40
@@ -2167,7 +2167,7 @@ const PIECES_IRONMAN = [
       for (const o of b.tete.children) if (o.geometry === GEO.oreille || o.geometry === GEO.lunettes) o.visible = false;   // (pas la barbiche de Tony)
       plaque(GEO.casqueIronman, 'rouge', b.tete, 0, 0, 0);
     } },
-  // le masque, en or, avec ses deux yeux qui brillent et la fente de la bouche. Il tourne autour du milieu de la tête : levé (touche M),
+  // le masque, en or, avec ses deux yeux qui brillent et la fente de la bouche. Il tourne autour du milieu de la tête : levé (touche L),
   // il glisse sur le haut du casque
   { nom: 'Masque',        ancre: b => b.tete,       poser: b => {
       const v = b.ironman.visiere = new THREE.Group(); v.name = 'accessoire'; b.tete.add(v);
@@ -2302,9 +2302,9 @@ const TRICHES = [
       }) });
     } },
   // Iron Man : l'armure rouge et or arrive en volant, pièce par pièce, et se referme sur lui (voir IRONMAN, après ARMURE, et PIECES_IRONMAN, juste
-  // au-dessus). A et E : les répulseurs des mains gauche et droite ; R : le rayon du plastron ; F : voler ; M : lever le masque ; A Z E : sortir de
+  // au-dessus). A et E : les répulseurs des mains gauche et droite ; R : le rayon du plastron ; F : voler ; L : lever le masque ; A Z E : sortir de
   // l'armure (elle reste debout, vide), et encore A Z E pour la rappeler. Dans l'armure, il prend moins de dégâts, et tomber de haut ne lui fait rien
-  { code: 'IRONMAN', texte: "Iron Man ! A et E : répulseurs · R : plastron · F : voler · M : masque · A Z E : sortir de l'armure ou la rappeler", ironman: true,
+  { code: 'IRONMAN', texte: "Iron Man ! A et E : répulseurs · R : plastron · F : voler · L : masque · A Z E : sortir de l'armure ou la rappeler", ironman: true,
     effet: b => habillerIronman(b, J.ironman?.pieces || []) },
   { code: 'SLIP',        texte: 'En slip !',            effet: b => { habiller(b.bassin, '#fff'); b.ceinture.visible = false; habillerMembre(b.jambeD, PEAU_BJ); habillerMembre(b.jambeG, PEAU_BJ); } },
   { code: 'CHAUSSURE',   texte: 'Une chaussure perdue', effet: b => habiller(b.jambeG.chaussure, '#eee') },   // il reste la chaussette
@@ -6732,6 +6732,7 @@ function majAccident(v, dt) {
     const rel = vitesseEn(v, C).sub(vitesseEn(o, C)).dot(N);
     if (rel >= 0) continue;
     const mv = masse(v), mo = masse(o), j = -1.3 * rel, dvo = N.clone().multiplyScalar(-j * mv / (mv + mo));
+    if (v.faute) o.faute = true;   // un carambolage que B.J. a lancé : la suite est sa faute aussi
     pousser(v, C, N.clone().multiplyScalar(j * mo / (mv + mo) / souple(v, C.clone().sub(a.c), N)));
     if (!heurter(o, C, dvo) && o.accident) { commencerAccident(o); pousser(o, C, dvo.divideScalar(souple(o, C.clone().sub(o.accident.c), N))); }   // même un petit coup la pousse
     if (-rel > 3) { // les deux carrosseries s'enfoncent
@@ -6744,7 +6745,7 @@ function majAccident(v, dt) {
     if (p.vie <= 0 || p.vol || Math.abs(p.y - v.y) > 2) continue;
     for (const lz of v.cercles) {
       const c = cercle(lz), P = V3(p.x, a.c.y, p.z), u = vitesseEn(v, P).setY(0), vit = u.length();
-      if (dist(p, c) < v.rayon + 0.4 && vit > 4) { blesser(p, 200, v === J.voiture); projeter(p, u.x * 1.1, 2 + vit * 0.25, u.z * 1.1, 3 + vit * 0.5); break; }   // il vole, comme sous une voiture qui roule
+      if (dist(p, c) < v.rayon + 0.4 && vit > 4) { blesser(p, 200, !!v.faute); projeter(p, u.x * 1.1, 2 + vit * 0.25, u.z * 1.1, 3 + vit * 0.5); break; }   // il vole, comme sous une voiture qui roule (un crime si c'est la faute de B.J.)
     }
   }
   if (pire) { // le choc le plus fort cabosse la carrosserie là où il a tapé, ou tord la roue
@@ -7313,24 +7314,29 @@ const lumiereBoum = new THREE.PointLight('#ff8030', 0, 40); scene.add(lumiereBou
 // tireur = celui qui a tiré la roquette (null si c'est B.J.) : l'explosion l'épargne
 // foudre = true : c'est la foudre qui tombe (le sceptre de Zeus). Tout pareil, mais au lieu de la boule de feu, c'est un éclat blanc et bleu,
 // plus petit et qui s'éteint plus vite
-function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null, foudre = false) {
+// parJoueur = false : ce n'est pas la faute de B.J. (une roquette ennemie, une voiture qui explose sans qu'il y soit pour rien) : ceux qu'elle tue
+// ne lui donnent ni étoile ni victime
+function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null, foudre = false, parJoueur = !tireur) {
   const s = new THREE.Sprite((foudre ? M_FLASH_FOUDRE : M_FLASH).clone()); s.position.copy(pos); scene.add(s);
   effets.push(foudre ? { o: s, vie: 0.3, boule: rayon * 0.6 } : { o: s, vie: 0.6, boule: rayon });
   lumiereBoum.color.set(foudre ? '#b8d0ff' : '#ff8030'); lumiereBoum.position.copy(pos); lumiereBoum.intensity = 5000;
   bruit(clamp(1.2 - dist(pos, J) / 150, 0, 1), 350, 1.4);
   if (degatsPNJ) for (const p of personnes) { // elle blesse et souffle les personnages : ils volent à la renverse
     const d = Math.hypot(p.x - pos.x, p.y + 1 - pos.y, p.z - pos.z), k = 1 - d / rayon, dx = p.x - pos.x, dz = p.z - pos.z, l = Math.hypot(dx, dz) || 1;
-    if (p.vie > 0 && p !== tireur && d < rayon) { blesser(p, degatsPNJ * k, !tireur); projeter(p, dx / l * (3 + 9 * k), 3 + 6 * k, dz / l * (3 + 9 * k), -3 - 8 * k); }
+    if (p.vie > 0 && p !== tireur && d < rayon) { blesser(p, degatsPNJ * k, parJoueur); projeter(p, dx / l * (3 + 9 * k), 3 + 6 * k, dz / l * (3 + 9 * k), -3 - 8 * k); }
   }
   const d = Math.hypot(J.x - pos.x, J.y + 1 - pos.y, J.z - pos.z);
   if (d < rayon && degatsJoueur) blesserJoueur(degatsJoueur * (1 - d / rayon));   // (degatsJoueur = 0 : les fusées de l'armure, qui épargnent B.J.)
-  for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v, pos, !tireur);
+  for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v, pos, parJoueur);
   // le heavy robot : l'explosion casse la vitre de sa cabine, puis blesse son pilote
-  for (const r of robots) { const d = Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z); if (r !== tireur && d < rayon + 1.5) toucherRobot(r, degatsPNJ * (1 - d / (rayon + 1.5)), null, !tireur); }
+  for (const r of robots) { const d = Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z); if (r !== tireur && d < rayon + 1.5) toucherRobot(r, degatsPNJ * (1 - d / (rayon + 1.5)), null, parJoueur); }
 }
-// parJoueur = false quand c'est une roquette ennemie : son conducteur tué ne donne pas d'étoile à B.J.
-function exploserVoiture(v, pos = v, parJoueur = true) {
+// parJoueur = false quand ce n'est pas la faute de B.J. (une roquette ennemie, ou une voiture qu'il n'a jamais touchée, qui brûle après
+// un accident tout seul) : son conducteur tué, et ceux que l'explosion tue autour, ne lui donnent ni étoile ni victime.
+// v.faute : B.J. y est pour quelque chose (il l'a conduite, lui a tiré dessus, l'a cognée, poussée, écrasée...). Ça reste
+function exploserVoiture(v, pos = v, parJoueur = !!v.faute) {
   if (v.detruite) return;
+  if (parJoueur) v.faute = true;   // (une voiture blindée qui encaisse : si elle brûle ensuite, c'est sa faute)
   if (v.type.glisse) { souffler(v, pos, 1); return; }   // des skis, un snowboard ou une luge n'explosent pas : le souffle les envoie valser, c'est tout
   if (estBlindee(v) && ++v.roquettes <= R_.roquettesBlindage) { // le blindage encaisse : ça cabosse, mais ça tient
     const P = versLocal(v, pos.x - v.x, pos.z - v.z), l = Math.hypot(P.x, P.z) || 1;
@@ -7348,7 +7354,7 @@ function exploserVoiture(v, pos = v, parJoueur = true) {
   if (v.feu) v.m.remove(v.feu);   // elle brûlait déjà : le grand feu prend la place du petit
   v.feu = new THREE.Sprite(M_FLASH); v.feu.position.y = 1.3; v.m.add(v.feu);
   souffler(v, pos, 1);   // la carcasse vole en tournoyant
-  exploser(new THREE.Vector3(v.x, v.y + 1, v.z), 7, 150, R_.degatsExplosion);
+  exploser(new THREE.Vector3(v.x, v.y + 1, v.z), 7, 150, R_.degatsExplosion, null, false, parJoueur);
 }
 // roquettes : elles volent tout droit et explosent sur le premier mur, voiture ou personnage touché, ou par terre
 const M_FUMEE = new THREE.SpriteMaterial({ map: TEX.fumee, color: '#9a9a9a', transparent: true, depthWrite: false });
@@ -7470,7 +7476,7 @@ function arriver(a, pos) {
   for (const r of robots) if (Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z) < a.rayon + 1.5) toucherRobot(r, a.degats);   // le heavy robot : sa vitre
   if (a.batarang === 'feu') { // des flammes : ceux qui sont là sont brûlés, puis encore tant qu'ils y restent ; les voitures prennent feu (pas les blindées)
     for (const p of pres) blesser(p, a.degats);
-    for (const v of autos) if (!estBlindee(v)) allumer(v);
+    for (const v of autos) if (!estBlindee(v)) { v.faute = true; allumer(v); }
     const flammes = [...Array(6)].map((_, k) => {
       const fl = new THREE.Sprite(M_FLASH), an = k * 1.05, d = k ? a.rayon * 0.55 : 0;
       fl.position.set(pos.x + Math.sin(an) * d, pos.y + 0.45, pos.z + Math.cos(an) * d); scene.add(fl); return fl;
@@ -8023,6 +8029,7 @@ function pasRobot(r) {
 // les vitres éclatent, le conducteur est tué, puis elle prend feu
 function aplatir(o, parJoueur = true) {
   o.ecrasee = true; o.vitesse = 0;
+  if (parJoueur) o.faute = true;   // (quand elle explosera : voir exploserVoiture)
   blesserConducteur(o, Infinity, parJoueur);
   for (const z of o.cercles) abimer(o, V3(0, o.forme.hauteur, z), V3(0, -1, 0), 1);
 }
@@ -8330,7 +8337,7 @@ function lanceFlammes(r, dt) {
   // dans le jet : devant l'armure, à moins de « portee » mètres, et pas trop loin de l'axe (le jet s'élargit en s'éloignant)
   const dedans = (x, y, z, marge = 0) => { const v = V3(x, y, z).sub(o), t = v.dot(dir); return t > 0 && t < F.portee + marge && v.addScaledVector(dir, -t).length() < 0.9 + t * cone + marge; };
   for (const p of personnes) if (p.vie > 0 && dedans(p.x, p.y + 1, p.z) && voit(yeux, p)) blesser(p, F.degats * 0.1);
-  for (const v of voitures) if (v !== J.voiture && !pasDeTole(v) && !estBlindee(v) && dedans(v.x, v.y + 0.7, v.z, v.rayon)) allumer(v);
+  for (const v of voitures) if (v !== J.voiture && !pasDeTole(v) && !estBlindee(v) && dedans(v.x, v.y + 0.7, v.z, v.rayon)) { v.faute = true; allumer(v); }
   for (const q of robots) if (q.pilote === 'police' && dedans(q.x, q.y + 3, q.z, 1.5)) toucherRobot(q, F.degats * 0.1);
   vacarme();
 }
@@ -8821,7 +8828,7 @@ function suiteIronman(code) {
   basculerArmure();
   return true;
 }
-// M : le masque se lève (il glisse sur le haut du casque : on voit son visage), ou se baisse
+// L : le masque se lève (il glisse sur le haut du casque : on voit son visage), ou se baisse
 function leverMasque() {
   const I = J.ironman; I.masque = !I.masque;
   bip(I.masque ? 500 : 900, I.masque ? 900 : 500, 0.25, 'triangle', 0.04); bruit(0.15, 4000, 0.1);
@@ -8862,6 +8869,7 @@ function repulseur(cote) {
     const u = hit?.object.userData || {}, p = u.personne, vc = !p && u.voiture;
     if (p) { blesser(p, R.degats); projeter(p, dir.x * R.recul, 2 + R.recul * 0.25, dir.z * R.recul, -4); }
     else if (vc) { // une voiture : cabossée, son conducteur touché, et poussée
+      vc.faute = true;
       abimer(vc, vc.m.worldToLocal(point.clone()), dir.clone().applyQuaternion(vc.m.quaternion.clone().invert()), R.degats / 150, true);
       if (!estBlindee(vc)) blesserConducteur(vc, R.degats);
       heurter(vc, point, dir.clone().multiplyScalar(R.recul * 0.6));
@@ -9017,8 +9025,7 @@ addEventListener('keydown', e => {
   }
   if (!e.repeat || !J.danse) touches[e.code] = true;   // pendant la danse, une touche restée enfoncée ne compte pas
   if (e.repeat) return;
-  if (e.key.toLowerCase() === 'm' && !carte.ouverte && ironmanLibre()) { leverMasque(); return; }   // dans l'armure d'Iron Man, M lève ou baisse le masque...
-  if (e.key.toLowerCase() === 'm' || e.code === 'Tab') { ouvrirCarte(!carte.ouverte); return; } // ...sinon, la lettre M (quel que soit le clavier) ouvre la carte, comme Tab
+  if (e.key.toLowerCase() === 'm' || e.code === 'Tab') { ouvrirCarte(!carte.ouverte); return; } // la lettre M (quel que soit le clavier) ouvre la carte, comme Tab (même dans l'armure d'Iron Man)
   if (carte.ouverte) return;
   if (J.ironman && suiteIronman(e.code)) return;   // A Z E (Q W E sur un clavier anglais) : l'armure d'Iron Man arrive, ou il en sort
   if (J.ironman?.anim && e.code !== 'KeyV') return;   // pendant ce temps, il ne fait rien d'autre
@@ -9034,6 +9041,7 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if (e.code === 'KeyR' && im) tirerPlastron();   // Iron Man : le rayon du plastron
   else if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
+  if (e.code === 'KeyL' && im) leverMasque();   // Iron Man : L lève ou baisse le masque
   if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
   if (e.code === 'KeyB') rappelerVoiture();   // Batman rappelle sa Batmobile
   if (e.code === 'KeyT' && !voyage) appuyerT();   // la DeLorean : choisir le chapitre où aller (dedans), ou la faire venir
@@ -9520,6 +9528,7 @@ function attraper(v, souris = true) {
   if (J.prise || v === J.voiture) return;
   const a = commencerAccident(v);
   if (!a) return;   // (un bateau, un avion, un hélicoptère : trop lourd)
+  v.faute = true;   // ce qu'elle fauche en tournant, c'est sa faute
   if ((a.conducteur || v.police) && (v.police || policeVoit())) crime(1);   // attraper une voiture avec quelqu'un dedans, devant la police
   if (v.filet) oterFilet(v);
   J.prise = { v, a: angleVers(J, v), w: 2.5, r: Math.max(3, dist(v, J)), y: a.c.y, souris };
@@ -9588,6 +9597,7 @@ function tirer(a = ARMES[J.arme]) {
     if (hit || sol) {
       const u = hit?.object.userData || {}, p = u.personne;
       const vc = !p && u.voiture, roue = vc && vc.roues.find(r => r.tourne === hit.object.parent);
+      if (vc) vc.faute = true;   // B.J. lui tire dessus : si elle explose, c'est sa faute
       // la foudre : tout ce qui est à moins de a.eclair mètres prend le choc, comme dans une explosion (les gens volent, les voitures sautent)
       if (a.eclair) { exploser(point, a.eclair, a.degats, R_.degatsExplosion, null, true); etincelles(point, 10, 6); }
       else if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
@@ -9841,6 +9851,7 @@ function ecraser(h, choc) {
     if (pasDeTole(o) || o.type.glisse || o.detruite || Math.abs(o.y - J.y) > 3) continue;
     const d = Math.min(...o.cercles.map(lz => dist(local(o, 0, lz), J))) - o.rayon;   // de B.J. à sa carrosserie
     if (d > r) continue;
+    o.faute = true;
     if (d < r * 0.4 && !estBlindee(o)) aplatir(o); else souffler(o, ici, 0.6 * (1 - d / r));   // une voiture blindée ne s'écrase pas : elle est soulevée, comme celles qui sont plus loin
   }
   for (const o of robots) { const d = Math.max(0, dist(o, J) - 1.5); if (d < r && Math.abs(o.y - J.y) < 4) toucherRobot(o, R_.degatsEcrase * (1 - d / r)); }   // le heavy robot : sa vitre casse
@@ -10603,6 +10614,7 @@ function bougerVoiture(v, dt, parJoueur) {
       }
     }
     if (!n) continue;
+    if (parJoueur || v.faute) o.faute = true;   // B.J. (ou sa voiture qui roule toute seule) la cogne : si elle explose, c'est sa faute
     const l = Math.hypot(sx, sz) || 1, nx = sx / l, nz = sz / l, w = vitesseDe(o);
     noter(cx / n, cz / n, nx, nz, -((vx - w.x) * nx + (vz - w.z) * nz), o);   // la vitesse du choc, dans sa direction moyenne
   }
@@ -10697,6 +10709,9 @@ function poserVoiture(v, dt) {
     // à ski, on reste collé à la neige (les jambes amortissent les bosses, même quand la pente plonge) : on ne s'envole que d'un vrai rebord
     // (le bout d'un kicker), ou en sautant (v.saute)
     if (v.type.glisse && !v.vol && !v.saute && v.y > sol && v.y < sol + 0.15 + 0.02 * Math.abs(v.vitesse)) v.y = sol;
+    // une voiture de la circulation (ou de la police) reste collée à la route : elle ne décolle pas en haut d'une côte raide ou d'une bosse
+    // (sinon, elle retombait, s'abîmait, et finissait par brûler). Seul un vrai trou, de plus de 1,5 m, la fait tomber
+    else if (v.conducteur && !v.type.glisse && v !== J.voiture && !v.vol && v.y > sol && v.y < sol + 1.5) v.y = sol;
     if (v.y <= sol) { // les roues touchent le sol
       v.vy = vySol + (v.vol ? atterrir(v, vySol - vy, pente) : 0);
       v.y = sol; v.vol = v.saute = false;
@@ -11379,7 +11394,7 @@ function majVoiture(v, dt) {
   if (v.ski && v.conducteur !== 'skieur') v.ski = v.telesiege = null;   // un autre skieur qui est tombé, ou à qui B.J. a pris ses skis
   if (v.telesiege) { majSkieur(v, dt); return; }   // un autre skieur sur une remontée
   if (v.gyro) { const on = Math.sin(temps * 14) > 0; v.gyro[0].material.emissiveIntensity = on ? 4 : 0.1; v.gyro[1].material.emissiveIntensity = on ? 0.1 : 4; }
-  if (v === J.voiture) {}
+  if (v === J.voiture) v.faute = true;   // sa voiture : ce qui lui arrivera sera sa faute (voir exploserVoiture)
   else if (v.type.vole) piloterAeronef(v, dt, false);
   else if (v.enVol && v.type.vitesseVol) piloterBatmobile(v, dt, false);   // la Batmobile en l'air, sans personne dedans : elle se pose toute seule
   else if (v.accident) majAccident(v, dt);
@@ -12259,7 +12274,7 @@ function majHUD(dt) {
     : J.prise ? tr(J.prise.souris ? 'Lâche le bouton pour lancer la voiture là où tu regardes' : 'Lâche <b>G</b> pour lancer la voiture là où tu regardes') : J.grappin ? tr('<b>Espace</b> : lâcher le grappin')
     : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape')
     : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping')   // en volant : les figures
-    : ironmanLibre() ? tr("<b>A</b> <b>E</b> : répulseurs · <b>R</b> : plastron · <b>F</b> : voler · <b>M</b> : masque · <b>A Z E</b> : sortir de l'armure") : '';   // dans l'armure d'Iron Man
+    : ironmanLibre() ? tr("<b>A</b> <b>E</b> : répulseurs · <b>R</b> : plastron · <b>F</b> : voler · <b>L</b> : masque · <b>A Z E</b> : sortir de l'armure") : '';   // dans l'armure d'Iron Man
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
