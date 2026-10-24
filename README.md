@@ -20,6 +20,8 @@ Le bouton **⚙ Réglages** ouvre tous les nombres du jeu (voir « Modifier le j
 
 Le bouton **🎮 Codes de triche** montre tous les codes de triche du jeu.
 
+Sous le menu, la liste des touches est celle du chapitre où tu es : à Malibu, celles de l'armure d'Iron Man ; à Gotham, celles de Batman, et ainsi de suite.
+
 | Touche | Action |
 |---|---|
 | Z Q S D ou flèches | Se déplacer / conduire |
@@ -204,6 +206,6 @@ Dans le code :
 11. **`TRADUCTIONS`** (tout en haut, avant `REGLAGES`) : chaque phrase du jeu en allemand, en anglais et en züritüütsch. Si tu inventes une mission ou un code, ajoute la traduction de ses textes, sinon ils restent en français. Tu peux aussi ajouter une langue dans **`LANGUES`**.
 12. **`FOULES`** (tout en haut) : le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
 13. **`HEROS`** et **`CHEVEUX`** (tout en haut) : le nom et la carrure de chaque héros du menu (épaules, taille, bras, cou, cuisses, poitrine), la couleur de la jupe et des talons, et les couleurs de cheveux. Change les nombres, ajoute ta couleur (`'Violets': '#8a3ad8'`), ou invente un héros.
-14. **`CHAPITRES`** (tout en haut, juste après `HEROS`) : pour chaque chapitre, sa ville, le nom de ton héros (et de ton héroïne), son nom de super-héros, son code de triche (allumé tout le chapitre), sa tenue de tous les jours (`civil`, `civilFille` : la veste, la chemise, le pantalon ou la jupe, les chaussures, les cheveux, les lunettes de soleil, la barbiche), son logo, son heure (`heure: 1` : toujours la nuit), la cachette de la DeLorean (une lettre de la carte), `sansReproche` (pas de police, mais l'amende) et ses bulles d'aide. Les nombres de l'amende (`amende`, `amendeVictimes`, `amendeMax`, `pardon`) et du voyage (`dureeVoyage`) sont dans `REGLAGES`.
+14. **`CHAPITRES`** (tout en haut, juste après `HEROS`) : pour chaque chapitre, sa ville, le nom de ton héros (et de ton héroïne), son nom de super-héros, son code de triche (allumé tout le chapitre), sa tenue de tous les jours (`civil`, `civilFille` : la veste, la chemise, le pantalon ou la jupe, les chaussures, les cheveux, les lunettes de soleil, la barbiche), son logo, son heure (`heure: 1` : toujours la nuit), la cachette de la DeLorean (une lettre de la carte), `sansReproche` (pas de police, mais l'amende), ses bulles d'aide et la liste des touches du menu (`touches` : `['H', 'ton armure arrive en volant']`, une ligne chacune ; pense à leur traduction dans `TRADUCTIONS`). Les nombres de l'amende (`amende`, `amendeVictimes`, `amendeMax`, `pardon`) et du voyage (`dureeVoyage`) sont dans `REGLAGES`.
 
 Recharge la page (F5) pour voir tes changements. Le fonctionnement complet du jeu est décrit dans [DESIGN.md](DESIGN.md).

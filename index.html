@@ -182,25 +182,7 @@
   </details>
   <div id="histoire">Tu es {nom}. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !</div>
   <div id="etat">Chargement… (il faut une connexion Internet)</div>
-  <table>
-    <tr><td>Z Q S D</td><td>se déplacer / conduire</td></tr>
-    <tr><td>Souris</td><td>regarder</td></tr>
-    <tr><td>Clic gauche</td><td>tirer / frapper</td></tr>
-    <tr><td>Clic droit</td><td>viser (lunette du sniper)</td></tr>
-    <tr><td>Maj</td><td>courir</td></tr>
-    <tr><td>Espace</td><td>sauter (frein à main en voiture)</td></tr>
-    <tr><td>Ctrl ou C</td><td>s'accroupir</td></tr>
-    <tr><td>À ski</td><td>Espace : sauter (plus haut sur une bosse) · Maj + Q ou D : déraper · R : peaux des skis de rando</td></tr>
-    <tr><td>En l'air, à ski</td><td>Q D : vrilles (180, 360…) · S : backflip · Z : frontflip · S + Q ou D : cork · clics : grabs</td></tr>
-    <tr><td>E</td><td>monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)</td></tr>
-    <tr><td>V</td><td>vue 1re / 3e personne</td></tr>
-    <tr><td>1 à 8 ou molette</td><td>changer d'arme</td></tr>
-    <tr><td>M ou Tab</td><td>carte du pays (molette : zoom)</td></tr>
-    <tr><td>T</td><td>DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)</td></tr>
-    <tr><td>H, J</td><td>Iron Man (chapitre 2) : appeler ton armure ou en sortir · J : en choisir une autre</td></tr>
-    <tr><td>Entrée</td><td>code de triche</td></tr>
-    <tr><td>Échap</td><td>pause</td></tr>
-  </table>
+  <table id="touches"></table>   <!-- la liste des touches : celle du chapitre où l'on est (touches, dans CHAPITRES) -->
 </div>
 <div id="ecran-chapitre"><canvas></canvas></div>
 
@@ -254,9 +236,20 @@ for (const k in heros) {
 //  sansReproche: true : un héros sans reproche. La police est de son côté (jamais d'étoiles), mais il ne doit pas tuer de passants :
 //    dès la 3e victime, une amende (voir amende, dans REGLAGES)
 //  bulles : les bulles d'aide du début du chapitre, l'une après l'autre ({heros} : ton nom ; {super} : ton nom de super-héros ; <b>A</b> : la lettre en gras)
+//  touches : la liste des touches du menu, dans ce chapitre : [la touche, ce qu'elle fait], une ligne du menu chacune ({super} : ton nom
+//    de super-héros). Elles sont traduites dans TRADUCTIONS, plus bas. Un chapitre sans touches montre celles du chapitre 1
 // =====================================================================
 const CHAPITRES = [
-  { ville: 'Los Santos', logo: 'wolfenstein', cachette: '?', bulles: [
+  { ville: 'Los Santos', logo: 'wolfenstein', cachette: '?', touches: [
+    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
+    ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
+    ['À ski', 'Espace : sauter (plus haut sur une bosse) · Maj + Q ou D : déraper · R : peaux des skis de rando'],
+    ["En l'air, à ski", 'Q D : vrilles (180, 360…) · S : backflip · Z : frontflip · S + Q ou D : cork · clics : grabs'],
+    ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
+    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
+    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
+    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+  ], bulles: [
     'Suis le <b>point jaune</b> de la mini-carte : il te mène à ta mission.',
     '<b>E</b> : monter dans une voiture (ou la voler !). <b>M</b> : la carte du pays.',
     'Si tu fais des bêtises, la police te poursuit : cache-toi pour la semer.',
@@ -264,7 +257,19 @@ const CHAPITRES = [
   ]},
   { ville: 'Malibu', heros: 'Tony Stark', heroine: 'Pepper Potts', super: 'Iron Man', superFille: 'Rescue', ami: 'Pepper Potts', amiFille: 'Tony Stark', triche: 'IRONMAN', logo: 'ironman', heure: 13, cachette: '>', sansReproche: true,
     civil: { veste: '#2b2d34', chemise: '#ececf0', pantalon: '#2b2d34', chaussures: '#141418', cheveux: '#3b2717', lunettes: '#8a2c14', barbiche: true },
-    civilFille: { veste: '#ece2d0', chemise: '#ffffff', jupe: '#ece2d0', talons: '#cdb48c', cheveux: '#d08a4e' }, bulles: [
+    civilFille: { veste: '#ece2d0', chemise: '#ffffff', jupe: '#ece2d0', talons: '#cdb48c', cheveux: '#d08a4e' }, touches: [
+    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser'],
+    ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
+    ['H', 'ton armure arrive en volant, et tu deviens {super} · H encore : tu en sors'],
+    ["Dans l'armure", 'A E : répulseurs · R : plastron · F : voler (F encore : te poser) · L : masque'],
+    ['En volant', 'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping'],
+    ['G, X', "dans l'armure : les mini-missiles, le laser des bras (achète-les chez Stark Industries)"],
+    ['J', "changer d'armure (Stark Industries en vend d'autres : ⚙ sur la carte)"],
+    ['E', "monter / descendre (voiture, bateau, avion), ascenseur, magasin de Stark Industries, prendre quelqu'un dans tes bras"],
+    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
+    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
+    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+  ], bulles: [
     'Tu es <b>{heros}</b>. <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !',
     '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.',
     '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.',
@@ -273,7 +278,18 @@ const CHAPITRES = [
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'Suis le <b>point jaune</b> : tes missions t\'attendent. À la fin, le Mandarin a caché la DeLorean : il faudra la retrouver.',
   ]},
-  { ville: 'Gotham', heros: 'Bruce Wayne', heroine: 'Barbara Gordon', super: 'Batman', superFille: 'Batgirl', triche: 'BATMAN', logo: 'batman', heure: 1, cachette: 'b', sansReproche: true, bulles: [
+  { ville: 'Gotham', heros: 'Bruce Wayne', heroine: 'Barbara Gordon', super: 'Batman', superFille: 'Batgirl', triche: 'BATMAN', logo: 'batman', heure: 1, cachette: 'b', sansReproche: true, touches: [
+    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
+    ['Maj', "courir · en l'air, garde-le enfoncé : tu planes avec ta cape"], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
+    ['G', 'le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher'],
+    ['9', 'le grappin, les batarangs et les filets'],
+    ['B', 'ta Batmobile arrive à côté de toi'],
+    ['R', 'dans la Batmobile : déployer les ailes et voler, ou se poser'],
+    ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
+    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
+    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
+    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+  ], bulles: [
     'Tu es <b>{super}</b> ! Ta Batmobile t\'attend à côté de toi : <b>B</b> la rappelle, <b>R</b> la fait voler.',
     '<b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.',
     'En l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.',
@@ -281,7 +297,17 @@ const CHAPITRES = [
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
-  { ville: 'Metropolis', heros: 'Clark Kent', heroine: 'Kara Danvers', super: 'Superman', superFille: 'Supergirl', triche: 'SUPERMAN', logo: 'superman', heure: 12, cachette: 'd', sansReproche: true, bulles: [
+  { ville: 'Metropolis', heros: 'Clark Kent', heroine: 'Kara Danvers', super: 'Superman', superFille: 'Supergirl', triche: 'SUPERMAN', logo: 'superman', heure: 12, cachette: 'd', sansReproche: true, touches: [
+    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
+    ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
+    ['Maj 3 fois, vite', "t'envoler · encore 3 fois : arrêter de voler"],
+    ['En volant', 'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping'],
+    ['9', 'les yeux laser (garde le clic gauche enfoncé)'],
+    ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
+    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
+    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
+    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+  ], bulles: [
     'Tu es <b>{super}</b> ! <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.',
     'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.',
     '<b>9</b> : les yeux laser.',
@@ -289,7 +315,18 @@ const CHAPITRES = [
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
-  { ville: 'New York', heros: 'Peter Parker', heroine: 'Gwen Stacy', super: 'Spiderman', superFille: 'Spider-Gwen', triche: 'SPIDERMAN', logo: 'spiderman', cachette: 'a', sansReproche: true, bulles: [
+  { ville: 'New York', heros: 'Peter Parker', heroine: 'Gwen Stacy', super: 'Spiderman', superFille: 'Spider-Gwen', triche: 'SPIDERMAN', logo: 'spiderman', cachette: 'a', sansReproche: true, touches: [
+    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
+    ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
+    ['G', "une toile, pour te balancer d'immeuble en immeuble : garde la touche enfoncée, lâche-la pour t'envoler (ou clic gauche, la toile en main)"],
+    ['Contre un mur', 'avance : tu grimpes · Espace : sauter du mur'],
+    ['Toile sur une voiture', 'garde la touche enfoncée : elle tourne autour de toi · lâche-la : tu la lances'],
+    ['9', 'la toile et les filets'],
+    ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
+    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
+    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
+    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+  ], bulles: [
     'Tu es <b>{super}</b> ! <b>G</b> (ou clic gauche) : une toile, pour te balancer d\'immeuble en immeuble.',
     'Avance contre un mur : tu grimpes. <b>Espace</b> : sauter du mur.',
     'Une toile sur une voiture : garde le bouton enfoncé pour la faire tourner, lâche-le pour la lancer !',
@@ -644,7 +681,6 @@ const TRADUCTIONS = {
   'Dans ton armure, G : ils partent de tes épaules et suivent les ennemis': { de: 'In deiner Rüstung, G: Sie starten von deinen Schultern und verfolgen die Feinde', en: 'In your armor, G: they launch from your shoulders and chase the enemies', gsw: 'I dinere Rüschtig, G: Si started vo dine Schultere und verfolged d Feind' },
   'Dans ton armure, X : un genou à terre, tu tournes sur toi-même, et le laser coupe tout autour de toi': { de: 'In deiner Rüstung, X: Ein Knie am Boden drehst du dich um dich selbst, und der Laser schneidet alles um dich herum', en: 'In your armor, X: one knee down, you spin around, and the laser cuts everything around you', gsw: 'I dinere Rüschtig, X: Es Chnüü am Bode, du drähsch di um di sälber, und de Laser schniidt alles um di ume' },
   "Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d'autres armures et des améliorations. <b>J</b> : changer d'armure.": { de: 'Der Laden von <b>Stark Industries</b> (⚙ auf der Karte) verkauft andere Rüstungen und Verbesserungen. <b>J</b>: Rüstung wechseln.', en: 'The <b>Stark Industries</b> store (⚙ on the map) sells other armors and upgrades. <b>J</b>: switch armor.', gsw: 'De Lade vo <b>Stark Industries</b> (⚙ uf de Charte) verchauft anderi Rüschtige und Verbesserige. <b>J</b>: Rüschtig wächsle.' },
-  'Iron Man (chapitre 2) : appeler ton armure ou en sortir · J : en choisir une autre': { de: 'Iron Man (Kapitel 2): deine Rüstung rufen oder aussteigen · J: eine andere wählen', en: 'Iron Man (chapter 2): call your armor or step out · J: choose another one', gsw: 'Iron Man (Kapitel 2): dini Rüschtig rüefe oder uusstiige · J: en anderi uuswähle' },
   'M ou Tab':         { de: 'M oder Tab', en: 'M or Tab', gsw: 'M oder Tab' },
   '{voiture} : à côté de toi !': { de: '{voiture}: gleich neben dir!', en: '{voiture}: right next to you!', gsw: '{voiture}: grad näb dir!' },
   '{voiture} : pas de place ici !': { de: '{voiture}: kein Platz hier!', en: '{voiture}: no room here!', gsw: '{voiture}: kei Platz da!' },
@@ -863,6 +899,42 @@ const TRADUCTIONS = {
     gsw: 'Willkomme z {ville}, {nom}! Du bisch {super}: d Polizei isch uf dinere Siite. Find de DeLorean, zum wiiterchoo!' },
   'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)': { de: 'DeLorean: das Kapitel wählen, in das du reist (drinnen), oder ihn herholen (fertiges Kapitel)',
     en: 'DeLorean: choose the chapter to go to (inside), or call it to you (finished chapter)', gsw: 'DeLorean: s Kapitel uuswähle, wo du hii wotsch (dinne), oder en härhole (fertigs Kapitel)' },
+  // la liste des touches du menu, dans les chapitres des super-héros (touches, dans CHAPITRES)
+  'viser':            { de: 'zielen', en: 'aim', gsw: 'ziele' },
+  'ton armure arrive en volant, et tu deviens {super} · H encore : tu en sors': { de: 'deine Rüstung fliegt herbei, und du wirst {super} · H noch einmal: Du steigst aus',
+    en: 'your armor flies in, and you become {super} · H again: you step out', gsw: 'dini Rüschtig flüügt här, und du wirsch {super} · H nomal: Du stiigsch uus' },
+  "Dans l'armure":    { de: 'In der Rüstung', en: 'In the armor', gsw: 'I de Rüschtig' },
+  'A E : répulseurs · R : plastron · F : voler (F encore : te poser) · L : masque': { de: 'Q E: Repulsoren · R: Brustplatte · F: fliegen (noch einmal F: landen) · L: Maske',
+    en: 'Q E: repulsors · R: chest beam · F: fly (F again: land) · L: mask', gsw: 'Q E: Repulsore · R: Bruschtplatte · F: flüüge (nomal F: lande) · L: Maske' },
+  'En volant':        { de: 'Im Flug', en: 'While flying', gsw: 'Im Flug' },
+  'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping': { de: 'Leertaste: steigen · C: sinken · Shift: schneller · Shift + A oder D: Fassrolle · Shift + Leertaste: Looping',
+    en: 'Space: up · C: down · Shift: faster · Shift + A or D: barrel roll · Shift + Space: loop', gsw: 'Läärtaschte: ufe · C: abe · Shift: schnäller · Shift + A oder D: Fassrolle · Shift + Läärtaschte: Looping' },
+  "dans l'armure : les mini-missiles, le laser des bras (achète-les chez Stark Industries)": { de: 'in der Rüstung: die Mini-Raketen, der Armlaser (kauf sie bei Stark Industries)',
+    en: 'in the armor: the mini-missiles, the arm laser (buy them at Stark Industries)', gsw: 'i de Rüschtig: d Mini-Rakete, de Armlaser (chauf si bi Stark Industries)' },
+  "changer d'armure (Stark Industries en vend d'autres : ⚙ sur la carte)": { de: 'Rüstung wechseln (Stark Industries verkauft andere: ⚙ auf der Karte)',
+    en: 'switch armor (Stark Industries sells others: ⚙ on the map)', gsw: 'Rüschtig wächsle (Stark Industries verchauft anderi: ⚙ uf de Charte)' },
+  "monter / descendre (voiture, bateau, avion), ascenseur, magasin de Stark Industries, prendre quelqu'un dans tes bras": { de: 'einsteigen / aussteigen (Auto, Boot, Flugzeug), Aufzug, Laden von Stark Industries, jemanden in die Arme nehmen',
+    en: 'get in / out (car, boat, plane), elevator, Stark Industries store, pick someone up', gsw: 'iistiige / uusstiige (Auto, Boot, Flüüger), Lift, Lade vo Stark Industries, öpper i d Arme näh' },
+  "courir · en l'air, garde-le enfoncé : tu planes avec ta cape": { de: 'rennen · in der Luft gedrückt halten: Du gleitest mit deinem Umhang',
+    en: 'run · in the air, hold it: you glide with your cape', gsw: 'seckle · i de Luft druckt hebe: Du gleitisch mit dim Umhang' },
+  'le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher': { de: 'der Greifhaken, um auf die Dächer zu kommen (oder Linksklick, mit dem Greifhaken in der Hand) · Leertaste: loslassen',
+    en: 'the grapple, to get onto the roofs (or left click, with the grapple in your hand) · Space: let go', gsw: 'de Griifhaagge, zum uf d Dächer cho (oder Linksklick, mit em Griifhaagge i de Hand) · Läärtaschte: loslaa' },
+  'le grappin, les batarangs et les filets': { de: 'Greifhaken, Batarangs und Netze', en: 'grapple, batarangs and nets', gsw: 'Griifhaagge, Batarangs und Netz' },
+  'ta Batmobile arrive à côté de toi': { de: 'dein Batmobil kommt neben dich', en: 'your Batmobile comes next to you', gsw: 'dis Batmobil chunnt näb di' },
+  'dans la Batmobile : déployer les ailes et voler, ou se poser': { de: 'im Batmobil: die Flügel ausklappen und fliegen, oder landen', en: 'in the Batmobile: spread the wings and fly, or land', gsw: 'im Batmobil: d Flügel uusklappe und flüüge, oder lande' },
+  'Maj 3 fois, vite': { de: 'Shift 3-mal, schnell', en: 'Shift 3 times, fast', gsw: 'Shift 3 Mal, schnäll' },
+  "t'envoler · encore 3 fois : arrêter de voler": { de: 'losfliegen · noch 3-mal: aufhören zu fliegen', en: 'take off · 3 more times: stop flying', gsw: 'losflüüge · nomal 3 Mal: ufhöre flüüge' },
+  'les yeux laser (garde le clic gauche enfoncé)': { de: 'die Laseraugen (Linksklick gedrückt halten)', en: 'laser eyes (hold left click)', gsw: 'd Laserauge (Linksklick druckt hebe)' },
+  "une toile, pour te balancer d'immeuble en immeuble : garde la touche enfoncée, lâche-la pour t'envoler (ou clic gauche, la toile en main)": {
+    de: 'ein Netz, um dich von Haus zu Haus zu schwingen: Taste gedrückt halten, loslassen, um davonzufliegen (oder Linksklick, mit dem Netz in der Hand)',
+    en: 'a web, to swing from building to building: hold the key, let go to fly off (or left click, with the web in your hand)',
+    gsw: 'es Netz, zum di vo Huus zu Huus schwinge: Taschte druckt hebe, loslaa zum dervoflüüge (oder Linksklick, mit em Netz i de Hand)' },
+  'Contre un mur':    { de: 'An einer Wand', en: 'Against a wall', gsw: 'A de Wand' },
+  'avance : tu grimpes · Espace : sauter du mur': { de: 'geh dagegen: Du kletterst · Leertaste: von der Wand springen', en: 'walk into it: you climb · Space: jump off the wall', gsw: 'lauf dergäge: Du chlätterisch · Läärtaschte: vo de Wand gumpe' },
+  'Toile sur une voiture': { de: 'Netz auf ein Auto', en: 'Web on a car', gsw: 'Netz uf es Auto' },
+  'garde la touche enfoncée : elle tourne autour de toi · lâche-la : tu la lances': { de: 'Taste gedrückt halten: Es dreht sich um dich · loslassen: Du wirfst es',
+    en: 'hold the key: it spins around you · let go: you throw it', gsw: 'Taschte druckt hebe: Es dräiht sich um di · loslaa: Du rüersch es' },
+  'la toile et les filets': { de: 'das Spinnennetz und die Netze', en: 'the web and the nets', gsw: 's Spinnenetz und d Netz' },
   'CHAPITRE {n}':     { de: 'KAPITEL {n}', en: 'CHAPTER {n}', gsw: 'KAPITEL {n}' },
   'Suis le <b>point jaune</b> de la mini-carte : il te mène à ta mission.': { de: 'Folge dem <b>gelben Punkt</b> auf der Minikarte: Er führt dich zu deiner Mission.',
     en: 'Follow the <b>yellow dot</b> on the minimap: it leads you to your mission.', gsw: 'Gang em <b>gääle Punkt</b> uf de Minicharte nah: Er füehrt di zu dinere Mission.' },
@@ -1262,6 +1334,11 @@ for (const ligne of document.querySelectorAll('.foule')) for (const nom in FOULE
 }
 // l'histoire du menu : celle du chapitre où l'on est
 if (partie.chapitre > 1) document.getElementById('histoire').dataset.fr = 'Bienvenue à {ville}, {nom} ! Tu es {super} : la police est de ton côté. Retrouve la DeLorean pour aller plus loin !';
+// la liste des touches du menu : celle du chapitre où l'on est (touches, dans CHAPITRES), une ligne par touche
+for (const [touche, quoi] of CHAPITRE.touches || CHAPITRES[0].touches || []) {
+  const ligne = document.getElementById('touches').insertRow();
+  ligne.insertCell().dataset.fr = touche; ligne.insertCell().dataset.fr = quoi;   // (traduireMenu les écrit dans la langue choisie)
+}
 traduireMenu();
 // le numéro de version : le nombre de commits du jeu sur GitHub. Il augmente tout seul à chaque mise en ligne.
 // GitHub donne la liste des commits par pages (ici, d'un commit chacune) : le numéro de la dernière page, c'est leur nombre
