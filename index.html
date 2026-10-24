@@ -4305,7 +4305,7 @@ function genererBloc(i, j) {
     for (const [u, w] of [[-10.5, -9], [-9.2, -9], [-10.5, -7.6], [10.5, -9], [10.5, -7.6]]) b.meuble('boisClair', u, 0, w, 1.2, 1.2, 1.2);   // des caisses
     for (const u of [-11, 11]) b.meuble('jaune', u, 0, 2, 0.8, 1.6, 0.8);              // deux gros accumulateurs dorés
     for (const [a, z, l, p] of [[40, 18, 1, 6], [40, 42, 1, 6]]) boite('sacs', X(a), 0.2, Z(z), l, 1.1, p, true);
-    if (cachetteDeLorean('?')) voituresGarees.push({ ...b.point(0, 0, -3), a: Math.PI / 2, type: 'DeLorean' });    // la seule DeLorean du pays, le nez vers la porte
+    if (cachetteDeLorean('?', false)) voituresGarees.push({ ...b.point(0, 0, -3), a: Math.PI / 2, type: 'DeLorean' });    // la seule DeLorean du pays, le nez vers la porte
     // la porte blindée (9 × 4 m), à l'est : fermée, un bouchon de collision. Elle descend dans le sol quand on appuie sur le bouton
     const y = Y0 + 0.25;
     bunkerSecret = { x: X(30), z: Z(30), y, porte: { x: X(31.85), z: Z(30), y, l: 9, h: 4 }, bouchon: ajouterCollision(X(31.6), Z(25.5), X(32.1), Z(34.5), y + 4.1, Y0),
@@ -12311,7 +12311,7 @@ function amenerVoiture(nom) {
   if (!type || J.voiture || J.robot) return;
   const v = garerPres(type);
   if (!v) return;
-  for (const o of voitures) if (o.triche === nom && o !== v) o.supprimer = true;
+  for (const o of voitures) if (o !== v && (o.triche === nom || (nom === 'DeLorean' && o.type.nom === nom))) o.supprimer = true;   // (la DeLorean : celle qui attendait dans sa cachette s'en va aussi)
   v.triche = nom; v.volee = true; bip(300, 900, 0.3, 'sawtooth', 0.08);
   return v;
 }
@@ -12396,9 +12396,13 @@ function majCamera(dt) {
 // =====================================================================
 //  Les chapitres : la partie sauvegardée, l'amende des héros sans reproche, la DeLorean qui voyage d'un chapitre à l'autre
 // =====================================================================
-// la DeLorean de ce chapitre attend-elle encore dans sa cachette (la lettre l de la CARTE) ? Oui, tant qu'on ne l'a pas retrouvée.
-// Ensuite, elle est à lui : elle arrive avec lui dans le chapitre, et la touche T la fait venir
-function cachetteDeLorean(l) { return CHAPITRE.cachette === l && !partie.trouvee[chapitre]; }
+// la DeLorean de ce chapitre attend-elle dans sa cachette (la lettre l de la CARTE) ? Oui, tant qu'on ne l'a pas retrouvée. Ensuite, elle est à
+// lui : elle arrive avec lui dans le chapitre, et la touche T la fait venir. Mais si la mission en cours demande d'aller la chercher (on rejoue
+// le chapitre, ou la page a été rechargée avant de partir), elle y retourne : sinon, la cachette serait vide (cacherDeLorean n'en met une que
+// s'il n'y en a aucune dans le pays). mission = false : pendant la construction du pays, quand les missions ne sont pas encore là
+function cachetteDeLorean(l, mission = true) { return CHAPITRE.cachette === l && (!partie.trouvee[chapitre] || (mission && chercheDeLorean())); }
+// l'étape de mission en cours : monter dans la DeLorean ?
+const chercheDeLorean = () => { const et = MISSIONS_CH[missionIndex]?.etapes[etapeIndex]; return et?.type === 'conduire' && et.voiture === 'DeLorean'; };
 // y a-t-il une DeLorean dans le pays (pas explosée, pas coulée, pas celle qui repart toute seule à l'arrivée) ?
 function deLoreanLa() { return voitures.some(v => v.type.nom === 'DeLorean' && !v.detruite && !v.coule && !v.supprimer && !v.fantome); }
 
