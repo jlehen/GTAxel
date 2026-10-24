@@ -3110,6 +3110,36 @@ for (const pts of ROUTES) for (let q = 1; q < pts.length; q++) {
       if (a.pont && b.pont) HT[k] = Math.min(HT[k], v); else HT[k] = v;
     }
 }
+// Le terrain est fait de triangles de 9,25 m de côté. Un triangle qui touche la chaussée, mais dont un coin est loin d'elle (en haut d'un talus),
+// passait par-dessus le goudron : des morceaux de route disparaissaient sous l'herbe (18 % des routes de Los Santos, 36 % à Malibu, jusqu'à
+// 13 m au-dessus sur les routes de montagne). On abaisse donc les coins de tout ce qui touche la chaussée, juste sous elle
+function sousLaChaussee(x, z, y) { // les trois coins du triangle du terrain qui est en (x, z) : pas plus haut que y
+  const fx = clamp(x / PT, 0, NXT - 1.001), fz = clamp(z / PT, 0, NZT - 1.001), ix = Math.floor(fx), iz = Math.floor(fz), k = iz * NXT + ix;
+  for (const c of fx - ix + fz - iz <= 1 ? [k, k + 1, k + NXT] : [k + NXT + 1, k + NXT, k + 1]) HT[c] = Math.min(HT[c], y);
+}
+// les routes de campagne : tout le ruban de 10 m (voir « ruban », plus bas), 25 cm sous le goudron
+for (const pts of ROUTES) {
+  const normale = q => { const a = pts[Math.max(0, q - 1)], b = pts[Math.min(pts.length - 1, q + 1)], l = Math.hypot(b.x - a.x, b.z - a.z) || 1; return [-(b.z - a.z) / l, (b.x - a.x) / l]; };
+  for (let q = 1; q < pts.length; q++) {
+    const a = pts[q - 1], b = pts[q], na = normale(q - 1), nb = normale(q), n = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.5);
+    if (a.pont && b.pont) continue;   // (un pont passe au-dessus)
+    for (let s = 0; s <= n; s++) for (let l = -5; l <= 5; l += 0.25) {
+      const t = s / n, nx = na[0] + (nb[0] - na[0]) * t, nz = na[1] + (nb[1] - na[1]) * t;
+      sousLaChaussee(a.x + (b.x - a.x) * t + nx * l, a.z + (b.z - a.z) * t + nz * l, a.y + (b.y - a.y) * t - 0.25);
+    }
+  }
+}
+// les rues des villes : les carrés du terrain qui touchent la rue, 5 cm sous elle (comme le terrain sous une ville)
+for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
+  const n = noeud(i, j), y = baseNoeud(i, j) - 0.05;
+  for (const [rue, dx, dz] of [[rueH(i, j), 1, 0], [rueV(i, j), 0, 1]]) {
+    if (!rue) continue;
+    const x1 = n.x - R / 2, z1 = n.z - R / 2, x2 = n.x + R / 2 + dx * PAS, z2 = n.z + R / 2 + dz * PAS;
+    for (let iz = Math.max(0, Math.floor(z1 / PT)); iz <= Math.min(NZT - 2, Math.floor(z2 / PT)); iz++)
+      for (let ix = Math.max(0, Math.floor(x1 / PT)); ix <= Math.min(NXT - 2, Math.floor(x2 / PT)); ix++)
+        for (const k of [iz * NXT + ix, iz * NXT + ix + 1, (iz + 1) * NXT + ix, (iz + 1) * NXT + ix + 1]) HT[k] = Math.min(HT[k], y);
+  }
+}
 
 // les pistes de cascades (tableau CASCADES) : chaque morceau est un ruban de goudron, qui suit une ligne de points.
 // Un point : sa position p, et trois directions : t vers l'avant, n vers le haut de la piste, l vers sa gauche.
@@ -4795,11 +4825,14 @@ for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
 }
 // les routes de campagne : un ruban de 10 m qui suit la route. Sur l'eau, c'est un pont, avec ses piliers
 {
-  const ruban = (pts, larg, dy, mat, bas = 0) => { // un ruban horizontal (ou ses deux flancs si bas > 0), le long des points
-    const pos = [], uv = [], idx = [];
+  // un ruban horizontal (ou ses deux flancs si bas > 0), le long des points de la route, du numéro de à jusqua. Chaque point prend sa direction
+  // d'après ses voisins sur toute la route : deux tronçons qui se suivent se raccordent sans fente (avant, dans un virage, il en restait une
+  // en biais, où l'on voyait l'herbe)
+  const ruban = (route, de, jusqua, larg, dy, mat, bas = 0) => {
+    const pts = route.slice(de, jusqua + 1), pos = [], uv = [], idx = [];
     let long = 0;
     pts.forEach((p, k) => {
-      const a = pts[Math.max(0, k - 1)], b = pts[Math.min(pts.length - 1, k + 1)], l = Math.hypot(b.x - a.x, b.z - a.z) || 1, nx = -(b.z - a.z) / l, nz = (b.x - a.x) / l;
+      const a = route[Math.max(0, de + k - 1)], b = route[Math.min(route.length - 1, de + k + 1)], l = Math.hypot(b.x - a.x, b.z - a.z) || 1, nx = -(b.z - a.z) / l, nz = (b.x - a.x) / l;
       if (k) long += Math.hypot(p.x - pts[k - 1].x, p.z - pts[k - 1].z);
       if (!bas) { pos.push(p.x + nx * larg, p.y + dy, p.z + nz * larg, p.x - nx * larg, p.y + dy, p.z - nz * larg); uv.push(1, long / 12, 0, long / 12); }
       else for (const s of [1, -1]) pos.push(p.x + s * nx * larg, p.y + dy, p.z + s * nz * larg, p.x + s * nx * larg, p.y + dy - bas, p.z + s * nz * larg), uv.push(long / 4, 1, long / 4, 0);
@@ -4817,15 +4850,15 @@ for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
   };
   for (const pts of ROUTES) {
     // la route, coupée en tronçons (pour les ranger dans les bons morceaux)
-    for (let k = 0; k < pts.length - 1; k += 12) ruban(pts.slice(k, k + 13), 5, 0.02, 'routeCampagne');
+    for (let k = 0; k < pts.length - 1; k += 12) ruban(pts, k, k + 12, 5, 0.02, 'routeCampagne');
     // les ponts : les parties au-dessus de l'eau
     let debut = -1;
     for (let k = 0; k <= pts.length; k++) {
       const surPont = k < pts.length && pts[k].pont;
       if (surPont && debut < 0) debut = Math.max(0, k - 1);
       if (!surPont && debut >= 0) {
-        const p = pts.slice(debut, Math.min(pts.length, k + 1));
-        ruban(p, 5.2, 0, 'beton2', 1.2); ruban(p, 5.1, 1, 'rambarde', 0.12); ruban(p, 5.1, 0.6, 'rambarde', 0.1);
+        const fin = Math.min(pts.length - 1, k), p = pts.slice(debut, fin + 1);
+        ruban(pts, debut, fin, 5.2, 0, 'beton2', 1.2); ruban(pts, debut, fin, 5.1, 1, 'rambarde', 0.12); ruban(pts, debut, fin, 5.1, 0.6, 'rambarde', 0.1);
         p.forEach((q, n) => { const t = hauteurTerrain(q.x, q.z); if (n % 3 === 1 && t < q.y - 3) {
           ajouterGeo('beton2', new THREE.CylinderGeometry(0.8, 0.9, q.y - 1.2 - t, 10).translate(q.x, (q.y - 1.2 + t) / 2, q.z));
           ajouterCollision(q.x - 0.8, q.z - 0.8, q.x + 0.8, q.z + 0.8, q.y - 1.3, t - 5); } });
@@ -5380,23 +5413,72 @@ function majMorceaux() {
 // =====================================================================
 //  Collisions, sol et ligne de vue
 // =====================================================================
-function resoudre(o, r, haut = 1.7) { // pousse un cercle (o.x, o.z, rayon r, haut de « haut » mètres) hors des bâtiments ; renvoie true si choc
+// pousse un cercle (o.x, o.z, rayon r, haut de « haut » mètres) hors des bâtiments ; renvoie true si choc.
+// depuis : où il était avant de bouger ({ x, z }). Alors, on refait son chemin par petits bouts (un demi-rayon au plus) : d'un grand pas
+// (en courant sur un ordinateur lent, en volant), il sauterait par-dessus un mur fin (une cloison fait 12 cm), ou s'arrêterait au milieu
+// et ressortirait de l'autre côté. Un bout qui le ferait passer à travers une boîte (coincé entre un meuble et un mur, qui le poussent
+// chacun vers l'autre), il ne le fait pas : il reste où il était
+function resoudre(o, r, haut = 1.7, depuis = null) {
   const y = o.y ?? hauteurSol(o.x, o.z);
   let choc = false;
-  pourBoites(o.x - r, o.z - r, o.x + r, o.z + r, b => {
-    if (b.h <= y + PASMAX || b.y0 >= y + haut) return;   // une marche qu'on monte, ou quelque chose au-dessus de la tête
-    const px = clamp(o.x, b.x1, b.x2), pz = clamp(o.z, b.z1, b.z2);
-    const dx = o.x - px, dz = o.z - pz, d2 = dx * dx + dz * dz;
-    if (d2 >= r * r) return;
-    choc = true;
-    if (d2 > 1e-8) { const d = Math.sqrt(d2); o.x = px + dx / d * r; o.z = pz + dz / d * r; }
-    else {
-      const m = Math.min(o.x - b.x1, b.x2 - o.x, o.z - b.z1, b.z2 - o.z);
-      if (m === o.x - b.x1) o.x = b.x1 - r; else if (m === b.x2 - o.x) o.x = b.x2 + r; else if (m === o.z - b.z1) o.z = b.z1 - r; else o.z = b.z2 + r;
+  if (!depuis) choc = pousserHors(o, r, y, haut);
+  else {
+    const dx = o.x - depuis.x, dz = o.z - depuis.z, n = Math.min(60, Math.ceil(Math.hypot(dx, dz) / (r / 2)) || 1);
+    o.x = depuis.x; o.z = depuis.z;
+    for (let k = 0; k < n; k++) {
+      const ax = o.x, az = o.z;
+      o.x += dx / n; o.z += dz / n;
+      if (!pousserHors(o, r, y, haut)) continue;   // (rien ne l'a poussé : un si petit bout ne traverse rien)
+      choc = true;
+      if (entreDansUneBoite(ax, az, o.x, o.z, y, haut)) { o.x = ax; o.z = az; break; }
     }
-  });
+  }
   o.x = clamp(o.x, -30, TAILLE_X + 30); o.z = clamp(o.z, -30, TAILLE_Z + 30);
   return choc;
+}
+// une boîte qui gêne quelqu'un dont les pieds sont en y, haut de « haut » : pas une marche qu'on monte, ni quelque chose au-dessus de la tête
+const gene = (b, y, haut) => b.h > y + PASMAX && b.y0 < y + haut;
+// une boîte qui commence plus haut que sa taille, et dont le cercle est dessous : un plafond (le plancher du dessus, le haut d'une porte).
+// Elle ne le pousse pas de côté : sinon, la tête dans le plafond (en sautant d'un lit, en volant), il était poussé vers son bord le plus
+// proche, souvent de l'autre côté du mur (dehors). C'est sa tête qui s'y cogne (voir plafondAu)
+const plafond = (b, x, z, y, haut) => b.y0 > y + haut / 2 && x > b.x1 && x < b.x2 && z > b.z1 && z < b.z2;
+// le pousse hors de chaque boîte qu'il touche ; en sortir peut le faire entrer dans une autre : on recommence, trois fois au plus
+function pousserHors(o, r, y, haut) {
+  let choc = false;
+  for (let passe = 0; passe < 3; passe++) {
+    let bouge = false;
+    pourBoites(o.x - r, o.z - r, o.x + r, o.z + r, b => {
+      if (!gene(b, y, haut) || plafond(b, o.x, o.z, y, haut)) return;
+      const px = clamp(o.x, b.x1, b.x2), pz = clamp(o.z, b.z1, b.z2);
+      const dx = o.x - px, dz = o.z - pz, d2 = dx * dx + dz * dz;
+      if (d2 >= r * r - 1e-6) return;
+      bouge = true;
+      if (d2 > 1e-8) { const d = Math.sqrt(d2); o.x = px + dx / d * r; o.z = pz + dz / d * r; }
+      else { // son milieu est dedans (il vient d'apparaître là) : on le sort par le côté le plus proche
+        const m = Math.min(o.x - b.x1, b.x2 - o.x, o.z - b.z1, b.z2 - o.z);
+        if (m === o.x - b.x1) o.x = b.x1 - r; else if (m === b.x2 - o.x) o.x = b.x2 + r; else if (m === o.z - b.z1) o.z = b.z1 - r; else o.z = b.z2 + r;
+      }
+    });
+    if (!bouge) break;
+    choc = true;
+  }
+  return choc;
+}
+// le chemin tout droit de (ax, az) à (bx, bz) entre-t-il dans une boîte qui gêne (voir gene) ? Pas une boîte où il est déjà (il en sort)
+function entreDansUneBoite(ax, az, bx, bz, y, haut) {
+  let entre = false;
+  pourBoites(Math.min(ax, bx), Math.min(az, bz), Math.max(ax, bx), Math.max(az, bz), b => {
+    if (entre || !gene(b, y, haut) || plafond(b, bx, bz, y, haut)) return;
+    const [t1, t2] = traversee([ax, 0, az], [bx - ax, 0, bz - az], [b.x1, -1, b.z1], [b.x2, 1, b.z2]);
+    if (t1 >= 0 && t1 < 1 && t1 < t2) entre = true;
+  });
+  return entre;
+}
+// le plafond au-dessus de (x, z), pour quelqu'un dont les pieds sont en y : le bas de la boîte la plus basse qui commence au-dessus de ses genoux
+function plafondAu(x, z, y) {
+  let p = Infinity;
+  pourBoites(x, z, x, z, b => { if (x > b.x1 && x < b.x2 && z > b.z1 && z < b.z2 && b.h > b.y0 && b.y0 > y + PASMAX && b.y0 < p) p = b.y0; });
+  return p;
 }
 // la boîte de collision où est le point (x, y, z), ou null
 function boiteEn(x, y, z) {
@@ -7489,6 +7571,7 @@ function coin(i, j, k) { const o = origine(i, j); return { x: o.x + (k === 1 || 
 function initChemin(p) {
   const [i, j] = blocEn(p.x, p.z);
   p.bloc = [i, j]; p.sens = Math.random() < 0.5 ? 1 : 3;
+  p.chemin = null; p.perdu = false; p.verifier = true;   // (voit-il le coin où il va ? sinon, il cherchera son chemin : voir marcher)
   p.coin = [0, 1, 2, 3].reduce((m, k) => dist(coin(i, j, k), p) < dist(coin(i, j, m), p) ? k : m, 0);
 }
 function coinSuivant(p) {
@@ -10517,30 +10600,34 @@ function majJoueur(dt) {
     if (J.mur) { J.mur.y0 = J.y; J.mur.espace = touches.Space; J.lance = null; }   // (y0 : la hauteur où il s'est collé ; espace : la touche du saut est-elle déjà enfoncée ?)
   }
   if (J.mur) { escalader(dt, av, lat); return; }
+  const avant = { x: J.x, z: J.z }, taille = tailleIronman();   // d'où il part (voir resoudre) ; sa taille (la Hulkbuster est plus grande, et plus large)
   if (L) { L.vx += mx * 6 * dt; L.vz += mz * 6 * dt; J.x += L.vx * dt; J.z += L.vz * dt; }
   else if (n > 0) { J.x += mx * v * dt; J.z += mz * v * dt; }
   const vx = L ? L.vx : n > 0 ? mx * v : 0, vz = L ? L.vz : n > 0 ? mz * v : 0;   // sa vitesse à l'horizontale
   J.vitesse = L ? Math.hypot(vx, vz) : n > 0 ? v : 0; J.pasX = vx; J.pasZ = vz;
+  // on ne traverse pas les voitures, ni le robot, ni l'armure vide d'Iron Man : ils le poussent. Les murs passent après (une voiture garée
+  // contre un mur ne le pousse pas à travers), et le sol après les murs (le sol d'où les murs l'ont laissé, pas d'où il voulait aller)
+  for (const o of voitures) for (const lz of o.cercles) {
+    if (Math.abs(o.y - J.y) > 1.5) continue;
+    const c = local(o, 0, lz), d = dist(c, J), r = o.rayon + 0.35;
+    if (d < r && d > 0) { J.x = c.x + (J.x - c.x) / d * r; J.z = c.z + (J.z - c.z) / d * r; }
+  }
+  for (const o of robots) { const d = dist(o, J), r = 1.6; if (d < r && d > 0 && Math.abs(o.y - J.y) < 4) { J.x = o.x + (J.x - o.x) / d * r; J.z = o.z + (J.z - o.z) / d * r; } }
+  const vide = J.ironman?.vide;
+  if (vide && Math.abs(vide.y - J.y) < 2) { const d = dist(vide, J), r = 0.72 * vide.h.g.scale.x; if (d < r && d > 0) { J.x = vide.x + (J.x - vide.x) / d * r; J.z = vide.z + (J.z - vide.z) / d * r; } }
+  if (resoudre(J, 0.35 * taille, 1.7 * taille, avant) && L) { L.vx *= 0.3; L.vz *= 0.3; }   // (lancé contre un mur : son élan s'arrête presque)
   // en nageant, on peut remonter sur un ponton ou une plage (une marche plus haute)
   const hs = hauteurSol(J.x, J.z, J.y + (J.nage ? 1.3 : 0)), surface = EAU - 1.25;
   if (J.sol && touches.Space && !J.nage && libre) { J.vy = R_.forceSaut; J.sol = false; J.saute = true; J.accroupi = false; }
   J.vy -= R_.gravite * dt; J.y += J.vy * dt;
+  if (J.vy > 0) { const p = plafondAu(J.x, J.z, J.y - J.vy * dt); if (J.y + 1.7 * taille > p) { J.y = p - 1.7 * taille; J.vy = 0; } }   // en sautant, sa tête se cogne au plafond
   if (hs < EAU - 1.3 && J.y <= surface + 0.01) { J.y = surface; J.vy = 0; J.nage = true; J.sol = false; }   // trop profond pour avoir pied : on nage (sans se faire mal)
   else {
     J.nage = false;
     if (J.y <= hs) { const tombe = !J.sol; J.y = hs; if (!tombe || !retomber(-J.vy, vx, vz)) { J.vy = 0; J.sol = true; } }   // (s'il casse le toit, il tombe encore : voir retomber)
     else if (J.y > hs + 0.05) J.sol = false;   // il quitte le sol : un saut, une marche qui descend, le bord d'un toit
   }
-  if (resoudre(J, 0.35) && L) { L.vx *= 0.3; L.vz *= 0.3; }   // (lancé contre un mur : son élan s'arrête presque)
-  for (const o of voitures) for (const lz of o.cercles) { // on ne traverse pas les voitures
-    if (Math.abs(o.y - J.y) > 1.5) continue;
-    const c = local(o, 0, lz), d = dist(c, J), r = o.rayon + 0.35;
-    if (d < r && d > 0) { J.x = c.x + (J.x - c.x) / d * r; J.z = c.z + (J.z - c.z) / d * r; }
-  }
-  for (const o of robots) { const d = dist(o, J), r = 1.6; if (d < r && d > 0 && Math.abs(o.y - J.y) < 4) { J.x = o.x + (J.x - o.x) / d * r; J.z = o.z + (J.z - o.z) / d * r; } }   // ni à travers le robot
-  const vide = J.ironman?.vide;   // ni à travers l'armure vide d'Iron Man
-  if (vide && Math.abs(vide.y - J.y) < 2) { const d = dist(vide, J), r = 0.72 * vide.h.g.scale.x; if (d < r && d > 0) { J.x = vide.x + (J.x - vide.x) / d * r; J.z = vide.z + (J.z - vide.z) / d * r; } }
-  // on bouscule les passants : en marchant, on les pousse et ils vacillent ; en courant, on les renverse (pas le Kommandant ni Hitler)
+  // on bouscule les passants : en marchant, on les pousse et ils vacillent (pas contre un mur) ; en courant, on les renverse (pas le Kommandant ni Hitler)
   for (const p of personnes) {
     if (p.vie <= 0 || p.vol || p.releve !== undefined || p.h.chien || Math.abs(p.y - J.y) > (p.lourd ? 4 : 1)) continue;
     const d = dist(p, J), r = p.lourd ? 0.4 * p.h.g.scale.x : 0.65;   // (Iron Monger, bien plus gros : on ne le bouscule pas, on bute dessus)
@@ -10548,7 +10635,7 @@ function majJoueur(dt) {
     const dx = (p.x - J.x) / d, dz = (p.z - J.z) / d;
     if (p.lourd) { J.x = p.x - dx * r; J.z = p.z - dz * r; continue; }
     if (J.vitesse > 6 && p.type !== 'boss' && p.type !== 'hitler') { blesser(p, 0); projeter(p, dx * 3.5, 2.5, dz * 3.5, -5); bruit(0.25, 300, 0.12); }
-    else { p.x = J.x + dx * 0.65; p.z = J.z + dz * 0.65; p.touche = 0.3; }
+    else { const ap = { x: p.x, z: p.z }; p.x = J.x + dx * 0.65; p.z = J.z + dz * 0.65; resoudre(p, 0.35, 1.7, ap); p.touche = 0.3; }
   }
   // orientation du corps : celle de la danse, sinon vers la caméra avec une arme à feu, sinon vers où on marche
   const danse = J.danse ? pasDeDanse(dt) : null, biceps = J.biceps ? majBiceps(dt) : 0;
@@ -10815,8 +10902,9 @@ function chuter(r, v, sol, dt) {
 function rouler(dt) {
   const r = J.roule, v = Math.hypot(r.vx, r.vz), frotte = r.chute && !r.touche ? 0 : 12, f = v > 0 ? Math.max(0, v - frotte * dt) / v : 0;   // ça frotte : il perd 12 m/s chaque seconde (pas avant d'avoir touché le sol, dans une chute)
   r.vx *= f; r.vz *= f;
+  const avant = { x: J.x, z: J.z };
   J.x += r.vx * dt; J.z += r.vz * dt;
-  if (resoudre(J, 0.35)) { r.vx *= 0.2; r.vz *= 0.2; }   // contre un mur, il s'arrête presque
+  if (resoudre(J, 0.35, 1.7, avant)) { r.vx *= 0.2; r.vz *= 0.2; }   // contre un mur, il s'arrête presque
   // pente : à quelle vitesse le sol monte ou descend sous lui (m/s). Une pente ou une marche, pas le bord d'un toit ou d'un pont : là, il tombe
   const hs = hauteurSol(J.x, J.z, J.y), marche = 0.25 + 1.7 * v * dt, dh = hs - (r.hs ?? hs), pente = r.pente = Math.abs(dh) <= marche ? dh / dt : 0;
   r.hs = hs;
@@ -10896,8 +10984,9 @@ function superman(dt) {
     const v = Math.min(R_.vitesseVolMax, R_.vitesseVol + f.crans * R_.vitesseVolMaj) * volIronman() / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
     f.vx += (dx * v - f.vx) * k; J.vy += (dy * v - J.vy) * k; f.vz += (dz * v - f.vz) * k;
   }
+  const avant = { x: J.x, z: J.z }, taille = tailleIronman();
   J.x += f.vx * dt; J.y += J.vy * dt; J.z += f.vz * dt;
-  resoudre(J, 0.35);
+  resoudre(J, 0.35 * taille, 1.7 * taille, avant);
   const hs = hauteurSol(J.x, J.z, J.y), sol = hs < EAU - 1.3 ? EAU - 1.25 : hs;   // au-dessus de l'eau profonde, il se pose sur l'eau (et nage)
   if (J.y <= sol) {
     J.y = sol;
@@ -11016,9 +11105,10 @@ function balancer(dt) {
   }
   const v = Math.hypot(b.vx, J.vy, b.vz), frein = Math.min(1, R_.vitesseBalance / (v || 1));
   b.vx *= frein; J.vy *= frein; b.vz *= frein;
+  const avant = { x: J.x, z: J.z };
   J.x += b.vx * dt; J.y += J.vy * dt; J.z += b.vz * dt;
   const bx = J.x, bz = J.z;
-  if (resoudre(J, 0.35)) { // un mur : il ne garde que sa vitesse le long du mur
+  if (resoudre(J, 0.35, 1.7, avant)) { // un mur : il ne garde que sa vitesse le long du mur
     const nx = J.x - bx, nz = J.z - bz, n = Math.hypot(nx, nz);
     if (n > 1e-6) { const vn = (b.vx * nx + b.vz * nz) / n; if (vn < 0) { b.vx -= vn * nx / n; b.vz -= vn * nz / n; } }
   }
@@ -11122,8 +11212,9 @@ function planer(dt) {
   const pique = clamp((-J.tangage - 0.35) / 0.6, 0, 1), v = R_.vitesseCape * (1 + 0.8 * pique), chute = lerp(R_.chuteCape, 12, pique), k = Math.min(1, 2 * dt);
   q.vx += (Math.sin(J.lacet) * v - q.vx) * k; q.vz += (Math.cos(J.lacet) * v - q.vz) * k;
   J.vy += (-chute - J.vy) * Math.min(1, 4 * dt);
+  const depart = { x: J.x, z: J.z };
   J.x += q.vx * dt; J.y += J.vy * dt; J.z += q.vz * dt;
-  if (resoudre(J, 0.35)) { q.vx *= 0.3; q.vz *= 0.3; }   // contre un mur : il n'avance presque plus
+  if (resoudre(J, 0.35, 1.7, depart)) { q.vx *= 0.3; q.vz *= 0.3; }   // contre un mur : il n'avance presque plus
   const hs = hauteurSol(J.x, J.z, J.y);
   if (hs < EAU - 1.3 && J.y <= EAU - 1.25) { J.plane = null; J.y = EAU - 1.25; J.vy = 0; J.nage = true; return false; }   // à l'eau : il nage
   if (J.y <= hs) { J.y = hs; J.atterri = Math.min(1, 0.3 - J.vy / 14); J.vy = 0; J.sol = true; J.saute = false; J.plane = null; return false; }   // il se pose, en douceur
@@ -11816,14 +11907,17 @@ function majPersonne(p, dt) {
       }
     } else if (p.rodeur) vitesse = marcher(p, dt);   // un membre de gang qui se promène, la nuit, tant qu'on ne le provoque pas
   } else if (p.peur > 0) {
-    if (Math.random() < dt * 2) p.angle = angleVers(J, p) + entre(-0.6, 0.6);
+    // il court loin de B.J., en changeant un peu de direction ; contre un mur, il repart du côté où l'on passe (voir fuite), et garde ce cap 1 s
+    p.esquive = Math.max(0, (p.esquive || 0) - dt);
+    if (p.coince > 0.25) { const a = fuite(p); if (a !== null) { p.angle = a; p.esquive = 1; } p.coince = 0; }
+    else if (!p.esquive && Math.random() < dt * 2) p.angle = angleVers(J, p) + entre(-0.6, 0.6);
     vitesse = 5;
     if (p.peur - dt <= 0) initChemin(p);
   } else if (p.bloc) vitesse = marcher(p, dt);
   if (vitesse) {
     const ax = p.x, az = p.z;
     p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt;
-    resoudre(p, 0.35);
+    resoudre(p, 0.35, 1.7, { x: ax, z: az });
     if (p.zone) { p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]); }
     const y = hauteurSol(p.x, p.z, p.y);
     if (EAU - y > 0.9) { p.x = ax; p.z = az; p.angle += Math.PI * 0.5; }   // personne d'autre que B.J. ne va dans l'eau profonde
@@ -11850,24 +11944,114 @@ function marcher(p, dt) {
     return d > 3 ? 3 : 1.4;
   }
   if (p.rodeur) { const t = p.trace ||= []; if (!t.length || dist(t.at(-1), p) > 0.4) { t.push({ x: p.x, z: p.z }); if (t.length > 4) t.shift(); } }
-  // bloqué contre un meuble ou un mur depuis 1 s (p.coince : voir majPersonne) : il le contourne, de côté, pendant 0,8 s
-  if (p.coince > 1) { p.contour = 0.8; p.sensContour = Math.random() < 0.5 ? 1 : -1; p.coince = 0; }
-  p.contour = Math.max(0, (p.contour || 0) - dt);
-  const cap = c => angleVers(p, c) + (p.contour > 0 ? p.sensContour * Math.PI / 2 : 0);
-  // dans un bâtiment (il y a suivi B.J. pendant une poursuite, ou s'y est enfui) : il en sort par la porte, puis reprend son chemin. À l'étage,
-  // il ne sait pas descendre l'escalier : il attend (et s'en va quand on ne le voit plus : voir peupler)
+  if (p.perdu) return 0;   // enfermé, sans chemin pour sortir : il attend (et s'en va quand on ne le voit plus : voir peupler)
+  // là où il va (c) : le prochain coin de son pâté ; dans un bâtiment (il y a suivi B.J. pendant une poursuite, ou s'y est enfui), la porte,
+  // puis il reprend son chemin. À l'étage, il ne sait pas descendre l'escalier : il attend (et s'en va quand on ne le voit plus : voir peupler)
   if ((p.tDedans = (p.tDedans ?? 0) - dt) <= 0) { p.tDedans = 0.5; const d = interieurDe(p); if (p.dedans && !d) { p.versPorte = false; initChemin(p); } p.dedans = d; }
+  let c;
   if (p.dedans) {
     const d = p.dedans;
     if (p.y > d.y1 + 1.5) return 0;
     if (dist(p, d.porte.dedans) < 0.8) p.versPorte = true;
-    p.angle = lerpAngle(p.angle, cap(p.versPorte ? d.porte.dehors : d.porte.dedans), 6 * dt);
-    return 1.4;
+    c = p.versPorte ? d.porte.dehors : d.porte.dedans;
+  } else {
+    c = coin(p.bloc[0], p.bloc[1], p.coin);
+    if (dist(p, c) < 0.8) { coinSuivant(p); c = coin(p.bloc[0], p.bloc[1], p.coin); }
   }
-  let c = coin(p.bloc[0], p.bloc[1], p.coin);
-  if (dist(p, c) < 0.8) { coinSuivant(p); c = coin(p.bloc[0], p.bloc[1], p.coin); }
-  p.angle = lerpAngle(p.angle, cap(c), 6 * dt);
+  if (p.chemin && (p.chemin.but.x !== c.x || p.chemin.but.z !== c.z)) p.chemin = null;   // il va ailleurs : son chemin ne sert plus
+  // bloqué contre un mur ou un meuble depuis 1 s (p.coince : voir majPersonne), ou il repart (après avoir eu peur) sans voir où il va
+  // (un immeuble entre les deux) : il cherche son chemin (voir cheminVers). Il n'y en a pas : il est enfermé
+  const yeux = p.y + 1;
+  if (p.coince > 1 || (p.verifier && butee({ x: p.x, y: yeux, z: p.z }, { x: c.x, y: yeux, z: c.z }) < 1)) {
+    const ch = cheminVers(p, c);
+    if (ch === null) { p.perdu = true; return 0; }
+    if (ch) { p.chemin = { but: { x: c.x, z: c.z }, points: ch }; p.coince = 0; p.verifier = false; }   // (undefined : on cherchera à la prochaine image)
+  } else p.verifier = false;
+  // il suit son chemin, de tournant en tournant, jusqu'à là où il va
+  if (p.chemin && dist(p, p.chemin.points[0]) < 0.6) { p.chemin.points.shift(); if (!p.chemin.points.length) p.chemin = null; }
+  p.angle = lerpAngle(p.angle, angleVers(p, p.chemin ? p.chemin.points[0] : c), 6 * dt);
   return 1.4;
+}
+// Un passant qui s'enfuit bute contre un mur : vers où courir ? Parmi 12 directions, celles où il peut faire 2 m, la plus loin de B.J.
+// (null s'il est coincé de tous les côtés)
+function fuite(p) {
+  let mieux = null, loin = -1;
+  for (let k = 0; k < 12; k++) {
+    const a = k * Math.PI / 6, o = { x: p.x + Math.sin(a) * 2, y: p.y, z: p.z + Math.cos(a) * 2 };
+    resoudre(o, 0.35, 1.7, p);
+    if (dist(o, p) < 1.5) continue;   // un mur tout près de ce côté-là
+    const d = dist(o, J);
+    if (d > loin) { loin = d; mieux = a; }
+  }
+  return mieux;
+}
+// Un passant qui ne peut pas aller tout droit là où il va (but) cherche son chemin, comme les militaires du camp (voir champCamp) : autour de
+// lui et de son but, le sol est découpé en cases de 40 cm, libres ou prises par un mur ou un meuble ; on compte de proche en proche, depuis
+// lui, jusqu'à son but, en contournant ce qui gêne ; puis on ne garde que les tournants : il va tout droit de l'un à l'autre.
+// Renvoie la liste des points où passer ; null s'il n'y a pas de chemin (il est enfermé) ; undefined si on a déjà cherché deux chemins à
+// cette image (chercher prend du temps : il attendra la suivante)
+const CASE_CHEMIN = 0.4, MARGE_CHEMIN = 12;
+let cherches = { t: -1, n: 0 }, casesChemin = null;
+function cheminVers(p, but) {
+  if (cherches.t !== temps) cherches = { t: temps, n: 0 };
+  if (cherches.n++ >= 2) return undefined;
+  const C = CASE_CHEMIN, x1 = Math.min(p.x, but.x) - MARGE_CHEMIN, z1 = Math.min(p.z, but.z) - MARGE_CHEMIN;
+  const n = Math.ceil((Math.max(p.x, but.x) + MARGE_CHEMIN - x1) / C), m = Math.ceil((Math.max(p.z, but.z) + MARGE_CHEMIN - z1) / C);
+  if (n * m > 100000) return null;   // trop loin (plus de 100 m) : on ne cherche pas
+  if (!casesChemin) casesChemin = { libre: new Uint8Array(100000), venu: new Int32Array(100000), file: new Int32Array(100000) };
+  const { libre, venu, file } = casesChemin, e = 0.25;   // (e : on grossit les murs de 25 cm : c'est presque la largeur d'un passant)
+  libre.fill(1, 0, n * m); venu.fill(-1, 0, n * m);
+  pourBoites(x1, z1, x1 + n * C, z1 + m * C, b => {
+    if (!gene(b, p.y, 1.7)) return;
+    const i1 = Math.max(0, Math.ceil((b.x1 - e - x1) / C - 0.5)), i2 = Math.min(n - 1, Math.floor((b.x2 + e - x1) / C - 0.5));
+    const k1 = Math.max(0, Math.ceil((b.z1 - e - z1) / C - 0.5)), k2 = Math.min(m - 1, Math.floor((b.z2 + e - z1) / C - 0.5));
+    if (i2 >= i1) for (let k = k1; k <= k2; k++) libre.fill(0, k * n + i1, k * n + i2 + 1);
+  });
+  // la case libre la plus proche du point q (à 3 cases au plus), ou -1
+  const caseLibre = q => {
+    const i0 = Math.floor((q.x - x1) / C), k0 = Math.floor((q.z - z1) / C);
+    let mieux = -1, dm = Infinity;
+    for (let dk = -3; dk <= 3; dk++) for (let di = -3; di <= 3; di++) {
+      const i = i0 + di, k = k0 + dk;
+      if (i >= 0 && k >= 0 && i < n && k < m && libre[k * n + i] && di * di + dk * dk < dm) { dm = di * di + dk * dk; mieux = k * n + i; }
+    }
+    return mieux;
+  };
+  const a = caseLibre(p), z = caseLibre(but);
+  if (a < 0 || z < 0) return null;
+  let lu = 0, ecrit = 0;
+  file[ecrit++] = a; venu[a] = a;
+  while (lu < ecrit && venu[z] < 0) {
+    const c = file[lu++], i = c % n, k = (c - i) / n;
+    for (const [di, dk] of V8) {
+      const ii = i + di, kk = k + dk, v = kk * n + ii;
+      if (ii < 0 || kk < 0 || ii >= n || kk >= m || venu[v] >= 0 || !libre[v]) continue;
+      if (di && dk && !(libre[k * n + ii] && libre[kk * n + i])) continue;   // en diagonale : pas au coin d'un mur
+      venu[v] = c; file[ecrit++] = v;
+    }
+  }
+  if (venu[z] < 0) return null;
+  const cases = [];
+  for (let c = z; c !== a; c = venu[c]) cases.push(c);
+  cases.push(a); cases.reverse();
+  const point = c => ({ x: x1 + (c % n + 0.5) * C, z: z1 + (Math.floor(c / n) + 0.5) * C });
+  // de la case c1, voit-on la case c2 en ligne droite (sans passer sur une case prise) ?
+  const voit = (c1, c2) => {
+    const A = point(c1), B = point(c2), pas = Math.ceil(dist(A, B) / (C / 2));
+    for (let s = 1; s < pas; s++) {
+      const i = Math.floor((A.x + (B.x - A.x) * s / pas - x1) / C), k = Math.floor((A.z + (B.z - A.z) * s / pas - z1) / C);
+      if (!libre[k * n + i]) return false;
+    }
+    return true;
+  };
+  const points = [];
+  for (let i = 0; i < cases.length - 1;) {
+    let j = i + 1;
+    while (j + 1 < cases.length && voit(cases[i], cases[j + 1])) j++;
+    points.push(point(cases[j])); i = j;
+  }
+  points.push({ x: but.x, z: but.z });
+  return points;
 }
 // un personnage projeté (renversé par une voiture, soufflé par une explosion, bousculé par B.J. qui court) : (vx, vy, vz) sa vitesse,
 // w : combien il tourne (radians par seconde ; plus de 0 : la tête part vers ce qui l'a poussé, comme quand une voiture fauche les jambes)
@@ -11882,8 +12066,9 @@ function projeter(p, vx, vy, vz, w) {
 function majVol(p, dt) {
   const v = p.vol, H = 0.95 * p.h.g.scale.y;
   v.vy -= R_.gravite * dt;
+  const avant = { x: p.x, z: p.z };
   p.x += v.vx * dt; p.z += v.vz * dt; v.y += v.vy * dt;
-  if (resoudre(p, 0.3)) { v.vx *= -0.2; v.vz *= -0.2; }   // contre un mur : il rebondit à peine
+  if (resoudre(p, 0.3, 1.7, avant)) { v.vx *= -0.2; v.vz *= -0.2; }   // contre un mur : il rebondit à peine
   // couché, son bassin est à 15 cm du sol ; debout (ou sur la tête), à 95 cm
   const sol = hauteurSol(p.x, p.z, v.y - 0.15), bas = sol + 0.15 + (H - 0.15) * Math.abs(Math.cos(v.a) * Math.cos(v.r));
   p.y = sol;
@@ -11966,8 +12151,9 @@ function majChien(p, dt, d) {
     if ((p.tAboie = (p.tAboie ?? entre(0.3, 1)) - dt) <= 0) { p.tAboie = entre(0.6, 1.4); aboyer(p); }
   }
   if (vitesse) {
+    const avant = { x: p.x, z: p.z };
     p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt;
-    resoudre(p, 0.3);
+    resoudre(p, 0.3, 1.7, avant);
     p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]);
     p.y = hauteurSol(p.x, p.z, p.y);
   }
@@ -12354,8 +12540,9 @@ function peupler(dt) {
   for (const p of personnes) if ((p.type === 'pieton' || p.rodeur) && (dist(p, J) > 200 || (dist(p, J) > 60 && derriere(p)))) p.supprimer = true;
   for (const p of personnes) if (p.rodeur && !estNuit() && !p.alerte && dist(p, J) > 80) p.supprimer = true;   // au lever du jour, les gangs rentrent chez eux
   // la police semée, les policiers venus en renfort s'en vont, dès qu'on ne les voit plus ; de même, un passant qui attend à l'étage d'un bâtiment
-  // (il ne sait pas descendre l'escalier : voir marcher)
+  // (il ne sait pas descendre l'escalier : voir marcher), ou enfermé, sans chemin pour sortir (voir cheminVers)
   for (const p of personnes) if (p.vie > 0 && horsDeVue(p) && ((p.type === 'flic' && p.renfort && etoiles === 0)
+    || (p.perdu && (p.type === 'pieton' || p.rodeur))
     || (p.dedans && p.y > p.dedans.y1 + 1.5 && (p.type === 'pieton' || p.rodeur || (p.type === 'flic' && etoiles === 0))))) p.supprimer = true;
   // un gang dont des membres sont tombés revient au complet quand B.J. est loin (à plus de 250 m) ; de même quand la nuit tombe (ils sont
   // plus nombreux) ou que le jour se lève
