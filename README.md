@@ -40,7 +40,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | **Langue** | **Français**, **Deutsch**, **English** ou **Züritüütsch**. Même les enseignes des magasins changent de langue. |
 | **Personnage** | **B.J.**, le garçon tout en muscles, ou sa fille **Jess**, en jupe et talons hauts. Le menu te le montre de face. |
 | **Cheveux** | Blonds, châtains, bruns, noirs, roux, roses, bleus ou verts. |
-| **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. |
+| **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. Pour voir ce que ça change, appuie sur **P** pendant le jeu : le compteur de performances te dit combien d'images par seconde le jeu dessine (plus il y en a, plus c'est fluide : 60, c'est parfait ; moins de 25, ça rame). |
 | **Chapitre** | Retourner dans un chapitre que tu as déjà ouvert. |
 | **↺ Nouvelle partie** | Tout effacer pour recommencer au chapitre 1. |
 | **⚙ Réglages** | Tous les nombres du jeu, à changer sans toucher au code (voir [Modifier le jeu](#modifier-le-jeu)). |
@@ -69,6 +69,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | 1 à 8 ou molette | Changer d'arme |
 | 9 | Les armes des codes de triche : voir [La touche 9](#la-touche-9) |
 | M ou Tab | Carte de tout le pays (molette : zoom ; souris ou flèches : se déplacer) |
+| P | Le compteur de performances, en bas à droite de la mini-carte (P encore : il s'éteint) : les images par seconde, le temps de calcul et de dessin de chaque image, les appels de dessin et les triangles. Pratique pour voir ce qui fait ramer le jeu |
 | Entrée | Taper un code de triche |
 | Échap | Pause |
 | Q S D, 3 fois de suite | Danser comme Michael Jackson : voir [La danse](#la-danse) |
@@ -852,7 +853,7 @@ Les nombres de tout le jeu :
 - **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), ce que les batarangs explosifs font à Batman lui-même (`explosifsBatman`, et `explosifsPres` : à moins de combien de mètres de sa main leur explosion ne lui fait rien), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
 - **Jusqu'où on voit** : `distanceRelief`, les montagnes et la mer (10 km) ; `distanceVue`, les bâtiments et les arbres (900 m).
 
-**Si le jeu rame**, mets `distanceVue: 500`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`.
+**Si le jeu rame**, mets `distanceVue: 500`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ).
 
 #### `ARMES`, `TRESORS` et `ARMES_ROBOT`
 
