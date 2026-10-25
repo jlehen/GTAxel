@@ -89,6 +89,8 @@
   #menu .partie button.nouvelle { border-style: dashed; }   /* « Nouvelle partie » : efface tout */
   /* les chapitres de super-héros : les victimes, à la place des étoiles (dès la 3e, une amende) */
   #victimes { font: 22px 'Anton', Impact, sans-serif; color: #ff8a6a; }
+  /* un appel de la police : des voyous braquent un magasin (le point rouge) */
+  #appel { font: 20px 'Anton', Impact, sans-serif; color: #ff5a4a; }
   /* les bulles d'aide du début d'un chapitre */
   #bulle { position: absolute; left: 24px; top: 36%; max-width: 360px; background: #fffdf4; color: #151515; text-shadow: none; border: 3px solid #151515;
            border-radius: 18px; padding: 10px 16px 12px; font-size: 19px; opacity: 0; transition: opacity .35s; box-shadow: 4px 4px 0 rgba(0,0,0,.45); }
@@ -139,6 +141,7 @@
     <div id="argent">0 $</div>
     <div id="etoiles"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
     <div id="victimes"></div>
+    <div id="appel"></div>
     <div id="arme"></div>
     <div id="munitions"></div>
   </div>
@@ -286,6 +289,7 @@ const CHAPITRES = [
     '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>L</b> : le masque.',
     'Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d\'autres armures et des améliorations. <b>J</b> : changer d\'armure.',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
+    'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     'Suis le <b>point jaune</b> : tes missions t\'attendent. À la fin, le Mandarin a caché la DeLorean : il faudra la retrouver.',
   ]},
   { ville: 'Gotham', heros: 'Bruce Wayne', heroine: 'Barbara Gordon', super: 'Batman', superFille: 'Batgirl', triche: 'BATMAN', logo: 'batman', heure: 1, cachette: 'b', sansReproche: true, touches: [
@@ -305,6 +309,7 @@ const CHAPITRES = [
     'En l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.',
     '<b>9</b> : le grappin, les batarangs et les filets.',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
+    'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
   { ville: 'Metropolis', heros: 'Clark Kent', heroine: 'Kara Danvers', super: 'Superman', superFille: 'Supergirl', triche: 'SUPERMAN', logo: 'superman', heure: 12, cachette: 'd', sansReproche: true, touches: [
@@ -323,6 +328,7 @@ const CHAPITRES = [
     '<b>9</b> : les yeux laser.',
     'Tomber de très haut ne te fait rien : tout s\'écrase autour de toi !',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
+    'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
   { ville: 'New York', heros: 'Peter Parker', heroine: 'Gwen Stacy', super: 'Spiderman', superFille: 'Spider-Gwen', triche: 'SPIDERMAN', logo: 'spiderman', cachette: 'a', sansReproche: true, touches: [
@@ -342,6 +348,7 @@ const CHAPITRES = [
     'Une toile sur une voiture : garde le bouton enfoncé pour la faire tourner, lâche-le pour la lancer !',
     '<b>9</b> : les filets. Tomber de haut ne te fait pas mal.',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
+    'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
 ];
@@ -1059,6 +1066,22 @@ const TRADUCTIONS = {
   'AMENDE !':         { de: 'STRAFE!', en: 'FINE!', gsw: 'BUESS!' },
   '-{prix} : {n} victimes. Un héros protège les passants !': { de: '-{prix}: {n} Opfer. Ein Held beschützt die Passanten!', en: '-{prix}: {n} victims. A hero protects passers-by!', gsw: '-{prix}: {n} Opfer. En Held schützt d Passante!' },
   '⚠ Victimes : {n}': { de: '⚠ Opfer: {n}', en: '⚠ Victims: {n}', gsw: '⚠ Opfer: {n}' },
+  // les appels de la police (chapitres de super-héros)
+  'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !': {
+    de: 'Die Polizei ruft dich, wenn Gauner einen Laden überfallen: Folge dem <b>roten Punkt</b> und halte sie auf, für eine Belohnung!',
+    en: 'The police call you when crooks rob a store: follow the <b>red dot</b> and stop them, for a reward!',
+    gsw: 'D Polizei rüeft di aa, wänn Gauner en Lade überfalled: Gang em <b>rote Punkt</b> nah und halt si uf, für e Belohnig!' },
+  "La police t'appelle : des voyous braquent {lieu} ! Arrête-les (point rouge)": { de: 'Die Polizei ruft dich: Gauner überfallen {lieu}! Halte sie auf (roter Punkt)',
+    en: 'The police are calling you: crooks are robbing {lieu}! Stop them (red dot)', gsw: 'D Polizei rüeft di aa: Gauner überfalled {lieu}! Halt si uf (rote Punkt)' },
+  'la supérette':     { de: 'den Laden', en: 'the convenience store', gsw: 's Lädeli' },
+  'la station-service': { de: 'die Tankstelle', en: 'the gas station', gsw: 'd Tankstell' },
+  'Les voyous sont arrêtés. La police te remercie : +{prime}': { de: 'Die Gauner sind gefasst. Die Polizei dankt dir: +{prime}', en: 'The crooks are caught. The police thank you: +{prime}',
+    gsw: 'D Gauner sind gschnappt. D Polizei dankt dir: +{prime}' },
+  'Les voyous se sont enfuis avec la caisse': { de: 'Die Gauner sind mit der Kasse abgehauen', en: 'The crooks got away with the cash', gsw: 'D Gauner sind mit de Kasse abghaue' },
+  '● {lieu} · voyous : {n}': { de: '● {lieu} · Gauner: {n}', en: '● {lieu} · crooks: {n}', gsw: '● {lieu} · Gauner: {n}' },
+  '● {lieu} · voyous : {n} · {t} s': { de: '● {lieu} · Gauner: {n} · {t} s', en: '● {lieu} · crooks: {n} · {t} s', gsw: '● {lieu} · Gauner: {n} · {t} s' },
+  'Appel de la police': { de: 'Notruf der Polizei', en: 'Police call', gsw: 'Polizei-Aaruef' },
+  'Voyou':            { de: 'Gauner', en: 'Crook', gsw: 'Gauner' },
   "Retrouve d'abord la DeLorean de ce chapitre pour voyager": { de: 'Finde zuerst den DeLorean dieses Kapitels, um zu reisen', en: "Find this chapter's DeLorean first to travel", gsw: 'Find zersch de DeLorean vo dem Kapitel, zum reise' },
   "La DeLorean est cachée quelque part : retrouve-la d'abord !": { de: 'Der DeLorean ist irgendwo versteckt: Finde ihn zuerst!', en: 'The DeLorean is hidden somewhere: find it first!', gsw: 'De DeLorean isch irgendwo versteckt: Find en zersch!' },
   'Tiens bon : encore {n} secondes...': { de: 'Halt durch: noch {n} Sekunden...', en: 'Hold on: {n} more seconds...', gsw: 'Heb dure: no {n} Sekunde...' },
@@ -1857,7 +1880,13 @@ const REGLAGES = {
   amendeVictimes: 3,         // la victime qui coûte la première amende
   amende: 200,               // dollars : la première amende (puis 400, 800, 1 600...)
   amendeMax: 100000,         // dollars : l'amende ne dépasse jamais ça. L'argent peut devenir négatif !
+  detteMax: 100000,          // dollars : ...mais il ne descend jamais sous -100 000 $, même avec beaucoup d'amendes (pour pouvoir toujours s'en sortir)
   pardon: 120,               // secondes sans victime : une victime est oubliée
+  // les appels de la police : des voyous braquent une supérette ou une station-service (point rouge). Arrête-les tous : une prime !
+  appelAttente: 45,          // secondes entre deux appels (la police n'appelle pas pendant un combat, un compte à rebours, ni près de ta mission)
+  appelVoyous: 3,            // combien de voyous à chaque braquage
+  appelDuree: 150,           // secondes pour arriver (à moins de 100 m du magasin) : après, les voyous s'enfuient avec la caisse
+  prime: 5000,               // dollars : la prime de la police, quand ils sont tous à terre
   dureeVoyage: 3,            // secondes à 88 miles à l'heure (142 km/h) dans la DeLorean pour partir dans un autre chapitre
   retourDeLorean: 4,         // secondes : la DeLorean a explosé ou coulé avant qu'on la retrouve, une neuve revient alors dans sa cachette
 };
@@ -2068,6 +2097,8 @@ const ENNEMIS = {
   // l'armée d'Ultron : ses sentinelles, des robots argentés qui volent autour de toi et tirent des rayons rouges ; et Ultron lui-même
   sentinelle: { nom: "Sentinelle d'Ultron", vie: 120, degats: 5, precision: 0.3, vue: 120, tir: [1.5, 2.5], vitesse: 9 },
   ultron:    { nom: 'Ultron',        vie: 6000, degats: 12, degatsGrandRayon: 35, precision: 0.5, vue: 150, tir: [1.2, 2], vitesse: 10, taille: 1.3, boss: true },
+  // les chapitres de super-héros : les voyous qui braquent un magasin, au pistolet (arme 2), quand la police appelle (voir appelVoyous, dans REGLAGES)
+  voyou:     { nom: 'Voyou',         vie: 70,  arme: 2, degats: 6,  precision: 0.35, vue: 45, tir: [1, 2],     vitesse: 4.5 },
 };
 
 // =====================================================================
@@ -8175,7 +8206,7 @@ const J = { x: depart.x, z: depart.z, y: hauteurSol(depart.x, depart.z), vy: 0, 
   robot: null, masque: false, sac: 0, fumee: 0, secousse: 0, echelle: null, atterri: 0, genou: 0, roule: null, energie: 0, superman: null, telesiege: null, laser: 0, biceps: null,   // atterri, genou, roule : voir retomber (roule : il roule par terre, en roulade ou en chute : voir commencerRoulade et commencerChute) ; superman : voir decoller ; laser : voir majLaser ; sac : le nombre d'objets volés dans le sac ; echelle : celle où il grimpe ; telesiege : voir monterTelesiege ; biceps : voir poserBiceps
   grappin: null, plane: null, balance: null, mur: null, lance: null, prise: null, sansMur: 0 };   // les codes BATMAN et SPIDERMAN. grappin : voir accrocher ; plane : voir planer ; balance : voir balancer ; mur : celui où il grimpe (escalader) ; lance : son élan en l'air (majJoueur) ; prise : la voiture au bout de sa toile (attraper)
 // la partie sauvegardée : l'argent (le même dans tous les chapitres) et les armes de ce chapitre (voir chargerArmes)
-if (partie.argent != null) J.argent = partie.argent;
+if (partie.argent != null) J.argent = Math.max(-R_.detteMax, partie.argent);   // (une dette plus grosse que detteMax, d'une partie d'avant : elle n'est plus que de detteMax)
 chargerArmes();
 const joueurH = creerHumain(TENUE_BJ); // B.J. Blazkowicz
 joueurH.g.traverse(o => o.userData.habit = o.material);   // sa tenue normale, pour la lui remettre après les codes de triche
@@ -8388,12 +8419,15 @@ const TENUES = {
   // les passagers d'Air Force One, en costume ; Hulk : tout vert, en short violet, pieds nus
   passager: () => ({ ...TENUES.pieton(), haut: hasard(['#22242a', '#3a3c44', '#2a3a5a', '#e8e4dc']), bas: hasard(['#22242a', '#3a3c44']), manchesCourtes: false, short: false }),
   hulk: () => ({ peau: '#5e9e3a', haut: '#5e9e3a', bas: '#4a2266', chaussures: '#5e9e3a', cheveux: '#141414', short: true, manchesCourtes: true }),
+  // un voyou qui braque un magasin (chapitres de super-héros) : un sweat sombre, un jean et un bonnet noir
+  voyou: () => ({ peau: hasard(PEAUX), haut: hasard(['#26262b', '#3a3a42', '#4a1c1c', '#1c2a44']), bas: hasard(['#2a3a5a', '#222']), chaussures: hasard(['#eee', '#222']), bonnet: '#141416' }),
 };
 // ceux qui restent dans leur pâté (le camp, le bunker, le château, une grotte...) et attaquent dès qu'ils te voient : les nazis, les militaires
-// du camp et leur commandante, et, à Malibu, les Dix Anneaux, Iron Monger, Whiplash, les soldats Extremis et Killian. Les drones et les
-// hélicoptères attaquent aussi, mais ils volent partout (VOLANTS), comme Whiplash, qui marche dans les rues. Les vigiles, les chiens et les
-// gangs restent aussi dans leur pâté, mais n'attaquent que si on les provoque
-const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'raza', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron'], VIGILES = ['garde', 'chien', 'gang'];
+// du camp et leur commandante, et, à Malibu, les Dix Anneaux, Iron Monger, Whiplash, les soldats Extremis et Killian ; et les voyous des
+// appels de la police (chapitres de super-héros), devant le magasin qu'ils braquent. Les drones et les hélicoptères attaquent aussi, mais ils
+// volent partout (VOLANTS), comme Whiplash, qui marche dans les rues. Les vigiles, les chiens et les gangs restent aussi dans leur pâté, mais
+// n'attaquent que si on les provoque
+const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'raza', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron', 'voyou'], VIGILES = ['garde', 'chien', 'gang'];
 const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron'], LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron'];
 const LIBRES = ['whiplash', 'killian', 'hulk'];   // ceux-là ne gardent pas de pâté : ils vont où ils veulent
 const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
@@ -9887,6 +9921,11 @@ const repere =new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 5, 24, 1, true
 scene.add(repere);
 const fleche = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.7, 4).rotateX(Math.PI), new THREE.MeshBasicMaterial({ color: '#ffd23a', fog: false }));
 scene.add(fleche);
+// les mêmes en rouge, pour un appel de la police : la colonne sur le magasin braqué, puis, de près, la flèche au-dessus du voyou le plus proche
+const repereAppel = new THREE.Mesh(repere.geometry, repere.material.clone()), flecheAppel = new THREE.Mesh(fleche.geometry, fleche.material.clone());
+repereAppel.material.color.set('#ff3a2a'); flecheAppel.material.color.set('#ff3a2a');
+repereAppel.visible = flecheAppel.visible = false;
+scene.add(repereAppel, flecheAppel);
 
 // =====================================================================
 //  L'armure d'Iron Man (le code de triche IRONMAN), et les autres armures de Tony Stark (ARMURES_STARK, au chapitre d'Iron Man)
@@ -15658,7 +15697,7 @@ function calmerHulk(p, dt) {
 function hulkCalme(p) {
   p.calme = 0; p.saut = null;
   const f = facture?.montant || 0;
-  if (f) J.argent -= f;
+  if (f) J.argent = Math.max(-R_.detteMax, J.argent - f);   // (comme les amendes : jamais sous -detteMax)
   annonce(tr('HULK SE CALME...'), f ? tr('Bruce Banner est de retour. La facture des dégâts : -{prix}', { prix: montant(f) }) : tr('Bruce Banner est de retour, et rien de cassé : bravo !'), 5);
   bip(300, 150, 1.5, 'sine', 0.15);
 }
@@ -15759,7 +15798,8 @@ addEventListener('pagehide', () => { if (dejaJoue) sauverPartie(); });
 
 // --- un héros sans reproche (CHAPITRES : sansReproche) ---
 // La police est de son côté : jamais d'étoiles (voir crime). Mais chaque passant, policier ou vigile qu'il tue est une victime : à partir
-// de la 3e (amendeVictimes), une amende, qui double à chaque victime de plus (amende, amendeMax). L'argent peut devenir négatif.
+// de la 3e (amendeVictimes), une amende, qui double à chaque victime de plus (amende, amendeMax). L'argent peut devenir négatif, mais jamais
+// plus bas que -detteMax : avec les primes des appels de la police (plus bas), on peut toujours s'en sortir.
 // Une victime est oubliée au bout de 2 minutes sans en faire d'autre (pardon)
 let victimes = 0, tPardon = 0;
 function victime() {
@@ -15767,11 +15807,65 @@ function victime() {
   const n = victimes - R_.amendeVictimes;
   if (n < 0) { annonce('', tr('Attention aux passants ! Victimes : {n}', { n: victimes }), 2.5); return; }
   const prix = Math.min(R_.amendeMax, Math.round(R_.amende * 2 ** n));
-  J.argent -= prix;
+  J.argent = Math.max(-R_.detteMax, J.argent - prix);
   annonce(tr('AMENDE !'), tr('-{prix} : {n} victimes. Un héros protège les passants !', { prix: montant(prix), n: victimes }), 3.5);
   bip(400, 150, 0.5, 'square', 0.15);
 }
 function pardonner(dt) { if (victimes > 0 && (tPardon += dt) >= R_.pardon) { victimes--; tPardon = 0; } }
+
+// --- les appels de la police (CHAPITRES : sansReproche) ---
+// Un héros ne fait pas les poches et ne braque pas de banque : à part ses missions, ce sont les appels de la police qui lui rapportent de
+// l'argent, autant de fois qu'il veut. De temps en temps (appelAttente), quand il n'est pas occupé, des voyous (appelVoyous) braquent une
+// supérette ou une station-service (S ou E dans la CARTE), à 150 à 700 m de lui : un point rouge sur la carte et une colonne rouge montrent
+// où. Ils attendent devant la porte, et attaquent tous ensemble dès que l'un d'eux le voit. Tous à terre : la police lui verse une prime
+// (prime). S'il n'est pas arrivé (à moins de 100 m) au bout de appelDuree secondes, ils s'enfuient. Un passant tué reste une victime !
+const MAGASINS_BRAQUES = { S: ['Supérette', 'la supérette'], E: ['Station-service', 'la station-service'] };   // les magasins braqués : leur nom, et comment on en parle
+let appel = null, tAppel = 0;   // appel : { x, y, z, nom, le, voyous, reste : les secondes pour arriver } ; tAppel : depuis le dernier appel
+const voyousDebout = () => appel ? appel.voyous.filter(p => p.vie > 0 && !p.supprimer) : [];
+// il est occupé : mort, en voyage, pendant les bulles d'aide, sans armure (à Malibu, avant de s'évader de la grotte), pendant l'embuscade,
+// un compte à rebours, la course, quelqu'un dans ses bras, des anneaux à passer, le givre, Trevor qui parle, les passagers qui tombent, un
+// ennemi à moins de 300 m, ou l'objectif de sa mission à moins de 250 m
+function occupe() {
+  const c = cibleMission();
+  return J.mort || voyage || arrivee || bulles || sansArmure() || sceneEmbuscade() || panne || explosionExpo || course?.t0 || porte || givre || anneaux || discours
+    || (chute && chute.phase !== 'avion')
+    || (c && dist(c, J) < 250) || personnes.some(p => ennemi(p) && dist(p, J) < 300);
+}
+function commencerAppel() {
+  const magasins = Object.entries(MAGASINS_BRAQUES).flatMap(([c, [nom, le]]) => (lieux[c] || []).map(q => ({ ...q, nom, le }))).filter(q => dist(q, J) > 150);
+  if (!magasins.length) return;
+  const pres = magasins.filter(q => dist(q, J) < 700);
+  const q = pres.length ? hasard(pres) : magasins.reduce((m, o) => dist(o, J) < dist(m, J) ? o : m);   // (aucun à moins de 700 m : le plus proche)
+  const voyous = [];
+  for (let k = 0; k < R_.appelVoyous; k++) { // en ligne, devant la porte du magasin (au sud de la place)
+    const x = q.x + (k - (R_.appelVoyous - 1) / 2) * 2.5, z = q.z + entre(4, 7);
+    const p = creerPersonne('voyou', x, z, undefined, hauteurSol(x, z, q.y + 1));
+    p.angle = entre(-0.6, 0.6); voyous.push(p);
+  }
+  appel = { x: q.x, y: q.y, z: q.z, nom: q.nom, le: q.le, voyous, reste: R_.appelDuree };
+  annonce(tr('ALERTE !'), tr("La police t'appelle : des voyous braquent {lieu} ! Arrête-les (point rouge)", { lieu: tr(q.le) }), 4);
+  bip(1200, 900, 0.6, 'square', 0.08);
+}
+function majAppel(dt) {
+  if (!appel) {
+    if ((tAppel += dt) < R_.appelAttente) return;
+    if (occupe()) tAppel = R_.appelAttente - 1;   // la police réessaie dans 1 s
+    else { tAppel = 0; commencerAppel(); }
+    return;
+  }
+  const debout = voyousDebout();
+  if (!debout.length) { // tous à terre : la prime
+    J.argent += R_.prime; appel = null; tAppel = 0;
+    annonce(tr('BRAVO !'), tr('Les voyous sont arrêtés. La police te remercie : +{prime}', { prime: montant(R_.prime) }), 4);
+    bip(500, 1500, 0.5, 'triangle', 0.3); sauverPartie();
+    return;
+  }
+  if (debout.some(p => p.alerte)) for (const p of debout) p.alerte = true;   // l'un d'eux l'a vu : ils attaquent tous
+  if (dist(appel, J) < 100 || (appel.reste -= dt) > 0) return;   // (arrivé, il a tout son temps)
+  for (const p of debout) p.supprimer = true;   // trop tard : ils s'enfuient
+  appel = null; tAppel = 0;
+  annonce(tr('TROP TARD...'), tr('Les voyous se sont enfuis avec la caisse'), 3);
+}
 
 // --- la DeLorean qui voyage ---
 // les chapitres où elle peut aller d'ici : ceux qu'on a déjà ouverts, et le suivant. Aucun, tant qu'on n'a pas retrouvé celle de ce chapitre
@@ -16059,12 +16153,14 @@ function dessinerMinicarte() {
   mctx.save(); mctx.translate(110, 110); mctx.rotate(th); mctx.scale(zoom, zoom); mctx.translate(-J.x, -J.z); mctx.drawImage(carteImg, 0, 0, carteImg.width / ECHELLE_IMG, carteImg.height / ECHELLE_IMG); mctx.restore();
   cercleExpo(mctx, ecran, zoom);
   pointsCarte((x, z, couleur, r = 3) => { const [a, b] = ecran(x, z); mctx.fillStyle = couleur; mctx.beginPath(); mctx.arc(a, b, r, 0, 7); mctx.fill(); });
-  const cible = cibleMission();
-  if (cible) { // le point jaune reste au bord si l'objectif est loin
-    let [a, b] = ecran(cible.x, cible.z); const dx = a - 110, dz = b - 110, l = Math.hypot(dx, dz);
+  const auBord = (o, fond, trait) => { // le point reste au bord si c'est loin
+    let [a, b] = ecran(o.x, o.z); const dx = a - 110, dz = b - 110, l = Math.hypot(dx, dz);
     if (l > 100) { a = 110 + dx / l * 100; b = 110 + dz / l * 100; }
-    mctx.fillStyle = '#ffd23a'; mctx.strokeStyle = '#000'; mctx.beginPath(); mctx.arc(a, b, 6, 0, 7); mctx.fill(); mctx.stroke();
-  }
+    mctx.fillStyle = fond; mctx.strokeStyle = trait; mctx.beginPath(); mctx.arc(a, b, 6, 0, 7); mctx.fill(); mctx.stroke();
+  };
+  if (appel) auBord(appel, '#ff3a2a', '#fff');   // un appel de la police : le point rouge
+  const cible = cibleMission();
+  if (cible) auBord(cible, '#ffd23a', '#000');   // l'objectif : le point jaune
   flecheJoueur(mctx, 110, 110, 0, 1);
   mctx.restore();
 }
@@ -16099,6 +16195,7 @@ function legendeCarte(g, h) {
     ...PISTES_SKI.length ? [['Piste bleue', trait(COULEURS_PISTES.bleue)], ['Piste rouge', trait(COULEURS_PISTES.rouge)], ['Piste noire', trait(COULEURS_PISTES.noire)],
       ['Hors-piste', trait(COULEURS_PISTES.jaune)]] : [], ...TELESIEGES.length ? [['Remontée', trait('#1a3a6a', [5, 3])]] : [],
     ['Objectif', (x, y) => { g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); g.stroke(); }],
+    ...CHAPITRE.sansReproche ? [['Appel de la police', (x, y) => { g.fillStyle = '#ff3a2a'; g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); g.stroke(); }]] : [],
     ['Toi', (x, y) => flecheJoueur(g, x, y, 0, 0.9)],
     ['Police', (x, y) => { rond('#f33', x - 3, y); rond('#39f', x + 3, y); }],
     ['Ennemi', (x, y) => rond('#e33', x, y)],
@@ -16125,6 +16222,11 @@ function dessinerGrandeCarte(dt) {
   for (const [p, fond, lettre, nom] of REPERES) { const [a, b] = ecran(p.x, p.z); icone(g, a, b, fond, lettre, z < 0.4 ? 8 : 13); if (z >= 0.6) texteCarte(g, tr(nom), a, b + 31, 16); }
   cercleExpo(g, ecran, z);
   pointsCarte((x, y, couleur, rayon = 3) => { const [a, b] = ecran(x, y); g.fillStyle = couleur; g.beginPath(); g.arc(a, b, rayon + 2, 0, 7); g.fill(); });
+  if (appel) { // un appel de la police : un point rouge entouré d'un anneau qui bat
+    const [a, b] = ecran(appel.x, appel.z);
+    g.strokeStyle = '#ff3a2a'; g.lineWidth = 2; g.beginPath(); g.arc(a, b, 16 + Math.sin(performance.now() / 150) * 4, 0, 7); g.stroke();
+    g.fillStyle = '#ff3a2a'; g.strokeStyle = '#fff'; g.beginPath(); g.arc(a, b, 8, 0, 7); g.fill(); g.stroke();
+  }
   const cible = cibleMission();
   if (cible) { // l'objectif : un point jaune entouré d'un anneau qui bat
     const [a, b] = ecran(cible.x, cible.z);
@@ -16236,6 +16338,8 @@ function majHUD(dt) {
   $('etoiles').classList.toggle('vu', vuParPolice && etoiles > 0);
   $('etoiles').style.display = CHAPITRE.sansReproche ? 'none' : '';   // un héros sans reproche : pas d'étoiles, mais ses victimes
   $('victimes').textContent = CHAPITRE.sansReproche && victimes ? tr('⚠ Victimes : {n}', { n: victimes }) : '';
+  const vd = { lieu: appel && tr(appel.nom), n: voyousDebout().length, t: Math.ceil(appel?.reste) };   // un appel de la police : le temps compte tant qu'il est loin
+  $('appel').textContent = !appel ? '' : dist(appel, J) < 100 ? tr('● {lieu} · voyous : {n}', vd) : tr('● {lieu} · voyous : {n} · {t} s', vd);
   majTableau();
   const a = ARMES[J.arme], rb = J.robot, ar = rb?.armure ? rb : null;   // ar : l'armure, quand il est dedans
   $('barre-armure').style.display = ar ? 'block' : 'none';
@@ -16544,9 +16648,9 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   temps += dt;
   avancerJournee(horloge); majSommeil(horloge);
   // les chapitres : la DeLorean qui part (et ses traces en feu), qui arrive ou qui revient dans sa cachette, les bulles d'aide, les victimes
-  // oubliées, la sauvegarde
+  // oubliées, les appels de la police, la sauvegarde
   majVoyage(dt); majRetourDeLorean(dt); if (arrivee) majArrivee(dt); majBulles(dt);
-  if (CHAPITRE.sansReproche) pardonner(dt);
+  if (CHAPITRE.sansReproche) { pardonner(dt); majAppel(dt); }
   if ((tSauve -= dt) <= 0) { tSauve = 2; sauverPartie(); }
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
   if (J.mort || J.voiture || J.robot || J.telesiege) J.grappin = J.balance = J.mur = J.plane = J.lance = null;   // ni grappin, ni toile, ni mur, ni cape
@@ -16671,6 +16775,10 @@ function majRepere(dt) {
   const surCible = et?.type === 'eliminer' || et?.type === 'voler' || (['sauver', 'emmener', 'repecher', 'chute'].includes(et?.type) && !porte && !!cible?.h) || et?.type === 'parler';   // une flèche au-dessus de la cible, du butin, ou de quelqu'un à sauver
   repere.visible = !!cible && !surCible && et?.type !== 'anneaux' && !(et?.type === 'course' && course?.portes.includes(cible));   // (un anneau, une porte de la course : ils se voient tout seuls)
   fleche.visible = !!cible && surCible;
+  const v = voyousDebout().reduce((m, p) => !m || dist(p, J) < dist(m, J) ? p : m, null);   // un appel de la police : le voyou le plus proche
+  repereAppel.visible = !!appel && dist(appel, J) > 40; flecheAppel.visible = !!v && !repereAppel.visible;
+  if (appel) repereAppel.position.set(appel.x, appel.y + 2.5, appel.z);
+  if (v) { flecheAppel.position.set(v.x, v.y + 2.9 + Math.sin(temps * 4) * 0.15, v.z); flecheAppel.rotation.y += dt * 2; }
   if (cible) { const y = cible.y ?? hauteurSol(cible.x, cible.z); repere.position.set(cible.x, y + 2.5, cible.z); fleche.position.set(cible.x, y + (cible.h ? (cible.h.hauteur || 1.9 * cible.h.g.scale.y) + 1 : 2.9) + Math.sin(temps * 4) * 0.15, cible.z); fleche.rotation.y += dt * 2; }   // (au-dessus de sa tête : plus haut pour Iron Monger, ou un hélicoptère)
 }
 
@@ -16726,6 +16834,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   majVoyage, majArrivee, victime, pardonner, fixerHeure, ecranChapitre, montrerEcran, sortirEcran, debutChapitre, lancerJeu, appuyerT, cacherDeLorean, deLoreanLa, majTableau, majBulles, basculerTriche,
   get destination() { return destination; }, set destination(v) { destination = v; }, get voyage() { return voyage; }, get arrivee() { return arrivee; }, set arrivee(v) { arrivee = v; },
   get traces() { return traces; }, get victimes() { return victimes; }, set victimes(v) { victimes = v; }, get bulles() { return bulles; }, set bulles(v) { bulles = v; },
+  majAppel, commencerAppel, occupe, voyousDebout, repereAppel, flecheAppel, get appel() { return appel; }, set appel(v) { appel = v; }, get tAppel() { return tAppel; }, set tAppel(v) { tAppel = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   MISSIONS_MALIBU, toursT, grotte, usine, vieuxReacteur, creerMonger, porterSecours, donnerArmure, texteEtape, commencerEtape, finirEtape, missions, monterRobot, faireArriver, majRepere, repere, fleche,
   get markI() { return markI; }, get vague() { return vague; }, get anneaux() { return anneaux; }, get givre() { return givre; }, get sauvetage() { return sauvetage; }, get panne() { return panne; },
