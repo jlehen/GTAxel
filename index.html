@@ -1119,6 +1119,11 @@ const TRADUCTIONS = {
     en: 'Carry on on foot: a new Mark I will be waiting in the cave once you have moved away', gsw: 'Lauf z Fuess wiiter: En neue Mark I wartet i de Höhli, wänn du wäg bisch' },
   'Appuie sur <b>E</b> pour le prendre dans tes bras': { de: 'Drück <b>E</b>, um ihn in die Arme zu nehmen', en: 'Press <b>E</b> to pick them up', gsw: 'Druck <b>E</b>, zum en i d Arme z näh' },
   'Mets ton armure (<b>H</b>) pour le porter': { de: 'Zieh deine Rüstung an (<b>H</b>), um ihn zu tragen', en: 'Put on your armour (<b>H</b>) to carry them', gsw: 'Leg dini Rüschtig aa (<b>H</b>), zum en träge' },
+  'Plus près ! Mets-toi juste à côté de lui, puis E': { de: 'Näher! Stell dich direkt neben ihn, dann E', en: 'Closer! Stand right next to them, then E', gsw: 'Nöcher! Stell di grad näbe en, dänn E' },
+  'Plus près ! Mets-toi juste à côté de {ami}, puis E': { de: 'Näher! Stell dich direkt neben {ami}, dann E', en: 'Closer! Stand right next to {ami}, then E', gsw: 'Nöcher! Stell di grad näbe {ami}, dänn E' },
+  "Un seul à la fois : pose d'abord celui que tu portes": { de: 'Einer nach dem anderen: Setz zuerst den ab, den du trägst', en: 'One at a time: first put down the one you are carrying', gsw: 'Eine nach em andere: Stell zerscht dä ab, wo du treisch' },
+  'AU SECOURS !': { de: 'HILFE!', en: 'HELP!', gsw: 'HILFE!' },
+  'Un autre habitant sort sur le toit : encore {n} à sauver': { de: 'Ein anderer Bewohner kommt aufs Dach: noch {n} zu retten', en: 'Another resident comes out onto the roof: {n} left to save', gsw: 'En andere Bewohner chunnt ufs Dach: na {n} z rette' },
   // les missions d'Iron Man, suite : Whiplash, les drones de Hammer, la villa attaquée, le faux Mandarin
   'Le Grand Prix de Santa Monica ! Monte dans ta Formule 1, sur la ligne de départ (point jaune), et passe les portes : il en reste {n}': {
     de: 'Der Grand Prix von Santa Monica! Steig in deinen Formel-1-Wagen an der Startlinie (gelber Punkt) und fahr durch die Tore: noch {n}',
@@ -10619,8 +10624,8 @@ function action() {
   const n = navetteProche();
   if (n) { prendreNavette(n); return true; }
   const v = voitureProche();
-  if (v) entrerVoiture(v);
-  return !!v;
+  if (v) { entrerVoiture(v); return true; }
+  return armureIronman() && secoursPasLoin();   // quelqu'un à sauver attend un peu plus loin : E ne tire pas sur lui
 }
 // la voiture dans laquelle on peut monter : la plus proche, si on est à moins de 1,30 m de son bout
 function voitureProche() {
@@ -13393,23 +13398,15 @@ const armureGelee = () => !!givre?.gel && !givre.fond && !givre.fini;   // (F ne
 // La tour de la case (col, ligne) brûle : des flammes aux fenêtres de ses derniers étages, une colonne de fumée noire. Sur son toit, « nombre »
 // habitants agitent le bras. E près de l'un d'eux, dans l'armure : Iron Man le prend dans ses bras. Il le pose en se posant près des pompiers,
 // dans la rue au sud de la tour : il est sauvé (il s'en va, à pied). S'il le lâche (il meurt, monte en voiture, sort de son armure), l'habitant
-// se retrouve sur le toit
-let sauvetage = null;   // { nombre, sauves, gens, depot : là où sont les pompiers, feu : les flammes, pompiers, t } (celui qu'il porte : porte)
+// se retrouve sur le toit. Un habitant tué par mégarde : un autre sort sur le toit, pour qu'il en reste toujours assez à sauver
+let sauvetage = null;   // { nombre, sauves, gens, depot : là où sont les pompiers, feu : les flammes, pompiers, t, autres } (celui qu'il porte : porte)
 function commencerSauvetage(et) {
   const toits = toursT[et.col + ',' + et.ligne];
-  if (!toits?.length) { console.error(`Mission « sauver » : la case ${et.col}, ${et.ligne} n'est pas une tour (T)`); sauvetage = { nombre: 0, sauves: 0, gens: [], feu: [], pompiers: [] }; return; }
+  if (!toits?.length) { console.error(`Mission « sauver » : la case ${et.col}, ${et.ligne} n'est pas une tour (T)`); sauvetage = { nombre: 0, sauves: 0, gens: [], feu: [], pompiers: [], autres: [] }; return; }
   const toit = toits.reduce((m, t) => t.y > m.y ? t : m), o = origine(et.col, et.ligne), c = centre(et.col, et.ligne);
   const depot = { x: c.x, z: o.z + S + R / 2 }; depot.y = hauteurSol(depot.x, depot.z);
-  const S_ = sauvetage = { nombre: et.nombre, sauves: 0, gens: [], depot, toit, feu: [], pompiers: [], t: 0 };
-  for (let k = 0; k < et.nombre; k++) { // sur le toit, pas sur une des boîtes en métal qui y sont posées
-    let x = toit.x, z = toit.z;
-    for (let essai = 0; essai < 30; essai++) {
-      x = toit.x + entre(-1, 1) * (toit.l / 2 - 2.5); z = toit.z + entre(-1, 1) * (toit.p / 2 - 2.5);
-      if (Math.abs(hauteurSol(x, z, toit.y + 1) - toit.y) < 0.05 && !S_.gens.some(p => dist(p, { x, z }) < 2.5)) break;
-    }
-    const p = creerPersonne('rescape', x, z, undefined, toit.y);
-    p.secours = 'attend'; p.place = { x, z, y: toit.y }; p.angle = entre(0, 6.28); S_.gens.push(p);
-  }
+  const S_ = sauvetage = { nombre: et.nombre, sauves: 0, gens: [], depot, toit, feu: [], pompiers: [], t: 0, autres: [] };   // autres : dans combien de secondes un autre habitant sort sur le toit
+  for (let k = 0; k < et.nombre; k++) habitantSurLeToit(S_);
   // les flammes, sur les quatre côtés, aux fenêtres des derniers étages
   for (let k = 0; k < 64; k++) {
     const cote = k % 4, u = entre(-0.45, 0.45), y = toit.y - entre(0.5, 16);
@@ -13423,9 +13420,32 @@ function commencerSauvetage(et) {
   }
   annonce(tr('AU FEU !'), tr('Une tour brûle dans le centre-ville : des gens sont coincés sur le toit !'), 4); bip(1200, 900, 0.6, 'square', 0.08);
 }
+// un habitant de plus sur le toit, qui attend Iron Man : pas sur une des boîtes en métal qui y sont posées, ni contre un autre
+function habitantSurLeToit(S_) {
+  const toit = S_.toit;
+  let x = toit.x, z = toit.z;
+  for (let essai = 0; essai < 30; essai++) {
+    x = toit.x + entre(-1, 1) * (toit.l / 2 - 2.5); z = toit.z + entre(-1, 1) * (toit.p / 2 - 2.5);
+    if (Math.abs(hauteurSol(x, z, toit.y + 1) - toit.y) < 0.05 && !S_.gens.some(p => dist(p, { x, z }) < 2.5)) break;
+  }
+  const p = creerPersonne('rescape', x, z, undefined, toit.y);
+  p.secours = 'attend'; p.place = { x, z, y: toit.y }; p.angle = entre(0, 6.28); S_.gens.push(p);
+  return p;
+}
 function majSauvetage(dt) {
   const S_ = sauvetage;
   for (const f of S_.feu) f.s.scale.setScalar(f.taille * entre(0.75, 1.25));   // les flammes dansent
+  // un habitant tué (par mégarde !) : c'est une victime, mais la mission continue. Un autre sort sur le toit 3,5 s plus tard (le temps de
+  // lire l'amende). Tué dans les bras d'Iron Man, il tombe
+  for (const p of S_.gens) if (p.secours && p.vie <= 0) {
+    const dansSesBras = p.secours === 'porte';
+    p.secours = null; S_.autres.push(3.5);
+    if (dansSesBras) { p.h.g.quaternion.identity(); projeter(p, 0, 0, 0, 1); }
+  }
+  for (let k = S_.autres.length - 1; k >= 0; k--) if ((S_.autres[k] -= dt) <= 0) {
+    S_.autres.splice(k, 1); habitantSurLeToit(S_);
+    annonce(tr('AU SECOURS !'), tr('Un autre habitant sort sur le toit : encore {n} à sauver', { n: S_.nombre - S_.sauves }), 3); bip(1200, 900, 0.4, 'square', 0.06);
+  }
   if ((S_.t -= dt) <= 0 && S_.toit) { // une colonne de fumée noire monte au-dessus du toit, de plus en plus large en montant
     S_.t = 0.06;
     const t = S_.toit, h = entre(0, 50), s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#262628');
@@ -13665,7 +13685,18 @@ function tirSurJoueur(p, d, depart, degats, precision, gros = false) {
 // E près de quelqu'un qui l'attend (p.secours = 'attend'), dans son armure : Iron Man le prend dans ses bras, un seul à la fois. S'il le lâche
 // (il meurt, monte en voiture ou dans la Mark I, sort de son armure), celui-ci se retrouve là où il attendait (p.place)
 let porte = null;   // celui qu'Iron Man porte
-const attendProche = () => personnes.find(q => q.secours === 'attend' && q.vie > 0 && !q.supprimer && Math.hypot(q.x - J.x, q.z - J.z) < 2.5 && Math.abs(q.y - J.y) < 2.5);
+// quelqu'un qui l'attend, à moins de « loin » mètres de lui (et pas plus de « haut » mètres plus haut ou plus bas)
+const attend = (q, loin, haut) => q.secours === 'attend' && q.vie > 0 && !q.supprimer && Math.hypot(q.x - J.x, q.z - J.z) < loin && Math.abs(q.y - J.y) < haut;
+const attendProche = () => personnes.find(q => attend(q, 3.5, 2.5));   // assez près pour le prendre dans ses bras
+// E, dans l'armure, quand il n'y avait rien à faire tout près : si quelqu'un attend à moins de 30 m, la main droite ne tire pas (le répulseur
+// le blesserait !), et on lui dit de s'approcher
+function secoursPasLoin() {
+  const p = personnes.find(q => attend(q, 30, 30));
+  if (!p) return false;
+  annonce('', porte ? tr("Un seul à la fois : pose d'abord celui que tu portes") : p.type === 'ami' ? tr('Plus près ! Mets-toi juste à côté de {ami}, puis E', { ami: nomAmi() })
+    : tr('Plus près ! Mets-toi juste à côté de lui, puis E'), 2);
+  return true;
+}
 function porterSecours() {
   const p = !porte && attendProche();
   if (!p) return false;
