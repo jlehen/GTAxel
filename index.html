@@ -1880,7 +1880,7 @@ const REGLAGES = {
   amendeVictimes: 3,         // la victime qui coûte la première amende
   amende: 200,               // dollars : la première amende (puis 400, 800, 1 600...)
   amendeMax: 100000,         // dollars : l'amende ne dépasse jamais ça. L'argent peut devenir négatif !
-  detteMax: 100000,          // dollars : ...mais il ne descend jamais sous -100 000 $, même avec beaucoup d'amendes (pour pouvoir toujours s'en sortir)
+  detteMax: 10000000,        // dollars : ...mais il ne descend jamais sous -10 000 000 $ (10 millions), même avec beaucoup d'amendes
   pardon: 120,               // secondes sans victime : une victime est oubliée
   // les appels de la police : des voyous braquent une supérette ou une station-service (point rouge). Arrête-les tous : une prime !
   appelAttente: 45,          // secondes entre deux appels (la police n'appelle pas pendant un combat, un compte à rebours, ni près de ta mission)
@@ -15799,7 +15799,7 @@ addEventListener('pagehide', () => { if (dejaJoue) sauverPartie(); });
 // --- un héros sans reproche (CHAPITRES : sansReproche) ---
 // La police est de son côté : jamais d'étoiles (voir crime). Mais chaque passant, policier ou vigile qu'il tue est une victime : à partir
 // de la 3e (amendeVictimes), une amende, qui double à chaque victime de plus (amende, amendeMax). L'argent peut devenir négatif, mais jamais
-// plus bas que -detteMax : avec les primes des appels de la police (plus bas), on peut toujours s'en sortir.
+// plus bas que -detteMax (10 millions) ; les primes des appels de la police (plus bas) permettent d'en regagner.
 // Une victime est oubliée au bout de 2 minutes sans en faire d'autre (pardon)
 let victimes = 0, tPardon = 0;
 function victime() {
