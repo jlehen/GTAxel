@@ -706,6 +706,7 @@ const TRADUCTIONS = {
   'AFFICHAGE COUPÉ':  { de: 'ANZEIGE AUS', en: 'DISPLAY OFF', gsw: 'AAZEIG US' },
   'BATTERIE FAIBLE':  { de: 'BATTERIE SCHWACH', en: 'LOW BATTERY', gsw: 'BATTERIE SCHWACH' },
   'BATTERIE VIDE':    { de: 'BATTERIE LEER', en: 'BATTERY EMPTY', gsw: 'BATTERIE LÄÄR' },
+  'ALERTE GIVRE':     { de: 'VEREISUNGSALARM', en: 'ICING ALERT', gsw: 'IISALARM' },
   'BATTERIE VIDE !':  { de: 'BATTERIE LEER!', en: 'BATTERY EMPTY!', gsw: 'BATTERIE LÄÄR!' },
   '{partie} HORS SERVICE': { de: '{partie} AUSGEFALLEN', en: '{partie} OFFLINE', gsw: '{partie} USGFALLE' },
   '{partie} HORS SERVICE !': { de: '{partie} AUSGEFALLEN!', en: '{partie} OFFLINE!', gsw: '{partie} USGFALLE!' },
@@ -1130,6 +1131,9 @@ const TRADUCTIONS = {
   'Anneau {k} sur {n} !': { de: 'Ring {k} von {n}!', en: 'Ring {k} of {n}!', gsw: 'Ring {k} vo {n}!' },
   'Tous les anneaux !': { de: 'Alle Ringe!', en: 'All the rings!', gsw: 'Alli Ring!' },
   'GIVRE !':          { de: 'VEREISUNG!', en: 'ICING!', gsw: 'IIS!' },
+  'Alerte givre !':   { de: 'Vereisungsalarm!', en: 'Icing alert!', gsw: 'Iisalarm!' },   // (ce que dit J.A.R.V.I.S.)
+  "Alerte givre ! L'armure d'Iron Monger gèle.": { de: 'Vereisungsalarm! Die Rüstung von Iron Monger vereist.', en: "Icing alert! Iron Monger's armour is freezing.",
+    gsw: 'Iisalarm! D Rüschtig vom Iron Monger vereist.' },
   "Ton armure gèle : ses réacteurs s'éteignent !": { de: 'Deine Rüstung vereist: Die Triebwerke gehen aus!', en: 'Your armour is icing up: its thrusters cut out!', gsw: 'Dini Rüschtig vereist: D Triebwärch gönd us!' },
   'LE GIVRE FOND !':  { de: 'DAS EIS SCHMILZT!', en: 'THE ICE IS MELTING!', gsw: 'S IIS SCHMILZT!' },
   'Vite, F : rallume tes réacteurs !': { de: 'Schnell, F: Zünde deine Triebwerke!', en: 'Quick, F: restart your thrusters!', gsw: 'Schnäll, F: Zünd dini Triebwärch aa!' },
@@ -2075,6 +2079,12 @@ const ARMURE = {
 //    plus (le torse), l'affichage du casque s'éteint (le casque), tu n'accélères plus en volant (une jambe). Elle se répare toute seule,
 //    de « reparation » % par seconde, quand tu n'as pas été touché depuis « attente » secondes, et remarche à « reprise » %.
 //    Une armure qui arrive est toute neuve
+//  givre : quand une armure gèle (la tienne tout là-haut, au premier vol ; celle d'Iron Monger, s'il te suit trop haut), elle se couvre de
+//    glace en « prise » secondes : ses couleurs pâlissent jusqu'à « couleur », ses yeux et son réacteur s'éteignent, et « cristaux »
+//    cristaux de glace poussent dessus (« taille » : leur longueur, en mètres, sur quelqu'un de ta taille). Elle dégèle en « fonte »
+//    secondes, en gouttes ; si elle touche le sol encore gelée, la glace vole en éclats
+//  jarvis : la voix de J.A.R.V.I.S., l'ordinateur de ton armure (« Alerte givre ! »), dans la langue du jeu (celle de l'ordinateur, s'il
+//    en a une) : hauteur (1 : normale ; plus petit, plus grave), vitesse (1 : normale), volume (de 0 à 1 ; 0 : il se tait)
 // =====================================================================
 const IRONMAN = {
   touches: ['KeyQ', 'KeyW', 'KeyE'],   // A Z E sur un clavier français
@@ -2083,6 +2093,8 @@ const IRONMAN = {
   plastron:   { nom: 'Plastron', degats: 400, explosion: 5, portee: 200, charge: 0.4, recharge: 4 },
   batterie:   { recharge: 3, vol: 0.2, volVite: 1, repulseur: 0.3, plastron: 6, canon: 1.5, mitrailleuse: 0.1, missiles: 8, laser: 10, faible: 20, descente: 4, reprise: 20 },
   parties:    { usure: 1.5, reparation: 4, attente: 5, reprise: 25 },
+  givre:      { prise: 0.8, fonte: 1.5, cristaux: 50, taille: 0.16, couleur: '#c8e6ff' },
+  jarvis:     { hauteur: 0.8, vitesse: 1, volume: 1 },
 };
 
 // =====================================================================
@@ -10724,7 +10736,7 @@ document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
   saisie = null; $('triche').style.display = 'none';
   enJeu = false; $('menu').style.display = 'flex'; etat('Pause — clique pour continuer');
-  ouvrirCarte(false); audio?.suspend();
+  ouvrirCarte(false); audio?.suspend(); taireJarvis();
   for (const k in touches) touches[k] = false;
   sourisG = visee = false;
 });
@@ -13544,7 +13556,7 @@ function majEtape(et, dt) {
 }
 function finirEtape() {
   finirVague(); finirAnneaux(); finirSauvetage(); finirPanne(); finirCourse(); finirEmmener(); finirRepecher(); finirParler(); finirHappy(); finirChuteLibre(); facture = null;
-  givre = null; $('givre').style.opacity = 0;
+  givre = null; $('givre').style.opacity = 0; degeler(joueurH);   // (l'étape sautée, son armure encore gelée : elle dégèle)
 }
 // le texte de l'étape, en bas de l'écran ({n} : ce qu'il reste ; {t} : les secondes qui restent ; {h}, {y} : la hauteur à atteindre, et celle où
 // il est ; {ami} : Pepper Potts, ou Tony Stark). Pendant le givre, ou quand Iron Man porte quelqu'un, il dit ce qu'il faut faire tout de suite
@@ -13657,19 +13669,130 @@ function majGivre(dt) {
     if (!J.superman || !armureIronman() || J.y < G.hauteur) return;
     G.gel = 0.001; J.superman = null; J.vy = Math.min(J.vy, 0);
     annonce(tr('GIVRE !'), tr("Ton armure gèle : ses réacteurs s'éteignent !"), 3); bruit(0.5, 8000, 0.8); bip(1600, 300, 0.9, 'sine', 0.1);
+    geler(joueurH); jarvis(tr('Alerte givre !'));   // elle se couvre de glace, et J.A.R.V.I.S. le prévient
   }
   G.gel += dt;
   $('givre').style.opacity = G.fond ? Math.max(0, 0.75 - (G.gel - 3) * 0.6) : Math.min(0.85, G.gel * 3);
-  if (Math.random() < dt * 25) { // des éclats de glace s'envolent de son armure
-    const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#eaf6ff'); s.position.set(J.x + entre(-0.6, 0.6), J.y + entre(0.3, 1.9), J.z + entre(-0.6, 0.6));
-    scene.add(s); effets.push({ o: s, vie: 0.8, fumee: 0.8, taille: 0.6 });
+  if (!G.fond && Math.random() < dt * 15) { // des éclats de glace s'envolent de son armure (il tombe plus vite qu'eux)
+    const e = new THREE.Mesh(GEO_CRISTAL, M_CRISTAL); e.position.set(J.x + entre(-0.5, 0.5), J.y + entre(0.3, 1.8), J.z + entre(-0.5, 0.5));
+    e.scale.set(0.05, 0.12, 0.05); scene.add(e); lancerDebris(e, V3(entre(-1.5, 1.5), J.vy + entre(1, 4), entre(-1.5, 1.5)), 0.8);
   }
-  if (!G.fond && G.gel > 3) { G.fond = true; annonce(tr('LE GIVRE FOND !'), tr('Vite, F : rallume tes réacteurs !'), 2.5); bip(500, 1200, 0.3, 'square', 0.1); }
+  if (!G.fond && G.gel > 3) { G.fond = true; annonce(tr('LE GIVRE FOND !'), tr('Vite, F : rallume tes réacteurs !'), 2.5); bip(500, 1200, 0.3, 'square', 0.1); degeler(joueurH); }
   if (J.superman && G.fond) { G.fini = true; annonce(tr('OUF !'), tr('Tes réacteurs sont repartis : record battu !'), 3); }
-  else if (J.sol && G.gel > 0.3) { G.fini = true; annonce(tr('OUF !'), tr('Ton armure a encaissé la chute : rien de cassé !'), 3); }
+  else if (J.sol && G.gel > 0.3) { G.fini = true; annonce(tr('OUF !'), tr('Ton armure a encaissé la chute : rien de cassé !'), 3); briser(joueurH); }   // (encore gelée : la glace vole en éclats)
   if (G.fini) $('givre').style.opacity = 0;
 }
 const armureGelee = () => !!givre?.gel && !givre.fond && !givre.fini;   // (F ne le fait pas voler : voir decoller)
+
+// --- J.A.R.V.I.S. parle (IRONMAN.jarvis) ---
+// La voix de l'ordinateur (speechSynthesis), dans la langue du jeu : britannique en anglais, comme dans les films ; en züritüütsch, suisse
+// allemande s'il y en a une (sinon allemande). Une voix d'homme si l'ordinateur en a une. Sans voix, il se tait
+const LANGUES_VOIX = { fr: 'fr-FR', de: 'de-DE', en: 'en-GB', gsw: 'de-CH' };
+const VOIX_HOMME = /\bmale\b|daniel|george|ryan|arthur|oliver|thomas|paul|henri|stefan|markus|conrad|yannick/i;
+try { speechSynthesis.getVoices(); } catch {}   // (Chrome charge ses voix en arrière-plan : on les lui demande dès le début)
+function jarvis(texte) {
+  const V = IRONMAN.jarvis;
+  try {
+    if (!(V.volume > 0) || !window.speechSynthesis) return;
+    const l = LANGUES_VOIX[langue] || langue, voix = speechSynthesis.getVoices(), u = new SpeechSynthesisUtterance(texte);
+    const memes = voix.filter(v => v.lang.replace('_', '-').toLowerCase() === l.toLowerCase()), proches = voix.filter(v => v.lang.slice(0, 2).toLowerCase() === l.slice(0, 2));
+    const liste = memes.length ? memes : proches;
+    u.lang = l; u.voice = liste.find(v => VOIX_HOMME.test(v.name)) || liste[0] || null;
+    u.pitch = V.hauteur; u.rate = V.vitesse; u.volume = Math.min(1, V.volume);
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch {}
+}
+function taireJarvis() { try { speechSynthesis.cancel(); } catch {} }   // (la pause et la grande carte coupent tous les sons, sa voix aussi)
+
+// --- le givre sur une armure : la tienne (« Le premier vol »), celle d'Iron Monger (s'il te suit trop haut) ---
+// Elle se couvre de glace (IRONMAN.givre) : ses morceaux prennent une copie givrée de leur matière (les autres armures, faites des mêmes
+// matières, n'y sont pour rien), qui pâlit jusqu'au blanc bleuté de la glace ; ses lumières (les yeux, le réacteur) s'éteignent ; des
+// cristaux de glace poussent dessus, l'un après l'autre, pointés vers l'extérieur. Quand elle dégèle, tout revient, à l'envers, et les
+// cristaux fondent en gouttes ; si elle touche le sol encore gelée (briser), la glace vole en éclats
+const GEO_CRISTAL = new THREE.OctahedronGeometry(0.5, 0), GEO_GOUTTE = new THREE.SphereGeometry(0.5, 6, 4);
+const M_CRISTAL = new THREE.MeshStandardMaterial({ color: '#f4fbff', emissive: '#9fd6ff', emissiveIntensity: 0.45, roughness: 0.1, metalness: 0, transparent: true, opacity: 0.9 });
+const M_GOUTTE = new THREE.MeshStandardMaterial({ color: '#cfeaff', roughness: 0.05, transparent: true, opacity: 0.7 });
+const GLACE = new THREE.Color(), ETEINT = new THREE.Color('#26313a');
+const geles = [];   // les armures gelées : { h (qui la porte), copies (sa matière → sa copie givrée), cristaux, givre (de 0 à 1), fond, vite }
+function geler(h) {
+  const deja = geles.find(G => G.h === h);
+  if (deja) { deja.fond = false; deja.vite = 1; return; }   // (elle regèle avant d'avoir fini de dégeler)
+  const G = { h, copies: new Map(), cristaux: [], givre: 0, fond: false, vite: 1 }, armure = new Set(Object.values(cacheIronman)), morceaux = [];
+  h.g.updateMatrixWorld(true);
+  h.g.traverse(m => {
+    if (!m.isMesh || !armure.has(m.material)) return;
+    if (!G.copies.has(m.material)) G.copies.set(m.material, m.material.clone());
+    m.material = G.copies.get(m.material);
+    if (m.visible && !m.material.isMeshBasicMaterial) morceaux.push(m);
+  });
+  // les cristaux, sur les faces des morceaux (un grand morceau en a plus qu'un petit), à leur place dans le corps : ils suivent ses gestes
+  const P = IRONMAN.givre, boite = new THREE.Box3(), dim = V3(), inverse = new THREE.Matrix4(), echelle = V3();
+  const poids = morceaux.map(m => { boite.setFromObject(m).getSize(dim); return dim.x * dim.y + dim.y * dim.z + dim.x * dim.z; });
+  const total = poids.reduce((a, b) => a + b, 0);
+  for (let k = 0; k < P.cristaux && total > 0; k++) {
+    let r = Math.random() * total, i = 0;
+    while (r > poids[i] && i < poids.length - 1) r -= poids[i++];
+    const m = morceaux[i], b = m.geometry.boundingBox || (m.geometry.computeBoundingBox(), m.geometry.boundingBox);
+    const axe = Math.floor(Math.random() * 3), sens = Math.random() < 0.5 ? -1 : 1, normale = V3();
+    const point = V3(entre(b.min.x, b.max.x), entre(b.min.y, b.max.y), entre(b.min.z, b.max.z));
+    point.setComponent(axe, (sens > 0 ? b.max : b.min).getComponent(axe)); normale.setComponent(axe, sens);   // un point d'une de ses faces
+    m.localToWorld(point); normale.transformDirection(m.matrixWorld);
+    const parent = m.parent; inverse.copy(parent.matrixWorld).invert(); parent.worldToLocal(point); normale.transformDirection(inverse);
+    parent.getWorldScale(echelle);
+    const c = new THREE.Mesh(GEO_CRISTAL, M_CRISTAL), L = P.taille * entre(0.6, 1.4) * h.g.scale.y;   // (sur Iron Monger, plus grand : plus grands)
+    c.position.copy(point); c.quaternion.setFromUnitVectors(V3(0, 1, 0), normale); c.rotateY(entre(0, 6.3)); c.rotateX(entre(-0.4, 0.4));
+    c.userData = { debut: entre(0, 0.7), taille: V3(L * 0.4 / echelle.x, L / echelle.y, L * 0.4 / echelle.z) };   // (debut : quand il pousse)
+    c.scale.setScalar(0.0001); c.visible = false; parent.add(c); G.cristaux.push(c);
+  }
+  geles.push(G);
+}
+function degeler(h) { const G = geles.find(G => G.h === h); if (G) G.fond = true; }
+// elle touche le sol encore gelée : la glace vole en éclats (ses cristaux partent dans tous les sens), et le givre s'en va très vite
+function briser(h) {
+  const G = geles.find(G => G.h === h);
+  if (!G) return;
+  for (const c of G.cristaux) {
+    if (!c.visible) { c.parent?.remove(c); continue; }
+    scene.attach(c);   // (il garde sa place, sa taille et son angle)
+    lancerDebris(c, V3(entre(-5, 5), entre(2, 7), entre(-5, 5)), entre(0.6, 1.2));
+  }
+  G.cristaux = []; G.fond = true; G.vite = 4;
+  bruit(0.6, 7000, 0.35); bip(3200, 1800, 0.25, 'triangle', 0.08);   // la glace qui craque
+}
+function enleverGivre(G) {
+  for (const c of G.cristaux) c.parent?.remove(c);
+  G.h.g.traverse(m => { if (m.isMesh) for (const [o, c] of G.copies) if (m.material === c) m.material = o; });
+  for (const c of G.copies.values()) c.dispose();
+}
+// à chaque image (après majIronman) : le givre prend ou fond, ses cristaux poussent ou rapetissent, et il goutte quand il dégèle
+function majGivres(dt) {
+  const P = IRONMAN.givre;
+  GLACE.set(P.couleur);
+  for (const G of geles) {
+    G.givre = clamp(G.givre + (G.fond ? -G.vite / P.fonte : 1 / P.prise) * dt, 0, 1);
+    const k = G.givre;
+    for (const [o, c] of G.copies) {
+      if (o.isMeshBasicMaterial) { c.color.copy(o.color).lerp(ETEINT, k); continue; }   // ses lumières s'éteignent
+      c.color.copy(o.color).lerp(GLACE, 0.8 * k); c.emissive.copy(o.emissive).lerp(GLACE, 0.25 * k);
+      if (o.map) { c.color.multiplyScalar(1 - 0.8 * k); c.emissive.copy(GLACE).multiplyScalar(0.8 * k); }   // (le plastron, peint : la glace le recouvre)
+      c.roughness = lerp(o.roughness, 0.85, k); c.metalness = lerp(o.metalness, 0.1, k);   // (la glace ne brille pas comme le métal)
+    }
+    for (const c of G.cristaux) { const s = clamp((k - c.userData.debut) / 0.3, 0, 1); c.visible = s > 0; c.scale.copy(c.userData.taille).multiplyScalar(Math.max(s, 0.0001)); }
+    if (G.fond && k > 0 && Math.random() < dt * 25) { // il dégèle : une goutte tombe d'un cristal
+      const c = G.cristaux[Math.floor(Math.random() * G.cristaux.length)];
+      if (c?.visible) {
+        const g = new THREE.Mesh(GEO_GOUTTE, M_GOUTTE); c.getWorldPosition(g.position); g.scale.setScalar(0.035 * G.h.g.scale.y); scene.add(g);
+        lancerDebris(g, V3(entre(-0.4, 0.4), entre(-1.5, 0), entre(-0.4, 0.4)), 0.7);
+      }
+    }
+  }
+  for (let i = geles.length - 1; i >= 0; i--) { // dégelée, partie (Iron Monger vaincu, la mission finie), ou il est sorti de son armure
+    const G = geles[i];
+    if ((G.fond && G.givre <= 0) || !G.h.g.parent || (G.h === joueurH && !armureIronman())) { enleverGivre(G); geles.splice(i, 1); }
+  }
+  const G = geles.find(G => G.h === joueurH);   // à la 1re personne, ses bras gèlent aussi (majIronman vient de leur remettre leur matière)
+  if (G) for (const o of vm.children.slice(0, 2)) if (G.copies.has(o.material)) o.material = G.copies.get(o.material);
+}
 
 // --- la tour en feu (mission « Le pompier volant ») ---
 // La tour de la case (col, ligne) brûle : des flammes aux fenêtres de ses derniers étages, une colonne de fumée noire. Sur son toit, « nombre »
@@ -13867,7 +13990,7 @@ function majMonger(p, dt, d) {
     p.vy = (p.vy || 0) - R_.gravite * dt; p.y += p.vy * dt;
     if (p.y <= sol) {
       p.y = sol; p.vy = 0; p.gel = null; p.vole = false;
-      exploser(V3(p.x, p.y + 1, p.z), 7, 0, 25, p); J.secousse = Math.max(J.secousse || 0, 0.3 * clamp(1 - d / 80, 0, 1));
+      exploser(V3(p.x, p.y + 1, p.z), 7, 0, 25, p); J.secousse = Math.max(J.secousse || 0, 0.3 * clamp(1 - d / 80, 0, 1)); briser(h);   // (sa glace vole en éclats)
       annonce(tr('BOUM !'), tr("Iron Monger s'écrase : il est sonné !"), 2.5);
       blesser(p, M.vie * 0.3);
       if (p.vie <= 0) return;
@@ -13878,7 +14001,10 @@ function majMonger(p, dt, d) {
     p.x += v.x * dt; p.y += v.y * dt; p.z += v.z * dt; resoudre(p, 0.9, 4.5);
     if (p.zone) { p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]); }   // (même en volant, il reste au-dessus de son pâté)
     if (p.y < sol) p.y = sol;
-    if (p.y > M.givre) { p.gel = 0.001; p.vy = 0; annonce(tr('IRON MONGER GÈLE !'), tr("Son armure n'a pas été faite pour le froid : il tombe comme une pierre !"), 3.5); bip(1600, 300, 0.9, 'sine', 0.1); }
+    if (p.y > M.givre) {
+      p.gel = 0.001; p.vy = 0; annonce(tr('IRON MONGER GÈLE !'), tr("Son armure n'a pas été faite pour le froid : il tombe comme une pierre !"), 3.5); bip(1600, 300, 0.9, 'sine', 0.1);
+      geler(h); jarvis(tr("Alerte givre ! L'armure d'Iron Monger gèle."));   // il se couvre de glace, et J.A.R.V.I.S. le voit
+    }
     if ((J.sol || J.voiture || J.nage) && p.y - sol < 1.5) p.vole = false;   // Iron Man s'est posé : lui aussi
   } else { // à pied : il marche vers Iron Man ; il peut tomber d'un toit (sans se faire mal)
     p.vy = (p.vy || 0) - R_.gravite * dt; p.y += p.vy * dt;
@@ -13925,6 +14051,7 @@ function missileMonger(p, d) {
 // vaincu : une grosse explosion, des bouts de tôle qui volent, et il s'effondre
 function mongerVaincu(p) {
   const pos = V3(p.x, p.y + 2, p.z);
+  briser(p.h);   // (vaincu encore gelé)
   exploser(pos, 8, 0, 0, p); etincelles(pos, 20, 8);
   for (let k = 0; k < 12; k++) {
     const e = new THREE.Mesh(new THREE.BoxGeometry(entre(0.3, 0.8), entre(0.2, 0.6), entre(0.1, 0.3)), M_FER2);
@@ -15375,6 +15502,7 @@ const zoomMin = () => Math.min(innerWidth / (TAILLE_X + 2 * MARGE), innerHeight 
 function ouvrirCarte(ouvrir) {
   carte.ouverte = ouvrir; $('grande-carte').style.display = ouvrir ? 'block' : 'none';
   if (audio) { if (ouvrir) audio.suspend(); else audio.resume(); }   // pas de bruit de moteur pendant la pause
+  if (ouvrir) taireJarvis();
   if (!ouvrir) return;
   carte.zoom = zoomMin(); carte.x = J.x; carte.z = J.z; // on voit toute la ville ; en zoomant, on arrive sur le joueur
 }
@@ -15513,7 +15641,7 @@ function dessinerCasque(dt) {
   });
   // en bas : ce qui ne va pas (le plus grave d'abord), ou que tout va bien
   const casse = PARTIES_ARMURE.find(p => I.cassees[p.cle]);
-  const alerte = I.secours ? tr('BATTERIE VIDE') : casse ? tr('{partie} HORS SERVICE', { partie: tr(casse.nom).toUpperCase() }) : bat < B.faible ? tr('BATTERIE FAIBLE') : '';
+  const alerte = armureGelee() ? tr('ALERTE GIVRE') : I.secours ? tr('BATTERIE VIDE') : casse ? tr('{partie} HORS SERVICE', { partie: tr(casse.nom).toUpperCase() }) : bat < B.faible ? tr('BATTERIE FAIBLE') : '';
   c.textAlign = 'center'; c.font = police(13);
   c.fillStyle = alerte ? (cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .45)') : 'rgba(127, 228, 255, .7)';
   c.fillText(alerte ? `⚠ ${alerte}` : tr('SYSTÈMES EN LIGNE'), W / 2, 234);
@@ -15868,6 +15996,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   tenirPrise(dt);   // la voiture que Spiderman fait tourner au bout de sa toile
   majFete(dt);      // la grande roue et les montagnes russes de la jetée (Malibu)
   majIronman(dt);   // l'armure d'Iron Man : son masque, ses répulseurs, son plastron, ses réacteurs
+  majGivres(dt);    // les armures gelées (la sienne au premier vol, celle d'Iron Monger) : le givre qui prend ou qui fond
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
   auraBJ.material.map.offset.y -= dt * 1.5; auraBJ.material.opacity = (0.45 + Math.random() * 0.25) * (auraBJ.userData.avantInvisible ? 0.15 : 1);   // l'aura monte et tremble (on la voit à peine quand il est invisible)
   if (capeBJ.parent) majCape(dt);   // la cape de Superman flotte au vent
@@ -16013,7 +16142,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get traces() { return traces; }, get victimes() { return victimes; }, set victimes(v) { victimes = v; }, get bulles() { return bulles; }, set bulles(v) { bulles = v; },
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   MISSIONS_MALIBU, toursT, grotte, usine, vieuxReacteur, creerMonger, porterSecours, donnerArmure, texteEtape, commencerEtape, finirEtape, missions, monterRobot, faireArriver, majRepere, repere, fleche,
-  get markI() { return markI; }, get vague() { return vague; }, get anneaux() { return anneaux; }, get givre() { return givre; }, get sauvetage() { return sauvetage; }, get panne() { return panne; },
+  get markI() { return markI; }, get vague() { return vague; }, get anneaux() { return anneaux; }, get givre() { return givre; }, geles, geler, degeler, briser, jarvis, majGivres, get sauvetage() { return sauvetage; }, get panne() { return panne; },
   get obadiah() { return obadiah; }, sansReacteur, armureGelee, abimerArmure, PARTIES_ARMURE, marche, enSecours, depenser,
   get course() { return course; }, get allies() { return allies; }, get happy() { return happy; }, get porte() { return porte; }, get explosionExpo() { return explosionExpo; },
   get effondrement() { return effondrement; }, get repechage() { return repechage; }, get discours() { return discours; }, villaStark, trone, lieuEtape, couperVoiture, garderAllies,
