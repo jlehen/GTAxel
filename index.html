@@ -279,7 +279,8 @@ const CHAPITRES = [
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
     ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
-    'Tu es <b>{heros}</b>. <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !',
+    'Tu es <b>{heros}</b>. Ta toute première armure, tu vas la gagner dans ta première mission : suis le <b>point jaune</b> !',
+    'Ensuite, <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !',
     '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.',
     '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.',
     '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>L</b> : le masque.',
@@ -993,8 +994,12 @@ const TRADUCTIONS = {
     en: 'If you get up to mischief, the police will chase you: hide to shake them off.', gsw: 'Wänn du Seich machsch, verfolgt di d Polizei: Versteck di, zum si abhänke.' },
   'À la fin du chapitre, la <b>DeLorean</b> t\'emmène au chapitre suivant !': { de: 'Am Ende des Kapitels bringt dich der <b>DeLorean</b> ins nächste Kapitel!',
     en: 'At the end of the chapter, the <b>DeLorean</b> takes you to the next chapter!', gsw: 'Am Änd vom Kapitel bringt di de <b>DeLorean</b> is nächschte Kapitel!' },
-  'Tu es <b>{heros}</b>. <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !': { de: 'Du bist <b>{heros}</b>. <b>H</b>: Deine Rüstung fliegt herbei, und du wirst <b>{super}</b>!',
-    en: 'You are <b>{heros}</b>. <b>H</b>: your armor flies in, and you become <b>{super}</b>!', gsw: 'Du bisch <b>{heros}</b>. <b>H</b>: Dini Rüschtig flüügt här, und du wirsch <b>{super}</b>!' },
+  'Tu es <b>{heros}</b>. Ta toute première armure, tu vas la gagner dans ta première mission : suis le <b>point jaune</b> !': {
+    de: 'Du bist <b>{heros}</b>. Deine allererste Rüstung bekommst du in deiner ersten Mission: Folge dem <b>gelben Punkt</b>!',
+    en: 'You are <b>{heros}</b>. You will earn your very first armour in your first mission: follow the <b>yellow dot</b>!',
+    gsw: 'Du bisch <b>{heros}</b>. Dini allererschti Rüschtig überchunsch i dinere erschte Mission: Folg em <b>gääle Punkt</b>!' },
+  'Ensuite, <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !': { de: 'Danach, <b>H</b>: Deine Rüstung fliegt herbei, und du wirst <b>{super}</b>!',
+    en: 'Then, <b>H</b>: your armour flies in, and you become <b>{super}</b>!', gsw: 'Dänn, <b>H</b>: Dini Rüschtig flüügt här, und du wirsch <b>{super}</b>!' },
   '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.': { de: '<b>Q</b> und <b>E</b>: die Repulsoren deiner Hände. <b>R</b>: der Strahl der Brustplatte.',
     en: '<b>Q</b> and <b>E</b>: the repulsors in your hands. <b>R</b>: the chest beam.', gsw: '<b>Q</b> und <b>E</b>: d Repulsore vo dine Händ. <b>R</b>: de Strahl vo de Bruschtplatte.' },
   '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.': { de: '<b>F</b>: fliegen, und noch einmal <b>F</b> zum Landen. Im Flug, <b>Shift</b>: schneller.',
@@ -1075,18 +1080,30 @@ const TRADUCTIONS = {
   'Combattant des Dix Anneaux': { de: 'Kämpfer der Zehn Ringe', en: 'Ten Rings fighter', gsw: 'Kämpfer vo de Zäh Ringe' },
   'Habitant de la tour': { de: 'Bewohner des Turms', en: 'Tower resident', gsw: 'Bewohner vom Turm' },
   'La grotte des Dix Anneaux': { de: 'Die Höhle der Zehn Ringe', en: 'The Ten Rings cave', gsw: 'D Höhli vo de Zäh Ringe' },
-  'Les Dix Anneaux ont volé des armes de Stark Industries : va à leur grotte, dans le désert (point jaune)': {
-    de: 'Die Zehn Ringe haben Waffen von Stark Industries gestohlen: Geh zu ihrer Höhle in der Wüste (gelber Punkt)',
-    en: 'The Ten Rings have stolen weapons from Stark Industries: go to their cave in the desert (yellow dot)',
-    gsw: 'D Zäh Ringe händ Waffe vo Stark Industries klaut: Gang zu ihrer Höhli i de Wüeschti (gääle Punkt)' },
-  'Dans la grotte, ta toute première armure t\'attend : monte dans la Mark I, en ferraille (touche E)': {
-    de: 'In der Höhle wartet deine allererste Rüstung: Steig in den Mark I aus Altmetall (Taste E)',
-    en: 'In the cave, your very first armour is waiting: climb into the scrap-metal Mark I (E key)',
-    gsw: 'I de Höhli wartet dini allererschti Rüschtig: Stiig in Mark I us Altmetall (Taschte E)' },
-  'Les Dix Anneaux attaquent ! Clic droit : les lance-flammes · clic gauche : la mitrailleuse · F : les fusées. Il en reste {n}': {
-    de: 'Die Zehn Ringe greifen an! Rechtsklick: Flammenwerfer · Linksklick: Maschinengewehr · F: Raketen. Noch {n}',
-    en: 'The Ten Rings attack! Right click: flamethrowers · left click: machine gun · F: rockets. {n} left',
-    gsw: 'D Zäh Ringe griifed aa! Rächtschlick: Flammewärfer · Linkschlick: Maschinegwehr · F: Rakete. Na {n}' },
+  "Tu vas montrer tes nouveaux missiles à l'armée : rejoins le convoi, sur la route (point jaune)": {
+    de: 'Du zeigst der Armee deine neuen Raketen: Fahr zum Konvoi auf der Straße (gelber Punkt)',
+    en: 'You are showing your new missiles to the army: join the convoy on the road (yellow dot)',
+    gsw: 'Du zeigsch de Armee dini neue Rakete: Gang zum Konvoi uf de Strass (gääle Punkt)' },
+  'Avec des bouts de missiles, tu as fabriqué une armure en ferraille : monte dans la Mark I (touche E) !': {
+    de: 'Aus Raketenteilen hast du eine Rüstung aus Altmetall gebaut: Steig in den Mark I (Taste E)!',
+    en: 'Out of missile parts, you built a scrap-metal armour: climb into the Mark I (E key)!',
+    gsw: 'Us Raketeteil häsch du e Rüschtig us Altmetall baut: Stiig in Mark I (Taschte E)!' },
+  'Casse la porte de ta cellule ! Clic gauche : la mitrailleuse · clic droit : les lance-flammes': {
+    de: 'Brich die Tür deiner Zelle auf! Linksklick: Maschinengewehr · Rechtsklick: Flammenwerfer',
+    en: 'Break down the door of your cell! Left click: machine gun · right click: flamethrowers',
+    gsw: 'Mach d Tür vo dinere Zälle kaputt! Linkschlick: Maschinegwehr · Rächtschlick: Flammewärfer' },
+  "Suis la galerie jusqu'à la sortie, et casse la grande porte de la grotte ! Attention aux gardes": {
+    de: 'Folge dem Gang bis zum Ausgang und brich das große Tor der Höhle auf! Achtung, Wachen',
+    en: 'Follow the tunnel to the way out, and break down the big door of the cave! Watch out for the guards',
+    gsw: 'Folg em Gang bis zum Usgang und mach s grosse Tor vo de Höhli kaputt! Achtung, Wächter' },
+  'Le camp des Dix Anneaux : ils sortent des tentes ! F : les fusées. Il en reste {n}': {
+    de: 'Das Lager der Zehn Ringe: Sie kommen aus den Zelten! F: Raketen. Noch {n}',
+    en: 'The Ten Rings camp: they are coming out of the tents! F: rockets. {n} left',
+    gsw: 'S Lager vo de Zäh Ringe: Si chömed us de Zält! F: Rakete. Na {n}' },
+  'Raza, le chef des Dix Anneaux, arrive avec son lance-roquettes : arrête-le !': {
+    de: 'Raza, der Anführer der Zehn Ringe, kommt mit seinem Raketenwerfer: Halte ihn auf!',
+    en: 'Raza, the leader of the Ten Rings, is coming with his rocket launcher: stop him!',
+    gsw: 'De Raza, de Chef vo de Zäh Ringe, chunnt mit sim Raketewärfer: Halt en uf!' },
   'Le premier vol': { de: 'Der erste Flug', en: 'The first flight', gsw: 'De erscht Flug' },
   'Ta nouvelle armure, la Mark II, est prête : rentre dans ton atelier, à la villa (point jaune)': {
     de: 'Deine neue Rüstung, der Mark II, ist fertig: Geh in deine Werkstatt in der Villa (gelber Punkt)',
@@ -1169,6 +1186,31 @@ const TRADUCTIONS = {
   'Ton armure est gelée : attends que le givre fonde !': { de: 'Deine Rüstung ist vereist: Warte, bis das Eis schmilzt!', en: 'Your armour is frozen: wait for the ice to melt!', gsw: 'Dini Rüschtig isch vereist: Wart, bis s Iis schmilzt!' },
   "Continue à pied : une Mark I neuve t'attendra dans la grotte quand tu te seras éloigné": { de: 'Geh zu Fuß weiter: Ein neuer Mark I wartet in der Höhle, wenn du weg bist',
     en: 'Carry on on foot: a new Mark I will be waiting in the cave once you have moved away', gsw: 'Lauf z Fuess wiiter: En neue Mark I wartet i de Höhli, wänn du wäg bisch' },
+  // l'embuscade, la grotte des Dix Anneaux, ses portes et Raza ; pas d'armure avant de s'évader
+  "Continue à pied, ou retourne dans ta cellule : une Mark I neuve t'y attend": { de: 'Geh zu Fuß weiter oder zurück in deine Zelle: Dort wartet ein neuer Mark I',
+    en: 'Carry on on foot, or go back to your cell: a new Mark I is waiting there', gsw: 'Lauf z Fuess wiiter oder gang zrugg i dini Zälle: Det wartet en neue Mark I' },
+  'EMBUSCADE !': { de: 'HINTERHALT!', en: 'AMBUSH!', gsw: 'HINDERHALT!' },
+  'Les Dix Anneaux attaquent le convoi !': { de: 'Die Zehn Ringe greifen den Konvoi an!', en: 'The Ten Rings are attacking the convoy!', gsw: 'D Zäh Ringe griifed de Konvoi aa!' },
+  'Une bombe... de Stark Industries !': { de: 'Eine Bombe ... von Stark Industries!', en: 'A bomb... from Stark Industries!', gsw: 'E Bombe ... vo Stark Industries!' },
+  'Plus tard, dans une grotte...': { de: 'Später, in einer Höhle ...', en: 'Later, in a cave...', gsw: 'Spöter, i nere Höhli ...' },
+  'EN CAPTIVITÉ !': { de: 'GEFANGEN!', en: 'CAPTURED!', gsw: 'GFANGE!' },
+  'Les Dix Anneaux te gardent au fond de leur grotte': { de: 'Die Zehn Ringe halten dich tief in ihrer Höhle gefangen', en: 'The Ten Rings are holding you deep inside their cave', gsw: 'D Zäh Ringe händ di z hinderscht i ihrer Höhli gfange' },
+  'Les Dix Anneaux te ramènent dans ta cellule (-100 $)': { de: 'Die Zehn Ringe bringen dich zurück in deine Zelle (-100 $)', en: 'The Ten Rings take you back to your cell (-100 $)', gsw: 'D Zäh Ringe bringed di zrugg i dini Zälle (-100 $)' },
+  'LA PORTE CÈDE !': { de: 'DIE TÜR GIBT NACH!', en: 'THE DOOR GIVES WAY!', gsw: 'D TÜR GIT NAA!' },
+  'LA GRANDE PORTE CÈDE !': { de: 'DAS GROSSE TOR GIBT NACH!', en: 'THE BIG DOOR GIVES WAY!', gsw: 'S GROSSE TOR GIT NAA!' },
+  'Dehors, le camp des Dix Anneaux : ils sortent des tentes !': { de: 'Draußen das Lager der Zehn Ringe: Sie kommen aus den Zelten!', en: 'Outside, the Ten Rings camp: they are coming out of the tents!', gsw: 'Dusse s Lager vo de Zäh Ringe: Si chömed us de Zält!' },
+  "« Tu ne sortiras jamais d'ici, {heros} ! »": { de: '„Hier kommst du nie raus, {heros}!“', en: '"You will never get out of here, {heros}!"', gsw: '«Da chunsch nie use, {heros}!»' },
+  "PAS ENCORE D'ARMURE": { de: 'NOCH KEINE RÜSTUNG', en: 'NO ARMOUR YET', gsw: 'NO KEI RÜSCHTIG' },
+  "Ta toute première armure, la Mark I, t'attend dans ta cellule": { de: 'Deine allererste Rüstung, der Mark I, wartet in deiner Zelle', en: 'Your very first armour, the Mark I, is waiting in your cell', gsw: 'Dini allererschti Rüschtig, de Mark I, wartet i dinere Zälle' },
+  'Ta toute première armure, tu vas la fabriquer : suis le point jaune !': { de: 'Deine allererste Rüstung baust du selbst: Folge dem gelben Punkt!', en: 'You are going to build your very first armour: follow the yellow dot!', gsw: 'Dini allererschti Rüschtig bausch du sälber: Folg em gääle Punkt!' },
+  'MAGASIN FERMÉ': { de: 'LADEN GESCHLOSSEN', en: 'SHOP CLOSED', gsw: 'LADE ZUE' },
+  'Il ouvre quand tu as ta toute première armure : suis le point jaune !': { de: 'Er öffnet, wenn du deine allererste Rüstung hast: Folge dem gelben Punkt!', en: 'It opens once you have your very first armour: follow the yellow dot!', gsw: 'Er gaht uf, wänn du dini allererschti Rüschtig häsch: Folg em gääle Punkt!' },
+  'Le magasin ouvre quand tu as ta toute première armure (suis le point jaune)': { de: 'Der Laden öffnet, wenn du deine allererste Rüstung hast (folge dem gelben Punkt)',
+    en: 'The shop opens once you have your very first armour (follow the yellow dot)', gsw: 'De Lade gaht uf, wänn du dini allererschti Rüschtig häsch (folg em gääle Punkt)' },
+  'Évasion réussie ! Maintenant, tu as ton armure : <b>H</b>, elle arrive en volant, et tu deviens <b>{super}</b>.': {
+    de: 'Flucht gelungen! Jetzt hast du deine Rüstung: <b>H</b>, sie fliegt herbei, und du wirst <b>{super}</b>.',
+    en: 'Escape complete! Now you have your armour: <b>H</b>, it flies in, and you become <b>{super}</b>.',
+    gsw: 'Flucht gschafft! Jetzt häsch dini Rüschtig: <b>H</b>, si flüügt här, und du wirsch <b>{super}</b>.' },
   'Appuie sur <b>E</b> pour le prendre dans tes bras': { de: 'Drück <b>E</b>, um ihn in die Arme zu nehmen', en: 'Press <b>E</b> to pick them up', gsw: 'Druck <b>E</b>, zum en i d Arme z näh' },
   'Mets ton armure (<b>H</b>) pour le porter': { de: 'Zieh deine Rüstung an (<b>H</b>), um ihn zu tragen', en: 'Put on your armour (<b>H</b>) to carry them', gsw: 'Leg dini Rüschtig aa (<b>H</b>), zum en träge' },
   'Plus près ! Mets-toi juste à côté de lui, puis E': { de: 'Näher! Stell dich direkt neben ihn, dann E', en: 'Closer! Stand right next to them, then E', gsw: 'Nöcher! Stell di grad näbe en, dänn E' },
@@ -1995,10 +2037,12 @@ const ENNEMIS = {
   // Combien ils sont, et combien à la fois : voir CAMP, juste en dessous
   militaire: { nom: 'Militaire',     vie: 75,  arme: 3, degats: 10, precision: 0.4,  vue: 45, tir: [1.2, 2],   vitesse: 4.5 },
   engel:     { nom: 'Irene Engel',   vie: 300, arme: 2, degats: 12, precision: 0.4,  vue: 14, tir: [0.7, 1.4], vitesse: 4.5 },   // (vue : elle ne voit pas plus loin que son bureau)
-  // Malibu (le chapitre d'Iron Man) : les combattants des Dix Anneaux, au fusil d'assaut (arme 5), dans leur grotte ; et Iron Monger, la grosse
+  // Malibu (le chapitre d'Iron Man) : les combattants des Dix Anneaux, au fusil d'assaut (arme 5), dans leur grotte, et leur chef ; et Iron Monger, la grosse
   // armure d'Obadiah Stane. Iron Monger : degats (une balle de la mitrailleuse de son bras), degatsRoquette (un de ses missiles d'épaule),
   // taille (combien de fois plus grand que toi), vol (sa vitesse en volant, en m/s), givre (à cette hauteur, en mètres, son armure gèle : il tombe !)
   anneaux:   { nom: 'Combattant des Dix Anneaux', vie: 75, arme: 5, degats: 8, precision: 0.35, vue: 45, tir: [1, 2], vitesse: 4.5 },
+  // Raza, leur chef : chauve, avec un lance-roquettes (arme 6 : le bazooka). degats : une de ses roquettes en plein
+  raza:      { nom: 'Raza',          vie: 2000, arme: 6, degats: 45, precision: 0.5, vue: 70, tir: [2.5, 4], vitesse: 4.5, boss: true },
   monger:    { nom: 'Iron Monger',   vie: 9000, degats: 8, degatsRoquette: 25, precision: 0.3, vue: 120, tir: [2, 3.5], vitesse: 3.5, taille: 2.6, vol: 24, givre: 450, boss: true },
   rescape:   { nom: 'Habitant de la tour', vie: 50 },   // ceux qu'Iron Man sauve de la tour en feu (mission « Le pompier volant »)
   // Whiplash (Ivan Vanko) et ses deux fouets électriques : degats (un coup de fouet), degatsEclair (l'éclair qu'il lance de loin, toutes les
@@ -2276,6 +2320,8 @@ let NOMS_LIEUX = [
 let PANNEAUX = [];
 // les palmiers poussent sur les plages à partir de cette ligne de la CARTE (plus au nord, il n'y a rien sur le sable)
 let PALMIERS = 41;
+// la galerie de la grotte des Dix Anneaux, qui s'enfonce dans la colline (voir VILLES : à Malibu) ; à Los Santos, il n'y a pas de grotte
+let GALERIE = null;
 
 // =====================================================================
 //  LES GANGS : ils traînent dans leur quartier, et te laissent tranquille... sauf si tu en frappes un,
@@ -2297,13 +2343,18 @@ let GANGS = [
 //  PANNEAUX : les grandes lettres blanches posées sur une colline : texte, col, ligne (le milieu du mot), angle (vers où elles regardent :
 //    0 = le sud, 90 = l'est, 180 = le nord, 270 = l'ouest). Écris ton nom sur la colline !
 //  PALMIERS : les palmiers poussent sur les plages à partir de cette ligne de la carte (0 : sur toutes les plages)
+//  GALERIE : la galerie de la grotte ()), qui part du bord sud de son pâté et s'enfonce dans la colline, en tournant. chemin : les coins
+//    de son chemin, en mètres, depuis le milieu du bord sud du pâté ([vers l'est, vers le sud] : le premier, c'est l'entrée, [0, 0], et le
+//    deuxième doit être juste au sud). D'un coin à l'autre, elle va tout droit, sans biais (soit vers l'est ou l'ouest, soit vers le nord ou
+//    le sud). Au bout, la cellule où Tony se réveille. largeur, hauteur : sa taille, en mètres. porteCellule, porteGrotte : les points de vie
+//    des deux portes à casser (celle de la cellule, puis la grande porte de la grotte)
 // =====================================================================
 const VILLES = {
   // Malibu, au chapitre 2 (Iron Man). Dans sa CARTE, les signes de Los Santos, et ceux de Malibu (* = avec un étage ou un toit où monter) :
   //    < villa de Tony Stark*, au bout de la pointe, sur la falaise : son atelier en bas, le salon en haut
   //    | tour Stark* : un ascenseur monte jusqu'au toit, où Iron Man se pose        $ usine Stark Industries : on y entre
   //    ( Stark Expo : son grand globe, au milieu d'un parc        > repaire du Mandarin, sur la falaise : la DeLorean y est cachée
-  //    ) grotte des Dix Anneaux, creusée dans la montagne
+  //    ) grotte des Dix Anneaux : le camp et ses tentes, au pied d'une colline ; la galerie s'y enfonce (voir GALERIE)
   //    - jetée en planches, sur la mer ; du côté de la terre, la grande roue et les montagnes russes
   'Malibu': {
     CARTE: [
@@ -2335,8 +2386,8 @@ const VILLES = {
       "~~~3344555443322222212333433=211,1122222=1,,,::::::::::::12345=5432211_~~~",  // 25
       "~~~233444443=====1122222333=211,112333332=111111::::::::::2345=54333221~~~",  // 26
       "~~~22333333=2221,==2333222=211,,123344433=1222221:::::::::1235)53444322~~~",  // 27
-      "~~~~222333=33322112==4432=111111123455543=22333221::::::::1125554555432~~~",  // 28
-      "~~~~11222=34443211234==3=1,*1122223456543=234443211111:::::11234556554~~~~",  // 29
+      "~~~~222333=33322112==4432=111111123455543=22333221::::::::1127774555432~~~",  // 28
+      "~~~~11222=34443211234==3=1,*1122223456543=234443211111:::::11555556554~~~~",  // 29
       "~~~__111=23454321123444=21,,1233323455543=2345432122211::11112345676543~~~",  // 30
       "~~~~***=12344432112233=221**1234323344433=23444322232211112222345565543~~~",  // 31
       "~~~_*,=*122333221*122=221,,,1233322333332=22333222333221122333234555432~~~",  // 32
@@ -2386,19 +2437,22 @@ const VILLES = {
     ],
     PANNEAUX: [{ texte: 'HOLLYWOOD', col: 37, ligne: 31, angle: 0 }],
     PALMIERS: 0,
+    GALERIE: { chemin: [[0, 0], [0, 16], [-16, 16], [-16, 36], [16, 36], [16, 54], [-4, 54]], largeur: 7, hauteur: 5, porteCellule: 500, porteGrotte: 1000 },
   },
 };
 
 // =====================================================================
 //  LES MISSIONS : invente les tiennes !
 //  lieu : une lettre de la CARTE. S'il y en a plusieurs (un garage 'G'...), c'est la plus proche qui compte.
-//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss', 'hitler', 'militaire', 'engel', ou à Malibu 'anneaux',
+//  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss', 'hitler', 'militaire', 'engel', ou à Malibu 'anneaux', 'raza',
 //    'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian' : voir ENNEMIS)
 //  etoiles (nombre) · semer · arme (le nom d'une arme à posséder)
 //  blindage (avoir une voiture blindée par le garagiste) · voler (lieu : tout le butin de ce pâté est dans le sac)
 //  bouton (le bouton rouge du camp militaire est enfoncé) · conduire (voiture : être au volant d'une voiture de ce nom)
 //  voyager (partir dans un autre chapitre avec la DeLorean : 88 miles à l'heure pendant 3 secondes)
 //  Et pour Iron Man (le chapitre 2), dans son armure :
+//  embuscade (case, lieu ou noeud : le rendez-vous. Les Dix Anneaux y attaquent : tu perds connaissance, et tu te réveilles prisonnier
+//    dans leur grotte, dans ta cellule) · casser (porte : 'cellule', puis 'grotte' : casse cette porte de la grotte, avec tes armes)
 //  armure (monter dans la Mark I, l'armure en ferraille de la grotte des Dix Anneaux) · porter (armure : avoir mis l'armure de ce nom,
 //    une des ARMURES_STARK ; celle qui a « mission: true », l'étape te la donne)
 //  anneaux (passer en volant dans les anneaux, dans l'ordre : [colonne, ligne, hauteur au-dessus du sol] pour chacun)
@@ -2410,8 +2464,11 @@ const VILLES = {
 //    de feu, en mètres : il faut avoir emmené {ami} plus loin, dans tes bras ; degats : ce qu'elle te fait au milieu, s'il y est. Ensuite,
 //    pose-toi pour déposer {ami}) · repecher ({ami} est tombé à l'eau : prends-le dans tes bras, avec E, et ramène-le en
 //    haut de la falaise) · parler (qui : 'trevor' : va le voir, et écoute ce qu'il a à dire)
-//  Pour « eliminer », nombre : ils arrivent au début de l'étape, autour du lieu (ensemble : jamais plus à la fois). noeud : à la place d'un
-//  lieu, un carrefour [colonne, ligne] (Whiplash, au milieu de la course). allies : les armures qui se battent avec toi ('War Machine').
+//  Pour « eliminer » (et « casser »), nombre : ils arrivent au début de l'étape, autour du lieu (ensemble : jamais plus à la fois). À la
+//  grotte, depuis : d'où ils arrivent ('galerie' : postés dans la galerie ; 'tentes' : ils sortent des tentes du camp ; 'chef' : au nord du
+//  camp). noeud : à la place d'un lieu, un carrefour [colonne, ligne] (Whiplash, au milieu de la course) ; case : le milieu d'une case
+//  [colonne, ligne] (sur une route de campagne, on est sur la route). allies : les armures qui se battent avec toi ('War Machine').
+//  armures: true (sur la mission) : avant de l'avoir finie, Iron Man n'a aucune armure (H ne fait rien, le magasin attend).
 //  fuite : quand il n'a plus que cette part de sa vie (0.5 = la moitié), il s'enfuit, et c'est gagné.
 //  Dans le texte d'une étape, {n} est remplacé par ce qu'il reste (des ennemis, des anneaux, des gens à sauver), {t} par les secondes qui
 //  restent, {h} par la hauteur à atteindre et {y} par celle où tu es, {ami} par Pepper Potts (ou par Tony Stark, avec la fille du menu).
@@ -2489,11 +2546,17 @@ const DELOREAN_MANDARIN = { nom: 'Le repaire du Mandarin', recompense: 1000, eta
 ]};
 // les missions d'Iron Man, à Malibu, dans l'ordre des films (les étapes armure, porter, anneaux, givre, sauver et reacteur : voir MISSIONS)
 const MISSIONS_MALIBU = [
-  // Iron Man (2008) : sa toute première armure, en ferraille, fabriquée dans la grotte des Dix Anneaux. Elle a des lance-flammes !
-  { nom: 'La grotte des Dix Anneaux', recompense: 10000, etapes: [
-    { type: 'aller', lieu: ')', texte: 'Les Dix Anneaux ont volé des armes de Stark Industries : va à leur grotte, dans le désert (point jaune)' },
-    { type: 'armure', lieu: ')', texte: 'Dans la grotte, ta toute première armure t\'attend : monte dans la Mark I, en ferraille (touche E)' },
-    { type: 'eliminer', cible: 'anneaux', nombre: 12, ensemble: 6, lieu: ')', texte: 'Les Dix Anneaux attaquent ! Clic droit : les lance-flammes · clic gauche : la mitrailleuse · F : les fusées. Il en reste {n}' },
+  // Iron Man (2008) : Tony Stark va montrer ses missiles à l'armée... et tombe dans une embuscade des Dix Anneaux. Il se réveille prisonnier
+  // au fond de leur grotte, où il a fabriqué sa toute première armure, la Mark I, en ferraille (avec des lance-flammes !). Il casse la porte
+  // de sa cellule, puis celle de la grotte, et s'évade. armures: true : avant la fin de cette mission, il n'a aucune armure
+  { nom: 'La grotte des Dix Anneaux', recompense: 10000, armures: true, etapes: [
+    { type: 'embuscade', case: [13, 35], texte: "Tu vas montrer tes nouveaux missiles à l'armée : rejoins le convoi, sur la route (point jaune)" },
+    { type: 'armure', lieu: ')', texte: 'Avec des bouts de missiles, tu as fabriqué une armure en ferraille : monte dans la Mark I (touche E) !' },
+    { type: 'casser', porte: 'cellule', texte: 'Casse la porte de ta cellule ! Clic gauche : la mitrailleuse · clic droit : les lance-flammes' },
+    { type: 'casser', porte: 'grotte', cible: 'anneaux', nombre: 8, lieu: ')', depuis: 'galerie',
+      texte: 'Suis la galerie jusqu\'à la sortie, et casse la grande porte de la grotte ! Attention aux gardes' },
+    { type: 'eliminer', cible: 'anneaux', nombre: 24, ensemble: 8, lieu: ')', depuis: 'tentes', texte: 'Le camp des Dix Anneaux : ils sortent des tentes ! F : les fusées. Il en reste {n}' },
+    { type: 'eliminer', cible: 'raza', nombre: 1, lieu: ')', depuis: 'chef', texte: 'Raza, le chef des Dix Anneaux, arrive avec son lance-roquettes : arrête-le !' },
   ]},
   // la Mark II, argentée : le premier vol, dans des anneaux au-dessus de la pointe de Malibu... puis tout là-haut, où elle gèle
   { nom: 'Le premier vol', recompense: 15000, etapes: [
@@ -3178,8 +3241,8 @@ const S = 60, R = 14, PAS = S + R, VOIE = 3.2;
 const EAU = -1;                // la hauteur de l'eau : mer, lacs et rivières
 const PASMAX = 0.6;            // la plus haute marche qu'on monte sans sauter
 // le pays du chapitre : Los Santos (la CARTE et ses tableaux), ou la ville du chapitre (VILLES), dont les tableaux les remplacent
-if (VILLES[CHAPITRE.ville]) ({ CARTE, SOMMETS, REMONTEES, PISTES_SKI, NAVETTE, NOMS_LIEUX, GANGS, CASCADES, PANNEAUX, PALMIERS } =
-  { SOMMETS: [], REMONTEES: [], PISTES_SKI: [], NAVETTE: [], NOMS_LIEUX: [], GANGS: [], CASCADES: [], PANNEAUX: [], PALMIERS: 0, ...VILLES[CHAPITRE.ville] });
+if (VILLES[CHAPITRE.ville]) ({ CARTE, SOMMETS, REMONTEES, PISTES_SKI, NAVETTE, NOMS_LIEUX, GANGS, CASCADES, PANNEAUX, PALMIERS, GALERIE } =
+  { SOMMETS: [], REMONTEES: [], PISTES_SKI: [], NAVETTE: [], NOMS_LIEUX: [], GANGS: [], CASCADES: [], PANNEAUX: [], PALMIERS: 0, GALERIE: null, ...VILLES[CHAPITRE.ville] });
 const NBX = CARTE[0].length, NBZ = CARTE.length;
 const TAILLE_X = NBX * PAS + R, TAILLE_Z = NBZ * PAS + R;
 CARTE.forEach((l, i) => { if (l.length !== NBX) alert(`Carte : la ligne ${i} n'a pas la bonne longueur !`); });
@@ -3337,25 +3400,33 @@ function terrainNaturel(x, z) {
   // les SOMMETS n'ont pas de petites bosses (on y skie), mais de grandes arêtes et de grands creux, et leurs replats et leurs murs
   const sm = sommetEn(x, z), sh = sm.lisse;
   h += bosses(x, z) * (1.2 + 0.1 * clamp(h - sh, 0, 270)) + bruitDoux(x / 260, z / 260) * 0.06 * sh + sm.h - sh;
-  // autour d'une ville (ou d'une piste), le terrain est à plat, à la hauteur de la ville, puis il rejoint doucement le reste
-  let dmin = Infinity, base = 0;
+  // autour d'une ville (ou d'une piste), le terrain est à plat sur « plat » mètres, à la hauteur de la ville, puis il rejoint doucement le
+  // reste en « fondu » mètres. La grotte des Dix Anneaux, au pied de sa colline, n'a pas de rues autour : la colline monte tout de suite
+  let dmin = Infinity, base = 0, plat = 4, fondu = 40;
   const ci = Math.floor((x - R / 2) / PAS), cj = Math.floor((z - R / 2) / PAS);
   for (let j = cj - 1; j <= cj + 1; j++) for (let i = ci - 1; i <= ci + 1; i++) {
     const c = car(i, j);
     if (!estPlat(c)) continue;
-    const m = estPiste(c) ? R / 2 : 0, n = estPiste(c) ? R / 2 : R;   // un pâté compte avec ses rues
+    const pied = c === ')', m = estPiste(c) ? R / 2 : pied ? R : 0, n = estPiste(c) ? R / 2 : pied ? 0 : R;   // un pâté compte avec ses rues
     const d = Math.hypot(Math.max(i * PAS + m - x, 0, x - (i + 1) * PAS - n), Math.max(j * PAS + m - z, 0, z - (j + 1) * PAS - n));
-    if (d < dmin) { dmin = d; base = baseCase[j][i]; }
+    if (d < dmin) { dmin = d; base = baseCase[j][i]; [plat, fondu] = pied ? [0, 24] : [4, 40]; }
   }
-  if (dmin < 44) { const t = clamp((dmin - 4) / 40, 0, 1); h = base - 0.05 + (h - base + 0.05) * t * t * (3 - 2 * t); }
+  if (dmin < plat + fondu) { const t = clamp((dmin - plat) / fondu, 0, 1); h = base - 0.05 + (h - base + 0.05) * t * t * (3 - 2 * t); }
   return h;
 }
 // le terrain est une grille de points tous les PT mètres ; HT = leur hauteur
 const PT = PAS / 8, NXT = (NBX + 1) * 8 + 1, NZT = (NBZ + 1) * 8 + 1;
 const HT = new Float32Array(NXT * NZT);
 for (let iz = 0; iz < NZT; iz++) for (let ix = 0; ix < NXT; ix++) HT[iz * NXT + ix] = terrainNaturel(ix * PT, iz * PT);
-// la hauteur exacte du terrain dessiné (chaque carré de la grille est fait de deux triangles), plus le relief des pistes de ski
-function hauteurTerrain(x, z) {
+// la galerie de la grotte des Dix Anneaux, sous la colline (voir « la galerie de la grotte », plus bas) : ses morceaux (rects), son sol et son
+// plafond. trousTerrain : les carrés du terrain qu'on ne dessine pas, à son entrée (la falaise les cache)
+let galerie = null;
+const trousTerrain = new Set();
+function dansGalerie(x, z) { const G = galerie; return !!G && x > G.x1 && x < G.x2 && z > G.z1 && z < G.z2 && G.rects.some(r => x >= r.x1 && x <= r.x2 && z >= r.z1 && z <= r.z2); }
+// la hauteur exacte du terrain dessiné (chaque carré de la grille est fait de deux triangles), plus le relief des pistes de ski.
+// Pour quelqu'un dont les pieds sont en y (sans y : en bas), dans la galerie de la grotte : son sol, et pas la colline au-dessus
+function hauteurTerrain(x, z, y = -Infinity) {
+  if (galerie && y < galerie.toit + 1 && dansGalerie(x, z)) return galerie.sol;
   const fx = clamp(x / PT, 0, NXT - 1.001), fz = clamp(z / PT, 0, NZT - 1.001), ix = Math.floor(fx), iz = Math.floor(fz), u = fx - ix, w = fz - iz, k = iz * NXT + ix;
   const a = HT[k], b = HT[k + 1], c = HT[k + NXT], d = HT[k + NXT + 1];
   return (u + w <= 1 ? a + (b - a) * u + (c - a) * w : d + (c - d) * (1 - u) + (b - d) * (1 - w)) + reliefSki(x, z);
@@ -3380,8 +3451,9 @@ MISSIONS_CH.forEach(m => m.etapes.forEach(e => {
 }));
 if (!lieux[CHAPITRE.cachette]) alert(`Chapitre ${chapitre} : la cachette de la DeLorean, "${CHAPITRE.cachette}", n'est pas sur la carte !`);
 
-// les rues des villes suivent les lignes entre les cases : rueH(i, j) va du carrefour (i, j) à (i + 1, j), rueV(i, j) de (i, j) à (i, j + 1)
-const bordeRue = c => estBloc(c) || c === '+';
+// les rues des villes suivent les lignes entre les cases : rueH(i, j) va du carrefour (i, j) à (i + 1, j), rueV(i, j) de (i, j) à (i, j + 1).
+// (Pas de rues autour de la grotte des Dix Anneaux : son camp est dans la montagne)
+const bordeRue = c => (estBloc(c) && c !== ')') || c === '+';
 const rueH = (i, j) => bordeRue(car(i, j - 1)) || bordeRue(car(i, j));
 const rueV = (i, j) => bordeRue(car(i - 1, j)) || bordeRue(car(i, j));
 const estCarrefour = (i, j) => rueH(i, j) || rueH(i - 1, j) || rueV(i, j) || rueV(i, j - 1);
@@ -3571,6 +3643,52 @@ for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
     for (let iz = Math.max(0, Math.floor(z1 / PT)); iz <= Math.min(NZT - 2, Math.floor(z2 / PT)); iz++)
       for (let ix = Math.max(0, Math.floor(x1 / PT)); ix <= Math.min(NXT - 2, Math.floor(x2 / PT)); ix++)
         for (const k of [iz * NXT + ix, iz * NXT + ix + 1, (iz + 1) * NXT + ix, (iz + 1) * NXT + ix + 1]) HT[k] = Math.min(HT[k], y);
+  }
+}
+// la galerie de la grotte des Dix Anneaux ()) : elle part du milieu du bord sud de son pâté, et s'enfonce dans la colline en tournant
+// (GALERIE, dans VILLES). Ses morceaux (rects) : un par bout de chemin, d'un coin au suivant, qui déborde d'une demi-largeur à chaque bout
+// pour rejoindre ses voisins dans les tournants (sauf à l'entrée, au pied de la falaise, et au dernier coin, où est la porte de la cellule) ;
+// puis la cellule, 10 m plus loin, et 12 m de large. Son sol est à la hauteur du camp ; dedans, c'est lui que donne hauteurTerrain.
+// Derrière le camp, la colline monte à pic ; au-dessus de la galerie, elle est relevée là où elle n'aurait pas 3,5 m de roche sur le plafond ;
+// près de l'entrée, là où elle est trop basse, le terrain est percé (trousTerrain) : le porche de l'entrée (falaise : son emprise),
+// construit avec le pâté, bouche le trou
+if (GALERIE && lieux[')']) {
+  const L = GALERIE, [i, j] = blocEn(lieux[')'][0].x, lieux[')'][0].z), h = L.largeur / 2, xc = centre(i, j).x, zs = (j + 1) * PAS;
+  const pts = L.chemin.map(([a, b]) => ({ x: xc + a, z: zs + b })), n = pts.length;
+  if (n < 2 || L.chemin[0][0] || L.chemin[0][1] || pts[1].x !== xc || pts.slice(1).some(p => p.z < zs + h) || pts.some((p, k) => k && (p.x === pts[k - 1].x) === (p.z === pts[k - 1].z)))
+    alert('GALERIE : son chemin part de [0, 0] et va d\'abord vers le sud, dans la colline (pas vers le camp) ; puis tout droit d\'un coin à l\'autre, sans biais !');
+  else {
+    const rects = pts.slice(1).map((B, k) => {
+      const A = pts[k], r = { x1: Math.min(A.x, B.x) - h, x2: Math.max(A.x, B.x) + h, z1: Math.min(A.z, B.z) - h, z2: Math.max(A.z, B.z) + h };
+      if (k === 0) r.z1 = zs - 0.5;   // l'entrée, au pied de la falaise
+      if (k === n - 2) { if (B.x < A.x) r.x1 = B.x; if (B.x > A.x) r.x2 = B.x; if (B.z < A.z) r.z1 = B.z; if (B.z > A.z) r.z2 = B.z; }   // la porte de la cellule
+      return r;
+    });
+    // la cellule, au bout : f, vers où elle s'enfonce ; d, de côté
+    const A = pts[n - 2], B = pts[n - 1], l = Math.hypot(B.x - A.x, B.z - A.z), f = { x: (B.x - A.x) / l, z: (B.z - A.z) / l }, d = { x: -f.z, z: f.x };
+    const c1 = { x: B.x - d.x * 6, z: B.z - d.z * 6 }, c2 = { x: B.x + f.x * 10 + d.x * 6, z: B.z + f.z * 10 + d.z * 6 };
+    rects.push({ x1: Math.min(c1.x, c2.x), x2: Math.max(c1.x, c2.x), z1: Math.min(c1.z, c2.z), z2: Math.max(c1.z, c2.z) });
+    const sol = baseCase[j][i] - 0.05, o = origine(i, j);   // (le terrain du camp, tout plat)
+    const G = galerie = { rects, sol, toit: sol + L.hauteur, largeur: L.largeur, xc, zs, pts, porte: { x: B.x, z: B.z, f, d },
+      x1: Math.min(...rects.map(r => r.x1)), x2: Math.max(...rects.map(r => r.x2)), z1: Math.min(...rects.map(r => r.z1)), z2: Math.max(...rects.map(r => r.z2)) };
+    const pres = (x1, z1, x2, z2, m) => rects.some(r => x2 > r.x1 - m && x1 < r.x2 + m && z2 > r.z1 - m && z1 < r.z2 + m);
+    const coins = (ix, iz) => [iz * NXT + ix, iz * NXT + ix + 1, (iz + 1) * NXT + ix, (iz + 1) * NXT + ix + 1];
+    const iz0 = Math.round(zs / PT), ix1 = Math.floor((G.x1 - 4) / PT), ix2 = Math.floor((G.x2 + 4) / PT), iz2 = Math.floor((G.z2 + 4) / PT);
+    // derrière le camp, la colline monte à pic : 14 m dès le premier rang de la grille, puis d'un mètre par mètre (moins sur les côtés du camp)
+    for (let iz = iz0 + 1; iz <= iz0 + 4; iz++) for (let ix = Math.floor((xc - 40) / PT); ix <= Math.ceil((xc + 40) / PT); ix++) {
+      const k = iz * NXT + ix, t = clamp((36 - Math.abs(ix * PT - xc)) / 14, 0, 1), haut = sol + 14 + iz * PT - zs - PT;
+      if (HT[k] < haut) HT[k] += (haut - HT[k]) * t * t * (3 - 2 * t);
+    }
+    for (let iz = iz0 + 2; iz <= iz2; iz++) for (let ix = ix1; ix <= ix2; ix++)   // au fond, la colline couvre toute la galerie
+      if (pres(ix * PT, iz * PT, (ix + 1) * PT, (iz + 1) * PT, 2)) for (const k of coins(ix, iz)) HT[k] = Math.max(HT[k], G.toit + 3.5);
+    for (let iz = iz0; iz < iz0 + 2; iz++) for (let ix = ix1; ix <= ix2; ix++)   // près de l'entrée, on perce ce qui est trop bas
+      if (pres(ix * PT, iz * PT, (ix + 1) * PT, (iz + 1) * PT, 2) && Math.min(...coins(ix, iz).map(k => HT[k])) < G.toit + 2.5) trousTerrain.add(iz * NXT + ix);
+    // le porche couvre les trous, et 4 m de chaque côté de l'entrée ; ses points tombent tous les mètres, comme les bords de l'entrée (xc ± h)
+    let fx1 = xc - h - 4, fx2 = xc + h + 4, fz2 = zs + 6;
+    for (const k of trousTerrain) { const ix = k % NXT, iz = Math.floor(k / NXT); fx1 = Math.min(fx1, ix * PT - 1); fx2 = Math.max(fx2, (ix + 1) * PT + 1); fz2 = Math.max(fz2, (iz + 1) * PT + 1); }
+    G.falaise = { x1: xc + h - Math.ceil(xc + h - fx1), x2: xc - h + Math.ceil(fx2 - xc + h), z1: zs - 0.5, z2: zs - 0.5 + Math.ceil(fz2 - zs + 0.5) };
+    // tout le coin de la grotte (le camp, la falaise, la galerie) : ni arbre, ni rocher
+    G.aire = [Math.min(o.x, G.falaise.x1, G.x1) - 6, o.z - 6, Math.max(o.x + S, G.falaise.x2, G.x2) + 6, Math.max(G.z2, G.falaise.z2) + 6];
   }
 }
 
@@ -4145,6 +4263,8 @@ const MAT = {
   starkExpo: enseigne('STARK EXPO', '#fff', '#a01616'), dixAnneaux: std(TEX.dixAnneaux, { side: THREE.DoubleSide, bumpScale: 0.02 }),
   lettres: std(TEX.lettres, { alphaTest: 0.5, side: THREE.DoubleSide, bumpMap: null, roughness: 0.7 }),
   tente: std(null, { color: '#9a8a62', roughness: 1, side: THREE.DoubleSide }), roche: std(null, { color: '#7d756a', roughness: 1, flatShading: true, side: THREE.DoubleSide }),
+  // la grotte des Dix Anneaux : la falaise de son entrée (de la roche rousse, comme les montagnes du désert), et la terre de son camp et de sa galerie
+  falaise: std(TEX.sol, { color: '#a27b59', roughness: 1, flatShading: true, side: THREE.DoubleSide, bumpScale: 0.3 }), terre: std(TEX.sol, { color: '#8c7154', roughness: 1, bumpScale: 0.2 }),
 };
 MAT.dalle = MAT.platre;   // la dalle du toit d'un bâtiment où l'on entre : comme le plâtre, mais elle fait de l'ombre
 // taille (en mètres) couverte par une répétition de chaque texture
@@ -4648,14 +4768,228 @@ let camp = null, bunkerSecret = null;   // le camp militaire (%) et le bunker se
 // les toits de la case colonne 46, ligne 42
 let grotte = null, usine = null, vieuxReacteur = null, trone = null, repaire = null, tourStark = null;
 const toursT = {};
+// --- la grotte des Dix Anneaux ()), à Malibu : le camp au pied de la colline, la falaise de l'entrée, la galerie et la cellule ---
+// (Ses morceaux, son sol et son plafond, et les carrés du terrain percés à l'entrée : voir « la galerie de la grotte », avec les routes.)
+// Une bosse de la roche, entre -1 et 1 : toujours la même au même endroit
+const bosseRoche = (x, y, z) => 0.5 * bruitDoux(x * 0.45 + z * 0.3, y * 0.5 + 11) + 0.5 * bruitDoux(z * 0.45 - x * 0.3 + 23, y * 0.5 - 7);
+// une forme faite d'une grille de points [x, y, z] (nu par rangée, rangée après rangée) : la roche des parois et de la falaise.
+// Son dessin suit le monde (uv : d'un point, la place du dessin)
+function grilleRoche(pts, nu, uv = (x, y, z) => [(x + z) / 5, y / 5]) {
+  const pos = [], uvs = [], idx = [], nv = pts.length / nu;
+  for (const [x, y, z] of pts) { pos.push(x, y, z); uvs.push(...uv(x, y, z)); }
+  for (let b = 0; b < nv - 1; b++) for (let a = 0; a < nu - 1; a++) { const k = b * nu + a; idx.push(k, k + nu, k + 1, k + 1, k + nu, k + nu + 1); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2)); g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+// une nappe : des carrés de c mètres (cases : leurs numéros [a, b], le coin du carré a, b étant en x0 + a c, z0 + b c), à la hauteur y(x, z),
+// tournés vers le haut : le sol et le plafond de la galerie
+function nappe(cases, x0, z0, c, y) {
+  const num = new Map(), pos = [], uvs = [], idx = [];
+  const point = (a, b) => {
+    const k = a * 65536 + b;
+    if (!num.has(k)) { const x = x0 + a * c, z = z0 + b * c; num.set(k, pos.length / 3); pos.push(x, y(x, z), z); uvs.push(x / 4, z / 4); }
+    return num.get(k);
+  };
+  for (const [a, b] of cases) { const p = point(a, b), q = point(a + 1, b), r = point(a, b + 1), s = point(a + 1, b + 1); idx.push(p, r, q, q, r, s); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2)); g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+// une paroi de roche bosselée, du point (ax, az) au point (bx, bz), de y1 à y2 : ses bosses (des grosses et des petites) s'enfoncent dans la
+// roche, vers (ox, oz) (de -0,1 à 0,6 m), sauf à ses deux bouts, où elle rejoint la paroi voisine
+function paroiRoche(ax, az, bx, bz, ox, oz, y1, y2) {
+  const L = Math.hypot(bx - ax, bz - az), nu = Math.max(2, Math.round(L / 0.6) + 1), nv = Math.max(2, Math.round((y2 - y1) / 0.6) + 1), pts = [];
+  for (let b = 0; b < nv; b++) for (let a = 0; a < nu; a++) {
+    const t = a / (nu - 1), x = ax + (bx - ax) * t, z = az + (bz - az) * t, y = y1 + (y2 - y1) * b / (nv - 1);
+    const bosse = clamp(0.8 * bosseRoche(x * 0.8, y * 0.8, z * 0.8) + 0.4 * bosseRoche(x * 2 + 3, y * 2, z * 2), -1, 1);
+    const e = (0.25 + 0.35 * bosse) * clamp(Math.min(t, 1 - t) * L / 0.6, 0, 1);
+    pts.push([x + ox * e, y, z + oz * e]);
+  }
+  return grilleRoche(pts, nu);
+}
+// La grotte, construite avec son pâté (o : son coin ; X, Z : un point du pâté). Elle note ce qu'il faut aux missions (grotte) : la place de
+// la Mark I dans la cellule, celle où Tony se réveille, ses deux portes, d'où arrivent les Dix Anneaux (sorties : postés dans la galerie,
+// dans les tentes, et leur chef, au nord du camp) et là où ils restent (zones : le camp, ou la galerie)
+function construireGrotte(o, X, Z, rnd) {
+  const G = galerie, s0 = G.sol - Y0, h = G.largeur / 2, lisse = t => t * t * (3 - 2 * t), hasardE = (a, b) => a + rnd() * (b - a);
+  const long = f => Math.abs(f.x) > 0.5;   // (un couloir qui va vers l'est ou l'ouest)
+  // --- la galerie : une grille de cases de 50 cm, dedans, ou dans la roche ---
+  const c = 0.5, x0 = G.x1 - 2, z0 = G.z1 - 2, nx = Math.ceil((G.x2 + 2 - x0) / c), nz = Math.ceil((G.z2 + 2 - z0) / c);
+  const dedans = (a, b) => a >= 0 && b >= 0 && a < nx && b < nz && dansGalerie(x0 + (a + 0.5) * c, z0 + (b + 0.5) * c);
+  // les parois : là où une case du dedans touche une case de la roche (celles qui se suivent sont mises bout à bout). L'entrée reste ouverte
+  const parois = [], bouche = (x, z) => Math.abs(z - (G.zs - 0.5)) < 0.01 && Math.abs(x - G.xc) < h;
+  for (const [da, db] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+    const n1 = da ? nx : nz, n2 = da ? nz : nx;
+    for (let u = 0; u < n1; u++) {
+      let debut = null;
+      for (let v = 0; v <= n2; v++) {
+        const [a, b] = da ? [u, v] : [v, u], lx = x0 + (a + (da > 0)) * c, lz = z0 + (b + (db > 0)) * c;   // (la ligne entre les deux cases)
+        const face = v < n2 && dedans(a, b) && !dedans(a + da, b + db) && !(db && bouche(x0 + (a + 0.5) * c, lz));
+        if (face && debut === null) debut = v;
+        if (!face && debut !== null) {
+          parois.push(da ? { ax: lx, az: z0 + debut * c, bx: lx, bz: z0 + v * c, ox: da, oz: 0 } : { ax: x0 + debut * c, az: lz, bx: x0 + v * c, bz: lz, ox: 0, oz: db });
+          debut = null;
+        }
+      }
+    }
+  }
+  for (const p of parois) {
+    ajouterGeo('roche', paroiRoche(p.ax, p.az, p.bx, p.bz, p.ox, p.oz, G.sol - 0.4, G.toit + 0.8));
+    const x1 = Math.min(p.ax, p.bx) + Math.min(0, p.ox), x2 = Math.max(p.ax, p.bx) + Math.max(0, p.ox), z1 = Math.min(p.az, p.bz) + Math.min(0, p.oz), z2 = Math.max(p.az, p.bz) + Math.max(0, p.oz);
+    ajouterCollision(x1, z1, x2, z2, G.toit + 2, G.sol - 2, true);   // 1 m de roche, du sol au-dessus du plafond
+  }
+  // le sol et le plafond : sur les cases du dedans, et un mètre de plus tout autour (sous les bosses des parois), mais rien devant l'entrée
+  const cases = [];
+  for (let b = 0; b < nz; b++) for (let a = 0; a < nx; a++) {
+    if (z0 + (b + 0.5) * c < G.zs - 0.5) continue;
+    let pres = false;
+    for (let i = -2; i <= 2 && !pres; i++) for (let k = -2; k <= 2 && !pres; k++) pres = dedans(a + i, b + k);
+    if (pres) cases.push([a, b]);
+  }
+  ajouterGeo('terre', nappe(cases, x0, z0, c, () => G.sol + 0.01));
+  ajouterGeo('roche', nappe(cases, x0, z0, c, (x, z) => G.toit + 0.15 + 0.45 * (0.5 + 0.5 * bosseRoche(x, 0, z))));
+  for (const r of G.rects) ajouterCollision(r.x1, r.z1, r.x2, r.z2, G.toit + 2, G.toit, true);   // le plafond : on s'y cogne la tête, les balles s'y arrêtent
+  // des stalactites au plafond, et des cailloux par terre, le long des parois
+  const D = G.porte, loinDesPortes = q => dist(q, D) > 3 && dist(q, { x: G.xc, z: G.zs }) > 3;
+  for (const r of G.rects) for (let k = 0; k < (r.x2 - r.x1) * (r.z2 - r.z1) / 14; k++) {
+    const q = { x: hasardE(r.x1 + 0.5, r.x2 - 0.5), z: hasardE(r.z1 + 0.5, r.z2 - 0.5) }, l = hasardE(0.4, 1.3);
+    if (loinDesPortes(q)) ajouterGeo('roche', new THREE.ConeGeometry(hasardE(0.12, 0.3), l, 5).rotateX(Math.PI).translate(q.x, G.toit + 0.3 - l / 2, q.z));
+  }
+  for (const p of parois) for (let k = 0; k < Math.hypot(p.bx - p.ax, p.bz - p.az) / 4; k++) {
+    const t = rnd(), e = hasardE(0.15, 0.4), x = p.ax + (p.bx - p.ax) * t - p.ox * (e + 0.05), z = p.az + (p.bz - p.az) * t - p.oz * (e + 0.05);
+    ajouterGeo('rocher', new THREE.IcosahedronGeometry(e, 0).scale(1, 0.6, 1.2).rotateY(rnd() * 6).translate(x, G.sol + e * 0.2, z));
+  }
+  // le long du chemin : des étais en bois (deux poteaux et une poutre) tous les 10 m, avec une lampe pendue à la poutre ; des caisses d'armes
+  // volées à Stark Industries ; et les postes des gardes (deux par bout de chemin, mais pas tout près des portes)
+  const lampes = [], postes = [], P = G.pts;
+  for (let k = 1; k < P.length; k++) {
+    const A = P[k - 1], B = P[k], l = dist(A, B), f = { x: (B.x - A.x) / l, z: (B.z - A.z) / l }, d = { x: -f.z, z: f.x };
+    const en = (t, s) => ({ x: A.x + f.x * t + d.x * s, z: A.z + f.z * t + d.z * s });
+    for (let t = k === 1 ? 7 : 5; t < l - 3; t += 10) {
+      for (const s of [-1, 1]) { const q = en(t, s * (h - 0.25)); boite('bois', q.x, s0, q.z, 0.3, G.toit - G.sol - 0.2, 0.3); ajouterCollision(q.x - 0.15, q.z - 0.15, q.x + 0.15, q.z + 0.15, G.toit, G.sol); }
+      const q = en(t, 0);
+      boite('bois', q.x, G.toit - 0.55 - Y0, q.z, long(f) ? 0.3 : G.largeur, 0.35, long(f) ? G.largeur : 0.3);
+      boite('metal', q.x, G.toit - 0.95 - Y0, q.z, 0.04, 0.4, 0.04); boite('lampe', q.x, G.toit - 1.15 - Y0, q.z, 0.28, 0.22, 0.28);
+      lampes.push({ x: q.x, y: G.toit - 1.05, z: q.z, dedans: true, grotte: true });
+    }
+    const cote = k % 2 ? 1 : -1, q = en(l / 2, cote * (h - 0.8));
+    if (loinDesPortes(q)) { boite('boisClair', q.x, s0, q.z, 1.2, 1, 1.2, true); if (k % 3) boite('boisClair', q.x, s0 + 1, q.z, 1, 0.8, 1, true); }
+    for (const t of [l * 0.3, l * 0.72]) {
+      const p = en(t, (postes.length % 2 ? 1 : -1) * 1.6);
+      if (dist(p, D) > 7 && dist(p, { x: G.xc, z: G.zs }) > 8) postes.push({ ...p, y: G.sol });
+    }
+  }
+  // --- les deux portes (voir « les portes de la grotte ») : la grande porte de la grotte, juste derrière l'entrée ; celle de la cellule, au
+  // dernier coin, dans un mur de roche percé d'une porte de 3,20 m sur 3,40 m (la Mark I y passe). Fermée, une porte est une boîte de
+  // collision ; cassée, on la coupe
+  const lp = 3.2, hp = 3.4, ep = 0.8, axe = long(D.f);   // axe : la cellule est à l'est ou à l'ouest (le mur va du nord au sud)
+  const mur = (q, l, y1, y2) => { // un morceau du mur de la cellule, de l mètres, de y1 à y2
+    boite('roche', q.x, y1 - Y0, q.z, axe ? ep : l, y2 - y1, axe ? l : ep);
+    ajouterCollision(q.x - (axe ? ep : l) / 2, q.z - (axe ? l : ep) / 2, q.x + (axe ? ep : l) / 2, q.z + (axe ? l : ep) / 2, y2, y1, true);
+  };
+  for (const s of [-1, 1]) { const m = (h + lp / 2) / 2; mur({ x: D.x + D.d.x * s * m, z: D.z + D.d.z * s * m }, h - lp / 2, G.sol - 0.4, G.toit + 0.8); }
+  mur(D, lp, G.sol + hp, G.toit + 0.8);
+  const portes = [
+    { nom: 'grotte', x: G.xc, z: G.zs + 0.6, y: G.sol, l: G.largeur, h: G.toit - G.sol, f: { x: 0, z: 1 }, vie: GALERIE.porteGrotte },
+    { nom: 'cellule', x: D.x, z: D.z, y: G.sol, l: lp, h: hp, f: D.f, vie: GALERIE.porteCellule },
+  ];
+  for (const p of portes) {
+    const ex = long(p.f) ? 0.25 : p.l / 2, ez = long(p.f) ? p.l / 2 : 0.25;
+    p.boite = ajouterCollision(p.x - ex, p.z - ez, p.x + ex, p.z + ez, p.y + p.h, p.y, true);
+  }
+  // --- la cellule : la Mark I au milieu, face à la porte ; le lit de camp où Tony se réveille, l'établi, la forge et ses braises, des caisses,
+  // des morceaux de missiles Jericho (il en a fait son armure) ; une lampe au plafond ---
+  const Pc = (a, s) => ({ x: D.x + D.f.x * a + D.d.x * s, z: D.z + D.f.z * a + D.d.z * s });
+  const meuble = (m, a, s, la, hy, ls, y = 0, coll = true) => { const q = Pc(a, s); boite(m, q.x, s0 + y, q.z, axe ? la : ls, hy, axe ? ls : la, coll); };
+  meuble('boisClair', 8.6, -4.6, 2.1, 0.4, 0.95); meuble('tissu', 8.6, -4.6, 1.9, 0.12, 0.8, 0.4, false);               // le lit de camp
+  meuble('bois', 8.2, 4.4, 3, 0.9, 1.3); meuble('metal', 7.7, 4.3, 0.7, 0.14, 0.35, 0.9, false); meuble('metal', 9, 4.6, 0.18, 0.35, 0.18, 0.9, false);   // l'établi et ses outils
+  meuble('rouge', 2.6, 4.6, 1.5, 1, 1.5); meuble('lampe', 2.6, 4.6, 1.1, 0.06, 1.1, 1, false);                         // la forge et ses braises
+  meuble('boisClair', 9.3, 1.4, 1.1, 1.1, 1.1); meuble('boisClair', 9.3, 2.7, 1.1, 0.9, 1.1);                            // des caisses
+  for (const [a, s, r] of [[6.4, 5, 0], [5.2, 4.8, 0.3]]) { const q = Pc(a, s); ajouterGeo('metal', new THREE.CylinderGeometry(0.22, 0.22, 2.2, 10).rotateZ(Math.PI / 2).rotateY((axe ? Math.PI / 2 : 0) + r).translate(q.x, G.sol + 0.22, q.z)); }   // des missiles Jericho, vidés
+  const ql = Pc(5, 0); boite('metal', ql.x, G.toit - 0.9 - Y0, ql.z, 0.04, 0.9, 0.04); boite('lampe', ql.x, G.toit - 1.1 - Y0, ql.z, 0.3, 0.22, 0.3);
+  lampes.push({ x: ql.x, y: G.toit - 1, z: ql.z, dedans: true, grotte: true });
+  const poste = Pc(6.2, 0), reveil = Pc(3.6, -3.4);
+  // --- le porche de l'entrée : un gros rocher bosselé autour de l'entrée de la galerie, qui sort de la colline à pic. Il cache les carrés du
+  // terrain percés. Au-dessus de la galerie (et d'un mètre de chaque côté), il est 2,60 m au-dessus de son plafond ; plus loin, il redescend
+  // vite jusqu'à la colline, qu'il suit (30 cm au-dessus) jusqu'à ses bords ---
+  const F = G.falaise, loinGalerie = (x, z) => Math.min(...G.rects.map(r => Math.hypot(Math.max(r.x1 - x, 0, x - r.x2), Math.max(r.z1 - z, 0, z - r.z2))));
+  const dessusLisse = (x, z) => {
+    const s = hauteurTerrain(x, z, Infinity) + 0.3, bord = clamp(Math.min(x - F.x1, F.x2 - x, F.z2 - z) / 3, 0, 1);
+    return s + Math.max(0, G.toit + 2.6 - 2.2 * Math.max(0, loinGalerie(x, z) - 1) - s) * bord;
+  };
+  const cassee = (x, y, z) => clamp(0.9 * bosseRoche(x * 0.6, y * 0.6, z * 0.6) + 0.35 * bosseRoche(x * 1.7 + 5, y * 1.7, z * 1.7), -1, 1);   // de gros blocs, et des petits
+  const dessus = (x, z) => dessusLisse(x, z) + 0.6 * (1 + cassee(x, 3, z)) * clamp(Math.min(x - F.x1, F.x2 - x, F.z2 - z) / 2, 0, 1);
+  const nxF = Math.round(F.x2 - F.x1) + 1, nzF = Math.round(F.z2 - F.z1) + 1, haut = [];
+  for (let b = 0; b < nzF; b++) for (let a = 0; a < nxF; a++) { const x = F.x1 + a, z = F.z1 + b; haut.push([x, dessus(x, z), z]); }
+  ajouterGeo('falaise', grilleRoche(haut, nxF, (x, y, z) => [x / 5, z / 5]));
+  // devant : sa paroi à pic, de xa à xb (un point par mètre), de « bas » jusqu'au dessus ; ses bosses s'enfoncent dans le rocher, sauf sur
+  // ses bords (au-dessus de l'entrée : aussi en bas)
+  const face = (xa, xb, bas, bordBas) => {
+    const nu = Math.round(xb - xa) + 1, nv = 10, pts = [];
+    for (let b = 0; b < nv; b++) for (let a = 0; a < nu; a++) {
+      const x = xa + a, t = b / (nv - 1), y = bas + (dessus(x, F.z1) - bas) * t, e = Math.min(1, (nv - 1) * (1 - t), a, nu - 1 - a, bordBas ? (nv - 1) * t : 1);
+      pts.push([x, y, F.z1 + 0.4 * (1 + cassee(x, y, F.z1)) * e]);
+    }
+    ajouterGeo('falaise', grilleRoche(pts, nu));
+  };
+  face(F.x1, G.xc - h, G.sol - 2, false); face(G.xc + h, F.x2, G.sol - 2, false); face(G.xc - h, G.xc + h, G.toit - 0.1, true);
+  // sur les côtés et derrière : une bande sous le bord du dessus, jusque dans la colline
+  const pan = l => { const pts = []; for (const t of [0, 1]) for (const [x, z] of l) pts.push([x, t ? dessus(x, z) : hauteurTerrain(x, z, Infinity) - 3, z]); ajouterGeo('falaise', grilleRoche(pts, l.length)); };
+  pan(Array.from({ length: nzF }, (_, b) => [F.x1, F.z1 + b])); pan(Array.from({ length: nzF }, (_, b) => [F.x2, F.z1 + b])); pan(Array.from({ length: nxF }, (_, a) => [F.x1 + a, F.z2]));
+  // ses boîtes : un mètre sur un mètre, là où il dépasse de la colline (au-dessus de la galerie et de ses parois, elles commencent au-dessus
+  // de son plafond)
+  for (let x = F.x1; x < F.x2 - 0.01; x++) for (let z = F.z1; z < F.z2 - 0.01; z++) {
+    const y = dessusLisse(x + 0.5, z + 0.5) - 0.3, y0 = G.rects.some(r => x + 1 > r.x1 - 1 && x < r.x2 + 1 && z + 1 > r.z1 - 1 && z < r.z2 + 1) ? G.toit + 2 : G.sol - 3;
+    if (y > hauteurTerrain(x + 0.5, z + 0.5, Infinity) + 0.8 && y > y0 + 0.5) ajouterCollision(x, z, x + 1, z + 1, y, y0);
+  }
+  // au pied de la colline, des rochers tombés
+  for (let k = 0; k < 9; k++) {
+    const t = hasardE(1.2, 2.6), x = G.xc + (k % 2 ? 1 : -1) * hasardE(h + 5, 27), z = G.zs + hasardE(-0.8, 1.5);
+    ajouterGeo('rocher', new THREE.IcosahedronGeometry(t, 0).scale(1, 0.75, 1.1).rotateY(rnd() * 6).translate(x, G.sol + t * 0.35, z)); ajouterCollision(x - t * 0.8, z - t * 0.8, x + t * 0.8, z + t * 0.8, G.sol + t * 0.9, G.sol - 1);
+  }
+  // --- le camp : six tentes ouvertes devant, tournées vers le feu de camp, avec deux lits de camp chacune ; des murets de sacs de sable,
+  // des caisses, la bannière des Dix Anneaux, une jeep. Les combattants attendent dans les tentes ---
+  const tentes = [];
+  const tente = (x, z, a) => { // ouverte vers a : 6 m de long, 4,4 m de large, 2,8 m de haut
+    const loc = (lx, lz) => ({ x: x + lx * Math.cos(a) + lz * Math.sin(a), z: z - lx * Math.sin(a) + lz * Math.cos(a) });
+    const pente = Math.atan2(2.6, 2.2), cote = Math.hypot(2.2, 2.6), g = [];
+    for (const s of [-1, 1]) g.push(new THREE.BoxGeometry(cote, 0.04, 6).rotateZ(-s * pente).translate(s * 1.1, 1.5, 0));   // les deux pans du toit
+    g.push(new THREE.ShapeGeometry(new THREE.Shape([new THREE.Vector2(-2.2, 0), new THREE.Vector2(2.2, 0), new THREE.Vector2(0, 2.6)])).translate(0, 0.2, -3));   // le fond
+    for (const q of g) geoBloc('tente', q.rotateY(a).translate(x, s0, z));
+    const tourne = Math.abs(Math.sin(a)) > 0.5;   // (tournée vers l'est ou l'ouest : sa longueur va d'est en ouest)
+    for (const s of [-1, 1]) { const q = loc(s * 1.15, -0.6); boite('tissu', q.x, s0, q.z, tourne ? 1.9 : 0.8, 0.15, tourne ? 0.8 : 1.9); }   // deux lits de camp
+    // ses côtés et son fond, jusqu'à 1 m : on n'y entre que par devant (on voit par-dessus : les combattants tirent de dedans)
+    for (const [lx, lz, sx, sz] of [[0, -2.95, 4.4, 0.2], [-2.15, 0, 0.2, 6], [2.15, 0, 0.2, 6]]) {
+      const q = loc(lx, lz), ex = (tourne ? sz : sx) / 2, ez = (tourne ? sx : sz) / 2;
+      ajouterCollision(q.x - ex, q.z - ez, q.x + ex, q.z + ez, G.sol + 1, G.sol);
+    }
+    for (const s of [-1, 1]) tentes.push({ ...loc(s * 0.5, -1.2), y: G.sol });   // (au milieu : le toit est haut)
+  };
+  for (const [u, w, a] of [[9, 44, Math.PI / 2], [9, 23, Math.PI / 2], [21, 9, 0], [39, 9, 0], [51, 23, -Math.PI / 2], [51, 44, -Math.PI / 2]]) tente(X(u), Z(w), a);
+  for (let k = 0; k < 7; k++) boite('pierre', X(30 + Math.cos(k) * 1.4), s0, Z(34 + Math.sin(k) * 1.4), 0.5, 0.35, 0.5);   // le feu de camp : des pierres...
+  boite('lampe', X(30), s0, Z(34), 1.2, 0.15, 1.2);                                                                                 // ...et ses braises
+  for (const u of [19, 41]) boite('sacs', X(u), s0, Z(32), 1, 1.1, 7, true);                                                        // deux murets de sacs de sable
+  for (const [u, w, y] of [[39, 55, 0], [40.4, 55, 0], [39.7, 55, 1], [43, 54, 0]]) boite('boisClair', X(u), s0 + y, Z(w), 1.3, 1, 1.2, true);   // des caisses
+  boite('metal', X(21), s0, Z(54), 0.15, 7, 0.15); geoBloc('dixAnneaux', new THREE.PlaneGeometry(2, 3.4).translate(X(22.1), s0 + 5, Z(54)));   // la bannière, sur son mât
+  voituresGarees.push({ x: X(47), z: Z(5), a: Math.PI / 2, type: '4x4 du désert' });
+  G.lampes = lampes;
+  grotte = { x: X(30), z: Z(30), poste: { ...poste, angle: Math.atan2(-D.f.x, -D.f.z) }, reveil: { ...reveil, angle: angleVers(reveil, poste) }, portes,
+    sorties: { galerie: postes, tentes, chef: [{ x: X(30), z: Z(4), y: G.sol }] },
+    zones: { camp: [o.x + 3, o.z + 3, o.x + S - 3, G.zs - 1], galerie: [G.x1, G.zs - 1, G.x2, G.z2] } };   // (ceux du camp s'arrêtent à l'entrée : ils ne grimpent pas sur la colline)
+}
 function genererBloc(i, j) {
   const c = CARTE[j][i], o = origine(i, j), rnd = graine(i * 7919 + j * 104729);
   const X = v => o.x + v, Z = v => o.z + v;
   Y0 = baseCase[j][i];
-  boite('trottoir', X(S / 2), 0, Z(S / 2), S, 0.2, S);
-  for (const k of [12, 30, 48]) { // lampadaires sur les 4 côtés
-    for (const l of [{ x: X(k), z: Z(0.8), a: Math.PI }, { x: X(k), z: Z(S - 0.8), a: 0 }, { x: X(0.8), z: Z(k), a: -Math.PI / 2 }, { x: X(S - 0.8), z: Z(k), a: Math.PI / 2 }])
-      morceauEn(l.x, l.z).lampadaires.push({ ...l, y: Y0 + 0.2 });
+  if (c !== ')') { // (le camp de la grotte des Dix Anneaux est dans la montagne : ni trottoir, ni lampadaires)
+    boite('trottoir', X(S / 2), 0, Z(S / 2), S, 0.2, S);
+    for (const k of [12, 30, 48]) { // lampadaires sur les 4 côtés
+      for (const l of [{ x: X(k), z: Z(0.8), a: Math.PI }, { x: X(k), z: Z(S - 0.8), a: 0 }, { x: X(0.8), z: Z(k), a: -Math.PI / 2 }, { x: X(S - 0.8), z: Z(k), a: Math.PI / 2 }])
+        morceauEn(l.x, l.z).lampadaires.push({ ...l, y: Y0 + 0.2 });
+    }
   }
   const herbe = () => sol('herbe', X(S / 2), 0.21, Z(S / 2), S - 4, S - 4);
   const panneau = (mat, x, y, z, l, h) => geoBloc(mat, new THREE.PlaneGeometry(l, h).translate(x, y, z));   // un panneau tourné vers le sud
@@ -5271,33 +5605,9 @@ function genererBloc(i, j) {
     sol('piscine', X(42), 0.4, Z(46), 14.4, 7.8);
     for (const [x, z] of [[10, 8], [10, 52], [52, 52], [26, 52]]) arbre(X(x), Z(z), 1, Y0 + 0.2, 'palmier');
     Object.assign(lieux[c].find(q => q.x === X(30) && q.z === Z(30)), { x: X(16), z: Z(30), a: -Math.PI / 2 });   // la DeLorean, le nez vers la porte
-  } else if (c === ')') { // la grotte des Dix Anneaux : une salle creusée dans la roche (sous un dôme de rochers, fendu devant l'entrée), éclairée par
-    // des lampes, avec un établi et une forge. Devant, le camp des Dix Anneaux : des tentes, des caisses, un feu, une jeep et leur bannière
-    sol('sacs', X(30), 0.21, Z(30), S - 2, S - 2);
-    const b = batiment({ x: X(30), z: Z(20), l: 22, p: 16, mat: 'roche', mur: 'roche', sol: 'sacs', porte: 's', hEtage: 4.5, largeurPorte: 4, hauteurPorte: 3.4, lampes: false });
-    b.dedans(() => { // un plafond de roche, et des stalactites qui en pendent
-      b.B('roche', 0, b.niveau(1) - 0.62, 0, 2 * b.iu, 0.3, 2 * b.iw, false);
-      const e = (a, c) => a + rnd() * (c - a);
-      for (let k = 0; k < 14; k++) { const [x, z] = b.P(e(-b.iu + 1, b.iu - 1), e(-b.iw + 1, b.iw - 1)), h = e(0.4, 1.3); geoBloc('roche', new THREE.ConeGeometry(e(0.15, 0.35), h, 5).rotateX(Math.PI).translate(x, b.niveau(1) - 0.62 - h / 2, z)); }
-    });
-    b.meuble('bois', -6, 0, -5.5, 4, 0.9, 1.5); b.meuble('rouge', 6, 0, -5.5, 1.6, 1, 1.6); b.meuble('lampe', 6, 0, -5.5, 1.2, 0.05, 1.2, 1);   // l'établi, la forge et ses braises
-    b.meuble('tissu', -8.5, 0, 3.5, 2, 0.5, 0.9); for (const [u, w] of [[8, 4], [9.2, 4], [8.6, 2.8]]) b.meuble('boisClair', u, 0, w, 1.1, 0.9, 1.1);   // un lit de camp, des caisses
-    // la Mark I, l'armure en ferraille de Tony Stark, attend au milieu de la grotte, face à l'entrée ; les Dix Anneaux arrivent des tentes,
-    // du feu de camp, de la jeep et du fond de la grotte (mission « La grotte des Dix Anneaux »)
-    grotte = { x: X(30), z: Z(30), poste: { ...b.point(0, 0, -2), angle: 0 },
-      sorties: [{ x: X(17), z: Z(44) }, { x: X(43), z: Z(44) }, { x: X(23), z: Z(51) }, { x: X(30), z: Z(51) }, { x: X(40), z: Z(50) }, b.point(9.5, 0, 0), b.point(-9.5, 0, -1)] };
-    // le dôme de roche : un demi-œuf tout cabossé, ouvert devant la porte (au sud), et des bords où l'on se cogne
-    const dome = new THREE.SphereGeometry(1, 30, 12, Math.PI / 2 + 0.3, Math.PI * 2 - 0.6, 0, Math.PI / 2).scale(18, 10, 15), p = dome.attributes.position;
-    for (let k = 0; k < p.count; k++) { const e = 1 + 0.1 * bruitDoux(p.getX(k) * 0.35 + i, p.getZ(k) * 0.35 + p.getY(k) * 0.3 + j); p.setXYZ(k, p.getX(k) * e, p.getY(k) * e, p.getZ(k) * e); }
-    dome.computeVertexNormals();
-    geoBloc('roche', dome.translate(X(30), 0.1, Z(20)));
-    for (const [x1, z1, x2, z2, h] of [[14, 5, 46, 10, 6], [12, 8, 19, 32, 5], [41, 8, 48, 32, 5], [14, 28, 26, 34, 4], [34, 28, 46, 34, 4]]) ajouterCollision(X(x1), Z(z1), X(x2), Z(z2), Y0 + h, Y0);
-    for (const [x, z] of [[14, 42], [46, 42], [20, 53]]) geoBloc('tente', new THREE.ConeGeometry(3.2, 3.4, 4, 1, true).rotateY(Math.PI / 4).translate(X(x), 0.2 + 1.7, Z(z)));   // les tentes
-    for (const [x, z] of [[36, 46], [37.5, 46], [36.7, 47.6]]) boite('boisClair', X(x), 0.2, Z(z), 1.4, 1, 1.2, true);   // des caisses
-    for (let k = 0; k < 7; k++) boite('roche', X(30 + Math.cos(k) * 1.4), 0.2, Z(46 + Math.sin(k) * 1.4), 0.5, 0.35, 0.5);   // le feu de camp : des pierres...
-    boite('lampe', X(30), 0.2, Z(46), 1.2, 0.15, 1.2);                                                                     // ...et ses braises
-    boite('metal', X(24), 0.2, Z(36), 0.15, 7, 0.15); geoBloc('dixAnneaux', new THREE.PlaneGeometry(2, 3.4).translate(X(25.1), 5.2, Z(36)));   // la bannière, sur son mât
-    voituresGarees.push({ x: X(46), z: Z(52), a: Math.PI, type: '4x4 du désert' });
+  } else if (c === ')') { // la grotte des Dix Anneaux : le camp de ses combattants, au pied d'une colline, et la galerie qui s'y enfonce, jusqu'à
+    // la cellule où Tony se réveille (voir construireGrotte)
+    if (galerie) construireGrotte(o, X, Z, rnd);
   } else if (c === 'Y') { // une station de ski : une place enneigée et un chalet, derrière la gare du télésiège (construite avec le télésiège)
     sol('neige', X(30), 0.21, Z(30), S, S);
     const l = TELESIEGES.find(q => q.bas.x === X(30) && q.bas.z === Z(30));
@@ -5626,6 +5936,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
   const SOLS = ',;:*_';
   const solCase = CARTE.map((l, j) => [...l].map((c, i) => {
     if (SOLS.includes(c)) return c;
+    if ([-1, 0, 1].some(a => [-2, -1, 0, 1].some(b => car(i + a, j + b) === ')'))) return ':';   // (la grotte des Dix Anneaux, son camp et sa colline : le désert)
     if (estPlat(c)) return ',';
     if ('~#&+-'.includes(c)) return '~';
     const n = {};
@@ -5671,9 +5982,9 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
       const ombre = clamp(0.85 - (n.x + n.z) * 1.5, 0.45, 1.3), srgb = v => 255 * Math.min(1, v * ombre) ** (1 / 2.2);
       imageTerrain.set(y < EAU ? [63, 121, 163, 255] : [srgb(coul.r), srgb(coul.g), srgb(coul.b), 255], (iz * NXT + ix) * 4);
       // sous une ville, le terrain est gris : de près, les rues et les trottoirs le cachent ; de très loin, c'est tout ce qu'on voit de la ville
-      if (estBloc(CARTE[j][i]) && !'PM'.includes(CARTE[j][i])) coul.copy(COUL.ville);
+      if (estBloc(CARTE[j][i]) && !'PM)'.includes(CARTE[j][i])) coul.copy(COUL.ville);   // (pas sous le camp de la grotte : il est en terre)
       col.set([coul.r, coul.g, coul.b], k * 3);
-      if (a < nx - 1 && b < nz - 1) idx.push(k, k + nx, k + 1, k + nx, k + nx + 1, k + 1);
+      if (a < nx - 1 && b < nz - 1 && !trousTerrain.has(iz * NXT + ix)) idx.push(k, k + nx, k + 1, k + nx, k + nx + 1, k + 1);   // (sauf les carrés percés, à l'entrée de la grotte)
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
@@ -5708,7 +6019,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
   for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
     const c = CARTE[j][i], s = solCase[j][i], rnd = graine(i * 7919 + j * 104729 + 17);
     if (estPlat(c) || s === '~') continue;
-    const chiffre = /[0-9]/.test(c) ? +c : 0;
+    const chiffre = /[0-9]/.test(c) ? +c : 0, A = galerie?.aire, presGrotte = (x, z) => A && x > A[0] && z > A[1] && x < A[2] && z < A[3];   // (rien autour de la grotte)
     let n = 0, sorte = 'rond';
     if (s === '*') { n = 12; sorte = 'sapin'; }
     else if (s === ':') { n = 1; sorte = 'cactus'; }
@@ -5717,7 +6028,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
     if (chiffre && s === '*') n = chiffre >= 7 ? 3 : 8;
     for (let k = 0; k < n; k++) {
       const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z);
-      if (y < EAU + 0.4 || presDeChaussee(x, z, 3) || Math.abs(hauteurTerrain(x + 2, z) - y) > 1.6 || presDePiste(x, z, 14)) continue;   // ni dans l'eau, ni à moins de 3 m d'une rue ou d'une route
+      if (y < EAU + 0.4 || presDeChaussee(x, z, 3) || Math.abs(hauteurTerrain(x + 2, z) - y) > 1.6 || presDePiste(x, z, 14) || presGrotte(x, z)) continue;   // ni dans l'eau, ni à moins de 3 m d'une rue ou d'une route
       if (pisteSkiEn(x, z, 6) || presDeRemontee(x, z, 8)) continue;   // ni sur une piste de ski, ni sous le câble d'une remontée
       const neige = neigeEn(x, z) > 0.5;   // dans la neige : des sapins givrés, et plus rien au-dessus de 350 m
       if (neige && y > 350) continue;
@@ -5725,7 +6036,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
     }
     if (chiffre >= 3 && rnd() < 0.6) { // un rocher (il ne dépasse sur aucune chaussée : 2 m de marge en plus de sa taille)
       const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z), t = 1.5 + rnd() * 2.5;
-      if (!presDeChaussee(x, z, t + 2) && !presDePiste(x, z, 16) && !pisteSkiEn(x, z, 6)) { ajouterGeo('rocher', new THREE.IcosahedronGeometry(t, 0).scale(1, 0.7, 1.2).rotateY(rnd() * 6).translate(x, y + t * 0.3, z)); ajouterCollision(x - t, z - t, x + t, z + t, y + t, y - 1); }
+      if (!presDeChaussee(x, z, t + 2) && !presDePiste(x, z, 16) && !pisteSkiEn(x, z, 6) && !presGrotte(x, z)) { ajouterGeo('rocher', new THREE.IcosahedronGeometry(t, 0).scale(1, 0.7, 1.2).rotateY(rnd() * 6).translate(x, y + t * 0.3, z)); ajouterCollision(x - t, z - t, x + t, z + t, y + t, y - 1); }
     }
   }
 }
@@ -5847,8 +6158,8 @@ eau.position.set(TAILLE_X / 2, EAU, TAILLE_Z / 2); eau.receiveShadow = true; sce
 // fusion : quelques gros objets par morceau au lieu de milliers de petits (beaucoup plus rapide)
 const batiments = [];
 // les intérieurs (planchers, marches, meubles) ne font pas d'ombre : les murs et le toit la font déjà
-const SANS_OMBRE = ['garde', 'platre', 'boisClair', 'parquet', 'carrelage', 'moquette', 'cuir', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'croix', 'enseigne', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'police', 'superette', 'customs', 'banque', 'yellowjack', 'essence', 'maze'];
-const PAS_UN_MUR = ['lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'cable', 'trottoir', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'rambarde'];
+const SANS_OMBRE = ['terre', 'garde', 'platre', 'boisClair', 'parquet', 'carrelage', 'moquette', 'cuir', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'croix', 'enseigne', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'police', 'superette', 'customs', 'banque', 'yellowjack', 'essence', 'maze'];
+const PAS_UN_MUR = ['terre', 'tente', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'cable', 'trottoir', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'rambarde'];
 const GEO_ARBRE = {
   rond: [new THREE.CylinderGeometry(0.15, 0.25, 3, 7).translate(0, 1.5, 0),
          mergeGeometries([[0, 4.4, 0, 1.7], [0.9, 3.9, 0.3, 1.2], [-0.8, 4, -0.5, 1.25], [0.1, 4.1, 0.9, 1.1], [-0.2, 5.3, -0.1, 1.2]].map(([x, y, z, r]) => new THREE.IcosahedronGeometry(r, 1).translate(x, y, z)))],
@@ -6054,9 +6365,9 @@ function dansBatiment(x, y, z) { return !!boiteEn(x, y, z); }
 // la hauteur du sol en (x, z) : terrain, trottoir, rue, route, pont... Si on donne y (la hauteur des pieds),
 // on compte aussi les planchers, les marches et les toits qui ne sont pas trop haut au-dessus
 function hauteurSol(x, z, y = -Infinity) {
-  let h = hauteurTerrain(x, z);
+  let h = hauteurTerrain(x, z, y);
   const i = Math.floor((x - R) / PAS), j = Math.floor((z - R) / PAS);
-  if (estBloc(car(i, j)) && x - R - i * PAS <= S && z - R - j * PAS <= S) h = Math.max(h, baseCase[j][i] + 0.2);   // le trottoir d'un pâté
+  if (estBloc(car(i, j)) && car(i, j) !== ')' && x - R - i * PAS <= S && z - R - j * PAS <= S) h = Math.max(h, baseCase[j][i] + 0.2);   // le trottoir d'un pâté (pas au camp de la grotte : de la terre)
   const jl = Math.round((z - R / 2) / PAS), il = Math.round((x - R / 2) / PAS);
   if (Math.abs(z - jl * PAS - R / 2) <= R / 2) { const a = Math.floor((x - R / 2) / PAS); if (rueH(a, jl)) h = Math.max(h, baseNoeud(a, jl)); }
   if (Math.abs(x - il * PAS - R / 2) <= R / 2) { const b = Math.floor((z - R / 2) / PAS); if (rueV(il, b)) h = Math.max(h, baseNoeud(il, b)); }
@@ -6072,7 +6383,7 @@ const profondeur = (x, z) => EAU - hauteurTerrain(x, z);   // plus de 0 : il y a
 // 'rue' ; 'route' : une route de campagne ou un pont ; 'terre' : le terrain (herbe, sable, rocher, neige)
 function sorteDeSol(x, z) {
   const i = Math.floor((x - R) / PAS), j = Math.floor((z - R) / PAS), c = car(i, j);
-  if (estBloc(c) && x - R - i * PAS <= S && z - R - j * PAS <= S) return c === 'P' || c === 'M' ? 'herbe' : 'pave';
+  if (estBloc(c) && c !== ')' && x - R - i * PAS <= S && z - R - j * PAS <= S) return c === 'P' || c === 'M' ? 'herbe' : 'pave';
   const jl = Math.round((z - R / 2) / PAS), il = Math.round((x - R / 2) / PAS);
   if (Math.abs(z - jl * PAS - R / 2) <= R / 2 && rueH(Math.floor((x - R / 2) / PAS), jl)) return 'rue';
   if (Math.abs(x - il * PAS - R / 2) <= R / 2 && rueV(il, Math.floor((z - R / 2) / PAS))) return 'rue';
@@ -6101,7 +6412,7 @@ function butee(a, b) {
     if (Math.max(t1, 0) <= Math.min(t2, t)) t = Math.max(t1, 0);
   });
   const n = Math.ceil(Math.hypot(d[0], d[2]) / 1.5);   // le terrain : un point tous les 1,5 m suffit, une colline est large
-  for (let i = 1; i < n && i / n < t; i++) if (o[1] + d[1] * i / n < hauteurTerrain(o[0] + d[0] * i / n, o[2] + d[2] * i / n)) return i / n;
+  for (let i = 1; i < n && i / n < t; i++) { const y = o[1] + d[1] * i / n; if (y < hauteurTerrain(o[0] + d[0] * i / n, o[2] + d[2] * i / n, y)) return i / n; }
   return t;
 }
 // a voit-il b ? De ses yeux à ceux de b (1,5 m au-dessus des pieds), rien ne doit gêner
@@ -6136,7 +6447,7 @@ function balleArrive(tireur, depart, arrivee, ratee = false) {
 function toucheSol(a, b) {
   const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z, n = Math.ceil(Math.hypot(dx, dy, dz));
   const dessous = t => {
-    const x = a.x + dx * t, y = a.y + dy * t, z = a.z + dz * t, h = hauteurSol(x, z), bas = Math.max(hauteurTerrain(x, z), EAU);
+    const x = a.x + dx * t, y = a.y + dy * t, z = a.z + dz * t, bas = Math.max(hauteurTerrain(x, z, y), EAU), h = Math.max(hauteurSol(x, z), bas);   // (au-dessus de la galerie de la grotte : la colline)
     return y < (h > bas + 1.5 && y < h - 1.2 ? bas : Math.max(h, EAU)) + 0.02;
   };
   for (let i = 1; i <= n; i++) if (dessous(i / n)) {
@@ -8064,8 +8375,9 @@ const TENUES = {
     chaussures: hasard(['#222', '#eee', '#d01818']), bonnet: hasard(['#d01818', '#1a5ad8', '#f0c020', '#eee', '#222', '#2ab86a']), taille: entre(0.88, 1.06), carrure: entre(0.9, 1.15) }),
   // un membre de gang : le maillot et la casquette de la couleur de son gang
   gang: couleur => ({ peau: hasard(PEAUX), haut: couleur, bas: hasard(['#2a3a5a', '#222', '#4a4a4a']), chaussures: hasard(['#eee', '#222']), casquette: couleur, manchesCourtes: true }),
-  // Malibu : un combattant des Dix Anneaux (une veste couleur sable, un foulard sur la tête), et un habitant de la tour en feu
+  // Malibu : un combattant des Dix Anneaux (une veste couleur sable, un foulard sur la tête), leur chef, Raza, et un habitant de la tour en feu
   anneaux: () => ({ peau: hasard(PEAUX.slice(1, 4)), haut: hasard(['#7a6a4a', '#5e5a44', '#6a5238']), bas: hasard(['#3e3a2c', '#4a4232']), chaussures: '#2a2018', bonnet: hasard(['#b8a888', '#2a2a2a', '#8a2a20']) }),
+  raza: () => ({ peau: '#c8956a', haut: '#2c3026', bas: '#24241e', chaussures: '#18140f', cheveux: '#1c1612', carrure: 1.08 }),   // (sa tête rasée et sa barbe : voir creerRaza)
   rescape: () => TENUES.pieton(),
   // Ivan Vanko (Whiplash) : un grand costaud aux cheveux longs, en combinaison grise ; les soldats Extremis, en noir, et Aldrich Killian,
   // blond, en costume sombre (leur peau brille comme de la lave : voir creerExtremis) ; Trevor Slattery, dans la robe verte et or du Mandarin
@@ -8081,7 +8393,7 @@ const TENUES = {
 // du camp et leur commandante, et, à Malibu, les Dix Anneaux, Iron Monger, Whiplash, les soldats Extremis et Killian. Les drones et les
 // hélicoptères attaquent aussi, mais ils volent partout (VOLANTS), comme Whiplash, qui marche dans les rues. Les vigiles, les chiens et les
 // gangs restent aussi dans leur pâté, mais n'attaquent que si on les provoque
-const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron'], VIGILES = ['garde', 'chien', 'gang'];
+const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'raza', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron'], VIGILES = ['garde', 'chien', 'gang'];
 const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron'], LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron'];
 const LIBRES = ['whiplash', 'killian', 'hulk'];   // ceux-là ne gardent pas de pâté : ils vont où ils veulent
 const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
@@ -8089,7 +8401,7 @@ const personnes = [];
 // le corps de ceux qui ne sont pas faits comme tout le monde (voir « Les missions d'Iron Man ») : une armure, des fouets, un hélicoptère...
 const CORPS = { monger: () => creerMonger(), whiplash: t => creerWhiplash(t, false), whiplashArmure: t => creerWhiplash(t, true), drone: () => creerDrone(),
   helico: () => creerHelico(), extremis: t => creerExtremis(t), killian: t => creerExtremis(t, true), trevor: t => creerTrevor(t), ami: () => creerAmi(),
-  hulk: t => creerHulk(t), sentinelle: () => creerDrone(ARMURE_SENTINELLE, false), ultron: () => creerDrone({ ...ARMURE_ULTRON, taille: ENNEMIS.ultron.taille }, false) };
+  hulk: t => creerHulk(t), raza: t => creerRaza(t), sentinelle: () => creerDrone(ARMURE_SENTINELLE, false), ultron: () => creerDrone({ ...ARMURE_ULTRON, taille: ENNEMIS.ultron.taille }, false) };
 function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z)) {
   const h = type === 'chien' ? creerChien() : CORPS[type] ? CORPS[type](tenue) : creerHumain(tenue);
   if (type === 'boss') h.g.scale.setScalar(1.15);
@@ -8314,6 +8626,7 @@ function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null, foudre = f
   if (voituresAussi) for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v, pos, parJoueur);
   // le heavy robot : l'explosion casse la vitre de sa cabine, puis blesse son pilote
   for (const r of robots) { const d = Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z); if (r !== tireur && d < rayon + 1.5) toucherRobot(r, degatsPNJ * (1 - d / (rayon + 1.5)), null, parJoueur); }
+  if (degatsPNJ) for (const p of portes) { const d = distPorte(p, pos); if (d < rayon) toucherPorte(p, degatsPNJ * (1 - d / rayon)); }   // les portes de la grotte des Dix Anneaux
 }
 // parJoueur = false quand ce n'est pas la faute de B.J. (une roquette ennemie, ou une voiture qu'il n'a jamais touchée, qui brûle après
 // un accident tout seul) : son conducteur tué, et ceux que l'explosion tue autour, ne lui donnent ni étoile ni victime.
@@ -9279,7 +9592,8 @@ function casserArmure(r) {
     e.position.copy(pos).add(V3(entre(-0.4, 0.4), entre(-0.8, 0.8), entre(-0.4, 0.4))); e.castShadow = true; scene.add(e);
     lancerDebris(e, V3(entre(-5, 5), entre(2, 7), entre(-5, 5)), entre(6, 12), true);
   }
-  annonce(tr('ARMURE DÉTRUITE !'), r.markI ? tr("Continue à pied : une Mark I neuve t'attendra dans la grotte quand tu te seras éloigné")
+  annonce(tr('ARMURE DÉTRUITE !'), r.markI ? (enEvasion() ? tr("Continue à pied, ou retourne dans ta cellule : une Mark I neuve t'y attend")
+    : tr("Continue à pied : une Mark I neuve t'attendra dans la grotte quand tu te seras éloigné"))
     : tr("Continue à pied : une armure neuve t'attendra devant le camp quand tu te seras éloigné"), 4);
 }
 // le vacarme d'une arme : les piétons s'enfuient, les soldats, les vigiles et les gangs sont alertés, la police réagit
@@ -9325,6 +9639,7 @@ function lanceFlammes(r, dt) {
   for (const p of personnes) if (p.vie > 0 && dedans(p.x, p.y + 1, p.z) && voit(yeux, p)) blesser(p, F.degats * 0.1);
   for (const v of voitures) if (v !== J.voiture && !pasDeTole(v) && !estBlindee(v) && dedans(v.x, v.y + 0.7, v.z, v.rayon)) { v.faute = true; allumer(v); }
   for (const q of robots) if (q.pilote === 'police' && dedans(q.x, q.y + 3, q.z, 1.5)) toucherRobot(q, F.degats * 0.1);
+  for (const p of portes) if (dedans(p.x, p.y + p.h / 2, p.z, p.l / 2)) toucherPorte(p, F.degats * 0.1);   // une porte de la grotte des Dix Anneaux brûle
   vacarme();
 }
 // la touche F : toutes les fusées partent d'un coup, réparties sur les ennemis qu'on voit (les plus proches d'abord), et se dirigent toutes seules
@@ -9655,17 +9970,26 @@ const armureIronman = () => !!J.ironman && J.ironman.pieces.length === PIECES_IR
 const ironmanLibre = () => armureIronman() && !J.ironman.anim && !J.ironman.tour && !J.voiture && !J.robot && !J.telesiege && !J.mort;
 const ironmanVise = () => !!J.ironman && (J.ironman.mains.G.leve > 0.05 || J.ironman.mains.D.leve > 0.05 || !!J.ironman.plastron || J.ironman.tirEpaule > 0);
 // Le magasin de Stark Industries, au chapitre d'Iron Man : ce qu'il y a acheté (la partie s'en souvient, voir sauverPartie).
-// armures : leurs numéros dans ARMURES_STARK (la première, il l'a dès le début) ; choisie : celle que H appelle (J en choisit une autre) ;
-// missiles, laser : les AMELIORATIONS_STARK qu'il a ; reacteur : le niveau de son réacteur (de 1 à 5). Au chapitre 1, rien de tout ça
+// armures : leurs numéros dans ARMURES_STARK (la première, il l'a dès qu'il s'est évadé) ; choisie : celle que H appelle (J en choisit une autre) ;
+// missiles, laser : les AMELIORATIONS_STARK qu'il a ; reacteur : le niveau de son réacteur (de 1 à 5) ; evade : il s'est évadé de la grotte des
+// Dix Anneaux (la mission qui a « armures: true ») : avant, aucune armure ne vient, et le magasin attend. Au chapitre 1, rien de tout ça
 const chezStark = CHAPITRE.triche === 'IRONMAN';
-const stark = { armures: [0], choisie: 0, missiles: false, laser: false, reacteur: 1 };
+const stark = { armures: [0], choisie: 0, missiles: false, laser: false, reacteur: 1, evade: true };
 if (chezStark) { // (les armures par leur nom : on peut en ajouter une au tableau sans tout casser)
   const m = partie.magasin?.[chapitre] || {}, numero = nom => ARMURES_STARK.findIndex(a => a.nom === nom);
   stark.armures = [...new Set([0, ...(m.armures || []).map(numero).filter(k => k > 0)])].sort((a, b) => a - b);
   stark.choisie = Math.max(0, stark.armures.includes(numero(m.choisie)) ? numero(m.choisie) : 0);
   for (const c in AMELIORATIONS_STARK) stark[c] = c === 'reacteur' ? clamp(Math.round(m.reacteur) || 1, 1, AMELIORATIONS_STARK.reacteur.prix.length + 1) : !!m[c];
+  // (une partie d'avant : déjà évadé s'il a passé cette mission, ou fini le chapitre)
+  stark.evade = !!m.evade || (partie.missions[chapitre] || 0) > MISSIONS_CH.findIndex(x => x.armures) || partie.ouvert > chapitre || !!partie.trouvee[chapitre];
 }
 const armureChoisie = () => chezStark ? stark.choisie : 0;
+// au chapitre d'Iron Man, tant qu'il ne s'est pas évadé de la grotte des Dix Anneaux : pas encore d'armure (H, A Z E et J ne font rien)
+const sansArmure = () => chezStark && !stark.evade;
+function pasEncoreDArmure() {
+  annonce(tr("PAS ENCORE D'ARMURE"), enEvasion() ? tr("Ta toute première armure, la Mark I, t'attend dans ta cellule") : tr('Ta toute première armure, tu vas la fabriquer : suis le point jaune !'), 3);
+  bip(300, 200, 0.1, 'square', 0.1);
+}
 // ce que son réacteur change (AMELIORATIONS_STARK.reacteur) : 'protection', 'degats' ou 'vol', multiplié une fois par niveau au-dessus du 1er
 const reacteur = cle => chezStark ? AMELIORATIONS_STARK.reacteur[cle] ** (stark.reacteur - 1) : 1;
 // dans son armure : la part des dégâts qu'il prend, et sa vitesse en volant (1 : celle de Superman)
@@ -9683,6 +10007,7 @@ function mettreIronman(civil = false) {
 // qu'il a choisie (touche J), il en sort, et la nouvelle arrive aussitôt
 function costume() {
   if (!J.ironman || J.ironman.anim || J.ironman.tour) return;
+  if (sansArmure()) { pasEncoreDArmure(); return; }
   if (sansReacteur()) { annonce('', tr('Sans ton réacteur, ton armure ne marche plus : vite, ton ancien réacteur !'), 2); return; }   // (mission « Iron Monger »)
   if (!surPlace() && !J.superman) { annonce('', tr('Sois à pied, debout par terre !'), 2); return; }
   basculerArmure();
@@ -9690,6 +10015,7 @@ function costume() {
 // J, au chapitre d'Iron Man : il choisit une autre de ses armures (celles qu'il a achetées au magasin de Stark Industries). H la fera venir
 function changerArmure() {
   if (!J.ironman || !chezStark) return;
+  if (sansArmure()) { pasEncoreDArmure(); return; }
   const l = stark.armures;
   if (l.length < 2) { annonce('', tr("Tu n'as que cette armure : les autres s'achètent au magasin de Stark Industries (⚙ sur la carte)"), 3); bip(300, 200, 0.1, 'square', 0.1); return; }
   stark.choisie = l[(l.indexOf(stark.choisie) + 1) % l.length];
@@ -9773,6 +10099,7 @@ const surPlace = () => !J.mort && !J.voiture && !J.robot && !J.telesiege && !J.s
 function basculerArmure() {
   const I = J.ironman;
   if (!I || I.anim || I.tour) return;
+  if (sansArmure()) { pasEncoreDArmure(); return; }
   if (J.superman) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }
   if (sansReacteur()) { annonce('', tr('Sans ton réacteur, ton armure ne marche plus : vite, ton ancien réacteur !'), 2); return; }
   if (armureIronman()) sortirArmure(I.armure !== armureChoisie()); else appelerArmure();
@@ -10088,6 +10415,7 @@ function repulseur(cote) {
       heurter(vc, point, dir.clone().multiplyScalar(R.recul * 0.6));
     }
     else if (u.robot) toucherRobot(u.robot, degats, hit.object);
+    else if (u.porte) toucherPorte(u.porte, degats);
     if (!p && !vc && u.tourelle && (u.tourelle.vie -= degats) <= 0) { u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4); }
     marqueIronman(v, 1.5); etincelles(point, 5, 3);
   }
@@ -10430,6 +10758,7 @@ function texteStark(o) {
 }
 // l'aide, près d'un stand (« Appuie sur E pour acheter... »)
 function aideStark(s) {
+  if (sansArmure()) return tr('Le magasin ouvre quand tu as ta toute première armure (suis le point jaune)');
   const acheter = (arme, prix) => tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme, prix: prix.toLocaleString(langue === 'gsw' ? 'de-CH' : langue) });   // (le prix, les milliers séparés)
   if (s.k !== undefined) {
     const A = armureDe(s.k);
@@ -10444,6 +10773,7 @@ function aideStark(s) {
 // E près d'un stand : il achète l'armure (elle devient celle que H appelle), ou il choisit une armure qu'il a déjà ; il achète une amélioration,
 // ou le niveau suivant du réacteur. Les prix au-dessus des stands changent, et la partie s'en souvient tout de suite
 function acheterStark(s) {
+  if (sansArmure()) { annonce(tr('MAGASIN FERMÉ'), tr('Il ouvre quand tu as ta toute première armure : suis le point jaune !'), 3); bip(300, 200, 0.2, 'square', 0.2); return; }
   const paye = prix => {
     if (J.argent < prix) { annonce(tr("Pas assez d'argent"), tr('Il te faut {prix} $', { prix: prix.toLocaleString(langue === 'gsw' ? 'de-CH' : langue) }), 2); bip(300, 200, 0.2, 'square', 0.2); return false; }
     J.argent -= prix; bip(700, 1400, 0.2, 'sine', 0.3); return true;
@@ -11126,6 +11456,7 @@ function tirer(a = ARMES[J.arme], depart0 = null) {
         impactVoiture(vc, raycaster);   // le trou de la balle (sur un blindage : juste des étincelles)
       }
       else if (u.robot) toucherRobot(u.robot, a.degats, hit.object);   // le heavy robot : la vitre, puis le pilote
+      else if (u.porte) toucherPorte(u.porte, a.degats);   // une porte de la grotte des Dix Anneaux
       if (!p && !vc && u.tourelle && (u.tourelle.vie -= a.degats) <= 0) { // une mitrailleuse de la banque, détruite
         u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
       }
@@ -11158,6 +11489,9 @@ function frapper(a) {
   if (cible) {
     blesser(cible, a.degats * fort); bip(160, 60, 0.12, 'sine', 0.5);
     if (fort > 1) projeter(cible, sx * 3 * fort, 2 + fort, sz * 3 * fort, -6); else { cible.x += sx * 0.5; cible.z += sz * 0.5; }
+  } else { // une porte de la grotte des Dix Anneaux, juste devant lui
+    const q = portes.find(q => !q.cassee && distPorte(q, { x: J.x, y: J.y + 1, z: J.z }) < a.portee + 0.6 && Math.abs(diffAngle(J.lacet, angleVers(J, q))) < 1.2);
+    if (q) toucherPorte(q, a.degats * fort);
   }
   if (fort <= 1) return;
   // la voiture devant lui (à 1,60 m de sa carrosserie au plus) : cabossée, et poussée
@@ -11229,7 +11563,7 @@ const abrite = () => J.voiture && !J.voiture.forme.ouvert;   // une carrosserie 
 // gilet = false : le gilet pare-balles ne protège pas (une chute, une roulade). de : d'où vient le coup (le tireur, l'explosion), s'il vient de
 // quelque part : le bouclier d'Iron Man arrête ce qui vient de devant lui
 function blesserJoueur(degats, gilet = true, de = null) {
-  if (J.mort || voyage || estBlindee(J.voiture) || invincible()) return;   // dans une voiture blindée, rien ne passe (ni quand il est parti dans un autre chapitre)
+  if (J.mort || voyage || estBlindee(J.voiture) || invincible() || sceneEmbuscade()) return;   // dans une voiture blindée, rien ne passe (ni quand il est parti dans un autre chapitre, ni pendant l'embuscade)
   if (J.robot?.armure) { toucherArmure(J.robot, degats); return; }   // dans l'armure : c'est elle qui encaisse tout, jusqu'à ce qu'elle casse
   if (de && bouclierLeve() && Math.abs(diffAngle(J.lacet, angleVers(J, de))) < armureDe(J.ironman.armure).bouclier.angle * Math.PI / 180) { // le bouclier, levé vers là d'où ça vient
     joueurH.ironman?.bouclier?.getWorldPosition(vTmp2); etincelles(vTmp2.clone(), 5, 3); bip(2400, 1500, 0.1, 'sine', 0.05);
@@ -11249,14 +11583,16 @@ function reapparaitre() {
   if (J.voiture) { J.voiture.vitesse = 0; sortirVoiture(); }   // arrêté d'abord : on ne roule pas par terre en se réveillant
   if (J.robot) sortirRobot();
   if (J.ironman) Object.assign(J.ironman, { batterie: 100, secours: false, parties: partiesNeuves(), cassees: {} });   // l'armure d'Iron Man : batterie pleine, toute réparée
-  const h = hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);   // l'hôpital le plus proche
-  J.x = h.x; J.z = h.z; J.y = hauteurSol(J.x, J.z); J.vy = 0; J.lacet = 0; J.accroupi = false; J.nage = false; J.roule = null; J.genou = J.atterri = J.energie = 0;
+  // l'hôpital le plus proche ; pendant l'évasion de la grotte des Dix Anneaux, les Dix Anneaux le ramènent dans sa cellule (avec une Mark I neuve)
+  const cellule = enEvasion(), h = cellule ? grotte.reveil : hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);
+  J.x = h.x; J.z = h.z; J.y = hauteurSol(J.x, J.z); J.vy = 0; J.lacet = cellule ? h.angle : 0; J.accroupi = false; J.nage = false; J.roule = null; J.genou = J.atterri = J.energie = 0;
+  if (cellule && (!markI || markI.supprimer || dist(markI, grotte.poste) > 1)) { if (markI && !markI.supprimer) markI.supprimer = true; poserMarkI(); }
   etoiles = 0;
   for (const p of personnes) { p.alerte = false; if (p.renfort) p.supprimer = true; }
   for (const v of voitures) if (v.police && v.renfort) v.supprimer = true;
   for (const r of robots) if (r.pilote === 'police') r.supprimer = true;
   $('wasted').style.display = 'none'; renderer.domElement.style.filter = '';
-  annonce('', tr("Tu te réveilles à l'hôpital le plus proche (-100 $)"), 3);
+  annonce('', cellule ? tr('Les Dix Anneaux te ramènent dans ta cellule (-100 $)') : tr("Tu te réveilles à l'hôpital le plus proche (-100 $)"), 3);
 }
 
 // =====================================================================
@@ -12457,7 +12793,7 @@ function pilotageAvion(v, dt, pilote) {
   v.m.updateMatrixWorld();
   for (const [x, y, z] of [[0, 2.6, 8], [9.5, 2.1, 1], [-9.5, 2.1, 1], [0, 4.4, -10.5]]) {
     const p = v.m.localToWorld(V3(x, y, z));
-    if (dansBatiment(p.x, p.y, p.z) || p.y < hauteurTerrain(p.x, p.z)) { exploserVoiture(v); return; }
+    if (dansBatiment(p.x, p.y, p.z) || p.y < hauteurTerrain(p.x, p.z, p.y)) { exploserVoiture(v); return; }
   }
 }
 // l'hélicoptère : son rotor met 2 s à tourner à fond. Espace le fait monter, C descendre, Z Q S D avancer ; il se tourne vers où tu regardes
@@ -13178,7 +13514,7 @@ function majVoiture(v, dt) {
         h.g.updateWorldMatrix(false, true);
         for (const [b, c] of [[h.brasD, -1], [h.brasG, 1]]) for (let n = 0; n < 4; n++) {
           b.main.getWorldPosition(vTmp);
-          const e = vTmp.y - hauteurTerrain(vTmp.x, vTmp.z);
+          const e = vTmp.y - hauteurTerrain(vTmp.x, vTmp.z, vTmp.y);
           if (e > 0.03) break;
           b.rotation.z += c * clamp((0.06 - e) * 2, 0.05, 0.7); b.updateWorldMatrix(false, true);
         }
@@ -13234,7 +13570,7 @@ function apparaitrePersonne(type, tenue) {
   const [bi, bj] = blocEn(J.x, J.z);
   for (let essai = 0; essai < 20; essai++) {
     const i = bi + Math.floor(entre(-2, 3)), j = bj + Math.floor(entre(-2, 3));
-    if (!typeBloc(i, j) || (type !== 'flic' && '%?v'.includes(car(i, j)))) continue;   // (personne ne se promène autour du camp militaire, du bunker secret ni des villas de B.J.)
+    if (!typeBloc(i, j) || (type !== 'flic' && '%?v)'.includes(car(i, j)))) continue;   // (personne ne se promène autour du camp militaire, du bunker secret, des villas de B.J. ni dans le camp de la grotte des Dix Anneaux)
     const p = coin(i, j, Math.floor(Math.random() * 4)), d = dist(p, J);
     if (d < 45 || d > 170 || (type === 'pieton' && derriere(p)) || (d < 110 && voit(p, J))) continue;
     return creerPersonne(type, p.x, p.z, tenue);
@@ -13325,7 +13661,9 @@ const vivantsType = type => personnes.filter(p => p.type === type && p.vie > 0).
 const resteAEliminer = type => type === 'militaire' && camp ? Math.max(resteCamp(), vivantsType(type)) : vivantsType(type) + (vague && vague.cible === type ? vague.reste : 0);
 function etapeFinie(et) {
   switch (et.type) {
+    case 'embuscade': return embuscade?.phase === 'fini';   // il s'est réveillé, prisonnier, dans la grotte des Dix Anneaux
     case 'armure': return !!J.robot?.markI;   // dans la Mark I, l'armure en ferraille de la grotte
+    case 'casser': return !!portes.find(p => p.nom === et.porte)?.cassee;   // cette porte de la grotte est cassée
     case 'porter': return armureIronman() && !J.ironman.anim && armureDe(J.ironman.armure).nom === et.armure;
     case 'anneaux': return !!anneaux && anneaux.k >= anneaux.liste.length;
     case 'givre': return givre?.fini;
@@ -13376,10 +13714,13 @@ function cibleMission() {
   // la chute libre : l'avion, puis le passager qui tombe le plus près, puis la plage
   if (et.type === 'chute') return !chute ? null : chute.phase === 'avion' ? chute.avion && { x: chute.avion.x, y: chute.avion.y, z: chute.avion.z } : chute.phase === 'poser' ? chute.depot
     : proche(chute.gens.filter(p => p.etat === 'tombe'));
+  // l'embuscade : le rendez-vous (ensuite, plus rien : il est assommé) ; une porte de la grotte à casser
+  if (et.type === 'embuscade') return embuscade?.phase === 'attente' ? embuscade.lieu : null;
+  if (et.type === 'casser') { const p = portes.find(q => q.nom === et.porte); return p && !p.cassee ? { x: p.x, y: p.y, z: p.z } : null; }
   if (et.type === 'eliminer' && et.nombre) return proche(personnes.filter(p => p.type === et.cible && p.vie > 0)) || lieuEtape(et);
   if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule && !v.fantome))
     || (et.voiture === 'DeLorean' ? placeDeLorean() : null);   // (la DeLorean a explosé : sa cachette, où une neuve va revenir)
-  if (et.lieu || et.noeud) return lieuEtape(et);
+  if (et.lieu || et.noeud || et.case) return lieuEtape(et);
   if (et.type === 'eliminer') return personnes.find(p => p.type === et.cible && p.vie > 0) || (resteAEliminer(et.cible) ? camp : null);   // (les renforts ne sont pas encore sortis : le camp)
   if (et.type === 'arme') return objets.filter(o => o.type === 'stand' && o.arme === indexArme(et.arme)).reduce((m, o) => !m || dist(o, J) < dist(m, J) ? o : m, null) || lieuProche('A', J);
   return null;
@@ -13396,6 +13737,10 @@ function missions(dt) {
   bip(500, 1500, 0.5, 'triangle', 0.3);
   if (++etapeIndex < m.etapes.length) return;
   J.argent += m.recompense; J.sac = 0;   // le butin est livré à la planque
+  if (m.armures && chezStark && !stark.evade) { // il s'est évadé de la grotte des Dix Anneaux : son armure est à lui (une bulle d'aide le lui dit)
+    stark.evade = true;
+    bulles = { liste: ['Évasion réussie ! Maintenant, tu as ton armure : <b>H</b>, elle arrive en volant, et tu deviens <b>{super}</b>.'], k: 0, t: 4.5, montree: false };
+  }
   missionIndex++; etapeIndex = 0;
   const fini = missionIndex >= MISSIONS_CH.length;
   annonce(tr(fini ? 'BRAVO !' : 'MISSION RÉUSSIE'), fini ? tr('Toutes les missions sont finies !') : m.recompense ? tr('{mission} : +{argent}', { mission: tr(m.nom), argent: montant(m.recompense) }) : tr(m.nom), 4);
@@ -13467,7 +13812,7 @@ function placerCamera(pivot, direction, distance, epaule) {
     }
   });
   camera.position.lerpVectors(pivot, voulu, Math.max(0.05, t));
-  camera.position.y = Math.max(Math.max(hauteurTerrain(camera.position.x, camera.position.z), EAU) + 0.3, camera.position.y);   // ni sous la terre, ni sous l'eau
+  camera.position.y = Math.max(Math.max(hauteurTerrain(camera.position.x, camera.position.z, camera.position.y), EAU) + 0.3, camera.position.y);   // ni sous la terre, ni sous l'eau
 }
 const DEMI_TOUR = new THREE.Quaternion().setFromAxisAngle(V3(0, 1, 0), Math.PI);   // la caméra regarde vers -z, la voiture vers +z
 function majCamera(dt) {
@@ -13515,14 +13860,16 @@ function majCamera(dt) {
 }
 
 // =====================================================================
-//  Les missions d'Iron Man (MISSIONS_MALIBU, au chapitre 2) : la Mark I de la grotte et les Dix Anneaux, les anneaux et le givre du premier
+//  Les missions d'Iron Man (MISSIONS_MALIBU, au chapitre 2) : l'embuscade, la Mark I de la grotte, ses portes à casser, les Dix Anneaux et
+//  leur chef, Raza ; les anneaux et le givre du premier
 //  vol, la tour en feu, le réacteur arraché et Iron Monger ; la course et Whiplash, les drones de Hammer et War Machine, les hélicoptères du
 //  Mandarin et la villa qui tombe dans la mer, l'Extremis, Trevor Slattery et Aldrich Killian. Une étape commence (commencerEtape), vit à
 //  chaque image (majEtape), puis finit (finirEtape) : quand elle est réussie, ou quand on la quitte (le code MISSION8, la mort au milieu du
 //  compte à rebours...)
 // =====================================================================
 function commencerEtape(et) {
-  if (et.type === 'eliminer' && et.nombre) commencerVague(et);
+  if (et.nombre && et.cible) commencerVague(et);   // (une étape « eliminer », ou « casser » avec des gardes)
+  if (et.type === 'embuscade') commencerEmbuscade(et);
   if (et.type === 'porter') donnerArmure(et.armure);
   if (et.type === 'anneaux') commencerAnneaux(et);
   if (et.type === 'givre') givre = { hauteur: et.hauteur, gel: 0, fond: false, fini: false };
@@ -13536,7 +13883,8 @@ function commencerEtape(et) {
   if (et.cible === 'hulk') commencerFacture();
 }
 function majEtape(et, dt) {
-  majMarkI(); majVague(dt); majObadiah(dt); majPorte(); majAllies(dt);
+  majMarkI(); majPortes(dt); majVague(dt); majObadiah(dt); majPorte(); majAllies(dt);
+  if (embuscade) majEmbuscade(dt);
   if (anneaux) majAnneaux();
   if (givre) majGivre(dt);
   if (sauvetage) majSauvetage(dt);
@@ -13554,7 +13902,7 @@ function majEtape(et, dt) {
   if (villaStark?.tombee && !repechage && Math.hypot(J.x - villaStark.x, J.z - villaStark.z) > 600) releverVilla();
 }
 function finirEtape() {
-  finirVague(); finirAnneaux(); finirSauvetage(); finirPanne(); finirCourse(); finirEmmener(); finirRepecher(); finirParler(); finirHappy(); finirChuteLibre(); facture = null;
+  finirVague(); finirEmbuscade(); finirAnneaux(); finirSauvetage(); finirPanne(); finirCourse(); finirEmmener(); finirRepecher(); finirParler(); finirHappy(); finirChuteLibre(); facture = null;
   givre = null; $('givre').style.opacity = 0;
 }
 // le texte de l'étape, en bas de l'écran ({n} : ce qu'il reste ; {t} : les secondes qui restent ; {h}, {y} : la hauteur à atteindre, et celle où
@@ -13577,9 +13925,9 @@ function texteEtape(et) {
 }
 
 // --- la Mark I, dans la grotte des Dix Anneaux (mission « La grotte des Dix Anneaux ») ---
-// C'est l'armure en ferraille du camp militaire (creerArmure : sa mitrailleuse, ses lance-flammes, ses fusées), qui attend au milieu de la
-// grotte. Comme celle du camp, une neuve revient à sa place quand on l'a cassée, ou laissée ailleurs, dès qu'il est loin (à plus de 250 m
-// d'elle, et à plus de 150 m de sa place)
+// C'est l'armure en ferraille du camp militaire (creerArmure : sa mitrailleuse, ses lance-flammes, ses fusées), qui attend dans la cellule,
+// au fond de la galerie. Comme celle du camp, une neuve revient à sa place quand on l'a cassée, ou laissée ailleurs, dès qu'il est loin
+// (à plus de 250 m d'elle, et à plus de 150 m de sa place ; pendant l'évasion, à 40 m de sa place, ça suffit)
 let markI = null;
 function poserMarkI() { const q = grotte.poste; markI = creerArmure(q.x, q.z, q.angle); markI.markI = true; }
 if (grotte) poserMarkI();
@@ -13587,28 +13935,211 @@ function majMarkI() {
   if (!grotte) return;
   const a = markI;
   if (a && !a.supprimer && a !== J.robot && dist(a, J) > 250 && (a.points < ARMURE.points || dist(a, grotte.poste) > 1)) a.supprimer = true;
-  if ((!markI || markI.supprimer) && dist(J, grotte.poste) > 150) poserMarkI();
+  if ((!markI || markI.supprimer) && dist(J, grotte.poste) > (enEvasion() ? 40 : 150)) poserMarkI();
+}
+// l'évasion de la grotte : après l'embuscade, jusqu'à la fin de la mission. S'il meurt, les Dix Anneaux le ramènent dans sa cellule
+// (voir reapparaitre), avec une Mark I neuve
+function enEvasion() {
+  const l = MISSIONS_CH[missionIndex]?.etapes || [], k = l.findIndex(e => e.type === 'embuscade');
+  return !!grotte && k >= 0 && etapeIndex > k;
+}
+// il se réveille dans sa cellule, à côté de son lit de camp, face à la Mark I (il ne bouge pas tant que l'écran est noir)
+function placerAuReveil() {
+  const q = grotte.reveil;
+  Object.assign(J, { x: q.x, z: q.z, y: hauteurSol(q.x, q.z), vy: 0, vitesse: 0, lacet: q.angle, angleCorps: q.angle, tangage: -0.05, accroupi: false, nage: false, roule: null, genou: 0, atterri: 0 });
+}
+// les Dix Anneaux l'enferment : il sort de sa voiture (ou de son armure : on la lui prend), les deux portes se referment, et une Mark I toute
+// neuve attend à sa place
+function enfermer() {
+  if (J.voiture) { J.voiture.vitesse = 0; sortirVoiture(); }
+  if (J.robot) sortirRobot();
+  const I = J.ironman;
+  if (I?.anim) interrompreIronman();
+  if (armureIronman()) { laisserArmure(); I.pieces = []; I.plastron = null; rhabillerBJ(); }
+  J.superman = null;
+  reparerPortes();
+  if (markI && !markI.supprimer) markI.supprimer = true;
+  poserMarkI();
+  placerAuReveil(); J.vie = R_.viesJoueur;
 }
 
-// --- les ennemis qui arrivent (une étape « eliminer » qui a un « nombre ») ---
-// Ils arrivent au début de l'étape, aux sorties du lieu (la grotte : ses tentes, son feu de camp, sa jeep, le fond de la grotte ; l'usine
-// Stark Industries : son toit ; ailleurs : autour du pâté), jamais plus de « ensemble » à la fois, et ils attaquent tout de suite.
+// --- les portes de la grotte des Dix Anneaux (mission « La grotte des Dix Anneaux ») ---
+// Celle de la cellule (des barreaux), puis la grande porte de la grotte (des planches et des bandes de fer). Elles arrêtent tout, comme un
+// mur, jusqu'à ce qu'on les casse : les balles, les flammes, les explosions, les coups (leurs points de vie : GALERIE, dans VILLES). Chaque
+// coup les secoue, et elles penchent de plus en plus. Cassées, elles volent en morceaux, et le restent ; elles se referment quand les Dix
+// Anneaux enferment Tony (l'embuscade). p.g : son dessin, dont les morceaux arrêtent les balles (dans batiments)
+const portes = grotte?.portes || [];
+const M_BARREAUX = mat('#3e3c39', { metalness: 0.7, roughness: 0.5 });
+for (const p of portes) {
+  const g = p.g = new THREE.Group(), bois = [], fer = [];
+  if (p.nom === 'grotte') { // des planches de haut en bas, et trois bandes de fer en travers
+    for (let x = -p.l / 2 + 0.25; x < p.l / 2; x += 0.5) bois.push(new THREE.BoxGeometry(0.47, p.h, 0.14).translate(x, p.h / 2, 0));
+    for (const y of [0.6, p.h / 2, p.h - 0.6]) fer.push(new THREE.BoxGeometry(p.l, 0.2, 0.2).translate(0, y, 0.02));
+  } else { // des barreaux, et trois traverses
+    for (let x = -p.l / 2 + 0.2; x < p.l / 2 - 0.1; x += 0.26) fer.push(new THREE.CylinderGeometry(0.035, 0.035, p.h, 6).translate(x, p.h / 2, 0));
+    for (const y of [0.15, p.h * 0.55, p.h - 0.12]) fer.push(new THREE.BoxGeometry(p.l, 0.08, 0.1).translate(0, y, 0));
+  }
+  for (const [l, m] of [[bois, MAT.bois], [fer, M_BARREAUX]]) if (l.length) { const e = new THREE.Mesh(mergeGeometries(l), m); e.castShadow = true; e.userData = { mur: true, porte: p }; g.add(e); }
+  const plaque = new THREE.Mesh(new THREE.BoxGeometry(p.l, p.h, 0.1).translate(0, p.h / 2, 0)); plaque.visible = false; plaque.userData = { porte: p }; g.add(plaque);   // (invisible : les balles ne passent pas entre les barreaux)
+  g.position.set(p.x, p.y, p.z); g.rotation.y = Math.atan2(p.f.x, p.f.z); scene.add(g);
+  Object.assign(p, { max: p.vie, h0: p.boite.h, cassee: false, secoue: 0 });
+  batiments.push(...g.children);
+}
+// la distance du point q (x, y, z) à la porte p, au plus près
+function distPorte(p, q) {
+  const dx = q.x - p.x, dz = q.z - p.z, cote = dx * p.f.z - dz * p.f.x, devant = dx * p.f.x + dz * p.f.z, y = q.y ?? p.y;
+  return Math.hypot(Math.max(0, Math.abs(cote) - p.l / 2), Math.max(0, p.y - y, y - p.y - p.h), devant);
+}
+function toucherPorte(p, degats) {
+  if (p.cassee || !(degats > 0)) return;
+  p.vie -= degats; p.secoue = 0.15;
+  bip(p.nom === 'grotte' ? 160 : 1300, p.nom === 'grotte' ? 90 : 700, 0.08, 'square', 0.04);   // ça cogne sur le bois, ça sonne sur le fer
+  if (p.vie <= 0) casserPorte(p);
+}
+function casserPorte(p) {
+  p.cassee = true; p.boite.h = -Infinity; p.g.visible = false;
+  for (const e of p.g.children) { const k = batiments.indexOf(e); if (k >= 0) batiments.splice(k, 1); }
+  // ses morceaux volent, loin de lui
+  const c = V3(p.x, p.y + p.h / 2, p.z), sens = (J.x - p.x) * p.f.x + (J.z - p.z) * p.f.z > 0 ? -1 : 1, planches = p.nom === 'grotte';
+  for (let k = 0; k < 14; k++) {
+    const e = new THREE.Mesh(planches ? new THREE.BoxGeometry(0.47, entre(0.8, 2.2), 0.14) : new THREE.CylinderGeometry(0.035, 0.035, entre(0.8, 2.2), 6), planches ? MAT.bois : M_BARREAUX);
+    const u = entre(-p.l / 2, p.l / 2);
+    e.position.set(c.x + p.f.z * u, c.y + entre(-p.h / 3, p.h / 3), c.z - p.f.x * u); e.castShadow = true; scene.add(e);
+    lancerDebris(e, V3(sens * p.f.x * entre(3, 8) + entre(-2, 2), entre(1, 5), sens * p.f.z * entre(3, 8) + entre(-2, 2)), entre(4, 8), true);
+  }
+  etincelles(c, 16, 6); bruit(0.9, 300, 0.9); bip(500, 70, 0.5, 'sawtooth', 0.15); J.secousse = Math.max(J.secousse || 0, 0.25);
+  annonce(planches ? tr('LA GRANDE PORTE CÈDE !') : tr('LA PORTE CÈDE !'), planches ? tr('Dehors, le camp des Dix Anneaux : ils sortent des tentes !') : '', 3);
+}
+function reparerPortes() {
+  for (const p of portes) {
+    Object.assign(p, { vie: p.max, cassee: false, secoue: 0 }); p.boite.h = p.h0; p.g.visible = true;
+    for (const e of p.g.children) if (!batiments.includes(e)) batiments.push(e);
+  }
+}
+function majPortes(dt) {
+  for (const p of portes) {
+    if (p.cassee) continue;
+    p.secoue = Math.max(0, p.secoue - dt);
+    const e = p.secoue * 0.3;
+    p.g.position.set(p.x + entre(-e, e), p.y, p.z + entre(-e, e)); p.g.rotation.z = (1 - p.vie / p.max) * 0.05;   // (abîmée, elle penche)
+  }
+}
+
+// --- l'embuscade (mission « La grotte des Dix Anneaux ») ---
+// Au rendez-vous, sur la route, le convoi de l'armée l'attend : deux 4x4. Quand il arrive (à 12 m), des balles sifflent de partout, des
+// explosions éclatent autour de lui, les 4x4 sautent ; puis une bombe de Stark Industries tombe à ses pieds... BOUM ! Tout devient blanc,
+// puis noir. Quand l'écran se rallume, il est prisonnier des Dix Anneaux, dans sa cellule, au fond de leur grotte, à côté de la Mark I.
+// Pendant l'embuscade, rien ne peut le blesser (c'est comme dans le film)
+let embuscade = null;   // { lieu, convoi : les 4x4, phase : 'attente', 'tirs', 'noir', 'reveil' ou 'fini', t, tTir, tBoum, bombe, emmene }
+const sceneEmbuscade = () => !!embuscade && embuscade.phase !== 'attente' && embuscade.phase !== 'fini';   // (voir blesserJoueur)
+const M_BOMBE = mat('#d8d6d0', { metalness: 0.4, roughness: 0.4 });   // la bombe de Stark Industries
+function commencerEmbuscade(et) {
+  const c = lieuEtape(et), E = embuscade = { lieu: c, convoi: [], phase: 'attente', t: 0, tTir: 0, tBoum: 0, bombe: null, emmene: false };
+  // le convoi : sur le bas-côté, un 4x4 de chaque côté du rendez-vous, dans le sens de la route
+  let best = Infinity, a0 = 0;
+  for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8, r = routeSous(c.x + Math.sin(a) * 8, c.z + Math.cos(a) * 8); if (r && r.d < best) { best = r.d; a0 = a; } }
+  for (const s of [-1, 1]) {
+    const v = creerVoiture(c.x + Math.sin(a0) * 9 * s + Math.cos(a0) * 3, c.z + Math.cos(a0) * 9 * s - Math.sin(a0) * 3, a0, false, typeNomme('4x4 du désert'));
+    v.couleur = '#5e6146'; habillerVoiture(v); E.convoi.push(v);   // (kaki, comme ceux de l'armée)
+  }
+}
+function majEmbuscade(dt) {
+  const E = embuscade, c = E.lieu;
+  if (E.phase === 'fini') return;
+  if (E.phase === 'attente') {
+    if (J.mort || Math.hypot(J.x - c.x, J.z - c.z) > 12) return;
+    E.phase = 'tirs'; E.t = 0;
+    annonce(tr('EMBUSCADE !'), tr('Les Dix Anneaux attaquent le convoi !'), 3); bip(900, 300, 0.5, 'sawtooth', 0.12);
+    return;
+  }
+  E.t += dt;
+  if (E.phase === 'tirs') {
+    if ((E.tTir -= dt) <= 0) { // des balles qui sifflent, tirées des collines
+      E.tTir = entre(0.04, 0.16);
+      const a = entre(0, 6.3), d = entre(30, 60), depart = V3(c.x + Math.sin(a) * d, 0, c.z + Math.cos(a) * d);
+      depart.y = hauteurSol(depart.x, depart.z) + 1.4;
+      traceur(depart, V3(J.x + entre(-3, 3), J.y + entre(0.2, 2.2), J.z + entre(-3, 3))); flash(depart, 0.5); bruit(0.25, 1800, 0.1);
+    }
+    if ((E.tBoum -= dt) <= 0) { // des explosions tout autour de lui
+      E.tBoum = entre(0.45, 0.8);
+      const a = entre(0, 6.3), d = entre(8, 18), q = V3(J.x + Math.sin(a) * d, 0, J.z + Math.cos(a) * d);
+      q.y = hauteurSol(q.x, q.z) + 0.3;
+      exploser(q, 4, 0, 0, null, false, false, false); J.secousse = Math.max(J.secousse || 0, 0.25);
+    }
+    if (E.t > 0.7 && E.convoi.length) { for (const v of E.convoi) if (!v.detruite && !v.supprimer) exploserVoiture(v, v, false); E.convoi = []; }   // les 4x4 sautent
+    if (E.t > 2.4 && !E.bombe && !E.emmene) { // une bombe tombe du ciel, juste à côté de lui : elle porte le nom de Stark Industries
+      const g = new THREE.Group(), corps = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 2.2, 12), M_BOMBE), nez = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.6, 12), M_BOMBE);
+      nez.position.y = -1.4; nez.rotation.x = Math.PI; g.add(corps, nez);
+      for (let k = 0; k < 4; k++) { const ail = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.5, 0.45), M_BOMBE); ail.position.set(0, 1, 0); ail.rotation.y = k * Math.PI / 2; ail.translateZ(0.3); g.add(ail); }
+      for (const s of [-1, 1]) { const nom = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.22), MAT.starkIndustries); nom.rotation.set(0, s > 0 ? 0 : Math.PI, Math.PI / 2); nom.position.z = s * 0.225; g.add(nom); }
+      const a = J.angleCorps + entre(-0.6, 0.6), vers = V3(J.x + Math.sin(a) * 2.5, 0, J.z + Math.cos(a) * 2.5);
+      vers.y = hauteurSol(vers.x, vers.z, J.y + 1) + 0.6;
+      const de = vers.clone().add(V3(entre(-6, 6), 40, entre(-6, 6)));
+      g.position.copy(de); g.lookAt(vers); g.rotateX(-Math.PI / 2); scene.add(g);   // (son nez vers le sol)
+      E.bombe = { g, de, vers, t: 0 };
+      annonce('', tr('Une bombe... de Stark Industries !'), 2); bip(1500, 400, 0.9, 'sine', 0.08);
+    }
+    if (E.bombe && (E.bombe.t += dt) >= 0.9) { // BOUM : tout devient blanc
+      const B = E.bombe; scene.remove(B.g); E.bombe = null;
+      exploser(B.vers.clone(), 6, 0, 0, null, false, false, false); bruit(1, 200, 1.5); J.secousse = 0.6;
+      $('voile').style.opacity = 1; $('sommeil').textContent = ''; $('sommeil').style.fontSize = '46px';
+      E.phase = 'noir'; E.t = 0;
+    } else if (E.bombe) E.bombe.g.position.lerpVectors(E.bombe.de, E.bombe.vers, E.bombe.t / 0.9);
+  } else if (E.phase === 'noir') { // le blanc s'en va, et tout devient noir : il a perdu connaissance
+    $('voile').style.opacity = clamp(1 - E.t * 1.5, 0, 1); $('sommeil').style.opacity = clamp(E.t * 2, 0, 1);
+    if (E.t > 1.2 && !E.emmene) { E.emmene = true; $('sommeil').textContent = tr('Plus tard, dans une grotte...'); enfermer(); }
+    if (E.emmene) placerAuReveil();
+    if (E.t > 4.2) { E.phase = 'reveil'; E.t = 0; annonce(tr('EN CAPTIVITÉ !'), tr('Les Dix Anneaux te gardent au fond de leur grotte'), 4); }
+  } else if (E.phase === 'reveil') { // l'écran se rallume
+    $('sommeil').style.opacity = clamp(1 - E.t / 1.5, 0, 1);
+    if (E.t > 1.5) { E.phase = 'fini'; $('sommeil').textContent = 'Zzz…'; $('sommeil').style.fontSize = ''; }
+  }
+}
+function finirEmbuscade() {
+  const E = embuscade;
+  if (!E) return;
+  for (const v of E.convoi) if (!v.detruite) v.supprimer = true;   // (on a quitté la mission avant l'embuscade : le convoi s'en va)
+  if (E.bombe) scene.remove(E.bombe.g);
+  if (E.phase !== 'attente' && E.phase !== 'fini') { $('voile').style.opacity = 0; $('sommeil').style.opacity = 0; }
+  $('sommeil').textContent = 'Zzz…'; $('sommeil').style.fontSize = '';
+  embuscade = null;
+}
+
+// --- Raza, le chef des Dix Anneaux (mission « La grotte des Dix Anneaux ») ---
+// Le crâne rasé, une courte barbe et une moustache noires, et un lance-roquettes (sa vie, ses roquettes, sa précision : ENNEMIS.raza). Il
+// arrive au nord du camp quand tous ses combattants sont tombés, et se bat comme eux ; sa barre de vie s'affiche en haut de l'écran
+function creerRaza(t) {
+  const h = creerHumain(t);
+  h.cheveux.visible = false;
+  piece(GEO.barbiche, '#1c1612', h.tete, 0, 0, 0).scale.set(1.6, 1.25, 1.15); piece(GEO.moustache, '#1c1612', h.tete, 0, -0.05, 0.12);
+  return h;
+}
+
+// --- les ennemis qui arrivent (une étape « eliminer » qui a un « nombre », ou « casser » : les gardes de la galerie) ---
+// Ils arrivent au début de l'étape, aux sorties du lieu (la grotte : d'où dit « depuis », postés dans la galerie, dans les tentes du camp,
+// ou au nord du camp ; l'usine Stark Industries : son toit ; ailleurs : autour du pâté), jamais plus de « ensemble » à la fois, et ils
+// attaquent tout de suite. À la grotte, ceux du camp y restent (ils s'arrêtent à l'entrée de la galerie), et ceux de la galerie, postés,
+// ne bougent pas (zone).
 // Ceux qui sont encore là quand on quitte l'étape s'en vont
-let vague = null;   // { cible, reste : combien doivent encore arriver, ensemble, sorties, t : avant le suivant, partis : ceux qui sont arrivés }
+let vague = null;   // { cible, reste : combien doivent encore arriver, ensemble, sorties, t : avant le suivant, partis : ceux qui sont arrivés, zone, poste }
 // (un carrefour, noeud : tous arrivent juste là ; un hélicoptère ou un drone arrive du ciel, à 50 m de haut)
-const sortiesDe = (et, c) => et.noeud ? [{ x: c.x, z: c.z, y: c.y }] : et.lieu === ')' && grotte ? grotte.sorties : et.lieu === '$' && usine ? [{ x: usine.x, z: usine.z, y: usine.y }]
+const sortiesDe = (et, c) => et.noeud ? [{ x: c.x, z: c.z, y: c.y }] : et.lieu === ')' && grotte ? grotte.sorties[et.depuis || 'tentes'] : et.lieu === '$' && usine ? [{ x: usine.x, z: usine.z, y: usine.y }]
   : et.lieu === '>' && repaire ? (et.cible === 'killian' ? [repaire.killian] : repaire.sorties) : et.cible === 'ultron' && tourStark ? [tourStark]
   : VOLANTS.includes(et.cible) ? [[-60, -40], [60, -40], [-60, 40], [60, 40]].map(([a, b]) => ({ x: c.x + a, z: c.z + b, y: Math.max(hauteurSol(c.x + a, c.z + b, 1e4), c.y ?? 0) + 50 }))
   : [[-20, -20], [20, -20], [-20, 20], [20, 20]].map(([a, b]) => ({ x: c.x + a, z: c.z + b }));
 function commencerVague(et) {
   const c = lieuEtape(et) || J;
-  vague = { cible: et.cible, reste: et.nombre, ensemble: et.ensemble || et.nombre, sorties: sortiesDe(et, c), t: 0, partis: [] };
+  vague = { cible: et.cible, reste: et.nombre, ensemble: et.ensemble || et.nombre, sorties: sortiesDe(et, c), t: 0, partis: [],
+    zone: et.lieu === ')' && grotte ? grotte.zones[et.depuis === 'galerie' ? 'galerie' : 'camp'] : null, poste: et.depuis === 'galerie' };
   while (vague.reste > 0 && vague.partis.length < vague.ensemble) faireArriver();
 }
 function faireArriver() {
   const V = vague, libres = V.sorties.filter(s => !personnes.some(p => p.vie > 0 && dist(p, s) < 1.5)), s = hasard(libres.length ? libres : V.sorties);
   const x = s.x + entre(-0.6, 0.6), z = s.z + entre(-0.6, 0.6), p = creerPersonne(V.cible, x, z, undefined, s.y ?? hauteurSol(x, z));
   p.alerte = !['monger', 'whiplash', 'whiplashArmure', 'killian'].includes(V.cible); p.angle = angleVers(p, J);   // (les boss attendent, eux, qu'on vienne : voir majMonger)
+  if (V.zone) p.zone = V.zone;
+  if (V.poste) p.poste = { x: p.x, y: p.y, z: p.z };   // (posté : il ne bouge pas, il tire)
+  if (p.type === 'raza') { annonce('RAZA !', tr("« Tu ne sortiras jamais d'ici, {heros} ! »", { heros: nomHeros() }), 3.5); bruit(0.5, 600, 0.5); }
   V.reste--; V.partis.push(p); V.t = 0.8;
 }
 function majVague(dt) {
@@ -13959,8 +14490,9 @@ function majBarreBoss() {
   $('boss').firstElementChild.textContent = tr(fiche(p).nom).toUpperCase();
   $('boss').lastElementChild.firstElementChild.style.width = `${clamp(p.vie / fiche(p).vie, 0, 1) * 100}%`;
 }
-// le lieu d'une étape : la lettre de la carte la plus proche, ou un carrefour (noeud : [colonne, ligne])
-const lieuEtape = et => et.noeud ? { ...noeud(...et.noeud), y: baseNoeud(...et.noeud) } : lieuProche(et.lieu, J);
+// le lieu d'une étape : la lettre de la carte la plus proche, un carrefour (noeud : [colonne, ligne]), ou le milieu d'une case (case :
+// [colonne, ligne] ; sur une route de campagne, c'est sur la route)
+const lieuEtape = et => et.noeud ? { ...noeud(...et.noeud), y: baseNoeud(...et.noeud) } : et.case ? (c => ({ ...c, y: hauteurSol(c.x, c.z) }))(centre(...et.case)) : lieuProche(et.lieu, J);
 // une balle (ou une rafale) tirée sur lui, depuis « depart » : elle le touche une fois sur « precision » de près, moins de loin, moins s'il est
 // accroupi, s'il court ou s'il est à l'abri dans une voiture. gros : une grosse balle (une mitrailleuse lourde)
 function tirSurJoueur(p, d, depart, degats, precision, gros = false) {
@@ -15194,7 +15726,7 @@ function sauverPartie() {
   partie.argent = J.argent; partie.missions[chapitre] = missionIndex;
   partie.armes[chapitre] = { possede: ARMES.filter((w, i) => J.possede[i] && !pouvoirArme(w)).map(w => w.nom), gilet: J.gilet, masque: J.masque,
     balles: Object.fromEntries(ARMES.map((w, i) => [w.nom, J.balles[i]]).filter(([, n]) => Number.isFinite(n) && n > 0)) };
-  if (chezStark) partie.magasin = { ...partie.magasin, [chapitre]: { armures: stark.armures.map(k => ARMURES_STARK[k].nom), choisie: ARMURES_STARK[stark.choisie].nom,
+  if (chezStark) partie.magasin = { ...partie.magasin, [chapitre]: { armures: stark.armures.map(k => ARMURES_STARK[k].nom), choisie: ARMURES_STARK[stark.choisie].nom, evade: stark.evade,
     ...Object.fromEntries(Object.keys(AMELIORATIONS_STARK).map(c => [c, stark[c]])) } };   // le magasin de Stark Industries (les armures par leur nom)
   try { localStorage.partie = JSON.stringify(partie); } catch {}
 }
@@ -15872,17 +16404,21 @@ function haloLampadaire(e, allume) {
   p.setY(e.halo.k, allume ? e.tete.y : -1e4); p.needsUpdate = true;
 }
 // la nuit, quelques vraies lumières (REGLAGES.lumieresNuit) éclairent le sol, les murs, les voitures et les gens : celles des lampadaires
-// les plus proches de B.J., ou, s'il est dans une maison, celles des lampes de son étage. Toutes les 0,25 s, on les pose sur les plus proches ;
+// les plus proches de B.J., ou, s'il est dans une maison, celles des lampes de son étage. Dans la galerie de la grotte des Dix Anneaux, où le
+// soleil n'entre pas, ses lampes éclairent vraiment, même le jour. Toutes les 0,25 s, on les pose sur les plus proches ;
 // une lumière garde sa lampe tant qu'elle reste parmi les plus proches, et s'éteint doucement quand elle s'éloigne (on ne la voit pas sauter)
 const lumieresNuit = Array.from({ length: clamp(Math.round(R_.lumieresNuit) || 0, 0, 16) }, () => {
   const l = new THREE.PointLight('#ffcf90', 0, 35, 1.4); scene.add(l);
   return { l, source: null, force: 0 };
 });
 let tSources = 0, sourcesNuit = [], dLoin = Infinity;   // les lampes choisies ; dLoin : la distance de la première qui n'a pas de lumière
+const sousTerre = () => !!galerie && J.y < galerie.toit && dansGalerie(J.x, J.z);   // dans la galerie de la grotte
+let ombreGrotte = 0;   // (voir majCiel)
 function choisirSources() {
   const dedans = interieurDe(J);
   let l = [];
-  if (dedans) l = dedans.lampes.filter(q => q.y > J.y && q.y < J.y + 4.5);   // les lampes au plafond de son étage
+  if (sousTerre()) l = [...galerie.lampes];
+  else if (dedans) l = dedans.lampes.filter(q => q.y > J.y && q.y < J.y + 4.5);   // les lampes au plafond de son étage
   else {
     const cx = Math.floor(J.x / MORCEAU), cz = Math.floor(J.z / MORCEAU);
     for (let a = cx - 1; a <= cx + 1; a++) for (let b = cz - 1; b <= cz + 1; b++)
@@ -15896,13 +16432,14 @@ function choisirSources() {
   for (const q of sourcesNuit) if (!lumieresNuit.some(n => n.source === q)) { const n = lumieresNuit.find(n => !n.source); n.source = q; n.force = 0; }
 }
 function majLumieresNuit(dt) {
-  if (lumiere.nuit > 0 && (tSources -= dt) <= 0) { tSources = 0.25; choisirSources(); }
+  const nuit = sousTerre() ? 1 : lumiere.nuit;   // (sous la colline, il fait toujours nuit)
+  if (nuit > 0 && (tSources -= dt) <= 0) { tSources = 0.25; choisirSources(); }
   for (const n of lumieresNuit) {
     const q = n.source, d = q ? Math.hypot(q.x - J.x, q.y - J.y, q.z - J.z) : 0;
-    const voulue = q ? lumiere.nuit * (q.dedans ? 10 : 60) * doux(d, dLoin, dLoin - 4) : 0;   // (une lampe de maison éclaire moins loin et moins fort)
+    const voulue = q ? nuit * (q.grotte ? 18 : q.dedans ? 10 : 60) * doux(d, dLoin, dLoin - 4) : 0;   // (celles de la grotte éclairent plus loin)   // (une lampe de maison éclaire moins loin et moins fort)
     n.force += (voulue - n.force) * Math.min(1, dt * 5);
     n.l.intensity = n.force;
-    if (q) { n.l.position.set(q.x, q.y - (q.dedans ? 0 : 0.15), q.z); n.l.distance = q.dedans ? 10 : 35; }
+    if (q) { n.l.position.set(q.x, q.y - (q.dedans ? 0 : 0.15), q.z); n.l.distance = q.grotte ? 15 : q.dedans ? 10 : 35; }
   }
 }
 // les phares : la voiture de B.J. éclaire vraiment la route devant elle ; les autres y posent une tache de lumière (un faisceau dessiné par terre)
@@ -15963,6 +16500,10 @@ function majCiel(dt) {
   ambiance.color.copy(C.cielNuit).lerp(C.cielJour, lumiere.jour); ambiance.groundColor.copy(C.solNuit).lerp(C.solJour, lumiere.jour);
   scene.environmentIntensity = 0.7 * (0.04 + 0.96 * lumiere.jour);
   couleurBrume(h, scene.fog.color).lerp(brumeNuit.copy(C.brumeNuit).multiplyScalar(lueur), lumiere.nuit);
+  // dans la galerie de la grotte des Dix Anneaux, le jour n'entre presque pas : la lumière du ciel, ses reflets et le soleil baissent, et le
+  // fond se perd dans le noir (ombreGrotte : de 0 dehors à 1 au fond ; à l'entrée, il reste un peu de jour)
+  ombreGrotte += ((sousTerre() ? clamp((J.z - galerie.zs) / 10, 0.3, 1) : 0) - ombreGrotte) * Math.min(1, dt * 3);
+  if (ombreGrotte > 0.001) { const f = ombreGrotte; ambiance.intensity *= 1 - 0.8 * f; scene.environmentIntensity *= 1 - 0.9 * f; soleil.intensity *= 1 - 0.9 * f; scene.fog.color.multiplyScalar(1 - 0.9 * f); }
   // les reflets : on rephotographie le ciel quand le soleil a bougé de 2° (pas en pleine nuit : il n'y a plus rien à refléter)
   if (soleilDir.angleTo(soleilPhoto) > 0.035 && (h > -10 || THREE.MathUtils.radToDeg(Math.asin(soleilPhoto.y)) > -10)) { photographierCiel(); soleilPhoto.copy(soleilDir); }
   // les étoiles et la lune, autour de la caméra
@@ -16193,6 +16734,8 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get effondrement() { return effondrement; }, get repechage() { return repechage; }, get discours() { return discours; }, villaStark, trone, lieuEtape, couperVoiture, garderAllies,
   effondrerVilla, releverVilla, poserPorte, tirSurJoueur, majBarreBoss, interieurs,
   get chute() { return chute; }, get facture() { return facture; }, FETE_DES_ARMURES, tourStark,
+  galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
+  mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; },
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
