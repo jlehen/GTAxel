@@ -1158,6 +1158,8 @@ const TRADUCTIONS = {
   "Son armure n'a pas été faite pour le froid : il tombe comme une pierre !": { de: 'Seine Rüstung ist nicht für die Kälte gebaut: Er fällt wie ein Stein!',
     en: 'His armour was not built for the cold: he drops like a stone!', gsw: 'Sini Rüschtig isch nöd für d Chälti baut: Er gheit abe wie en Stei!' },
   "Iron Monger s'envole !": { de: 'Iron Monger hebt ab!', en: 'Iron Monger takes off!', gsw: 'De Iron Monger hebt ab!' },
+  "Iron Monger s'envole ! Emmène-le tout là-haut, à {h} m : son armure n'aime pas le froid !": { de: 'Iron Monger hebt ab! Lock ihn ganz nach oben, auf {h} m: Seine Rüstung mag keine Kälte!',
+    en: 'Iron Monger takes off! Lead him way up high, to {h} m: his armour does not like the cold!', gsw: 'De Iron Monger hebt ab! Lock en ganz ufe, uf {h} m: Sini Rüschtig het d Chälti nöd gärn!' },
   'IRON MONGER VAINCU !': { de: 'IRON MONGER BESIEGT!', en: 'IRON MONGER DEFEATED!', gsw: 'DE IRON MONGER ISCH BESIEGT!' },
   'Obadiah Stane ne fera plus de mal à personne': { de: 'Obadiah Stane wird niemandem mehr schaden', en: 'Obadiah Stane will never hurt anyone again', gsw: 'De Obadiah Stane macht niemerem meh öppis z leid' },
   'Sans ton réacteur, ton armure ne marche plus : vite, ton ancien réacteur !': { de: 'Ohne deinen Reaktor geht deine Rüstung nicht mehr: schnell, dein alter Reaktor!',
@@ -1989,7 +1991,7 @@ const ENNEMIS = {
   // armure d'Obadiah Stane. Iron Monger : degats (une balle de la mitrailleuse de son bras), degatsRoquette (un de ses missiles d'épaule),
   // taille (combien de fois plus grand que toi), vol (sa vitesse en volant, en m/s), givre (à cette hauteur, en mètres, son armure gèle : il tombe !)
   anneaux:   { nom: 'Combattant des Dix Anneaux', vie: 75, arme: 5, degats: 8, precision: 0.35, vue: 45, tir: [1, 2], vitesse: 4.5 },
-  monger:    { nom: 'Iron Monger',   vie: 15000, degats: 14, degatsRoquette: 45, precision: 0.45, vue: 120, tir: [1.5, 2.5], vitesse: 3.5, taille: 2.6, vol: 24, givre: 450, boss: true },
+  monger:    { nom: 'Iron Monger',   vie: 9000, degats: 8, degatsRoquette: 25, precision: 0.3, vue: 120, tir: [2, 3.5], vitesse: 3.5, taille: 2.6, vol: 24, givre: 450, boss: true },
   rescape:   { nom: 'Habitant de la tour', vie: 50 },   // ceux qu'Iron Man sauve de la tour en feu (mission « Le pompier volant »)
   // Whiplash (Ivan Vanko) et ses deux fouets électriques : degats (un coup de fouet), degatsEclair (l'éclair qu'il lance de loin, toutes les
   // « tir » secondes), portee (la longueur de ses fouets, en mètres). Il coupe les voitures en deux ! whiplashArmure : le même, dans son
@@ -13889,7 +13891,11 @@ function majMonger(p, dt, d) {
       if (EAU - hauteurSol(p.x, p.z, p.y) > 1.5) { p.x = ax; p.z = az; }   // (pas dans la mer)
       if ((p.tPas = (p.tPas ?? 0) - dt) <= 0) { p.tPas = 0.55; bruit(0.5 * clamp(1 - d / 100, 0, 1), 150, 0.3); J.secousse = Math.max(J.secousse || 0, 0.15 * clamp(1 - d / 40, 0, 1)); }   // ses pas font trembler le sol
     }
-    if (reveille && J.y > p.y + 6 && !J.mort) { p.vole = true; bruit(0.6, 900, 1.2); annonce('', tr("Iron Monger s'envole !"), 2); }   // (Iron Man est en l'air, ou sur un toit : il le rejoint)
+    if (reveille && J.y > p.y + 6 && !J.mort) { // (Iron Man est en l'air, ou sur un toit : il le rejoint)
+      p.vole = true; bruit(0.6, 900, 1.2);
+      if (p.aide) annonce('', tr("Iron Monger s'envole !"), 2);
+      else { p.aide = true; annonce('', tr("Iron Monger s'envole ! Emmène-le tout là-haut, à {h} m : son armure n'aime pas le froid !", { h: M.givre }), 5); }   // (la 1re fois : comment le faire geler)
+    }
   }
   // il vise Iron Man, et tire : la mitrailleuse de son bras droit, en rafales, et ses missiles d'épaule
   const vise = angleVers(p, J);
