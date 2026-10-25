@@ -1194,10 +1194,10 @@ const TRADUCTIONS = {
     gsw: 'Em Hammer sini Drohne griifed aa! De Rhodey kämpft i de War Machine mit dir. Na {n}' },
   'Whiplash est revenu, dans une armure ! Arrête-le, avec War Machine': { de: 'Whiplash ist zurück, in einer Rüstung! Halte ihn auf, zusammen mit War Machine',
     en: 'Whiplash is back, in a suit of armour! Stop him, with War Machine', gsw: 'De Whiplash isch zrugg, i nere Rüschtig! Halt en uf, mit de War Machine' },
-  'Les drones vont exploser ! Prends {ami} dans tes bras (E), et file loin de l\'Expo : encore {t} s': {
-    de: 'Die Drohnen explodieren gleich! Nimm {ami} in die Arme (E) und flieg weit weg von der Expo: noch {t} s',
-    en: 'The drones are about to explode! Pick up {ami} (E) and get far away from the Expo: {t} s left',
-    gsw: 'D Drohne explodiered grad! Nimm {ami} i d Arme (E) und flüüg wiit wäg vo de Expo: na {t} s' },
+  'Les drones vont exploser ! Prends {ami} dans tes bras (E), et file à plus de {loin} m de l\'Expo : encore {t} s': {
+    de: 'Die Drohnen explodieren gleich! Nimm {ami} in die Arme (E) und flieg mehr als {loin} m von der Expo weg: noch {t} s',
+    en: 'The drones are about to explode! Pick up {ami} (E) and get more than {loin} m away from the Expo: {t} s left',
+    gsw: 'D Drohne explodiered grad! Nimm {ami} i d Arme (E) und flüüg meh als {loin} m vo de Expo wäg: na {t} s' },
   'La villa attaquée': { de: 'Die angegriffene Villa', en: 'The villa under attack', gsw: 'Di aagriffni Villa' },
   'Tu as défié le Mandarin à la télé... Rentre vite à la villa : {ami} y est (point jaune)': {
     de: 'Du hast den Mandarin im Fernsehen herausgefordert... Schnell zurück zur Villa: {ami} ist dort (gelber Punkt)',
@@ -1224,7 +1224,10 @@ const TRADUCTIONS = {
     gsw: 'Aldrich Killian, de ächt Mandarin! Er spöit Füür und heilt sich sälber: Schlag fescht und schnäll zue!' },
   'Ramène {ami} en haut de la falaise, sur la place du départ (point jaune), et pose-toi': { de: 'Bring {ami} hoch auf die Klippe, zum Startplatz (gelber Punkt), und lande dort',
     en: 'Bring {ami} up to the top of the cliff, to the starting square (yellow dot), and land', gsw: 'Bring {ami} ufe uf d Klippe, zum Startplatz (gääle Punkt), und land det' },
-  'Emmène {ami} loin de l\'Expo, vite : encore {t} s': { de: 'Bring {ami} weit weg von der Expo, schnell: noch {t} s', en: 'Take {ami} far away from the Expo, quick: {t} s left', gsw: 'Bring {ami} wiit wäg vo de Expo, schnäll: na {t} s' },
+  'Emmène {ami} à plus de {loin} m de l\'Expo (tu es à {d} m) : encore {t} s': { de: 'Bring {ami} mehr als {loin} m von der Expo weg (du bist bei {d} m): noch {t} s',
+    en: 'Take {ami} more than {loin} m away from the Expo (you are at {d} m): {t} s left', gsw: 'Bring {ami} meh als {loin} m vo de Expo wäg (du bisch bi {d} m): na {t} s' },
+  'Assez loin ! Restes-y avec {ami} : encore {t} s': { de: 'Weit genug! Bleib mit {ami} hier: noch {t} s', en: 'Far enough! Stay there with {ami}: {t} s left', gsw: 'Wiit gnueg! Blib mit {ami} da: na {t} s' },
+  'Pose-toi pour déposer {ami}': { de: 'Lande, um {ami} abzusetzen', en: 'Land to set {ami} down', gsw: 'Land, zum {ami} abzsetze' },
   'Whiplash ! Tiens bon : Happy et {ami} arrivent avec la valise de ta Mark V': { de: 'Whiplash! Halte durch: Happy und {ami} kommen mit dem Koffer deines Mark V',
     en: 'Whiplash! Hold on: Happy and {ami} are coming with your Mark V suitcase', gsw: 'Whiplash! Heb dure: De Happy und {ami} chömed mit em Koffer vo dim Mark V' },
   'Tu as lâché {ami} !': { de: 'Du hast {ami} fallen lassen!', en: 'You dropped {ami}!', gsw: 'Du häsch {ami} la gheie!' },
@@ -1252,7 +1255,9 @@ const TRADUCTIONS = {
   'Les drones vont tous exploser !': { de: 'Alle Drohnen werden gleich explodieren!', en: 'All the drones are about to explode!', gsw: 'Alli Drohne explodiered grad!' },
   'Toute la Stark Expo saute... mais vous êtes sains et saufs !': { de: 'Die ganze Stark Expo fliegt in die Luft... aber ihr seid in Sicherheit!',
     en: 'The whole Stark Expo blows up... but you are both safe and sound!', gsw: 'Di ganz Stark Expo flüügt i d Luft... aber ihr sind in Sicherheit!' },
-  'Les explosions vous ont soufflés : on recommence': { de: 'Die Explosionen haben euch weggeschleudert: Noch einmal von vorn', en: 'The explosions blew you away: try again', gsw: 'D Explosione händ eu wäggschlöiderat: Nomal vo vorne' },
+  "L'explosion vous a soufflés : on recommence": { de: 'Die Explosion hat euch weggeschleudert: Noch einmal von vorn', en: 'The explosion blew you away: try again', gsw: 'D Explosion hät eu wäggschlöiderat: Nomal vo vorne' },
+  "{ami} était encore dans l'Expo : on recommence": { de: '{ami} war noch in der Expo: Noch einmal von vorn', en: '{ami} was still at the Expo: try again', gsw: '{ami} isch na i de Expo gsii: Nomal vo vorne' },
+  '« Merci, {super} ! Je rentre à la villa »': { de: '„Danke, {super}! Ich fahre zurück zur Villa“', en: '"Thank you, {super}! I\'m going back to the villa"', gsw: '«Merci, {super}! Ich gang zrugg i d Villa»' },
   'Hélicoptère abattu !': { de: 'Hubschrauber abgeschossen!', en: 'Helicopter shot down!', gsw: 'Heli abgschosse!' },
   "LA FALAISE S'EFFONDRE !": { de: 'DIE KLIPPE STÜRZT EIN!', en: 'THE CLIFF IS COLLAPSING!', gsw: 'D KLIPPE STÜRZT II!' },
   'La villa tombe dans la mer... avec {ami} !': { de: 'Die Villa stürzt ins Meer... mit {ami}!', en: 'The villa is falling into the sea... with {ami}!', gsw: 'D Villa gheit is Meer... mit {ami}!' },
@@ -2401,8 +2406,9 @@ const VILLES = {
 //  sauver (col, ligne : une tour T de la carte, qui brûle ; nombre : les gens qui attendent sur son toit, à porter un par un, avec E,
 //    jusqu'aux pompiers, en bas) · reacteur (secondes : le temps de rejoindre ton ancien réacteur, au salon de ta villa)
 //  course (depart, portes : des carrefours [colonne, ligne] de la carte ; voiture : celle qui t'attend sur la ligne de départ. Passe toutes
-//    les portes, en voiture, dans l'ordre) · emmener (secondes : le temps qu'il reste avant que tout explose ; loin : à combien de mètres du
-//    lieu il faut avoir emmené {ami}, dans tes bras) · repecher ({ami} est tombé à l'eau : prends-le dans tes bras, avec E, et ramène-le en
+//    les portes, en voiture, dans l'ordre) · emmener (secondes : le temps qu'il reste avant que tout explose ; loin : jusqu'où va la boule
+//    de feu, en mètres : il faut avoir emmené {ami} plus loin, dans tes bras ; degats : ce qu'elle te fait au milieu, s'il y est. Ensuite,
+//    pose-toi pour déposer {ami}) · repecher ({ami} est tombé à l'eau : prends-le dans tes bras, avec E, et ramène-le en
 //    haut de la falaise) · parler (qui : 'trevor' : va le voir, et écoute ce qu'il a à dire)
 //  Pour « eliminer », nombre : ils arrivent au début de l'étape, autour du lieu (ensemble : jamais plus à la fois). noeud : à la place d'un
 //  lieu, un carrefour [colonne, ligne] (Whiplash, au milieu de la course). allies : les armures qui se battent avec toi ('War Machine').
@@ -2520,7 +2526,7 @@ const MISSIONS_MALIBU = [
     { type: 'aller', lieu: '(', texte: 'Justin Hammer montre ses drones à la Stark Expo... Il prépare un mauvais coup : vas-y (point jaune)' },
     { type: 'eliminer', cible: 'drone', nombre: 16, ensemble: 6, lieu: '(', allies: ['War Machine'], texte: 'Les drones de Hammer attaquent ! Rhodey, dans War Machine, se bat avec toi. Il en reste {n}' },
     { type: 'eliminer', cible: 'whiplashArmure', nombre: 1, lieu: '(', allies: ['War Machine'], texte: 'Whiplash est revenu, dans une armure ! Arrête-le, avec War Machine' },
-    { type: 'emmener', lieu: '(', secondes: 30, loin: 150, texte: 'Les drones vont exploser ! Prends {ami} dans tes bras (E), et file loin de l\'Expo : encore {t} s' },
+    { type: 'emmener', lieu: '(', secondes: 30, loin: 150, degats: 200, texte: 'Les drones vont exploser ! Prends {ami} dans tes bras (E), et file à plus de {loin} m de l\'Expo : encore {t} s' },
   ]},
   // Iron Man 3 (2013) : le Mandarin attaque la villa avec ses hélicoptères, et elle s'écroule dans la mer, avec {ami} dedans !
   { nom: 'La villa attaquée', recompense: 45000, etapes: [
@@ -13364,7 +13370,7 @@ function cibleMission() {
   // la course : la Formule 1 (tant qu'il n'est pas en voiture), puis la porte suivante ; {ami} à emmener, à repêcher (puis la place du départ) ;
   // Trevor, sur son trône
   if (et.type === 'course') return !course ? null : !J.voiture && course.voiture && !course.voiture.detruite ? course.voiture : course.portes[course.k] || null;
-  if (et.type === 'emmener') return explosionExpo && !porte ? explosionExpo.ami : null;
+  if (et.type === 'emmener') return explosionExpo && !porte && !explosionExpo.boum ? explosionExpo.ami : null;
   if (et.type === 'repecher') return !repechage ? null : porte ? repechage.depot : repechage.ami || (villaStark && { x: villaStark.x, z: effondrement?.zMer ?? villaStark.z, y: EAU });
   if (et.type === 'parler') return discours?.trevor || (trone && { x: trone.x, y: trone.y, z: trone.z });
   // la chute libre : l'avion, puis le passager qui tombe le plus près, puis la plage
@@ -13538,6 +13544,7 @@ function majEtape(et, dt) {
   if (course) majCourse();
   if (et?.cible === 'whiplash') majHappy(dt, personnes.find(p => p.type === 'whiplash' && p.vie > 0));
   if (explosionExpo) majEmmener(dt);
+  if (boumExpo) majBoumExpo(dt);
   if (effondrement) majEffondrement(dt);
   if (repechage) majRepecher();
   if (discours) majParler(dt);
@@ -13551,19 +13558,22 @@ function finirEtape() {
   givre = null; $('givre').style.opacity = 0;
 }
 // le texte de l'étape, en bas de l'écran ({n} : ce qu'il reste ; {t} : les secondes qui restent ; {h}, {y} : la hauteur à atteindre, et celle où
-// il est ; {ami} : Pepper Potts, ou Tony Stark). Pendant le givre, ou quand Iron Man porte quelqu'un, il dit ce qu'il faut faire tout de suite
+// il est ; {ami} : Pepper Potts, ou Tony Stark ; {loin}, {d} : jusqu'où ira l'explosion de l'Expo, et à combien il en est). Pendant le givre,
+// ou quand Iron Man porte quelqu'un, il dit ce qu'il faut faire tout de suite
 function texteEtape(et) {
   const reste = et.type === 'anneaux' && anneaux ? anneaux.liste.length - anneaux.k : et.type === 'sauver' && sauvetage ? sauvetage.nombre - sauvetage.sauves
     : et.type === 'course' && course ? course.portes.length - course.k : et.type === 'chute' && chute ? tombent() : et.type === 'eliminer' ? resteAEliminer(et.cible) : 0;
   const texte = et.type === 'givre' && givre?.gel ? (givre.fond ? 'Le givre fond : vite, F pour rallumer tes réacteurs !' : "Ton armure gèle : ses réacteurs s'éteignent, tu tombes... attends que le givre fonde !")
     : et.type === 'sauver' && porte ? 'Descends le poser en bas, près des pompiers (point jaune) : pose-toi à côté d\'eux. Encore {n} à sauver'
     : et.type === 'repecher' && porte ? 'Ramène {ami} en haut de la falaise, sur la place du départ (point jaune), et pose-toi'
-    : et.type === 'emmener' && porte ? 'Emmène {ami} loin de l\'Expo, vite : encore {t} s'
+    : et.type === 'emmener' && porte && explosionExpo?.sauve ? 'Pose-toi pour déposer {ami}'
+    : et.type === 'emmener' && porte && loinDeLExpo() > et.loin ? 'Assez loin ! Restes-y avec {ami} : encore {t} s'
+    : et.type === 'emmener' && porte ? 'Emmène {ami} à plus de {loin} m de l\'Expo (tu es à {d} m) : encore {t} s'
     : et.type === 'eliminer' && et.cible === 'whiplash' && happy && happy.phase !== 'fini' ? 'Whiplash ! Tiens bon : Happy et {ami} arrivent avec la valise de ta Mark V'
     : et.type === 'chute' && chute?.phase === 'chute' ? 'Les passagers tombent ! Rattrape-les en volant (touche-les, toi ou ceux que tu tiens déjà) : il en reste {n}'
     : et.type === 'chute' && chute?.phase === 'poser' ? 'Tu les as tous ! Pose-les doucement sur la plage de Santa Monica (point jaune)' : et.texte;
   const t = explosionExpo ? explosionExpo.reste : panne?.reste ?? 0;
-  return tr(texte, { n: reste, t: Math.max(0, Math.ceil(t)), h: et.hauteur, y: Math.max(0, Math.round(J.y)), ami: nomAmi(), f: montant(facture?.montant || 0) });
+  return tr(texte, { n: reste, t: Math.max(0, Math.ceil(t)), h: et.hauteur, y: Math.max(0, Math.round(J.y)), ami: nomAmi(), f: montant(facture?.montant || 0), loin: et.loin, d: Math.round(loinDeLExpo()) });
 }
 
 // --- la Mark I, dans la grotte des Dix Anneaux (mission « La grotte des Dix Anneaux ») ---
@@ -13968,7 +13978,8 @@ function tirSurJoueur(p, d, depart, degats, precision, gros = false) {
 
 // --- porter quelqu'un dans ses bras (« Le pompier volant », « Les drones de Hammer », « La villa attaquée ») ---
 // E près de quelqu'un qui l'attend (p.secours = 'attend'), dans son armure : Iron Man le prend dans ses bras, un seul à la fois. S'il le lâche
-// (il meurt, monte en voiture ou dans la Mark I, sort de son armure), celui-ci se retrouve là où il attendait (p.place)
+// (il meurt, monte en voiture ou dans la Mark I, sort de son armure), celui-ci se retrouve là où il attendait (p.place) ; s'il est déjà sauvé
+// (p.libre), Iron Man le pose à côté de lui
 let porte = null;   // celui qu'Iron Man porte
 // quelqu'un qui l'attend, à moins de « loin » mètres de lui (et pas plus de « haut » mètres plus haut ou plus bas)
 const attend = (q, loin, haut) => q.secours === 'attend' && q.vie > 0 && !q.supprimer && Math.hypot(q.x - J.x, q.z - J.z) < loin && Math.abs(q.y - J.y) < haut;
@@ -13996,6 +14007,7 @@ function majPorte() {
   if (!p) return;
   if (p.libre && J.sol && !J.superman && !J.nage) { poserPorte(true); return; }
   if (!(J.mort || p.vie <= 0 || p.supprimer || !armureIronman() || J.voiture || J.robot)) return;
+  if (p.libre && p.vie > 0 && !p.supprimer) { poserPorte(true); return; }   // (déjà sauvé : il le pose à côté de lui, pas là où il attendait)
   porte = null;
   if (p.vie <= 0 || p.supprimer) return;
   Object.assign(p, p.place); p.secours = 'attend'; p.flotte = !!p.place.flotte;
@@ -14430,11 +14442,15 @@ function finirCourse() {
 
 // --- les drones vont exploser (mission « Les drones de Hammer ») ---
 // Partout dans la Stark Expo, des drones abattus clignotent en rouge, de plus en plus vite. {ami} attend au bord du bassin : il faut le prendre
-// dans ses bras (E) et l'emmener à plus de « loin » mètres avant que tout explose. Trop tard : les explosions les soufflent, et on recommence
-let explosionExpo = null;   // { reste, total, centre, loin, ami, epaves : [{ h, lumiere }], boum, fini }
+// dans ses bras (E) et l'emmener à plus de « loin » mètres avant que tout explose (les cartes montrent la limite : un cercle rouge). Puis BOUM :
+// une boule de feu grandit jusqu'à « loin » mètres (voir boumExpo), et souffle tout ce qu'elle atteint (voir soufflerExpo). Si elle les
+// attrape, ou si {ami} est resté à l'Expo, on recommence. Sinon, il pose {ami} dès qu'il touche le sol, et c'est fini
+let explosionExpo = null;   // { reste, total, centre, loin, degats, ami, epaves : [{ h, s }], boum, t, touches, touche, rate, sauve, merci, fini }
 const M_ALERTE = new THREE.SpriteMaterial({ map: TEX.flash, color: '#ff2a1a', blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+// à combien de mètres du milieu de l'Expo il est (en l'air aussi : la boule de feu est ronde)
+const loinDeLExpo = () => explosionExpo ? Math.hypot(J.x - explosionExpo.centre.x, J.y + 1 - explosionExpo.centre.y, J.z - explosionExpo.centre.z) : 0;
 function commencerEmmener(et, encore = false) {
-  const c = lieuEtape(et) || J, E = explosionExpo = { reste: et.secondes, total: et.secondes, centre: { x: c.x, z: c.z, y: c.y }, loin: et.loin, epaves: [], boum: false, fini: false, et, tFin: 2.5 };
+  const c = lieuEtape(et) || J, E = explosionExpo = { reste: et.secondes, total: et.secondes, centre: { x: c.x, z: c.z, y: c.y }, loin: et.loin, degats: et.degats ?? 200, epaves: [], boum: false, fini: false, et };
   E.ami = amiQuiAttend(c.x + 6, c.z - 1, hauteurSol(c.x + 6, c.z - 1, c.y + 1));
   for (let k = 0; k < 9; k++) { // des drones abattus, couchés sur le dos, qui clignotent
     const a = k / 9 * 6.28 + entre(-0.3, 0.3), r = entre(10, 26), x = c.x + Math.sin(a) * r, z = c.z + Math.cos(a) * r, y = hauteurSol(x, z, c.y + 1);
@@ -14447,21 +14463,54 @@ function commencerEmmener(et, encore = false) {
 function majEmmener(dt) {
   const E = explosionExpo;
   if (E.fini) return;
-  if (E.sauve) { if ((E.tFin -= dt) <= 0) E.fini = true; return; }   // (le temps de lire « BOUM ! »)
+  if (E.boum) { soufflerExpo(E, dt); return; }
   E.reste -= dt;
   const vite = 1 + 7 * (1 - clamp(E.reste / E.total, 0, 1)), allume = Math.sin(temps * vite * 6) > 0;
-  for (const q of E.epaves) q.s.visible = allume && !E.boum;
+  for (const q of E.epaves) q.s.visible = allume;
   if ((E.bip = (E.bip || 0) - dt) <= 0) { E.bip = 1 / vite; bip(1500, 1500, 0.06, 'square', 0.04 * clamp(1 - Math.hypot(J.x - E.centre.x, J.z - E.centre.z) / 200, 0.1, 1)); }   // bip, bip, de plus en plus vite
-  if (E.reste > 0 || E.boum) return;
-  E.boum = true;   // BOUM : tous les drones sautent, et d'autres explosions partout dans l'Expo
-  for (const q of E.epaves) { exploser(V3(q.x, q.y + 1, q.z), 9, 300, 40, null, false, false); scene.remove(q.h.g); }
-  for (let k = 0; k < 8; k++) { const a = entre(0, 6.28), r = entre(0, 30); exploser(V3(E.centre.x + Math.sin(a) * r, E.centre.y + entre(1, 8), E.centre.z + Math.cos(a) * r), 8, 0, 0, null, false, false); }
-  J.secousse = Math.max(J.secousse || 0, 0.4 * clamp(1 - Math.hypot(J.x - E.centre.x, J.z - E.centre.z) / 300, 0, 1));
-  const sauve = porte === E.ami && Math.hypot(J.x - E.centre.x, J.z - E.centre.z) > E.loin;
-  if (sauve) { E.sauve = true; E.ami.libre = true; annonce(tr('BOUM !'), tr('Toute la Stark Expo saute... mais vous êtes sains et saufs !'), 4); return; }
-  annonce(tr('TROP TARD...'), tr('Les explosions vous ont soufflés : on recommence'), 4);
-  const et = E.et;
-  finirEmmener(); commencerEmmener(et, true);   // tout revient comme au début de l'étape
+  if (E.reste > 0) return;
+  E.boum = true; E.t = 0; E.touches = new Set();   // BOUM : tous les drones sautent, et la boule de feu part du milieu de l'Expo
+  for (const q of E.epaves) { exploser(V3(q.x, q.y + 1, q.z), 12, 0, 0, null, false, false, false); scene.remove(q.h.g); scene.remove(q.s); }
+  E.epaves = [];
+  commencerBoumExpo(E.centre, E.loin);
+  if (porte !== E.ami) raterExpo(E, tr("{ami} était encore dans l'Expo : on recommence", { ami: nomAmi() }));
+}
+const raterExpo = (E, texte) => { E.rate = true; annonce(tr('TROP TARD...'), texte, 4); };
+// la boule de feu grandit (frontBoum) : tout ce qu'elle atteint est soufflé, une seule fois. Les gens volent à la renverse, les voitures aussi
+// (jusqu'aux 7/10 de son rayon, elles explosent), et Iron Man : ça lui fait mal (degats au milieu, 20 % de ça tout au bord). S'il portait
+// {ami}, c'est raté. Quand elle a fini de grandir sans les attraper, ils sont sains et saufs
+function soufflerExpo(E, dt) {
+  const t = (E.t += dt), f = frontBoum(t, E.loin), c = E.centre, C = V3(c.x, c.y, c.z);
+  if (t < DUREE_BOUM + dt) {
+    for (const p of personnes) {
+      const d = Math.hypot(p.x - c.x, p.y + 1 - c.y, p.z - c.z);
+      if (d >= f || p.vie <= 0 || p === E.ami || E.touches.has(p)) continue;
+      E.touches.add(p);
+      const k = 1 - d / E.loin, dx = p.x - c.x, dz = p.z - c.z, l = Math.hypot(dx, dz) || 1;
+      blesser(p, 30 + 300 * k, false); projeter(p, dx / l * (5 + 15 * k), 4 + 8 * k, dz / l * (5 + 15 * k), -4 - 8 * k);
+    }
+    for (const v of voitures) {
+      if (v.detruite || E.touches.has(v) || Math.hypot(v.x - c.x, v.y - c.y, v.z - c.z) >= f) continue;
+      E.touches.add(v);
+      if (dist(v, c) < E.loin * 0.7) exploserVoiture(v, C, false); else souffler(v, C, 2 - 1.2 * dist(v, c) / E.loin);
+    }
+    const d = loinDeLExpo();
+    if (!E.touche && d < f) { // elle l'attrape : il vole à la renverse
+      E.touche = true;
+      const k = 1 - d / E.loin;
+      blesserJoueur(E.degats * (0.2 + 0.8 * k), true, C);
+      if (!J.mort && !J.robot && !J.voiture) { const a = Math.atan2(J.x - c.x, J.z - c.z); J.superman = null; J.lance = { vx: Math.sin(a) * (10 + 20 * k), vz: Math.cos(a) * (10 + 20 * k) }; J.vy = 6 + 8 * k; J.sol = false; }
+      if (porte === E.ami && !E.rate) raterExpo(E, tr("L'explosion vous a soufflés : on recommence"));
+    }
+  }
+  if (E.rate) { if (t > DUREE_BOUM + 2) { const et = E.et; finirEmmener(); commencerEmmener(et, true); } return; }   // (le temps de voir l'explosion) tout revient comme au début de l'étape
+  if (t < DUREE_BOUM) return;
+  if (!E.sauve) { E.sauve = true; E.ami.libre = true; E.tFin = 3; annonce(tr('BOUM !'), tr('Toute la Stark Expo saute... mais vous êtes sains et saufs !'), 4); return; }
+  // {ami} est sauvé : Iron Man le pose dès qu'il touche le sol (voir majPorte). Puis {ami} le remercie, et la mission est finie
+  if ((E.tFin -= dt) > 0 || porte === E.ami) return;
+  if (E.merci) { E.fini = true; return; }
+  E.merci = true; E.tFin = 2.5;
+  annonce(nomAmi().toUpperCase(), tr('« Merci, {super} ! Je rentre à la villa »', { super: nomSuper() }), 3); bip(600, 1300, 0.3, 'sine', 0.2);
 }
 function finirEmmener() {
   const E = explosionExpo;
@@ -14469,6 +14518,95 @@ function finirEmmener() {
   for (const q of E.epaves) { scene.remove(q.h.g); scene.remove(q.s); }
   if (E.ami && !E.ami.libre) { if (porte === E.ami) porte = null; E.ami.supprimer = true; }
   explosionExpo = null;
+}
+
+// --- la grande explosion de l'Expo ---
+// Une boule de feu qui grandit jusqu'à « rayon » mètres en DUREE_BOUM secondes (très vite au début, puis de moins en moins), avec une onde de
+// choc par terre, de la poussière tout le long de son bord et des explosions partout où elle passe ; l'écran devient blanc un instant, et la
+// ville tremble. Puis elle s'éteint, et un grand champignon de fumée sombre monte. Elle ne fait que se montrer : c'est soufflerExpo qui
+// souffle ce qu'elle atteint
+const DUREE_BOUM = 1.4;
+const frontBoum = (t, rayon) => rayon * (1 - (1 - clamp(t / DUREE_BOUM, 0, 1)) ** 3);   // jusqu'où elle est arrivée, au bout de t secondes
+// le feu de la boule : des taches jaunes, orange et rouge sombre sur de l'orange. Chaque tache est dessinée aussi à gauche et à droite de
+// l'image, pour qu'on ne voie pas où elle se raccorde ; en haut et en bas (les pôles de la boule, où l'image se resserre en étoile), un
+// orange tout uni
+const TEX_BOULE_FEU = toile(256, 128, (g, l, h) => {
+  g.fillStyle = '#ff7a1e'; g.fillRect(0, 0, l, h);
+  for (let k = 0; k < 500; k++) {
+    const x = Math.random() * l, y = Math.random() * h, r = entre(4, 16), c = hasard(['255,245,190', '255,210,90', '255,150,40', '200,60,15', '130,35,10']);
+    for (const dx of [-l, 0, l]) { const d = g.createRadialGradient(x + dx, y, 0, x + dx, y, r); d.addColorStop(0, `rgba(${c},.9)`); d.addColorStop(1, `rgba(${c},0)`); g.fillStyle = d; g.fillRect(x + dx - r, y - r, 2 * r, 2 * r); }
+  }
+  for (const [y0, y1] of [[0, h * 0.3], [h, h * 0.7]]) {
+    const d = g.createLinearGradient(0, y0, 0, y1); d.addColorStop(0, 'rgba(255,130,40,1)'); d.addColorStop(0.35, 'rgba(255,130,40,.85)'); d.addColorStop(1, 'rgba(255,130,40,0)');
+    g.fillStyle = d; g.fillRect(0, Math.min(y0, y1), l, Math.abs(y1 - y0));
+  }
+});
+TEX_BOULE_FEU.repeat.set(3, 1);
+const GEO_BOULE_FEU = new THREE.SphereGeometry(1, 48, 24), GEO_ONDE = new THREE.RingGeometry(0.86, 1, 96).rotateX(-Math.PI / 2);
+// (ajoute = true : en lumière ajoutée, pour le cœur blanc et l'onde de choc, qui brillent ; sinon, un feu bien orange, même sur un ciel clair)
+const matBoum = (couleur, map, ajoute) => new THREE.MeshBasicMaterial({ map, color: couleur, transparent: true, blending: ajoute ? THREE.AdditiveBlending : THREE.NormalBlending, depthWrite: false, side: THREE.DoubleSide, fog: false, toneMapped: false });
+let boumExpo = null;   // { centre, rayon, t, feu, coeur, onde, explosions : [{ r, x, y, z, fait }], fumees : [{ o, vx, vy, vz, t, vie, taille }], blanc }
+function commencerBoumExpo(c, rayon) {
+  finirBoumExpo();
+  const B = boumExpo = { centre: c, rayon, t: 0, explosions: [], fumees: [] };
+  B.feu = new THREE.Mesh(GEO_BOULE_FEU, matBoum('#ffffff', TEX_BOULE_FEU)); B.coeur = new THREE.Mesh(GEO_BOULE_FEU, matBoum('#ffe0a0', TEX_BOULE_FEU, true)); B.onde = new THREE.Mesh(GEO_ONDE, matBoum('#ffd8a0', null, true));
+  B.coeur.renderOrder = 1;   // (le cœur brille par-dessus le feu)
+  for (const o of [B.feu, B.coeur, B.onde]) { o.position.set(c.x, c.y, c.z); o.scale.setScalar(0.01); scene.add(o); }
+  B.onde.position.y += 0.6;
+  for (let k = 0; k < 28; k++) { // les explosions, là où la boule de feu passera
+    const a = entre(0, 6.28), r = entre(8, rayon * 0.95), x = c.x + Math.sin(a) * r, z = c.z + Math.cos(a) * r;
+    B.explosions.push({ r, x, z, y: hauteurSol(x, z, c.y + 30) + entre(1, 12) });
+  }
+  for (let k = 0; k < 30; k++) { // des morceaux de l'Expo qui volent
+    const e = new THREE.Mesh(new THREE.BoxGeometry(entre(0.6, 2.5), entre(0.3, 1.2), entre(0.5, 2)), MAT.betonBlanc), a = entre(0, 6.28), v = entre(18, 40);
+    e.position.set(c.x + Math.sin(a) * entre(2, 25), c.y + entre(1, 6), c.z + Math.cos(a) * entre(2, 25)); scene.add(e);
+    lancerDebris(e, V3(Math.sin(a) * v, entre(12, 30), Math.cos(a) * v), entre(4, 6), true);
+  }
+  const d = Math.hypot(J.x - c.x, J.y - c.y, J.z - c.z);
+  bruit(1, 110, 6); bruit(clamp(1.3 - d / 400, 0.4, 1), 600, 2); bip(70, 30, 3, 'sawtooth', 0.2);   // un énorme boum, qui gronde longtemps
+  B.blanc = clamp(1.2 - d / 500, 0.35, 0.95);
+}
+function majBoumExpo(dt) {
+  const B = boumExpo, c = B.centre, t = (B.t += dt), f = frontBoum(t, B.rayon), u = clamp(t / DUREE_BOUM, 0, 1);
+  const eteint = clamp((t - DUREE_BOUM) / 2.2, 0, 1);   // après avoir tout soufflé, elle s'éteint en 2,2 s, en montant un peu, de plus en plus rouge
+  const dedans = camera.position.distanceTo(B.feu.position) < f;   // la caméra est dans le feu : on voit à travers, un peu
+  B.feu.scale.setScalar(Math.max(0.01, f)); B.feu.rotation.y += dt * 0.25; B.feu.position.y = c.y + 8 * eteint;
+  B.feu.material.opacity = (dedans ? 0.55 : 0.95) * (1 - eteint); B.feu.material.color.setRGB(1, 1 - 0.55 * eteint, 1 - 0.75 * eteint); B.feu.visible = eteint < 1;
+  B.coeur.scale.setScalar(Math.max(0.01, f * 0.55)); B.coeur.rotation.y -= dt * 0.4;
+  B.coeur.material.opacity = 1 - clamp(t - DUREE_BOUM * 0.6, 0, 1); B.coeur.visible = B.coeur.material.opacity > 0;
+  B.onde.scale.setScalar(Math.max(0.01, f * 1.02)); B.onde.material.opacity = 0.9 * (1 - u); B.onde.visible = u < 1;
+  for (const q of B.explosions) if (!q.fait && f >= q.r) { q.fait = true; exploser(V3(q.x, q.y, q.z), entre(7, 12), 0, 0, null, false, false, false); }
+  if (u < 1) for (B.poussiere = (B.poussiere || 0) + dt * 80; B.poussiere >= 1; B.poussiere--) { // la poussière soulevée, tout le long de son bord (80 bouffées par seconde)
+    const a = entre(0, 6.28), x = c.x + Math.sin(a) * f, z = c.z + Math.cos(a) * f, s = new THREE.Sprite(M_FUMEE.clone());
+    s.material.color.set('#b0a088'); s.position.set(x, hauteurSol(x, z, c.y + 40) + 3, z); scene.add(s); effets.push({ o: s, vie: 2, fumee: 2, taille: 14 });
+  }
+  if (t > DUREE_BOUM && t < 5 && (B.tFumee = (B.tFumee || 0) - dt) <= 0) { // le champignon de fumée : une colonne, et son chapeau, plus large et plus haut
+    B.tFumee = 0.06;
+    const chapeau = Math.random() < 0.45, s = new THREE.Sprite(M_FUMEE.clone()), a = entre(0, 6.28), r = chapeau ? entre(10, 55) : entre(0, 12);
+    s.material.color.set(Math.random() < 0.3 ? '#7a6656' : '#5a544e'); s.position.set(c.x + Math.sin(a) * r, c.y + (chapeau ? entre(40, 70) : entre(5, 35)), c.z + Math.cos(a) * r); scene.add(s);
+    const s2 = chapeau ? 4 : 0.5;   // (le chapeau s'élargit ; et le vent pousse tout un peu vers l'est)
+    B.fumees.push({ o: s, vx: Math.sin(a) * s2 + 1.5, vz: Math.cos(a) * s2, vy: chapeau ? entre(20, 30) : entre(8, 22), t: 0, vie: entre(7, 10), taille: chapeau ? entre(45, 75) : entre(22, 38) });
+  }
+  for (const q of B.fumees) {
+    q.t += dt; q.vy *= Math.pow(0.75, dt); q.o.position.x += q.vx * dt; q.o.position.y += q.vy * dt; q.o.position.z += q.vz * dt;
+    const k = q.t / q.vie; q.o.scale.setScalar(q.taille * (0.4 + 0.9 * Math.min(1, k * 2))); q.o.material.opacity = 0.8 * clamp(1 - k, 0, 1) * Math.min(1, q.t * 3);
+    if (q.t >= q.vie) { scene.remove(q.o); q.o.material.dispose(); }
+  }
+  B.fumees = B.fumees.filter(q => q.t < q.vie);
+  // sa lumière éclaire toute la ville ; l'écran devient blanc un instant ; tout tremble
+  if (eteint < 1) { lumiereBoum.color.set('#ff9a40'); lumiereBoum.position.set(c.x, c.y + 20 + f * 0.3, c.z); lumiereBoum.distance = B.rayon * 5; lumiereBoum.intensity = 6e5 * (1 - eteint); }
+  else lumiereBoum.distance = 40;
+  if (!voyage) $('voile').style.opacity = B.blanc * Math.max(0, 1 - t / 0.7);
+  if (t < DUREE_BOUM + 1) J.secousse = Math.max(J.secousse || 0, 0.45 * clamp(1 - Math.hypot(J.x - c.x, J.z - c.z) / 500, 0.1, 1));
+  if (eteint >= 1 && !B.fumees.length) finirBoumExpo();
+}
+function finirBoumExpo() {
+  const B = boumExpo;
+  if (!B) return;
+  for (const o of [B.feu, B.coeur, B.onde]) { scene.remove(o); o.material.dispose(); }
+  for (const q of B.fumees) { scene.remove(q.o); q.o.material.dispose(); }
+  lumiereBoum.distance = 40; if (!voyage) $('voile').style.opacity = 0;
+  boumExpo = null;
 }
 
 // --- les hélicoptères du Mandarin (mission « La villa attaquée ») ---
@@ -15371,6 +15509,14 @@ carteImg.width = Math.ceil(TAILLE_X * ECHELLE_IMG); carteImg.height = Math.ceil(
   dessinerPlan(g);
   for (const [p, fond, lettre] of REPERES) icone(g, p.x, p.z, fond, lettre);
 }
+// sur les cartes, pendant le compte à rebours de l'Expo : un cercle rouge, là où ira la boule de feu (ecran : où tombe un point de la ville ;
+// zoom : combien de points pour un mètre)
+function cercleExpo(g, ecran, zoom) {
+  const E = explosionExpo;
+  if (!E || E.boum) return;
+  const [a, b] = ecran(E.centre.x, E.centre.z);
+  g.fillStyle = 'rgba(255,40,20,.18)'; g.strokeStyle = '#ff3a2a'; g.lineWidth = 2; g.beginPath(); g.arc(a, b, E.loin * zoom, 0, 7); g.fill(); g.stroke();
+}
 const mctx = $('minicarte').getContext('2d');
 function dessinerMinicarte() {
   const zoom = J.voiture ? (enAvion(J.voiture) ? 0.35 : 0.7) : 1.3, th = -Math.PI / 2 - Math.atan2(Math.cos(J.lacetCam), Math.sin(J.lacetCam)), c = Math.cos(th), s = Math.sin(th);
@@ -15379,6 +15525,7 @@ function dessinerMinicarte() {
   mctx.beginPath(); mctx.arc(110, 110, 110, 0, 7); mctx.clip();
   mctx.fillStyle = COULEUR_MER; mctx.fillRect(0, 0, 220, 220);
   mctx.save(); mctx.translate(110, 110); mctx.rotate(th); mctx.scale(zoom, zoom); mctx.translate(-J.x, -J.z); mctx.drawImage(carteImg, 0, 0, carteImg.width / ECHELLE_IMG, carteImg.height / ECHELLE_IMG); mctx.restore();
+  cercleExpo(mctx, ecran, zoom);
   pointsCarte((x, z, couleur, r = 3) => { const [a, b] = ecran(x, z); mctx.fillStyle = couleur; mctx.beginPath(); mctx.arc(a, b, r, 0, 7); mctx.fill(); });
   const cible = cibleMission();
   if (cible) { // le point jaune reste au bord si l'objectif est loin
@@ -15444,6 +15591,7 @@ function dessinerGrandeCarte(dt) {
   g.save(); g.translate(l / 2, h / 2); g.scale(z, z); g.translate(-m.x, -m.z); g.imageSmoothingEnabled = true; g.drawImage(terrainImg, 0, 0, NXT * PT, NZT * PT); dessinerPlan(g); g.restore();
   if (z < 1.5) for (const [nom, i, j] of NOMS_LIEUX) { const c = centre(i, j), [a, b] = ecran(c.x, c.z); texteCarte(g, tr(nom), a, b, nom === nom.toUpperCase() ? 22 : 16); }
   for (const [p, fond, lettre, nom] of REPERES) { const [a, b] = ecran(p.x, p.z); icone(g, a, b, fond, lettre, z < 0.4 ? 8 : 13); if (z >= 0.6) texteCarte(g, tr(nom), a, b + 31, 16); }
+  cercleExpo(g, ecran, z);
   pointsCarte((x, y, couleur, rayon = 3) => { const [a, b] = ecran(x, y); g.fillStyle = couleur; g.beginPath(); g.arc(a, b, rayon + 2, 0, 7); g.fill(); });
   const cible = cibleMission();
   if (cible) { // l'objectif : un point jaune entouré d'un anneau qui bat
@@ -16041,7 +16189,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   MISSIONS_MALIBU, toursT, grotte, usine, vieuxReacteur, creerMonger, porterSecours, donnerArmure, texteEtape, commencerEtape, finirEtape, missions, monterRobot, faireArriver, majRepere, repere, fleche,
   get markI() { return markI; }, get vague() { return vague; }, get anneaux() { return anneaux; }, get givre() { return givre; }, get sauvetage() { return sauvetage; }, get panne() { return panne; },
   get obadiah() { return obadiah; }, sansReacteur, armureGelee, abimerArmure, PARTIES_ARMURE, marche, enSecours, depenser,
-  get course() { return course; }, get allies() { return allies; }, get happy() { return happy; }, get porte() { return porte; }, get explosionExpo() { return explosionExpo; },
+  get course() { return course; }, get allies() { return allies; }, get happy() { return happy; }, get porte() { return porte; }, get explosionExpo() { return explosionExpo; }, get boumExpo() { return boumExpo; }, loinDeLExpo,
   get effondrement() { return effondrement; }, get repechage() { return repechage; }, get discours() { return discours; }, villaStark, trone, lieuEtape, couperVoiture, garderAllies,
   effondrerVilla, releverVilla, poserPorte, tirSurJoueur, majBarreBoss, interieurs,
   get chute() { return chute; }, get facture() { return facture; }, FETE_DES_ARMURES, tourStark,
