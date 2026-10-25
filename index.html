@@ -113,6 +113,13 @@
   #boss { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(420px, 60%); text-align: center; display: none; font: 22px 'Anton', Impact, sans-serif; letter-spacing: 2px; }
   #boss > div { height: 12px; background: rgba(0,0,0,.6); border: 2px solid #ddd; margin-top: 2px; }
   #boss > div > div { height: 100%; width: 100%; background: linear-gradient(90deg, #c0392b, #ff7a50); transition: width .2s; }
+  /* l'affichage du casque d'Iron Man, à droite (sa batterie, et les 6 parties de l'armure), et, à la 1re personne, les bords de la visière */
+  #casque { position: absolute; right: 18px; top: max(230px, calc(50% - 125px)); width: 250px; height: 250px; display: none; }
+  #visiere { position: absolute; inset: 0; display: none; background: radial-gradient(ellipse 85% 95% at center, transparent 68%, rgba(60, 170, 230, .1) 82%, rgba(2, 10, 18, .8)); }
+  #visiere::before, #visiere::after { content: ''; position: absolute; top: 14%; bottom: 14%; width: 30vw; border: 2px solid transparent; border-radius: 50%; }
+  #visiere::before { left: 3vw; border-left-color: rgba(120, 225, 255, .35); }
+  #visiere::after { right: 3vw; border-right-color: rgba(120, 225, 255, .35); }
+  #hud.casque #annonce small { padding: 0 280px; }   /* (une longue annonce passe à la ligne au lieu de passer sous l'affichage du casque) */
   /* l'écran du chapitre : le logo du héros, « Chapitre 2 », puis il s'en va */
   #ecran-chapitre { position: fixed; inset: 0; display: none; cursor: pointer; }
   #ecran-chapitre canvas { width: 100%; height: 100%; }
@@ -121,10 +128,12 @@
 <body>
 <div id="hud">
   <div id="lunette"></div>
+  <div id="visiere"></div>
   <canvas id="minicarte" width="220" height="220"></canvas>
   <div id="barre-vie"><div></div></div>
   <div id="barre-gilet"><div></div></div>
   <div id="barre-armure"><div></div></div>
+  <canvas id="casque"></canvas>
   <div id="haut-droite">
     <div id="heure"></div>
     <div id="argent">0 $</div>
@@ -677,7 +686,46 @@ const TRADUCTIONS = {
   '{armure} achetée !': { de: '{armure} gekauft!', en: '{armure} bought!', gsw: '{armure} gchauft!' },
   'Réacteur niveau {n} !': { de: 'Reaktor Stufe {n}!', en: 'Reactor level {n}!', gsw: 'Reaktor Stufe {n}!' },
   'Ton réacteur est déjà au niveau maximum': { de: 'Dein Reaktor ist schon auf der höchsten Stufe', en: 'Your reactor is already at the top level', gsw: 'Din Reaktor isch scho uf de höchschte Stufe' },
-  'Tu prends moins de dégâts, tes répulseurs font plus mal, et tu voles plus vite': { de: 'Du nimmst weniger Schaden, deine Repulsoren treffen härter, und du fliegst schneller', en: 'You take less damage, your repulsors hit harder, and you fly faster', gsw: 'Du nimmsch weniger Schade, dini Repulsore träffed härter, und du flüügsch schnäller' },
+  'Tu prends moins de dégâts, tes répulseurs font plus mal, tu voles plus vite, et ta batterie dure plus longtemps': { de: 'Du nimmst weniger Schaden, deine Repulsoren treffen härter, du fliegst schneller, und deine Batterie hält länger',
+    en: 'You take less damage, your repulsors hit harder, you fly faster, and your battery lasts longer', gsw: 'Du nimmsch weniger Schade, dini Repulsore träffed härter, du flüügsch schnäller, und dini Batterie hebt länger' },
+  // l'affichage du casque d'Iron Man : la batterie, et les 6 parties de l'armure (PARTIES_ARMURE)
+  'Casque':           { de: 'Helm', en: 'Helmet', gsw: 'Helm' },
+  'Torse':            { de: 'Brust', en: 'Chest', gsw: 'Bruscht' },
+  'Bras gauche':      { de: 'Linker Arm', en: 'Left arm', gsw: 'Linke Arm' },
+  'Bras droit':       { de: 'Rechter Arm', en: 'Right arm', gsw: 'Rächte Arm' },
+  'Jambe gauche':     { de: 'Linkes Bein', en: 'Left leg', gsw: 'Linggs Bei' },
+  'Jambe droite':     { de: 'Rechtes Bein', en: 'Right leg', gsw: 'Rächts Bei' },
+  'G':                { de: 'L', en: 'L', gsw: 'L' },   // (gauche et droite, à côté de l'armure dessinée)
+  'D':                { de: 'R', en: 'R', gsw: 'R' },
+  'BATTERIE':         { de: 'BATTERIE', en: 'BATTERY', gsw: 'BATTERIE' },
+  'EN CHARGE':        { de: 'LÄDT', en: 'CHARGING', gsw: 'LADT' },
+  'EN VOL':           { de: 'IM FLUG', en: 'FLYING', gsw: 'IM FLUG' },
+  'PLEINE':           { de: 'VOLL', en: 'FULL', gsw: 'VOLL' },
+  'SECOURS':          { de: 'NOTSTROM', en: 'BACKUP POWER', gsw: 'NOTSTROM' },
+  'SYSTÈMES EN LIGNE': { de: 'ALLE SYSTEME BEREIT', en: 'ALL SYSTEMS ONLINE', gsw: 'ALLI SYSTEM PARAT' },
+  'AFFICHAGE COUPÉ':  { de: 'ANZEIGE AUS', en: 'DISPLAY OFF', gsw: 'AAZEIG US' },
+  'BATTERIE FAIBLE':  { de: 'BATTERIE SCHWACH', en: 'LOW BATTERY', gsw: 'BATTERIE SCHWACH' },
+  'BATTERIE VIDE':    { de: 'BATTERIE LEER', en: 'BATTERY EMPTY', gsw: 'BATTERIE LÄÄR' },
+  'BATTERIE VIDE !':  { de: 'BATTERIE LEER!', en: 'BATTERY EMPTY!', gsw: 'BATTERIE LÄÄR!' },
+  '{partie} HORS SERVICE': { de: '{partie} AUSGEFALLEN', en: '{partie} OFFLINE', gsw: '{partie} USGFALLE' },
+  '{partie} HORS SERVICE !': { de: '{partie} AUSGEFALLEN!', en: '{partie} OFFLINE!', gsw: '{partie} USGFALLE!' },
+  '{partie} hors service !': { de: '{partie} ausgefallen!', en: '{partie} offline!', gsw: '{partie} usgfalle!' },
+  '{partie} : de nouveau en service !': { de: '{partie}: läuft wieder!', en: '{partie}: back online!', gsw: '{partie}: lauft wider!' },
+  'À pied, elle se recharge : pose-toi bientôt !': { de: 'Zu Fuß lädt sie sich auf: Lande bald!', en: 'It recharges on foot: land soon!', gsw: 'Z Fuess ladt si sich uf: Lande bald!' },
+  'Tes armes ne tirent plus, et tes réacteurs faiblissent : pose-toi, elle se recharge à pied': { de: 'Deine Waffen schießen nicht mehr, und deine Düsen werden schwach: Lande, zu Fuß lädt sie sich auf',
+    en: 'Your weapons stop firing, and your thrusters weaken: land, it recharges on foot', gsw: 'Dini Waffe schüüssed nüme, und dini Düse wärded schwach: Lande, z Fuess ladt si sich uf' },
+  'Batterie à {n} % : tes armes et tes réacteurs repartent !': { de: 'Batterie bei {n} %: Deine Waffen und Düsen laufen wieder!', en: 'Battery at {n} %: your weapons and thrusters are back!', gsw: 'Batterie bi {n} %: Dini Waffe und Düse laufed wider!' },
+  'Batterie vide : à pied, elle se recharge ({n} %)': { de: 'Batterie leer: Zu Fuß lädt sie sich auf ({n} %)', en: 'Battery empty: it recharges on foot ({n} %)', gsw: 'Batterie läär: Z Fuess ladt si sich uf ({n} %)' },
+  "L'affichage de ton casque s'éteint : il se répare tout seul, à l'abri des coups": { de: 'Die Anzeige in deinem Helm geht aus: Er repariert sich von selbst, wenn du nicht mehr getroffen wirst',
+    en: 'Your helmet display goes dark: it repairs itself once you stop getting hit', gsw: 'D Aazeig i dim Helm gaht us: Er flickt sich sälber, wänn du nüme troffe wirsch' },
+  "R ne marche plus : il se répare tout seul, à l'abri des coups": { de: 'R geht nicht mehr: Sie repariert sich von selbst, wenn du nicht mehr getroffen wirst',
+    en: 'R stops working: it repairs itself once you stop getting hit', gsw: 'R gaht nüme: Si flickt sich sälber, wänn du nüme troffe wirsch' },
+  "Ta main gauche ne tire plus : il se répare tout seul, à l'abri des coups": { de: 'Deine linke Hand schießt nicht mehr: Er repariert sich von selbst, wenn du nicht mehr getroffen wirst',
+    en: 'Your left hand stops firing: it repairs itself once you stop getting hit', gsw: 'Dini linki Hand schüüsst nüme: Er flickt sich sälber, wänn du nüme troffe wirsch' },
+  "Ta main droite ne tire plus : il se répare tout seul, à l'abri des coups": { de: 'Deine rechte Hand schießt nicht mehr: Er repariert sich von selbst, wenn du nicht mehr getroffen wirst',
+    en: 'Your right hand stops firing: it repairs itself once you stop getting hit', gsw: 'Dini rächti Hand schüüsst nüme: Er flickt sich sälber, wänn du nüme troffe wirsch' },
+  "Tu ne peux plus accélérer en volant : elle se répare toute seule, à l'abri des coups": { de: 'Du kannst beim Fliegen nicht mehr beschleunigen: Es repariert sich von selbst, wenn du nicht mehr getroffen wirst',
+    en: 'You can no longer speed up while flying: it repairs itself once you stop getting hit', gsw: 'Du chasch bim Flüüge nüme schnäller wärde: Es flickt sich sälber, wänn du nüme troffe wirsch' },
   'Dans ton armure, G : ils partent de tes épaules et suivent les ennemis': { de: 'In deiner Rüstung, G: Sie starten von deinen Schultern und verfolgen die Feinde', en: 'In your armor, G: they launch from your shoulders and chase the enemies', gsw: 'I dinere Rüschtig, G: Si started vo dine Schultere und verfolged d Feind' },
   'Dans ton armure, X : un genou à terre, tu tournes sur toi-même, et le laser coupe tout autour de toi': { de: 'In deiner Rüstung, X: Ein Knie am Boden drehst du dich um dich selbst, und der Laser schneidet alles um dich herum', en: 'In your armor, X: one knee down, you spin around, and the laser cuts everything around you', gsw: 'I dinere Rüschtig, X: Es Chnüü am Bode, du drähsch di um di sälber, und de Laser schniidt alles um di ume' },
   "Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d'autres armures et des améliorations. <b>J</b> : changer d'armure.": { de: 'Der Laden von <b>Stark Industries</b> (⚙ auf der Karte) verkauft andere Rüstungen und Verbesserungen. <b>J</b>: Rüstung wechseln.', en: 'The <b>Stark Industries</b> store (⚙ on the map) sells other armors and upgrades. <b>J</b>: switch armor.', gsw: 'De Lade vo <b>Stark Industries</b> (⚙ uf de Charte) verchauft anderi Rüschtige und Verbesserige. <b>J</b>: Rüschtig wächsle.' },
@@ -2015,12 +2063,24 @@ const ARMURE = {
 //  plastron (R) : le gros rayon qui part du réacteur, sur ta poitrine. degats : au centre de l'explosion · explosion : son rayon, en mètres ·
 //    charge : les secondes avant qu'il parte · recharge : les secondes avant le suivant
 //  Pour voler (F), c'est le vol de Superman : voir vitesseVol dans REGLAGES. L lève ou baisse le masque
+//  batterie (en %, elle est pleine à 100) : à pied, elle se recharge de « recharge » % par seconde, même quand tu tires. En volant, elle se
+//    vide de « vol » % par seconde, plus « volVite » à pleine vitesse (à mi-vitesse, la moitié). Chaque tir coûte : repulseur, plastron,
+//    canon, mitrailleuse (chaque balle), missiles (toute la salve), laser (tout le tour). Sous « faible » %, ton casque te prévient.
+//    À 0 %, tes armes ne tirent plus, et tes réacteurs n'ont plus la force de monter : tu redescends à « descente » m/s. Tout repart à
+//    « reprise » %. Elle se remplit quand tu reviens de l'hôpital
+//  parties : les 6 parties de l'armure (le casque, le torse, les bras, les jambes), de 0 à 100 %. Un coup abîme la partie du côté d'où il
+//    vient : « usure » % par point de vie qu'il t'enlève. Une partie à 0 % est hors service : une main ne tire plus (le bras), R ne marche
+//    plus (le torse), l'affichage du casque s'éteint (le casque), tu n'accélères plus en volant (une jambe). Elle se répare toute seule,
+//    de « reparation » % par seconde, quand tu n'as pas été touché depuis « attente » secondes, et remarche à « reprise » %.
+//    Une armure qui arrive est toute neuve
 // =====================================================================
 const IRONMAN = {
   touches: ['KeyQ', 'KeyW', 'KeyE'],   // A Z E sur un clavier français
   suite: 0.8, arrivee: 0.22, vitessePieces: 18, protection: 0.3,
   repulseurs: { nom: 'Répulseurs', degats: 75, cadence: 0.3, portee: 150, charge: 0.15, recul: 8 },
   plastron:   { nom: 'Plastron', degats: 400, explosion: 5, portee: 200, charge: 0.4, recharge: 4 },
+  batterie:   { recharge: 3, vol: 0.2, volVite: 1, repulseur: 0.3, plastron: 6, canon: 1.5, mitrailleuse: 0.1, missiles: 8, laser: 10, faible: 20, descente: 4, reprise: 20 },
+  parties:    { usure: 1.5, reparation: 4, attente: 5, reprise: 25 },
 };
 
 // =====================================================================
@@ -2713,6 +2773,17 @@ const PIECES_IRONMAN = [
       plaque(GEO.boucheIronman, 'acier', v, 0, -0.07, 0.131);
     } },
 ];
+// LES 6 PARTIES DE L'ARMURE, que l'affichage du casque montre (de 0 à 100 % : voir IRONMAN.parties). Un coup abîme celle qui est de son côté.
+//  os : le morceau du corps où elle est (ses étincelles en partent) ; panne : ce qu'on lit quand elle tombe en panne (à 0 %, elle est hors
+//  service : le casque éteint l'affichage, le torse arrête R, un bras arrête sa main, une jambe empêche d'accélérer en volant)
+const PARTIES_ARMURE = [
+  { cle: 'casque', nom: 'Casque',       os: b => b.tete,      panne: "L'affichage de ton casque s'éteint : il se répare tout seul, à l'abri des coups" },
+  { cle: 'torse',  nom: 'Torse',        os: b => b.torse,     panne: "R ne marche plus : il se répare tout seul, à l'abri des coups" },
+  { cle: 'brasG',  nom: 'Bras gauche',  os: b => b.brasG.pli, panne: "Ta main gauche ne tire plus : il se répare tout seul, à l'abri des coups" },
+  { cle: 'brasD',  nom: 'Bras droit',   os: b => b.brasD.pli, panne: "Ta main droite ne tire plus : il se répare tout seul, à l'abri des coups" },
+  { cle: 'jambeG', nom: 'Jambe gauche', os: b => b.jambeG.pli, panne: "Tu ne peux plus accélérer en volant : elle se répare toute seule, à l'abri des coups" },
+  { cle: 'jambeD', nom: 'Jambe droite', os: b => b.jambeD.pli, panne: "Tu ne peux plus accélérer en volant : elle se répare toute seule, à l'abri des coups" },
+];
 // LES ARMURES DE TONY STARK, au chapitre d'Iron Man : tu as la première dès le début ; les autres s'achètent au magasin de l'usine
 // Stark Industries ($ sur la carte de Malibu), avec les AMELIORATIONS_STARK (juste en dessous). J : choisir une de tes armures ;
 // H : elle arrive (si tu en portes une autre, tu en sors d'abord). Au chapitre 1, le code IRONMAN donne toujours la première.
@@ -2751,11 +2822,12 @@ const ARMURES_STARK = [
 //    chaque poignet et coupe tout ce qui est autour de toi, à « portee » mètres. degats : à chacun · tour : la durée du tour, en secondes ·
 //    recharge : les secondes avant le suivant
 //  reacteur : un meilleur réacteur, niveau par niveau (prix : celui de chaque niveau, du 2 au 5). À chaque niveau, tu prends moins de dégâts
-//    (la protection est multipliée par ça), tes répulseurs, ton canon et ton plastron font plus mal, et tu voles plus vite
+//    (la protection est multipliée par ça), tes répulseurs, ton canon et ton plastron font plus mal, tu voles plus vite, et ta batterie
+//    dure plus longtemps (ce qui la vide, voler et tirer, est multiplié par « batterie » : voir IRONMAN)
 const AMELIORATIONS_STARK = {
   missiles: { nom: 'Mini-missiles', prix: 15000, nombre: 8, recharge: 6, degats: 160, explosion: 3, vitesse: 34, portee: 120 },
   laser:    { nom: 'Laser des bras', prix: 20000, degats: 300, portee: 22, tour: 0.9, recharge: 8 },
-  reacteur: { nom: 'Réacteur', prix: [10000, 25000, 50000, 100000], protection: 0.85, degats: 1.25, vol: 1.1 },
+  reacteur: { nom: 'Réacteur', prix: [10000, 25000, 50000, 100000], protection: 0.85, degats: 1.25, vol: 1.1, batterie: 0.8 },
 };
 // IRON MONGER, la grosse armure d'Obadiah Stane (mission « Iron Monger ») : faite comme celles de Tony Stark, mais grise, et massive comme
 // la Hulkbuster. Sa taille, sa vie et ses armes sont dans ENNEMIS (monger)
@@ -9561,6 +9633,11 @@ function habillerIronman(b, liste, k = 0) {
 }
 const toutesLesPieces = () => PIECES_IRONMAN.map((p, k) => k);
 const nouvelleMain = () => ({ charge: 0, cd: 0, leve: 0, dernier: -9, bloque: false });   // un répulseur : voir majIronman
+// la batterie (de 0 à 100 %) et les 6 parties de l'armure (PARTIES_ARMURE, de 0 à 100 % ; cassees : celles qui sont hors service) :
+// voir majBatterie et abimerArmure
+const partiesNeuves = () => Object.fromEntries(PARTIES_ARMURE.map(p => [p.cle, 100]));
+const marche = cle => !J.ironman?.cassees?.[cle];   // cette partie de son armure marche-t-elle ?
+const enSecours = () => armureIronman() && !!J.ironman.secours;   // batterie vide : ses armes ne tirent plus, ses réacteurs faiblissent
 // porte-t-il toute l'armure ? Peut-il s'en servir (à pied : ni en voiture, ni dans un robot, ni sur une remontée) ? Lève-t-il une main
 // pour tirer, ou tire-t-il le rayon de son plastron (il se tourne alors vers le viseur) ?
 const armureIronman = () => !!J.ironman && J.ironman.pieces.length === PIECES_IRONMAN.length;
@@ -9588,7 +9665,7 @@ const tailleIronman = () => armureIronman() ? armureDe(J.ironman.armure).taille 
 // civil : au début du chapitre d'Iron Man, Tony Stark est en civil. Il a le code, mais pas encore l'armure : la touche H l'appellera
 function mettreIronman(civil = false) {
   J.ironman = { armure: armureChoisie(), pieces: [], anim: null, masque: false, ouvert: 0, vide: null, plastron: null, recharge: 0, ailes: 0, mains: { G: nouvelleMain(), D: nouvelleMain() },
-    cdMitrailleuse: 0, tirEpaule: 0, missiles: 0, laser: 0, tour: null };
+    cdMitrailleuse: 0, tirEpaule: 0, missiles: 0, laser: 0, tour: null, batterie: 100, secours: false, parties: partiesNeuves(), cassees: {} };
   if (!civil && !appelerArmure()) J.ironman.pieces = toutesLesPieces();
 }
 // H : il met son armure (elle arrive à sa façon), ou il en sort. Comme A Z E, mais d'une seule touche. S'il en porte une autre que celle
@@ -9930,7 +10007,7 @@ function finirArrivee() {
   const I = J.ironman, A = I.anim;
   nettoyerArrivee(A);
   if (A.vide) { scene.remove(A.vide.h.g); if (I.vide === A.vide) I.vide = null; }
-  I.pieces = toutesLesPieces(); I.anim = null; J.vue = A.vue;
+  I.pieces = toutesLesPieces(); I.anim = null; J.vue = A.vue; I.parties = partiesNeuves(); I.cassees = {};   // (une armure qui arrive est toute neuve)
   rhabillerBJ();
   if (!J.mort) { annonce(tr(rescue() && !A.k ? 'RESCUE !' : 'IRON MAN !'), A.k ? armureDe(A.k).nom : '', 2); bip(500, 1500, 0.35, 'sine', 0.08); }
 }
@@ -10028,7 +10105,9 @@ const rayonPlastron = rayonIronman(V3(), V3(0, 0, 1), 1); rayonPlastron.visible 
 function tirerPlastron() {
   const I = J.ironman, P = IRONMAN.plastron;
   if (armureDe(I.armure).mitrailleuse || I.plastron || J.nage || J.roule || J.echelle || accroche() || J.superman?.looping) return;
+  if (!marche('torse')) { horsService('torse'); return; }
   if (I.recharge > 0) { bip(300, 200, 0.1, 'square', 0.1); annonce('', tr('Plastron : encore {n} s', { n: Math.ceil(I.recharge) }), 1); return; }
+  if (!depenser('plastron')) return;
   I.plastron = { t: 0 }; I.recharge = P.charge + P.recharge; J.danse = 0;
   bip(160, 2400, P.charge, 'sine', 0.07);
 }
@@ -10042,6 +10121,7 @@ function tirerMissiles() {
   const I = J.ironman, M = AMELIORATIONS_STARK.missiles;
   if (!stark.missiles) { annonce('', tr("Les mini-missiles s'achètent au magasin de Stark Industries (⚙ sur la carte)"), 2.5); return; }
   if (I.missiles > 0) { bip(300, 200, 0.1, 'square', 0.1); annonce('', tr('{nom} : encore {n} s', { nom: tr('Missiles'), n: Math.ceil(I.missiles) }), 1); return; }
+  if (!depenser('missiles')) return;
   const yeux = { x: J.x, y: J.y + 1, z: J.z };
   const cibles = [...personnes.filter(p => ennemi(p) && dist(p, J) < M.portee && voit(yeux, p)), ...robots.filter(q => q.pilote === 'police' && dist(q, J) < M.portee)]
     .sort((a, b) => dist(a, J) - dist(b, J));
@@ -10065,6 +10145,7 @@ function lancerLaser() {
   if (I.tour || J.nage || J.roule || J.echelle || accroche()) return;
   if (J.superman || !J.sol) { annonce('', tr("Pose-toi d'abord !"), 1.5); return; }
   if (I.laser > 0) { bip(300, 200, 0.1, 'square', 0.1); annonce('', tr('{nom} : encore {n} s', { nom: tr('Laser'), n: Math.ceil(I.laser) }), 1); return; }
+  if (!depenser('laser')) return;
   I.tour = { t: 0, a0: J.angleCorps, a: null, touches: new Set() };
   I.laser = L.recharge; J.danse = 0; J.accroupi = false;
   bip(400, 2600, 0.25, 'sine', 0.06);
@@ -10120,11 +10201,13 @@ function mitrailleuseIronman(dt, peut) {
   const I = J.ironman, M = armureDe(I.armure).mitrailleuse, g = joueurH.ironman?.mitrailleuse;
   I.cdMitrailleuse -= dt; I.tirEpaule = Math.max(0, I.tirEpaule - dt);
   if (!M || !g) return;
-  const tire = peut && !!touches.KeyR;
+  const appuie = peut && !!touches.KeyR, tire = appuie && marche('torse');   // (le torse hors service : elle ne tire plus)
+  if (appuie && !tire && !I.panneEpaule) horsService('torse');
+  I.panneEpaule = appuie && !tire;
   if (tire) {
     camera.getWorldDirection(vVise).multiplyScalar(60).add(camera.position); g.lookAt(vVise);   // vers un point à 60 m, droit dans le viseur
     joueurH.ironman.canons.rotation.z += 30 * dt; I.tirEpaule = 0.5; J.danse = 0;
-    if (I.cdMitrailleuse <= 0) { I.cdMitrailleuse = M.cadence; g.updateMatrixWorld(true); tirer(M, joueurH.ironman.canons.localToWorld(V3(0, 0, 0.45))); }
+    if (I.cdMitrailleuse <= 0) { I.cdMitrailleuse = M.cadence; g.updateMatrixWorld(true); if (depenser('mitrailleuse')) tirer(M, joueurH.ironman.canons.localToWorld(V3(0, 0, 0.45))); }
   } else g.quaternion.slerp(Q_.identity(), Math.min(1, 6 * dt));
 }
 // la lueur bleue d'un répulseur qui se charge (G, D), et celle du réacteur (P)
@@ -10140,6 +10223,82 @@ function viserMains(h) {
 }
 // le bouclier de la main gauche est-il levé (A, avec une armure qui a un « bouclier ») ? Il arrête ce qui arrive de devant (voir blesserJoueur)
 const bouclierLeve = () => ironmanLibre() && !!armureDe(J.ironman.armure).bouclier && J.ironman.mains.G.leve > 0.7 && !!touches.KeyQ;
+// --- La batterie de l'armure d'Iron Man (IRONMAN.batterie) et ses 6 parties (PARTIES_ARMURE, IRONMAN.parties) ---
+// ce que coûte un tir (quoi : repulseur, plastron, canon...), en % de la batterie : moins avec un meilleur réacteur
+const coutBatterie = quoi => (IRONMAN.batterie[quoi] || 0) * reacteur('batterie');
+// peut-il tirer ça ? Si oui, c'est retiré de la batterie. Sinon (pas assez, ou batterie vide jusqu'à la « reprise »), rien ne part
+function depenser(quoi) {
+  const I = J.ironman, c = coutBatterie(quoi);
+  if (!I) return true;
+  if (!I.secours && I.batterie >= c) { I.batterie -= c; return true; }
+  pasDeBatterie();
+  return false;
+}
+function pasDeBatterie() { // (pas plus d'une fois toutes les 0,6 s, même en gardant la touche)
+  const I = J.ironman;
+  if (temps - (I.bipVide ?? -9) < 0.6) return;
+  I.bipVide = temps; bip(220, 140, 0.12, 'square', 0.08);
+  annonce('', tr('Batterie vide : à pied, elle se recharge ({n} %)', { n: Math.floor(I.batterie) }), 1.2);
+}
+// il appuie sur la touche d'une partie hors service : un petit bip, et l'annonce
+function horsService(cle) {
+  bip(240, 160, 0.12, 'square', 0.08);
+  annonce('', tr('{partie} hors service !', { partie: tr(PARTIES_ARMURE.find(p => p.cle === cle).nom) }), 1.2);
+}
+// un coup qui lui enlève « perdu » points de vie (de : d'où il vient, s'il le sait) abîme une partie de son armure, au hasard, mais plus
+// souvent celle qui est du côté du coup : de sa gauche, le bras ou la jambe gauche ; d'en haut, le casque ; d'en bas, les jambes. Le torse,
+// le plus gros, est touché le plus souvent. À 0 %, elle est hors service
+function abimerArmure(perdu, de) {
+  const I = J.ironman;
+  if (!I?.parties || !(perdu > 0)) return;
+  let droite = 0, haut = 0;
+  if (de) {
+    const dx = de.x - J.x, dz = de.z - J.z, l = Math.hypot(dx, dz) || 1, a = J.angleCorps;
+    droite = (dz * Math.sin(a) - dx * Math.cos(a)) / l;   // de -1 (à sa gauche) à 1 (à sa droite)
+    haut = clamp(((de.y ?? J.y) - J.y - 1) / (l + 1), -1, 1);   // d'au-dessus de lui : positif
+  }
+  const poids = { casque: 1 + 2 * Math.max(0, haut), torse: 3, brasG: 1.5 + 2 * Math.max(0, -droite), brasD: 1.5 + 2 * Math.max(0, droite),
+    jambeG: 1.2 + 1.5 * Math.max(0, -droite) + 1.5 * Math.max(0, -haut), jambeD: 1.2 + 1.5 * Math.max(0, droite) + 1.5 * Math.max(0, -haut) };
+  let r = Math.random() * Object.values(poids).reduce((a, b) => a + b, 0), k = 'torse';
+  for (const c in poids) if ((r -= poids[c]) < 0) { k = c; break; }
+  I.parties[k] = Math.max(0, I.parties[k] - perdu * IRONMAN.parties.usure);
+  if (I.parties[k] > 0 || I.cassees[k]) return;
+  I.cassees[k] = true;   // hors service !
+  const p = PARTIES_ARMURE.find(q => q.cle === k);
+  annonce(tr('{partie} HORS SERVICE !', { partie: tr(p.nom).toUpperCase() }), tr(p.panne), 3);
+  bip(700, 90, 0.5, 'sawtooth', 0.12); bruit(0.5, 3000, 0.3);
+  joueurH.g.updateMatrixWorld(true); etincelles(p.os(joueurH).getWorldPosition(V3()), 14, 4);
+}
+// à chaque image : en volant, la batterie se vide (plus vite à pleine vitesse) ; sinon, elle se recharge. Vide, l'armure est « en secours »
+// jusqu'à la reprise. Les parties se réparent quand il n'est plus touché ; abîmées, elles font des étincelles, et hors service, elles fument
+function majBatterie(dt) {
+  const I = J.ironman, B = IRONMAN.batterie, P = IRONMAN.parties, porte = armureIronman(), avant = I.batterie;
+  if (J.superman && porte) I.batterie -= (B.vol + B.volVite * Math.min(1, J.vitesse / R_.vitesseVolMax)) * reacteur('batterie') * dt;
+  else I.batterie += B.recharge * dt;
+  I.batterie = clamp(I.batterie, 0, 100);
+  if (I.secours && I.batterie >= B.reprise) { // elle est assez rechargée : tout repart
+    I.secours = false;
+    if (porte) { annonce('', tr('Batterie à {n} % : tes armes et tes réacteurs repartent !', { n: Math.floor(I.batterie) }), 2.5); bip(500, 1300, 0.3, 'sine', 0.08); }
+  }
+  if (!porte) return;
+  if (I.batterie < B.faible && avant >= B.faible) { annonce(tr('BATTERIE FAIBLE'), tr('À pied, elle se recharge : pose-toi bientôt !'), 2.5); bip(880, 660, 0.25, 'square', 0.06); }
+  if (I.batterie <= 0 && !I.secours) {
+    I.secours = true; I.plastron = null;
+    annonce(tr('BATTERIE VIDE !'), tr('Tes armes ne tirent plus, et tes réacteurs faiblissent : pose-toi, elle se recharge à pied'), 3.5); bip(600, 120, 0.6, 'sawtooth', 0.1);
+  }
+  const repare = temps - (J.dernierDegat ?? -99) > P.attente, dehors = J.vue !== 1 && !I.anim;
+  for (const p of PARTIES_ARMURE) {
+    const k = p.cle;
+    if (repare) I.parties[k] = Math.min(100, I.parties[k] + P.reparation * dt);
+    if (I.cassees[k] && I.parties[k] >= P.reprise) { delete I.cassees[k]; annonce('', tr('{partie} : de nouveau en service !', { partie: tr(p.nom) }), 2); bip(700, 1400, 0.2, 'sine', 0.06); }
+    if (!dehors || I.parties[k] >= 40) continue;
+    if (Math.random() < dt * (I.cassees[k] ? 5 : 1.5)) etincelles(p.os(joueurH).getWorldPosition(V3()), 3, 2);
+    if (I.cassees[k] && Math.random() < dt * 6) { // de la fumée noire
+      const f = new THREE.Sprite(M_FUMEE.clone()); f.material.color.set('#3a3a3e'); p.os(joueurH).getWorldPosition(f.position);
+      scene.add(f); effets.push({ o: f, vie: 1, fumee: 1, taille: 0.5 });
+    }
+  }
+}
 // À chaque image : l'armure qui arrive, si on ne l'attend plus (il est mort, monté en voiture...) ; le masque qui se lève ou se baisse ;
 // les répulseurs (tant qu'on garde A ou E enfoncé, la main se lève, se charge, puis tire tous les IRONMAN.repulseurs.cadence secondes),
 // ou le canon et le bouclier qui sortent des mains ; le rayon du plastron, ou la mitrailleuse d'épaule ; les missiles et le laser qui se
@@ -10157,6 +10316,7 @@ function majIronman(dt) {
   for (let k = capsules.length - 1; k >= 0; k--) if (capsules[k].t > 6) { scene.remove(capsules[k].g); capsules.splice(k, 1); }
   const I = J.ironman;
   if (!I) return;
+  majBatterie(dt);
   if (I.anim && (J.mort || J.voiture || J.robot || J.telesiege)) interrompreIronman();
   if (I.tour && (J.mort || J.voiture || J.robot || J.telesiege)) I.tour = null;
   const b = joueurH.ironman, R = IRONMAN.repulseurs, P = IRONMAN.plastron, dehors = J.vue !== 1, A = armureDe(I.armure);
@@ -10170,13 +10330,15 @@ function majIronman(dt) {
   for (const [cote, m, code, k] of [[1, I.mains.G, 'KeyQ', 'G'], [-1, I.mains.D, 'KeyE', 'D']]) {
     const canon = cote < 0 && A.canon, garde = cote > 0 && !!A.bouclier, C = canon || R;   // (C : sa charge et sa cadence)
     m.cd -= dt;
-    const tient = peut && !!touches[code] && !m.bloque;
+    const bras = cote > 0 ? 'brasG' : 'brasD', appuie = peut && !!touches[code] && !m.bloque, tient = appuie && marche(bras);   // (un bras hors service : sa main ne se lève plus)
+    if (appuie && !tient && !m.panne) horsService(bras);
+    m.panne = appuie && !tient;
     if (!tient) m.charge = 0;
     else {
       if (!m.charge) { if (garde) { bruit(0.25, 6000, 0.25); bip(300, 700, 0.2, 'triangle', 0.04); } else bip(canon ? 300 : 500, canon ? 1100 : 1700, C.charge + 0.05, 'sine', 0.035); J.danse = 0; }   // la main se lève, et le répulseur se charge en sifflant (le bouclier sort en chuintant)
       m.charge += dt;
       if (garde) m.dernier = temps;
-      else if (m.charge >= C.charge && m.cd <= 0) { if (canon) tirerCanon(); else repulseur(cote); m.cd = C.cadence; m.dernier = temps; }
+      else if (m.charge >= C.charge && m.cd <= 0) { if (depenser(canon ? 'canon' : 'repulseur')) { if (canon) tirerCanon(); else repulseur(cote); } m.cd = C.cadence; m.dernier = temps; }   // (sans assez de batterie, rien ne part)
     }
     m.leve = peut ? clamp(m.leve + (tient || temps - m.dernier < 0.4 ? 8 : -4) * dt, 0, 1) : 0;
     const objet = cote < 0 ? b?.canon : b?.bouclier;   // le canon ou le bouclier sort du bout du bras, quand la main se lève
@@ -10288,7 +10450,7 @@ function acheterStark(s) {
     if (prix === undefined) { annonce('', tr('Ton réacteur est déjà au niveau maximum'), 2); return; }
     if (!paye(prix)) return;
     stark.reacteur++;
-    annonce(tr('Réacteur niveau {n} !', { n: stark.reacteur }), tr('Tu prends moins de dégâts, tes répulseurs font plus mal, et tu voles plus vite'), 3.5);
+    annonce(tr('Réacteur niveau {n} !', { n: stark.reacteur }), tr('Tu prends moins de dégâts, tes répulseurs font plus mal, tu voles plus vite, et ta batterie dure plus longtemps'), 3.5);
   } else {
     const c = s.amelioration, U = AMELIORATIONS_STARK[c];
     if (stark[c]) { annonce('', tr('{nom} : déjà à toi', { nom: tr(U.nom) }), 2); return; }
@@ -10549,6 +10711,7 @@ function decoller() {
   if (J.superman) { J.superman = null; return; }
   if (sansReacteur()) return;   // (mission « Iron Monger » : sans son réacteur, il ne vole plus)
   if (armureGelee() && armureIronman()) { annonce('', tr('Ton armure est gelée : attends que le givre fonde !'), 1.5); bip(300, 200, 0.1, 'square', 0.1); return; }   // (mission « Le premier vol »)
+  if (enSecours()) { pasDeBatterie(); return; }   // (batterie vide : ses réacteurs n'ont plus la force de le soulever)
   // sa vitesse (la montée est dans J.vy) : il s'élance d'abord vers le ciel. crans : combien de fois on a tapé Maj en volant ; roulis : il penche dans ses virages ;
   // bascule : debout (0) ou couché ; tonneau, sensTonneau : le tonneau en cours (voir figuresVol, qui y ajoute « looping », le looping en cours)
   J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0, bascule: 0, tonneau: 0, sensTonneau: 0 }; J.vy = 8;
@@ -11063,6 +11226,7 @@ function blesserJoueur(degats, gilet = true, de = null) {
   }
   const d = degats * (abrite() ? R_.protectionVoiture : J.robot ? R_.protectionRobot : armureIronman() ? protectionIronman() : 1), g = gilet ? Math.min(J.gilet, d) : 0; // le gilet prend les dégâts en premier (l'armure d'Iron Man en prend la plus grosse part)
   J.gilet -= g; J.vie -= d - g;
+  if (armureIronman() && !J.voiture) abimerArmure(d, de);   // dans l'armure d'Iron Man : le coup abîme une de ses parties
   J.dernierDegat = temps;
   $('rouge').style.opacity = 0.9;
   bip(180, 90, 0.15, 'triangle', 0.3);
@@ -11073,6 +11237,7 @@ function reapparaitre() {
   J.mort = 0; J.vie = R_.viesJoueur; J.argent = Math.min(J.argent, Math.max(0, J.argent - 100));   // (sans descendre sous 0 ; mais une dette d'amendes reste)
   if (J.voiture) { J.voiture.vitesse = 0; sortirVoiture(); }   // arrêté d'abord : on ne roule pas par terre en se réveillant
   if (J.robot) sortirRobot();
+  if (J.ironman) Object.assign(J.ironman, { batterie: 100, secours: false, parties: partiesNeuves(), cassees: {} });   // l'armure d'Iron Man : batterie pleine, toute réparée
   const h = hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);   // l'hôpital le plus proche
   J.x = h.x; J.z = h.z; J.y = hauteurSol(J.x, J.z); J.vy = 0; J.lacet = 0; J.accroupi = false; J.nage = false; J.roule = null; J.genou = J.atterri = J.energie = 0;
   etoiles = 0;
@@ -11502,8 +11667,10 @@ function superman(dt) {
   } else {
     const dx = Math.sin(J.lacet) * ct * av - Math.cos(J.lacet) * lat, dy = Math.sin(J.tangage) * av + monte, dz = Math.cos(J.lacet) * ct * av + Math.sin(J.lacet) * lat;
     if (!av && !lat && !monte) f.crans = 0;   // il s'arrête : il repart à la vitesse normale
-    const v = Math.min(R_.vitesseVolMax, R_.vitesseVol + f.crans * R_.vitesseVolMaj) * volIronman() / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
-    f.vx += (dx * v - f.vx) * k; J.vy += (dy * v - J.vy) * k; f.vz += (dz * v - f.vz) * k;
+    const crans = armureIronman() && !(marche('jambeG') && marche('jambeD')) ? 0 : f.crans;   // (dans l'armure d'Iron Man, une jambe hors service : il n'accélère plus)
+    const secours = enSecours(), v = Math.min(R_.vitesseVolMax, R_.vitesseVol + (secours ? 0 : crans) * R_.vitesseVolMaj) * volIronman() / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
+    const vy = secours ? Math.min(dy * v, -IRONMAN.batterie.descente) : dy * v;   // (batterie vide : ses réacteurs n'ont plus la force de monter, ni d'aller vite ; il redescend doucement)
+    f.vx += (dx * v - f.vx) * k; J.vy += (vy - J.vy) * k; f.vz += (dz * v - f.vz) * k;
   }
   const avant = { x: J.x, z: J.z }, taille = tailleIronman();
   J.x += f.vx * dt; J.y += J.vy * dt; J.z += f.vz * dt;
@@ -15272,6 +15439,80 @@ function aideIronman() {
     A.mitrailleuse ? tr('<b>R</b> : mitrailleuse') : tr('<b>R</b> : plastron'), tr('<b>F</b> : voler'), stark.missiles && tr('<b>G</b> : missiles'), stark.laser && tr('<b>X</b> : laser'),
     tr('<b>L</b> : masque'), stark.armures.length > 1 && tr("<b>J</b> : changer d'armure"), tr('<b>H</b> : sortir')].filter(Boolean).join(' · ');
 }
+// L'affichage du casque d'Iron Man : ce que Tony Stark voit dans son armure, masque baissé (L le lève : plus d'affichage). En haut, le nom de
+// l'armure ; à gauche, la batterie, un anneau qui se vide, comme son réacteur ; à droite, l'armure vue de dos (sa gauche à gauche), chaque
+// partie de sa couleur : bleue, jaune sous 67 %, rouge sous 34 %, qui clignote hors service ; en dessous, chaque partie en %, et ce qui ne
+// va pas. Il s'allume de haut en bas quand le masque se ferme. Le casque hors service : il grésille. À la 1re personne, les bords de la visière
+const casqueEcran = $('casque'), casqueCtx = casqueEcran.getContext('2d'), DPR_CASQUE = Math.min(2, devicePixelRatio || 1);
+casqueEcran.width = casqueEcran.height = 250 * DPR_CASQUE;
+let allumageCasque = 0;   // de 0 (éteint) à 1 (tout allumé)
+const BLEU_CASQUE = '#7fe4ff', JAUNE_CASQUE = '#ffcf4a', ROUGE_CASQUE = '#ff5a40';
+// les formes de l'armure, vue de dos : un rond pour le casque, des rectangles arrondis pour le reste (x, y, largeur, hauteur)
+const SILHOUETTE = { casque: [175, 34, 18, 20], torse: [166, 58, 36, 44], brasG: [151, 60, 12, 46], brasD: [205, 60, 12, 46], jambeG: [168, 106, 15, 52], jambeD: [185, 106, 15, 52] };
+function dessinerCasque(dt) {
+  const I = J.ironman, voit = armureIronman() && !I.anim && I.ouvert < 0.5 && !J.voiture && !J.robot && !J.mort && !voyage;
+  if (voit && !allumageCasque) bip(900, 1600, 0.15, 'sine', 0.03);   // il s'allume
+  allumageCasque = voit ? Math.min(1, allumageCasque + 2.5 * dt) : 0;
+  casqueEcran.style.display = voit ? 'block' : 'none'; $('hud').classList.toggle('casque', voit);
+  $('visiere').style.display = voit && J.vue === 1 ? 'block' : 'none';
+  if (!voit) return;
+  const c = casqueCtx, W = 250, B = IRONMAN.batterie, bat = I.batterie, cligne = Math.floor(temps * 4) % 2 === 0;
+  const police = (taille, gras = true) => `${gras ? '700 ' : ''}${taille}px 'Roboto Condensed', Arial, sans-serif`;
+  const couleur = k => I.cassees[k] ? (cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .3)') : I.parties[k] < 34 ? ROUGE_CASQUE : I.parties[k] < 67 ? JAUNE_CASQUE : BLEU_CASQUE;
+  c.setTransform(DPR_CASQUE, 0, 0, DPR_CASQUE, 0, 0); c.clearRect(0, 0, W, W);
+  c.save();
+  c.beginPath(); c.rect(0, 0, W, W * allumageCasque); c.clip();   // il s'allume de haut en bas
+  c.fillStyle = 'rgba(6, 22, 34, .45)'; c.strokeStyle = 'rgba(127, 228, 255, .55)'; c.lineWidth = 1.5;
+  c.beginPath(); c.roundRect(1, 1, W - 2, W - 2, 14); c.fill(); c.stroke();
+  c.textBaseline = 'middle'; c.shadowColor = 'rgba(0, 0, 0, .8)'; c.shadowBlur = 4;
+  if (!marche('casque')) { // hors service : il grésille
+    c.shadowBlur = 0;
+    for (let k = 0; k < 40; k++) { c.fillStyle = `rgba(160, 230, 255, ${Math.random() * 0.3})`; c.fillRect(Math.random() * W, Math.random() * W, entre(10, 60), 2); }
+    c.font = police(15); c.textAlign = 'center'; c.fillStyle = cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .45)';
+    c.fillText(tr('{partie} HORS SERVICE', { partie: tr('Casque').toUpperCase() }), W / 2, W / 2 - 10);
+    c.fillText(tr('AFFICHAGE COUPÉ'), W / 2, W / 2 + 12);
+    c.restore(); return;
+  }
+  // en haut : J.A.R.V.I.S., et le nom de l'armure
+  c.font = police(13); c.fillStyle = BLEU_CASQUE;
+  c.textAlign = 'left'; c.fillText('J.A.R.V.I.S.', 12, 16);
+  c.textAlign = 'right'; c.fillText(armureDe(I.armure).nom.toUpperCase(), W - 12, 16);
+  c.fillStyle = 'rgba(127, 228, 255, .4)'; c.fillRect(12, 27, W - 24, 1);
+  // la batterie : l'anneau, ses 10 graduations, le % au milieu, et ce qu'elle fait (elle se recharge, elle se vide en volant, ou elle est vide)
+  const cb = bat < B.faible || I.secours ? (cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .45)') : bat < 50 ? JAUNE_CASQUE : BLEU_CASQUE, cx = 64, cy = 82, r = 34;
+  c.lineWidth = 8;
+  c.strokeStyle = 'rgba(127, 228, 255, .15)'; c.beginPath(); c.arc(cx, cy, r, 0, 2 * Math.PI); c.stroke();
+  c.strokeStyle = cb; c.beginPath(); c.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * bat / 100); c.stroke();
+  c.lineWidth = 1.5; c.strokeStyle = 'rgba(127, 228, 255, .5)';
+  for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5; c.beginPath(); c.moveTo(cx + Math.cos(a) * (r + 6), cy + Math.sin(a) * (r + 6)); c.lineTo(cx + Math.cos(a) * (r + 10), cy + Math.sin(a) * (r + 10)); c.stroke(); }
+  c.textAlign = 'center'; c.fillStyle = cb; c.font = "22px 'Anton', Impact, sans-serif"; c.fillText(`${Math.floor(bat)} %`, cx, cy + 1);
+  c.font = police(13); c.fillStyle = BLEU_CASQUE; c.fillText(tr('BATTERIE'), cx, 134);
+  c.font = police(12);
+  if (I.secours) { c.fillStyle = cb; c.fillText(`⚠ ${tr('SECOURS')}`, cx, 151); }
+  else if (J.superman) { c.fillStyle = JAUNE_CASQUE; c.fillText(`▼ ${tr('EN VOL')}`, cx, 151); }
+  else { c.fillStyle = BLEU_CASQUE; c.fillText(bat < 100 ? `▲ ${tr('EN CHARGE')}` : tr('PLEINE'), cx, 151); }
+  // l'armure, vue de dos
+  for (const k in SILHOUETTE) {
+    const [x, y, l, h] = SILHOUETTE[k], col = couleur(k);
+    c.beginPath(); c.roundRect(x, y, l, h, k === 'casque' ? 9 : 4);
+    c.globalAlpha = 0.35; c.fillStyle = col; c.fill(); c.globalAlpha = 1; c.strokeStyle = col; c.lineWidth = 1.5; c.stroke();
+  }
+  c.font = police(11); c.fillStyle = 'rgba(127, 228, 255, .7)'; c.fillText(tr('G'), 157, 120); c.fillText(tr('D'), 211, 120);
+  // chaque partie en %, sur deux colonnes : à gauche, le casque, le bras et la jambe gauches ; à droite, le torse, le bras et la jambe droits
+  c.font = police(11.5);
+  PARTIES_ARMURE.forEach((p, i) => {
+    const x = i % 2 ? 132 : 12, y = 177 + Math.floor(i / 2) * 18, col = couleur(p.cle);
+    c.fillStyle = col; c.textAlign = 'left'; c.fillText(tr(p.nom).toUpperCase(), x, y, 70);   // (un nom trop long est serré)
+    c.textAlign = 'right'; c.fillText(I.cassees[p.cle] ? '✕' : `${Math.ceil(I.parties[p.cle])} %`, x + 106, y);
+  });
+  // en bas : ce qui ne va pas (le plus grave d'abord), ou que tout va bien
+  const casse = PARTIES_ARMURE.find(p => I.cassees[p.cle]);
+  const alerte = I.secours ? tr('BATTERIE VIDE') : casse ? tr('{partie} HORS SERVICE', { partie: tr(casse.nom).toUpperCase() }) : bat < B.faible ? tr('BATTERIE FAIBLE') : '';
+  c.textAlign = 'center'; c.font = police(13);
+  c.fillStyle = alerte ? (cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .45)') : 'rgba(127, 228, 255, .7)';
+  c.fillText(alerte ? `⚠ ${alerte}` : tr('SYSTÈMES EN LIGNE'), W / 2, 234);
+  c.restore();
+}
 function majHUD(dt) {
   $('barre-vie').firstChild.style.width = `${J.vie / R_.viesJoueur * 100}%`;
   $('barre-vie').firstChild.style.background = J.vie < 30 ? '#c0392b' : '#56b24c';
@@ -15338,6 +15579,7 @@ function majHUD(dt) {
     : ironmanLibre() ? aideIronman() : '';   // dans l'armure d'Iron Man
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   majBarreBoss();   // Iron Monger : sa barre de vie, en haut de l'écran
+  dessinerCasque(dt);   // dans l'armure d'Iron Man : sa batterie et ses parties
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
   if (tempsAnnonce <= 0) $('annonce').style.opacity = 0;
@@ -15766,7 +16008,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get etoiles() { return etoiles; }, set etoiles(v) { etoiles = v; }, get missionIndex() { return missionIndex; }, set enJeu(v) { enJeu = v; },
   MISSIONS_MALIBU, toursT, grotte, usine, vieuxReacteur, creerMonger, porterSecours, donnerArmure, texteEtape, commencerEtape, finirEtape, missions, monterRobot, faireArriver, majRepere, repere, fleche,
   get markI() { return markI; }, get vague() { return vague; }, get anneaux() { return anneaux; }, get givre() { return givre; }, get sauvetage() { return sauvetage; }, get panne() { return panne; },
-  get obadiah() { return obadiah; }, sansReacteur, armureGelee,
+  get obadiah() { return obadiah; }, sansReacteur, armureGelee, abimerArmure, PARTIES_ARMURE, marche, enSecours, depenser,
   get course() { return course; }, get allies() { return allies; }, get happy() { return happy; }, get porte() { return porte; }, get explosionExpo() { return explosionExpo; },
   get effondrement() { return effondrement; }, get repechage() { return repechage; }, get discours() { return discours; }, villaStark, trone, lieuEtape, couperVoiture, garderAllies,
   effondrerVilla, releverVilla, poserPorte, tirSurJoueur, majBarreBoss, interieurs,
