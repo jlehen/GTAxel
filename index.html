@@ -1060,6 +1060,8 @@ const TRADUCTIONS = {
   "Trop lent ! Il faut tenir 88 miles à l'heure": { de: 'Zu langsam! Du musst 88 Meilen pro Stunde halten', en: 'Too slow! You have to hold 88 miles per hour', gsw: 'Z langsam! Du muesch 88 Meile pro Stund hebe' },
   'LA DELOREAN EST REPARTIE !': { de: 'DER DELOREAN IST WEG!', en: 'THE DELOREAN IS GONE!', gsw: 'DE DELOREAN ISCH WÄG!' },
   'Elle est cachée quelque part : retrouve-la pour finir le chapitre': { de: 'Er ist irgendwo versteckt: Finde ihn, um das Kapitel abzuschließen', en: 'It is hidden somewhere: find it to finish the chapter', gsw: 'Er isch irgendwo versteckt: Find en, zum s Kapitel fertigmache' },
+  'LA DELOREAN REVIENT !': { de: 'DER DELOREAN KOMMT ZURÜCK!', en: 'THE DELOREAN IS BACK!', gsw: 'DE DELOREAN CHUNNT ZRUGG!' },
+  'Une toute neuve, dans sa cachette': { de: 'Ein ganz neuer, in seinem Versteck', en: 'A brand new one, in its hiding place', gsw: 'En ganz nöie, i sim Versteck' },
   'CHAPITRE {n} · {ville}': { de: 'KAPITEL {n} · {ville}', en: 'CHAPTER {n} · {ville}', gsw: 'KAPITEL {n} · {ville}' },
   'DESTINATION':      { de: 'ZIEL', en: 'DESTINATION', gsw: 'ZIIL' },
   'PRÉSENT':          { de: 'GEGENWART', en: 'PRESENT', gsw: 'GÄGEWART' },
@@ -1810,6 +1812,7 @@ const REGLAGES = {
   amendeMax: 100000,         // dollars : l'amende ne dépasse jamais ça. L'argent peut devenir négatif !
   pardon: 120,               // secondes sans victime : une victime est oubliée
   dureeVoyage: 3,            // secondes à 88 miles à l'heure (142 km/h) dans la DeLorean pour partir dans un autre chapitre
+  retourDeLorean: 4,         // secondes : la DeLorean a explosé ou coulé avant qu'on la retrouve, une neuve revient alors dans sa cachette
 };
 
 // =====================================================================
@@ -9539,8 +9542,6 @@ function majCamp(dt) {
   B.porteM.position.y = B.porte.y + B.porte.h / 2 - B.ouverture * (B.porte.h + 0.15);
   B.porteM.visible = B.voyant.visible = db < 400;
   B.voyant.material = camp.ouvert ? M_BOUTON_OK : M_BOUTON;
-  // la DeLorean : s'il n'y en a plus une seule dans le pays (explosée, coulée), une neuve revient dans le bunker quand B.J. est loin
-  if (db > 150 && cachetteDeLorean('?') && !deLoreanLa()) creerVoiture(B.garage.x, B.garage.z, B.garage.a, false, typeNomme('DeLorean'));
 }
 // le code de triche MISSION11 : le camp repart de zéro. Tous les militaires sont revenus, la commandante aussi, le bunker est refermé
 // (avec la DeLorean dedans), et une armure neuve attend devant la porte
@@ -13370,7 +13371,8 @@ function cibleMission() {
   if (et.type === 'chute') return !chute ? null : chute.phase === 'avion' ? chute.avion && { x: chute.avion.x, y: chute.avion.y, z: chute.avion.z } : chute.phase === 'poser' ? chute.depot
     : proche(chute.gens.filter(p => p.etat === 'tombe'));
   if (et.type === 'eliminer' && et.nombre) return proche(personnes.filter(p => p.type === et.cible && p.vie > 0)) || lieuEtape(et);
-  if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule && !v.fantome));
+  if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule && !v.fantome))
+    || (et.voiture === 'DeLorean' ? placeDeLorean() : null);   // (la DeLorean a explosé : sa cachette, où une neuve va revenir)
   if (et.lieu || et.noeud) return lieuEtape(et);
   if (et.type === 'eliminer') return personnes.find(p => p.type === et.cible && p.vie > 0) || (resteAEliminer(et.cible) ? camp : null);   // (les renforts ne sont pas encore sortis : le camp)
   if (et.type === 'arme') return objets.filter(o => o.type === 'stand' && o.arme === indexArme(et.arme)).reduce((m, o) => !m || dist(o, J) < dist(m, J) ? o : m, null) || lieuProche('A', J);
@@ -15196,17 +15198,19 @@ function majVoyage(dt) {
   if (voyage.t > 3.3 && !voyage.fini) { voyage.fini = true; allerAuChapitre(voyage.dest, true); }   // ...et on arrive dans l'autre chapitre
 }
 // on arrive avec la DeLorean : trois éclairs, puis elle est là, à côté de B.J., toute fumante. Si on n'a pas encore retrouvé celle de ce
-// chapitre, elle repart toute seule au bout de 3,6 s (un éclair) : elle est cachée dans la ville (cachette, dans CHAPITRES)
+// chapitre, elle repart toute seule au bout de 3,6 s (un éclair) : elle est cachée dans la ville (cachette, dans CHAPITRES).
+// v : une DeLorean déjà posée ailleurs, qui arrive pareil (la neuve qui revient dans sa cachette : voir majRetourDeLorean)
 let arrivee = null;   // { t, v }
 function majArrivee(dt) {
   const a = arrivee, t0 = a.t;
   a.t += dt;
-  if (!a.v) { // elle est là tout de suite, mais toute petite (invisible) jusqu'au 3e éclair
+  if (!a.v) { // elle arrive à côté de lui
     a.v = amenerVoiture('DeLorean');
     if (!a.v) { arrivee = null; return; }   // pas de place à côté de lui
-    a.v.m.scale.setScalar(0.001); a.v.fantome = !partie.trouvee[chapitre];
+    a.v.fantome = !partie.trouvee[chapitre];
   }
   const v = a.v, p = V3(v.x, v.y + 0.8, v.z);
+  if (!t0) v.m.scale.setScalar(0.001);   // elle est là tout de suite, mais toute petite (invisible) jusqu'au 3e éclair
   for (const k of [0, 1, 2]) if (t0 <= k * 0.3 && a.t > k * 0.3) { // trois éclairs, trois boums
     for (const t of [2, 4]) { const s = new THREE.Sprite(M_FLASH_FOUDRE.clone()); s.position.copy(p); scene.add(s); effets.push({ o: s, vie: 0.4, boule: t }); }
     lumiereBoum.position.copy(p); lumiereBoum.intensity = 9000; bruit(0.9, 800, 0.6); bip(1600, 150, 0.4, 'sawtooth', 0.2);
@@ -15225,11 +15229,28 @@ function majArrivee(dt) {
   }
   if (a.t > 6) arrivee = null;
 }
-// la DeLorean de ce chapitre, dans sa cachette (une place de la ville). Le bunker secret du chapitre 1 s'occupe de la sienne (voir majCamp).
-// Si elle a explosé ou coulé avant qu'on la retrouve, une neuve y revient quand B.J. est à plus de « loin » mètres
-function cacherDeLorean(loin = 0) {
-  const c = CHAPITRE.cachette !== '?' && cachetteDeLorean(CHAPITRE.cachette) && lieuProche(CHAPITRE.cachette, J);
-  if (c && !deLoreanLa() && dist(J, c) >= loin) creerVoiture(c.x, c.z, c.a || 0, false, typeNomme('DeLorean'));
+// la DeLorean de ce chapitre, dans sa cachette (une place de la ville). Celle du bunker secret, au chapitre 1, s'y gare quand le pays se construit
+function cacherDeLorean() {
+  const c = CHAPITRE.cachette !== '?' && placeDeLorean();
+  if (c && !deLoreanLa()) creerVoiture(c.x, c.z, c.a || 0, false, typeNomme('DeLorean'));
+}
+// où elle attend qu'on la retrouve : sa cachette (au chapitre 1, le garage du bunker secret). Rien si elle est déjà à lui
+function placeDeLorean() {
+  if (!cachetteDeLorean(CHAPITRE.cachette)) return null;
+  return CHAPITRE.cachette === '?' ? bunkerSecret?.garage || null : lieuProche(CHAPITRE.cachette, J);
+}
+// elle a explosé ou coulé avant qu'on la retrouve : au bout de 4 s (retourDeLorean), sa carcasse s'en va, et une neuve revient dans sa cachette,
+// dans trois éclairs, comme quand elle arrive d'un autre chapitre. Il suffit qu'il ne soit pas juste à sa place
+let tRetour = 0;   // depuis combien de temps il n'y a plus de DeLorean dans le pays
+function majRetourDeLorean(dt) {
+  const c = placeDeLorean();
+  if (!c || arrivee || voyage || deLoreanLa()) { tRetour = 0; return; }
+  if ((tRetour += dt) < R_.retourDeLorean || dist(J, c) < 4) return;
+  const carcasses = voitures.filter(v => v.type.nom === 'DeLorean');
+  if (carcasses.length) { for (const v of carcasses) v.supprimer = true; return; }   // la carcasse s'en va d'abord (à la fin de l'image)
+  tRetour = 0;
+  arrivee = { t: 0, v: creerVoiture(c.x, c.z, c.a || 0, false, typeNomme('DeLorean')) };   // trois éclairs, et la voilà (voir majArrivee)
+  annonce(tr('LA DELOREAN REVIENT !'), tr('Une toute neuve, dans sa cachette'), 3);
 }
 // les bulles d'aide du début d'un chapitre (CHAPITRES : bulles), l'une après l'autre : chacune reste le temps de la lire
 let bulles = null;   // { liste, k : la suivante, t : combien de temps encore, montree : une bulle est affichée }
@@ -15833,10 +15854,11 @@ function majSommeil(dt) {
 function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   temps += dt;
   avancerJournee(horloge); majSommeil(horloge);
-  // les chapitres : la DeLorean qui part (et ses traces en feu) ou qui arrive, les bulles d'aide, les victimes oubliées, la sauvegarde
-  majVoyage(dt); if (arrivee) majArrivee(dt); majBulles(dt);
+  // les chapitres : la DeLorean qui part (et ses traces en feu), qui arrive ou qui revient dans sa cachette, les bulles d'aide, les victimes
+  // oubliées, la sauvegarde
+  majVoyage(dt); majRetourDeLorean(dt); if (arrivee) majArrivee(dt); majBulles(dt);
   if (CHAPITRE.sansReproche) pardonner(dt);
-  if ((tSauve -= dt) <= 0) { tSauve = 2; sauverPartie(); cacherDeLorean(150); }
+  if ((tSauve -= dt) <= 0) { tSauve = 2; sauverPartie(); }
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
   if (J.mort || J.voiture || J.robot || J.telesiege) J.grappin = J.balance = J.mur = J.plane = J.lance = null;   // ni grappin, ni toile, ni mur, ni cape
   if (J.biceps && (J.mort || J.voiture || J.robot || J.telesiege || J.superman || J.roule || J.echelle || accroche())) finirBiceps();   // et on ne montre son biceps que debout
