@@ -2073,8 +2073,9 @@ const ENNEMIS = {
   // armure d'Obadiah Stane. Iron Monger : degats (une balle de la mitrailleuse de son bras), degatsRoquette (un de ses missiles d'épaule),
   // taille (combien de fois plus grand que toi), vol (sa vitesse en volant, en m/s), givre (à cette hauteur, en mètres, son armure gèle : il tombe !)
   anneaux:   { nom: 'Combattant des Dix Anneaux', vie: 75, arme: 5, degats: 8, precision: 0.35, vue: 45, tir: [1, 2], vitesse: 4.5 },
-  // Raza, leur chef : chauve, avec un lance-roquettes (arme 6 : le bazooka). degats : une de ses roquettes en plein
-  raza:      { nom: 'Raza',          vie: 2000, arme: 6, degats: 45, precision: 0.5, vue: 70, tir: [2.5, 4], vitesse: 4.5, boss: true },
+  // Raza, leur chef : chauve, avec un lance-roquettes (arme 6 : le bazooka). degats : une de ses roquettes en plein (dans la Mark I, c'est elle
+  // qui les prend, et elle recule en titubant)
+  raza:      { nom: 'Raza',          vie: 2000, arme: 6, degats: 90, precision: 0.5, vue: 70, tir: [2.5, 4], vitesse: 4.5, boss: true },
   monger:    { nom: 'Iron Monger',   vie: 9000, degats: 8, degatsRoquette: 25, precision: 0.3, vue: 120, tir: [2, 3.5], vitesse: 3.5, taille: 2.6, vol: 24, givre: 450, boss: true },
   rescape:   { nom: 'Habitant de la tour', vie: 50 },   // ceux qu'Iron Man sauve de la tour en feu (mission « Le pompier volant »)
   // Whiplash (Ivan Vanko) et ses deux fouets électriques : degats (un coup de fouet), degatsEclair (l'éclair qu'il lance de loin, toutes les
@@ -2588,7 +2589,7 @@ const MISSIONS_MALIBU = [
     { type: 'embuscade', case: [13, 35], texte: "Tu vas montrer tes nouveaux missiles à l'armée : rejoins le convoi, sur la route (point jaune)" },
     { type: 'armure', lieu: ')', texte: 'Avec des bouts de missiles, tu as fabriqué une armure en ferraille : monte dans la Mark I (touche E) !' },
     { type: 'casser', porte: 'cellule', texte: 'Casse la porte de ta cellule ! Clic gauche : la mitrailleuse · clic droit : les lance-flammes' },
-    { type: 'casser', porte: 'grotte', cible: 'anneaux', nombre: 8, lieu: ')', depuis: 'galerie',
+    { type: 'casser', porte: 'grotte', cible: 'anneaux', nombre: 16, lieu: ')', depuis: 'galerie',
       texte: 'Suis la galerie jusqu\'à la sortie, et casse la grande porte de la grotte ! Attention aux gardes' },
     { type: 'eliminer', cible: 'anneaux', nombre: 24, ensemble: 8, lieu: ')', depuis: 'tentes', texte: 'Le camp des Dix Anneaux : ils sortent des tentes ! F : les fusées. Il en reste {n}' },
     { type: 'eliminer', cible: 'raza', nombre: 1, lieu: ')', depuis: 'chef', texte: 'Raza, le chef des Dix Anneaux, arrive avec son lance-roquettes : arrête-le !' },
@@ -4898,7 +4899,7 @@ function construireGrotte(o, X, Z, rnd) {
     ajouterGeo('rocher', new THREE.IcosahedronGeometry(e, 0).scale(1, 0.6, 1.2).rotateY(rnd() * 6).translate(x, G.sol + e * 0.2, z));
   }
   // le long du chemin : des étais en bois (deux poteaux et une poutre) tous les 10 m, avec une lampe pendue à la poutre ; des caisses d'armes
-  // volées à Stark Industries ; et les postes des gardes (deux par bout de chemin, mais pas tout près des portes)
+  // volées à Stark Industries ; et les postes des gardes (un tous les 4 à 5 m, d'un côté puis de l'autre, mais pas tout près des portes)
   const lampes = [], postes = [], P = G.pts;
   for (let k = 1; k < P.length; k++) {
     const A = P[k - 1], B = P[k], l = dist(A, B), f = { x: (B.x - A.x) / l, z: (B.z - A.z) / l }, d = { x: -f.z, z: f.x };
@@ -4912,8 +4913,9 @@ function construireGrotte(o, X, Z, rnd) {
     }
     const cote = k % 2 ? 1 : -1, q = en(l / 2, cote * (h - 0.8));
     if (loinDesPortes(q)) { boite('boisClair', q.x, s0, q.z, 1.2, 1, 1.2, true); if (k % 3) boite('boisClair', q.x, s0 + 1, q.z, 1, 0.8, 1, true); }
-    for (const t of [l * 0.3, l * 0.72]) {
-      const p = en(t, (postes.length % 2 ? 1 : -1) * 1.6);
+    const n = 2 * Math.max(1, Math.round(l / 10));   // (un nombre pair : aucun au milieu, où est la caisse)
+    for (let i = 0; i < n; i++) {
+      const p = en(l * (i + 0.5) / n, (postes.length % 2 ? 1 : -1) * 1.6);
       if (dist(p, D) > 7 && dist(p, { x: G.xc, z: G.zs }) > 8) postes.push({ ...p, y: G.sol });
     }
   }
@@ -8660,11 +8662,21 @@ function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null, foudre = f
     if (p.vie > 0 && p !== tireur && d < rayon) { blesser(p, degatsPNJ * k, parJoueur); projeter(p, dx / l * (3 + 9 * k), 3 + 6 * k, dz / l * (3 + 9 * k), -3 - 8 * k); }
   }
   const d = Math.hypot(J.x - pos.x, J.y + 1 - pos.y, J.z - pos.z);
-  if (d < rayon && degatsJoueur) blesserJoueur(degatsJoueur * (1 - d / rayon), true, pos);   // (degatsJoueur = 0 : les fusées de l'armure, qui épargnent B.J.)
+  if (d < rayon && degatsJoueur) { blesserJoueur(degatsJoueur * (1 - d / rayon), true, pos); soufflerJoueur(pos, 1 - d / rayon, tireur); }   // (degatsJoueur = 0 : les fusées de l'armure, qui épargnent B.J.)
   if (voituresAussi) for (const v of voitures) if (dist(v, pos) < rayon) exploserVoiture(v, pos, parJoueur);
   // le heavy robot : l'explosion casse la vitre de sa cabine, puis blesse son pilote
   for (const r of robots) { const d = Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z); if (r !== tireur && d < rayon + 1.5) toucherRobot(r, degatsPNJ * (1 - d / (rayon + 1.5)), null, parJoueur); }
   if (degatsPNJ) for (const p of portes) { const d = distPorte(p, pos); if (d < rayon) toucherPorte(p, degatsPNJ * (1 - d / rayon)); }   // les portes de la grotte des Dix Anneaux
+}
+// le souffle d'une explosion qui l'atteint (k : 1 au milieu, 0 au bord) : la caméra tremble ; dans l'armure (la Mark I), il recule de près de
+// 2 m en titubant (voir piloterRobot). de : celui qui a tiré la roquette. Elle a explosé contre lui : c'est de là-bas qu'elle venait
+function soufflerJoueur(pos, k, de) {
+  J.secousse = Math.max(J.secousse || 0, 0.1 + 0.3 * k);
+  const r = J.robot;
+  if (!r?.armure) return;
+  const a = Math.hypot(J.x - pos.x, J.z - pos.z) > 1 || !de ? angleVers(pos, J) : angleVers(de, J);
+  r.souffle = { vx: Math.sin(a) * 7 * k, vz: Math.cos(a) * 7 * k };
+  bip(700, 140, 0.25, 'sawtooth', 0.12);   // la tôle encaisse
 }
 // parJoueur = false quand ce n'est pas la faute de B.J. (une roquette ennemie, ou une voiture qu'il n'a jamais touchée, qui brûle après
 // un accident tout seul) : son conducteur tué, et ceux que l'explosion tue autour, ne lui donnent ni étoile ni victime.
@@ -9492,7 +9504,7 @@ function monterRobot(r) {
 }
 function sortirRobot() {
   const r = J.robot, e = r.armure ? 1.4 : 2.6;   // il descend à côté
-  J.robot = null; r.pilote = null; r.tire = false; joueurH.jambeD.visible = joueurH.jambeG.visible = true;
+  J.robot = null; r.pilote = null; r.tire = false; r.souffle = null; joueurH.jambeD.visible = joueurH.jambeG.visible = true;
   J.x = r.x + Math.cos(r.angle) * e; J.z = r.z - Math.sin(r.angle) * e; J.y = hauteurSol(J.x, J.z, r.y + 1); J.vy = 0;
   resoudre(J, 0.35);
 }
@@ -9502,6 +9514,11 @@ function piloterRobot(r, dt) {
   const mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat, n = Math.hypot(mx, mz);
   const course = touche('ShiftLeft', 'ShiftRight'), v = r.armure ? (course ? ARMURE.course : ARMURE.vitesse) : course ? 6 : ENNEMIS.robot.vitesse;
   if (n) { const ax = r.x, az = r.z; r.x += mx / n * v * dt; r.z += mz / n * v * dt; bougerRobot(r, ax, az); }
+  const S = r.souffle;
+  if (S) { // le souffle d'une explosion le fait reculer (voir soufflerJoueur), de moins en moins vite
+    const ax = r.x, az = r.z, f = Math.pow(0.02, dt); r.x += S.vx * dt; r.z += S.vz * dt; bougerRobot(r, ax, az);
+    S.vx *= f; S.vz *= f; if (Math.hypot(S.vx, S.vz) < 0.2) r.souffle = null;
+  }
   r.angle = lerpAngle(r.angle, J.lacet, (r.armure ? 9 : 3) * dt);   // (l'armure se tourne bien plus vite)
   r.tire = sourisG && r.munitions.lourde > 0;
   if (r.armure) animerArmure(r, n ? v : 0, dt, J.tangage); else animerRobot(r, n ? v : 0, dt, J.tangage);
@@ -9605,6 +9622,9 @@ function animerArmure(r, vitesse, dt, tangage = 0) {
   });
   m.bassin.position.y = 1.22 - Math.abs(s) * a * 0.07;
   m.torse.rotation.y = s * a * 0.14;   // elle se dandine
+  // soufflée par une explosion, elle titube : elle penche du côté où elle recule
+  const S = r.souffle || { vx: 0, vz: 0 }, sa = Math.sin(r.angle), ca = Math.cos(r.angle);
+  m.bassin.rotation.x = clamp((S.vx * sa + S.vz * ca) * 0.04, -0.3, 0.3); m.bassin.rotation.z = clamp(-(S.vx * ca - S.vz * sa) * 0.04, -0.3, 0.3);
   if (a && Math.sign(s) !== Math.sign(avant)) { const d = dist(r, J); bruit(0.3 * clamp(1 - d / 60, 0, 1), 260, 0.14); if (pilotee) J.secousse = Math.max(J.secousse || 0, 0.02); }
   for (const b of m.bras) { b.epaule.rotation.x = pilotee ? -0.3 : 0; b.arme.rotation.x = pilotee ? 0.3 - clamp(tangage, -0.8, 0.8) : 1.35; }
   m.canons.rotation.z += dt * (r.tire ? 30 : 0);
