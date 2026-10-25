@@ -696,6 +696,7 @@ const TRADUCTIONS = {
   '<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping': { de: '<b>Shift</b> + A oder D: Fassrolle · <b>Shift</b> + Leertaste oder C: Looping', en: '<b>Shift</b> + A or D: barrel roll · <b>Shift</b> + Space or C: loop', gsw: '<b>Shift</b> + A oder D: Fassrolle · <b>Shift</b> + Läärtaschte oder C: Looping' },
   'Garde <b>Maj</b> enfoncé pour déployer la cape': { de: 'Halte <b>Shift</b> gedrückt, um den Umhang auszubreiten', en: 'Hold <b>Shift</b> to spread the cape', gsw: 'Heb <b>Shift</b> druckt, zum de Umhang uusbreite' },
   'Riche ! +100 000 $': { de: 'Reich! +100.000 $', en: 'Rich! +100,000 $', gsw: 'Riich! +100’000 $' },
+  'Milliardaire ! +1 000 000 000 $': { de: 'Milliardär! +1.000.000.000 $', en: 'Billionaire! +1,000,000,000 $', gsw: 'Milliardär! +1’000’000’000 $' },
   'Toutes les armes, plein de munitions, gilet et masque à gaz !': { de: 'Alle Waffen, viel Munition, Schutzweste und Gasmaske!', en: 'All weapons, lots of ammo, body armor and gas mask!', gsw: 'Alli Waffe, vill Munition, Schutzweschte und Gasmaske!' },
   'Saute à une mission : MISSION8 pour la mission 8': { de: 'Springt zu einer Mission: MISSION8 für Mission 8', en: 'Jumps to a mission: MISSION8 for mission 8', gsw: 'Gumpt zunere Mission: MISSION8 für d Mission 8' },
   // les annonces
@@ -2975,6 +2976,8 @@ const TRICHES = [
       J.gilet = R_.giletMax; J.masque = true; } },
   // pour tester ce qui coûte cher : 100 000 $ d'un coup (change le nombre pour en avoir plus ou moins)
   { code: 'RICHE',       texte: 'Riche ! +100 000 $',   action: () => { J.argent += 100000; } },
+  // pour être aussi riche que Tony Stark ou Bruce Wayne : un milliard de dollars d'un coup (un 1 et neuf zéros : 10 000 fois RICHE)
+  { code: 'MILLIARDAIRE', texte: 'Milliardaire ! +1 000 000 000 $', action: () => { J.argent += 1000000000; } },
   // pour tester une mission : MISSION8 saute à la mission 8 (avec une voiture blindée à côté si elle en a besoin)
   { code: 'MISSION',     texte: 'Saute à une mission : MISSION8 pour la mission 8', action: n => sauterMission(n) },
   // pour tester un chapitre : CHAPITRE2 y va tout de suite, avec la DeLorean (les chapitres d'avant sont alors finis : on peut y revenir)
