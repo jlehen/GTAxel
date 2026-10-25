@@ -114,12 +114,12 @@
   #boss > div { height: 12px; background: rgba(0,0,0,.6); border: 2px solid #ddd; margin-top: 2px; }
   #boss > div > div { height: 100%; width: 100%; background: linear-gradient(90deg, #c0392b, #ff7a50); transition: width .2s; }
   /* l'affichage du casque d'Iron Man, à droite (sa batterie, et les 6 parties de l'armure), et, à la 1re personne, les bords de la visière */
-  #casque { position: absolute; right: 18px; top: max(230px, calc(50% - 125px)); width: 250px; height: 250px; display: none; }
-  #visiere { position: absolute; inset: 0; display: none; background: radial-gradient(ellipse 85% 95% at center, transparent 68%, rgba(60, 170, 230, .1) 82%, rgba(2, 10, 18, .8)); }
+  #casque { position: absolute; right: 18px; top: max(230px, calc(50% - var(--casque, 300px) / 2)); width: var(--casque, 300px); height: var(--casque, 300px); display: none; }   /* (--casque : IRONMAN.affichage) */
+  #visiere { position: absolute; inset: 0; display: none; background: radial-gradient(ellipse at center, transparent 50%, rgba(30, 110, 160, .15) 62%, rgba(2, 10, 18, .6) 76%, rgba(0, 0, 0, .9)); }   /* (au milieu des bords : à moitié sombre ; dans les coins : presque noir) */
   #visiere::before, #visiere::after { content: ''; position: absolute; top: 14%; bottom: 14%; width: 30vw; border: 2px solid transparent; border-radius: 50%; }
   #visiere::before { left: 3vw; border-left-color: rgba(120, 225, 255, .35); }
   #visiere::after { right: 3vw; border-right-color: rgba(120, 225, 255, .35); }
-  #hud.casque #annonce small { padding: 0 280px; }   /* (une longue annonce passe à la ligne au lieu de passer sous l'affichage du casque) */
+  #hud.casque #annonce small { padding: 0 calc(var(--casque, 300px) + 30px); }   /* (une longue annonce passe à la ligne au lieu de passer sous l'affichage du casque) */
   /* l'écran du chapitre : le logo du héros, « Chapitre 2 », puis il s'en va */
   #ecran-chapitre { position: fixed; inset: 0; display: none; cursor: pointer; }
   #ecran-chapitre canvas { width: 100%; height: 100%; }
@@ -2075,12 +2075,14 @@ const ARMURE = {
 //    plus (le torse), l'affichage du casque s'éteint (le casque), tu n'accélères plus en volant (une jambe). Elle se répare toute seule,
 //    de « reparation » % par seconde, quand tu n'as pas été touché depuis « attente » secondes, et remarche à « reprise » %.
 //    Une armure qui arrive est toute neuve
+//  affichage : la taille de l'affichage du casque (la batterie et les parties, à droite de l'écran), en points de côté
 // =====================================================================
 const IRONMAN = {
   touches: ['KeyQ', 'KeyW', 'KeyE'],   // A Z E sur un clavier français
   suite: 0.8, arrivee: 0.22, vitessePieces: 18, protection: 0.3,
   repulseurs: { nom: 'Répulseurs', degats: 75, cadence: 0.3, portee: 150, charge: 0.15, recul: 8 },
   plastron:   { nom: 'Plastron', degats: 400, explosion: 5, portee: 200, charge: 0.4, recharge: 4 },
+  affichage: 300,
   batterie:   { recharge: 3, vol: 0.2, volVite: 1, repulseur: 0.3, plastron: 6, canon: 1.5, mitrailleuse: 0.1, missiles: 8, laser: 10, faible: 20, descente: 4, reprise: 20 },
   parties:    { usure: 1.5, reparation: 4, attente: 5, reprise: 25 },
 };
@@ -15449,9 +15451,9 @@ function aideIronman() {
 // l'armure ; à gauche, la batterie, un anneau qui se vide, comme son réacteur ; à droite, l'armure vue de dos (sa gauche à gauche), chaque
 // partie de sa couleur : bleue, jaune sous 67 %, rouge sous 34 %, qui clignote hors service ; en dessous, chaque partie en %, et ce qui ne
 // va pas. Il s'allume de haut en bas quand le masque se ferme. Le casque hors service : il grésille. À la 1re personne, les bords de la visière
+// (on le dessine toujours sur 250 points de côté : il est agrandi à IRONMAN.affichage)
 const casqueEcran = $('casque'), casqueCtx = casqueEcran.getContext('2d'), DPR_CASQUE = Math.min(2, devicePixelRatio || 1);
-casqueEcran.width = casqueEcran.height = 250 * DPR_CASQUE;
-let allumageCasque = 0;   // de 0 (éteint) à 1 (tout allumé)
+let allumageCasque = 0, tailleCasque = 0;   // de 0 (éteint) à 1 (tout allumé) ; sa taille, en points de côté
 const BLEU_CASQUE = '#7fe4ff', JAUNE_CASQUE = '#ffcf4a', ROUGE_CASQUE = '#ff5a40';
 // les formes de l'armure, vue de dos : un rond pour le casque, des rectangles arrondis pour le reste (x, y, largeur, hauteur)
 const SILHOUETTE = { casque: [175, 34, 18, 20], torse: [166, 58, 36, 44], brasG: [151, 60, 12, 46], brasD: [205, 60, 12, 46], jambeG: [168, 106, 15, 52], jambeD: [185, 106, 15, 52] };
@@ -15462,10 +15464,12 @@ function dessinerCasque(dt) {
   casqueEcran.style.display = voit ? 'block' : 'none'; $('hud').classList.toggle('casque', voit);
   $('visiere').style.display = voit && J.vue === 1 ? 'block' : 'none';
   if (!voit) return;
+  const taille = Math.max(100, IRONMAN.affichage || 250), echelle = DPR_CASQUE * taille / 250;
+  if (taille !== tailleCasque) { tailleCasque = taille; casqueEcran.width = casqueEcran.height = Math.round(250 * echelle); $('hud').style.setProperty('--casque', `${taille}px`); }   // (sa taille a changé : dans les réglages, par exemple)
   const c = casqueCtx, W = 250, B = IRONMAN.batterie, bat = I.batterie, cligne = Math.floor(temps * 4) % 2 === 0;
   const police = (taille, gras = true) => `${gras ? '700 ' : ''}${taille}px 'Roboto Condensed', Arial, sans-serif`;
   const couleur = k => I.cassees[k] ? (cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .3)') : I.parties[k] < 34 ? ROUGE_CASQUE : I.parties[k] < 67 ? JAUNE_CASQUE : BLEU_CASQUE;
-  c.setTransform(DPR_CASQUE, 0, 0, DPR_CASQUE, 0, 0); c.clearRect(0, 0, W, W);
+  c.setTransform(echelle, 0, 0, echelle, 0, 0); c.clearRect(0, 0, W, W);
   c.save();
   c.beginPath(); c.rect(0, 0, W, W * allumageCasque); c.clip();   // il s'allume de haut en bas
   c.fillStyle = 'rgba(6, 22, 34, .45)'; c.strokeStyle = 'rgba(127, 228, 255, .55)'; c.lineWidth = 1.5;
