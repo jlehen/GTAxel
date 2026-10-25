@@ -115,8 +115,10 @@
   #boss { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(420px, 60%); text-align: center; display: none; font: 22px 'Anton', Impact, sans-serif; letter-spacing: 2px; }
   #boss > div { height: 12px; background: rgba(0,0,0,.6); border: 2px solid #ddd; margin-top: 2px; }
   #boss > div > div { height: 100%; width: 100%; background: linear-gradient(90deg, #c0392b, #ff7a50); transition: width .2s; }
-  /* l'affichage du casque d'Iron Man, à droite (sa batterie, et les 6 parties de l'armure), et, à la 1re personne, les bords de la visière */
-  #casque { position: absolute; right: 18px; top: max(230px, calc(50% - var(--casque, 300px) / 2)); width: var(--casque, 300px); height: var(--casque, 300px); display: none; }   /* (--casque : IRONMAN.affichage) */
+  /* l'affichage du casque d'Iron Man : à droite, l'armure et ses 6 parties ; à gauche, la batterie ; et, à la 1re personne, les bords de la visière */
+  /* (leur hauteur : --casque-haut et --batterie-haut, d'après IRONMAN.affichage et zoomBatterie ; leur largeur suit. Sur un écran pas assez haut, ils rapetissent) */
+  #casque { position: absolute; right: 18px; --haut: min(var(--casque-haut), 100% - 330px); top: max(230px, calc(50% - var(--haut) / 2)); height: var(--haut); display: none; }   /* (sous l'argent et l'arme, au-dessus de la vitesse) */
+  #batterie { position: absolute; left: 18px; --haut: min(var(--batterie-haut), 100% - 412px); top: max(130px, min(calc(50% - var(--haut) / 2), calc(100% - 282px - var(--haut)))); height: var(--haut); display: none; }   /* (au milieu, mais sous l'aide et au-dessus de la mini-carte) */
   #visiere { position: absolute; inset: 0; display: none; background: radial-gradient(ellipse at center, transparent 50%, rgba(30, 110, 160, .15) 62%, rgba(2, 10, 18, .6) 76%, rgba(0, 0, 0, .9)); }   /* (au milieu des bords : à moitié sombre ; dans les coins : presque noir) */
   #visiere::before, #visiere::after { content: ''; position: absolute; top: 14%; bottom: 14%; width: 30vw; border: 2px solid transparent; border-radius: 50%; }
   #visiere::before { left: 3vw; border-left-color: rgba(120, 225, 255, .35); }
@@ -136,6 +138,7 @@
   <div id="barre-gilet"><div></div></div>
   <div id="barre-armure"><div></div></div>
   <canvas id="casque"></canvas>
+  <canvas id="batterie"></canvas>
   <div id="haut-droite">
     <div id="heure"></div>
     <div id="argent">0 $</div>
@@ -2158,14 +2161,15 @@ const ARMURE = {
 //    plus (le torse), l'affichage du casque s'éteint (le casque), tu n'accélères plus en volant (une jambe). Elle se répare toute seule,
 //    de « reparation » % par seconde, quand tu n'as pas été touché depuis « attente » secondes, et remarche à « reprise » %.
 //    Une armure qui arrive est toute neuve
-//  affichage : la taille de l'affichage du casque (la batterie et les parties, à droite de l'écran), en points de côté
+//  affichage : la largeur de l'affichage du casque, à droite de l'écran (l'armure et ses 6 parties), en points ; sa hauteur suit
+//  zoomBatterie : la batterie, à gauche de l'écran, est à la même échelle, mais zoomée (2 = deux fois plus grosse)
 // =====================================================================
 const IRONMAN = {
   touches: ['KeyQ', 'KeyW', 'KeyE'],   // A Z E sur un clavier français
   suite: 0.8, arrivee: 0.22, vitessePieces: 18, protection: 0.3,
   repulseurs: { nom: 'Répulseurs', degats: 75, cadence: 0.3, portee: 150, charge: 0.15, recul: 8 },
   plastron:   { nom: 'Plastron', degats: 400, explosion: 5, portee: 200, charge: 0.4, recharge: 4 },
-  affichage: 300,
+  affichage: 300, zoomBatterie: 2,
   batterie:   { recharge: 3, vol: 0.2, volVite: 1, repulseur: 0.3, plastron: 6, canon: 1.5, mitrailleuse: 0.1, missiles: 8, laser: 10, faible: 20, descente: 4, reprise: 20 },
   parties:    { usure: 1.5, reparation: 4, attente: 5, reprise: 25 },
 };
@@ -16255,80 +16259,106 @@ function aideIronman() {
     A.mitrailleuse ? tr('<b>R</b> : mitrailleuse') : tr('<b>R</b> : plastron'), tr('<b>F</b> : voler'), stark.missiles && tr('<b>G</b> : missiles'), stark.laser && tr('<b>X</b> : laser'),
     tr('<b>L</b> : masque'), stark.armures.length > 1 && tr("<b>J</b> : changer d'armure"), tr('<b>H</b> : sortir')].filter(Boolean).join(' · ');
 }
-// L'affichage du casque d'Iron Man : ce que Tony Stark voit dans son armure, masque baissé (L le lève : plus d'affichage). En haut, le nom de
-// l'armure ; à gauche, la batterie, un anneau qui se vide, comme son réacteur ; à droite, l'armure vue de dos (sa gauche à gauche), chaque
-// partie de sa couleur : bleue, jaune sous 67 %, rouge sous 34 %, qui clignote hors service ; en dessous, chaque partie en %, et ce qui ne
-// va pas. Il s'allume de haut en bas quand le masque se ferme. Le casque hors service : il grésille. À la 1re personne, les bords de la visière
-// (on le dessine toujours sur 250 points de côté : il est agrandi à IRONMAN.affichage)
-const casqueEcran = $('casque'), casqueCtx = casqueEcran.getContext('2d'), DPR_CASQUE = Math.min(2, devicePixelRatio || 1);
-let allumageCasque = 0, tailleCasque = 0;   // de 0 (éteint) à 1 (tout allumé) ; sa taille, en points de côté
+// L'affichage du casque d'Iron Man : ce que Tony Stark voit dans son armure, masque baissé (L le lève : plus d'affichage). À droite de l'écran,
+// l'armure : en haut, son nom ; puis l'armure vue de dos (sa gauche à gauche), chaque partie de sa couleur : bleue, jaune sous 67 %, rouge
+// sous 34 %, qui clignote hors service ; en dessous, les 6 parties l'une sous l'autre, avec leur jauge et leur %, et ce qui ne va pas.
+// À gauche de l'écran, la batterie : un anneau qui se vide, comme son réacteur. Ils s'allument de haut en bas quand le masque se ferme.
+// Le casque hors service : ils grésillent. À la 1re personne, les bords de la visière
+// (l'armure est dessinée sur 250 points de large, et agrandie à IRONMAN.affichage ; la batterie, à la même échelle, est zoomée IRONMAN.zoomBatterie fois)
+const casqueEcran = $('casque'), casqueCtx = casqueEcran.getContext('2d'), batterieEcran = $('batterie'), batterieCtx = batterieEcran.getContext('2d');
+const DPR_CASQUE = Math.min(2, devicePixelRatio || 1);
+let allumageCasque = 0, tailleCasque = '';   // de 0 (éteint) à 1 (tout allumé) ; sa largeur et le zoom de la batterie, la dernière fois
 const BLEU_CASQUE = '#7fe4ff', JAUNE_CASQUE = '#ffcf4a', ROUGE_CASQUE = '#ff5a40';
+const HAUT_CASQUE = 312, LARGE_BATTERIE = 100, HAUT_BATTERIE = 131;   // la hauteur de l'armure (pour 250 de large) ; la batterie, sans zoom
 // les formes de l'armure, vue de dos : un rond pour le casque, des rectangles arrondis pour le reste (x, y, largeur, hauteur)
-const SILHOUETTE = { casque: [175, 34, 18, 20], torse: [166, 58, 36, 44], brasG: [151, 60, 12, 46], brasD: [205, 60, 12, 46], jambeG: [168, 106, 15, 52], jambeD: [185, 106, 15, 52] };
+const SILHOUETTE = { casque: [116, 34, 18, 20], torse: [107, 58, 36, 44], brasG: [92, 60, 12, 46], brasD: [146, 60, 12, 46], jambeG: [109, 106, 15, 52], jambeD: [126, 106, 15, 52] };
 function dessinerCasque(dt) {
   const I = J.ironman, voit = armureIronman() && !I.anim && I.ouvert < 0.5 && !J.voiture && !J.robot && !J.mort && !voyage;
   if (voit && !allumageCasque) bip(900, 1600, 0.15, 'sine', 0.03);   // il s'allume
   allumageCasque = voit ? Math.min(1, allumageCasque + 2.5 * dt) : 0;
-  casqueEcran.style.display = voit ? 'block' : 'none'; $('hud').classList.toggle('casque', voit);
+  casqueEcran.style.display = batterieEcran.style.display = voit ? 'block' : 'none'; $('hud').classList.toggle('casque', voit);
   $('visiere').style.display = voit && J.vue === 1 ? 'block' : 'none';
   if (!voit) return;
-  const taille = Math.max(100, IRONMAN.affichage || 250), echelle = DPR_CASQUE * taille / 250;
-  if (taille !== tailleCasque) { tailleCasque = taille; casqueEcran.width = casqueEcran.height = Math.round(250 * echelle); $('hud').style.setProperty('--casque', `${taille}px`); }   // (sa taille a changé : dans les réglages, par exemple)
-  const c = casqueCtx, W = 250, B = IRONMAN.batterie, bat = I.batterie, cligne = Math.floor(temps * 4) % 2 === 0;
+  const taille = Math.max(100, IRONMAN.affichage || 250), zoom = Math.max(0.5, IRONMAN.zoomBatterie || 1), echelle = DPR_CASQUE * taille / 250;
+  const W = 250, H = HAUT_CASQUE, LB = LARGE_BATTERIE * zoom, HB = HAUT_BATTERIE * zoom;   // (la batterie, zoomée)
+  if (`${taille} ${zoom}` !== tailleCasque) { // (sa taille a changé : dans les réglages, par exemple)
+    tailleCasque = `${taille} ${zoom}`;
+    casqueEcran.width = Math.round(W * echelle); casqueEcran.height = Math.round(H * echelle);
+    batterieEcran.width = Math.round(LB * echelle); batterieEcran.height = Math.round(HB * echelle);
+    const points = n => `${n * taille / 250}px`, hud = $('hud').style;
+    hud.setProperty('--casque', points(W)); hud.setProperty('--casque-haut', points(H)); hud.setProperty('--batterie-haut', points(HB));
+  }
+  const B = IRONMAN.batterie, bat = I.batterie, cligne = Math.floor(temps * 4) % 2 === 0, rouge = cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .45)';
   const police = (taille, gras = true) => `${gras ? '700 ' : ''}${taille}px 'Roboto Condensed', Arial, sans-serif`;
   const couleur = k => I.cassees[k] ? (cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .3)') : I.parties[k] < 34 ? ROUGE_CASQUE : I.parties[k] < 67 ? JAUNE_CASQUE : BLEU_CASQUE;
-  c.setTransform(echelle, 0, 0, echelle, 0, 0); c.clearRect(0, 0, W, W);
-  c.save();
-  c.beginPath(); c.rect(0, 0, W, W * allumageCasque); c.clip();   // il s'allume de haut en bas
-  c.fillStyle = 'rgba(6, 22, 34, .45)'; c.strokeStyle = 'rgba(127, 228, 255, .55)'; c.lineWidth = 1.5;
-  c.beginPath(); c.roundRect(1, 1, W - 2, W - 2, 14); c.fill(); c.stroke();
-  c.textBaseline = 'middle'; c.shadowColor = 'rgba(0, 0, 0, .8)'; c.shadowBlur = 4;
-  if (!marche('casque')) { // hors service : il grésille
+  // le cadre, sombre et transparent, bordé de bleu, qui s'allume de haut en bas. Le casque hors service : il grésille (et on ne dessine rien d'autre)
+  const cadre = (c, l, h) => {
+    c.setTransform(echelle, 0, 0, echelle, 0, 0); c.clearRect(0, 0, l, h);
+    c.beginPath(); c.rect(0, 0, l, h * allumageCasque); c.clip();   // il s'allume de haut en bas
+    c.fillStyle = 'rgba(6, 22, 34, .45)'; c.strokeStyle = 'rgba(127, 228, 255, .55)'; c.lineWidth = 1.5;
+    c.beginPath(); c.roundRect(1, 1, l - 2, h - 2, 14); c.fill(); c.stroke();
+    c.textBaseline = 'middle'; c.shadowColor = 'rgba(0, 0, 0, .8)'; c.shadowBlur = 4;
+    if (marche('casque')) return true;
     c.shadowBlur = 0;
-    for (let k = 0; k < 40; k++) { c.fillStyle = `rgba(160, 230, 255, ${Math.random() * 0.3})`; c.fillRect(Math.random() * W, Math.random() * W, entre(10, 60), 2); }
-    c.font = police(15); c.textAlign = 'center'; c.fillStyle = cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .45)';
-    c.fillText(tr('{partie} HORS SERVICE', { partie: tr('Casque').toUpperCase() }), W / 2, W / 2 - 10);
-    c.fillText(tr('AFFICHAGE COUPÉ'), W / 2, W / 2 + 12);
-    c.restore(); return;
+    for (let k = 0; k < 40 * h / W; k++) { c.fillStyle = `rgba(160, 230, 255, ${Math.random() * 0.3})`; c.fillRect(Math.random() * l, Math.random() * h, entre(10, 60), 2); }
+    c.font = police(15); c.textAlign = 'center'; c.fillStyle = rouge;
+    c.fillText(tr('{partie} HORS SERVICE', { partie: tr('Casque').toUpperCase() }), l / 2, h / 2 - 10, l - 16);
+    c.fillText(tr('AFFICHAGE COUPÉ'), l / 2, h / 2 + 12, l - 16);
+    return false;
+  };
+  // à gauche de l'écran : la batterie, zoomée. L'anneau, ses 10 graduations, le % au milieu, et ce qu'elle fait (elle se recharge, elle se
+  // vide en volant, ou elle est vide)
+  let c = batterieCtx;
+  c.save();
+  if (cadre(c, LB, HB)) {
+    c.scale(zoom, zoom);
+    const cb = bat < B.faible || I.secours ? rouge : bat < 50 ? JAUNE_CASQUE : BLEU_CASQUE, cx = 50, cy = 50, r = 34;
+    c.lineWidth = 8;
+    c.strokeStyle = 'rgba(127, 228, 255, .15)'; c.beginPath(); c.arc(cx, cy, r, 0, 2 * Math.PI); c.stroke();
+    c.strokeStyle = cb; c.beginPath(); c.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * bat / 100); c.stroke();
+    c.lineWidth = 1.5; c.strokeStyle = 'rgba(127, 228, 255, .5)';
+    for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5; c.beginPath(); c.moveTo(cx + Math.cos(a) * (r + 6), cy + Math.sin(a) * (r + 6)); c.lineTo(cx + Math.cos(a) * (r + 10), cy + Math.sin(a) * (r + 10)); c.stroke(); }
+    c.textAlign = 'center'; c.fillStyle = cb; c.font = "22px 'Anton', Impact, sans-serif"; c.fillText(`${Math.floor(bat)} %`, cx, cy + 1, 2 * r - 16);   // (dans l'anneau)
+    c.font = police(13); c.fillStyle = BLEU_CASQUE; c.fillText(tr('BATTERIE'), cx, cy + 52);
+    c.font = police(12);
+    if (I.secours) { c.fillStyle = cb; c.fillText(`⚠ ${tr('SECOURS')}`, cx, cy + 69, LARGE_BATTERIE - 8); }
+    else if (J.superman) { c.fillStyle = JAUNE_CASQUE; c.fillText(`▼ ${tr('EN VOL')}`, cx, cy + 69, LARGE_BATTERIE - 8); }
+    else { c.fillStyle = BLEU_CASQUE; c.fillText(bat < 100 ? `▲ ${tr('EN CHARGE')}` : tr('PLEINE'), cx, cy + 69, LARGE_BATTERIE - 8); }
   }
-  // en haut : J.A.R.V.I.S., et le nom de l'armure
-  c.font = police(13); c.fillStyle = BLEU_CASQUE;
-  c.textAlign = 'left'; c.fillText('J.A.R.V.I.S.', 12, 16);
-  c.textAlign = 'right'; c.fillText(armureDe(I.armure).nom.toUpperCase(), W - 12, 16);
-  c.fillStyle = 'rgba(127, 228, 255, .4)'; c.fillRect(12, 27, W - 24, 1);
-  // la batterie : l'anneau, ses 10 graduations, le % au milieu, et ce qu'elle fait (elle se recharge, elle se vide en volant, ou elle est vide)
-  const cb = bat < B.faible || I.secours ? (cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .45)') : bat < 50 ? JAUNE_CASQUE : BLEU_CASQUE, cx = 64, cy = 82, r = 34;
-  c.lineWidth = 8;
-  c.strokeStyle = 'rgba(127, 228, 255, .15)'; c.beginPath(); c.arc(cx, cy, r, 0, 2 * Math.PI); c.stroke();
-  c.strokeStyle = cb; c.beginPath(); c.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * bat / 100); c.stroke();
-  c.lineWidth = 1.5; c.strokeStyle = 'rgba(127, 228, 255, .5)';
-  for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5; c.beginPath(); c.moveTo(cx + Math.cos(a) * (r + 6), cy + Math.sin(a) * (r + 6)); c.lineTo(cx + Math.cos(a) * (r + 10), cy + Math.sin(a) * (r + 10)); c.stroke(); }
-  c.textAlign = 'center'; c.fillStyle = cb; c.font = "22px 'Anton', Impact, sans-serif"; c.fillText(`${Math.floor(bat)} %`, cx, cy + 1);
-  c.font = police(13); c.fillStyle = BLEU_CASQUE; c.fillText(tr('BATTERIE'), cx, 134);
-  c.font = police(12);
-  if (I.secours) { c.fillStyle = cb; c.fillText(`⚠ ${tr('SECOURS')}`, cx, 151); }
-  else if (J.superman) { c.fillStyle = JAUNE_CASQUE; c.fillText(`▼ ${tr('EN VOL')}`, cx, 151); }
-  else { c.fillStyle = BLEU_CASQUE; c.fillText(bat < 100 ? `▲ ${tr('EN CHARGE')}` : tr('PLEINE'), cx, 151); }
-  // l'armure, vue de dos
-  for (const k in SILHOUETTE) {
-    const [x, y, l, h] = SILHOUETTE[k], col = couleur(k);
-    c.beginPath(); c.roundRect(x, y, l, h, k === 'casque' ? 9 : 4);
-    c.globalAlpha = 0.35; c.fillStyle = col; c.fill(); c.globalAlpha = 1; c.strokeStyle = col; c.lineWidth = 1.5; c.stroke();
+  c.restore();
+  // à droite de l'écran : l'armure
+  c = casqueCtx;
+  c.save();
+  if (cadre(c, W, H)) {
+    // en haut : J.A.R.V.I.S., et le nom de l'armure
+    c.font = police(13); c.fillStyle = BLEU_CASQUE;
+    c.textAlign = 'left'; c.fillText('J.A.R.V.I.S.', 12, 16);
+    c.textAlign = 'right'; c.fillText(armureDe(I.armure).nom.toUpperCase(), W - 12, 16);
+    c.fillStyle = 'rgba(127, 228, 255, .4)'; c.fillRect(12, 27, W - 24, 1);
+    // l'armure, vue de dos, au milieu
+    for (const k in SILHOUETTE) {
+      const [x, y, l, h] = SILHOUETTE[k], col = couleur(k);
+      c.beginPath(); c.roundRect(x, y, l, h, k === 'casque' ? 9 : 4);
+      c.globalAlpha = 0.35; c.fillStyle = col; c.fill(); c.globalAlpha = 1; c.strokeStyle = col; c.lineWidth = 1.5; c.stroke();
+    }
+    c.font = police(11); c.textAlign = 'center'; c.fillStyle = 'rgba(127, 228, 255, .7)'; c.fillText(tr('G'), 98, 120); c.fillText(tr('D'), 152, 120);
+    c.fillStyle = 'rgba(127, 228, 255, .4)'; c.fillRect(12, 166, W - 24, 1);
+    // en dessous, les 6 parties, l'une sous l'autre (le casque, le torse, les bras, les jambes) : leur nom, leur jauge et leur %
+    c.font = police(12);
+    PARTIES_ARMURE.forEach((p, i) => {
+      const y = 182 + i * 18, col = couleur(p.cle), part = I.cassees[p.cle] ? 0 : I.parties[p.cle] / 100;
+      c.fillStyle = col; c.textAlign = 'left'; c.fillText(tr(p.nom).toUpperCase(), 12, y, 92);   // (un nom trop long est serré)
+      c.textAlign = 'right'; c.fillText(I.cassees[p.cle] ? '✕' : `${Math.ceil(I.parties[p.cle])} %`, W - 12, y);
+      c.fillStyle = 'rgba(127, 228, 255, .15)'; c.fillRect(110, y - 3, 86, 6);
+      c.fillStyle = col; c.fillRect(110, y - 3, 86 * part, 6);
+    });
+    // en bas : ce qui ne va pas (le plus grave d'abord), ou que tout va bien
+    const casse = PARTIES_ARMURE.find(p => I.cassees[p.cle]);
+    const alerte = I.secours ? tr('BATTERIE VIDE') : casse ? tr('{partie} HORS SERVICE', { partie: tr(casse.nom).toUpperCase() }) : bat < B.faible ? tr('BATTERIE FAIBLE') : '';
+    c.textAlign = 'center'; c.font = police(13);
+    c.fillStyle = alerte ? rouge : 'rgba(127, 228, 255, .7)';
+    c.fillText(alerte ? `⚠ ${alerte}` : tr('SYSTÈMES EN LIGNE'), W / 2, H - 16, W - 24);
   }
-  c.font = police(11); c.fillStyle = 'rgba(127, 228, 255, .7)'; c.fillText(tr('G'), 157, 120); c.fillText(tr('D'), 211, 120);
-  // chaque partie en %, sur deux colonnes : à gauche, le casque, le bras et la jambe gauches ; à droite, le torse, le bras et la jambe droits
-  c.font = police(11.5);
-  PARTIES_ARMURE.forEach((p, i) => {
-    const x = i % 2 ? 132 : 12, y = 177 + Math.floor(i / 2) * 18, col = couleur(p.cle);
-    c.fillStyle = col; c.textAlign = 'left'; c.fillText(tr(p.nom).toUpperCase(), x, y, 70);   // (un nom trop long est serré)
-    c.textAlign = 'right'; c.fillText(I.cassees[p.cle] ? '✕' : `${Math.ceil(I.parties[p.cle])} %`, x + 106, y);
-  });
-  // en bas : ce qui ne va pas (le plus grave d'abord), ou que tout va bien
-  const casse = PARTIES_ARMURE.find(p => I.cassees[p.cle]);
-  const alerte = I.secours ? tr('BATTERIE VIDE') : casse ? tr('{partie} HORS SERVICE', { partie: tr(casse.nom).toUpperCase() }) : bat < B.faible ? tr('BATTERIE FAIBLE') : '';
-  c.textAlign = 'center'; c.font = police(13);
-  c.fillStyle = alerte ? (cligne ? ROUGE_CASQUE : 'rgba(255, 90, 64, .45)') : 'rgba(127, 228, 255, .7)';
-  c.fillText(alerte ? `⚠ ${alerte}` : tr('SYSTÈMES EN LIGNE'), W / 2, 234);
   c.restore();
 }
 function majHUD(dt) {
