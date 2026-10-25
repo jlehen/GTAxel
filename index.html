@@ -1799,6 +1799,7 @@ const REGLAGES = {
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
+  penteRoute: 0.35,          // une route de campagne qui arrive dans une ville ne monte jamais plus raide que ça depuis son carrefour (0.35 = 35 m pour 100 m) : si la colline d'à côté est plus haute, la route s'y enfonce. Mets 5 pour voir des routes qui tombent comme des murs
   vitesseTelesiege: 42,      // m/s : les télésièges et la télécabine des stations de ski (le rond bleu ❄ sur la carte du jeu). 42 = 45 secondes pour monter en haut du mont Gordo. Mets 5 pour un vrai télésiège, tout lent
   vitesseGare: 2,            // m/s : dans les gares, les sièges ralentissent pour qu'on monte dessus (un télésiège « débrayable »). Mets 42 pour qu'ils ne ralentissent plus
   frottementNeige: 0.4,      // à ski, en snowboard ou en luge : ce que la neige freine (m/s par seconde). Hors de la neige, ça freine 15 fois plus
@@ -3465,9 +3466,12 @@ function dansGalerie(x, z) { const G = galerie; return !!G && x > G.x1 && x < G.
 // Pour quelqu'un dont les pieds sont en y (sans y : en bas), dans la galerie de la grotte : son sol, et pas la colline au-dessus
 function hauteurTerrain(x, z, y = -Infinity) {
   if (galerie && y < galerie.toit + 1 && dansGalerie(x, z)) return galerie.sol;
+  return hauteurGrille(x, z) + reliefSki(x, z);
+}
+function hauteurGrille(x, z) { // (la même, sans les pistes de ski ni la galerie)
   const fx = clamp(x / PT, 0, NXT - 1.001), fz = clamp(z / PT, 0, NZT - 1.001), ix = Math.floor(fx), iz = Math.floor(fz), u = fx - ix, w = fz - iz, k = iz * NXT + ix;
   const a = HT[k], b = HT[k + 1], c = HT[k + NXT], d = HT[k + NXT + 1];
-  return (u + w <= 1 ? a + (b - a) * u + (c - a) * w : d + (c - d) * (1 - u) + (b - d) * (1 - w)) + reliefSki(x, z);
+  return u + w <= 1 ? a + (b - a) * u + (c - a) * w : d + (c - d) * (1 - u) + (b - d) * (1 - w);
 }
 
 // les lieux : chaque lettre de la carte, avec le centre de chacune de ses cases
@@ -3598,8 +3602,20 @@ const grilleRoutes = new Map();   // case de rangement -> morceaux de route qui 
     }
     pts = pts.map(p => ({ ...p, ...hauteurPoint(p.x, p.z) }));
     pts[0].y = NOEUDS[n0].y; pts.at(-1).y = NOEUDS[n1].y;
-    // la route monte et descend en douceur ; au-dessus de l'eau, elle reste assez haute pour que les bateaux passent dessous
-    for (let k = 0; k < 40; k++) for (let q = 1; q < pts.length - 1; q++) pts[q].y = Math.max(pts[q].min, (pts[q - 1].y + 2 * pts[q].y + pts[q + 1].y) / 4);
+    // la route monte et descend en douceur ; au-dessus de l'eau, elle reste assez haute pour que les bateaux passent dessous.
+    // En partant du carrefour d'une ville, elle ne monte (ni ne descend) pas plus raide que penteRoute : quand la colline d'à côté est bien
+    // plus haute que la ville, la route s'y enfonce, au lieu de tomber comme un mur sur le carrefour (à Paleto Bay : 19 m en 17 m).
+    // Seulement sur ce bout trop raide : dès qu'elle ne l'est plus, on la laisse (la route du château, raide au milieu, ne change pas)
+    const villes = [[0, 1], [pts.length - 1, -1]].filter(([b]) => ch[b ? ch.length - 1 : 0][0] === 'c');   // ses bouts sur un carrefour de ville, et le sens pour s'en éloigner
+    for (let k = 0; k < 40; k++) {
+      for (let q = 1; q < pts.length - 1; q++) pts[q].y = Math.max(pts[q].min, (pts[q - 1].y + 2 * pts[q].y + pts[q + 1].y) / 4);
+      for (const [b, sens] of villes) for (let q = b + sens, s = 0; q > 0 && q < pts.length - 1; q += sens) {
+        s += Math.hypot(pts[q].x - pts[q - sens].x, pts[q].z - pts[q - sens].z);
+        const y = clamp(pts[q].y, pts[b].y - R_.penteRoute * s, pts[b].y + R_.penteRoute * s);
+        if (y === pts[q].y) break;
+        pts[q].y = Math.max(pts[q].min, y);
+      }
+    }
     let prec = n0;
     for (let q = 1; q < pts.length; q++) {
       const n = q === pts.length - 1 ? n1 : nouveauNoeud(pts[q].x, pts[q].z, pts[q].y);
@@ -3653,24 +3669,57 @@ for (const pts of ROUTES) for (let q = 1; q < pts.length; q++) {
       if (a.pont && b.pont) HT[k] = Math.min(HT[k], v); else HT[k] = v;
     }
 }
-// Le terrain est fait de triangles de 9,25 m de côté. Un triangle qui touche la chaussée, mais dont un coin est loin d'elle (en haut d'un talus),
-// passait par-dessus le goudron : des morceaux de route disparaissaient sous l'herbe (18 % des routes de Los Santos, 36 % à Malibu, jusqu'à
-// 13 m au-dessus sur les routes de montagne). On abaisse donc les coins de tout ce qui touche la chaussée, juste sous elle
-function sousLaChaussee(x, z, y) { // les trois coins du triangle du terrain qui est en (x, z) : pas plus haut que y
+// Le terrain est fait de triangles de 9,25 m de côté, que le ruban d'une route traverse en biais. Sous le ruban, chaque triangle doit suivre
+// la route. Un coin en haut d'un talus faisait passer l'herbe par-dessus le goudron (des morceaux de route disparaissaient) ; un coin en bas
+// d'un remblai, ou abaissé jusqu'au bas de la pente, laissait la route flotter en l'air, à côté du terrain (jusqu'à 18 m au-dessus).
+// Chaque coin de tout ce qui touche la chaussée prend donc la hauteur de la route juste en face de lui, 25 cm dessous : on creuse ou on
+// remblaie. (S'il touche deux routes à la fois, il prend la plus basse des deux.)
+const coinsDuTriangle = (x, z) => { // les numéros, dans HT, des trois coins du triangle du terrain qui est en (x, z)
   const fx = clamp(x / PT, 0, NXT - 1.001), fz = clamp(z / PT, 0, NZT - 1.001), ix = Math.floor(fx), iz = Math.floor(fz), k = iz * NXT + ix;
-  for (const c of fx - ix + fz - iz <= 1 ? [k, k + 1, k + NXT] : [k + NXT + 1, k + NXT, k + 1]) HT[c] = Math.min(HT[c], y);
-}
-// les routes de campagne : tout le ruban de 10 m (voir « ruban », plus bas), 25 cm sous le goudron
-for (const pts of ROUTES) {
+  return fx - ix + fz - iz <= 1 ? [k, k + 1, k + NXT] : [k + NXT + 1, k + NXT, k + 1];
+};
+// tout le ruban de 10 m d'une route de campagne (voir « ruban », plus bas), sauf ses ponts : un point tous les 50 cm en long, tous les 25 cm
+// en travers. f(x, z, y, q) : y, la hauteur de la route à cet endroit ; q, le numéro de son point suivant
+function surLeRuban(pts, f) {
   const normale = q => { const a = pts[Math.max(0, q - 1)], b = pts[Math.min(pts.length - 1, q + 1)], l = Math.hypot(b.x - a.x, b.z - a.z) || 1; return [-(b.z - a.z) / l, (b.x - a.x) / l]; };
   for (let q = 1; q < pts.length; q++) {
     const a = pts[q - 1], b = pts[q], na = normale(q - 1), nb = normale(q), n = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.5);
     if (a.pont && b.pont) continue;   // (un pont passe au-dessus)
     for (let s = 0; s <= n; s++) for (let l = -5; l <= 5; l += 0.25) {
       const t = s / n, nx = na[0] + (nb[0] - na[0]) * t, nz = na[1] + (nb[1] - na[1]) * t;
-      sousLaChaussee(a.x + (b.x - a.x) * t + nx * l, a.z + (b.z - a.z) * t + nz * l, a.y + (b.y - a.y) * t - 0.25);
+      f(a.x + (b.x - a.x) * t + nx * l, a.z + (b.z - a.z) * t + nz * l, a.y + (b.y - a.y) * t, q);
     }
   }
+}
+{
+  const hauteurCoin = new Map();   // numéro du coin -> la hauteur qu'il prend
+  for (const pts of ROUTES) {
+    // la hauteur de la route en face du point (x, z) (le plus proche des morceaux de route autour du point numéro q)
+    const enFace = (x, z, q) => {
+      let d = Infinity, y = 0;
+      for (let k = Math.max(1, q - 2); k <= Math.min(pts.length - 1, q + 2); k++) {
+        const a = pts[k - 1], b = pts[k], dx = b.x - a.x, dz = b.z - a.z, t = clamp(((x - a.x) * dx + (z - a.z) * dz) / (dx * dx + dz * dz || 1), 0, 1);
+        const e = Math.hypot(a.x + dx * t - x, a.z + dz * t - z);
+        if (e < d) { d = e; y = a.y + (b.y - a.y) * t; }
+      }
+      return y;
+    };
+    let q0 = 0, vus = new Set();   // (les coins déjà vus depuis le morceau de route qui finit au point q0)
+    surLeRuban(pts, (x, z, y, q) => {
+      if (q !== q0) { q0 = q; vus = new Set(); }
+      for (const c of coinsDuTriangle(x, z)) if (!vus.has(c)) {
+        vus.add(c);
+        hauteurCoin.set(c, Math.min(hauteurCoin.get(c) ?? Infinity, enFace((c % NXT) * PT, Math.floor(c / NXT) * PT, q) - 0.25));
+      }
+    });
+  }
+  for (const [c, h] of hauteurCoin) HT[c] = h;
+  // dans un creux (en bas d'une descente), la route s'arrondit, mais le terrain va tout droit d'un coin à l'autre : il passerait au-dessus
+  // du goudron. Là, on abaisse les trois coins juste ce qu'il faut, pour que le goudron reste au moins 10 cm au-dessus
+  for (const pts of ROUTES) surLeRuban(pts, (x, z, y) => {
+    const trop = hauteurGrille(x, z) - (y - 0.1);
+    if (trop > 0) for (const c of coinsDuTriangle(x, z)) HT[c] -= trop;
+  });
 }
 // les rues des villes : les carrés du terrain qui touchent la rue, 5 cm sous elle (comme le terrain sous une ville)
 for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
