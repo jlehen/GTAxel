@@ -124,6 +124,10 @@
   #visiere::before { left: 3vw; border-left-color: rgba(120, 225, 255, .35); }
   #visiere::after { right: 3vw; border-right-color: rgba(120, 225, 255, .35); }
   #hud.casque #annonce small { padding: 0 calc(var(--casque, 300px) + 30px); }   /* (une longue annonce passe à la ligne au lieu de passer sous l'affichage du casque) */
+  /* le compteur de performances (touche P) : en bas, juste à droite de la mini-carte, sous l'objectif. Étroit (4 lignes courtes), il reste à gauche
+     de la vitesse même sur un petit écran (1024 points de large) ; la grande carte passe par-dessus */
+  #compteur { position: absolute; left: 262px; bottom: 3px; display: none; white-space: pre; padding: 2px 8px; border-radius: 4px;
+              background: rgba(0,0,0,.55); color: #d8f0d0; text-shadow: none; font: 12px/1.2 ui-monospace, Menlo, Consolas, 'DejaVu Sans Mono', monospace; }
   /* l'écran du chapitre : le logo du héros, « Chapitre 2 », puis il s'en va */
   #ecran-chapitre { position: fixed; inset: 0; display: none; cursor: pointer; }
   #ecran-chapitre canvas { width: 100%; height: 100%; }
@@ -168,6 +172,7 @@
   </div>
   <div id="boss"><span>IRON MONGER</span><div><div></div></div></div>
   <div id="voile"></div>
+  <div id="compteur"></div>
   <canvas id="grande-carte"></canvas>
   <div id="triche"></div>
 </div>
@@ -263,7 +268,7 @@ const CHAPITRES = [
     ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
     'Suis le <b>point jaune</b> de la mini-carte : il te mène à ta mission.',
     '<b>E</b> : monter dans une voiture (ou la voler !). <b>M</b> : la carte du pays.',
@@ -283,7 +288,7 @@ const CHAPITRES = [
     ['E', "monter / descendre (voiture, bateau, avion), ascenseur, magasin de Stark Industries, prendre quelqu'un dans tes bras"],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
     'Tu es <b>{heros}</b>. Ta toute première armure, tu vas la gagner dans ta première mission : suis le <b>point jaune</b> !',
     'Ensuite, <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !',
@@ -305,7 +310,7 @@ const CHAPITRES = [
     ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
     'Tu es <b>{super}</b> ! Ta Batmobile t\'attend à côté de toi : <b>B</b> la rappelle, <b>R</b> la fait voler.',
     '<b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.',
@@ -324,7 +329,7 @@ const CHAPITRES = [
     ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
     'Tu es <b>{super}</b> ! <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.',
     'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.',
@@ -344,7 +349,7 @@ const CHAPITRES = [
     ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
     'Tu es <b>{super}</b> ! <b>G</b> (ou clic gauche) : une toile, pour te balancer d\'immeuble en immeuble.',
     'Avance contre un mur : tu grimpes. <b>Espace</b> : sauter du mur.',
@@ -467,6 +472,14 @@ const TRADUCTIONS = {
   'code de triche':           { de: 'Cheatcode', en: 'cheat code', gsw: 'Cheatcode' },
   'Échap':                    { de: 'Esc', en: 'Esc', gsw: 'Esc' },
   'pause':                    { de: 'Pause', en: 'pause', gsw: 'Pause' },
+  // le compteur de performances (touche P) : sa ligne dans le menu, et ce qu'il écrit
+  'compteur de performances (images par seconde…)': { de: 'Leistungsanzeige (Bilder pro Sekunde…)', en: 'performance meter (frames per second…)', gsw: 'Leischtigsaazeig (Bilder pro Sekunde…)' },
+  '{ips} i/s · calcul {calcul} ms · dessin {dessin} ms': { de: '{ips} B/s · Rechnen {calcul} ms · Zeichnen {dessin} ms', en: '{ips} fps · update {calcul} ms · render {dessin} ms',
+    gsw: '{ips} B/s · Rächne {calcul} ms · Zeichne {dessin} ms' },
+  '{appels} appels de dessin · {triangles} triangles': { de: '{appels} Zeichenaufrufe · {triangles} Dreiecke', en: '{appels} draw calls · {triangles} triangles', gsw: '{appels} Zeichenufrüef · {triangles} Dreiegg' },
+  '{programmes} programmes · {formes} formes · {textures} textures': { de: '{programmes} Shader · {formes} Formen · {textures} Texturen', en: '{programmes} shaders · {formes} geometries · {textures} textures',
+    gsw: '{programmes} Shader · {formes} Forme · {textures} Texture' },
+  'JS : {mo} Mo':             { de: 'JS: {mo} MB', en: 'JS: {mo} MB', gsw: 'JS: {mo} MB' },
   // les armes, les véhicules, le butin
   'Poings':           { de: 'Fäuste', en: 'Fists', gsw: 'Füüscht' },
   'Couteau':          { de: 'Messer', en: 'Knife', gsw: 'Mässer' },
@@ -1795,6 +1808,7 @@ const REGLAGES = {
   // la vie, les dégâts et la précision des policiers, des nazis et des autres ennemis : voir ENNEMIS, après les voitures
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
+  compteur: false,           // true = le compteur de performances (touche P) est allumé dès le départ : les images par seconde, et ce qui coûte. Si le jeu rame, allume-le, puis change ombres, distanceVue ou la foule du menu, et regarde ce qui baisse
   ombres: true,              // mets false si le jeu rame
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
@@ -10906,6 +10920,7 @@ addEventListener('keydown', e => {
   }
   if (!e.repeat || !J.danse) touches[e.code] = true;   // pendant la danse, une touche restée enfoncée ne compte pas
   if (e.repeat) return;
+  if (e.code === 'KeyP') { allumerCompteur(!compteur.allume); return; }   // P : le compteur de performances (images par seconde...), partout dans le jeu
   if (e.key.toLowerCase() === 'm' || e.code === 'Tab') { ouvrirCarte(!carte.ouverte); return; } // la lettre M (quel que soit le clavier) ouvre la carte, comme Tab (même dans l'armure d'Iron Man)
   if (carte.ouverte) return;
   if (J.ironman && suiteIronman(e.code)) return;   // A Z E (Q W E sur un clavier anglais) : l'armure d'Iron Man arrive, ou il en sort
@@ -16817,12 +16832,51 @@ function majRepere(dt) {
   if (cible) { const y = cible.y ?? hauteurSol(cible.x, cible.z); repere.position.set(cible.x, y + 2.5, cible.z); fleche.position.set(cible.x, y + (cible.h ? (cible.h.hauteur || 1.9 * cible.h.g.scale.y) + 1 : 2.9) + Math.sin(temps * 4) * 0.15, cible.z); fleche.rotation.y += dt * 2; }   // (au-dessus de sa tête : plus haut pour Iron Monger, ou un hélicoptère)
 }
 
+// Le compteur de performances (touche P, ou compteur: true dans REGLAGES), en bas, à droite de la mini-carte. Deux fois par seconde, il écrit :
+//  - les images par seconde, et ce que prend une image, en millisecondes : le calcul (tout ce qui bouge, la caméra, l'écran, le ciel...)
+//    et le dessin (le temps que le processeur passe à envoyer la scène à la carte graphique ; ce qu'elle met à dessiner ne se voit pas ici) ;
+//  - les appels de dessin (un par objet dessiné, et encore un pour son ombre) et les triangles de la dernière image ;
+//  - les programmes de la carte graphique (les shaders), les formes et les textures qu'elle garde, et la mémoire du JavaScript.
+// Change un réglage (ombres, distanceVue, la foule du menu...) et regarde ce qui baisse ! Éteint, il ne fait rien.
+const compteur = { allume: false, reglage: null, images: 0, calcul: 0, dessin: 0, debut: 0,   // (ce qu'il additionne en attendant d'écrire)
+  ips: 0, msCalcul: 0, msDessin: 0, appels: 0, triangles: 0, programmes: 0, formes: 0, textures: 0, memoireJS: null };   // (ses derniers chiffres)
+const formatsCompteur = {};   // (fabriquer une façon d'écrire les nombres coûte plus cher que de s'en servir : on les garde)
+function allumerCompteur(oui) {
+  compteur.allume = oui;
+  renderer.info.autoReset = !oui;   // allumé, c'est lui qui remet les comptes à zéro, une fois par image (à la 1re personne, une image, c'est deux dessins)
+  renderer.info.reset();
+  Object.assign(compteur, { images: 0, calcul: 0, dessin: 0, debut: performance.now() });
+  $('compteur').style.display = oui ? 'block' : 'none';
+}
+// à la fin de chaque image (debut : quand elle a commencé ; avantDessin : quand le dessin a commencé)
+function compter(debut, avantDessin) {
+  if (R_.compteur !== compteur.reglage) { allumerCompteur(compteur.reglage = R_.compteur); return; }   // le réglage a changé (au départ, ou dans le menu ⚙) : il compte à partir de l'image suivante
+  if (!compteur.allume) return;
+  const C = compteur, fin = performance.now(), info = renderer.info;
+  C.images++; C.calcul += avantDessin - debut; C.dessin += fin - avantDessin;
+  C.appels = info.render.calls; C.triangles = info.render.triangles; info.reset();   // (ceux de cette image)
+  if (fin - C.debut < 500) return;   // il n'écrit que deux fois par seconde
+  Object.assign(C, { ips: C.images * 1000 / (fin - C.debut), msCalcul: C.calcul / C.images, msDessin: C.dessin / C.images,
+    programmes: info.programs?.length ?? 0, formes: info.memory.geometries, textures: info.memory.textures,
+    memoireJS: performance.memory ? performance.memory.usedJSHeapSize / 1e6 : null,   // (seulement dans Chrome et Edge)
+    images: 0, calcul: 0, dessin: 0, debut: fin });
+  const n = (x, chiffres = 0) => (formatsCompteur[langue + chiffres] ||=   // (les nombres écrits à la façon de la langue : 1 234,5 ou 1,234.5)
+    new Intl.NumberFormat(langue === 'gsw' ? 'de-CH' : langue, { minimumFractionDigits: chiffres, maximumFractionDigits: chiffres })).format(x);
+  $('compteur').textContent = [
+    tr('{ips} i/s · calcul {calcul} ms · dessin {dessin} ms', { ips: n(C.ips, C.ips < 10 ? 1 : 0), calcul: n(C.msCalcul, 1), dessin: n(C.msDessin, 1) }),
+    tr('{appels} appels de dessin · {triangles} triangles', { appels: n(C.appels), triangles: n(C.triangles) }),
+    tr('{programmes} programmes · {formes} formes · {textures} textures', { programmes: C.programmes, formes: n(C.formes), textures: n(C.textures) }),
+    ...(C.memoireJS === null ? [] : [tr('JS : {mo} Mo', { mo: n(C.memoireJS) })]),   // (des lignes courtes : le compteur reste étroit)
+  ].join('\n');
+}
+
 let dernier = performance.now();
 function boucle(t) {
+  const debutImage = performance.now();   // (pour le compteur de performances)
   const dt = clamp((t - dernier) / 1000 * R_.vitesseJeu, 0, 0.05);   // (REGLAGES.vitesseJeu ralentit tout le jeu)
   const horloge = R_.vitesseJeu > 0 ? clamp((t - dernier) / 1000, 0, 1) : 0;   // le vrai temps écoulé : la journée dure ce qu'il faut, même si le jeu rame
   dernier = t;
-  if (carte.ouverte) { dessinerGrandeCarte(dt); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
+  if (carte.ouverte) { dessinerGrandeCarte(dt); compter(debutImage, performance.now()); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
   if (enJeu && !ecranChapitre.bloque()) mettreAJour(dt, horloge); else if (!enJeu) dessinerApercu(dt);   // dans le menu : l'aperçu du héros (et le jeu attend que l'écran du chapitre s'en aille)
   majCamera(dt); majRepere(dt); majHUD(dt); majLaser(dt);
   majCiel(dt);   // le soleil (ou la lune), le ciel, la brume, les lumières de la nuit
@@ -16834,9 +16888,11 @@ function boucle(t) {
   vm.position.set(0.2 + Math.sin(joueurH.phase) * 0.01, -0.2 - Math.abs(Math.cos(joueurH.phase)) * 0.01, -0.5 + J.recul * 0.05);
   vm.rotation.set(J.recul * 0.15 - J.frappe * 0.8, 0, 0);
   if (vm.userData.arme?.userData.sceptre) { vm.position.x -= 0.52; vm.position.y -= 0.1; vm.rotation.x = -J.recul * 0.25; }   // le sceptre : dans la main gauche, et il part en avant à chaque éclair
+  const avantDessin = performance.now();
   renderer.clear();
   renderer.render(scene, camera);
   if ((J.vue === 1 || tropPres) && !J.voiture && !J.mort && !dansLunette() && !J.robot?.armure) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
+  compter(debutImage, avantDessin);   // le compteur de performances (touche P)
   requestAnimationFrame(boucle);
 }
 // premier placement du joueur
@@ -16879,7 +16935,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   effondrerVilla, releverVilla, poserPorte, tirSurJoueur, majBarreBoss, interieurs,
   get chute() { return chute; }, get facture() { return facture; }, FETE_DES_ARMURES, tourStark,
   galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
-  mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; },
+  mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; }, compteur, allumerCompteur, compter,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
