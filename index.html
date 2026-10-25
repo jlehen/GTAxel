@@ -14595,12 +14595,17 @@ function poserPorte(reste = false) {
 }
 // {ami} : l'autre héros du menu, dans sa tenue de tous les jours (Pepper Potts dans son tailleur, ou Tony Stark dans son costume, avec ses
 // lunettes de soleil). On l'habille comme le héros, le temps de prendre l'autre côté du menu
-function creerAmi() {
-  const h = creerHumain(TENUE_BJ), avant = heros.genre;
+function corpsAmi(h) {
+  const avant = heros.genre;
   heros.genre = Object.keys(HEROS).find(g => !!HEROS[g].fille !== fille()) || avant;
   try { corpsHeros(h); } finally { heros.genre = avant; }
-  return h;
 }
+function creerAmi() { const h = creerHumain(TENUE_BJ); corpsAmi(h); return h; }
+// on a changé de héros dans le menu en pleine mission : {ami} change aussi (sinon, Tony Stark porterait Tony Stark dans ses bras !). Ses
+// lunettes de soleil, s'il en a maintenant, comptent comme lui pour les tirs
+addEventListener('heros', () => {
+  for (const p of personnes) if (p.type === 'ami') { corpsAmi(p.h); p.h.g.traverse(o => o.userData.personne = p); }
+});
 // {ami} qui l'attend là, en agitant le bras (flotte : dans l'eau). On ne peut pas le blesser
 function amiQuiAttend(x, z, y, flotte = false) {
   const p = creerPersonne('ami', x, z, undefined, y);
