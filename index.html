@@ -3956,7 +3956,8 @@ scene.fog = new THREE.Fog(0xa9c4e0, R_.distanceVue * 0.2, VUE_RELIEF);
 }
 const relief = m => { m.defines = { ...m.defines, RELIEF: 1 }; return m; };   // une matière qu'on voit de très loin
 // Ce qui est tout entier plus loin que distanceVue (une voiture garée à l'autre bout du pays...) n'est même pas envoyé à la carte graphique :
-// Three.js sait déjà sauter ce qui est hors du champ de la caméra, on lui fait sauter aussi ce qui est trop loin (sauf le relief)
+// Three.js sait déjà sauter ce qui est hors du champ de la caméra, on lui fait sauter aussi ce qui est trop loin (sauf le relief).
+// (La distance se compte depuis la caméra du jeu, même dans une autre scène : l'arme à la 1re personne et l'aperçu du menu ont frustumCulled = false)
 const dansLeChamp = THREE.Frustum.prototype.intersectsObject, bouleLoin = new THREE.Sphere();
 THREE.Frustum.prototype.intersectsObject = function (o) {
   if (!dansLeChamp.call(this, o)) return false;
@@ -3984,15 +3985,18 @@ ciel.material.uniforms.sunPosition.value.copy(soleilDir);
   m.fragmentShader = 'uniform float eclat;\nuniform vec3 fondNuit;\n' + m.fragmentShader.replace(avant, 'gl_FragColor = vec4( texColor * eclat + fondNuit, 1.0 );');
   Object.assign(m.uniforms, { eclat: { value: 1 }, fondNuit: { value: new THREE.Color(0, 0, 0) } });
 }
-// les reflets : le ciel, photographié tout autour (sans le disque du soleil : la lumière « soleil » éclaire déjà). On le refait quand le soleil a bougé
-const pmrem = new THREE.PMREMGenerator(renderer), scenePhoto = new THREE.Scene();
+// les reflets : le ciel, photographié tout autour (sans le disque du soleil : la lumière « soleil » éclaire déjà). On le refait quand le soleil a bougé.
+// scenesReflets : les scènes qui reflètent ce ciel (le pays, et plus bas l'arme à la 1re personne). La photo d'avant est jetée : une scène
+// qui la garderait ne refléterait plus rien (le gant d'Iron Man, à la 1re personne, devenait tout noir)
+const pmrem = new THREE.PMREMGenerator(renderer), scenePhoto = new THREE.Scene(), scenesReflets = [scene];
 let reflets = null;
 function photographierCiel() {
   const u = ciel.material.uniforms, avant = ciel.position.clone();
   scenePhoto.add(ciel); ciel.position.set(0, 0, 0); u.showSunDisc.value = 0;
   const r = pmrem.fromScene(scenePhoto);
   u.showSunDisc.value = 1; ciel.position.copy(avant); scene.add(ciel);
-  reflets?.dispose(); reflets = r; scene.environment = r.texture;
+  reflets?.dispose(); reflets = r;
+  for (const s of scenesReflets) s.environment = r.texture;
 }
 photographierCiel();
 scene.environmentIntensity = 0.7;
@@ -8369,7 +8373,7 @@ majHeros();
 const vmScene = new THREE.Scene(), vmCamera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.01, 10);
 vmScene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.2));
 { const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(1, 2, 1); vmScene.add(l); }
-vmScene.environment = scene.environment; vmScene.environmentIntensity = 0.25;
+vmScene.environment = scene.environment; vmScene.environmentIntensity = 0.25; scenesReflets.push(vmScene);   // (elle reflète le même ciel que le pays : voir photographierCiel)
 const vm = new THREE.Group(); vmScene.add(vm);
 function construireVM() {
   vm.clear();
@@ -8378,6 +8382,9 @@ function construireVM() {
   const a = vm.userData.arme = creerArme(J.arme);
   if (a) { a.rotation.y = Math.PI; a.position.set(0, 0.03, -0.02); vm.add(a); }
   if (a?.userData.sceptre) { a.rotation.x = 0.8; a.scale.setScalar(0.7); }   // le sceptre : dressé vers le haut, plus petit pour ne pas cacher le viseur (et à gauche de l'écran : voir boucle)
+  // la main et l'arme sont toujours dessinées : sinon le jeu les sauterait, parce qu'il saute ce qui est à plus de distanceVue de la caméra
+  // du jeu, et qu'elles sont près du point 0, 0, 0 de leur scène à elle (une pièce qu'on ajouterait à vm ailleurs doit faire pareil)
+  vm.traverse(o => o.frustumCulled = false);
 }
 // en 1re personne, le sceptre est dessiné à part, par-dessus le reste : renvoie le point de la scène qui est à l'écran derrière son bout, à 1 m
 function boutSceptreVM(v) {
@@ -16888,10 +16895,12 @@ function boucle(t) {
   vm.position.set(0.2 + Math.sin(joueurH.phase) * 0.01, -0.2 - Math.abs(Math.cos(joueurH.phase)) * 0.01, -0.5 + J.recul * 0.05);
   vm.rotation.set(J.recul * 0.15 - J.frappe * 0.8, 0, 0);
   if (vm.userData.arme?.userData.sceptre) { vm.position.x -= 0.52; vm.position.y -= 0.1; vm.rotation.x = -J.recul * 0.25; }   // le sceptre : dans la main gauche, et il part en avant à chaque éclair
+  if (vm.userData.arme) vm.userData.arme.visible = !joueurH.arme || joueurH.arme.visible;   // il l'a rangée (pour nager, voler...) : comme à la 3e personne
   const avantDessin = performance.now();
   renderer.clear();
   renderer.render(scene, camera);
-  if ((J.vue === 1 || tropPres) && !J.voiture && !J.mort && !dansLunette() && !J.robot?.armure) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
+  // (pas en voiture, ni dans le heavy robot ou une armure : c'est leur arme à eux qui tire)
+  if ((J.vue === 1 || tropPres) && !J.voiture && !J.mort && !dansLunette() && !J.robot) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
   compter(debutImage, avantDessin);   // le compteur de performances (touche P)
   requestAnimationFrame(boucle);
 }
