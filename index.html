@@ -3840,6 +3840,19 @@ const TEX = {
   bunker: toile(256, 256, (g, l, h) => { g.fillStyle = '#6e6e66'; g.fillRect(0, 0, l, h); grain(g, l, h, 6000, 0.1); g.fillStyle = 'rgba(0,0,0,.3)'; for (let k = 0; k < 4; k++) { g.fillRect(k * 64, 0, 2, h); g.fillRect(0, k * 64, l, 2); } for (let i = 0; i < 12; i++) { g.fillStyle = 'rgba(40,35,20,.15)'; g.fillRect(Math.random() * l, Math.random() * h, 6, entre(20, 80)); } }),
   // Malibu : la façade de la tour Stark (du verre bleu sombre, de fines lames d'acier entre les vitres)
   stark: facade('#18222e', 8, 4, (g, x, y, w, h) => { vitre(g, x + 1.5, y + 1, w - 3, h - 2, [30, 64, 96]); g.fillStyle = '#a8b2bc'; g.fillRect(x, y, 1.5, h); }),
+  // la villa de Tony Stark : en bas (l'atelier), un socle blanc et une longue fenêtre en bande ; à l'étage (le salon), du verre du sol au plafond,
+  // une vitre tous les 2 m entre de fines lames blanches ; au-dessus (le garde-fou du toit), du blanc. La nuit, presque tout est allumé
+  villaStark: facade('#f2f1ec', 4, 3, (g, x, y, w, h) => {
+    if (y > g.hauteur / 2) vitre(g, x + 1.5, y + h * .19, w - 3, h * .42, [36, 74, 96]); else if (y > 1) vitre(g, x + 1.5, y + h * .11, w - 3, h * .87, [36, 74, 96]);
+  }, null, 346, 0.85),
+  // la mer, vue du salon de Tony Stark, dans ses grandes baies : le ciel, l'horizon (à hauteur des yeux), la mer et ses vagues, entre les lames
+  vueMer: toile(512, 128, (g, l, h) => {
+    const ciel = g.createLinearGradient(0, 0, 0, h / 2); ciel.addColorStop(0, '#78acdc'); ciel.addColorStop(1, '#e2edf4');
+    const mer = g.createLinearGradient(0, h / 2, 0, h); mer.addColorStop(0, '#3c7caa'); mer.addColorStop(1, '#1a4a70');
+    g.fillStyle = ciel; g.fillRect(0, 0, l, h / 2); g.fillStyle = mer; g.fillRect(0, h / 2, l, h / 2);
+    g.fillStyle = 'rgba(255,255,255,.4)'; for (let i = 0; i < 260; i++) g.fillRect(Math.random() * l, h / 2 + Math.random() ** 2 * h / 2, entre(2, 9), 0.7);
+    g.fillStyle = '#f2f1ec'; for (let x = 0; x < l; x += 64) g.fillRect(x, 0, 2, h); g.fillRect(0, 0, l, 3); g.fillRect(0, h - 3, l, 3);
+  }),
   // la bannière des Dix Anneaux (chez le Mandarin, à la grotte) : rouge bordée d'or, avec dix anneaux d'or en cercle autour d'un rond d'or
   dixAnneaux: toile(128, 256, (g) => {
     g.fillStyle = '#8c0f12'; g.fillRect(0, 0, 128, 256); g.strokeStyle = '#d8a830'; g.lineWidth = 6; g.strokeRect(6, 6, 116, 244);
@@ -4040,7 +4053,10 @@ const MAT = {
   vitrine: std(null, { color: '#cfe6f0', metalness: 0.2, roughness: 0.02, transparent: true, opacity: 0.25, depthWrite: false }),
   enseigneMusee: enseigne('MUSÉE D\'ART DE LOS SANTOS', '#3a2a10', '#e8dcc0'), vangelico: enseigne('VANGELICO', '#e8c060'), pacific: enseigne('PACIFIC STANDARD', '#fff', '#1a3a2a'),
   // Malibu
-  stark: std(TEX.stark), starkEnseigne: enseigne('STARK', '#e6f6ff', '#0b1018'), starkIndustries: enseigne('STARK INDUSTRIES', '#fff', '#2a2e36'),
+  stark: std(TEX.stark), villaStark: std(TEX.villaStark), vueMer: std(TEX.vueMer, { roughness: 0.3, bumpScale: 0 }),
+  betonBlanc: std(null, { color: '#f4f2ec', roughness: 0.6 }),   // les plateaux arrondis de la villa de Tony Stark
+  garde: std(null, { color: '#cfe6f0', metalness: 0.2, roughness: 0.05, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide }),   // un garde-corps en verre
+  starkEnseigne: enseigne('STARK', '#e6f6ff', '#0b1018'), starkIndustries: enseigne('STARK INDUSTRIES', '#fff', '#2a2e36'),
   starkExpo: enseigne('STARK EXPO', '#fff', '#a01616'), dixAnneaux: std(TEX.dixAnneaux, { side: THREE.DoubleSide, bumpScale: 0.02 }),
   lettres: std(TEX.lettres, { alphaTest: 0.5, side: THREE.DoubleSide, bumpMap: null, roughness: 0.7 }),
   tente: std(null, { color: '#9a8a62', roughness: 1, side: THREE.DoubleSide }), roche: std(null, { color: '#7d756a', roughness: 1, flatShading: true, side: THREE.DoubleSide }),
@@ -4051,7 +4067,7 @@ const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [
   maison1: [6, 6], maison2: [6, 6], maison3: [6, 6], villa: [8, 9], magasin: [12, 6], bunker: [8, 8], toit: [8, 8], trottoir: [4, 4],
   herbe: [6, 6], paves: [4, 4], chateau: [4, 4], carrelage: [2, 2], parquet: [3, 3], planches: [3, 3], grange: [6, 6], tole: [6, 6],
   conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2],
-  marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2], stark: [12, 12] };
+  marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2], stark: [12, 12], villaStark: [8, 10.8], vueMer: [16, 3.2] };
 // Les trous que B.J. fait dans un toit ou un plancher en tombant de très haut (voir trouer). On ne peut pas enlever un morceau de dalle
 // de son dessin : toutes les formes d'une même matière sont fusionnées en une seule. Alors on retouche le programme qui dessine les matières
 // des bâtiments : un point qui tombe dans un trou n'est pas dessiné, et on voit au travers (les étages du dessus, le ciel).
@@ -4179,6 +4195,55 @@ function sol(mat, x, y, z, l, p) {
   g.translate(x, Y0 + y, z);
   ajouterGeo(mat, g);
 }
+// Des formes arrondies (la villa de Tony Stark) : une forme est une fonction dedans(x, z), qui dit si le point (x, z) est dedans.
+// rectArrondi : un rectangle de (x1, z1) à (x2, z2), aux coins arrondis (r : leur rayon) ; disque : de centre (x, z) et de rayon r
+const rectArrondi = (x1, z1, x2, z2, r) => (x, z) => x >= x1 && x <= x2 && z >= z1 && z <= z2
+  && Math.hypot(Math.max(x1 + r - x, 0, x - x2 + r), Math.max(z1 + r - z, 0, z - z2 + r)) <= r;
+const disque = (cx, cz, r) => (x, z) => Math.hypot(x - cx, z - cz) <= r;
+// le contour de plusieurs formes réunies, vu de (cx, cz) : n points [x, z], chacun le plus loin possible dans sa direction (60 m au plus)
+function contourDe(formes, cx, cz, n = 192) {
+  const dedans = (x, z) => formes.some(f => f(x, z)), points = [];
+  for (let k = 0; k < n; k++) {
+    const a = k * 2 * Math.PI / n, dx = Math.cos(a), dz = Math.sin(a);
+    let t = 60, t2 = 60.25;
+    while (t > 0 && !dedans(cx + dx * t, cz + dz * t)) { t2 = t; t -= 0.25; }
+    for (let i = 0; i < 12; i++) { const m = (t + t2) / 2; if (dedans(cx + dx * m, cz + dz * m)) t = m; else t2 = m; }   // (au millimètre près)
+    points.push([cx + dx * t, cz + dz * t]);
+  }
+  return points;
+}
+// une dalle de la forme d'un contour (une liste de points [x, z]), épaisse de ep mètres, posée à la hauteur y ; trou : un rectangle
+// [x1, z1, x2, z2] où il n'y a rien (là où est la maison : on ne voit pas la dalle dépasser dedans)
+function dalleForme(mat, contour, y, ep, trou = null) {
+  const v = ([x, z]) => new THREE.Vector2(x, -z), s = new THREE.Shape(contour.map(v));
+  if (trou) { const [x1, z1, x2, z2] = trou; s.holes.push(new THREE.Path([[x1, z1], [x2, z1], [x2, z2], [x1, z2]].map(v))); }
+  const g = new THREE.ExtrudeGeometry(s, { depth: ep, bevelEnabled: false }).rotateX(-Math.PI / 2).translate(0, Y0 + y, 0);
+  g.setIndex([...Array(g.attributes.position.count).keys()]);   // (pour être fusionnée avec les boîtes, qui ont un index)
+  ajouterGeo(mat, g);
+}
+// les boîtes de collision d'une forme (une fonction dedans(x, z)), dans le rectangle [x1, z1, x2, z2], de la hauteur bas à haut : des bandes de
+// pas mètres, coupées là où la forme s'arrête. Pour un sol où l'on marche (plein = false), une case n'en fait partie que si ses 4 coins sont
+// dedans (on ne marche pas dans le vide) ; pour un mur (plein = true), il suffit que son milieu le soit
+function collisionsForme(dedans, [x1, z1, x2, z2], bas, haut, pas = 1, plein = false) {
+  for (let z = z1; z < z2; z += pas) {
+    let debut = null;
+    for (let x = x1; x <= x2 + pas; x += pas) {
+      const ok = x + pas <= x2 + 0.001 && (plein ? dedans(x + pas / 2, z + pas / 2) : [[0, 0], [pas, 0], [0, pas], [pas, pas]].every(([dx, dz]) => dedans(x + dx, z + dz)));
+      if (ok && debut === null) debut = x;
+      if (!ok && debut !== null) { ajouterCollision(debut, z, x, z + pas, haut, bas); debut = null; }
+    }
+  }
+}
+// un ruban debout, de la hauteur y à y + h, tout le long d'un contour fermé : un garde-corps en verre, une rampe
+function ruban(mat, contour, y, h) {
+  const pos = [], idx = [], n = contour.length;
+  for (let k = 0; k <= n; k++) { const [x, z] = contour[k % n]; pos.push(x, Y0 + y, z, x, Y0 + y + h, z); }
+  for (let k = 0; k < n; k++) idx.push(2 * k, 2 * k + 2, 2 * k + 1, 2 * k + 1, 2 * k + 2, 2 * k + 3);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(pos.length / 3 * 2), 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  ajouterGeo(mat, g);
+}
 // un sol dont le dessin suit le monde (les morceaux de rue se raccordent sans couture)
 function solMonde(mat, x1, z1, x2, z2, y, taille = 8) {
   const g = new THREE.PlaneGeometry(x2 - x1, z2 - z1).rotateX(-Math.PI / 2).translate((x1 + x2) / 2, y, (z1 + z2) / 2);
@@ -4213,11 +4278,11 @@ function arbre(x, z, s = 1, y = Y0 + 0.2, sorte = 'rond') { morceauEn(x, z).arbr
 // etages : les étages qu'on visite (hEtage mètres chacun), reliés par un escalier au fond à gauche ;
 // plein : des étages en plus au-dessus, où on ne va pas ; toit : true = l'escalier monte jusqu'au toit,
 // 'dehors' = on monte sur le toit par dehors (une échelle, un escalier de secours) : il a un garde-fou, mais pas de trou ;
-// bas : à quelle hauteur il commence (un bâtiment posé sur un autre).
+// bas : à quelle hauteur il commence (un bâtiment posé sur un autre) ; solToit : ce qui couvre son toit (du gravier gris, sinon).
 // Les meubles se placent avec u (de gauche à droite) et w (du fond vers la porte), en mètres depuis le centre,
 // comme si la porte était au sud : le bâtiment se tourne tout seul (porte 's', 'n', 'e' ou 'o').
 function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein = 0, largeurPorte = 2.4, hauteurPorte = 2.6, decalagePorte = 0,
-                    sol: matSol = 'carrelage', mur = 'platre', toit = false, lampes = true, bas = 0 }) {
+                    sol: matSol = 'carrelage', mur = 'platre', toit = false, lampes = true, bas = 0, solToit = 'toit' }) {
   const E = 0.3, [a, b, c, d] = { s: [1, 0, 0, 1], n: [-1, 0, 0, -1], e: [0, 1, -1, 0], o: [0, -1, 1, 0] }[porte];
   const P = (u, w) => [x + a * u + b * w, z + c * u + d * w];
   const B = (m, u, y, w, lu, h, lw, coll = true) => { const [X, Z] = P(u, w); return boite(m, X, y, Z, b ? lw : lu, h, b ? lu : lw, coll); };
@@ -4254,13 +4319,13 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
     B('boisClair', k % 2 ? us + long - (s + 0.5) * pas : us + (s + 0.5) * pas, niveau(k), bande(k), pas, monte * (s + 1), 1.4); });
   // les planchers (un trou au-dessus de l'escalier qui arrive), et le toit
   for (let k = 1; k <= etages; k++) {
-    const y = niveau(k) - 0.3, dessus = k === etages && !plein ? 'toit' : matSol;
+    const y = niveau(k) - 0.3, auToit = k === etages && !plein, dessus = auToit ? solToit : matSol;
     let trou = null;
     if (k - 1 < vols) trou = (k - 1) % 2 ? [us - 0.2, us + long - 3 * pas + 0.2] : [us + 3 * pas - 0.2, us + long + 0.2];
     const morceauxDalle = trou ? [[-iu, trou[0], -iw, iw], [trou[1], iu, -iw, iw], [trou[0], trou[1], bande(k - 1) + 0.7, iw], [trou[0], trou[1], -iw, bande(k - 1) - 0.7]] : [[-iu, iu, -iw, iw]];
     for (const [u1, u2, w1, w2] of morceauxDalle) if (u2 - u1 > 0.01 && w2 - w1 > 0.01) {
-      const poser = () => { B(dessus === 'toit' ? 'dalle' : 'platre', (u1 + u2) / 2, y, (w1 + w2) / 2, u2 - u1, 0.3, w2 - w1); Plan(dessus, (u1 + u2) / 2, y + 0.305, (w1 + w2) / 2, u2 - u1, w2 - w1); };
-      if (dessus === 'toit') poser(); else dedans(poser);   // le toit se voit de loin (et fait de l'ombre) ; les planchers, non
+      const poser = () => { B(auToit ? 'dalle' : 'platre', (u1 + u2) / 2, y, (w1 + w2) / 2, u2 - u1, 0.3, w2 - w1); Plan(dessus, (u1 + u2) / 2, y + 0.305, (w1 + w2) / 2, u2 - u1, w2 - w1); };
+      if (auToit) poser(); else dedans(poser);   // le toit se voit de loin (et fait de l'ombre) ; les planchers, non
     }
   }
   if (plein) { // des étages pleins au-dessus, et un toit plat
@@ -4963,13 +5028,15 @@ function genererBloc(i, j) {
     garde(B, 5, b.point(-10, 0, 8)); garde(B, 4, b.point(10, 0, 8)); garde(B, 2, b.point(3, 0, 14));
     B.gyros.push({ x: X(22), y: Y0 + 6.2, z: Z(43.2) }, { x: X(38), y: Y0 + 6.2, z: Z(43.2) }, { ...P(0, -6), y: Y0 + sol0 + 3.3 });
     B.lumiere = { ...P(0, -6), y: Y0 + sol0 + 2.5 };
-  } else if (c === '<') { // la villa de Tony Stark, au bout de la pointe. En bas, l'atelier : la grande porte du garage donne sur la rue (au nord), avec
-    // deux de ses voitures, ses établis, ses écrans, Dum-E (son robot) et ses armures dans leurs vitrines. En haut, le salon, avec la vue sur la mer.
-    // Sur le toit, la plateforme où il se pose ; derrière, une terrasse et une piscine au-dessus de la falaise ; à l'ouest, le salon rond
+  } else if (c === '<') { // la villa de Tony Stark, au bout de la pointe, comme dans les films : un socle blanc, et au-dessus des murs tout en verre,
+    // entre de grands plateaux blancs aux bords arrondis, empilés et décalés comme un toit qui tourne (l'architecte John Lautner l'a inspirée). En bas, l'atelier : la grande porte
+    // du garage donne sur la rue (au nord), avec deux de ses voitures, ses établis, ses écrans, Dum-E (son robot) et ses armures dans leurs vitrines.
+    // En haut, le salon, et ses grandes baies sur la mer. Sur le toit, la plateforme où il se pose, et un auvent ; à l'est, le salon rond, en verre ;
+    // derrière, une terrasse et une piscine au-dessus de la falaise
     herbe();
     // la maison elle-même, dans son groupe à part (aPart) : la mission « La villa attaquée » la fait tomber dans la mer
     const villa = aPart = villaStark = { geos: {}, boites: [], interieurs: interieurs.length, x: X(30), z: Z(25), y: Y0 + 0.2, sud: Z(36), nord: Z(14) };
-    const b = batiment({ x: X(30), z: Z(25), l: 40, p: 22, mat: 'villa', porte: 'n', etages: 2, hEtage: 3.6, toit: true, sol: 'parquet', largeurPorte: 7, hauteurPorte: 3.2 });
+    const b = batiment({ x: X(30), z: Z(25), l: 40, p: 22, mat: 'villaStark', porte: 'n', etages: 2, hEtage: 3.6, toit: true, sol: 'parquet', largeurPorte: 7, hauteurPorte: 3.2, solToit: 'trottoir' });
     const atelier = interieurs.at(-1);
     sol('paves', X(30), 0.215, Z(10), 24, 8);                                          // devant la porte du garage
     // l'atelier (u : vers l'ouest ; w : vers la porte, au nord)
@@ -4986,19 +5053,60 @@ function genererBloc(i, j) {
     b.meuble('boisClair', 3, 1, -3.8, 2.6, 0.4, 1.4); b.meuble('noirMeuble', 13, 1, 4, 2.2, 1, 1.4); b.meuble('bois', -12, 1, 7.5, 6, 1.1, 1);   // la table basse, le piano, le bar
     vieuxReacteur = { ...b.point(3, 1, -3.8), dy: 0.4, a: Math.PI };   // sur la table basse : son tout premier réacteur, sous verre (mission « Iron Monger »)
     soins.push(b.point(-8, 1, 6));
-    sol('helipad', X(30), b.niveau(2) + 0.02, Z(25), 14, 14);                         // sur le toit, là où il se pose
-    // le salon rond, à l'ouest
-    geoBloc('villa', new THREE.CylinderGeometry(5.5, 5.5, 7.4, 28, 1, true).translate(X(54), 0.2 + 3.7, Z(28)));
-    geoBloc('toit', new THREE.CylinderGeometry(5.9, 5.9, 0.4, 28).translate(X(54), 7.8, Z(28)));
-    ajouterCollision(X(48.5), Z(22.5), X(59.5), Z(33.5), Y0 + 8, Y0);
+    b.meuble('vueMer', 0, 1, -b.iw + 0.03, 2 * b.iu, 3.2, 0.02, 0.05); b.meuble('vueMer', b.iu - 0.03, 1, 0, 0.02, 3.2, 2 * b.iw, 0.05);   // ses baies : la mer, au sud et à l'ouest
+    const haut = b.niveau(2);                                                          // le dessus du toit
+    sol('helipad', X(30), haut + 0.02, Z(25), 14, 14);                                // sur le toit, là où il se pose
+    // Dehors, les grands plateaux blancs arrondis, qui dépassent tout autour, décalés l'un sur l'autre comme un toit qui tourne : au 1er étage,
+    // un balcon qui s'avance en rond vers le sud-ouest, au-dessus de la terrasse ; au toit, un plus grand, qui s'avance vers le sud-est. Ils font
+    // aussi le plancher et le toit du salon rond, à l'est. Leur trou : la maison (on ne les voit pas dépasser dedans). Sur leur bord, un
+    // garde-corps en verre. On peut s'y poser. y : la hauteur du dessous, ep : l'épaisseur, formes : ce qu'ils couvrent, réuni
+    const maison = [X(10.15), Z(14.15), X(49.85), Z(35.85)];
+    const horsMaison = f => (x, z) => f(x, z) && !(x > maison[0] && x < maison[2] && z > maison[1] && z < maison[3]);
+    const plateaux = [
+      { y: 3.25, ep: 0.6, formes: [rectArrondi(X(6), Z(11.5), X(52.5), Z(40), 8), disque(X(19), Z(31), 11), disque(X(50.5), Z(32), 7.8)] },
+      { y: 7, ep: 0.8, formes: [rectArrondi(X(4.5), Z(11), X(53), Z(41), 10), disque(X(38), Z(32), 12), disque(X(50.5), Z(32.5), 8.3)] },
+    ];
+    for (const { y, ep, formes } of plateaux) {
+      const contour = contourDe(formes, X(30), Z(27));
+      dalleForme('betonBlanc', contour, y, ep, maison);
+      ruban('garde', contour, y + ep, 1); ruban('rambarde', contour, y + ep + 0.97, 0.06);
+      for (let k = 0; k < contour.length; k += 12) { // des petites lampes dessous, à 90 cm du bord
+        const [x, z] = contour[k], d = Math.hypot(X(30) - x, Z(27) - z);
+        boite('lampe', x + (X(30) - x) * 0.9 / d, y - 0.04, z + (Z(27) - z) * 0.9 / d, 0.25, 0.04, 0.25);
+      }
+      collisionsForme(horsMaison((x, z) => formes.some(f => f(x, z))), [X(2), Z(8), X(60), Z(46)], Y0 + y, Y0 + y + ep);
+    }
+    // le salon rond, à l'est : un cylindre de verre sur les deux étages, sous les plateaux, qui s'avance vers la mer. On ne fait que ce qui
+    // dépasse de la maison : de l'angle a1, où il sort de son mur sud, à l'angle a2, où il rentre dans son mur est (les angles partent du sud
+    // et tournent vers l'est). Son dessin : une vitre tous les 2 m, comme sur la maison
+    const r = 6.6, cx = X(50.5), cz = Z(32), [, , mx, mz] = maison;
+    const a1 = Math.atan2(-Math.sqrt(r * r - (mz - cz) ** 2), mz - cz), a2 = Math.atan2(mx - cx, -Math.sqrt(r * r - (mx - cx) ** 2)) + 2 * Math.PI;
+    const rotonde = new THREE.CylinderGeometry(r, r, 6.8, 48, 1, true, a1, a2 - a1), uv = rotonde.attributes.uv;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * r * (a2 - a1) / 8, uv.getY(i) * 6.8 / 10.8);
+    geoBloc('villaStark', rotonde.translate(cx, 0.2 + 3.4, cz));
+    collisionsForme(horsMaison(disque(cx, cz, r)), [X(43.5), Z(25), X(58), Z(39)], Y0, Y0 + 7, 0.5, true);
+    empreintes.push([cx - r, cz - r, 2 * r, 2 * r]);
+    // côté rue, au coin nord-ouest : un grand mur blanc courbe, sous le balcon (un quart de cercle de 9,6 m de rayon, épais de 35 cm)
+    const quart = R => Array.from({ length: 25 }, (_, k) => { const t = Math.PI * (1 + k / 48); return [X(17) + R * Math.cos(t), Z(21.5) + R * Math.sin(t)]; });
+    dalleForme('betonBlanc', [...quart(9.6), ...quart(9.25).reverse()], 0.2, 3.05);
+    collisionsForme((x, z) => { const d = Math.hypot(x - X(17), z - Z(21.5)); return d > 9 && d < 9.85 && x < X(17) && z < Z(21.5); }, [X(7), Z(11.5), X(17.5), Z(22)], Y0 + 0.2, Y0 + 3.25, 0.5, true);
+    // sur le toit, à l'ouest : un auvent arrondi sur quatre pilotis, encore plus haut et décalé (le toit tourne), et deux bains de soleil dessous
+    const auvent = [disque(X(13), Z(23), 7.5), disque(X(17), Z(32), 6.5)];
+    dalleForme('betonBlanc', contourDe(auvent, X(15), Z(27), 96), haut + 3.15, 0.4);
+    collisionsForme((x, z) => auvent.some(f => f(x, z)), [X(4), Z(14), X(25), Z(40)], Y0 + haut + 3.15, Y0 + haut + 3.55);
+    for (const [x, z] of [[11, 19], [17, 20], [11, 31], [18, 33]]) {
+      geoBloc('betonBlanc', new THREE.CylinderGeometry(0.16, 0.16, 3.15, 10).translate(X(x), haut + 1.575, Z(z)));
+      ajouterCollision(X(x) - 0.16, Z(z) - 0.16, X(x) + 0.16, Z(z) + 0.16, Y0 + haut + 3.15, Y0 + haut);
+    }
+    for (const x of [13, 15.8]) { boite('blanc', X(x), haut, Z(30), 0.8, 0.35, 2, true); boite('blanc', X(x), haut + 0.35, Z(29.15), 0.8, 0.5, 0.3, true); }
     aPart = null; villa.interieurs = interieurs.slice(villa.interieurs);
     // la terrasse, la piscine et leurs garde-corps, au-dessus de la falaise
     sol('paves', X(30), 0.215, Z(46), 44, 18);
     for (const [x, z, l, p] of [[30, 42.8, 18.6, 0.6], [30, 51.2, 18.6, 0.6], [21, 47, 0.6, 9], [39, 47, 0.6, 9]]) boite('pierre', X(x), 0.2, Z(z), l, 0.3, p, true);
     sol('piscine', X(30), 0.4, Z(47), 17.4, 7.8);
-    for (const x of [8, 52]) boite('rambarde', X(x), 0.2, Z(46), 0.08, 1.1, 18, true);
-    boite('rambarde', X(30), 0.2, Z(55), 44, 1.1, 0.08, true);
-    for (const [x, z] of [[6, 8], [54, 8], [5, 40], [55, 40]]) arbre(X(x), Z(z), 1, Y0 + 0.2, 'palmier');
+    for (const [x, z, p] of [[8, 46, 18], [52, 47.25, 15.5]]) { boite('garde', X(x), 0.2, Z(z), 0.06, 1.05, p, true); boite('rambarde', X(x), 1.25, Z(z), 0.08, 0.06, p); }   // (en verre)
+    boite('garde', X(30), 0.2, Z(55), 44, 1.05, 0.06, true); boite('rambarde', X(30), 1.25, Z(55), 44, 0.06, 0.08);
+    for (const [x, z] of [[6, 8], [54, 8], [4, 45], [56, 45]]) arbre(X(x), Z(z), 1, Y0 + 0.2, 'palmier');
   } else if (c === '|') { // la tour Stark : du verre sombre, STARK en lettres lumineuses sur les quatre côtés de sa couronne, un ascenseur jusqu'au toit,
     // et la plateforme d'Iron Man, accrochée au côté est, tout en haut
     const plein = 42, b = batiment({ x: X(30), z: Z(30), l: 32, p: 32, mat: 'stark', hEtage: 6, plein, largeurPorte: 6, hauteurPorte: 4 });
@@ -5654,7 +5762,7 @@ eau.position.set(TAILLE_X / 2, EAU, TAILLE_Z / 2); eau.receiveShadow = true; sce
 // fusion : quelques gros objets par morceau au lieu de milliers de petits (beaucoup plus rapide)
 const batiments = [];
 // les intérieurs (planchers, marches, meubles) ne font pas d'ombre : les murs et le toit la font déjà
-const SANS_OMBRE = ['platre', 'boisClair', 'parquet', 'carrelage', 'moquette', 'cuir', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'croix', 'enseigne', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'police', 'superette', 'customs', 'banque', 'yellowjack', 'essence', 'maze'];
+const SANS_OMBRE = ['garde', 'platre', 'boisClair', 'parquet', 'carrelage', 'moquette', 'cuir', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'croix', 'enseigne', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'police', 'superette', 'customs', 'banque', 'yellowjack', 'essence', 'maze'];
 const PAS_UN_MUR = ['lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'cable', 'trottoir', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'rambarde'];
 const GEO_ARBRE = {
   rond: [new THREE.CylinderGeometry(0.15, 0.25, 3, 7).translate(0, 1.5, 0),
@@ -14285,7 +14393,7 @@ function majEffondrement(dt) {
   }
   if (t < 7 && Math.random() < dt * 30) { // la poussière, et des morceaux de mur qui tombent
     const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#c8bca8'); s.position.set(V.x + entre(-25, 25), P.position.y + entre(0, 6), P.position.z + entre(-25, 5)); scene.add(s); effets.push({ o: s, vie: 2.5, fumee: 2.5, taille: 9 });
-    if (Math.random() < 0.3) { const e = new THREE.Mesh(new THREE.BoxGeometry(entre(0.5, 2), entre(0.3, 1.2), entre(0.3, 1.5)), MAT.villa); e.position.copy(s.position); scene.add(e); lancerDebris(e, V3(entre(-4, 4), entre(1, 5), entre(2, 8)), entre(3, 5), true); }
+    if (Math.random() < 0.3) { const e = new THREE.Mesh(new THREE.BoxGeometry(entre(0.5, 2), entre(0.3, 1.2), entre(0.3, 1.5)), MAT.betonBlanc); e.position.copy(s.position); scene.add(e); lancerDebris(e, V3(entre(-4, 4), entre(1, 5), entre(2, 8)), entre(3, 5), true); }
   }
   if (t < 7) J.secousse = Math.max(J.secousse || 0, 0.25 * proche);
 }
