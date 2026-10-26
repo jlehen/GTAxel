@@ -1814,6 +1814,7 @@ const REGLAGES = {
   imagesParSeconde: 60,      // le jeu ne dessine pas plus d'images par seconde que ça, même sur un écran rapide (120, 144 Hz...) : l'œil n'y voit presque rien de plus, mais l'ordinateur chauffe et la batterie se vide. 0 = autant que l'écran. Pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20. Si le jeu rame (moins de 60 au compteur, touche P), ça ne l'accélère pas : 30 le fait moins chauffer, un peu moins fluide mais régulier
   ombres: true,              // mets false si le jeu rame
   ombresPersonnages: 30,     // mètres : les passants, policiers et ennemis plus près que ça de la caméra ont une vraie ombre ; plus loin, une tache sombre sous les pieds, bien moins de travail (toi, tu gardes toujours la tienne). 0 = une tache pour tous. Si le jeu rame, mets 15 ; 150 = de vraies ombres pour presque tous, presque comme avant
+  sommeilVoitures: 60,       // mètres : une voiture garée plus loin que ça de toi, qui ne bouge plus depuis 2 s, « dort » : le jeu ne la recalcule plus à chaque image (la plupart des voitures du pays sont garées). Elle se réveille dès que tu t'approches, ou qu'on la touche. 0 = aucune ne dort (le jeu recalcule tout, comme avant : deux fois plus de calcul). Si le jeu rame, surtout pas 0 ; 30, si tu veux, mais ça ne gagne presque rien de plus
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
@@ -7712,6 +7713,7 @@ function habillerVoiture(v) {
   v.m.rotation.order = 'YXZ';   // elle tourne, puis elle penche (dans les pentes)
   v.m.traverse(o => o.userData.voiture = v);
   scene.add(v.m);
+  reveiller(v);   // (une voiture toute neuve : majVoiture doit la poser, et placer ses roues)
 }
 // passer du repère de la voiture (lx vers sa gauche, lz vers l'avant) au monde
 const local = (v, lx, lz) => ({ x: v.x + lx * Math.cos(v.angle) + lz * Math.sin(v.angle), z: v.z - lx * Math.sin(v.angle) + lz * Math.cos(v.angle) });
@@ -7851,6 +7853,7 @@ function tordreRoue(r, force) {
 // vitesseCrevaison, elle part en tête-à-queue du côté du pneu crevé, et parfois en tonneaux. Les pneus blindés ne crèvent pas
 function crever(v, r) {
   if (r.crevee || pasDeTole(v) || estBlindee(v)) return;
+  reveiller(v);   // (garée, elle dormait peut-être : elle doit s'affaisser de ce côté)
   r.crevee = true; r.pivot.scale.y = 0.75; r.pivot.position.y = v.forme.roue * 0.75;
   bruit(0.7 * clamp(1.3 - dist(v, J) / 60, 0, 1), 2500, 0.25);
   const s = Math.abs(v.vitesse), gauche = Math.sign(r.pivot.position.x);   // (la roue avant du tricycle, au milieu, ne tire d'aucun côté)
@@ -8053,7 +8056,10 @@ function majAccident(v, dt) {
     if (choc > 3) abimer(v, versVoiture(v, V3(avant.x - N.x * v.rayon, a.c.y, avant.z - N.z * v.rayon)), versVoiture(v, N, true), (choc - 3) * 0.03);   // comme un choc sur la route
   }
   for (const o of voitures) {
-    if (o === v || o.coule || dist(o, a.c) > (v.forme.longueur + o.forme.longueur) / 2 + 1 || Math.abs(o.y - v.y) > 2.5) continue;
+    if (o === v) continue;
+    const loin = (v.forme.longueur + o.forme.longueur) / 2 + 1, d = dist(o, a.c);
+    if (o.dort && d < loin + 6) reveiller(o);   // (une voiture qui dort, tout près : elle se réveille, voir bougerVoiture)
+    if (o.coule || d > loin || Math.abs(o.y - v.y) > 2.5) continue;
     // les points où les cercles se touchent : le coup est donné en leur milieu (C), dans leur direction moyenne (N)
     let n = 0; const C = V3(), N = V3();
     for (const lz of v.cercles) for (const oz of o.cercles) {
@@ -12585,7 +12591,10 @@ function bougerVoiture(v, dt, parJoueur) {
     }
   }
   for (const o of voitures) {
-    if (o === v || dist(o, v) > (v.forme.longueur + o.forme.longueur) / 2 + 1 || Math.abs(o.y - v.y) > 2) continue;
+    if (o === v) continue;
+    const loin = (v.forme.longueur + o.forme.longueur) / 2 + 1, d = dist(o, v);
+    if (o.dort && d < loin + 6) reveiller(o);   // une voiture qui dort, et qu'on va peut-être toucher : elle se réveille avant (6 m : plus qu'on ne roule en une image)
+    if (d > loin || Math.abs(o.y - v.y) > 2) continue;
     // chaque cercle de la voiture contre chaque cercle de l'autre. S'ils se touchent en plusieurs points (un choc en plein flanc),
     // le coup est donné au milieu de ces points : sinon, il serait donné à un bout, et l'autre voiture tournerait sur elle-même pour rien
     let n = 0, cx = 0, cz = 0, sx = 0, sz = 0;
@@ -12983,6 +12992,20 @@ function piloterBatmobile(v, dt, pilote) {
 // =====================================================================
 //  Intelligence des personnages
 // =====================================================================
+// Un passant loin derrière la caméra (à plus de 35 m, et à plus de 90° de là où elle regarde, même en regardant vers le bas) : personne ne
+// peut le voir. Lui faire bouger les bras et les jambes à chaque image ne servirait à rien : ils attendent comme ils sont, et repartent
+// d'où ils en étaient dès qu'il s'approche du bord de l'image (sur un écran 16/9, il reste encore 35° jusqu'au bord). Lui, il marche quand
+// même, à la même vitesse et par le même chemin. Mais s'il a une vraie ombre (p.ombreLoin faux : voir majOmbresPersonnages ; avec
+// ombresPersonnages grand, au coucher du soleil), elle peut s'allonger jusque dans l'image : alors ses bras et ses jambes bougent. Avec une
+// tache (ou sans ombres du tout), rien de lui ne se voit. Seulement les passants : un ennemi tire du bout de son arme, qui doit être à sa
+// place. La caméra ne sera placée qu'après (majCamera) : on regarde là où elle regardait à l'image d'avant, et là où B.J. regarde
+// maintenant (la souris a pu la retourner d'un coup) ; il faut être dans le dos des deux
+const dosCamera = new THREE.Vector3(), dosRegard = new THREE.Vector3();   // (mettreAJour les note avant de faire bouger les personnages)
+function dansLeDos(p) {
+  if (!p.ombreLoin && renderer.shadowMap.enabled) return false;   // (sa vraie ombre pourrait se voir)
+  const c = camera.position, dx = p.x - c.x, dy = p.y + 1 - c.y, dz = p.z - c.z;
+  return dx * dx + dy * dy + dz * dz > 35 * 35 && dx * dosCamera.x + dy * dosCamera.y + dz * dosCamera.z < 0 && dx * dosRegard.x + dy * dosRegard.y + dz * dosRegard.z < 0;
+}
 function majPersonne(p, dt) {
   const d = dist(p, J);
   p.h.g.visible = d < (p.lourd ? 450 : 220);   // (Iron Monger, si grand, se voit de plus loin)
@@ -13058,6 +13081,7 @@ function majPersonne(p, dt) {
   } else p.coince = 0;
   if (p.h.g.visible) {
     p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle;
+    if (p.type === 'pieton' && dansLeDos(p)) return;   // un passant que personne ne voit : ses bras et ses jambes attendent (voir dansLeDos)
     animerHumain(p.h, p.coince > 0.3 ? 0 : Math.abs(vitesse), dt, { arme, touche: p.touche / 0.3 });
     membresMous(p.h, dt, p.touche > 0 ? { raideur: 12, sol: p.y, jambes: false } : { sol: p.y });   // un coup : le haut du corps part et revient, la tête et les bras suivent
   }
@@ -13388,8 +13412,12 @@ function majVoitureIA(v, dt) {
   // Face à face, les deux attendent : l'une finira par faire demi-tour
   v.priorite ??= Math.random();
   const croise = o => o.conducteur && o.priorite < v.priorite && o.regard.x * v.regard.x + o.regard.z * v.regard.z > -0.9 && devantDe(o, v, 4.6 + o.forme.longueur / 2 + nez, 2);
-  let bloque = voitures.some(o => o !== v && devant(o, 4.6 + nez + o.forme.longueur / 2, 2) && !croise(o)) || robots.some(o => devant(o, 5 + nez, 2.5));
-  if (!v.police) bloque ||= (!J.voiture && devant(J, 4.8 + nez, 1.6)) || personnes.some(p => p.vie > 0 && devant(p, 4.8 + nez, 1.6));
+  // elle regarde toutes les voitures et tous les passants : pour aller vite, d'abord seulement s'ils sont tout près en x et en z (moins que
+  // la portée plus la largeur de devantDe : plus loin, ils ne peuvent pas être devant elle). Avec la foule, ça faisait des dizaines de milliers
+  // de regards par image, presque tous pour rien
+  const x = v.x, z = v.z, pres = (o, l) => Math.abs(o.x - x) < l && Math.abs(o.z - z) < l;
+  let bloque = voitures.some(o => o !== v && pres(o, 6.6 + nez + o.forme.longueur / 2) && devant(o, 4.6 + nez + o.forme.longueur / 2, 2) && !croise(o)) || robots.some(o => devant(o, 5 + nez, 2.5));
+  if (!v.police) bloque ||= (!J.voiture && devant(J, 4.8 + nez, 1.6)) || personnes.some(p => p.vie > 0 && pres(p, 6.4 + nez) && devant(p, 4.8 + nez, 1.6));
   v.attente = bloque ? v.attente + dt : 0;
   if (v.attente > 5) { // bloquée trop longtemps : demi-tour
     v.attente = 0;
@@ -13477,9 +13505,33 @@ function majSkisRando(v) {
     ski.peau.scale.z = Math.max(peau, 0.001); ski.peau.visible = peau > 0.01;
   });
 }
+// Les voitures qui dorment (REGLAGES.sommeilVoitures). La plupart des voitures du pays sont garées, loin de B.J. (au chapitre 1, 173 sur
+// 235) : chercher à chaque image le sol sous leurs roues, tourner leurs roues, pencher leur carrosserie, c'était plus de la moitié du
+// calcul des voitures, pour rien, puisqu'elles ne bougent pas. Alors une voiture garée qui ne bouge plus depuis 2 s s'endort : majVoiture
+// ne fait plus que la cacher quand elle est loin. Elle se réveille dès que quelque chose peut changer pour elle : B.J. qui s'approche,
+// quelqu'un qui monte dedans, une voiture qui arrive tout près (voir bougerVoiture), un choc, une balle, une explosion, le feu, un filet,
+// un pneu crevé (voir peutDormir, et reveiller), ou si on la déplace (sa place, son cap ou sa vitesse changent : v.dort les garde).
+// (Une voiture soufflée peut garder un reste de vitesse, moins de 0,05 m/s : elle n'avance déjà plus, mais ses roues tournaient encore
+// tout doucement sur place, un tour par minute ; endormie, elles s'arrêtent)
+function peutDormir(v, d) {
+  return R_.sommeilVoitures > 0 && d > R_.sommeilVoitures && v !== J.voiture && !v.conducteur && Math.abs(v.vitesse) <= 0.05
+    && !v.accident && !v.vol && !v.enVol && !v.rail && !v.quat && !(v.rotor > 0)   // (posée sur ses roues, le rotor arrêté)
+    && !v.abimee && !(v.brule > 0) && !v.detruite && !v.coule && !v.filet && !(v.panne > 0) && !v.gyro   // (rien qui fume, brûle, grésille ou clignote)
+    && !v.police && !v.epave && !v.ski && !v.telesiege && !v.suit && !v.happy && !v.type.bateau && !v.type.vitesseVol;   // (pas une épave qui disparaîtra, ni un bateau qui flotte, ni la Batmobile)
+}
+// elle dort encore si rien n'a changé pour elle ; sinon, elle se réveille
+function dortEncore(v, d) {
+  const s = v.dort;
+  return peutDormir(v, d) && v.x === s.x && v.y === s.y && v.z === s.z && v.angle === s.angle && v.vitesse === s.vitesse && v.vy === s.vy;
+}
+// on la réveille (un pneu crevé, une voiture refaite à neuf, le sol qui s'effondre sous elle...) : elle ne se rendormira qu'après 2 s sans bouger.
+// Si tu inventes quelque chose qui change une voiture garée sans la déplacer (une roue, sa couleur, le sol sous elle...), appelle
+// reveiller(v) : endormie, elle ne le verrait pas. Et ce que tu ajoutes dans majVoiture ne se fait pas pour une voiture qui dort
+function reveiller(v) { v.dort = null; v.immobile = 0; }
 function majVoiture(v, dt) {
   const d = dist(v, J);
   v.m.visible = d < 350;
+  if (v.dort) { if (dortEncore(v, d)) return; reveiller(v); }   // elle dort : il n'y a rien à faire (voir peutDormir)
   if (J.telesiege && v === J.voiture) return;   // sur le télésiège avec B.J. : monterTelesiege la porte
   if (v.ski && v.conducteur !== 'skieur') v.ski = v.telesiege = null;   // un autre skieur qui est tombé, ou à qui B.J. a pris ses skis
   if (v.telesiege) { majSkieur(v, dt); return; }   // un autre skieur sur une remontée
@@ -13616,6 +13668,9 @@ function majVoiture(v, dt) {
     v.detruite += dt; v.feu.visible = v.detruite < 12; v.feu.scale.setScalar(2 + Math.random());
     if (v.detruite > 40 && d > 60) v.supprimer = true;
   }
+  // garée, elle ne bouge plus depuis 2 s (elle est bien posée sur le sol) : elle s'endort (voir peutDormir)
+  v.immobile = peutDormir(v, d) ? (v.immobile || 0) + dt : 0;
+  if (v.immobile > 2) v.dort = { x: v.x, y: v.y, z: v.z, angle: v.angle, vitesse: v.vitesse, vy: v.vy };
 }
 
 // faire apparaître piétons et voitures autour du joueur (hors de sa vue)
@@ -15307,6 +15362,7 @@ function effondrerVilla() {
   if (!V || V.tombee) return;
   V.tombee = true;
   for (const b of V.boites) { b.hAvant = b.h; b.h = -Infinity; }
+  for (const v of voitures) reveiller(v);   // (le sol change sous les voitures de l'atelier : celles qui dormaient doivent tomber)
   for (const d of V.interieurs) d.cache = true;
   if (cadreReacteur) cadreReacteur.visible = false;
   let zb = V.sud; while (zb < V.sud + 250 && hauteurTerrain(V.x, zb) > V.y - 15) zb += 2;     // le bord de la falaise, au sud
@@ -15340,6 +15396,7 @@ function majEffondrement(dt) {
 function releverVilla() {
   const V = villaStark;
   for (const b of V.boites) b.h = b.hAvant;
+  for (const v of voitures) reveiller(v);   // (le sol revient sous les voitures)
   for (const d of V.interieurs) d.cache = false;
   if (cadreReacteur) cadreReacteur.visible = true;
   V.pivot.position.set(V.x, V.y, V.sud); V.pivot.rotation.set(0, 0, 0);
@@ -16861,6 +16918,8 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
   auraBJ.material.map.offset.y -= dt * 1.5; auraBJ.material.opacity = (0.45 + Math.random() * 0.25) * (auraBJ.userData.avantInvisible ? 0.15 : 1);   // l'aura monte et tremble (on la voit à peine quand il est invisible)
   if (capeBJ.parent) majCape(dt);   // la cape de Superman flotte au vent
+  // (pour les passants qu'on ne voit pas : voir dansLeDos)
+  camera.getWorldDirection(dosCamera); dosRegard.set(Math.sin(J.lacet) * Math.cos(J.tangage), Math.sin(J.tangage), Math.cos(J.lacet) * Math.cos(J.tangage));
   for (const p of personnes) majPersonne(p, dt);
   for (const v of voitures) majVoiture(v, dt);
   for (const r of robots) majRobot(r, dt);
