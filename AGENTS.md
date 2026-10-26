@@ -12,6 +12,15 @@ GTAxel est un jeu 3D dans le navigateur, entièrement contenu dans `index.html`.
    - les limites connues et les pistes, si ta modification en règle une ou en crée une ;
    - la date de mise à jour, en haut du document (la date seule, sans résumé) ;
    - le « Journal des modifications », tout à la fin : une puce par changement, en tête du jour concerné, le jour le plus récent en premier.
-4. Si la modification change les touches, les armes, la carte ou les missions, mets aussi à jour `README.md`.
+4. Si la modification change les touches, les armes, la carte ou les missions, mets aussi à jour `README.md`. Il parle des missions à plusieurs endroits, qui doivent suivre le code :
+   - « Les missions du chapitre 1 » : une ligne par mission de `MISSIONS`, dans le même ordre, avec son `nom` et ce qu'il faut faire ;
+   - « Malibu (chapitre 2) » : la liste numérotée des missions de `MISSIONS_MALIBU`, dans le même ordre, avec leur `nom` en gras, puis `DELOREAN_MANDARIN` en dernier ;
+   - les nombres de missions : « B.J. (les 11 missions) » dans le tableau des chapitres, « Malibu a ses 12 missions d'Iron Man » juste en dessous, et « C'est la 11e mission » au camp militaire ;
+   - les exemples du code `MISSION` (`MISSION8` : le musée ; `MISSION11` : le camp militaire), dans « Les codes de triche » ;
+   - les noms de mission cités ailleurs (la mission « Hulkbuster », au magasin de Stark Industries) ;
+   - dans « Modifier le jeu », `MISSIONS` : les tableaux des étapes et la liste des ennemis de `eliminer`, si tu ajoutes un type d'étape ou un ennemi ;
+   - quand un autre chapitre reçoit ses missions (Gotham, Metropolis, New York) : une section comme celle de Malibu, et la phrase « Les autres chapitres n'ont pour l'instant qu'une mission » à corriger.
+
+   Pour n'en oublier aucun : `grep -n -i mission README.md`.
 
 Une modification n'est pas terminée tant que `DESIGN.md` ne correspond pas au code.
