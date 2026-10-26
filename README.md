@@ -41,12 +41,15 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | **Personnage** | **B.J.**, le garçon tout en muscles, ou sa fille **Jess**, en jupe et talons hauts. Le menu te le montre de face. |
 | **Cheveux** | Blonds, châtains, bruns, noirs, roux, roses, bleus ou verts. |
 | **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. Pour voir ce que ça change, appuie sur **P** pendant le jeu : le compteur de performances te dit combien d'images par seconde le jeu dessine (plus il y en a, plus c'est fluide : 60, c'est parfait ; moins de 25, ça rame). Le jeu n'en dessine jamais plus de 60, même sur un écran plus rapide (120 ou 144 Hz) : ça suffit, et l'ordinateur chauffe moins (le réglage `imagesParSeconde`, dans ⚙ Réglages : 0 = autant que l'écran). Et si ta carte graphique n'arrive pas à suivre, le jeu dessine tout seul l'image un peu moins fine (un peu plus floue) pour rester fluide, puis la remet quand tout va bien : le compteur te montre la finesse du moment (« finesse 1,25 (auto) »). |
+| **Qualité** | La qualité des images : **Basse**, **Moyenne** ou **Haute**. Au départ, c'est Haute (le jeu tel qu'il est). Si le jeu rame encore, prends Moyenne, puis Basse. Moyenne : les ombres du soleil un peu plus floues, les bâtiments et les arbres visibles jusqu'à 700 m au lieu de 900, 4 lampadaires qui éclairent vraiment la nuit au lieu de 8, et une image un peu moins fine sur un écran Retina. Basse : plus d'ombres du soleil du tout, des bords un peu en escalier (sans anticrénelage), une vue jusqu'à 500 m, 2 lampadaires, et sur un écran Retina, un point d'image par point d'écran. |
 | **Chapitre** | Retourner dans un chapitre que tu as déjà ouvert. |
 | **↺ Nouvelle partie** | Tout effacer pour recommencer au chapitre 1. |
 | **⚙ Réglages** | Tous les nombres du jeu, à changer sans toucher au code (voir [Modifier le jeu](#modifier-le-jeu)). |
 | **🎮 Codes de triche** | Tous les codes de triche du jeu. |
 
 - Le navigateur se souvient de ta langue, et de **ta partie** : ton chapitre, tes missions, ton argent et tes armes.
+- Pour changer la qualité, le jeu recharge la page (pendant une partie, il te demande d'abord : tu gardes ton argent, tes armes et tes missions réussies, mais tu repars du départ, comme avec F5 : la mission en cours recommence, et tes codes de triche s'éteignent). Le navigateur se souvient de ton choix.
+- La qualité change d'un coup plusieurs cases de **⚙ Réglages** (elles deviennent jaunes) : si tu en changes une toi-même, la qualité devient « personnalisée » (c'est ta case qui compte), et **Tout remettre** revient à Haute.
 - Tu peux changer de personnage quand tu veux, même en pause (Échap).
 - Sous le menu, la liste des touches est celle du chapitre où tu es : à Malibu, celles de l'armure d'Iron Man ; à Gotham, celles de Batman, et ainsi de suite.
 - En allemand et en anglais, les touches pour se déplacer sont W A S D (et l'armure d'Iron Man s'appelle avec Q W E au lieu de A Z E).
@@ -787,6 +790,7 @@ Pour les tableaux `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `ENNEMIS`, `CA
 - Le jeu en tient compte tout de suite (pour la carte, les ombres ou les ennemis déjà là, appuie sur F5).
 - Les cases changées sont en jaune, et le navigateur s'en souvient. **Tout remettre** revient aux nombres du code.
 - Si tu changes le même nombre dans le code, c'est le code qui gagne.
+- La qualité du menu (Basse, Moyenne, Haute) change d'un coup quelques-unes de ces cases (`anticrenelage`, `ombres`, `ombreSoleil`, `ombresPersonnages`, `distanceVue`, `lumieresNuit`, `finesse`, `finesseMin`) ; si tu en changes une à la main, la qualité devient « personnalisée », et c'est ta case qui compte. Haute, ce sont les nombres du code.
 
 ### Dans le code
 
@@ -796,7 +800,7 @@ Les tableaux, dans l'ordre où ils sont dans le fichier, de haut en bas :
 |---|---|
 | [`HEROS` et `CHEVEUX`](#heros-et-cheveux) | Les héros du menu et leurs couleurs de cheveux |
 | [`CHAPITRES`](#chapitres) | Les chapitres : ville, héros, tenue, logo, pluie, brouillard... |
-| [`FOULES`](#foules) | Le nombre de piétons et de voitures |
+| [`FOULES` et `QUALITES`](#foules-et-qualites) | Le nombre de piétons et de voitures, et les qualités du menu |
 | [`TRADUCTIONS` et `LANGUES`](#traductions-et-langues) | Les phrases du jeu dans les autres langues |
 | [`REGLAGES`](#reglages) | Les nombres de tout le jeu |
 | [`ARMES`, `TRESORS` et `ARMES_ROBOT`](#armes-tresors-et-armes_robot) | Les armes et les objets à voler |
@@ -831,9 +835,11 @@ Juste après `HEROS` et `CHEVEUX`. Pour chaque chapitre :
 
 Les nombres de l'amende et du voyage sont dans [`REGLAGES`](#reglages).
 
-#### `FOULES`
+#### `FOULES` et `QUALITES`
 
 Le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
+
+Juste après, `QUALITES` : les nombres de `REGLAGES` que donne chaque qualité du menu (Basse, Moyenne, Haute). Change-les, ou invente un niveau : `'Très basse': { ombres: false, distanceVue: 300 }` (ce qu'un niveau ne dit pas ne change pas). Haute, ce sont les nombres de `REGLAGES` : si tu en changes un dans `REGLAGES`, change-le aussi dans Haute.
 
 #### `TRADUCTIONS` et `LANGUES`
 
@@ -854,8 +860,9 @@ Les nombres de tout le jeu :
 - **Jusqu'où on voit** : `distanceRelief`, les montagnes et la mer (10 km) ; `distanceVue`, les bâtiments et les arbres (900 m).
 - **Les ombres des gens** : `ombresPersonnages` : les passants plus près que ça de la caméra (30 m) ont une vraie ombre, les autres une tache sombre sous les pieds (0 = une tache pour tous).
 - **Les voitures garées** : `sommeilVoitures` : les voitures garées à plus de 60 m de toi, qui ne bougent plus, « dorment » : le jeu ne les recalcule plus à chaque image, et elles se réveillent dès que tu t'approches ou qu'on les touche (0 = aucune ne dort).
+- **Les bords et les ombres du soleil** : `anticrenelage` : les bords des objets bien lisses (`false` : un peu en escalier, mais bien moins de travail pour la carte graphique). `ombreSoleil` : la finesse des ombres du soleil (2048 points de côté pour 180 m ; 1024 : un peu plus floues, 4 fois moins de points).
 
-**Si le jeu rame**, mets `distanceVue: 500`, `ombresPersonnages: 15`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ). `imagesParSeconde` : le jeu ne dessine pas plus d'images par seconde (60 ; 0 = autant que l'écran ; 30 pour que l'ordinateur chauffe moins ; pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20). `finesse` : combien de points le jeu dessine pour chaque point de ton écran (1,5 ; jamais plus que ton écran n'en a : 1 sur un écran ordinaire ; 0.75 = un peu flou, mais presque deux fois moins de travail pour la carte graphique) ; avec `finesseAuto: true`, le jeu la baisse tout seul quand la carte graphique n'arrive pas à suivre, mais jamais sous `finesseMin` (0.75), et la remonte quand tout va bien (`finesseAuto: false` : toujours `finesse`).
+**Si le jeu rame**, choisis d'abord la qualité Moyenne ou Basse dans le menu ; ou mets toi-même `distanceVue: 500`, `ombresPersonnages: 15`, `ombres: false`, `anticrenelage: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ). `imagesParSeconde` : le jeu ne dessine pas plus d'images par seconde (60 ; 0 = autant que l'écran ; 30 pour que l'ordinateur chauffe moins ; pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20). `finesse` : combien de points le jeu dessine pour chaque point de ton écran (1,5 ; jamais plus que ton écran n'en a : 1 sur un écran ordinaire ; 0.75 = un peu flou, mais presque deux fois moins de travail pour la carte graphique) ; avec `finesseAuto: true`, le jeu la baisse tout seul quand la carte graphique n'arrive pas à suivre, mais jamais sous `finesseMin` (0.75), et la remonte quand tout va bien (`finesseAuto: false` : toujours `finesse`).
 
 #### `ARMES`, `TRESORS` et `ARMES_ROBOT`
 
