@@ -40,7 +40,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | **Langue** | **Français**, **Deutsch**, **English** ou **Züritüütsch**. Même les enseignes des magasins changent de langue. |
 | **Personnage** | **B.J.**, le garçon tout en muscles, ou sa fille **Jess**, en jupe et talons hauts. Le menu te le montre de face. |
 | **Cheveux** | Blonds, châtains, bruns, noirs, roux, roses, bleus ou verts. |
-| **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. Pour voir ce que ça change, appuie sur **P** pendant le jeu : le compteur de performances te dit combien d'images par seconde le jeu dessine (plus il y en a, plus c'est fluide : 60, c'est parfait ; moins de 25, ça rame). Le jeu n'en dessine jamais plus de 60, même sur un écran plus rapide (120 ou 144 Hz) : ça suffit, et l'ordinateur chauffe moins (le réglage `imagesParSeconde`, dans ⚙ Réglages : 0 = autant que l'écran). |
+| **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. Pour voir ce que ça change, appuie sur **P** pendant le jeu : le compteur de performances te dit combien d'images par seconde le jeu dessine (plus il y en a, plus c'est fluide : 60, c'est parfait ; moins de 25, ça rame). Le jeu n'en dessine jamais plus de 60, même sur un écran plus rapide (120 ou 144 Hz) : ça suffit, et l'ordinateur chauffe moins (le réglage `imagesParSeconde`, dans ⚙ Réglages : 0 = autant que l'écran). Et si ta carte graphique n'arrive pas à suivre, le jeu dessine tout seul l'image un peu moins fine (un peu plus floue) pour rester fluide, puis la remet quand tout va bien : le compteur te montre la finesse du moment (« finesse 1,25 (auto) »). |
 | **Chapitre** | Retourner dans un chapitre que tu as déjà ouvert. |
 | **↺ Nouvelle partie** | Tout effacer pour recommencer au chapitre 1. |
 | **⚙ Réglages** | Tous les nombres du jeu, à changer sans toucher au code (voir [Modifier le jeu](#modifier-le-jeu)). |
@@ -69,7 +69,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | 1 à 8 ou molette | Changer d'arme |
 | 9 | Les armes des codes de triche : voir [La touche 9](#la-touche-9) |
 | M ou Tab | Carte de tout le pays (molette : zoom ; souris ou flèches : se déplacer) |
-| P | Le compteur de performances, en bas à droite de la mini-carte (P encore : il s'éteint) : les images par seconde, le temps de calcul et de dessin de chaque image, les appels de dessin et les triangles. Pratique pour voir ce qui fait ramer le jeu |
+| P | Le compteur de performances, en bas à droite de la mini-carte (P encore : il s'éteint) : les images par seconde, le temps de calcul et de dessin de chaque image, les appels de dessin et les triangles, et la finesse de l'image. Pratique pour voir ce qui fait ramer le jeu |
 | Entrée | Taper un code de triche |
 | Échap | Pause |
 | Q S D, 3 fois de suite | Danser comme Michael Jackson : voir [La danse](#la-danse) |
@@ -855,7 +855,7 @@ Les nombres de tout le jeu :
 - **Les ombres des gens** : `ombresPersonnages` : les passants plus près que ça de la caméra (30 m) ont une vraie ombre, les autres une tache sombre sous les pieds (0 = une tache pour tous).
 - **Les voitures garées** : `sommeilVoitures` : les voitures garées à plus de 60 m de toi, qui ne bougent plus, « dorment » : le jeu ne les recalcule plus à chaque image, et elles se réveillent dès que tu t'approches ou qu'on les touche (0 = aucune ne dort).
 
-**Si le jeu rame**, mets `distanceVue: 500`, `ombresPersonnages: 15`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ). `imagesParSeconde` : le jeu ne dessine pas plus d'images par seconde (60 ; 0 = autant que l'écran ; 30 pour que l'ordinateur chauffe moins ; pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20).
+**Si le jeu rame**, mets `distanceVue: 500`, `ombresPersonnages: 15`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ). `imagesParSeconde` : le jeu ne dessine pas plus d'images par seconde (60 ; 0 = autant que l'écran ; 30 pour que l'ordinateur chauffe moins ; pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20). `finesse` : combien de points le jeu dessine pour chaque point de ton écran (1,5 ; jamais plus que ton écran n'en a : 1 sur un écran ordinaire ; 0.75 = un peu flou, mais presque deux fois moins de travail pour la carte graphique) ; avec `finesseAuto: true`, le jeu la baisse tout seul quand la carte graphique n'arrive pas à suivre, mais jamais sous `finesseMin` (0.75), et la remonte quand tout va bien (`finesseAuto: false` : toujours `finesse`).
 
 #### `ARMES`, `TRESORS` et `ARMES_ROBOT`
 
