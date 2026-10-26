@@ -2074,8 +2074,10 @@ const ENNEMIS = {
   // taille (combien de fois plus grand que toi), vol (sa vitesse en volant, en m/s), givre (à cette hauteur, en mètres, son armure gèle : il tombe !)
   anneaux:   { nom: 'Combattant des Dix Anneaux', vie: 75, arme: 5, degats: 8, precision: 0.35, vue: 45, tir: [1, 2], vitesse: 4.5 },
   // Raza, leur chef : chauve, avec un lance-roquettes (arme 6 : le bazooka). degats : une de ses roquettes en plein (dans la Mark I, c'est elle
-  // qui les prend, et elle recule en titubant)
-  raza:      { nom: 'Raza',          vie: 2000, arme: 6, degats: 90, precision: 0.5, vue: 70, tir: [2.5, 4], vitesse: 4.5, boss: true },
+  // qui les prend, et elle recule en titubant). explosions : la part des dégâts d'une explosion qu'il prend (0.2 = 20 % : il a l'habitude,
+  // c'est lui qui tire au bazooka !) : tes fusées ne suffisent plus. recule : il garde ses distances, et recule quand tu t'approches à moins
+  // de tant de mètres (les lance-flammes de la Mark I portent à 20 m)
+  raza:      { nom: 'Raza',          vie: 2500, arme: 6, degats: 90, precision: 0.5, vue: 70, tir: [2.5, 4], vitesse: 4.5, boss: true, explosions: 0.2, recule: 21 },
   monger:    { nom: 'Iron Monger',   vie: 9000, degats: 8, degatsRoquette: 25, precision: 0.3, vue: 120, tir: [2, 3.5], vitesse: 3.5, taille: 2.6, vol: 24, givre: 450, boss: true },
   rescape:   { nom: 'Habitant de la tour', vie: 50 },   // ceux qu'Iron Man sauve de la tour en feu (mission « Le pompier volant »)
   // Whiplash (Ivan Vanko) et ses deux fouets électriques : degats (un coup de fouet), degatsEclair (l'éclair qu'il lance de loin, toutes les
@@ -2407,20 +2409,20 @@ const VILLES = {
       "~~~44565443344555443233455543321,,,,,,,,,,,,,1111:!!!!!^!!!!!^!!!!!::_~~~~",  // 10
       "~~~~4555433234444432223444443221,,,,,,,,,,,,,:::::!!@!!!!!!!!!!!!@!::__~~~",  // 11
       "~~~~4444432223333332223334333211;,,;,;,,,,;,;:::::NNE::::::::::::::::__~~~",  // 12
-      "~~~~334333223334443332223332211,,,;;,,,,,,;,,::===:::=:::::::::::::::_~~~~",  // 13
-      "~~~~23332223344555443322222211;;;;,,,,,,,;;;;:=:::::::=::::::::::::::__~~~",  // 14
-      "~~~12222222344555554432211111,,,,,,,;,,,,,;,;=:::::::::=:::::::::::::_~~~~",  // 15
-      "~~~~2223333345666665433211111,,,,,,,;;;,,;,,=:::::::::::=::::::::::::_~~~~",  // 16
-      "~~~223333334556777655432222211,,;;,MMIMM,;;=;::::::::::::=:::::::::::_~~~~",  // 17
-      "~~~2334444445567876554323332211,;,;MSPIM,,=,,:::::::::::::=::::::::::__~~~",  // 18
-      "~~~~3445554455677765543334333211;,=IMHMM==,,,::::::::::::::=:::::::::_~~~~",  // 19
-      "~~~~4455655445666665433444443221;=;MMEMI,,,,,:::::::::11111=::1::::::_~~~~",  // 20
-      "~~~34556665544555554433455543321=,,,,=,,;,,,;:::::::::122211=22211:::__~~~",  // 21
-      "~~~3456676654445554433445654432=;,;;;=,,;,,;,:::::::::123211=333211::__~~~",  // 22
-      "~~~~45566655433444333334555433=1,;,,,,=;,,;;;:::::::::1222123=44321::_~~~~",  // 23
-      "~~~34455655443333332223444443=21,;11111=1,,;;:::::::::1111234=54432::__~~~",  // 24
-      "~~~3344555443322222212333433=211,1122222=1,,,::::::::::::12345=5432211_~~~",  // 25
-      "~~~233444443=====1122222333=211,112333332=111111::::::::::2345=54333221~~~",  // 26
+      "~~~~334333223334443332223332211,,,;;,,,,,,;,,::===:::::::::::::::::::_~~~~",  // 13
+      "~~~~23332223344555443322222211;;;;,,,,,,,;;;;:=::::::::::::::::::::::__~~~",  // 14
+      "~~~12222222344555554432211111,,,,,,,;,,,,,;,;=:::::::::::::::::::::::_~~~~",  // 15
+      "~~~~2223333345666665433211111,,,,,,,;;;,,;,,=::::::::::::::::::::::::_~~~~",  // 16
+      "~~~223333334556777655432222211,,;;,MMIMM,;;=;::::::::::::::::::::::::_~~~~",  // 17
+      "~~~2334444445567876554323332211,;,;MSPIM,,=,,::::::::::::::::::::::::__~~~",  // 18
+      "~~~~3445554455677765543334333211;,=IMHMM==,,,::::::::::::::::::::::::_~~~~",  // 19
+      "~~~~4455655445666665433444443221;=;MMEMI,,,,,:::::::::111111::1::::::_~~~~",  // 20
+      "~~~34556665544555554433455543321=,,,,=,,;,,,;:::::::::122211122211:::__~~~",  // 21
+      "~~~3456676654445554433445654432=;,;;;=,,;,,;,:::::::::1232112333211::__~~~",  // 22
+      "~~~~45566655433444333334555433=1,;,,,,=;,,;;;:::::::::1222123444321::_~~~~",  // 23
+      "~~~34455655443333332223444443=21,;11111=1,,;;:::::::::1111234454432::__~~~",  // 24
+      "~~~3344555443322222212333433=211,1122222=1,,,::::::::::::1234555432211_~~~",  // 25
+      "~~~233444443=====1122222333=211,112333332=111111::::::::::2345554333221~~~",  // 26
       "~~~22333333=2221,==2333222=211,,123344433=1222221:::::::::1235)53444322~~~",  // 27
       "~~~~222333=33322112==4432=111111123455543=22333221::::::::1127774555432~~~",  // 28
       "~~~~11222=34443211234==3=1,*1122223456543=234443211111:::::11555556554~~~~",  // 29
@@ -8434,7 +8436,7 @@ const TENUES = {
 // volent partout (VOLANTS), comme Whiplash, qui marche dans les rues. Les vigiles, les chiens et les gangs restent aussi dans leur pâté, mais
 // n'attaquent que si on les provoque
 const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'raza', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron', 'voyou'], VIGILES = ['garde', 'chien', 'gang'];
-const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron'], LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron'];
+const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron'], LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron', 'raza'];
 const LIBRES = ['whiplash', 'killian', 'hulk'];   // ceux-là ne gardent pas de pâté : ils vont où ils veulent
 const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
 const personnes = [];
@@ -8446,7 +8448,7 @@ function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z
   const h = type === 'chien' ? creerChien() : CORPS[type] ? CORPS[type](tenue) : creerHumain(tenue);
   if (type === 'boss') h.g.scale.setScalar(1.15);
   const p = { type, h, x, y, z, angle: Math.random() * 6.28, vie: ENNEMIS[type]?.vie, cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
-  if (LOURDS.includes(type)) p.lourd = true;   // Iron Monger, Whiplash, Killian, un hélicoptère : rien ne les fait voler à la renverse (voir projeter)
+  if (LOURDS.includes(type)) p.lourd = true;   // Iron Monger, Whiplash, Killian, Raza, un hélicoptère : rien ne les fait voler à la renverse (voir projeter)
   if (ENNEMIS[type]?.arme !== undefined) { p.armeIdx = ENNEMIS[type].arme; donnerArme(h, p.armeIdx); }
   if (type === 'militaire' && ARMES[p.armeIdx]?.auto) p.rafale = 0;   // à la mitraillette, en rafales
   h.g.traverse(o => o.userData.personne = p);
@@ -8659,7 +8661,7 @@ function exploser(pos, rayon, degatsPNJ, degatsJoueur, tireur = null, foudre = f
   bruit(clamp(1.2 - dist(pos, J) / 150, 0, 1), 350, 1.4);
   if (degatsPNJ) for (const p of personnes) { // elle blesse et souffle les personnages : ils volent à la renverse
     const d = Math.hypot(p.x - pos.x, p.y + 1 - pos.y, p.z - pos.z), k = 1 - d / rayon, dx = p.x - pos.x, dz = p.z - pos.z, l = Math.hypot(dx, dz) || 1;
-    if (p.vie > 0 && p !== tireur && d < rayon) { blesser(p, degatsPNJ * k, parJoueur); projeter(p, dx / l * (3 + 9 * k), 3 + 6 * k, dz / l * (3 + 9 * k), -3 - 8 * k); }
+    if (p.vie > 0 && p !== tireur && d < rayon) { blesser(p, degatsPNJ * k * (fiche(p)?.explosions ?? 1), parJoueur); projeter(p, dx / l * (3 + 9 * k), 3 + 6 * k, dz / l * (3 + 9 * k), -3 - 8 * k); }   // (explosions : Raza a l'habitude, elles lui font moins mal)
   }
   const d = Math.hypot(J.x - pos.x, J.y + 1 - pos.y, J.z - pos.z);
   if (d < rayon && degatsJoueur) { blesserJoueur(degatsJoueur * (1 - d / rayon), true, pos); soufflerJoueur(pos, 1 - d / rayon, tireur); }   // (degatsJoueur = 0 : les fusées de l'armure, qui épargnent B.J.)
@@ -13003,7 +13005,8 @@ function majPersonne(p, dt) {
       arme = true;
       const vise = angleVers(p, J);
       p.angle = lerpAngle(p.angle, militaire && !p.voitJ && !p.poste ? capCamp(p, vise) : vise, 8 * dt);   // (au camp militaire, celui qui ne voit pas B.J. contourne les bâtiments)
-      if (!p.voitJ || d > 22) vitesse = fiche(p).vitesse; else if (d < 6) vitesse = -2;
+      const recule = fiche(p).recule;   // (Raza garde ses distances : il recule aussi vite qu'il avance, hors de portée des lance-flammes)
+      if (!p.voitJ || d > 22) vitesse = fiche(p).vitesse; else if (d < (recule ?? 6)) vitesse = recule ? -fiche(p).vitesse : -2;
       if (p.poste) vitesse = 0;   // posté en hauteur (un mirador, un toit) : il ne bouge pas, il tire
       if (p.voitJ && p.cooldown <= 0 && Math.abs(diffAngle(p.angle, vise)) < 0.3) {
         // les vigiles et les policiers d'élite à la mitraillette ou au fusil d'assaut tirent en rafales de 3 à 5 balles
