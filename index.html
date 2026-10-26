@@ -1810,9 +1810,10 @@ const REGLAGES = {
   // la vie, les dégâts et la précision des policiers, des nazis et des autres ennemis : voir ENNEMIS, après les voitures
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
-  compteur: false,           // true = le compteur de performances (touche P) est allumé dès le départ : les images par seconde, et ce qui coûte. Si le jeu rame, allume-le, puis change ombres, distanceVue ou la foule du menu, et regarde ce qui baisse
+  compteur: false,           // true = le compteur de performances (touche P) est allumé dès le départ : les images par seconde, et ce qui coûte. Si le jeu rame, allume-le, puis change ombres, ombresPersonnages, distanceVue ou la foule du menu, et regarde ce qui baisse
   imagesParSeconde: 60,      // le jeu ne dessine pas plus d'images par seconde que ça, même sur un écran rapide (120, 144 Hz...) : l'œil n'y voit presque rien de plus, mais l'ordinateur chauffe et la batterie se vide. 0 = autant que l'écran. Pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20. Si le jeu rame (moins de 60 au compteur, touche P), ça ne l'accélère pas : 30 le fait moins chauffer, un peu moins fluide mais régulier
   ombres: true,              // mets false si le jeu rame
+  ombresPersonnages: 30,     // mètres : les passants, policiers et ennemis plus près que ça de la caméra ont une vraie ombre ; plus loin, une tache sombre sous les pieds, bien moins de travail (toi, tu gardes toujours la tienne). 0 = une tache pour tous. Si le jeu rame, mets 15 ; 150 = de vraies ombres pour presque tous, presque comme avant
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
@@ -8479,7 +8480,8 @@ const CORPS = { monger: () => creerMonger(), whiplash: t => creerWhiplash(t, fal
 function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z)) {
   const h = type === 'chien' ? creerChien() : CORPS[type] ? CORPS[type](tenue) : creerHumain(tenue);
   if (type === 'boss') h.g.scale.setScalar(1.15);
-  const p = { type, h, x, y, z, angle: Math.random() * 6.28, vie: ENNEMIS[type]?.vie, cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0 };
+  const p = { type, h, x, y, z, angle: Math.random() * 6.28, vie: ENNEMIS[type]?.vie, cooldown: 1, peur: 0, alerte: false, vuTimer: Math.random() * 0.3, voitJ: false, mort: 0,
+    ombreLoin: false, solOmbre: null };   // (son ombre : voir majOmbresPersonnages)
   if (LOURDS.includes(type)) p.lourd = true;   // Iron Monger, Whiplash, Killian, un hélicoptère : rien ne les fait voler à la renverse (voir projeter)
   if (ENNEMIS[type]?.arme !== undefined) { p.armeIdx = ENNEMIS[type].arme; donnerArme(h, p.armeIdx); }
   if (type === 'militaire' && ARMES[p.armeIdx]?.auto) p.rafale = 0;   // à la mitraillette, en rafales
@@ -16660,6 +16662,96 @@ function majPhares() {
     if (o.faisceau) o.faisceau.visible = voir;
   }
 }
+// Les ombres des personnages (REGLAGES.ombresPersonnages). Chacune des vingt pièces d'un personnage dessine son ombre dans la carte des
+// ombres du soleil : avec la foule, c'était plus de la moitié des appels de dessin de l'image. Alors seuls ceux qui sont près de la caméra
+// ont une vraie ombre. Plus loin, une tache sombre et douce sous leurs pieds, allongée à l'opposé du soleil comme une vraie ombre, et
+// seulement là où le soleil fait des ombres (90 m autour de B.J.). Toutes les taches sont dessinées d'un seul coup (un lot). B.J. garde
+// toujours sa vraie ombre (et un hélicoptère du Mandarin aussi : il est gros comme une voiture).
+// La tache est faite comme l'ombre d'un objet (ShadowMaterial, retouchée) : elle ne noircit que ce que le soleil (ou la lune) éclaire.
+// Dans l'ombre d'un immeuble, ou dans une maison, elle disparaît d'elle-même, comme une vraie ombre
+const TACHES_MAX = 300;   // (s'il y a plus de monde que ça, les derniers n'ont pas de tache)
+const ECART_OMBRE = 2;    // mètres : la vraie ombre part 2 m plus loin que la limite, et revient 2 m plus près, pour ne pas clignoter juste à la limite
+const GEO_TACHE = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);   // (couchée par terre : de -0,5 à 0,5 en x et en z)
+GEO_TACHE.setAttribute('force', new THREE.InstancedBufferAttribute(new Float32Array(TACHES_MAX), 1));   // (pour chaque tache, de 0 à 1 : elle pâlit quand il saute)
+const M_TACHE = new THREE.ShadowMaterial({ color: '#000', depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 });
+M_TACHE.onBeforeCompile = s => { // ShadowMaterial noircit ce qui est dans l'ombre : on lui fait noircir ce qui est au soleil, en rond, plus fort au milieu
+  const ombre = 'opacity * ( 1.0 - getShadowMask() )';
+  if (!s.vertexShader.includes('#include <begin_vertex>') || !s.fragmentShader.includes(ombre)) alert('Ombres : le programme « ShadowMaterial » de Three.js a changé !');
+  s.vertexShader = 'attribute float force;\nvarying float vForce;\nvarying vec2 vTache;\n' + s.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n\tvForce = force; vTache = position.xz * 2.0;');
+  s.fragmentShader = 'varying float vForce;\nvarying vec2 vTache;\n' + s.fragmentShader.replace(ombre, 'opacity * vForce * getShadowMask() * ( 1.0 - smoothstep( 0.3, 1.0, length( vTache ) ) )');
+};
+const ombresLoin = new THREE.InstancedMesh(GEO_TACHE, M_TACHE, TACHES_MAX);
+ombresLoin.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+ombresLoin.count = 0; ombresLoin.frustumCulled = false; ombresLoin.receiveShadow = true;
+ombresLoin.renderOrder = -1;   // (dessinées avant les autres objets transparents : derrière une vitre, elles restent derrière)
+ombresLoin.raycast = () => {};   // les balles passent à travers
+scene.add(ombresLoin);
+// ceux qui n'ont pas de vraie ombre : on les cache juste le temps de dessiner la carte des ombres (sans parcourir leurs vingt pièces)
+const sansVraieOmbre = [];
+{
+  const dessinerOmbres = renderer.shadowMap.render;
+  renderer.shadowMap.render = function (lumieres, s, c) {
+    if (s !== scene || !sansVraieOmbre.length) return dessinerOmbres.call(this, lumieres, s, c);
+    for (const g of sansVraieOmbre) { g.userData.vu = g.visible; g.visible = false; }   // (on retient s'il était visible, pour le remettre comme avant)
+    try { return dessinerOmbres.call(this, lumieres, s, c); } finally { for (const g of sansVraieOmbre) g.visible = g.userData.vu; }
+  };
+}
+// la force d'une tache : ce qu'une vraie ombre enlève de lumière au sol (mesuré : 20 à 30 % quand le soleil est haut, 45 % quand il est bas),
+// moins quand il se couche, et bien moins au clair de lune
+const forceDesOmbres = () => (0.45 - 0.24 * Math.max(0, directionLumiere.y)) * Math.min(1, soleil.intensity / 4.5);
+// la place d'une tache (gardée d'une tache à l'autre : rien n'est fabriqué à chaque image)
+const POSE_TACHE = new THREE.Matrix4(), LARGEUR_TACHE = new THREE.Vector3(), HAUT_TACHE = new THREE.Vector3(0, 1, 0), LONGUEUR_TACHE = new THREE.Vector3();
+// à chaque image, après le ciel (le soleil a bougé) et la caméra : qui a une vraie ombre, et où sont les taches des autres
+function majOmbresPersonnages() {
+  sansVraieOmbre.length = 0; ombresLoin.count = 0; ombresLoin.visible = false;
+  if (!renderer.shadowMap.enabled) return;   // (REGLAGES.ombres : pas d'ombres du tout, ni vraies, ni taches)
+  const L = R_.ombresPersonnages, cam = camera.position, zone = soleil.shadow.camera.right;
+  const force = forceDesOmbres(), f = GEO_TACHE.attributes.force.array;
+  let aChercher = 10;   // (quand le soleil a tourné, on ne cherche à nouveau le sol que sous 10 taches par image : pas toutes d'un coup)
+  // l'ombre part à l'opposé de la lumière, d'autant plus loin que le soleil est bas (jusqu'à 3 fois sa taille)
+  const dh = Math.hypot(directionLumiere.x, directionLumiere.z), sx = dh > 1e-3 ? -directionLumiere.x / dh : 0, sz = dh > 1e-3 ? -directionLumiere.z / dh : 1;
+  const allonge = Math.min(3, dh / Math.max(1e-3, directionLumiere.y));
+  for (const p of personnes) {
+    const g = p.h.g, o = g.position;
+    if (!g.visible || p.h.helico) continue;   // (trop loin de B.J. : il n'est pas dessiné du tout)
+    const taille = g.scale.y, d = cam.distanceTo(o);
+    p.ombreLoin = !(L > 0) || d > L * Math.max(1, taille) + (p.ombreLoin ? -ECART_OMBRE : ECART_OMBRE);   // (un géant, comme Iron Monger, a sa vraie ombre de plus loin)
+    if (!p.ombreLoin) continue;
+    sansVraieOmbre.push(g);
+    // sa tache : pas la nuit sans lune, pas hors de la zone des ombres, ni s'il vole, flotte dans l'eau ou qu'on le porte
+    const n = ombresLoin.count;
+    if (force < 0.02 || n >= TACHES_MAX || Math.abs(o.x - J.x) > zone || Math.abs(o.z - J.z) > zone || p.vol || p.flotte || p.secours === 'porte') continue;
+    // sa longueur : couché par terre (mort, renversé, pris dans un filet), il ne fait qu'une ombre courte
+    const couche = p.vie <= 0 || p.releve !== undefined || p.pris;
+    const large = 0.5 * g.scale.x, long = large + allonge * (couche ? 0.3 : p.h.chien ? 0.8 : 1.75) * taille;
+    // le sol sous ses pieds, et sous la tache : cherché seulement quand il a bougé de 30 cm, ou que son ombre a tourné ou changé de longueur
+    const s = p.solOmbre ||= { x: Infinity, y: 0, z: 0, sol: 0, sx: 0, sz: 0, long: 0, pente: 0, rond: false };
+    if (Math.abs(o.x - s.x) + Math.abs(o.z - s.z) > 0.3 || Math.abs(o.y - s.y) > 0.3
+      || ((Math.abs(sx - s.sx) + Math.abs(sz - s.sz) > 0.05 || Math.abs(long - s.long) > 0.3) && aChercher-- > 0)) {
+      s.x = o.x; s.y = o.y; s.z = o.z; s.sx = sx; s.sz = sz; s.long = long;
+      s.sol = hauteurSol(o.x, o.z, o.y);
+      // le sol au bout de la tache et à mi-chemin : une pente bien régulière, la tache la suit ; un bord (trottoir, toit, pont, falaise),
+      // elle flotterait dans le vide : elle reste ronde, juste sous ses pieds
+      const e = long - large / 2, bout = hauteurSol(o.x + sx * e, o.z + sz * e, s.sol + 0.5), milieu = hauteurSol(o.x + sx * e / 2, o.z + sz * e / 2, s.sol + 0.5);
+      s.pente = (bout - s.sol) / e;
+      s.rond = Math.abs(milieu - (s.sol + bout) / 2) > 0.06 || Math.abs(s.pente) > 1.5;
+      if (s.rond) s.pente = 0;
+    }
+    const haut = o.y - s.sol;
+    if (haut > 1.5 || s.sol < EAU) continue;   // loin au-dessus du sol (il saute, il vole), ou dans l'eau
+    // (la tache est un carré de 1 m couché par terre : on l'étire de large × l, on la tourne vers l'ombre, on la penche comme la pente, et on
+    // la pose sous lui, 10 cm au-dessus du sol)
+    const l = s.rond ? large : long, c = (l - large) / 2;
+    POSE_TACHE.makeBasis(LARGEUR_TACHE.set(sz * large, 0, -sx * large), HAUT_TACHE, LONGUEUR_TACHE.set(sx * l, s.pente * l, sz * l))
+      .setPosition(o.x + sx * c, s.sol + s.pente * c + 0.1, o.z + sz * c);
+    ombresLoin.setMatrixAt(n, POSE_TACHE);
+    f[n] = 1 - Math.max(0, haut) / 1.5;
+    ombresLoin.count = n + 1;
+  }
+  if (!ombresLoin.count) return;
+  ombresLoin.visible = true; M_TACHE.opacity = force;
+  ombresLoin.instanceMatrix.needsUpdate = true; GEO_TACHE.attributes.force.needsUpdate = true;
+}
 // à chaque image : le soleil, la lune, le ciel, la brume, les lumières et les fenêtres
 function majCiel(dt) {
   const { a } = ouEnEst(), u = ciel.material.uniforms;
@@ -16699,6 +16791,7 @@ function majCiel(dt) {
   M_HALO.color.copy(C.halo).multiplyScalar(lumiere.nuit);
   M_PHARE.emissiveIntensity = 1.5 + 4 * lumiere.nuit; M_FEU.emissiveIntensity = 1 + 2 * lumiere.nuit;
   majLumieresNuit(dt); majPhares();
+  majOmbresPersonnages();   // (après le soleil, qui vient de bouger)
 }
 // dormir dans une villa de B.J. : on passe au début du moment suivant de la journée, avec toute sa vie
 let sommeil = null;   // { t : depuis combien de secondes il dort (à l'horloge), fait : le moment suivant est arrivé }
@@ -17043,6 +17136,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get chute() { return chute; }, get facture() { return facture; }, FETE_DES_ARMURES, tourStark,
   galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
   mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; }, compteur, allumerCompteur, compter, preparation, A_PREPARER,
+  ombresLoin, M_TACHE, majOmbresPersonnages, sansVraieOmbre, forceDesOmbres,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
