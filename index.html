@@ -481,6 +481,8 @@ const TRADUCTIONS = {
   '{programmes} programmes · {formes} formes · {textures} textures': { de: '{programmes} Shader · {formes} Formen · {textures} Texturen', en: '{programmes} shaders · {formes} geometries · {textures} textures',
     gsw: '{programmes} Shader · {formes} Forme · {textures} Texture' },
   'JS : {mo} Mo':             { de: 'JS: {mo} MB', en: 'JS: {mo} MB', gsw: 'JS: {mo} MB' },
+  'finesse {f}':              { de: 'Auflösung {f}', en: 'resolution {f}', gsw: 'Uflösig {f}' },
+  'finesse {f} (auto)':       { de: 'Auflösung {f} (auto)', en: 'resolution {f} (auto)', gsw: 'Uflösig {f} (auto)' },
   // les armes, les véhicules, le butin
   'Poings':           { de: 'Fäuste', en: 'Fists', gsw: 'Füüscht' },
   'Couteau':          { de: 'Messer', en: 'Knife', gsw: 'Mässer' },
@@ -1812,6 +1814,9 @@ const REGLAGES = {
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
   compteur: false,           // true = le compteur de performances (touche P) est allumé dès le départ : les images par seconde, et ce qui coûte. Si le jeu rame, allume-le, puis change ombres, ombresPersonnages, distanceVue ou la foule du menu, et regarde ce qui baisse
   imagesParSeconde: 60,      // le jeu ne dessine pas plus d'images par seconde que ça, même sur un écran rapide (120, 144 Hz...) : l'œil n'y voit presque rien de plus, mais l'ordinateur chauffe et la batterie se vide. 0 = autant que l'écran. Pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20. Si le jeu rame (moins de 60 au compteur, touche P), ça ne l'accélère pas : 30 le fait moins chauffer, un peu moins fluide mais régulier
+  finesse: 1.5,              // la finesse de l'image : combien de points le jeu dessine pour chaque point de ton écran (jamais plus que ton écran n'en a). 1 = un pour un ; 0.75 = un peu flou, mais presque deux fois moins de points à colorier pour la carte graphique. Avec finesseAuto, c'est la plus fine ; sans, c'est toujours celle-là
+  finesseAuto: true,         // true = le jeu règle tout seul la finesse : si les images arrivent trop lentement parce que la carte graphique n'arrive pas à colorier tous les points, il en dessine moins (un peu plus flou, mais de nouveau fluide), et il remonte quand tout va bien. false = toujours la finesse ci-dessus. Si le jeu rame, laisse true (le compteur, touche P, montre la finesse du moment)
+  finesseMin: 0.75,          // ...mais jamais moins fine que ça, même si le jeu rame encore (0.5 = très flou)
   ombres: true,              // mets false si le jeu rame
   ombresPersonnages: 30,     // mètres : les passants, policiers et ennemis plus près que ça de la caméra ont une vraie ombre ; plus loin, une tache sombre sous les pieds, bien moins de travail (toi, tu gardes toujours la tienne). 0 = une tache pour tous. Si le jeu rame, mets 15 ; 150 = de vraies ombres pour presque tous, presque comme avant
   sommeilVoitures: 60,       // mètres : une voiture garée plus loin que ça de toi, qui ne bouge plus depuis 2 s, « dort » : le jeu ne la recalcule plus à chaque image (la plupart des voitures du pays sont garées). Elle se réveille dès que tu t'approches, ou qu'on la touche. 0 = aucune ne dort (le jeu recalcule tout, comme avant : deux fois plus de calcul). Si le jeu rame, surtout pas 0 ; 30, si tu veux, mais ça ne gagne presque rien de plus
@@ -3928,7 +3933,7 @@ function presDePiste(x, z, marge) {
 //  Moteur 3D
 // =====================================================================
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.setPixelRatio(clamp(R_.finesse, 0.25, devicePixelRatio || 1));   // la finesse de l'image (finesse, dans REGLAGES) ; avec finesseAuto, reglerFinesse la change en jouant
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.5;
@@ -17016,10 +17021,11 @@ function majRepere(dt) {
 //  - les images par seconde, et ce que prend une image, en millisecondes : le calcul (tout ce qui bouge, la caméra, l'écran, le ciel...)
 //    et le dessin (le temps que le processeur passe à envoyer la scène à la carte graphique ; ce qu'elle met à dessiner ne se voit pas ici) ;
 //  - les appels de dessin (un par objet dessiné, et encore un pour son ombre) et les triangles de la dernière image ;
-//  - les programmes de la carte graphique (les shaders), les formes et les textures qu'elle garde, et la mémoire du JavaScript.
+//  - les programmes de la carte graphique (les shaders), les formes et les textures qu'elle garde, la mémoire du JavaScript, et la finesse
+//    de l'image (et si le jeu la règle tout seul : voir reglerFinesse).
 // Change un réglage (ombres, distanceVue, la foule du menu...) et regarde ce qui baisse ! Éteint, il ne fait rien.
 const compteur = { allume: false, reglage: null, images: 0, calcul: 0, dessin: 0, debut: 0,   // (ce qu'il additionne en attendant d'écrire)
-  ips: 0, msCalcul: 0, msDessin: 0, appels: 0, triangles: 0, programmes: 0, formes: 0, textures: 0, memoireJS: null };   // (ses derniers chiffres)
+  ips: 0, msCalcul: 0, msDessin: 0, appels: 0, triangles: 0, programmes: 0, formes: 0, textures: 0, memoireJS: null, finesse: 0 };   // (ses derniers chiffres)
 const formatsCompteur = {};   // (fabriquer une façon d'écrire les nombres coûte plus cher que de s'en servir : on les garde)
 function allumerCompteur(oui) {
   compteur.allume = oui;
@@ -17039,14 +17045,15 @@ function compter(debut, avantDessin) {
   Object.assign(C, { ips: C.images * 1000 / (fin - C.debut), msCalcul: C.calcul / C.images, msDessin: C.dessin / C.images,
     programmes: info.programs?.length ?? 0, formes: info.memory.geometries, textures: info.memory.textures,
     memoireJS: performance.memory ? performance.memory.usedJSHeapSize / 1e6 : null,   // (seulement dans Chrome et Edge)
-    images: 0, calcul: 0, dessin: 0, debut: fin });
+    finesse: renderer.getPixelRatio(), images: 0, calcul: 0, dessin: 0, debut: fin });
   const n = (x, chiffres = 0) => (formatsCompteur[langue + chiffres] ||=   // (les nombres écrits à la façon de la langue : 1 234,5 ou 1,234.5)
     new Intl.NumberFormat(langue === 'gsw' ? 'de-CH' : langue, { minimumFractionDigits: chiffres, maximumFractionDigits: chiffres })).format(x);
   $('compteur').textContent = [
     tr('{ips} i/s · calcul {calcul} ms · dessin {dessin} ms', { ips: n(C.ips, C.ips < 10 ? 1 : 0), calcul: n(C.msCalcul, 1), dessin: n(C.msDessin, 1) }),
     tr('{appels} appels de dessin · {triangles} triangles', { appels: n(C.appels), triangles: n(C.triangles) }),
     tr('{programmes} programmes · {formes} formes · {textures} textures', { programmes: C.programmes, formes: n(C.formes), textures: n(C.textures) }),
-    ...(C.memoireJS === null ? [] : [tr('JS : {mo} Mo', { mo: n(C.memoireJS) })]),   // (des lignes courtes : le compteur reste étroit)
+    [...(C.memoireJS === null ? [] : [tr('JS : {mo} Mo', { mo: n(C.memoireJS) })]),   // (des lignes courtes : le compteur reste étroit)
+      tr(R_.finesseAuto ? 'finesse {f} (auto)' : 'finesse {f}', { f: n(C.finesse, 2) })].join(' · '),
   ].join('\n');
 }
 
@@ -17069,15 +17076,92 @@ function imageAFaire(t) {
   return true;
 }
 
+// La finesse de l'image (finesse, finesseAuto et finesseMin, dans REGLAGES) : combien de points le jeu dessine pour chaque point de l'écran.
+// Une petite carte graphique (un portable, un vieil ordinateur) n'arrive pas toujours à colorier tous les points de l'image à temps : le jeu
+// rame, sans qu'on sache pourquoi. Avec finesseAuto, il se règle tout seul. Il regarde les images, une demi-seconde après l'autre :
+//  - si elles arrivent trop lentement depuis 2 s (plus de 20 ms chacune, moins de 50 par seconde ; ou nettement moins vite que le plafond
+//    imagesParSeconde), il descend d'un cran (FINESSES)... sauf si c'est le calcul qui prend presque tout ce temps : là, dessiner moins de
+//    points ne servirait à rien. Puis il vérifie que les images vont vraiment plus vite ; sinon, il remonte, et n'essaie plus de descendre
+//    pendant 30 s (puis 1, 2, 4 minutes) ;
+//  - si elles arrivent au plafond depuis 10 s, il essaie de remonter d'un cran. Si ça rame de nouveau, il redescend, et attendra deux fois
+//    plus longtemps avant de réessayer de monter (20 s, 40 s... jusqu'à 160 s).
+// Jamais plus d'un changement toutes les 2 s : changer la finesse refait toute l'image. Seules les images normales du jeu comptent : pas
+// le menu, la grande carte, l'écran du chapitre ou la mort, ni l'image d'après un trou (l'onglet caché, plus d'1 s sans image).
+const FINESSES = [2, 1.75, 1.5, 1.25, 1, 0.85, 0.75, 0.6, 0.5, 0.4, 0.3];   // les crans, du plus fin au plus flou (seulement ceux entre finesse et finesseMin)
+const finesse = { crans: [], cran: 0, max: 0, min: 0, auto: null,   // les crans permis (0 : le plus fin), et celui où l'on est
+  image: -1,                          // l'image d'avant : son temps de calcul (ms), ou -1 si ce n'était pas une image normale du jeu
+  duree: 0, images: 0, calcul: 0,     // la demi-seconde en cours : sa durée, ses images, leur temps de calcul
+  fenetres: [], lentes: 0, rapides: 0,   // les 4 dernières demi-secondes ([ms par image, ms de calcul]), et combien de lentes (ou de rapides) de suite
+  change: -1e9, verif: null, montee: null, interdit: 0, pause: 30000, attente: 10000 };   // (voir jugerFinesse)
+// au début de chaque image, avant de la dessiner (ecart : le temps depuis l'image d'avant, en ms)
+function reglerFinesse(t, ecart) {
+  const F = finesse, max = clamp(R_.finesse, 0.25, devicePixelRatio || 1), min = clamp(R_.finesseMin, 0.25, max);
+  if (max !== F.max || min !== F.min || !!R_.finesseAuto !== F.auto) {   // au départ, ou un réglage a changé (dans le menu ⚙), ou le zoom du navigateur : on repart du plus fin
+    Object.assign(F, { max, min, auto: !!R_.finesseAuto, crans: [max, ...FINESSES.filter(f => f < max && f > min), ...(min < max ? [min] : [])],
+      verif: null, montee: null, interdit: 0, pause: 30000, attente: 10000 });
+    changerFinesse(0, -1e9);
+  }
+  if (F.auto) jugerFinesse(t, ecart);
+  const voulue = F.auto ? F.crans[F.cran] : max;
+  if (renderer.getPixelRatio() !== voulue) renderer.setPixelRatio(voulue);   // (cette image-là n'est pas encore dessinée : elle le sera à la nouvelle finesse)
+}
+function changerFinesse(cran, t) {
+  finesse.cran = cran; finesse.change = t;
+  recompter();
+}
+function recompter() {   // on oublie les images d'avant, on recommence à compter
+  const F = finesse;
+  F.duree = F.images = F.calcul = F.lentes = F.rapides = F.fenetres.length = 0;
+}
+// verif : il vient de descendre, et vérifie (avant : le temps d'une image juste avant). montee : l'heure où il vient de monter.
+// interdit : pas de descente avant cette heure-là (pause : la prochaine fois, combien de temps). attente : combien de temps tout doit aller
+// bien avant de remonter
+function jugerFinesse(t, ecart) {
+  const F = finesse, calcul = F.image;
+  if (calcul < 0 || ecart > 1000) { recompter(); return; }   // pas une image normale, ou un trou : on recommence à compter
+  if (t - F.change < 500) return;   // juste après un changement, l'image refaite peut accrocher : on ne compte pas
+  F.duree += ecart; F.images++; F.calcul += calcul;
+  if (F.duree < 500) return;
+  const ms = F.duree / F.images;   // cette demi-seconde : le temps d'une image, en moyenne
+  F.fenetres.push([ms, F.calcul / F.images]); if (F.fenetres.length > 4) F.fenetres.shift();
+  F.duree = F.images = F.calcul = 0;
+  const pas = 1000 / (R_.imagesParSeconde > 0 ? Math.max(20, R_.imagesParSeconde) : 60);   // le temps d'une image au plafond (sans plafond : 60 par seconde, ça suffit)
+  F.lentes = ms > Math.max(20, 1.2 * pas) ? F.lentes + 1 : 0;
+  F.rapides = ms < 1.1 * Math.max(pas, 1000 / 60) ? F.rapides + 1 : 0;
+  if (F.montee && t - F.montee > 10000) { F.attente = 10000; F.montee = null; }   // monté depuis 10 s sans redescendre : réussi
+  // il vient de descendre : au bout de 2 s (4 demi-secondes), les images vont-elles vraiment plus vite ?
+  if (F.verif) { F.verif.somme += ms; F.verif.n++; }
+  if (F.verif?.n === 4) {
+    const plusVite = F.verif.somme / 4 < 0.95 * F.verif.avant;
+    F.verif = null;
+    if (!plusVite) {   // même pas 5 % : ce n'était pas la carte graphique. On remonte, et on n'essaie plus de descendre pendant un moment
+      F.interdit = t + F.pause; F.pause = Math.min(2 * F.pause, 240000);
+      changerFinesse(F.cran - 1, t); return;
+    }
+    F.pause = 30000;
+  }
+  const moyenne = k => F.fenetres.reduce((s, f) => s + f[k], 0) / F.fenetres.length;
+  const pasLeCalcul = moyenne(1) < 0.75 * moyenne(0);   // (le calcul prend moins des trois quarts du temps d'une image)
+  if (F.lentes >= 4 && F.cran < F.crans.length - 1 && t - F.change >= 2000 && (F.montee || (t >= F.interdit && pasLeCalcul))) {   // ça rame depuis 2 s, et pas à cause du calcul (ou il vient de monter : il revient où ça allait) : un cran plus bas
+    if (F.montee) F.attente = Math.min(2 * F.attente, 160000);   // il venait de monter : raté, il attendra deux fois plus longtemps avant de réessayer
+    F.montee = null; F.verif = { avant: moyenne(0), somme: 0, n: 0 };
+    changerFinesse(F.cran + 1, t);
+  } else if (F.cran > 0 && F.rapides * 500 >= F.attente && t - F.change >= 2000) {   // tout va bien depuis assez longtemps : un cran plus haut
+    F.montee = t;
+    changerFinesse(F.cran - 1, t);
+  }
+}
+
 let dernier = performance.now();   // l'heure de la dernière image dessinée
 function boucle(t) {
   if (!imageAFaire(t)) { requestAnimationFrame(boucle); return; }   // le plafond d'images par seconde : cette image-là est sautée, elle ne coûte rien (le pas de temps de la suivante comptera tout le temps écoulé)
   const debutImage = performance.now();   // (pour le compteur de performances)
+  reglerFinesse(t, t - dernier);   // la finesse de l'image, d'après les images d'avant (finesseAuto), avant de dessiner celle-ci
   animerEcran(t);   // l'écran du chapitre, s'il est affiché (son logo, par-dessus le jeu) : au même plafond
   const dt = clamp((t - dernier) / 1000 * R_.vitesseJeu, 0, 0.05);   // (REGLAGES.vitesseJeu ralentit tout le jeu)
   const horloge = R_.vitesseJeu > 0 ? clamp((t - dernier) / 1000, 0, 1) : 0;   // le vrai temps écoulé : la journée dure ce qu'il faut, même si le jeu rame
   dernier = t;
-  if (carte.ouverte) { dessinerGrandeCarte(dt); compter(debutImage, performance.now()); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
+  if (carte.ouverte) { finesse.image = -1; dessinerGrandeCarte(dt); compter(debutImage, performance.now()); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
   if (enJeu && !ecranChapitre.bloque()) mettreAJour(dt, horloge); else if (!enJeu) dessinerApercu(dt);   // dans le menu : l'aperçu du héros (et le jeu attend que l'écran du chapitre s'en aille)
   majCamera(dt); majRepere(dt); majHUD(dt); majLaser(dt);
   majCiel(dt);   // le soleil (ou la lune), le ciel, la brume, les lumières de la nuit
@@ -17091,6 +17175,7 @@ function boucle(t) {
   if (vm.userData.arme?.userData.sceptre) { vm.position.x -= 0.52; vm.position.y -= 0.1; vm.rotation.x = -J.recul * 0.25; }   // le sceptre : dans la main gauche, et il part en avant à chaque éclair
   if (vm.userData.arme) vm.userData.arme.visible = !joueurH.arme || joueurH.arme.visible;   // il l'a rangée (pour nager, voler...) : comme à la 3e personne
   const avantDessin = performance.now();
+  finesse.image = enJeu && !ecranChapitre.visible && !J.mort ? avantDessin - debutImage : -1;   // (pour la finesse automatique : une image normale du jeu, et son temps de calcul)
   renderer.clear();
   renderer.render(scene, camera);
   // (pas en voiture, ni dans le heavy robot ou une armure : c'est leur arme à eux qui tire)
@@ -17195,7 +17280,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get chute() { return chute; }, get facture() { return facture; }, FETE_DES_ARMURES, tourStark,
   galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
   mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; }, compteur, allumerCompteur, compter, preparation, A_PREPARER,
-  ombresLoin, M_TACHE, majOmbresPersonnages, sansVraieOmbre, forceDesOmbres,
+  ombresLoin, M_TACHE, majOmbresPersonnages, sansVraieOmbre, forceDesOmbres, finesse, reglerFinesse, FINESSES,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
