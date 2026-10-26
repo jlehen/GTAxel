@@ -413,6 +413,7 @@ const TRADUCTIONS = {
     en: 'You are {nom}. Roam Los Santos and the countryside, hunt the Nazis and take out Hitler in Castle Wolfenstein, on top of Mount Chiliad!',
     gsw: 'Du bisch {nom}. Streif dur Los Santos und d Umgäbig, jag d Nazis und mach de Hitler im Schloss Wolfenstein uf em Mount Chiliad fertig!' },
   'Chargement… (il faut une connexion Internet)': { de: 'Lädt… (braucht eine Internetverbindung)', en: 'Loading… (needs an Internet connection)', gsw: 'Am Lade… (es bruucht Internet)' },
+  'Préparation des images…':       { de: 'Bilder werden vorbereitet…', en: 'Preparing the graphics…', gsw: 'Bilder wärdet vorbereitet…' },
   'Clique pour jouer':             { de: 'Klicke zum Spielen', en: 'Click to play', gsw: 'Klick zum Spile' },
   'Personnage :':     { de: 'Figur:', en: 'Character:', gsw: 'Figur:' },
   'Garçon':           { de: 'Junge', en: 'Boy', gsw: 'Bueb' },
@@ -10996,7 +10997,7 @@ function lancerJeu() {
   renderer.domElement.requestPointerLock?.();
   debutChapitre();   // la première fois : l'écran du chapitre s'en va, la DeLorean arrive, les bulles d'aide
 }
-$('menu').addEventListener('click', lancerJeu);
+// (le clic sur le menu lance le jeu dès que ses programmes sont compilés : voir preparerProgrammes, tout à la fin)
 function validerTriche() {
   if (saisie === null) { // on ouvre la saisie
     saisie = ''; for (const k in touches) touches[k] = false;
@@ -16927,17 +16928,72 @@ function boucle(t) {
   compter(debutImage, avantDessin);   // le compteur de performances (touche P)
   requestAnimationFrame(boucle);
 }
+// Les programmes de la carte graphique (les « shaders ») : pour dessiner une matière, la carte graphique a besoin d'un petit programme
+// écrit pour elle, qu'il faut d'abord compiler (traduire dans sa langue à elle). Three.js le fait la première fois qu'il dessine la
+// matière : au premier dessin, il en compilait plus de 30 d'un coup, et la page gelait plusieurs secondes ; et chaque matière qu'on ne voit
+// qu'en jouant (une explosion, l'armure d'Iron Man...) faisait un accroc en pleine partie. Alors on les compile d'avance, pendant le menu ou
+// l'écran du chapitre : tout ce qui est dans le pays (même caché, même loin), l'aperçu du héros, la main de la 1re personne, et A_PREPARER.
+// Une carte graphique qui sait compiler en arrière-plan le fait sans geler la page (les autres gèlent encore, mais avant de jouer).
+// A_PREPARER : ce qu'on ne voit qu'en jouant (une explosion, un code de triche...). Une matière, et la sorte d'objet qui la porte :
+// 'forme' (un objet tout simple), 'lot' (beaucoup d'objets pareils dessinés d'un coup), 'image' (une image toujours face à la caméra),
+// 'trait' (une ligne) ; 'vm' : dans la main, à la 1re personne (d'autres lumières, donc d'autres programmes). Ce qui compte, c'est la sorte
+// de matière (à pleine lumière ou non, transparente, à deux faces, découpée, avec une image...), pas sa couleur : une seule suffit pour
+// toutes celles qui lui ressemblent, et si une matière de la même sorte est déjà dans le pays, même cachée, la ligne ne coûte rien.
+// Tu as inventé une matière qu'on ne voit qu'en jouant ? Ajoute-la ici, sinon elle fera peut-être un petit accroc la première fois qu'on
+// la verra (c'est tout)
+const IMAGE_PREPARER = TEX.flash;   // (n'importe quelle image : seul compte qu'il y en ait une)
+const A_PREPARER = [
+  // les tirs : l'éclair au bout du canon (et le feu des explosions, des voitures qui brûlent), le trait de la balle, un impact sur une voiture
+  [M_FLASH, 'image'], [M_TRACEUR, 'trait'], [M_TROU_BALLE, 'forme'],
+  // une voiture abîmée : ses vitres fêlées, ses éclats de verre (à deux faces, comme la cape de Superman et l'armure d'Iron Man)
+  [M_VITRE_FELEE, 'forme'], [M_ECLAT, 'forme'],
+  // la nuit : la tache des phares des autres voitures, par terre
+  [M_FAISCEAU, 'forme'],
+  // les yeux laser (à pleine lumière, comme la toile de Spiderman et les yeux de l'armure d'Iron Man) et leur halo (et celui des répulseurs)
+  [M_LASER, 'forme'], [M_HALO_LASER, 'forme'],
+  // la foudre du sceptre : un lot de traits, et leur halo
+  [M_ECLAIR, 'lot'], [M_HALO_ECLAIR, 'lot'],
+  // ce qui est découpé là où son image est transparente : le blason de Superman ou de Spiderman, le pagne de Zeus, la cape de Batman, le filet
+  [std(IMAGE_PREPARER, { alphaTest: 0.5 }), 'forme'], [std(IMAGE_PREPARER, { alphaTest: 0.5, side: THREE.DoubleSide }), 'forme'], [M_FILET, 'forme'],
+  // un tissu dessiné (le costume de Spiderman, le plastron d'Iron Man), l'aura de Goku, la flamme des réacteurs, la vitre du heavy robot
+  [std(IMAGE_PREPARER), 'forme'], [auraBJ.material, 'forme'], [M_JET, 'forme'], [M_VITRE_ROBOT, 'forme'],
+  // à la 1re personne : l'éclair au bout du canon, le gant d'Iron Man (à deux faces)
+  [M_FLASH, 'image', 'vm'], [M_ECLAT, 'forme', 'vm'],
+];
+const GEO_PREPARER = new THREE.BoxGeometry(), GEO_PREPARER_TRAIT = new THREE.BufferGeometry().setFromPoints([V3(0, 0, 0), V3(0, 1, 0)]);   // (un trait n'a que des points)
+const objetAPreparer = (m, sorte) => sorte === 'image' ? new THREE.Sprite(m) : sorte === 'trait' ? new THREE.Line(GEO_PREPARER_TRAIT, m)
+  : sorte === 'lot' ? new THREE.InstancedMesh(GEO_PREPARER, m, 1) : new THREE.Mesh(GEO_PREPARER, m);
+const preparation = { ms: 0, programmes: 0, rate: null };   // (pour les essais : ce qu'elle a duré, les programmes qu'il y a ensuite, et si elle a raté)
+async function preparerProgrammes() {
+  const debut = performance.now(), dehors = new THREE.Group(), main = new THREE.Group();   // (jamais ajoutés au pays : on ne les voit pas)
+  for (const [m, sorte, ou] of A_PREPARER) (ou === 'vm' ? main : dehors).add(objetAPreparer(m, sorte));
+  try { // (sans réponse au bout de 15 s, on y va quand même : ce qui manque se compilera en dessinant, comme avant)
+    const fin = await Promise.race([Promise.all([
+      renderer.compileAsync(scene, camera), renderer.compileAsync(dehors, camera, scene),   // (avec les lumières, la brume et les reflets du pays)
+      renderer.compileAsync(vmScene, vmCamera), renderer.compileAsync(main, vmCamera, vmScene), renderer.compileAsync(apercu.scene, apercu.camera)]).then(() => 'fini'),
+      new Promise(ok => setTimeout(() => ok('plus de 15 s'), 15000))]);
+    if (fin !== 'fini') preparation.rate = fin;
+  } catch (e) { preparation.rate = String(e); }
+  if (preparation.rate) console.warn('Les programmes de la carte graphique ne sont pas tous compilés d\'avance :', preparation.rate);
+  preparation.ms = performance.now() - debut; preparation.programmes = renderer.info.programs?.length ?? 0;
+}
 // premier placement du joueur
 majJoueur(0);
-requestAnimationFrame(boucle);
-ecranChapitre.parLeJeu = true;   // l'écran du chapitre n'a plus sa propre boucle : c'est boucle qui l'anime, au plafond d'images par seconde
-etat('Clique pour jouer');
-// le chapitre où l'on est : son heure, la DeLorean dans sa cachette, le code de son héros (allumé tout le chapitre),
-// et son écran, qui attendait que le pays soit construit
+// le chapitre où l'on est : son heure, la DeLorean dans sa cachette, le code de son héros (allumé tout le chapitre)
 if (CHAPITRE.heure != null) fixerHeure(CHAPITRE.heure);
 cacherDeLorean();
 { const t = TRICHES.find(t => t.code === CHAPITRE.triche); if (t && !t.actif) basculerTriche(t, false, enCivil()); }
-if (ecranChapitre.visible) { ecranChapitre.texte = 'Clique pour jouer'; ecranChapitre.clic = lancerJeu; }
+// on n'attend plus Internet, mais la carte graphique : le menu (et l'écran du chapitre) le disent
+etat('Préparation des images…');
+if (ecranChapitre.visible) ecranChapitre.texte = 'Préparation des images…';
+// les programmes compilés, le jeu démarre : on peut cliquer pour jouer (dans le menu, ou sur l'écran du chapitre, qui attendait que le pays soit construit)
+preparerProgrammes().then(() => {
+  requestAnimationFrame(boucle);
+  ecranChapitre.parLeJeu = true;   // l'écran du chapitre n'a plus sa propre boucle : c'est boucle qui l'anime, au plafond d'images par seconde
+  etat('Clique pour jouer');
+  $('menu').addEventListener('click', lancerJeu);
+  if (ecranChapitre.visible) { ecranChapitre.texte = 'Clique pour jouer'; ecranChapitre.clic = lancerJeu; }
+});
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
   TELESIEGES, SOMMETS, neigeSous, telesiegeProche, sommetEn, REMONTEES, PISTES_SKI, pisteSkiEn, neigeEn, siegeEn, siegeLibre, reliefSki, creerSkieur, TENUES_GLISSE, rhabillerBJ, entrerVoiture, sortirVoiture, animerHumain, blesserConducteur,
@@ -16968,7 +17024,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   effondrerVilla, releverVilla, poserPorte, tirSurJoueur, majBarreBoss, interieurs,
   get chute() { return chute; }, get facture() { return facture; }, FETE_DES_ARMURES, tourStark,
   galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
-  mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; }, compteur, allumerCompteur, compter,
+  mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; }, compteur, allumerCompteur, compter, preparation, A_PREPARER,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
