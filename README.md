@@ -40,7 +40,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | **Langue** | **Français**, **Deutsch**, **English** ou **Züritüütsch**. Même les enseignes des magasins changent de langue. |
 | **Personnage** | **B.J.**, le garçon tout en muscles, ou sa fille **Jess**, en jupe et talons hauts. Le menu te le montre de face. |
 | **Cheveux** | Blonds, châtains, bruns, noirs, roux, roses, bleus ou verts. |
-| **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. Pour voir ce que ça change, appuie sur **P** pendant le jeu : le compteur de performances te dit combien d'images par seconde le jeu dessine (plus il y en a, plus c'est fluide : 60, c'est parfait ; moins de 25, ça rame). |
+| **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. Pour voir ce que ça change, appuie sur **P** pendant le jeu : le compteur de performances te dit combien d'images par seconde le jeu dessine (plus il y en a, plus c'est fluide : 60, c'est parfait ; moins de 25, ça rame). Le jeu n'en dessine jamais plus de 60, même sur un écran plus rapide (120 ou 144 Hz) : ça suffit, et l'ordinateur chauffe moins (le réglage `imagesParSeconde`, dans ⚙ Réglages : 0 = autant que l'écran). |
 | **Chapitre** | Retourner dans un chapitre que tu as déjà ouvert. |
 | **↺ Nouvelle partie** | Tout effacer pour recommencer au chapitre 1. |
 | **⚙ Réglages** | Tous les nombres du jeu, à changer sans toucher au code (voir [Modifier le jeu](#modifier-le-jeu)). |
@@ -853,7 +853,7 @@ Les nombres de tout le jeu :
 - **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), ce que les batarangs explosifs font à Batman lui-même (`explosifsBatman`, et `explosifsPres` : à moins de combien de mètres de sa main leur explosion ne lui fait rien), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
 - **Jusqu'où on voit** : `distanceRelief`, les montagnes et la mer (10 km) ; `distanceVue`, les bâtiments et les arbres (900 m).
 
-**Si le jeu rame**, mets `distanceVue: 500`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ).
+**Si le jeu rame**, mets `distanceVue: 500`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ). `imagesParSeconde` : le jeu ne dessine pas plus d'images par seconde (60 ; 0 = autant que l'écran ; 30 pour que l'ordinateur chauffe moins ; pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20).
 
 #### `ARMES`, `TRESORS` et `ARMES_ROBOT`
 
