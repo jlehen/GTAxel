@@ -55,8 +55,9 @@
   #menu td, #triches th { padding: 3px 14px; }
   #menu td:first-child, #triches th { text-align: right; color: #f0c850; font-weight: 700; }
   #langues { margin: 2px 0 10px; }
-  .foule, .heros { font-size: 18px; margin-bottom: 4px; }
-  .foule span, .heros span { display: inline-block; min-width: 100px; text-align: right; margin-right: 4px; color: #f0c850; font-weight: 700; }
+  .foule, .heros, .qualite { font-size: 18px; margin-bottom: 4px; }
+  .foule span, .heros span, .qualite span { display: inline-block; min-width: 100px; text-align: right; margin-right: 4px; color: #f0c850; font-weight: 700; }
+  .qualite small { font-size: 15px; color: #f0c850; margin-left: 4px; }   /* à côté des boutons de la qualité : « personnalisée », « appuie sur F5… » */
   /* les choix du menu : l'aperçu du héros à gauche (avec son nom dessous), les lignes de boutons à droite */
   #choix { display: flex; align-items: center; justify-content: center; gap: 14px; max-width: 100%; }
   #apercu { display: block; width: 104px; height: 176px; border-radius: 12px; border: 2px solid rgba(255,255,255,.35); background: rgba(0,0,0,.4); }
@@ -85,6 +86,7 @@
   #reglages input[type=checkbox] { width: auto; }
   #reglages.change > summary { border-color: #f0c850; }   /* au moins un réglage changé dans le menu */
   #reglages input.change { background: rgba(240,200,80,.3); border-color: #f0c850; }   /* changé dans le menu : ne suit plus le code */
+  #reglages input[type=checkbox].change { outline: 2px solid #f0c850; outline-offset: 1px; }   /* (une case à cocher garde son fond : un cadre jaune autour) */
   #reglages input.faux { border-color: #e04040; }   /* ce n'est pas un nombre : pas pris en compte */
   #menu .partie button.nouvelle { border-style: dashed; }   /* « Nouvelle partie » : efface tout */
   /* les chapitres de super-héros : les victimes, à la place des étoiles (dès la 3e, une amende) */
@@ -187,12 +189,14 @@
       <div class="heros" data-heros="cheveux"><span>Cheveux :</span></div>
       <div class="foule" data-foule="pietons"><span>Piétons :</span></div>
       <div class="foule" data-foule="voitures"><span>Voitures :</span></div>
+      <div class="qualite"><span>Qualité :</span><small></small></div>
       <div class="partie"><span>Chapitre :</span></div>
     </div>
   </div>
   <details id="reglages">
     <summary>⚙ <span class="tr">Réglages</span></summary>
     <p class="tr">Les nombres des tableaux du haut de index.html. Le jeu en tient compte tout de suite, sauf pour ce qu'il construit au départ (la carte, les ombres, les ennemis déjà là…) : appuie alors sur F5. Le navigateur se souvient des cases en jaune ; si tu changes le même nombre dans le code, c'est le code qui gagne.</p>
+    <p class="tr">La qualité du menu (Basse, Moyenne, Haute) change d'un coup plusieurs de ces cases (voir QUALITES, en haut de index.html), puis le jeu recharge la page. Si tu changes l'une d'elles ici, la qualité devient « personnalisée ». Tout remettre revient à Haute.</p>
     <button id="remettre" class="tr">Tout remettre</button>
   </details>
   <details id="triches">
@@ -399,6 +403,33 @@ for (const k in foule) {
 }
 
 // =====================================================================
+//  LA QUALITÉ DES IMAGES : Basse, Moyenne ou Haute, dans le menu. Si le jeu rame (moins de 30 images par seconde au compteur, touche P),
+//  essaie Moyenne, puis Basse. Un niveau change d'un coup plusieurs nombres de REGLAGES (plus bas, dans le code du jeu) : dans le menu
+//  ⚙ Réglages, ils deviennent jaunes, comme si tu les avais changés toi-même. Haute, c'est le jeu tel qu'il est dans REGLAGES : si tu y
+//  changes un de ces nombres, change-le aussi dans Haute (sinon, le menu dira que la qualité est « personnalisée »).
+//  Pour changer ce qu'il construit au départ (les ombres, la distance de vue...), le jeu recharge la page : ta partie est gardée, mais tu
+//  repars du départ, comme avec F5 (en pleine partie, il te le demande d'abord). Seuls les réglages de la liste AU_LANCEMENT (dans le code
+//  du jeu, juste après l'écran des réglages) font recharger la page : ajoute-y un nombre que le jeu ne lit qu'au chargement.
+//  Change les nombres, ou invente un niveau ('Très basse': { distanceVue: 300, ... }) ! Ce qu'un niveau ne dit pas ne change pas.
+//    anticrenelage : les bords bien lisses (false : un peu en escalier, mais bien moins de travail pour la carte graphique)
+//    ombres : les ombres du soleil ; ombreSoleil : leur finesse (2048 : nettes ; 1024 : un peu floues, 4 fois moins de points à dessiner)
+//    ombresPersonnages : jusqu'où (en mètres) les passants ont une vraie ombre ; plus loin, une tache sous les pieds (0 : une tache pour tous)
+//    distanceVue : jusqu'où on voit les bâtiments, les arbres et les gens (mètres)
+//    lumieresNuit : combien de lampadaires éclairent vraiment autour de toi la nuit (les autres brillent seulement)
+//    finesse, finesseMin : combien de points l'image a pour chaque point de l'écran, au plus et au moins (voir REGLAGES)
+// =====================================================================
+const QUALITES = {
+  'Basse':   { anticrenelage: false, ombres: false, ombreSoleil: 1024, ombresPersonnages: 0,  distanceVue: 500, lumieresNuit: 2, finesse: 1,    finesseMin: 0.6 },
+  'Moyenne': { anticrenelage: true,  ombres: true,  ombreSoleil: 1024, ombresPersonnages: 15, distanceVue: 700, lumieresNuit: 4, finesse: 1.25, finesseMin: 0.75 },
+  'Haute':   { anticrenelage: true,  ombres: true,  ombreSoleil: 2048, ombresPersonnages: 30, distanceVue: 900, lumieresNuit: 8, finesse: 1.5,  finesseMin: 0.75 },
+};
+// le niveau que montre le menu : le jeu le trouve d'après les nombres de REGLAGES (null : aucun, la qualité est « personnalisée »).
+// Le navigateur s'en souvient, pour le montrer tout de suite au prochain lancement
+let qualite = 'Haute';
+try { qualite = localStorage.qualite ?? qualite; } catch {}
+let qualiteDemandee = null, notesQualite = [];   // un niveau cliqué avant que le jeu soit chargé (il le prendra en démarrant) ; ce qu'on écrit à côté
+
+// =====================================================================
 //  LES LANGUES : le jeu est écrit en français, et TRADUCTIONS donne chaque phrase dans les autres langues.
 //  Une phrase qui n'est pas dans le tableau (ou pas dans cette langue) reste en français.
 //  {prix}, {n}... : le jeu met un nombre ou un nom à cet endroit. Garde-les dans la traduction (tu peux les déplacer).
@@ -433,11 +464,26 @@ const TRADUCTIONS = {
   'Normal':           { de: 'Normal', en: 'Normal', gsw: 'Normal' },
   'Beaucoup':         { de: 'Viele', en: 'Lots', gsw: 'Vill' },
   'Énorme':           { de: 'Riesig viele', en: 'Tons', gsw: 'Mega vill' },
+  'Qualité :':        { de: 'Qualität:', en: 'Quality:', gsw: 'Qualität:' },
+  'Basse':            { de: 'Niedrig', en: 'Low', gsw: 'Tüüf' },
+  'Moyenne':          { de: 'Mittel', en: 'Medium', gsw: 'Mittel' },
+  'Haute':            { de: 'Hoch', en: 'High', gsw: 'Höch' },
+  'personnalisée (voir ⚙ Réglages)': { de: 'eigene (siehe ⚙ Einstellungen)', en: 'custom (see ⚙ Settings)', gsw: 'eigeti (lueg ⚙ Iistellige)' },
+  'appuie sur F5 pour la voir': { de: 'drück F5, um sie zu sehen', en: 'press F5 to see it', gsw: 'druck F5, zum si z gseh' },
+  'La qualité change : le jeu recharge la page…': { de: 'Die Qualität ändert sich: Das Spiel lädt die Seite neu…', en: 'Changing the quality: the game reloads the page…', gsw: 'D Qualität änderet: S Spiil ladet d Siite neu…' },
+  "Pour changer la qualité, le jeu recharge la page, comme avec F5 : tu gardes ton argent, tes armes et les missions que tu as réussies, mais tu repars du départ : la mission en cours recommence, et tes codes de triche s'éteignent. D'accord ?": {
+    de: 'Um die Qualität zu ändern, lädt das Spiel die Seite neu, wie mit F5: Du behältst dein Geld, deine Waffen und die geschafften Missionen, fängst aber wieder am Start an: Die laufende Mission beginnt von vorn, und deine Cheatcodes gehen aus. Einverstanden?',
+    en: 'To change the quality, the game reloads the page, like with F5: you keep your money, your weapons and the missions you completed, but you start again from the beginning: the current mission starts over, and your cheat codes are switched off. OK?',
+    gsw: 'Zum d Qualität ändere, ladet s Spiil d Siite neu, wie mit F5: Du bhaltisch dis Gäld, dini Waffe und d Missione, wo du gschafft häsch, aber du fangsch wider vom Start aa: D Mission, wo grad lauft, fangt vo vorne aa, und dini Cheatcodes gönd us. Isch guet?' },
   'Réglages':         { de: 'Einstellungen', en: 'Settings', gsw: 'Iistellige' },
   "Les nombres des tableaux du haut de index.html. Le jeu en tient compte tout de suite, sauf pour ce qu'il construit au départ (la carte, les ombres, les ennemis déjà là…) : appuie alors sur F5. Le navigateur se souvient des cases en jaune ; si tu changes le même nombre dans le code, c'est le code qui gagne.": {
     de: 'Die Zahlen aus den Tabellen oben in index.html. Das Spiel übernimmt sie sofort, außer bei dem, was es am Anfang baut (die Karte, die Schatten, die Feinde, die schon da sind…): Drück dann F5. Der Browser merkt sich die gelben Felder; änderst du dieselbe Zahl im Code, gewinnt der Code.',
     en: 'The numbers from the tables at the top of index.html. The game uses them right away, except for what it builds at the start (the map, the shadows, the enemies already there…): press F5 for those. The browser remembers the yellow boxes; if you change the same number in the code, the code wins.',
     gsw: 'D Zahle us de Tabälle zoberst im index.html. S Spiil nimmt si grad, ussert für das, wo s am Aafang baut (d Charte, d Schätte, d Feind, wo scho da sind…): Druck dänn F5. De Browser merkt sich di gäle Fälder; wänn du di glichi Zahl im Code änderisch, gwünnt de Code.' },
+  "La qualité du menu (Basse, Moyenne, Haute) change d'un coup plusieurs de ces cases (voir QUALITES, en haut de index.html), puis le jeu recharge la page. Si tu changes l'une d'elles ici, la qualité devient « personnalisée ». Tout remettre revient à Haute.": {
+    de: 'Die Qualität im Menü (Niedrig, Mittel, Hoch) ändert mehrere dieser Felder auf einmal (siehe QUALITES oben in index.html), dann lädt das Spiel die Seite neu. Änderst du eines davon hier, wird die Qualität „eigene“. Alles zurücksetzen geht zurück zu Hoch.',
+    en: 'The quality in the menu (Low, Medium, High) changes several of these boxes at once (see QUALITES at the top of index.html), then the game reloads the page. If you change one of them here, the quality becomes "custom". Reset everything goes back to High.',
+    gsw: 'D Qualität im Menü (Tüüf, Mittel, Höch) änderet mehreri vo dene Fälder ufs Mal (lueg QUALITES zoberst im index.html), dänn ladet s Spiil d Siite neu. Wänn du eis devo da änderisch, wird d Qualität «eigeti». Alles zruggsetze gaht zrugg uf Höch.' },
   'Tout remettre':    { de: 'Alles zurücksetzen', en: 'Reset everything', gsw: 'Alles zruggsetze' },
   'Codes de triche':  { de: 'Cheatcodes', en: 'Cheat codes', gsw: 'Cheatcodes' },
   "Pendant le jeu, appuie sur Entrée, tape un code, puis Entrée. Pour annuler un code, retape-le.": { de: 'Drück im Spiel Enter, tipp einen Code ein, dann Enter. Um einen Code aufzuheben, tipp ihn nochmal ein.',
@@ -1432,11 +1478,13 @@ function tr(texte, valeurs = {}) {
 // ({nom}, dans l'histoire : le nom du héros choisi ; {super} : son nom de super-héros ; {ville} : la ville du chapitre)
 function traduireMenu() {
   const nom = nomHeros();
-  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, .heros span, .heros button:not(.pastille), .partie span, #menu .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent, { nom, super: nomSuper(), ville: tr(CHAPITRE.ville) });
+  for (const el of document.querySelectorAll('#histoire, #etat, #menu td, .foule span, .foule button, .heros span, .heros button:not(.pastille), .qualite span, .qualite button, .partie span, #menu .tr')) el.textContent = tr(el.dataset.fr ??= el.textContent, { nom, super: nomSuper(), ville: tr(CHAPITRE.ville) });
   for (const b of document.querySelectorAll('.pastille')) b.title = tr(b.dataset.fr);   // le nom de la couleur
   document.getElementById('nom-heros').textContent = nom;
   for (const b of document.querySelectorAll('#langues button')) b.classList.toggle('on', b.dataset.langue === langue);
   for (const b of document.querySelectorAll('.foule button')) b.classList.toggle('on', foule[b.parentNode.dataset.foule] === b.dataset.fr);
+  for (const b of document.querySelectorAll('.qualite button')) b.classList.toggle('on', qualite === b.dataset.fr);
+  document.querySelector('.qualite small').textContent = notesQualite.map(t => tr(t)).join(' · ');
   for (const b of document.querySelectorAll('.heros button')) b.classList.toggle('on', heros[b.parentNode.dataset.heros] === b.dataset.fr);
   document.documentElement.lang = langue;
 }
@@ -1462,6 +1510,20 @@ for (const ligne of document.querySelectorAll('.foule')) for (const nom in FOULE
   b.textContent = nom;
   b.onclick = e => { e.stopPropagation(); foule[k] = nom; try { localStorage['foule-' + k] = nom; } catch {} traduireMenu(); };
   ligne.append(b);
+}
+// les boutons de la qualité : c'est le jeu qui change les réglages (l'évènement « qualite » : voir choisirQualite), et qui recharge la page
+// s'il le faut. Cliqué pendant que le jeu se charge encore, rien n'est construit : il prend le niveau en démarrant (qualiteDemandee)
+for (const nom in QUALITES) {
+  const b = document.createElement('button'), ligne = document.querySelector('.qualite');
+  b.textContent = nom;
+  b.onclick = e => { e.stopPropagation(); qualiteDemandee = qualite = nom; traduireMenu(); dispatchEvent(new CustomEvent('qualite', { detail: nom })); };
+  ligne.insertBefore(b, ligne.querySelector('small'));
+}
+// le jeu dit quel niveau montrer (nom : null s'il n'y en a aucun), et ce qu'il faut écrire à côté
+function afficherQualite(nom, notes) {
+  qualite = nom; notesQualite = notes;
+  try { localStorage.qualite = nom ?? ''; } catch {}
+  traduireMenu();
 }
 // la ligne des chapitres : un bouton par chapitre déjà ouvert (on y va tout de suite, sans la DeLorean ; ses missions recommencent s'il était fini),
 // et « Nouvelle partie », qui efface tout. Le jeu est prévenu par un évènement (« chapitre », « nouvellePartie ») : c'est lui qui sauve la partie
@@ -1812,12 +1874,16 @@ const REGLAGES = {
   // la vie, les dégâts et la précision des policiers, des nazis et des autres ennemis : voir ENNEMIS, après les voitures
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
-  compteur: false,           // true = le compteur de performances (touche P) est allumé dès le départ : les images par seconde, et ce qui coûte. Si le jeu rame, allume-le, puis change ombres, ombresPersonnages, distanceVue ou la foule du menu, et regarde ce qui baisse
+  compteur: false,           // true = le compteur de performances (touche P) est allumé dès le départ : les images par seconde, et ce qui coûte. Si le jeu rame, allume-le, puis change la qualité ou la foule du menu (ou ombres, ombresPersonnages, distanceVue...), et regarde ce qui baisse
   imagesParSeconde: 60,      // le jeu ne dessine pas plus d'images par seconde que ça, même sur un écran rapide (120, 144 Hz...) : l'œil n'y voit presque rien de plus, mais l'ordinateur chauffe et la batterie se vide. 0 = autant que l'écran. Pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20. Si le jeu rame (moins de 60 au compteur, touche P), ça ne l'accélère pas : 30 le fait moins chauffer, un peu moins fluide mais régulier
   finesse: 1.5,              // la finesse de l'image : combien de points le jeu dessine pour chaque point de ton écran (jamais plus que ton écran n'en a). 1 = un pour un ; 0.75 = un peu flou, mais presque deux fois moins de points à colorier pour la carte graphique. Avec finesseAuto, c'est la plus fine ; sans, c'est toujours celle-là
   finesseAuto: true,         // true = le jeu règle tout seul la finesse : si les images arrivent trop lentement parce que la carte graphique n'arrive pas à colorier tous les points, il en dessine moins (un peu plus flou, mais de nouveau fluide), et il remonte quand tout va bien. false = toujours la finesse ci-dessus. Si le jeu rame, laisse true (le compteur, touche P, montre la finesse du moment)
   finesseMin: 0.75,          // ...mais jamais moins fine que ça, même si le jeu rame encore (0.5 = très flou)
+  // la qualité du menu (Basse, Moyenne, Haute : voir QUALITES, tout en haut) change d'un coup anticrenelage, ombres, ombreSoleil,
+  // ombresPersonnages, distanceVue, lumieresNuit, finesse et finesseMin. Haute, ce sont les nombres d'ici
+  anticrenelage: true,       // true = les bords des objets sont bien lisses ; false = un peu en escalier, mais bien moins de travail pour la carte graphique (puis F5). Si le jeu rame, mets false
   ombres: true,              // mets false si le jeu rame
+  ombreSoleil: 2048,         // la finesse des ombres du soleil : la carte des ombres fait 2048 × 2048 points pour 180 × 180 m autour de toi. 1024 = un peu plus floues, mais 4 fois moins de points à dessiner ; 4096 = très nettes, et 4 fois plus (puis F5)
   ombresPersonnages: 30,     // mètres : les passants, policiers et ennemis plus près que ça de la caméra ont une vraie ombre ; plus loin, une tache sombre sous les pieds, bien moins de travail (toi, tu gardes toujours la tienne). 0 = une tache pour tous. Si le jeu rame, mets 15 ; 150 = de vraies ombres pour presque tous, presque comme avant
   sommeilVoitures: 60,       // mètres : une voiture garée plus loin que ça de toi, qui ne bouge plus depuis 2 s, « dort » : le jeu ne la recalcule plus à chaque image (la plupart des voitures du pays sont garées). Elle se réveille dès que tu t'approches, ou qu'on la touche. 0 = aucune ne dort (le jeu recalcule tout, comme avant : deux fois plus de calcul). Si le jeu rame, surtout pas 0 ; 30, si tu veux, mais ça ne gagne presque rien de plus
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
@@ -3221,6 +3287,7 @@ for (const chemin in changes) {
 function sauverReglages() {
   try { localStorage.reglages = JSON.stringify(changes); } catch {}
   document.getElementById('reglages').classList.toggle('change', Object.keys(changes).length > 0);
+  majQualite();   // (une case changée à la main : la qualité du menu devient peut-être « personnalisée »)
 }
 // un groupe qui se déplie : un tableau, une arme, une voiture, le son de son moteur...
 function groupeReglages(titre, obj, code, chemin) {
@@ -3260,15 +3327,50 @@ function champReglage(obj, k, code, chemin) {
     i.classList.toggle('change', chemin in changes);
     sauverReglages();
   };
-  i.remettre = () => { obj[k] = structuredClone(code); delete changes[chemin]; montrer(); };
+  i.mettre = v => { obj[k] = structuredClone(v); if (pareil(v, code)) delete changes[chemin]; else changes[chemin] = [code, structuredClone(v)]; montrer(); };   // (la qualité du menu)
+  i.remettre = () => i.mettre(code);
+  cases[chemin] = i;
   montrer();
   return l;
 }
+const cases = {};   // les cases, par leur chemin ("REGLAGES.distanceVue") : la qualité du menu les remplit
 // construit tout de suite : si un réglage empêche le jeu de démarrer, « Tout remettre » marche quand même
 const boiteReglages = document.getElementById('reglages');
 boiteReglages.onclick = e => e.stopPropagation();   // ne lance pas le jeu
 for (const nom in TABLEAUX) boiteReglages.append(groupeReglages(nom, TABLEAUX[nom], DU_CODE[nom], nom));
 document.getElementById('remettre').onclick = () => { for (const i of boiteReglages.querySelectorAll('input.change')) i.remettre(); sauverReglages(); };
+
+// La qualité des images (QUALITES, tout en haut ; ses boutons sont dans le menu) : un raccourci qui remplit d'un coup des cases de cet écran
+// (elles deviennent jaunes). Le menu montre le niveau dont tous les nombres sont ceux du jeu ; s'il n'y en a aucun (une case changée à la
+// main), la qualité est « personnalisée ». Tout remettre revient aux nombres du code : Haute.
+// AU_LANCEMENT : ce que le jeu ne lit qu'en se chargeant (la carte graphique, les ombres, la brume, les lumières sont réglées une fois pour
+// toutes) : pour le changer, il recharge la page. Le reste (ombresPersonnages, finesse, finesseMin) compte dès l'image suivante
+const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'distanceVue', 'distanceRelief', 'lumieresNuit'];
+for (const nom in QUALITES) for (const k in QUALITES[nom]) if (!cases['REGLAGES.' + k]) alert(`Qualité "${nom}" : "${k}" n'est pas un nombre de REGLAGES !`);
+function remplirQualite(nom) { for (const k in QUALITES[nom]) cases['REGLAGES.' + k]?.mettre(QUALITES[nom][k]); }
+function qualiteActuelle() {
+  return Object.keys(QUALITES).find(nom => Object.keys(QUALITES[nom]).every(k => !(k in REGLAGES) || pareil(REGLAGES[k], QUALITES[nom][k]))) ?? null;
+}
+if (QUALITES[qualiteDemandee]) remplirQualite(qualiteDemandee);   // un niveau cliqué pendant que le jeu se chargeait : rien n'est encore construit
+const auLancement = Object.fromEntries(AU_LANCEMENT.map(k => [k, structuredClone(REGLAGES[k])]));   // ce avec quoi le jeu se construit
+// le menu : le niveau, et, à côté, « personnalisée » ou « appuie sur F5 » (une case de AU_LANCEMENT a changé depuis le chargement)
+function majQualite() {
+  const nom = qualiteActuelle(), F5 = AU_LANCEMENT.some(k => !pareil(REGLAGES[k], auLancement[k]));
+  afficherQualite(nom, [...(nom ? [] : ['personnalisée (voir ⚙ Réglages)']), ...(F5 ? ['appuie sur F5 pour la voir'] : [])]);
+}
+// un bouton de la qualité, dans le menu. Si ce qui est construit au lancement change, la page se recharge (la partie est sauvée en
+// partant : voir pagehide) ; en pleine partie, le jeu demande d'abord, car on repart du départ du chapitre, comme avec F5 : la mission
+// en cours recommence, et les codes de triche s'éteignent
+function choisirQualite(nom) {
+  const Q = QUALITES[nom];
+  if (!Q) return;
+  const recharger = AU_LANCEMENT.some(k => k in Q && !pareil(Q[k], auLancement[k]));
+  let joue = false; try { joue = dejaJoue; } catch {}   // (si le jeu n'a pas pu démarrer, dejaJoue n'existe pas encore)
+  if (recharger && joue && !confirm(tr("Pour changer la qualité, le jeu recharge la page, comme avec F5 : tu gardes ton argent, tes armes et les missions que tu as réussies, mais tu repars du départ : la mission en cours recommence, et tes codes de triche s'éteignent. D'accord ?"))) { majQualite(); return; }
+  remplirQualite(nom); sauverReglages();
+  if (recharger) { etat('La qualité change : le jeu recharge la page…'); location.reload(); }
+}
+addEventListener('qualite', e => choisirQualite(e.detail));
 sauverReglages();
 traduireMenu();
 
@@ -3932,7 +4034,7 @@ function presDePiste(x, z, marge) {
 // =====================================================================
 //  Moteur 3D
 // =====================================================================
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: !!R_.anticrenelage });   // (l'anticrénelage ne se change qu'en recréant tout : il attend F5)
 renderer.setPixelRatio(clamp(R_.finesse, 0.25, devicePixelRatio || 1));   // la finesse de l'image (finesse, dans REGLAGES) ; avec finesseAuto, reglerFinesse la change en jouant
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -4014,7 +4116,7 @@ const ambiance = new THREE.HemisphereLight(0xcfe4ff, 0x5a5040, 0.35);   // la lu
 scene.add(ambiance);
 const soleil = new THREE.DirectionalLight(0xfff1dd, 4.5);
 soleil.castShadow = true;
-soleil.shadow.mapSize.set(2048, 2048);
+{ const n = clamp(Math.round(R_.ombreSoleil) || 2048, 256, 4096); soleil.shadow.mapSize.set(n, n); }   // la carte des ombres (ombreSoleil), pour 180 × 180 m
 Object.assign(soleil.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 1, far: 500 });
 soleil.shadow.bias = -0.0004;
 soleil.shadow.normalBias = 0.03;
@@ -17023,7 +17125,7 @@ function majRepere(dt) {
 //  - les appels de dessin (un par objet dessiné, et encore un pour son ombre) et les triangles de la dernière image ;
 //  - les programmes de la carte graphique (les shaders), les formes et les textures qu'elle garde, la mémoire du JavaScript, et la finesse
 //    de l'image (et si le jeu la règle tout seul : voir reglerFinesse).
-// Change un réglage (ombres, distanceVue, la foule du menu...) et regarde ce qui baisse ! Éteint, il ne fait rien.
+// Change la qualité du menu, un réglage (ombres, distanceVue...) ou la foule, et regarde ce qui baisse ! Éteint, il ne fait rien.
 const compteur = { allume: false, reglage: null, images: 0, calcul: 0, dessin: 0, debut: 0,   // (ce qu'il additionne en attendant d'écrire)
   ips: 0, msCalcul: 0, msDessin: 0, appels: 0, triangles: 0, programmes: 0, formes: 0, textures: 0, memoireJS: null, finesse: 0 };   // (ses derniers chiffres)
 const formatsCompteur = {};   // (fabriquer une façon d'écrire les nombres coûte plus cher que de s'en servir : on les garde)
@@ -17212,6 +17314,8 @@ const A_PREPARER = [
   [std(IMAGE_PREPARER, { alphaTest: 0.5 }), 'forme'], [std(IMAGE_PREPARER, { alphaTest: 0.5, side: THREE.DoubleSide }), 'forme'], [M_FILET, 'forme'],
   // un tissu dessiné (le costume de Spiderman, le plastron d'Iron Man), l'aura de Goku, la flamme des réacteurs, la vitre du heavy robot
   [std(IMAGE_PREPARER), 'forme'], [auraBJ.material, 'forme'], [M_JET, 'forme'], [M_VITRE_ROBOT, 'forme'],
+  // le sol fissuré de la chute qui écrase (transparent, à deux faces : deux programmes)
+  [M_FISSURES, 'forme'],
   // à la 1re personne : l'éclair au bout du canon, le gant d'Iron Man (à deux faces)
   [M_FLASH, 'image', 'vm'], [M_ECLAT, 'forme', 'vm'],
 ];
@@ -17281,6 +17385,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
   mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; }, compteur, allumerCompteur, compter, preparation, A_PREPARER,
   ombresLoin, M_TACHE, majOmbresPersonnages, sansVraieOmbre, forceDesOmbres, finesse, reglerFinesse, FINESSES,
+  QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
