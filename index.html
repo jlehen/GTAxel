@@ -4233,7 +4233,7 @@ function enseigne(texte, couleur, fond = '#111') {
   const dessin = (g) => { g.fillStyle = fond; g.fillRect(0, 0, 512, 96); g.fillStyle = couleur; g.font = 'bold 64px Impact, sans-serif'; g.textAlign = 'center'; g.fillText(tr(texte), 256, 72, 490); };
   const t = toile(512, 96, dessin);
   ENSEIGNES.push({ t, dessin, langue });
-  return std(t, { emissive: '#fff', emissiveMap: t, emissiveIntensity: 0.8 });
+  return std(t, { emissive: '#fff', emissiveMap: t, emissiveIntensity: 0.8, userData: { enseigne: true } });   // (enseigne : pas percée, voir percer)
 }
 function majEnseignes() {
   for (const e of ENSEIGNES) if (e.langue !== langue) { e.dessin(e.t.image.getContext('2d')); e.t.needsUpdate = true; e.langue = langue; }
@@ -4287,7 +4287,8 @@ const MAT = {
   routeCampagne: std(TEX.routeCampagne, { roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1 }),
   piste: std(TEX.piste, { roughness: 0.9, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 }),
   beton2: std(null, { color: '#a09c94', roughness: 0.9, side: THREE.DoubleSide }), rambarde: std(null, { color: '#c8ccd0', metalness: 0.6, roughness: 0.4, side: THREE.DoubleSide }),
-  rocher: std(null, { color: '#8a847a', roughness: 1, flatShading: true }), neige: std(TEX.sol, { color: '#f4f7fb', roughness: 1, bumpScale: 0.2 }),
+  rocher: std(null, { color: '#8a847a', roughness: 1 }),   // (à facettes sans flatShading : chaque triangle de ses formes a ses propres points, tournés comme lui)
+  neige: std(TEX.sol, { color: '#f4f7fb', roughness: 1, bumpScale: 0.2 }),
   cable: std(null, { color: '#222', metalness: 0.6, roughness: 0.4 }), siege: std(null, { color: '#2a5ad8', metalness: 0.4, roughness: 0.5 }),
   planches: std(TEX.parquet, { color: '#b89870' }),
   // l'intérieur des bâtiments
@@ -4314,13 +4315,13 @@ const MAT = {
   // Malibu
   stark: std(TEX.stark), villaStark: std(TEX.villaStark), vueMer: std(TEX.vueMer, { roughness: 0.3, bumpScale: 0 }),
   betonBlanc: std(null, { color: '#f4f2ec', roughness: 0.6 }),   // les plateaux arrondis de la villa de Tony Stark
-  garde: std(null, { color: '#cfe6f0', metalness: 0.2, roughness: 0.05, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide }),   // un garde-corps en verre
+  garde: std(null, { color: '#cfe6f0', metalness: 0.2, roughness: 0.05, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true }),   // un garde-corps en verre (en une seule fois : comme l'anneau des objets, voir creerObjet)
   starkEnseigne: enseigne('STARK', '#e6f6ff', '#0b1018'), starkIndustries: enseigne('STARK INDUSTRIES', '#fff', '#2a2e36'),
   starkExpo: enseigne('STARK EXPO', '#fff', '#a01616'), dixAnneaux: std(TEX.dixAnneaux, { side: THREE.DoubleSide, bumpScale: 0.02 }),
-  lettres: std(TEX.lettres, { alphaTest: 0.5, side: THREE.DoubleSide, bumpMap: null, roughness: 0.7 }),
-  tente: std(null, { color: '#9a8a62', roughness: 1, side: THREE.DoubleSide }), roche: std(null, { color: '#7d756a', roughness: 1, flatShading: true, side: THREE.DoubleSide }),
+  lettres: std(TEX.lettres, { alphaTest: 0.5, side: THREE.DoubleSide, bumpScale: 0, roughness: 0.7 }),   // (relief 0 : pas de relief, mais le même programme que le filet)
+  tente: std(null, { color: '#9a8a62', roughness: 1, side: THREE.DoubleSide }), roche: std(null, { color: '#7d756a', roughness: 1, side: THREE.DoubleSide, userData: { facettes: true } }),   // (facettes : voir fusionner)
   // la grotte des Dix Anneaux : la falaise de son entrée (de la roche rousse, comme les montagnes du désert), et la terre de son camp et de sa galerie
-  falaise: std(TEX.sol, { color: '#a27b59', roughness: 1, flatShading: true, side: THREE.DoubleSide, bumpScale: 0.3 }), terre: std(TEX.sol, { color: '#8c7154', roughness: 1, bumpScale: 0.2 }),
+  falaise: std(TEX.sol, { color: '#a27b59', roughness: 1, side: THREE.DoubleSide, bumpScale: 0.3, userData: { facettes: true } }), terre: std(TEX.sol, { color: '#8c7154', roughness: 1, bumpScale: 0.2 }),
 };
 MAT.dalle = MAT.platre;   // la dalle du toit d'un bâtiment où l'on entre : comme le plâtre, mais elle fait de l'ombre
 // taille (en mètres) couverte par une répétition de chaque texture
@@ -4375,7 +4376,12 @@ float bordTrou( float t, float g ) { return ( 1.07 + 0.07 * sin( 5.0 * t + g ) +
   };
   return m => { m.onBeforeCompile = retouche; return m; };
 })();
-for (const m of Object.values(MAT)) percer(m);
+// Les matières des bâtiments sont percées, sauf celles qui ne sont jamais dans un toit ni un plancher (ni juste au-dessus) : les enseignes
+// et les panneaux, collés aux façades, les vitrines, sur leur socle, les grandes lettres des collines, les cactus et les sièges des
+// télésièges (des lots, comme les arbres). Car une matière percée a son propre programme de la carte graphique (voir preparerProgrammes) :
+// sans trous, elles ont le même que d'autres (la trousse de soin, le verre du heavy robot, le filet, les arbres), et il y en a moins à compiler
+const SANS_TROUS = ['croix', 'vitrine', 'lettres', 'cactus', 'siege'];
+for (const [nom, m] of Object.entries(MAT)) if (!SANS_TROUS.includes(nom) && !m.userData.enseigne) percer(m);
 // les trous les plus proches de la caméra, pour le programme (à chaque image)
 function majTrous() {
   const c = camera.position, d = o => Math.hypot(o.x - c.x, o.z - c.z);
@@ -5816,6 +5822,7 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
 // qui prolonge la rue. La case qui touche la terre est plus large (44 m) : la grande roue et les montagnes russes (voir majFete)
 const jetees = [];   // le pont de chaque case de jetée [x, z, l, p] : pour les cartes
 const fete = [];   // les manèges qui bougent : la grande roue { roue, nacelles, c : son centre, u : le sens de la jetée }, le train { train, courbe, t, v }
+const MAT_NACELLES = MAT.rouge.clone();   // (une copie n'est pas percée : voir percer)
 for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
   if (car(i, j) !== '-') continue;
   const long = car(i - 1, j) === '-' || car(i + 1, j) === '-' || estBloc(car(i - 1, j)) || estBloc(car(i + 1, j));   // la jetée va d'ouest en est (sinon, du nord au sud)
@@ -5848,7 +5855,7 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
   for (let k = 0; k < 16; k++) rayons.push(new THREE.BoxGeometry(Rr * 2, 0.12, 0.12).rotateZ(k * Math.PI / 16));
   const roue = new THREE.Mesh(mergeGeometries(rayons).rotateY(long ? 0 : Math.PI / 2), MAT.rambarde);
   roue.position.set(c.x, c.y, c.z); roue.castShadow = true; scene.add(roue);
-  const nacelles = new THREE.InstancedMesh(new THREE.BoxGeometry(1.6, 1.8, 1.4), MAT.rouge, 16); nacelles.castShadow = true; nacelles.frustumCulled = false; scene.add(nacelles);
+  const nacelles = new THREE.InstancedMesh(new THREE.BoxGeometry(1.6, 1.8, 1.4), MAT_NACELLES, 16); nacelles.castShadow = true; nacelles.frustumCulled = false; scene.add(nacelles);
   fete.push({ roue, nacelles, c, u, axe, Rr });
   // les montagnes russes, de l'autre côté : une boucle qui monte et descend sur ses poteaux, et leur train de trois wagons
   const o = { x: cx - v.x * 11, z: cz - v.z * 11 }, pts = [[-17, 3, 0], [-12, 13, -6], [-2, 6, -7], [8, 15, -6], [16, 4, 0], [10, 9, 6], [0, 3.5, 7], [-10, 8, 6]];
@@ -6112,6 +6119,7 @@ const GEO_CABINE = boites([[0.08, 0.95, 0.08, 0, -0.47, 0], [1.9, 0.1, 2.1, 0, -
   [0.05, 0.9, 2, 0.88, -2.6, 0], [1.8, 0.9, 0.05, 0, -2.6, 0.98], [1.8, 0.9, 0.05, 0, -2.6, -0.98], [1.6, 0.08, 0.45, 0, -2.62, -0.7]]);
 const COULEURS_CABINES = ['#d01818', '#f0c020', '#1a5ad8', '#2a8a3a', '#e06010'];
 MAT.cabine = std(null, { color: '#fff', metalness: 0.3, roughness: 0.5 });
+const MAT_BARRES = MAT.metal.clone();   // (une copie n'est pas percée : voir percer)
 for (const l of TELESIEGES) {
   for (const [p, a] of [[l.bas, l.a], [l.haut, l.a + Math.PI]]) { // une gare : le devant regarde le câble
     const en = (av, dr) => ({ x: p.x + Math.sin(a) * av + l.droite.x * dr, z: p.z + Math.cos(a) * av + l.droite.z * dr });
@@ -6142,7 +6150,7 @@ for (const l of TELESIEGES) {
   horaire(l); l.n = Math.floor(l.periode / (l.cabines ? 4 : 5 / 3));
   l.sieges = new THREE.InstancedMesh(l.cabines ? GEO_CABINE : GEO_SIEGE, l.cabines ? MAT.cabine : MAT.siege, l.n);
   if (l.cabines) for (let k = 0; k < l.n; k++) l.sieges.setColorAt(k, new THREE.Color(COULEURS_CABINES[k % COULEURS_CABINES.length]));
-  else l.barres = new THREE.InstancedMesh(GEO_BARRE, MAT.metal, l.n);
+  else l.barres = new THREE.InstancedMesh(GEO_BARRE, MAT_BARRES, l.n);
   for (const m of [l.sieges, l.barres]) if (m) { m.castShadow = true; m.frustumCulled = false; scene.add(m); }
   l.milieu = { x: (l.bas.x + l.haut.x) / 2, z: (l.bas.z + l.haut.z) / 2 };
 }
@@ -6249,9 +6257,13 @@ function instances(dans, geo, mat, liste, placer) {
 const GEO_BORNE = new THREE.LatheGeometry([[0.2, 0], [0.2, 0.3], [0.16, 0.4], [0.08, 0.45], [0, 0.46]].map(([r, y]) => new THREE.Vector2(r, y * R_.hauteurBornes / 0.45)), 12);
 const MAT_BORNE = std(null, { color: '#b8b4aa', roughness: 0.9 });
 // les formes de chaque matière, fusionnées en un seul objet, dans le groupe g
+// Une matière à facettes (userData.facettes : la roche de la grotte, la falaise) : chaque triangle reçoit ses propres points, tournés comme
+// lui (aFacettes), au lieu de flatShading. Même dessin (chaque facette éclairée d'un bloc), mais le même programme de la carte graphique
+// que les autres matières (flatShading en demande un de plus), pour un peu plus de mémoire (3 points par triangle)
+const aFacettes = g => { const f = g.toNonIndexed(); f.computeVertexNormals(); g.dispose(); return f; };
 function fusionner(geos, g, ombre = true) {   // ombre = false : rien ne fait d'ombre (l'intérieur des bâtiments, où le soleil n'entre pas)
   for (const [nom, liste] of Object.entries(geos)) {
-    const mesh = new THREE.Mesh(mergeGeometries(liste), MAT[nom]);
+    const forme = mergeGeometries(liste), mesh = new THREE.Mesh(MAT[nom].userData.facettes ? aFacettes(forme) : forme, MAT[nom]);
     mesh.castShadow = ombre && !SANS_OMBRE.includes(nom); mesh.receiveShadow = true;
     mesh.raycast = raycastTroue;   // (les rayons passent par les trous des toits et des planchers)
     g.add(mesh);
@@ -8269,7 +8281,7 @@ function mettreCape(b, couleur, dents = false) {
     for (let k = 0; k < 4; k++) { g.beginPath(); g.ellipse(8 + k * 16, h, 7.5, 13, 0, 0, 7); g.fill(); }   // quatre creux ronds en bas : il reste cinq pointes
   };
   capeBJ.children[0].material = cacheCapes[couleur + dents] ||= !dents ? mat(couleur, { side: THREE.DoubleSide, roughness: 0.9 })
-    : new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, roughness: 0.9, alphaTest: 0.5, map: Object.assign(toile(64, 64, dessin), { wrapT: THREE.ClampToEdgeWrapping }) });   // (l'image ne se répète pas : sinon le haut de la cape déborde tout en bas, et fait un trait)
+    : std(Object.assign(toile(64, 64, dessin), { wrapT: THREE.ClampToEdgeWrapping }), { side: THREE.DoubleSide, roughness: 0.9, alphaTest: 0.5, bumpScale: 0 });   // (l'image ne se répète pas : sinon le haut de la cape déborde tout en bas, et fait un trait. Relief 0 : comme le filet)
   b.torse.add(capeBJ);
 }
 const avantCape = V3(), iciCape = V3(), ventCape = V3(), quatCape = new THREE.Quaternion();
@@ -8585,8 +8597,10 @@ function creerObjet(o) {
     const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.12, 0.02), M_BILLET); b.position.y = 0.14; g.add(b);
   }
   const couleur = { soin: '#f44', argent: '#6f6', gilet: '#4a9ae0', tresor: '#e070ff', munitions: '#4ad8d8', energie: '#4ad8d8', potDeVin: '#4ad8d8' }[o.type] || '#fc4';
+  // (forceSinglePass : Three.js dessine une matière transparente à deux faces en deux fois, le dos puis l'avant, chaque fois avec son propre
+  // programme. Un anneau tout plat ne montre qu'une face à la fois : une seule fois suffit, avec un seul programme, pour la même image)
   const anneau = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.6, 24).rotateX(-Math.PI / 2),
-    new THREE.MeshBasicMaterial({ color: couleur, transparent: true, opacity: 0.6, side: THREE.DoubleSide }));
+    new THREE.MeshBasicMaterial({ color: couleur, transparent: true, opacity: 0.6, side: THREE.DoubleSide, forceSinglePass: true }));
   anneau.position.y = -0.8;
   g.add(anneau);
   if (o.type === 'stand') {
@@ -8768,7 +8782,9 @@ function mailles(nx, ny, electrique) {
     for (const [x1, y1, x2, y2] of [[0, 0, l, h], [0, h, l, 0]]) { g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); }
   });
   map.repeat.set(nx, ny);
-  return new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, alphaTest: 0.5, roughness: 1, map, ...(electrique ? { color: '#3aa8ff', emissive: '#1a7cff', emissiveIntensity: 2 } : {}) });
+  // (bumpScale 0 : pas de relief du tout ; mais avec son image en relief, il a le même programme de la carte graphique que les costumes
+  // découpés à deux faces, comme le pagne de Zeus : un de moins à compiler)
+  return new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, alphaTest: 0.5, roughness: 1, map, bumpMap: map, bumpScale: 0, ...(electrique ? { color: '#3aa8ff', emissive: '#1a7cff', emissiveIntensity: 2 } : {}) });
 }
 const M_FILET = mailles(28, 8), M_FILET_ELEC = mailles(28, 8, true);                  // le filet ouvert (par terre, ou sur une voiture)
 const M_FILET_COCON = mailles(9, 7), M_FILET_COCON_ELEC = mailles(9, 7, true);       // le filet qui emballe quelqu'un
@@ -9944,8 +9960,10 @@ function reinitialiserCamp() {
 }
 
 // repère de mission : colonne lumineuse (ou flèche au-dessus de la cible)
+// (forceSinglePass : la colonne est dessinée en une seule fois, pas le dos puis l'avant, avec un programme de moins : d'une seule couleur,
+// et sans profondeur, elle donne la même image)
 const repere =new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 5, 24, 1, true),
-  new THREE.MeshBasicMaterial({ color: '#ffd23a', transparent: true, opacity: 0.35, side: THREE.DoubleSide, depthWrite: false, fog: false }));
+  new THREE.MeshBasicMaterial({ color: '#ffd23a', transparent: true, opacity: 0.35, side: THREE.DoubleSide, forceSinglePass: true, depthWrite: false, fog: false }));
 scene.add(repere);
 const fleche = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.7, 4).rotateX(Math.PI), new THREE.MeshBasicMaterial({ color: '#ffd23a', fog: false }));
 scene.add(fleche);
@@ -14048,7 +14066,7 @@ for (const p of portes) {
     for (const y of [0.15, p.h * 0.55, p.h - 0.12]) fer.push(new THREE.BoxGeometry(p.l, 0.08, 0.1).translate(0, y, 0));
   }
   for (const [l, m] of [[bois, MAT.bois], [fer, M_BARREAUX]]) if (l.length) { const e = new THREE.Mesh(mergeGeometries(l), m); e.castShadow = true; e.userData = { mur: true, porte: p }; g.add(e); }
-  const plaque = new THREE.Mesh(new THREE.BoxGeometry(p.l, p.h, 0.1).translate(0, p.h / 2, 0)); plaque.visible = false; plaque.userData = { porte: p }; g.add(plaque);   // (invisible : les balles ne passent pas entre les barreaux)
+  const plaque = new THREE.Mesh(new THREE.BoxGeometry(p.l, p.h, 0.1).translate(0, p.h / 2, 0), M_BARREAUX); plaque.visible = false; plaque.userData = { porte: p }; g.add(plaque);   // (invisible : les balles ne passent pas entre les barreaux. Sa matière ne se voit pas : celle des barreaux, car sans matière, Three.js lui en fait une, et la carte graphique un programme de plus)
   g.position.set(p.x, p.y, p.z); g.rotation.y = Math.atan2(p.f.x, p.f.z); scene.add(g);
   Object.assign(p, { max: p.vie, h0: p.boite.h, cassee: false, secoue: 0 });
   batiments.push(...g.children);
