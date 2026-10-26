@@ -1500,8 +1500,9 @@ fetch('https://api.github.com/repos/jlehen/GTAxel/commits?sha=main&per_page=1')
 // =====================================================================
 // visible : l'écran est là ; n : le chapitre ; t : depuis combien de secondes il est là ; sortie : depuis combien de secondes il s'en va
 // (-1 : pas encore) ; attend : il attend un clic (texte : ce qu'on lit en bas) ; sons : { bip, bruit }, donnés par le jeu ;
-// parts, eclats, image : les flammes, les chauves-souris, la fumée, les éclats du logo pendant qu'il s'en va
-const ecranChapitre = { visible: false, n: 1, t: 0, sortie: -1, attend: false, texte: '', clic: null, sons: null, parts: [], eclats: null, image: null, avant: 0,
+// parts, eclats, image : les flammes, les chauves-souris, la fumée, les éclats du logo pendant qu'il s'en va ; parLeJeu : le jeu est
+// chargé, et c'est sa boucle qui anime l'écran (avant, il a la sienne : animerEcran)
+const ecranChapitre = { visible: false, n: 1, t: 0, sortie: -1, attend: false, texte: '', clic: null, sons: null, parts: [], eclats: null, image: null, avant: 0, parLeJeu: false,
   bloque() { return this.visible && this.sortie < 0.5; } };   // le jeu attend : le fond est encore tout noir
 const divEcran = document.getElementById('ecran-chapitre'), toileEcran = divEcran.querySelector('canvas');
 divEcran.onclick = () => ecranChapitre.clic?.();
@@ -1733,12 +1734,12 @@ function animerEcran(t) {
   if (E.sortie >= 0) E.sortie += dt;
   if (E.sortie > (LOGOS[CHAPITRES[E.n - 1].logo] || LOGOS.wolfenstein).duree) { E.visible = false; divEcran.style.display = 'none'; return; }
   dessinerEcran(dt);
-  requestAnimationFrame(animerEcran);
+  if (!E.parLeJeu) requestAnimationFrame(animerEcran);   // (une fois le jeu chargé, c'est sa boucle qui l'appelle : au même plafond d'images par seconde que le jeu)
 }
 // n : le chapitre ; attend : jusqu'à un clic (texte : ce qu'on lit en bas), sinon 2,2 s ; sons : { bip, bruit }
 function montrerEcran(n, attend, texte = '', sons = null) {
   Object.assign(ecranChapitre, { visible: true, n, t: 0, sortie: -1, attend, texte, sons, avant: 0, parts: [], eclats: null, image: null });
-  divEcran.style.display = 'block'; requestAnimationFrame(animerEcran);
+  divEcran.style.display = 'block'; if (!ecranChapitre.parLeJeu) requestAnimationFrame(animerEcran);
 }
 function sortirEcran(sons = ecranChapitre.sons) {
   const E = ecranChapitre;
@@ -1809,6 +1810,7 @@ const REGLAGES = {
   argentDepart: 0,
   vueDepart: 3,              // 1 = première personne, 3 = troisième personne
   compteur: false,           // true = le compteur de performances (touche P) est allumé dès le départ : les images par seconde, et ce qui coûte. Si le jeu rame, allume-le, puis change ombres, distanceVue ou la foule du menu, et regarde ce qui baisse
+  imagesParSeconde: 60,      // le jeu ne dessine pas plus d'images par seconde que ça, même sur un écran rapide (120, 144 Hz...) : l'œil n'y voit presque rien de plus, mais l'ordinateur chauffe et la batterie se vide. 0 = autant que l'écran. Pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20. Si le jeu rame (moins de 60 au compteur, touche P), ça ne l'accélère pas : 30 le fait moins chauffer, un peu moins fluide mais régulier
   ombres: true,              // mets false si le jeu rame
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
@@ -16877,9 +16879,30 @@ function compter(debut, avantDessin) {
   ].join('\n');
 }
 
-let dernier = performance.now();
+// Le plafond d'images par seconde (imagesParSeconde, dans REGLAGES). L'écran rappelle boucle à son rythme : 60 fois par seconde, ou 120,
+// 144, 240 sur un écran rapide, où le jeu calculerait et dessinerait tout 2 à 4 fois plus, pour presque rien. Alors la prochaine image a un
+// rendez-vous, qui avance de 1000 / imagesParSeconde millisecondes à chaque image dessinée : avant l'heure (à une demi-image d'écran près),
+// boucle ne fait rien et attend l'appel suivant. Sur un écran à 75 ou 90 Hz, ça donne quand même 60 images par seconde (il saute une image
+// de l'écran sur 5, ou sur 3), et pas 37 ou 45 comme si on sautait une image sur deux.
+let rendezVous = 0;   // l'heure de la prochaine image à dessiner (en millisecondes, comme l'heure que donne l'écran)
+let appelEcran = performance.now(), imageEcran = 1000 / 60;   // le dernier appel de l'écran, et le temps entre deux de ses images, en moyenne
+function imageAFaire(t) {
+  if (t > appelEcran && t < appelEcran + 100) imageEcran = lerp(imageEcran, t - appelEcran, 0.1);   // (en moyenne, car l'heure de l'écran tremble un peu ; sans les trous : l'onglet caché, une image très lente ; ni la toute 1re image, dont l'heure date d'avant la construction du pays)
+  appelEcran = t;
+  const ips = R_.imagesParSeconde;
+  if (!(ips > 0)) return true;   // 0 : pas de plafond, on suit l'écran
+  const pas = 1000 / Math.max(20, ips);   // jamais moins de 20 images par seconde : en dessous, le pas de temps (50 ms au plus) ferait ralentir tout le jeu
+  if (rendezVous < t - pas || rendezVous > t + pas) rendezVous = t;   // plus d'une image de retard (l'onglet était caché, le jeu ramait), ou d'avance (le réglage vient de changer) : on repart de maintenant, sans rafale pour rattraper
+  if (t < rendezVous - imageEcran / 2) return false;   // trop tôt : on attend l'appel suivant de l'écran
+  rendezVous += pas + 0.1 * (t - rendezVous);   // le rendez-vous suivant, un peu recalé sur l'heure de cette image : un écran « à 60 Hz » qui bat à 59,94 ou 60,2 Hz ne saute jamais d'image
+  return true;
+}
+
+let dernier = performance.now();   // l'heure de la dernière image dessinée
 function boucle(t) {
+  if (!imageAFaire(t)) { requestAnimationFrame(boucle); return; }   // le plafond d'images par seconde : cette image-là est sautée, elle ne coûte rien (le pas de temps de la suivante comptera tout le temps écoulé)
   const debutImage = performance.now();   // (pour le compteur de performances)
+  animerEcran(t);   // l'écran du chapitre, s'il est affiché (son logo, par-dessus le jeu) : au même plafond
   const dt = clamp((t - dernier) / 1000 * R_.vitesseJeu, 0, 0.05);   // (REGLAGES.vitesseJeu ralentit tout le jeu)
   const horloge = R_.vitesseJeu > 0 ? clamp((t - dernier) / 1000, 0, 1) : 0;   // le vrai temps écoulé : la journée dure ce qu'il faut, même si le jeu rame
   dernier = t;
@@ -16907,6 +16930,7 @@ function boucle(t) {
 // premier placement du joueur
 majJoueur(0);
 requestAnimationFrame(boucle);
+ecranChapitre.parLeJeu = true;   // l'écran du chapitre n'a plus sa propre boucle : c'est boucle qui l'anime, au plafond d'images par seconde
 etat('Clique pour jouer');
 // le chapitre où l'on est : son heure, la DeLorean dans sa cachette, le code de son héros (allumé tout le chapitre),
 // et son écran, qui attendait que le pays soit construit
