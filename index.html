@@ -4108,15 +4108,17 @@ ciel.material.uniforms.sunPosition.value.copy(soleilDir);
 }
 // les reflets : le ciel, photographié tout autour (sans le disque du soleil : la lumière « soleil » éclaire déjà). On le refait quand le soleil a bougé.
 // scenesReflets : les scènes qui reflètent ce ciel (le pays, et plus bas l'arme à la 1re personne). La photo d'avant est jetée : une scène
-// qui la garderait ne refléterait plus rien (le gant d'Iron Man, à la 1re personne, devenait tout noir)
+// qui la garderait ne refléterait plus rien (le gant d'Iron Man, à la 1re personne, devenait tout noir). Sauf la toute première, celle du
+// chargement (premierePhoto) : l'aperçu du héros, dans le menu, la garde pour toujours (il ne suit pas l'heure du jeu)
 const pmrem = new THREE.PMREMGenerator(renderer), scenePhoto = new THREE.Scene(), scenesReflets = [scene];
-let reflets = null;
+let reflets = null, premierePhoto = null;
 function photographierCiel() {
   const u = ciel.material.uniforms, avant = ciel.position.clone();
   scenePhoto.add(ciel); ciel.position.set(0, 0, 0); u.showSunDisc.value = 0;
   const r = pmrem.fromScene(scenePhoto);
   u.showSunDisc.value = 1; ciel.position.copy(avant); scene.add(ciel);
-  reflets?.dispose(); reflets = r;
+  if (reflets !== premierePhoto) reflets.dispose();   // (la première n'est jamais jetée : l'aperçu s'en sert encore)
+  reflets = r; premierePhoto ??= r;
   for (const s of scenesReflets) s.environment = r.texture;
 }
 photographierCiel();
@@ -8600,7 +8602,7 @@ const apercu = { h: creerHumain(TENUE_BJ), scene: new THREE.Scene(), camera: new
 apercu.scene.background = new THREE.Color('#2c3848');
 apercu.scene.add(apercu.h.g, new THREE.HemisphereLight(0xffffff, 0x555555, 1.2));
 { const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(1, 2, 2); apercu.scene.add(l); }
-apercu.scene.environment = scene.environment; apercu.scene.environmentIntensity = 0.25;
+apercu.scene.environment = premierePhoto.texture; apercu.scene.environmentIntensity = 0.25;   // (le ciel du chargement, gardé pour lui : voir photographierCiel)
 apercu.camera.position.set(0, 1.02, 4.5); apercu.camera.lookAt(0, 0.95, 0);
 function dessinerApercu(dt) {
   const { h, cadre } = apercu, l = cadre.clientWidth, ha = cadre.clientHeight, pr = renderer.getPixelRatio(), image = renderer.domElement;
