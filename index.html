@@ -414,14 +414,15 @@ for (const k in foule) {
 //    anticrenelage : les bords bien lisses (false : un peu en escalier, mais bien moins de travail pour la carte graphique)
 //    ombres : les ombres du soleil ; ombreSoleil : leur finesse (2048 : nettes ; 1024 : un peu floues, 4 fois moins de points à dessiner)
 //    ombresPersonnages : jusqu'où (en mètres) les passants ont une vraie ombre ; plus loin, une tache sous les pieds (0 : une tache pour tous)
+//    detailsVoitures : jusqu'où (en mètres) les voitures ont toutes leurs pièces ; plus loin, elles sont dessinées d'un seul bloc
 //    distanceVue : jusqu'où on voit les bâtiments, les arbres et les gens (mètres)
 //    lumieresNuit : combien de lampadaires éclairent vraiment autour de toi la nuit (les autres brillent seulement)
 //    finesse, finesseMin : combien de points l'image a pour chaque point de l'écran, au plus et au moins (voir REGLAGES)
 // =====================================================================
 const QUALITES = {
-  'Basse':   { anticrenelage: false, ombres: false, ombreSoleil: 1024, ombresPersonnages: 0,  distanceVue: 500, lumieresNuit: 2, finesse: 1,    finesseMin: 0.6 },
-  'Moyenne': { anticrenelage: true,  ombres: true,  ombreSoleil: 1024, ombresPersonnages: 15, distanceVue: 700, lumieresNuit: 4, finesse: 1.25, finesseMin: 0.75 },
-  'Haute':   { anticrenelage: true,  ombres: true,  ombreSoleil: 2048, ombresPersonnages: 30, distanceVue: 900, lumieresNuit: 8, finesse: 1.5,  finesseMin: 0.75 },
+  'Basse':   { anticrenelage: false, ombres: false, ombreSoleil: 1024, ombresPersonnages: 0,  detailsVoitures: 30, distanceVue: 500, lumieresNuit: 2, finesse: 1,    finesseMin: 0.6 },
+  'Moyenne': { anticrenelage: true,  ombres: true,  ombreSoleil: 1024, ombresPersonnages: 15, detailsVoitures: 45, distanceVue: 700, lumieresNuit: 4, finesse: 1.25, finesseMin: 0.75 },
+  'Haute':   { anticrenelage: true,  ombres: true,  ombreSoleil: 2048, ombresPersonnages: 30, detailsVoitures: 60, distanceVue: 900, lumieresNuit: 8, finesse: 1.5,  finesseMin: 0.75 },
 };
 // le niveau que montre le menu : le jeu le trouve d'après les nombres de REGLAGES (null : aucun, la qualité est « personnalisée »).
 // Le navigateur s'en souvient, pour le montrer tout de suite au prochain lancement
@@ -1880,12 +1881,13 @@ const REGLAGES = {
   finesseAuto: true,         // true = le jeu règle tout seul la finesse : si les images arrivent trop lentement parce que la carte graphique n'arrive pas à colorier tous les points, il en dessine moins (un peu plus flou, mais de nouveau fluide), et il remonte quand tout va bien. false = toujours la finesse ci-dessus. Si le jeu rame, laisse true (le compteur, touche P, montre la finesse du moment)
   finesseMin: 0.75,          // ...mais jamais moins fine que ça, même si le jeu rame encore (0.5 = très flou)
   // la qualité du menu (Basse, Moyenne, Haute : voir QUALITES, tout en haut) change d'un coup anticrenelage, ombres, ombreSoleil,
-  // ombresPersonnages, distanceVue, lumieresNuit, finesse et finesseMin. Haute, ce sont les nombres d'ici
+  // ombresPersonnages, detailsVoitures, distanceVue, lumieresNuit, finesse et finesseMin. Haute, ce sont les nombres d'ici
   anticrenelage: true,       // true = les bords des objets sont bien lisses ; false = un peu en escalier, mais bien moins de travail pour la carte graphique (puis F5). Si le jeu rame, mets false
   ombres: true,              // mets false si le jeu rame
   ombreSoleil: 2048,         // la finesse des ombres du soleil : la carte des ombres fait 2048 × 2048 points pour 180 × 180 m autour de toi. 1024 = un peu plus floues, mais 4 fois moins de points à dessiner ; 4096 = très nettes, et 4 fois plus (puis F5)
   ombresPersonnages: 30,     // mètres : les passants, policiers et ennemis plus près que ça de la caméra ont une vraie ombre ; plus loin, une tache sombre sous les pieds, bien moins de travail (toi, tu gardes toujours la tienne). 0 = une tache pour tous. Si le jeu rame, mets 15 ; 150 = de vraies ombres pour presque tous, presque comme avant
   sommeilVoitures: 60,       // mètres : une voiture garée plus loin que ça de toi, qui ne bouge plus depuis 2 s, « dort » : le jeu ne la recalcule plus à chaque image (la plupart des voitures du pays sont garées). Elle se réveille dès que tu t'approches, ou qu'on la touche. 0 = aucune ne dort (le jeu recalcule tout, comme avant : deux fois plus de calcul). Si le jeu rame, surtout pas 0 ; 30, si tu veux, mais ça ne gagne presque rien de plus
+  detailsVoitures: 60,       // mètres : une voiture plus loin que ça de la caméra est dessinée d'un seul bloc (toutes ses pièces collées ensemble, roues comprises) : de loin, on ne voit pas la différence, et c'est deux fois moins de travail pour la carte graphique. Son ombre, elle, vient toujours de ce bloc, même de près (c'est la même ombre, en un seul dessin au lieu de 17). Une voiture abîmée, en feu, en accident, ou la police, garde toujours toutes ses pièces et leurs ombres. 0 = toutes les voitures ont toujours toutes leurs pièces (comme avant). Si le jeu rame, mets 30 (c'est ce que fait la qualité Basse)
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
@@ -3344,7 +3346,7 @@ document.getElementById('remettre').onclick = () => { for (const i of boiteRegla
 // (elles deviennent jaunes). Le menu montre le niveau dont tous les nombres sont ceux du jeu ; s'il n'y en a aucun (une case changée à la
 // main), la qualité est « personnalisée ». Tout remettre revient aux nombres du code : Haute.
 // AU_LANCEMENT : ce que le jeu ne lit qu'en se chargeant (la carte graphique, les ombres, la brume, les lumières sont réglées une fois pour
-// toutes) : pour le changer, il recharge la page. Le reste (ombresPersonnages, finesse, finesseMin) compte dès l'image suivante
+// toutes) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
 const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'distanceVue', 'distanceRelief', 'lumieresNuit'];
 for (const nom in QUALITES) for (const k in QUALITES[nom]) if (!cases['REGLAGES.' + k]) alert(`Qualité "${nom}" : "${k}" n'est pas un nombre de REGLAGES !`);
 function remplirQualite(nom) { for (const k in QUALITES[nom]) cases['REGLAGES.' + k]?.mettre(QUALITES[nom][k]); }
@@ -7815,12 +7817,121 @@ function skisRando(v) {
 // fabrique (ou refait, au garage) la voiture en 3D, toute neuve
 function habillerVoiture(v) {
   if (v.m) scene.remove(v.m);
-  Object.assign(v, modeleVoiture(v.type, v.couleur, v.police, v.blindee), { abimee: false, degats: { avant: 0, arriere: 0, gauche: 0, droite: 0, toit: 0 }, fenetres: [], pieces: [], deformables: [], impacts: [], roquettes: 0, brule: 0 });
+  Object.assign(v, modeleVoiture(v.type, v.couleur, v.police, v.blindee), { abimee: false, degats: { avant: 0, arriere: 0, gauche: 0, droite: 0, toit: 0 }, fenetres: [], pieces: [], deformables: [], impacts: [], roquettes: 0, brule: 0, deLoin: null });
   if (v.forme.rando) skisRando(v);
   v.m.rotation.order = 'YXZ';   // elle tourne, puis elle penche (dans les pentes)
   v.m.traverse(o => o.userData.voiture = v);
   scene.add(v.m);
   reveiller(v);   // (une voiture toute neuve : majVoiture doit la poser, et placer ses roues)
+}
+// La voiture vue de loin (REGLAGES.detailsVoitures). Une voiture, c'est une quinzaine de pièces : sa carrosserie, sa cabine, ses vitres, ses
+// phares, ses feux, ses plaques... et 2 par roue (le pneu et la jante). Chacune coûte un dessin à la carte graphique, et un de plus pour son
+// ombre : avec la foule, les voitures faisaient la moitié des dessins de l'image. Mais de loin, on ne voit ni les roues tourner, ni les plaques.
+// Alors une voiture intacte, plus loin que detailsVoitures de la caméra, est dessinée d'un seul bloc : sa forme de loin, toutes ses pièces
+// collées ensemble (faite une seule fois par modèle), avec les mêmes matières : un dessin par matière (8 au lieu de 17 pour une voiture). Et
+// son ombre, même de près, vient de ce bloc : un seul dessin (voir ombreEnBloc). Ses vraies pièces sont seulement cachées : les balles les
+// touchent toujours, comme avant. Si elle s'abîme, prend feu, crève un pneu, part en accident... (voir enBloc), ou qu'on s'approche, elle
+// reprend ses vraies pièces (et leurs ombres) dès l'image suivante
+const ECART_DETAILS = 2;   // mètres : elle passe à la forme de loin 2 m plus loin que la limite, et revient 2 m plus près (pour ne pas clignoter)
+// des roues plus simples (12 côtés au lieu de 24) : de loin, une roue ne fait que quelques points de l'écran
+GEO_V.pneuLoin = tour([[0.2, -0.11], [0.32, -0.12], [0.34, 0], [0.32, 0.12], [0.2, 0.11]], 12).rotateZ(Math.PI / 2);
+GEO_V.janteLoin = new THREE.CylinderGeometry(0.22, 0.22, 0.2, 12).rotateZ(Math.PI / 2);
+// de loin, les plaques prennent le chrome de la voiture : on ne voit plus la différence, et ça fait un dessin de moins. Et la jante prend la
+// couleur moyenne de son image : de loin, on ne voit plus ses branches (la carte graphique la moyenne déjà ainsi)
+const LOIN = { plaques: M_CHROME, jante: mat('#a0a0a3', { metalness: 0.7, roughness: 0.35 }) };
+const matiereLoin = p => LOIN[p.nom] ?? p.mesh.material;   // (sinon, celle de la vraie pièce, telle qu'elle est : les phares allumés ou éteints...)
+// une voiture qu'on peut dessiner d'un seul bloc : intacte (pas abîmée, aucun pneu crevé, ni en feu, ni détruite), posée sur ses roues (pas en
+// accident, ni sur un looping), pas en train de couler, pas celle de B.J., ni la police (ses gyrophares), ni la Batmobile (ses ailes), ni un
+// hélicoptère (ses pales), ni des skis
+const enBloc = v => v !== J.voiture && !v.abimee && !v.detruite && !(v.brule > 0) && !v.accident && !v.quat && !v.rail && !v.coule && !v.police
+  && !v.gyro && !v.type.vitesseVol && !v.rotors.length && !v.type.glisse && !v.roues.some(r => r.crevee);
+// une copie d'une forme, placée dans la voiture, avec seulement ce qu'ont toutes les pièces (pour pouvoir les coller ensemble).
+// uv : où prendre les points de son image, s'il y a une matière avec une image (la tôle rouillée du blindage) ; sinon, pas besoin
+function copiePlacee(forme, matrice, uv) {
+  const f = forme.index ? forme.toNonIndexed() : forme, g = new THREE.BufferGeometry();
+  g.setAttribute('position', f.attributes.position.clone());
+  if (f.attributes.normal) g.setAttribute('normal', f.attributes.normal.clone()); else g.computeVertexNormals();
+  if (uv) g.setAttribute('uv', f.attributes.uv?.clone() ?? new THREE.Float32BufferAttribute(f.attributes.position.count * 2, 2));   // (une pièce sans image : des zéros)
+  return matrice ? g.applyMatrix4(matrice) : g;
+}
+const cacheLoin = {};
+// fabrique la forme de loin d'une voiture : ses vraies pièces, toutes neuves, rangées par matière (dans l'ordre où elles viennent), puis collées
+function formeDeLoin(v) {
+  // les pièces : celles de la carrosserie (v.parts), et dans chaque roue, toute droite, le pneu et la jante, plus simples (et le guidon et le
+  // phare du tricycle). forme : sa forme (celle de la vraie pièce, sauf pour les roues) ; matrice : sa place dans la voiture
+  const pieces = Object.entries(v.parts).filter(([, mesh]) => mesh).map(([nom, mesh]) => ({ nom, mesh, forme: mesh.geometry, matrice: null }));
+  v.roues.forEach((r, k) => {
+    const p = r.pivot.position, place = new THREE.Matrix4().makeTranslation(p.x, p.y, p.z), taille = place.clone().scale(r.tourne.scale);
+    r.tourne.children.forEach((mesh, i) => pieces.push({ nom: i ? 'jante' : 'pneu', mesh, forme: i ? GEO_V.janteLoin : GEO_V.pneuLoin, matrice: taille }));
+    r.pivot.children.forEach((mesh, i) => { if (mesh.isMesh) pieces.push({ nom: 'roue' + k + '.' + i, mesh, forme: mesh.geometry, matrice: place }); });
+  });
+  if (!pieces.length) return;   // (rien à dessiner : les skis de rando, faits à part)
+  const groupes = [];   // les pièces de chaque matière
+  for (const p of pieces) {
+    const g = groupes.find(g => matiereLoin(g[0]) === matiereLoin(p));
+    if (g) g.push(p); else groupes.push([p]);
+  }
+  // la forme est la même pour toutes les voitures de ce modèle qui ont les mêmes pièces rangées de la même façon (pas la même couleur)
+  const cle = v.type.modele + ' : ' + groupes.map(g => g.map(p => p.nom).join('+')).join(' | ');
+  if (!cacheLoin[cle]) {
+    const uv = groupes.some(g => matiereLoin(g[0]).map);
+    cacheLoin[cle] = mergeGeometries(groupes.map(g => mergeGeometries(g.map(p => copiePlacee(p.forme, p.matrice, uv)))), true);   // (un morceau par matière)
+  }
+  // l'image a une matière par morceau (un dessin chacun) ; l'ombre, la même forme avec une seule matière : Three.js la dessine alors en entier,
+  // d'un seul coup (elle n'a pas besoin des couleurs)
+  const image = new THREE.Mesh(cacheLoin[cle], groupes.map(g => matiereLoin(g[0]))), ombre = new THREE.Mesh(cacheLoin[cle], M_NOIR);
+  ombre.castShadow = true; ombre.visible = image.visible = false;   // (l'ombre, on ne la montre que le temps de dessiner la carte des ombres : voir ombreEnBloc)
+  image.raycast = ombre.raycast = () => {};   // les balles passent à travers : elles touchent les vraies pièces, cachées, comme avant
+  image.userData.voiture = ombre.userData.voiture = v;
+  v.corps.add(image, ombre);   // (elles penchent avec la carrosserie quand on freine ou qu'on tourne)
+  v.deLoin = { image, ombre, groupes };
+}
+// la forme de loin prend les matières de la voiture telles qu'elles sont maintenant (ses phares s'allument quand quelqu'un la conduit...).
+// Si deux pièces collées ensemble n'ont plus la même matière, elle ne va plus : on l'oublie (elle sera refaite)
+function majMatieresDeLoin(v) {
+  const { image, groupes } = v.deLoin;
+  for (let i = 0; i < groupes.length; i++) {
+    const m = matiereLoin(groupes[i][0]);
+    if (groupes[i].some(p => matiereLoin(p) !== m)) { montrerDeLoin(v, false); v.corps.remove(image, v.deLoin.ombre); v.deLoin = null; return false; }
+    image.material[i] = m;
+  }
+  return true;
+}
+// montre la forme de loin à la place des vraies pièces (loin = true), ou l'inverse
+function montrerDeLoin(v, loin) {
+  if (loin && !v.deLoin) formeDeLoin(v);
+  if (!v.deLoin) return;
+  v.deLoin.image.visible = loin;
+  for (const p of Object.values(v.parts)) if (p) p.visible = !loin;
+  for (const r of v.roues) r.pivot.visible = !loin;
+}
+// L'ombre d'un seul bloc : pour l'ombre, la forme de loin est exactement la forme de la voiture (seules ses roues ne tournent pas, mais une roue
+// fait la même ombre qu'elle tourne ou non). Alors toute voiture intacte, même tout près, fait l'ombre de sa forme de loin : un seul dessin
+// dans la carte des ombres, au lieu de 17. Le temps de dessiner cette carte, on cache ses vraies pièces et on montre sa forme de loin (oui = true),
+// puis on remet tout comme avant (oui = false) : l'image, elle, a déjà fait la liste de ce qu'elle dessine
+const voituresEnBloc = [];   // (les voitures intactes de cette image : voir majDetailsVoitures)
+function ombreEnBloc(v, oui) {
+  if (!v.deLoin) return;   // (refaite au garage entre-temps)
+  v.deLoin.ombre.visible = oui;
+  if (v.deLoin.image.visible) return;   // (de loin, ses vraies pièces sont déjà cachées)
+  for (const p of Object.values(v.parts)) if (p) p.visible = !oui;
+  for (const r of v.roues) r.pivot.visible = !oui;
+}
+// à chaque image, après la caméra et les phares (dans majCiel) : chaque voiture intacte loin de la caméra prend sa forme de loin, et les
+// autres leurs vraies pièces ; les voitures intactes font l'ombre de leur forme de loin
+function majDetailsVoitures() {
+  voituresEnBloc.length = 0;
+  // avec la lunette du fusil de sniper (ou en visant), la caméra grossit : une voiture à 300 m y paraît à 50 m. loupe : de combien elle paraît
+  // plus près (70° : le champ de vision normal de la caméra, voir majCamera)
+  const L = R_.detailsVoitures, cam = camera.position, loupe = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) / Math.tan(THREE.MathUtils.degToRad(70) / 2);
+  for (const v of voitures) {
+    if (!v.m.visible) continue;   // (trop loin de B.J. : elle n'est pas dessinée du tout)
+    const avant = !!v.deLoin?.image.visible;
+    const bloc = L > 0 && enBloc(v) && (!v.deLoin || majMatieresDeLoin(v));
+    const loin = bloc && cam.distanceTo(v.m.position) * loupe > L + (avant ? -ECART_DETAILS : ECART_DETAILS);
+    if (loin !== avant) montrerDeLoin(v, loin);
+    if (bloc && renderer.shadowMap.enabled) { if (!v.deLoin) formeDeLoin(v); if (v.deLoin) voituresEnBloc.push(v); }
+  }
 }
 // passer du repère de la voiture (lx vers sa gauche, lz vers l'avant) au monde
 const local = (v, lx, lz) => ({ x: v.x + lx * Math.cos(v.angle) + lz * Math.sin(v.angle), z: v.z - lx * Math.sin(v.angle) + lz * Math.cos(v.angle) });
@@ -16850,14 +16961,16 @@ ombresLoin.count = 0; ombresLoin.frustumCulled = false; ombresLoin.receiveShadow
 ombresLoin.renderOrder = -1;   // (dessinées avant les autres objets transparents : derrière une vitre, elles restent derrière)
 ombresLoin.raycast = () => {};   // les balles passent à travers
 scene.add(ombresLoin);
-// ceux qui n'ont pas de vraie ombre : on les cache juste le temps de dessiner la carte des ombres (sans parcourir leurs vingt pièces)
+// ceux qui n'ont pas de vraie ombre : on les cache juste le temps de dessiner la carte des ombres (sans parcourir leurs vingt pièces) ;
+// et les voitures intactes y font l'ombre d'un seul bloc (voir ombreEnBloc)
 const sansVraieOmbre = [];
 {
   const dessinerOmbres = renderer.shadowMap.render;
   renderer.shadowMap.render = function (lumieres, s, c) {
-    if (s !== scene || !sansVraieOmbre.length) return dessinerOmbres.call(this, lumieres, s, c);
+    if (s !== scene || (!sansVraieOmbre.length && !voituresEnBloc.length)) return dessinerOmbres.call(this, lumieres, s, c);
     for (const g of sansVraieOmbre) { g.userData.vu = g.visible; g.visible = false; }   // (on retient s'il était visible, pour le remettre comme avant)
-    try { return dessinerOmbres.call(this, lumieres, s, c); } finally { for (const g of sansVraieOmbre) g.visible = g.userData.vu; }
+    for (const v of voituresEnBloc) ombreEnBloc(v, true);
+    try { return dessinerOmbres.call(this, lumieres, s, c); } finally { for (const g of sansVraieOmbre) g.visible = g.userData.vu; for (const v of voituresEnBloc) ombreEnBloc(v, false); }
   };
 }
 // la force d'une tache : ce qu'une vraie ombre enlève de lumière au sol (mesuré : 20 à 30 % quand le soleil est haut, 45 % quand il est bas),
@@ -16955,6 +17068,7 @@ function majCiel(dt) {
   M_HALO.color.copy(C.halo).multiplyScalar(lumiere.nuit);
   M_PHARE.emissiveIntensity = 1.5 + 4 * lumiere.nuit; M_FEU.emissiveIntensity = 1 + 2 * lumiere.nuit;
   majLumieresNuit(dt); majPhares();
+  majDetailsVoitures();     // (après les phares : la forme de loin prend leur matière)
   majOmbresPersonnages();   // (après le soleil, qui vient de bouger)
 }
 // dormir dans une villa de B.J. : on passe au début du moment suivant de la journée, avec toute sa vie
@@ -17385,6 +17499,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
   mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; }, compteur, allumerCompteur, compter, preparation, A_PREPARER,
   ombresLoin, M_TACHE, majOmbresPersonnages, sansVraieOmbre, forceDesOmbres, finesse, reglerFinesse, FINESSES,
+  majDetailsVoitures, voituresEnBloc, ombreEnBloc, enBloc, montrerDeLoin, formeDeLoin, cacheLoin, majPhares,
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
