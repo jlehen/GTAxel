@@ -1892,6 +1892,7 @@ const REGLAGES = {
   detailsVoitures: 60,       // mètres : une voiture plus loin que ça de la caméra est dessinée d'un seul bloc (toutes ses pièces collées ensemble, roues comprises) : de loin, on ne voit pas la différence, et c'est deux fois moins de travail pour la carte graphique. Son ombre, elle, vient toujours de ce bloc, même de près (c'est la même ombre, en un seul dessin au lieu de 17). Une voiture abîmée, en feu, en accident, ou la police, garde toujours toutes ses pièces et leurs ombres. 0 = toutes les voitures ont toujours toutes leurs pièces (comme avant). Si le jeu rame, mets 30 (c'est ce que fait la qualité Basse)
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
+  distanceInterieurs: 150,   // mètres : on ne voit l'intérieur d'un bâtiment (planchers, marches, meubles) qu'à moins de 100 m. Son dessin n'est fabriqué que quand la caméra est plus près que ça, et il est défait 100 m plus loin : ça garde beaucoup de mémoire libre. 100 = au dernier moment (encore moins de mémoire, mais en volant vite, le jeu peut accrocher en fabriquant plusieurs intérieurs à la fois) ; 100000 = tous les intérieurs, peu à peu, et jamais défaits (comme avant)
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
   vitesseTelesiege: 42,      // m/s : les télésièges et la télécabine des stations de ski (le rond bleu ❄ sur la carte du jeu). 42 = 45 secondes pour monter en haut du mont Gordo. Mets 5 pour un vrai télésiège, tout lent
   vitesseGare: 2,            // m/s : dans les gares, les sièges ralentissent pour qu'on monte dessus (un télésiège « débrayable »). Mets 42 pour qu'ils ne ralentissent plus
@@ -4562,34 +4563,54 @@ function ajusterUV(g, faces, [tl, th]) {
   faces.forEach(([fl, fh], f) => { for (let k = 0; k < 4; k++) { const i = f * 4 + k; uv.setXY(i, uv.getX(i) * fl / tl, uv.getY(i) * fh / th); } });
 }
 // chaque forme est rangée dans le morceau où elle est, avec les autres formes de la même matière (fusionnées à la fin),
-// ou dans l'intérieur d'un bâtiment (planchers, escaliers, meubles) : on ne dessine un intérieur que de près (majMorceaux)
+// ou dans l'intérieur d'un bâtiment (planchers, escaliers, meubles) : on ne dessine un intérieur que de près (majInterieurs)
 const interieurs = [];
 let interieur = null;   // l'intérieur où ranger les formes, ou null
 // un monument qu'une mission fait bouger (la villa de Tony Stark, qui tombe dans la mer : mission « La villa attaquée ») : ses formes ne sont
 // pas fusionnées avec le reste du morceau, mais dans son groupe à lui, et il garde ses boîtes de collision et ses intérieurs
 let aPart = null;       // { geos, boites, interieurs } : le monument qu'on construit, ou null
 let villaStark = null;  // la villa de Tony Stark (son groupe : villaStark.g, dans villaStark.pivot)
+// g : une forme, ou la fonction qui la fabrique. Dans l'intérieur d'un bâtiment, on n'en garde que la recette : le dessin d'un intérieur
+// n'est fabriqué que quand la caméra s'en approche (voir construireInterieur). Ses murs, ses lits, ses lampes... sont faits tout de suite.
+// Attention : une fonction de recette est appelée plus tard, peut-être bien après le chargement. Elle ne doit lire que des nombres
+// calculés avant elle (comme Y dans sol) : pas Y0, ni l'étage k de meubler, qui auront changé d'ici là
 function ajouterGeo(mat, g) {
-  if (interieur) { (interieur.geos[mat] ||= []).push(g); return; }
+  if (interieur) { recetteDe(mat).push(g); return; }
+  if (typeof g === 'function') g = g();
   if (aPart) { (aPart.geos[mat] ||= []).push(g); return; }
   const p = g.attributes.position; (morceauEn(p.getX(0), p.getZ(0)).geos[mat] ||= []).push(g);
 }
+// la recette de la matière mat, dans l'intérieur qu'on construit. Une faute dans le nom de la matière ('boisclair') se voit tout de
+// suite, au chargement, et pas quand on s'approche du bâtiment (le jeu se figerait)
+function recetteDe(mat) {
+  if (!MAT[mat]) throw new Error('Matière inconnue : ' + mat + ' (regarde dans MAT)');
+  return interieur.recette[mat] ||= [];
+}
 let Y0 = 0;   // la hauteur du pâté qu'on construit : une ville dans la montagne est plus haut
 const geoBloc = (mat, g) => ajouterGeo(mat, g.translate(0, Y0, 0));
-// une boîte posée : (x, z) = centre, y = bas (au-dessus du pâté)
+// une boîte posée : (x, z) = centre, y = bas (au-dessus du pâté). Elle rend sa forme ; dans un intérieur, null : on n'en garde que la
+// recette, 6 nombres, son milieu et sa taille (une fonction par boîte prendrait trois fois plus de place : il y en a 93 000 dans les
+// intérieurs du chapitre 1)
 function boite(mat, x, y, z, l, h, p, collision = false) {
-  const g = new THREE.BoxGeometry(l, h, p);
-  if (DIM_TEX[mat]) ajusterUV(g, [[p, h], [p, h], [l, p], [l, p], [l, h], [l, h]], DIM_TEX[mat]);
-  g.translate(x, Y0 + y + h / 2, z);
-  ajouterGeo(mat, g);
+  let g = null;
+  if (interieur) recetteDe(mat).push(x, Y0 + y + h / 2, z, l, h, p);
+  else ajouterGeo(mat, g = formeBoite(mat, x, Y0 + y + h / 2, z, l, h, p));
   if (collision) { ajouterCollision(x - l / 2, z - p / 2, x + l / 2, z + p / 2, Y0 + y + h, Y0 + y); if (h > 2 && !interieur) empreintes.push([x - l / 2, z - p / 2, l, p]); }
   return g;
 }
+// la forme d'une boîte : son milieu (x, y, z) et sa taille (l × h × p)
+function formeBoite(mat, x, y, z, l, h, p) {
+  const g = new THREE.BoxGeometry(l, h, p);
+  if (DIM_TEX[mat]) ajusterUV(g, [[p, h], [p, h], [l, p], [l, p], [l, h], [l, h]], DIM_TEX[mat]);
+  return g.translate(x, y, z);
+}
 function sol(mat, x, y, z, l, p) {
-  const g = new THREE.PlaneGeometry(l, p).rotateX(-Math.PI / 2);
-  if (DIM_TEX[mat]) ajusterUV(g, [[l, p]], DIM_TEX[mat]);
-  g.translate(x, Y0 + y, z);
-  ajouterGeo(mat, g);
+  const Y = Y0 + y;   // (Y0 change d'un pâté à l'autre : on le prend tout de suite, pas quand la forme sera fabriquée)
+  ajouterGeo(mat, () => {
+    const g = new THREE.PlaneGeometry(l, p).rotateX(-Math.PI / 2);
+    if (DIM_TEX[mat]) ajusterUV(g, [[l, p]], DIM_TEX[mat]);
+    return g.translate(x, Y, z);
+  });
 }
 // Des formes arrondies (la villa de Tony Stark) : une forme est une fonction dedans(x, z), qui dit si le point (x, z) est dedans.
 // rectArrondi : un rectangle de (x1, z1) à (x2, z2), aux coins arrondis (r : leur rayon) ; disque : de centre (x, z) et de rayon r
@@ -4684,7 +4705,8 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
   const B = (m, u, y, w, lu, h, lw, coll = true) => { const [X, Z] = P(u, w); return boite(m, X, y, Z, b ? lw : lu, h, b ? lu : lw, coll); };
   const Plan = (m, u, y, w, lu, lw) => { const [X, Z] = P(u, w); sol(m, X, y, Z, b ? lw : lu, b ? lu : lw); };
   const y0 = 0.2 + bas, niveau = k => y0 + 0.05 + k * hEtage, hVisite = etages * hEtage + 0.05, hMur = hVisite + (toit ? 1.1 : 0);
-  const moi = { x, z, geos: {}, lampes: [] }, dedans = f => { const avant = interieur; interieur = moi; f(); interieur = avant; };   // ce qui est dedans ne se voit que de près
+  // ce qui est dedans ne se voit que de près : on en garde la recette, et son dessin (formes) n'est fabriqué qu'à l'approche (voir majInterieurs)
+  const moi = { x, z, recette: {}, formes: null, lampes: [] }, dedans = f => { const avant = interieur; interieur = moi; f(); interieur = avant; };
   interieurs.push(moi);
   const iu = l / 2 - E, iw = p / 2 - E, g1 = decalagePorte - largeurPorte / 2, g2 = decalagePorte + largeurPorte / 2, pe = 0.02;
   // où il est (pour savoir si B.J. est dedans), et ses lampes : la nuit, celles de la maison où est B.J. éclairent vraiment (voir « Le jour et la nuit »).
@@ -4786,7 +4808,8 @@ function meubler(b, n, rnd, plan) {
   const ou = (u, w, f, av, lat) => [u + f[0] * av + f[1] * lat, w + f[1] * av - f[0] * lat];
   const pose = (m, u, w, f, larg, h, prof, av = 0, lat = 0, dy = 0, coll = true) => M(m, ...ou(u, w, f, av, lat), f[0] ? prof : larg, h, f[0] ? larg : prof, dy, coll);
   const cache = (u, w, dy) => caches.push({ ...b.point(u, k, w), dy });   // un objet pourra attendre là, sur un meuble haut de dy
-  const boule = (m, u, w, rayon, dy) => { const [X, Z] = b.P(u, w); b.dedans(() => ajouterGeo(m, new THREE.SphereGeometry(rayon, 8, 6).translate(X, Y0 + b.niveau(k) + dy, Z))); };
+  // (sa recette : la fonction qui la fabrique, plus tard. Y est calculé tout de suite : d'ici là, k sera à l'étage du dessus, et Y0 au pâté d'après)
+  const boule = (m, u, w, rayon, dy) => { const [X, Z] = b.P(u, w), Y = Y0 + b.niveau(k) + dy; b.dedans(() => ajouterGeo(m, () => new THREE.SphereGeometry(rayon, 8, 6).translate(X, Y, Z))); };
   const lampe = (u, w) => { b.dedans(() => b.B('lampe', u, b.niveau(k + 1) - 0.36, w, 0.8, 0.06, 0.8, false)); b.noterLampe(u, k, w); };
   const cloison = (u1, w1, u2, w2) => M('platre', (u1 + u2) / 2, (w1 + w2) / 2, Math.max(0.12, u2 - u1), 2.7, Math.max(0.12, w2 - w1));
   const tapis = (u, w, lu, lw, m) => M(m, u, w, lu, 0.012, lw, 0.004, false);
@@ -6391,16 +6414,19 @@ const MAT_BORNE = std(null, { color: '#b8b4aa', roughness: 0.9 });
 // que les autres matières (flatShading en demande un de plus), pour un peu plus de mémoire (3 points par triangle)
 const aFacettes = g => { const f = g.toNonIndexed(); f.computeVertexNormals(); g.dispose(); return f; };
 function fusionner(geos, g, ombre = true) {   // ombre = false : rien ne fait d'ombre (l'intérieur des bâtiments, où le soleil n'entre pas)
+  const faits = [];   // (les objets qu'elle a faits)
   for (const [nom, liste] of Object.entries(geos)) {
     const forme = mergeGeometries(liste), mesh = new THREE.Mesh(MAT[nom].userData.facettes ? aFacettes(forme) : forme, MAT[nom]);
     mesh.castShadow = ombre && !SANS_OMBRE.includes(nom); mesh.receiveShadow = true;
     mesh.raycast = raycastTroue;   // (les rayons passent par les trous des toits et des planchers)
-    g.add(mesh);
+    g.add(mesh); faits.push(mesh);
     if (!PAS_UN_MUR.includes(nom)) { batiments.push(mesh); mesh.userData.mur = true; }   // mur : une balle y laisse un impact
     liste.forEach(f => f.dispose());
   }
+  return faits;
 }
-for (const d of interieurs) { d.g = new THREE.Group(); scene.add(d.g); fusionner(d.geos, d.g, false); d.geos = null; }
+// chaque intérieur a son groupe, vide pour l'instant : son dessin n'est fabriqué que quand la caméra s'en approche (voir majInterieurs)
+for (const d of interieurs) { d.g = new THREE.Group(); scene.add(d.g); }
 // la villa de Tony Stark, dans son groupe, accroché à un pivot au pied de son mur sud (c'est autour de lui qu'elle bascule dans la mer)
 if (villaStark) {
   const V = villaStark;
@@ -6477,9 +6503,75 @@ function majMorceaux() {
     m.g.visible = d < R_.distanceVue;
     if (m.loin) m.loin.visible = !m.g.visible && d < VUE_RELIEF;   // (plus loin encore, la brume cache tout)
   }
-  for (const d of interieurs) d.g.visible = !d.cache && Math.hypot(d.x - camera.position.x, d.z - camera.position.z) < 100;   // l'intérieur des bâtiments, seulement de près (pas celui d'une villa tombée dans la mer)
+  majInterieurs();   // l'intérieur des bâtiments, seulement de près
   if (villaStark) villaStark.pivot.visible = Math.hypot(villaStark.x - camera.position.x, villaStark.z - camera.position.z) - 40 < R_.distanceVue;
   majTrous();
+}
+// L'intérieur des bâtiments (les planchers, les marches, les meubles, les lampes) ne se voit qu'à moins de 100 m de la caméra. Son dessin
+// est lourd (83 Mo de formes pour les 221 intérieurs du chapitre 1, presque les deux tiers de tout le pays) : alors on ne le fabrique que
+// quand la caméra s'en approche, à moins de distanceInterieurs mètres (REGLAGES), d'après sa recette (voir ajouterGeo), et on le défait
+// quand elle s'en éloigne nettement (100 m plus loin : un intérieur au bord de la limite n'est pas refait à chaque pas). Ce qui n'est pas
+// du dessin (les murs et les meubles qu'on touche, les lits, les objets à voler, les lampes la nuit...) est fait une fois pour toutes,
+// au chargement : il ne change pas
+const VUE_INTERIEURS = 100;   // mètres : on voit l'intérieur d'un bâtiment quand la caméra est plus près que ça de son milieu
+function majInterieurs() {
+  const cx = camera.position.x, cz = camera.position.z, pres = Math.max(R_.distanceInterieurs, VUE_INTERIEURS);
+  let suivant = null, dSuivant = Infinity;   // celui qu'on fabriquera à cette image : le plus proche de ceux qui attendent
+  for (const d of interieurs) {
+    // (celui d'une villa tombée dans la mer, d.cache, compte comme très loin : il est défait, et n'arrête plus les balles là où elle était)
+    const dist = d.cache ? Infinity : Math.hypot(d.x - cx, d.z - cz);
+    if (d.formes && dist > pres + 100) defaireInterieur(d);
+    else if (!d.formes && dist < VUE_INTERIEURS) construireInterieur(d);   // on va le voir : tout de suite (après un saut de la DeLorean, une mort...)
+    else if (!d.formes && dist < pres && dist < dSuivant) { suivant = d; dSuivant = dist; }
+    d.g.visible = dist < VUE_INTERIEURS;
+  }
+  if (suivant) construireInterieur(suivant);   // un seul de plus par image : pas d'accroc, même en volant au-dessus de la ville
+}
+// fabriquer le dessin de l'intérieur d, d'après sa recette : toutes ses formes, fusionnées en un objet par matière, dans son groupe
+function construireInterieur(d) {
+  const geos = {};
+  for (const [mat, recette] of Object.entries(d.recette)) {
+    const formes = geos[mat] = [];
+    for (let k = 0; k < recette.length;) {
+      if (typeof recette[k] !== 'number') { const r = recette[k++]; formes.push(typeof r === 'function' ? r() : r); continue; }   // une forme, ou la fonction qui la fabrique
+      let fin = k; while (typeof recette[fin] === 'number') fin += 6;   // des boîtes à la suite (6 nombres chacune) : toutes d'un coup
+      formes.push(formeBoites(mat, recette, k, fin)); k = fin;
+    }
+  }
+  d.formes = fusionner(geos, d.g, false);
+}
+// Une boîte de 1 m de côté, toute faite (6 faces de 4 points, et leurs 12 triangles) : formeBoites la recopie à la bonne taille et à la
+// bonne place pour chaque boîte d'un intérieur, au lieu de fabriquer une forme par boîte (les plus gros en ont 1 800 à 2 500)
+const BOITE1 = new THREE.BoxGeometry();
+const B1 = { pos: BOITE1.attributes.position.array, sens: BOITE1.attributes.normal.array, uv: BOITE1.attributes.uv.array, tri: BOITE1.index.array };
+// les boîtes de la recette r, de la case k à la case fin, en une seule forme : au point près ce que donneraient formeBoite pour chacune,
+// puis leur fusion, mais bien plus vite (le plus gros intérieur de Los Santos : 4 ms au lieu de 25)
+function formeBoites(mat, r, k, fin) {
+  const n = (fin - k) / 6, pos = new Float32Array(72 * n), sens = new Float32Array(72 * n), uv = new Float32Array(48 * n), tri = new Uint32Array(36 * n);
+  const [tl, th] = DIM_TEX[mat] || [];   // (la taille du dessin de la matière, s'il en a une : voir ajusterUV)
+  for (let b = 0; b < n; b++, k += 6) {
+    const x = r[k], y = r[k + 1], z = r[k + 2], l = r[k + 3], h = r[k + 4], p = r[k + 5];
+    const faces = [p, h, p, h, l, p, l, p, l, h, l, h];   // la taille de chacune des 6 faces, dans l'ordre (comme dans formeBoite)
+    for (let s = 0; s < 24; s++) {   // ses 24 points
+      const i = 72 * b + 3 * s, j = 48 * b + 2 * s, f = s >> 2;   // (f : sa face)
+      pos[i] = Math.fround(B1.pos[3 * s] * l) + x; pos[i + 1] = Math.fround(B1.pos[3 * s + 1] * h) + y; pos[i + 2] = Math.fround(B1.pos[3 * s + 2] * p) + z;
+      sens[i] = B1.sens[3 * s]; sens[i + 1] = B1.sens[3 * s + 1]; sens[i + 2] = B1.sens[3 * s + 2];
+      uv[j] = tl ? B1.uv[2 * s] * faces[2 * f] / tl : B1.uv[2 * s]; uv[j + 1] = tl ? B1.uv[2 * s + 1] * faces[2 * f + 1] / th : B1.uv[2 * s + 1];
+    }
+    for (let t = 0; t < 36; t++) tri[36 * b + t] = B1.tri[t] + 24 * b;   // ses 12 triangles
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(sens, 3)); g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  g.setIndex(new THREE.BufferAttribute(tri, 1));
+  return g;
+}
+// et le défaire : ses formes sont jetées (la carte graphique les oublie aussi) ; ses matières, elles, servent à tout le pays
+function defaireInterieur(d) {
+  for (const m of d.formes) {
+    d.g.remove(m); m.geometry.dispose();
+    const k = batiments.indexOf(m); if (k >= 0) batiments.splice(k, 1);
+  }
+  d.formes = null;
 }
 
 // =====================================================================
@@ -17427,8 +17519,9 @@ function boucle(t) {
 // écrit pour elle, qu'il faut d'abord compiler (traduire dans sa langue à elle). Three.js le fait la première fois qu'il dessine la
 // matière : au premier dessin, il en compilait plus de 30 d'un coup, et la page gelait plusieurs secondes ; et chaque matière qu'on ne voit
 // qu'en jouant (une explosion, l'armure d'Iron Man...) faisait un accroc en pleine partie. Alors on les compile d'avance, pendant le menu ou
-// l'écran du chapitre : tout ce qui est dans le pays (même caché, même loin), l'aperçu du héros, la main de la 1re personne, et A_PREPARER.
-// Une carte graphique qui sait compiler en arrière-plan le fait sans geler la page (les autres gèlent encore, mais avant de jouer).
+// l'écran du chapitre : tout ce qui est dans le pays (même caché, même loin), les matières de l'intérieur des bâtiments (leur dessin n'est
+// fabriqué qu'à l'approche : voir majInterieurs), l'aperçu du héros, la main de la 1re personne, et A_PREPARER. Une carte graphique qui
+// sait compiler en arrière-plan le fait sans geler la page (les autres gèlent encore, mais avant de jouer).
 // A_PREPARER : ce qu'on ne voit qu'en jouant (une explosion, un code de triche...). Une matière, et la sorte d'objet qui la porte :
 // 'forme' (un objet tout simple), 'lot' (beaucoup d'objets pareils dessinés d'un coup), 'image' (une image toujours face à la caméra),
 // 'trait' (une ligne) ; 'vm' : dans la main, à la 1re personne (d'autres lumières, donc d'autres programmes). Ce qui compte, c'est la sorte
@@ -17454,6 +17547,9 @@ const A_PREPARER = [
   [std(IMAGE_PREPARER), 'forme'], [auraBJ.material, 'forme'], [M_JET, 'forme'], [M_VITRE_ROBOT, 'forme'],
   // le sol fissuré de la chute qui écrase (transparent, à deux faces : deux programmes)
   [M_FISSURES, 'forme'],
+  // le diamant d'un objet à voler (le gros diamant, la bague) : une matière « physique », transparente, à facettes (à Malibu, où il
+  // n'y a pas de bijouterie, il n'est nulle part dans le pays avant qu'on s'approche d'un de ces objets)
+  [M_DIAMANT, 'forme'],
   // à la 1re personne : l'éclair au bout du canon, le gant d'Iron Man (à deux faces)
   [M_FLASH, 'image', 'vm'], [M_ECLAT, 'forme', 'vm'],
 ];
@@ -17464,6 +17560,7 @@ const preparation = { ms: 0, programmes: 0, rate: null };   // (pour les essais 
 async function preparerProgrammes() {
   const debut = performance.now(), dehors = new THREE.Group(), main = new THREE.Group();   // (jamais ajoutés au pays : on ne les voit pas)
   for (const [m, sorte, ou] of A_PREPARER) (ou === 'vm' ? main : dehors).add(objetAPreparer(m, sorte));
+  for (const nom of new Set(interieurs.flatMap(d => Object.keys(d.recette)))) dehors.add(objetAPreparer(MAT[nom], 'forme'));   // (les intérieurs)
   try { // (sans réponse au bout de 15 s, on y va quand même : ce qui manque se compilera en dessinant, comme avant)
     const fin = await Promise.race([Promise.all([
       renderer.compileAsync(scene, camera), renderer.compileAsync(dehors, camera, scene),   // (avec les lumières, la brume et les reflets du pays)
@@ -17525,6 +17622,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   ombresLoin, M_TACHE, majOmbresPersonnages, sansVraieOmbre, forceDesOmbres, finesse, reglerFinesse, FINESSES,
   majDetailsVoitures, voituresEnBloc, ombreEnBloc, enBloc, montrerDeLoin, formeDeLoin, cacheLoin, majPhares,
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
+  majInterieurs, construireInterieur, defaireInterieur, formeBoite, VUE_INTERIEURS,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
