@@ -51,6 +51,9 @@
   #version { font-size: 15px; opacity: .6; margin-bottom: 8px; min-height: 18px; }   /* le numéro de version, sous le titre (vide le temps de le demander) */
   #histoire { font-size: 22px; max-width: 700px; margin-top: 6px; }
   #etat { font-size: 28px; margin: 10px 0 26px; color: #f0c850; }
+  /* la barre de progression, sous la ligne jaune, pendant que le pays se construit (voir progression) */
+  #barre { width: 320px; max-width: 80%; height: 8px; flex: none; margin: -18px 0 26px; border-radius: 4px; background: rgba(255,255,255,.15); overflow: hidden; display: none; }
+  #barre div { width: 0; height: 100%; background: #f0c850; }
   #menu table { border-collapse: collapse; font-size: 18px; }
   #menu td, #triches th { padding: 3px 14px; }
   #menu td:first-child, #triches th { text-align: right; color: #f0c850; font-weight: 700; }
@@ -206,6 +209,7 @@
   </details>
   <div id="histoire">Tu es {nom}. Parcours Los Santos et ses environs, chasse les nazis et abats Hitler dans le château Wolfenstein, sur le mont Chiliad !</div>
   <div id="etat">Chargement… (il faut une connexion Internet)</div>
+  <div id="barre"><div></div></div>
   <table id="touches"></table>   <!-- la liste des touches : celle du chapitre où l'on est (touches, dans CHAPITRES) -->
 </div>
 <div id="ecran-chapitre"><canvas></canvas></div>
@@ -446,6 +450,7 @@ const TRADUCTIONS = {
     en: 'You are {nom}. Roam Los Santos and the countryside, hunt the Nazis and take out Hitler in Castle Wolfenstein, on top of Mount Chiliad!',
     gsw: 'Du bisch {nom}. Streif dur Los Santos und d Umgäbig, jag d Nazis und mach de Hitler im Schloss Wolfenstein uf em Mount Chiliad fertig!' },
   'Chargement… (il faut une connexion Internet)': { de: 'Lädt… (braucht eine Internetverbindung)', en: 'Loading… (needs an Internet connection)', gsw: 'Am Lade… (es bruucht Internet)' },
+  'Construction du pays…':         { de: 'Das Land wird gebaut…', en: 'Building the world…', gsw: 'S Land wird baut…' },
   'Préparation des images…':       { de: 'Bilder werden vorbereitet…', en: 'Preparing the graphics…', gsw: 'Bilder wärdet vorbereitet…' },
   'Clique pour jouer':             { de: 'Klicke zum Spielen', en: 'Click to play', gsw: 'Klick zum Spile' },
   'Personnage :':     { de: 'Figur:', en: 'Character:', gsw: 'Figur:' },
@@ -1491,6 +1496,21 @@ function traduireMenu() {
   document.documentElement.lang = langue;
 }
 function etat(texte) { document.getElementById('etat').dataset.fr = texte; traduireMenu(); }   // la ligne jaune du menu
+// la barre de progression, sous la ligne jaune du menu et en bas de l'écran du chapitre, pendant que le pays se construit
+// (fait : où en est la construction, de 0 à 1 ; null : plus de barre). C'est le jeu qui la fait avancer (voir respirer)
+function progression(fait) {
+  const b = document.getElementById('barre');
+  b.style.display = fait == null ? 'none' : 'block';
+  if (fait != null) b.firstChild.style.width = Math.round(Math.min(1, fait) * 100) + '%';
+  ecranChapitre.progres = fait;
+}
+// un bouton du menu prévient le jeu (les évènements « heros », « chapitre », « nouvellePartie ») : pendant que le pays se construit,
+// le jeu ne les écoute pas encore tous, alors ils attendent qu'il soit construit (jeuConstruit). Le dernier clic de chaque sorte suffit :
+// c'est lui qui compte. (La qualité, elle, n'attend pas : voir ses boutons)
+let paysConstruit = false;
+const aPrevenir = {};
+function prevenirJeu(ev) { if (paysConstruit) dispatchEvent(ev); else aPrevenir[ev.type] = ev; }
+function jeuConstruit() { paysConstruit = true; for (const ev of Object.values(aPrevenir)) dispatchEvent(ev); }
 for (const [l, nom] of Object.entries(LANGUES)) {
   const b = document.createElement('button');
   b.textContent = nom; b.dataset.langue = l;
@@ -1503,7 +1523,7 @@ for (const ligne of document.querySelectorAll('.heros')) for (const nom of CHOIX
   const b = document.createElement('button'), k = ligne.dataset.heros;
   b.dataset.fr = nom;
   if (k === 'cheveux') { b.className = 'pastille'; b.style.setProperty('--pastille', CHEVEUX[nom]); } else b.textContent = nom;
-  b.onclick = e => { e.stopPropagation(); heros[k] = nom; try { localStorage['heros-' + k] = nom; } catch {} traduireMenu(); dispatchEvent(new Event('heros')); };
+  b.onclick = e => { e.stopPropagation(); heros[k] = nom; try { localStorage['heros-' + k] = nom; } catch {} traduireMenu(); prevenirJeu(new Event('heros')); };
   ligne.append(b);
 }
 // les boutons de la foule : une ligne pour les piétons, une pour les voitures. Le jeu en tient compte tout de suite
@@ -1514,7 +1534,9 @@ for (const ligne of document.querySelectorAll('.foule')) for (const nom in FOULE
   ligne.append(b);
 }
 // les boutons de la qualité : c'est le jeu qui change les réglages (l'évènement « qualite » : voir choisirQualite), et qui recharge la page
-// s'il le faut. Cliqué pendant que le jeu se charge encore, rien n'est construit : il prend le niveau en démarrant (qualiteDemandee)
+// s'il le faut. Cliqué pendant que le jeu se charge encore, rien n'est construit : il prend le niveau en démarrant (qualiteDemandee) ;
+// cliqué pendant que le pays se construit, tout de suite (choisirQualite ne fait que recharger la page, ou changer des nombres que le jeu
+// lit en jouant : il marche même si la construction s'est arrêtée sur une erreur)
 for (const nom in QUALITES) {
   const b = document.createElement('button'), ligne = document.querySelector('.qualite');
   b.textContent = nom;
@@ -1534,12 +1556,12 @@ function afficherQualite(nom, notes) {
   for (let n = 1; n <= partie.ouvert; n++) {
     const b = document.createElement('button');
     b.textContent = `${n} · ${CHAPITRES[n - 1].ville}`; b.classList.toggle('on', n === partie.chapitre);
-    b.onclick = e => { e.stopPropagation(); if (n !== partie.chapitre) dispatchEvent(new CustomEvent('chapitre', { detail: n })); };
+    b.onclick = e => { e.stopPropagation(); if (n !== partie.chapitre) prevenirJeu(new CustomEvent('chapitre', { detail: n })); };
     ligne.append(b);
   }
   const b = document.createElement('button');
   b.className = 'tr nouvelle'; b.textContent = '↺ Nouvelle partie';
-  b.onclick = e => { e.stopPropagation(); if (confirm(tr('Tout recommencer au chapitre 1 ? Ton argent, tes armes et tes chapitres seront perdus.'))) dispatchEvent(new Event('nouvellePartie')); };
+  b.onclick = e => { e.stopPropagation(); if (confirm(tr('Tout recommencer au chapitre 1 ? Ton argent, tes armes et tes chapitres seront perdus.'))) prevenirJeu(new Event('nouvellePartie')); };
   ligne.append(b);
   ligne.style.display = nouvellePartie ? 'none' : '';   // (au tout premier lancement, il n'y a rien à effacer)
 }
@@ -1568,8 +1590,9 @@ fetch('https://api.github.com/repos/jlehen/GTAxel/commits?sha=main&per_page=1')
 // visible : l'écran est là ; n : le chapitre ; t : depuis combien de secondes il est là ; sortie : depuis combien de secondes il s'en va
 // (-1 : pas encore) ; attend : il attend un clic (texte : ce qu'on lit en bas) ; sons : { bip, bruit }, donnés par le jeu ;
 // parts, eclats, image : les flammes, les chauves-souris, la fumée, les éclats du logo pendant qu'il s'en va ; parLeJeu : le jeu est
-// chargé, et c'est sa boucle qui anime l'écran (avant, il a la sienne : animerEcran)
-const ecranChapitre = { visible: false, n: 1, t: 0, sortie: -1, attend: false, texte: '', clic: null, sons: null, parts: [], eclats: null, image: null, avant: 0, parLeJeu: false,
+// chargé, et c'est sa boucle qui anime l'écran (avant, il a la sienne : animerEcran) ; progres : la barre de progression, pendant que
+// le pays se construit (de 0 à 1 ; null : pas de barre ; voir progression)
+const ecranChapitre = { visible: false, n: 1, t: 0, sortie: -1, attend: false, texte: '', clic: null, sons: null, parts: [], eclats: null, image: null, avant: 0, parLeJeu: false, progres: null,
   bloque() { return this.visible && this.sortie < 0.5; } };   // le jeu attend : le fond est encore tout noir
 const divEcran = document.getElementById('ecran-chapitre'), toileEcran = divEcran.querySelector('canvas');
 divEcran.onclick = () => ecranChapitre.clic?.();
@@ -1782,6 +1805,11 @@ function dessinerEcran(dt) {
     g.font = `${Math.round(100 * k)}px Anton, Impact, sans-serif`; g.fillStyle = d; g.fillText(tr('CHAPITRE {n}', { n: E.n }), l / 2, y);
     g.font = `${Math.round(34 * k)}px 'Roboto Condensed', Arial, sans-serif`; g.fillStyle = '#ddd'; g.fillText(tr(C.ville), l / 2, y + 48 * k);
     if (E.texte && s < 0) { g.globalAlpha = a * (0.65 + 0.35 * Math.sin(E.t * 4)); g.fillStyle = '#f0c850'; g.fillText(tr(E.texte), l / 2, h - 40 * k); }
+    if (E.progres != null && s < 0) { // la barre de progression, sous le texte, pendant que le pays se construit
+      const lb = 360 * k, hb = 8 * k, xb = (l - lb) / 2, yb = h - 28 * k;
+      g.globalAlpha = a; g.fillStyle = 'rgba(255,255,255,.15)'; g.fillRect(xb, yb, lb, hb);
+      g.fillStyle = '#f0c850'; g.fillRect(xb, yb, lb * Math.min(1, E.progres), hb);
+    }
     g.globalAlpha = 1;
   }
   g.save(); g.translate(l / 2, cy); g.scale(k, k);
@@ -1795,7 +1823,10 @@ function dessinerEcran(dt) {
 function animerEcran(t) {
   const E = ecranChapitre;
   if (!E.visible) return;
-  const dt = E.avant ? Math.min(0.05, (t - E.avant) / 1000) : 0; E.avant = t;
+  // pendant que le pays se construit (la barre est là), 10 images par seconde suffisent : le logo est arrivé, seuls la barre et le texte
+  // bougent. Sur un ordinateur sans vraie carte graphique, chaque image de l'écran ralentissait la construction et la première image du jeu
+  if (E.progres != null && !E.parLeJeu && E.avant && t - E.avant < 100) { requestAnimationFrame(animerEcran); return; }
+  const dt = E.avant ? Math.min(E.progres != null ? 0.1 : 0.05, (t - E.avant) / 1000) : 0; E.avant = t;
   E.t += dt;
   if (!E.attend && E.sortie < 0 && E.t > 2.2) sortirEcran();   // sans clic : le logo reste 2,2 s, puis s'en va
   if (E.sortie >= 0) E.sortie += dt;
@@ -3404,6 +3435,23 @@ const indexArme = nom => ARMES.findIndex(a => a.nom === nom);
 // une arme qu'on n'a qu'avec un code de triche : le pouvoir que ce code doit avoir ('laser', 'eclair', 'batarang'...). Pour les autres armes : rien
 const POUVOIRS_ARMES = ['laser', 'eclair', 'grappin', 'batarang', 'filet', 'toile'];
 const pouvoirArme = a => POUVOIRS_ARMES.find(k => a[k]) || null;
+// La construction du pays prend quelques secondes (bien plus sur un vieil ordinateur). D'un seul bloc, elle gelait la page : l'écran du
+// chapitre s'arrêtait, le menu ne répondait plus, et on croyait que le jeu avait planté. Alors elle s'arrête de temps en temps, pour rendre
+// la main au navigateur le temps d'une image (il redessine l'écran du chapitre, fait avancer la barre de progression, écoute la souris) :
+// c'est « await respirer(0.3) », écrit entre les grandes étapes de la construction et dans ses grosses boucles (0.3 : où elle en est, de 0
+// à 1, pour la barre ; ce n'est qu'à peu près). Elle ne s'arrête vraiment que si elle construit d'affilée depuis RESPIRATION ms.
+// Tu ajoutes une construction ? Écris-la comme avant, là où elle doit être : il n'y a rien d'autre à faire. (« await respirer » ne s'écrit
+// qu'en dehors de toute fonction, comme ici. Et pendant ces pauses, rien ne démarre : le jeu attend que tout soit construit, comme avant)
+const RESPIRATION = 40;   // en ms (une page qui gèle moins de 50 ms, on ne le sent pas ; chaque pause coûte environ 5 ms)
+let reprise = performance.now();   // quand la construction a repris, après la dernière pause
+async function respirer(fait) {
+  progression(fait);
+  if (performance.now() - reprise < RESPIRATION || document.hidden) return;   // (une page cachée ne dessine rien : elle construit d'un bloc)
+  await new Promise(ok => setTimeout(ok));   // le navigateur fait ce qu'il a à faire (une image, un clic...), puis la construction reprend
+  reprise = performance.now();
+}
+etat('Construction du pays…'); progression(0);
+if (ecranChapitre.visible) ecranChapitre.texte = 'Construction du pays…';
 
 // =====================================================================
 //  Géographie : cases de PAS mètres (un pâté de S mètres et sa rue de R mètres)
@@ -3588,7 +3636,10 @@ function terrainNaturel(x, z) {
 // le terrain est une grille de points tous les PT mètres ; HT = leur hauteur
 const PT = PAS / 8, NXT = (NBX + 1) * 8 + 1, NZT = (NBZ + 1) * 8 + 1;
 const HT = new Float32Array(NXT * NZT);
-for (let iz = 0; iz < NZT; iz++) for (let ix = 0; ix < NXT; ix++) HT[iz * NXT + ix] = terrainNaturel(ix * PT, iz * PT);
+for (let iz = 0; iz < NZT; iz++) {
+  await respirer(0.01 + 0.08 * iz / NZT);   // (une rangée à la fois : voir respirer)
+  for (let ix = 0; ix < NXT; ix++) HT[iz * NXT + ix] = terrainNaturel(ix * PT, iz * PT);
+}
 // la galerie de la grotte des Dix Anneaux, sous la colline (voir « la galerie de la grotte », plus bas) : ses morceaux (rects), son sol et son
 // plafond. trousTerrain : les carrés du terrain qu'on ne dessine pas, à son entrée (la falaise les cache)
 let galerie = null;
@@ -3774,6 +3825,7 @@ function presDeChaussee(x, z, marge) {
   return [-marge, marge].some(a => [-marge, marge].some(b => estPiste(car(...blocEn(x + a, z + b)))));
 }
 // le terrain est creusé ou remblayé sous les routes (pas sous les ponts, qui passent au-dessus)
+await respirer(0.1);   // (voir respirer)
 for (const pts of ROUTES) for (let q = 1; q < pts.length; q++) {
   const a = pts[q - 1], b = pts[q];
   for (let iz = Math.floor((Math.min(a.z, b.z) - 20) / PT); iz <= Math.ceil((Math.max(a.z, b.z) + 20) / PT); iz++)
@@ -3794,7 +3846,8 @@ function sousLaChaussee(x, z, y) { // les trois coins du triangle du terrain qui
   for (const c of fx - ix + fz - iz <= 1 ? [k, k + 1, k + NXT] : [k + NXT + 1, k + NXT, k + 1]) HT[c] = Math.min(HT[c], y);
 }
 // les routes de campagne : tout le ruban de 10 m (voir « ruban », plus bas), 25 cm sous le goudron
-for (const pts of ROUTES) {
+for (const [r, pts] of ROUTES.entries()) {
+  await respirer(0.11 + 0.07 * r / ROUTES.length);   // (une route à la fois)
   const normale = q => { const a = pts[Math.max(0, q - 1)], b = pts[Math.min(pts.length - 1, q + 1)], l = Math.hypot(b.x - a.x, b.z - a.z) || 1; return [-(b.z - a.z) / l, (b.x - a.x) / l]; };
   for (let q = 1; q < pts.length; q++) {
     const a = pts[q - 1], b = pts[q], na = normale(q - 1), nb = normale(q), n = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.5);
@@ -4044,6 +4097,7 @@ function presDePiste(x, z, marge) {
 // =====================================================================
 //  Moteur 3D
 // =====================================================================
+await respirer(0.18);   // (voir respirer)
 const renderer = new THREE.WebGLRenderer({ antialias: !!R_.anticrenelage });   // (l'anticrénelage ne se change qu'en recréant tout : il attend F5)
 renderer.setPixelRatio(clamp(R_.finesse, 0.25, devicePixelRatio || 1));   // la finesse de l'image (finesse, dans REGLAGES) ; avec finesseAuto, reglerFinesse la change en jouant
 renderer.setSize(innerWidth, innerHeight);
@@ -4122,6 +4176,7 @@ function photographierCiel() {
   reflets = r; premierePhoto ??= r;
   for (const s of scenesReflets) s.environment = r.texture;
 }
+await respirer(0.19);   // (voir respirer)
 photographierCiel();
 scene.environmentIntensity = 0.7;
 const ambiance = new THREE.HemisphereLight(0xcfe4ff, 0x5a5040, 0.35);   // la lumière du ciel (en haut) et du sol (en bas)
@@ -4198,6 +4253,7 @@ function facade(fond, cols, rangs, fenetre, avant, hauteur = 256, allumees = 0.4
 }
 // les lettres et les chiffres des grandes lettres sur les collines (PANNEAUX) : une autre lettre fait un trou
 const LETTRES_PANNEAUX = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?&-';
+await respirer(0.2);   // (voir respirer)
 const TEX = {
   route: toile(256, 256, (g, l, h) => { g.fillStyle = '#3a3a3c'; g.fillRect(0, 0, l, h); grain(g, l, h, 8000, 0.07); }),
   lignes: toile(64, 256, (g) => { g.fillStyle = '#eee'; g.fillRect(30, 0, 4, 80); g.fillRect(3, 0, 3, 256); g.fillRect(58, 0, 3, 256); }),
@@ -4231,6 +4287,11 @@ const TEX = {
   villaStark: facade('#f2f1ec', 4, 3, (g, x, y, w, h) => {
     if (y > g.hauteur / 2) vitre(g, x + 1.5, y + h * .19, w - 3, h * .42, [36, 74, 96]); else if (y > 1) vitre(g, x + 1.5, y + h * .11, w - 3, h * .87, [36, 74, 96]);
   }, null, 346, 0.85),
+};
+// la suite des textures, après une pause (les peindre toutes d'un coup gelait la page 0,15 s : voir respirer). Une texture à toi peut
+// aller dans l'une ou l'autre liste
+await respirer(0.23);   // (voir respirer)
+Object.assign(TEX, {
   // la mer, vue du salon de Tony Stark, dans ses grandes baies : le ciel, l'horizon (à hauteur des yeux), la mer et ses vagues, entre les lames
   vueMer: toile(512, 128, (g, l, h) => {
     const ciel = g.createLinearGradient(0, 0, 0, h / 2); ciel.addColorStop(0, '#78acdc'); ciel.addColorStop(1, '#e2edf4');
@@ -4352,7 +4413,8 @@ const TEX = {
     grain(g, l, h, 3000, 0.12);
     g.strokeStyle = 'rgba(25,22,20,.7)'; g.lineWidth = 2; for (const x of [l / 3, l * 2 / 3]) { g.beginPath(); g.moveTo(x + entre(-6, 6), 0); g.lineTo(x + entre(-6, 6), h); g.stroke(); }
     g.fillStyle = '#26221e'; for (let k = 5; k < l; k += 16) for (const y of [4, h - 4]) { g.beginPath(); g.arc(k, y, 1.6, 0, 7); g.fill(); } }),
-};
+});
+await respirer(0.26);   // (voir respirer)
 // un panneau : du texte en couleur sur un fond sombre, dans la langue choisie.
 // ENSEIGNES les garde toutes, pour les redessiner quand on change de langue (majEnseignes)
 const ENSEIGNES = [];
@@ -5835,7 +5897,10 @@ function genererBloc(i, j) {
   }
   Y0 = 0;
 }
-for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) if (estBloc(CARTE[j][i])) genererBloc(i, j);
+for (let j = 0; j < NBZ; j++) {
+  await respirer(0.27 + 0.21 * j / NBZ);   // (une rangée de la CARTE à la fois : voir respirer)
+  for (let i = 0; i < NBX; i++) if (estBloc(CARTE[j][i])) genererBloc(i, j);
+}
 if (!hopitaux.length) hopitaux.push(depart);
 // la navette des pistes (tableau NAVETTE) : à chaque arrêt, un bus blanc « SKI SHUTTLE » avec son coffre à skis sur le toit, un poteau d'arrêt,
 // et parfois un abribus. arrets : { nom, x, y, z : le milieu du bus, quai : là où l'on monte et où l'on descend, a : vers où regarde le bus (et B.J. en descendant) }
@@ -5875,6 +5940,7 @@ for (const n of NAVETTE) {
 }
 
 // les rues des villes : un morceau de chaussée par rue, avec ses lignes, ses passages piétons et parfois un dos d'âne
+await respirer(0.48);   // (voir respirer)
 const geoDosDAne = () => { // une bosse en travers de la rue (qui va vers z)
   const g = new THREE.PlaneGeometry(R, LONG_DOS_ANE, 1, 12).rotateX(-Math.PI / 2), p = g.attributes.position;
   for (let k = 0; k < p.count; k++) p.setY(k, bosseDosDAne(p.getZ(k)));
@@ -5972,6 +6038,7 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
 }
 // La jetée (- dans la carte de Malibu) : un ponton en planches sur des pilotis, de 18 m de large, avec des rambardes et des lampadaires,
 // qui prolonge la rue. La case qui touche la terre est plus large (44 m) : la grande roue et les montagnes russes (voir majFete)
+await respirer(0.49);   // (voir respirer)
 const jetees = [];   // le pont de chaque case de jetée [x, z, l, p] : pour les cartes
 const fete = [];   // les manèges qui bougent : la grande roue { roue, nacelles, c : son centre, u : le sens de la jetée }, le train { train, courbe, t, v }
 const MAT_NACELLES = MAT.rouge.clone();   // (une copie n'est pas percée : voir percer)
@@ -6145,6 +6212,7 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
 }
 
 // le terrain : un morceau de grille par morceau du pays, colorié selon le sol (herbe, sable, désert, roche...)
+await respirer(0.5);   // (voir respirer)
 const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du ciel, pour les cartes
 {
   // pour une colline ou une route, le sol est celui qu'on trouve le plus autour (mais jamais du sable : la plage, c'est au bord de l'eau)
@@ -6173,6 +6241,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
   };
   const solEn = (i, j) => solCase[clamp(j, 0, NBZ - 1)][clamp(i, 0, NBX - 1)];
   for (let cz = 0; cz * 64 < NZT - 1; cz++) for (let cx = 0; cx * 64 < NXT - 1; cx++) {
+    await respirer(0.51 + 0.28 * cz * 64 / NZT);   // (un morceau de terrain à la fois : voir respirer)
     const x0 = cx * 64, z0 = cz * 64, nx = Math.min(64, NXT - 1 - x0) + 1, nz = Math.min(64, NZT - 1 - z0) + 1;
     const pos = new Float32Array(nx * nz * 3), nor = new Float32Array(nx * nz * 3), col = new Float32Array(nx * nz * 3), uv = new Float32Array(nx * nz * 2), idx = [];
     for (let b = 0; b < nz; b++) for (let a = 0; a < nx; a++) {
@@ -6231,32 +6300,36 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
     morceau.loin = new THREE.Mesh(gl, MAT.terrain); morceau.loin.visible = false; scene.add(morceau.loin);
   }
   // la végétation de la campagne : des sapins dans les forêts et les montagnes, des arbres dans l'herbe, des cactus dans le désert, des palmiers sur les plages
-  for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
-    const c = CARTE[j][i], s = solCase[j][i], rnd = graine(i * 7919 + j * 104729 + 17);
-    if (estPlat(c) || s === '~') continue;
-    const chiffre = /[0-9]/.test(c) ? +c : 0, A = galerie?.aire, presGrotte = (x, z) => A && x > A[0] && z > A[1] && x < A[2] && z < A[3];   // (rien autour de la grotte)
-    let n = 0, sorte = 'rond';
-    if (s === '*') { n = 12; sorte = 'sapin'; }
-    else if (s === ':') { n = 1; sorte = 'cactus'; }
-    else if (s === ',') { n = chiffre ? (chiffre >= 7 ? 2 : 5) : 2; sorte = chiffre || rnd() < 0.3 ? 'sapin' : 'feuillu'; }
-    else if (s === '_' && j >= PALMIERS) { n = 2; sorte = 'palmier'; }   // les plages du sud (PALMIERS)
-    if (chiffre && s === '*') n = chiffre >= 7 ? 3 : 8;
-    for (let k = 0; k < n; k++) {
-      const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z);
-      if (y < EAU + 0.4 || presDeChaussee(x, z, 3) || Math.abs(hauteurTerrain(x + 2, z) - y) > 1.6 || presDePiste(x, z, 14) || presGrotte(x, z)) continue;   // ni dans l'eau, ni à moins de 3 m d'une rue ou d'une route
-      if (pisteSkiEn(x, z, 6) || presDeRemontee(x, z, 8)) continue;   // ni sur une piste de ski, ni sous le câble d'une remontée
-      const neige = neigeEn(x, z) > 0.5;   // dans la neige : des sapins givrés, et plus rien au-dessus de 350 m
-      if (neige && y > 350) continue;
-      arbre(x, z, 0.8 + rnd() * 0.6, y, neige ? 'sapinNeige' : sorte);
-    }
-    if (chiffre >= 3 && rnd() < 0.6) { // un rocher (il ne dépasse sur aucune chaussée : 2 m de marge en plus de sa taille)
-      const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z), t = 1.5 + rnd() * 2.5;
-      if (!presDeChaussee(x, z, t + 2) && !presDePiste(x, z, 16) && !pisteSkiEn(x, z, 6) && !presGrotte(x, z)) { ajouterGeo('rocher', new THREE.IcosahedronGeometry(t, 0).scale(1, 0.7, 1.2).rotateY(rnd() * 6).translate(x, y + t * 0.3, z)); ajouterCollision(x - t, z - t, x + t, z + t, y + t, y - 1); }
+  for (let j = 0; j < NBZ; j++) {
+    await respirer(0.79 + 0.04 * j / NBZ);   // (une rangée de la CARTE à la fois)
+    for (let i = 0; i < NBX; i++) {
+      const c = CARTE[j][i], s = solCase[j][i], rnd = graine(i * 7919 + j * 104729 + 17);
+      if (estPlat(c) || s === '~') continue;
+      const chiffre = /[0-9]/.test(c) ? +c : 0, A = galerie?.aire, presGrotte = (x, z) => A && x > A[0] && z > A[1] && x < A[2] && z < A[3];   // (rien autour de la grotte)
+      let n = 0, sorte = 'rond';
+      if (s === '*') { n = 12; sorte = 'sapin'; }
+      else if (s === ':') { n = 1; sorte = 'cactus'; }
+      else if (s === ',') { n = chiffre ? (chiffre >= 7 ? 2 : 5) : 2; sorte = chiffre || rnd() < 0.3 ? 'sapin' : 'feuillu'; }
+      else if (s === '_' && j >= PALMIERS) { n = 2; sorte = 'palmier'; }   // les plages du sud (PALMIERS)
+      if (chiffre && s === '*') n = chiffre >= 7 ? 3 : 8;
+      for (let k = 0; k < n; k++) {
+        const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z);
+        if (y < EAU + 0.4 || presDeChaussee(x, z, 3) || Math.abs(hauteurTerrain(x + 2, z) - y) > 1.6 || presDePiste(x, z, 14) || presGrotte(x, z)) continue;   // ni dans l'eau, ni à moins de 3 m d'une rue ou d'une route
+        if (pisteSkiEn(x, z, 6) || presDeRemontee(x, z, 8)) continue;   // ni sur une piste de ski, ni sous le câble d'une remontée
+        const neige = neigeEn(x, z) > 0.5;   // dans la neige : des sapins givrés, et plus rien au-dessus de 350 m
+        if (neige && y > 350) continue;
+        arbre(x, z, 0.8 + rnd() * 0.6, y, neige ? 'sapinNeige' : sorte);
+      }
+      if (chiffre >= 3 && rnd() < 0.6) { // un rocher (il ne dépasse sur aucune chaussée : 2 m de marge en plus de sa taille)
+        const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z), t = 1.5 + rnd() * 2.5;
+        if (!presDeChaussee(x, z, t + 2) && !presDePiste(x, z, 16) && !pisteSkiEn(x, z, 6) && !presGrotte(x, z)) { ajouterGeo('rocher', new THREE.IcosahedronGeometry(t, 0).scale(1, 0.7, 1.2).rotateY(rnd() * 6).translate(x, y + t * 0.3, z)); ajouterCollision(x - t, z - t, x + t, z + t, y + t, y - 1); }
+      }
     }
   }
 }
 // les remontées : deux gares (un quai, quatre poteaux, un toit, et la grande roue où tourne le câble), les pylônes et leurs poulies, le câble,
 // et les sièges (ou les cabines), qui bougent : un seul objet pour tous ceux d'une remontée (majTelesieges les fait avancer)
+await respirer(0.83);   // (voir respirer)
 const boites = l => mergeGeometries(l.map(([lg, h, p, x, y, z, rx = 0]) => new THREE.BoxGeometry(lg, h, p).rotateX(rx).translate(x, y, z)));
 // le siège : la perche qui le pend au câble, l'assise, le dossier, et deux montants en haut desquels tourne le garde-corps
 const GEO_SIEGE = boites([[0.06, 2.45, 0.06, 0, -1.2, -0.38], [0.06, 0.06, 0.42, 0, 0, -0.18], [1.2, 0.08, 0.5, 0, -2.4, -0.05], [1.2, 0.55, 0.06, 0, -2.08, -0.36],
@@ -6340,7 +6413,8 @@ for (const c in COULEURS_PISTES) MAT['balise' + c] = std(null, { color: COULEURS
 MAT.baliseOrange = std(null, { color: '#ff7a10', roughness: 0.6 });
 MAT.neigePiste = std(TEX.sol, { vertexColors: true, roughness: 1, bumpScale: 0.2, polygonOffset: true, polygonOffsetFactor: -1 });
 MAT.bxDepart = enseigne('DÉPART', '#fff', '#d01818'); MAT.bxArrivee = enseigne('ARRIVÉE', '#111', '#f0c020');
-PISTES_SKI.forEach((p, n) => {
+for (const [n, p] of PISTES_SKI.entries()) {
+  await respirer(0.84 + 0.03 * n / PISTES_SKI.length);   // (une piste à la fois : voir respirer)
   const coul = COULEURS_PISTES[p.couleur] ? p.couleur : 'rouge', bord = p.large + (p.boardercross ? 3.5 : 0);
   const poteau = (x, z, h, r = 0.04, mat = 'balise' + coul, y = 0) => ajouterGeo(mat, new THREE.CylinderGeometry(r, r, h, 6).translate(x, hauteurTerrain(x, z) + y + h / 2, z));
   for (let s = 0; s <= p.long; s += p.boardercross ? 15 : 30) for (const cote of [1, -1]) {
@@ -6363,7 +6437,7 @@ PISTES_SKI.forEach((p, n) => {
     for (const q of p.sauts) bandeNeige(p, q.s - 1, q.s + q.long + 1, q.u - q.large / 2 - 1, q.u + q.large / 2 + 1);
     for (const q of p.reliefs.filter(q => !p.sauts.includes(q))) bandeNeige(p, q.s - 1, Math.min(p.long, q.s + q.long + 1), -p.large, p.large);   // les champs de bosses et les vagues
   }
-});
+}
 // l'eau : un grand plan à la hauteur EAU, qui brille et ondule
 const LARGE = 2 * Math.max(4500, VUE_RELIEF);   // elle dépasse le pays de tous les côtés, jusqu'au bout de la vue
 const eau = new THREE.Mesh(new THREE.PlaneGeometry(TAILLE_X + LARGE, TAILLE_Z + LARGE).rotateX(-Math.PI / 2),
@@ -6434,6 +6508,7 @@ if (villaStark) {
   V.pivot.add(V.g); scene.add(V.pivot); fusionner(V.geos, V.g); V.geos = null;
 }
 for (const m of morceaux.values()) {
+  await respirer(0.88);   // (un morceau à la fois : voir respirer)
   fusionner(m.geos, m.g);
   m.geos = null;
   for (const sorte of Object.keys(GEO_ARBRE)) {
@@ -8750,11 +8825,13 @@ function changerArme(i) {
 }
 construireVM();
 
-addEventListener('resize', () => {
+function ajusterTaille() {
   renderer.setSize(innerWidth, innerHeight);
   camera.aspect = vmCamera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix(); vmCamera.updateProjectionMatrix();
-});
+}
+addEventListener('resize', ajusterTaille);
+ajusterTaille();   // (la fenêtre a pu changer de taille pendant la construction, avant qu'on l'écoute : voir respirer)
 
 // =====================================================================
 //  Personnages non joueurs
@@ -10324,6 +10401,7 @@ scene.add(repereAppel, flecheAppel);
 //  ailes (celles de Rescue : de 0, fermées, à 1, ouvertes), cdMitrailleuse (celle de War Machine), missiles et laser (les secondes avant
 //  les suivants) et tour (le laser des bras, en cours)
 // =====================================================================
+await respirer(0.9);   // (voir respirer)
 const cacheIronman = {};
 // l'armure k (son numéro dans ARMURES_STARK) ; avec la fille du menu, au chapitre d'Iron Man, ce que « fille » y change (Rescue).
 // (k peut aussi être une armure toute faite : celle d'Iron Monger)
@@ -11240,6 +11318,7 @@ ouvrirMagasin();
 // =====================================================================
 //  État du jeu
 // =====================================================================
+await respirer(0.91);   // (voir respirer)
 let etoiles = 0, tempsCalme = 0, vuParPolice = false, tVu = 0, tRenfort = 0, tVoiturePolice = 0, tRobot = 15, tPeupler = 0, temps = 0;
 let elan = { x: 0, z: 0 }, dernierJ = null;   // où va B.J., en m/s (peupler le mesure toutes les demi-secondes)
 let saisie = null; // code de triche en cours de frappe
@@ -11256,7 +11335,10 @@ GANGS.forEach(creerGang);
 // les garagistes de LS Customs attendent devant leur établi
 for (const g of garagistes) { const h = creerHumain(TENUES.garagiste()); h.g.position.set(g.x, g.y, g.z); animerHumain(h, 0, 0); scene.add(h.g); }
 const typeNomme = nom => nom && VOITURES.find(t => t.nom === nom);
-voituresGarees.forEach(v => creerVoiture(v.x, v.z, v.a, !!v.police, typeNomme(v.type) || undefined));
+for (const [k, v] of voituresGarees.entries()) {
+  await respirer(0.92 + 0.05 * k / voituresGarees.length);   // (voir respirer)
+  creerVoiture(v.x, v.z, v.a, !!v.police, typeNomme(v.type) || undefined);
+}
 bateauxDepart.forEach(b => creerVoiture(b.x, b.z, b.a, false, typeNomme(b.type) || undefined));
 // les skis, snowboards, luges et skis de rando des gares : un de chaque en bas et en haut de chaque remontée, à droite du câble.
 // Dès qu'il n'y en a plus à moins de 12 m de sa place (B.J. l'a pris et s'en est allé), il en revient un : peupler y veille deux fois par seconde.
@@ -16505,6 +16587,7 @@ function majTableau() {
 // =====================================================================
 //  Affichage (mini-carte, grande carte, infos)
 // =====================================================================
+await respirer(0.98);   // (voir respirer)
 // les repères sur les cartes, pour chaque lettre : [couleur, lettre dans le rond, nom]
 const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital'], C: ['#1a3a9a', 'P', 'Commissariat'], G: ['#7a3ac0', 'G', 'LS Customs'],
   K: ['#1a7a3a', '$', 'Banque'], S: ['#0a7a3a', 'S', 'Supérette'], E: ['#c01818', 'E', 'Station-service'], Z: ['#801010', 'Z', 'Tour Maze Bank'],
@@ -17577,14 +17660,15 @@ majJoueur(0);
 if (CHAPITRE.heure != null) fixerHeure(CHAPITRE.heure);
 cacherDeLorean();
 { const t = TRICHES.find(t => t.code === CHAPITRE.triche); if (t && !t.actif) basculerTriche(t, false, enCivil()); }
-// on n'attend plus Internet, mais la carte graphique : le menu (et l'écran du chapitre) le disent
+await respirer(1);   // le pays est construit (la barre est pleine)
+// on n'attend plus que la carte graphique : le menu (et l'écran du chapitre) le disent
 etat('Préparation des images…');
 if (ecranChapitre.visible) ecranChapitre.texte = 'Préparation des images…';
 // les programmes compilés, le jeu démarre : on peut cliquer pour jouer (dans le menu, ou sur l'écran du chapitre, qui attendait que le pays soit construit)
 preparerProgrammes().then(() => {
   requestAnimationFrame(boucle);
   ecranChapitre.parLeJeu = true;   // l'écran du chapitre n'a plus sa propre boucle : c'est boucle qui l'anime, au plafond d'images par seconde
-  etat('Clique pour jouer');
+  etat('Clique pour jouer'); progression(null);   // (plus de barre)
   $('menu').addEventListener('click', lancerJeu);
   if (ecranChapitre.visible) { ecranChapitre.texte = 'Clique pour jouer'; ecranChapitre.clic = lancerJeu; }
 });
@@ -17624,6 +17708,8 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
   majInterieurs, construireInterieur, defaireInterieur, formeBoite, VUE_INTERIEURS,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
+// les boutons du menu cliqués pendant la construction (un héros, un chapitre, « Nouvelle partie ») : le jeu s'en occupe maintenant (voir prevenirJeu)
+jeuConstruit();
 </script>
 </body>
 </html>
