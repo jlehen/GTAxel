@@ -238,15 +238,20 @@ for (const k in heros) {
 //  LES CHAPITRES : le jeu se joue en chapitres, un par héros. À la fin d'un chapitre, la DeLorean emmène au suivant : il faut tenir
 //  88 miles à l'heure (142 km/h) pendant 3 secondes. Elle ramène aussi aux chapitres d'avant (dedans, la touche T choisit où aller).
 //  Les missions sont dans MISSIONS (le chapitre 1) et MISSIONS_CHAPITRES (les autres), plus bas.
-//  ville : où ça se passe. Sa carte est dans VILLES (plus bas), sinon c'est le pays de la CARTE (Los Santos). Gotham, Metropolis et New York arrivent bientôt
+//  ville : où ça se passe. Sa carte est dans VILLES (plus bas), sinon c'est le pays de la CARTE (Los Santos). Metropolis et New York arrivent bientôt
 //  heros, heroine : ton nom, avec le garçon ou la fille du menu (sans : celui de HEROS) ; super, superFille : le nom de super-héros ;
 //    ami, amiFille : qui t'aide dans les missions ({ami} dans leurs textes : avec le garçon, ami ; avec la fille, amiFille)
-//  civil, civilFille : ta tenue de tous les jours (le héros, l'héroïne), avant de mettre ton costume (touche H) : veste, chemise, pantalon (ou jupe),
-//    chaussures (ou talons), cheveux (sans : ceux du menu), lunettes : la couleur des verres de tes lunettes de soleil, barbiche: true : comme Tony Stark
-//  triche : le code de triche du héros, allumé pendant tout le chapitre. Les codes des autres super-héros n'y marchent pas
+//  civil, civilFille : ta tenue de tous les jours (le héros, l'héroïne), avant de mettre ton costume (touche H) : veste, chemise, cravate, pantalon
+//    (ou jupe), chaussures (ou talons), cheveux (sans : ceux du menu), lunettes : la couleur des verres de tes lunettes, barbiche: true : comme Tony Stark
+//  triche : le code de triche du héros, allumé pendant tout le chapitre (avec une tenue civile, seulement en costume : touche H). Les codes
+//    des autres super-héros n'y marchent pas
 //  logo : le dessin de l'écran du chapitre, et sa façon de s'en aller : 'wolfenstein' (il brûle), 'ironman' (un tir de répulseur le brise),
 //    'batman' (il s'envole en chauves-souris), 'superman' (il part comme une fusée), 'spiderman' (une toile l'arrache)
 //  heure : l'heure ne bouge plus (13 = 1 h de l'après-midi, 1 = 1 h du matin) ; sans heure, le jour et la nuit tournent
+//  pluie : il pleut tout le temps (1 = une bonne pluie, 2 = un déluge, 0.3 = quelques gouttes ; sans : jamais). Le ciel est alors couvert :
+//    ni lune, ni étoiles, et les rues mouillées brillent sous les lampadaires. Si le jeu rame, mets 0.5
+//  brouillard : au-delà de ce nombre de mètres, tout disparaît dans le brouillard (sans : la brume de tous les jours, qui laisse voir à 10 km).
+//    300 = un brouillard épais, 1000 = léger. Le jeu ne dessine rien de ce qu'on ne voit plus : plus il est épais, moins le jeu rame
 //  cachette : où la DeLorean attend qu'on la retrouve, à la fin du chapitre : une lettre de la CARTE ('?' : le bunker secret)
 //  sansReproche: true : un héros sans reproche. La police est de son côté (jamais d'étoiles), mais il ne doit pas tuer de passants :
 //    dès la 3e victime, une amende (voir amende, dans REGLAGES)
@@ -295,25 +300,30 @@ const CHAPITRES = [
     'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     'Suis le <b>point jaune</b> : tes missions t\'attendent. À la fin, le Mandarin a caché la DeLorean : il faudra la retrouver.',
   ]},
-  { ville: 'Gotham', heros: 'Bruce Wayne', heroine: 'Barbara Gordon', super: 'Batman', superFille: 'Batgirl', triche: 'BATMAN', logo: 'batman', heure: 1, cachette: 'b', sansReproche: true, touches: [
-    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
-    ['Maj', "courir · en l'air, garde-le enfoncé : tu planes avec ta cape"], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
-    ['G', 'le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher'],
-    ['9', 'le grappin, les batarangs et les filets'],
-    ['B', 'ta Batmobile arrive à côté de toi'],
+  { ville: 'Gotham', heros: 'Bruce Wayne', heroine: 'Barbara Gordon', super: 'Batman', superFille: 'Batgirl', ami: 'Batgirl', amiFille: 'Batman', triche: 'BATMAN', logo: 'batman', heure: 1,
+    pluie: 1, brouillard: 380, cachette: '§', sansReproche: true,
+    civil: { veste: '#1b1e27', chemise: '#eef0f2', cravate: '#6a1422', pantalon: '#1b1e27', chaussures: '#0e0e10', cheveux: '#17110c' },
+    civilFille: { veste: '#2f5a4c', chemise: '#efe6d2', jupe: '#2e2e38', talons: '#3a2416', cheveux: '#b33c18', lunettes: '#d8e6ee' }, touches: [
+    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser'],
+    ['Maj', "courir · en l'air, en costume, garde-le enfoncé : tu planes avec ta cape"], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
+    ['H', 'tu mets ton costume, et tu deviens {super} · H encore : tu repasses en civil (sans tes gadgets)'],
+    ['G', 'en costume : le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher'],
+    ['9', 'en costume : le grappin, les batarangs et les filets'],
+    ['B', 'en costume : ta Batmobile arrive à côté de toi'],
     ['R', 'dans la Batmobile : déployer les ailes et voler, ou se poser'],
-    ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
+    ['E', 'monter / descendre (voiture, bateau, monorail), ascenseur'],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
     ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
-    'Tu es <b>{super}</b> ! Ta Batmobile t\'attend à côté de toi : <b>B</b> la rappelle, <b>R</b> la fait voler.',
-    '<b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.',
-    'En l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.',
-    '<b>9</b> : le grappin, les batarangs et les filets.',
+    'Tu es <b>{heros}</b>, en civil. <b>H</b> : tu mets ton costume, et tu deviens <b>{super}</b> ! <b>H</b> encore : tu repasses en civil.',
+    'En costume, <b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.',
+    'En costume, en l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.',
+    'En costume, <b>9</b> : le grappin, les batarangs et les filets.',
+    'En costume, <b>B</b> : ta Batmobile arrive à côté de toi. Dedans, <b>R</b> : elle vole !',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
-    'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
-    'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
+    'Quand des voyous braquent un magasin, le <b>Bat-signal</b> s\'allume dans le ciel : suis le <b>point rouge</b> et arrête-les, pour une prime !',
+    'Le Sphinx a caché la DeLorean dans son repaire (<b>?</b> vert sur la carte) : retrouve-la, puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
   { ville: 'Metropolis', heros: 'Clark Kent', heroine: 'Kara Danvers', super: 'Superman', superFille: 'Supergirl', triche: 'SUPERMAN', logo: 'superman', heure: 12, cachette: 'd', sansReproche: true, touches: [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
@@ -654,6 +664,31 @@ const TRADUCTIONS = {
   'IRON MAN !':       { de: 'IRON MAN!', en: 'IRON MAN!', gsw: 'IRON MAN!' },
   'RESCUE !':         { de: 'RESCUE!', en: 'RESCUE!', gsw: 'RESCUE!' },
   'Rescue !':         { de: 'Rescue!', en: 'Rescue!', gsw: 'Rescue!' },
+  'PAS ENCORE DE COSTUME': { de: 'NOCH KEIN KOSTÜM', en: 'NO SUIT YET', gsw: 'NO KEIS KOSTÜM' },
+  'Ton costume, tu vas le trouver : suis le point jaune !': { de: 'Dein Kostüm wirst du finden: Folge dem gelben Punkt!', en: 'You will find your suit: follow the yellow dot!',
+    gsw: 'Dis Kostüm findsch scho: Gang em gääle Punkt nah!' },
+  'En civil : ni gadgets, ni cape. H : ton costume': { de: 'In Zivil: keine Ausrüstung, kein Umhang. H: dein Kostüm', en: 'In plain clothes: no gadgets, no cape. H: your suit',
+    gsw: 'In Zivil: kei Usrüschtig, kein Umhang. H: dis Kostüm' },
+  'Appuie sur H pour mettre ton costume': { de: 'Drück H, um dein Kostüm anzuziehen', en: 'Press H to put on your suit', gsw: 'Drück H, zum dis Kostüm aalege' },
+  'Mets ton costume (H) pour lancer ton grappin': { de: 'Zieh dein Kostüm an (H), um deinen Enterhaken zu werfen', en: 'Put on your suit (H) to fire your grapple',
+    gsw: 'Leg dis Kostüm aa (H), zum din Änterhake werfe' },
+  'Mets ton costume (H) pour avoir tes batarangs et tes filets': { de: 'Zieh dein Kostüm an (H), um deine Batarangs und Netze zu haben', en: 'Put on your suit (H) to get your batarangs and nets',
+    gsw: 'Leg dis Kostüm aa (H), zum dini Batarangs und Netz ha' },
+  'Pas de cape en civil : <b>H</b>, ton costume, et tu planes !': { de: 'In Zivil kein Umhang: <b>H</b>, dein Kostüm, und du gleitest!', en: 'No cape in plain clothes: <b>H</b>, your suit, and you glide!',
+    gsw: 'In Zivil kein Umhang: <b>H</b>, dis Kostüm, und du gleitisch!' },
+  'BATMAN !':         { de: 'BATMAN!', en: 'BATMAN!', gsw: 'BATMAN!' },
+  'BATGIRL !':        { de: 'BATGIRL!', en: 'BATGIRL!', gsw: 'BATGIRL!' },
+  'Mets ton costume (H) pour appeler ta Batmobile': { de: 'Zieh dein Kostüm an (H), um dein Batmobil zu rufen', en: 'Put on your suit (H) to call your Batmobile',
+    gsw: 'Leg dis Kostüm aa (H), zum dis Batmobil rüefe' },
+  'Gare : {gare}':    { de: 'Station: {gare}', en: 'Station: {gare}', gsw: 'Station: {gare}' },
+  'E à une gare : descendre': { de: 'E an einer Station: aussteigen', en: 'E at a station: get off', gsw: 'E anere Station: uusstiige' },
+  'Les portes sont fermées : attends la prochaine gare !': { de: 'Die Türen sind zu: Warte auf die nächste Station!', en: 'The doors are closed: wait for the next station!',
+    gsw: 'D Türe sind zue: Wart uf di nächscht Station!' },
+  'Appuie sur <b>E</b> pour descendre du monorail': { de: 'Drück <b>E</b>, um aus der Einschienenbahn auszusteigen', en: 'Press <b>E</b> to get off the monorail',
+    gsw: 'Drück <b>E</b>, zum us de Einschiinebahn uusstiige' },
+  'Monorail : prochaine gare, {gare}': { de: 'Einschienenbahn: nächste Station, {gare}', en: 'Monorail: next station, {gare}', gsw: 'Einschiinebahn: nächschti Station, {gare}' },
+  'Appuie sur <b>E</b> pour monter dans le monorail': { de: 'Drück <b>E</b>, um in die Einschienenbahn einzusteigen', en: 'Press <b>E</b> to get on the monorail',
+    gsw: 'Drück <b>E</b>, zum i d Einschiinebahn iistiige' },
   'Sois à pied, debout par terre !': { de: 'Sei zu Fuß und steh auf dem Boden!', en: 'Be on foot, standing on the ground!', gsw: 'Sig z Fuess und stand uf em Bode!' },
   'Iron Man !':       { de: 'Iron Man!', en: 'Iron Man!', gsw: 'Iron Man!' },
   'Répulseurs':       { de: 'Repulsoren', en: 'Repulsors', gsw: 'Repulsore' },
@@ -706,8 +741,8 @@ const TRADUCTIONS = {
   'Bras droit':       { de: 'Rechter Arm', en: 'Right arm', gsw: 'Rächte Arm' },
   'Jambe gauche':     { de: 'Linkes Bein', en: 'Left leg', gsw: 'Linggs Bei' },
   'Jambe droite':     { de: 'Rechtes Bein', en: 'Right leg', gsw: 'Rächts Bei' },
-  'G':                { de: 'L', en: 'L', gsw: 'L' },   // (gauche et droite, à côté de l'armure dessinée)
-  'D':                { de: 'R', en: 'R', gsw: 'R' },
+  'G (gauche)':       { fr: 'G', de: 'L', en: 'L', gsw: 'L' },   // (gauche et droite, à côté de l'armure dessinée ; pas 'G' tout court :
+  'D (droite)':       { fr: 'D', de: 'R', en: 'R', gsw: 'R' },   //  c'est aussi une touche, dans la liste des touches du menu)
   'BATTERIE':         { de: 'BATTERIE', en: 'BATTERY', gsw: 'BATTERIE' },
   'EN CHARGE':        { de: 'LÄDT', en: 'CHARGING', gsw: 'LADT' },
   'EN VOL':           { de: 'IM FLUG', en: 'FLYING', gsw: 'IM FLUG' },
@@ -912,6 +947,38 @@ const TRADUCTIONS = {
   'Désert de Mojave': { de: 'Mojave-Wüste', en: 'Mojave Desert', gsw: 'Mojave-Wüeschti' },
   'Base aérienne Edwards': { de: 'Luftwaffenstützpunkt Edwards', en: 'Edwards Air Force Base', gsw: 'Luftwaffebasis Edwards' },
   'Île de Catalina':  { de: 'Catalina-Insel', en: 'Catalina Island', gsw: 'Catalina-Insle' },
+  'GOTHAM':           { de: 'GOTHAM', en: 'GOTHAM', gsw: 'GOTHAM' },
+  'Midtown':          { de: 'Midtown', en: 'Midtown', gsw: 'Midtown' },
+  'Vieux Gotham':     { de: 'Altstadt von Gotham', en: 'Old Gotham', gsw: 'Altstadt vo Gotham' },
+  'Narrows':          { de: 'Narrows', en: 'The Narrows', gsw: 'Narrows' },
+  'East End':         { de: 'East End', en: 'East End', gsw: 'East End' },
+  'Robinson Park':    { de: 'Robinson Park', en: 'Robinson Park', gsw: 'Robinson Park' },
+  'Rivière de Gotham': { de: 'Gotham River', en: 'Gotham River', gsw: 'Gotham River' },
+  'Baie de Gotham':   { de: 'Bucht von Gotham', en: 'Gotham Bay', gsw: 'Bucht vo Gotham' },
+  'Domaine Wayne':    { de: 'Wayne-Anwesen', en: 'Wayne Estate', gsw: 'Wayne-Aawäse' },
+  'Bristol':          { de: 'Bristol', en: 'Bristol', gsw: 'Bristol' },
+  "Île d'Arkham":     { de: 'Arkham-Insel', en: 'Arkham Island', gsw: 'Arkham-Insle' },
+  'Autoroute':        { de: 'Autobahn', en: 'Expressway', gsw: 'Autobahn' },
+  'Tour Wayne':       { de: 'Wayne Tower', en: 'Wayne Tower', gsw: 'Wayne Tower' },
+  'Manoir Wayne':     { de: 'Wayne Manor', en: 'Wayne Manor', gsw: 'Wayne Manor' },
+  'Banque de Gotham': { de: 'Bank von Gotham', en: 'Gotham Bank', gsw: 'Bank vo Gotham' },
+  'Cathédrale':       { de: 'Kathedrale', en: 'Cathedral', gsw: 'Kathedrale' },
+  "Asile d'Arkham":   { de: 'Arkham Asylum', en: 'Arkham Asylum', gsw: 'Arkham Asylum' },
+  'Ace Chemicals':    { de: 'Ace Chemicals', en: 'Ace Chemicals', gsw: 'Ace Chemicals' },
+  'Zoo de Gotham':    { de: 'Zoo von Gotham', en: 'Gotham Zoo', gsw: 'Zoo vo Gotham' },
+  'Stade':            { de: 'Stadion', en: 'Stadium', gsw: 'Stadion' },
+  'Repaire du Sphinx': { de: 'Versteck des Riddlers', en: "The Riddler's lair", gsw: 'Versteck vom Riddler' },
+  'Commissariat (Bat-signal)': { de: 'Polizeiwache (Bat-Signal)', en: 'Police station (Bat-Signal)', gsw: 'Polizeiposchte (Bat-Signal)' },
+  'Gare du monorail': { de: 'Einschienenbahn-Station', en: 'Monorail station', gsw: 'Einschiinebahn-Station' },
+  // les enseignes de Gotham
+  'WAYNE':            { de: 'WAYNE', en: 'WAYNE', gsw: 'WAYNE' },
+  'WAYNE ENTERPRISES': { de: 'WAYNE ENTERPRISES', en: 'WAYNE ENTERPRISES', gsw: 'WAYNE ENTERPRISES' },
+  'BANQUE DE GOTHAM': { de: 'BANK VON GOTHAM', en: 'GOTHAM BANK', gsw: 'BANK VO GOTHAM' },
+  "ASILE D'ARKHAM":   { de: 'ARKHAM ASYLUM', en: 'ARKHAM ASYLUM', gsw: 'ARKHAM ASYLUM' },
+  'ACE CHEMICALS':    { de: 'ACE CHEMICALS', en: 'ACE CHEMICALS', gsw: 'ACE CHEMICALS' },
+  'ZOO DE GOTHAM':    { de: 'ZOO VON GOTHAM', en: 'GOTHAM ZOO', gsw: 'ZOO VO GOTHAM' },
+  'STADE DE GOTHAM':  { de: 'STADION VON GOTHAM', en: 'GOTHAM STADIUM', gsw: 'STADION VO GOTHAM' },
+  'MONORAIL':         { de: 'EINSCHIENENBAHN', en: 'MONORAIL', gsw: 'EINSCHIINEBAHN' },
   'Désert de Grand Senora': { de: 'Grand-Senora-Wüste', en: 'Grand Senora Desert', gsw: 'Grand-Senora-Wüeschti' },
   'Mont Josiah':      { de: 'Mount Josiah', en: 'Mount Josiah', gsw: 'Mount Josiah' },
   'Mont Chiliad':     { de: 'Mount Chiliad', en: 'Mount Chiliad', gsw: 'Mount Chiliad' },
@@ -975,12 +1042,16 @@ const TRADUCTIONS = {
     en: 'switch armor (Stark Industries sells others: ⚙ on the map)', gsw: 'Rüschtig wächsle (Stark Industries verchauft anderi: ⚙ uf de Charte)' },
   "monter / descendre (voiture, bateau, avion), ascenseur, magasin de Stark Industries, prendre quelqu'un dans tes bras": { de: 'einsteigen / aussteigen (Auto, Boot, Flugzeug), Aufzug, Laden von Stark Industries, jemanden in die Arme nehmen',
     en: 'get in / out (car, boat, plane), elevator, Stark Industries store, pick someone up', gsw: 'iistiige / uusstiige (Auto, Boot, Flüüger), Lift, Lade vo Stark Industries, öpper i d Arme näh' },
-  "courir · en l'air, garde-le enfoncé : tu planes avec ta cape": { de: 'rennen · in der Luft gedrückt halten: Du gleitest mit deinem Umhang',
-    en: 'run · in the air, hold it: you glide with your cape', gsw: 'seckle · i de Luft druckt hebe: Du gleitisch mit dim Umhang' },
-  'le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher': { de: 'der Greifhaken, um auf die Dächer zu kommen (oder Linksklick, mit dem Greifhaken in der Hand) · Leertaste: loslassen',
-    en: 'the grapple, to get onto the roofs (or left click, with the grapple in your hand) · Space: let go', gsw: 'de Griifhaagge, zum uf d Dächer cho (oder Linksklick, mit em Griifhaagge i de Hand) · Läärtaschte: loslaa' },
-  'le grappin, les batarangs et les filets': { de: 'Greifhaken, Batarangs und Netze', en: 'grapple, batarangs and nets', gsw: 'Griifhaagge, Batarangs und Netz' },
-  'ta Batmobile arrive à côté de toi': { de: 'dein Batmobil kommt neben dich', en: 'your Batmobile comes next to you', gsw: 'dis Batmobil chunnt näb di' },
+  "courir · en l'air, en costume, garde-le enfoncé : tu planes avec ta cape": { de: 'rennen · in der Luft, im Kostüm, gedrückt halten: Du gleitest mit deinem Umhang',
+    en: 'run · in the air, in your suit, hold it: you glide with your cape', gsw: 'seckle · i de Luft, im Kostüm, druckt hebe: Du gleitisch mit dim Umhang' },
+  'en costume : le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher': { de: 'im Kostüm: der Greifhaken, um auf die Dächer zu kommen (oder Linksklick, mit dem Greifhaken in der Hand) · Leertaste: loslassen',
+    en: 'in your suit: the grapple, to get onto the roofs (or left click, with the grapple in your hand) · Space: let go', gsw: 'im Kostüm: de Griifhaagge, zum uf d Dächer cho (oder Linksklick, mit em Griifhaagge i de Hand) · Läärtaschte: loslaa' },
+  'en costume : le grappin, les batarangs et les filets': { de: 'im Kostüm: Greifhaken, Batarangs und Netze', en: 'in your suit: grapple, batarangs and nets', gsw: 'im Kostüm: Griifhaagge, Batarangs und Netz' },
+  'en costume : ta Batmobile arrive à côté de toi': { de: 'im Kostüm: dein Batmobil kommt neben dich', en: 'in your suit: your Batmobile comes next to you', gsw: 'im Kostüm: dis Batmobil chunnt näb di' },
+  'tu mets ton costume, et tu deviens {super} · H encore : tu repasses en civil (sans tes gadgets)': { de: 'du ziehst dein Kostüm an und wirst {super} · H noch einmal: wieder in Zivil (ohne deine Ausrüstung)',
+    en: 'you put on your suit, and you become {super} · H again: back in plain clothes (without your gadgets)', gsw: 'du leisch dis Kostüm aa und wirsch {super} · H nomal: wieder in Zivil (ohni dini Usrüschtig)' },
+  'monter / descendre (voiture, bateau, monorail), ascenseur': { de: 'einsteigen / aussteigen (Auto, Boot, Einschienenbahn), Aufzug', en: 'get in / out (car, boat, monorail), elevator',
+    gsw: 'iistiige / uusstiige (Auto, Boot, Einschiinebahn), Lift' },
   'dans la Batmobile : déployer les ailes et voler, ou se poser': { de: 'im Batmobil: die Flügel ausklappen und fliegen, oder landen', en: 'in the Batmobile: spread the wings and fly, or land', gsw: 'im Batmobil: d Flügel uusklappe und flüüge, oder lande' },
   'Maj 3 fois, vite': { de: 'Shift 3-mal, schnell', en: 'Shift 3 times, fast', gsw: 'Shift 3 Mal, schnäll' },
   "t'envoler · encore 3 fois : arrêter de voler": { de: 'losfliegen · noch 3-mal: aufhören zu fliegen', en: 'take off · 3 more times: stop flying', gsw: 'losflüüge · nomal 3 Mal: ufhöre flüüge' },
@@ -1028,13 +1099,25 @@ const TRADUCTIONS = {
     de: 'Der DeLorean ist verschwunden: Finde ihn (gelber Punkt) und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
     en: 'The DeLorean has vanished: find it (yellow dot), then hold 88 miles per hour for 3 seconds.',
     gsw: 'De DeLorean isch verschwunde: Find en (gääle Punkt) und heb dänn 3 Sekunde lang 88 Meile pro Stund.' },
-  'Tu es <b>{super}</b> ! Ta Batmobile t\'attend à côté de toi : <b>B</b> la rappelle, <b>R</b> la fait voler.': { de: 'Du bist <b>{super}</b>! Dein Batmobil wartet neben dir: <b>B</b> ruft es, <b>R</b> lässt es fliegen.',
-    en: 'You are <b>{super}</b>! Your Batmobile is waiting next to you: <b>B</b> calls it, <b>R</b> makes it fly.', gsw: 'Du bisch <b>{super}</b>! Dis Batmobil wartet näbe dir: <b>B</b> rüeft s, <b>R</b> laht s flüüge.' },
-  '<b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.': { de: '<b>G</b> (oder Linksklick): der Enterhaken, um auf die Dächer zu kommen.',
-    en: '<b>G</b> (or left click): the grappling hook, to get onto the roofs.', gsw: '<b>G</b> (oder Linkschlick): de Änterhake, zum uf d Dächer cho.' },
-  'En l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.': { de: 'In der Luft halte <b>Shift</b> gedrückt: Du gleitest mit deinem Umhang.',
-    en: 'In the air, hold <b>Shift</b>: you glide with your cape.', gsw: 'I de Luft heb <b>Shift</b> druckt: Du gleitisch mit dim Umhang.' },
-  '<b>9</b> : le grappin, les batarangs et les filets.': { de: '<b>9</b>: Enterhaken, Batarangs und Netze.', en: '<b>9</b>: grappling hook, batarangs and nets.', gsw: '<b>9</b>: Änterhake, Batarangs und Netz.' },
+  'Tu es <b>{heros}</b>, en civil. <b>H</b> : tu mets ton costume, et tu deviens <b>{super}</b> ! <b>H</b> encore : tu repasses en civil.': {
+    de: 'Du bist <b>{heros}</b>, in Zivil. <b>H</b>: Du ziehst dein Kostüm an und wirst <b>{super}</b>! <b>H</b> noch einmal: wieder in Zivil.',
+    en: 'You are <b>{heros}</b>, in plain clothes. <b>H</b>: you put on your suit, and you become <b>{super}</b>! <b>H</b> again: back in plain clothes.',
+    gsw: 'Du bisch <b>{heros}</b>, in Zivil. <b>H</b>: Du leisch dis Kostüm aa und wirsch <b>{super}</b>! <b>H</b> nomal: wieder in Zivil.' },
+  'En costume, <b>B</b> : ta Batmobile arrive à côté de toi. Dedans, <b>R</b> : elle vole !': { de: 'Im Kostüm, <b>B</b>: Dein Batmobil kommt neben dich. Drinnen, <b>R</b>: Es fliegt!',
+    en: 'In your suit, <b>B</b>: your Batmobile comes next to you. Inside, <b>R</b>: it flies!', gsw: 'Im Kostüm, <b>B</b>: Dis Batmobil chunnt näb di. Drin, <b>R</b>: Es flüügt!' },
+  "Quand des voyous braquent un magasin, le <b>Bat-signal</b> s'allume dans le ciel : suis le <b>point rouge</b> et arrête-les, pour une prime !": {
+    de: 'Wenn Gauner einen Laden überfallen, leuchtet das <b>Bat-Signal</b> am Himmel: Folge dem <b>roten Punkt</b> und halte sie auf, für eine Belohnung!',
+    en: 'When crooks rob a store, the <b>Bat-Signal</b> lights up in the sky: follow the <b>red dot</b> and stop them, for a reward!',
+    gsw: 'Wänn Gauner en Lade überfalled, lüchtet s <b>Bat-Signal</b> am Himmel: Gang em <b>rote Punkt</b> nah und halt si uf, für e Belohnig!' },
+  "Le Sphinx a caché la DeLorean dans son repaire (<b>?</b> vert sur la carte) : retrouve-la, puis tiens 88 miles à l'heure pendant 3 secondes.": {
+    de: 'Der Riddler hat den DeLorean in seinem Versteck versteckt (grünes <b>?</b> auf der Karte): Finde ihn und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
+    en: 'The Riddler has hidden the DeLorean in his lair (green <b>?</b> on the map): find it, then hold 88 miles per hour for 3 seconds.',
+    gsw: 'De Riddler hät de DeLorean i sim Versteck versteckt (grüens <b>?</b> uf de Charte): Find en und heb dänn 3 Sekunde lang 88 Meile pro Stund.' },
+  'En costume, <b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.': { de: 'Im Kostüm, <b>G</b> (oder Linksklick): der Enterhaken, um auf die Dächer zu kommen.',
+    en: 'In your suit, <b>G</b> (or left click): the grappling hook, to get onto the roofs.', gsw: 'Im Kostüm, <b>G</b> (oder Linkschlick): de Änterhake, zum uf d Dächer cho.' },
+  'En costume, en l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.': { de: 'Im Kostüm, in der Luft, halte <b>Shift</b> gedrückt: Du gleitest mit deinem Umhang.',
+    en: 'In your suit, in the air, hold <b>Shift</b>: you glide with your cape.', gsw: 'Im Kostüm, i de Luft, heb <b>Shift</b> druckt: Du gleitisch mit dim Umhang.' },
+  'En costume, <b>9</b> : le grappin, les batarangs et les filets.': { de: 'Im Kostüm, <b>9</b>: Enterhaken, Batarangs und Netze.', en: 'In your suit, <b>9</b>: grappling hook, batarangs and nets.', gsw: 'Im Kostüm, <b>9</b>: Änterhake, Batarangs und Netz.' },
   'Tu es <b>{super}</b> ! <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.': { de: 'Du bist <b>{super}</b>! 3-mal schnell <b>Shift</b>: Du fliegst los. Noch 3-mal: Du hörst auf zu fliegen.',
     en: 'You are <b>{super}</b>! <b>Shift</b> 3 times, fast: you take off. 3 more times: you stop flying.', gsw: 'Du bisch <b>{super}</b>! 3 Mal schnäll <b>Shift</b>: Du flüügsch los. Nomal 3 Mal: Du hörsch uf flüüge.' },
   'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.': { de: 'Im Flug macht dich jedes Drücken auf <b>Shift</b> schneller. <b>Shift</b> + A oder D: eine Fassrolle.',
@@ -2361,6 +2444,9 @@ let PANNEAUX = [];
 let PALMIERS = 41;
 // la galerie de la grotte des Dix Anneaux, qui s'enfonce dans la colline (voir VILLES : à Malibu) ; à Los Santos, il n'y a pas de grotte
 let GALERIE = null;
+// le vieux quartier gothique, le Bat-signal et le monorail (voir VILLES : à Gotham) ; à Los Santos, il n'y en a pas
+let GOTHIQUE = null, BATSIGNAL = false, MONORAIL = null;
+let VISITABLES = null;   // (à Los Santos : REGLAGES.immeublesVisitables)
 
 // =====================================================================
 //  LES GANGS : ils traînent dans leur quartier, et te laissent tranquille... sauf si tu en frappes un,
@@ -2387,6 +2473,19 @@ let GANGS = [
 //    deuxième doit être juste au sud). D'un coin à l'autre, elle va tout droit, sans biais (soit vers l'est ou l'ouest, soit vers le nord ou
 //    le sud). Au bout, la cellule où Tony se réveille. largeur, hauteur : sa taille, en mètres. porteCellule, porteGrotte : les points de vie
 //    des deux portes à casser (celle de la cellule, puis la grande porte de la grotte)
+//  GOTHIQUE : le vieux quartier gothique (à Gotham). Les immeubles (I) et les tours (T) à moins de « rayon » cases de la case col, ligne y sont
+//    de vieux bâtiments en pierre noire, aux fenêtres pointues, avec des toits pointus, des flèches, des gargouilles et des statues
+//    (autour, un peu des deux). Ailleurs, des tours modernes de verre et de béton, comme à Los Santos
+//  BATSIGNAL: true : le Bat-signal, un grand projecteur sur le toit du commissariat (C). Il s'allume à chaque appel de la police :
+//    un faisceau monte dans le ciel, et la chauve-souris se dessine sur les nuages
+//  VISITABLES : la part des immeubles (pâtés I) où l'on entre, dans cette ville (sans : REGLAGES.immeublesVisitables). Chaque immeuble où
+//    l'on entre a ses étages, ses meubles : une ville avec beaucoup d'immeubles en a beaucoup, et le jeu prend plus de mémoire
+//  MONORAIL : un train qui roule en hauteur, au-dessus des rues. points : les carrefours [colonne, ligne] par où passe sa voie (elle va tout
+//    droit de l'un à l'autre, en tournant en douceur ; 26.5 : au milieu d'une rue, entre deux carrefours) ; gares : où il s'arrête [nom,
+//    colonne, ligne] (la première et la dernière sont les deux bouts : il y fait demi-tour) ; hauteur : sa voie, en mètres au-dessus de la rue
+//    du premier point (elle reste à cette hauteur tout du long : fais-la passer dans une ville plate ; vers une colline, elle s'y enterre) ;
+//    wagons : combien ; vitesse : en m/s ; arret : les secondes qu'il attend dans chaque gare. Monte dedans avec E, dans une gare (un ascenseur
+//    monte de la rue au quai)
 // =====================================================================
 const VILLES = {
   // Malibu, au chapitre 2 (Iron Man). Dans sa CARTE, les signes de Los Santos, et ceux de Malibu (* = avec un étage ou un toit où monter) :
@@ -2477,6 +2576,98 @@ const VILLES = {
     PANNEAUX: [{ texte: 'HOLLYWOOD', col: 37, ligne: 31, angle: 0 }],
     PALMIERS: 0,
     GALERIE: { chemin: [[0, 0], [0, 16], [-16, 16], [-16, 36], [16, 36], [16, 54], [-4, 54]], largeur: 7, hauteur: 5, porteCellule: 500, porteGrotte: 1000 },
+  },
+  // Gotham, au chapitre 3 (Batman). Toujours la nuit, sous la pluie et dans le brouillard (CHAPITRES : pluie, brouillard). Dans sa CARTE,
+  // les signes de Los Santos, et ceux de Gotham (* = avec un étage ou un toit où monter) :
+  //    { manoir Wayne, sur sa colline, à l'ouest de la rivière (la Batcave sera creusée dessous) : on part de la place à côté (X)
+  //    / tour Wayne* (Wayne Enterprises), la plus haute : un grand hall en bas, un ascenseur jusqu'au toit, et la gare du monorail
+  //    £ banque de Gotham : une tour de verre, et son hall        é cathédrale* : la plateforme de son clocher à 57 m (le grappin y monte), sa flèche à 98 m
+  //    [ asile d'Arkham, sur son île        ] Ace Chemicals : l'usine et ses cuves vertes        } zoo de Gotham (le repaire du Pingouin)
+  //    ° stade        § repaire du Sphinx : la DeLorean y est cachée, dans la cour
+  //  Le commissariat (C) est celui de la police de Gotham (GCPD) : le Bat-signal est sur son toit (BATSIGNAL)
+  'Gotham': {
+    CARTE: [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 0
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 1
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 2
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_______~~~~~~~~~~~~~~~~~~",  // 3
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_*,,,1**_~~~~~~~~~~~~~~~~~",  // 4
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_*,,,,**_~~~~~~~~~~~~~~~~~",  // 5
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_,,[,,1,_~~~~~~~~~~~~~~~~~",  // 6
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~_,=,,,,,_~~~~~~~~~~~~~~~~~",  // 7
+      "~~~_______________~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~",  // 8
+      "~~~**************,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~",  // 9
+      "~~~**************,~~~___________________________~~#~~~~~~~~~~~~~~~~~~~~~~~",  // 10
+      "~~~**************,~~~,,,*,,,,,,,,*,,*,,,,**,,,,_~~#~~~~~~~~~~~~~~~~~~~~~~~",  // 11
+      "~~_**************,~~~,==========================###~~~~~~~~~~~~~~~~~~~~~~~",  // 12
+      "~~_**************,~~~,=,**,,*,,*,,,=,,**,,,*,=,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 13
+      "~~_**************,~~~,=*,TTITTIITTTTTTTITTIIE,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 14
+      "~~_**************,~~~,=*,TTTITTTTTTTTTTTPPPPI,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 15
+      "~~_,,,,,,,,,,,,,,,~~~,=**TTHIIIITTTTTTTTP}PPI,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 16
+      "~~_,,,,,1122211,,,~~~,=*,TTITTIITTTTTTTTPPPPI,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 17
+      "~~_,,,,12233322,,,~~~,=*,TTITTTTTTT/TTTIPPPPT,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 18
+      "~~_,,,1233333321,,~~~,=,*TTTIPTTTTP.PT£TTITTT,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 19
+      "~~_,,,1233{X======###====TTIITTITTTTTTTTTITIT,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 20
+      "~~_,,,12333333=1,,~~~,=**STTITITTITTTITTIIITT,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 21
+      "~~_,,,,1223332=1,,~~~,=*,TTTTIITTSTTIIIIIITTI,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 22
+      "~~_,,,,,112221=11,~~~,=,,TITTITTTTIITIITITTII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 23
+      "~~_*****,,,,,1=1,,~~~~#~~~+~~+~~IIIIIIIIIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 24
+      "~~_*****,,,,1,=,1,~~~,=,,IIIIII~IIIIIITIIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 25
+      "~~_*****,,,,,,=1,,~~~,=,*IIIIII~ITIIIIII.IIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 26
+      "~~_*****,,,,,,=,,,~~~,=,,IIIIII+IIIIIIIIIIII°,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 27
+      "~~_*****MMMMSM,,,,~~~,=,,IIIIPI~IIIIIICITIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 28
+      "~~_*****MMPMMM,,,,~~~,=*,IIIIII~TIIIIIIIIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 29
+      "~~_*****MMMMMM,,,,~~~,=*,IIIIII+IIIIéIIIIIMMI,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 30
+      "~~_*****MEMMMM,,,,~~~,=,,IIISII~IIII.IIIITMMI,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 31
+      "~~_*****,,,,,,,,,,~~~,=,*IIIIII~IIPIIIITIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 32
+      "~~_*****,,,,,,,,,,~~~,=,,IIIIII+ITIIIIIIIIIIE,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 33
+      "~~_,,,,,,,,,,,,,,,~~~,=,,EIIIII~IIIITIIHIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 34
+      "~~_,,,,,,,,,,,,,,,~~~,=*,IIIIII&IITIIIITIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 35
+      "~~_,******,,,,,,,,~~~,=*,IIIIII~IIIIIIIIIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 36
+      "~~_,******,121,,,,~~~,=,*I§IIII+IIIIISIIIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 37
+      "~~_,******,232,,,,~~~,=,,IIIIII~IIIIIIIIIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 38
+      "~~_,******,,1,,,,,~~~,=,,IIIIII~IIDIIIIIIIIII,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 39
+      "~~_,******,,,,,,,,~~~_===IIIIII~DDDDDDDDDI]DD,,_~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 40
+      "~~_,******,,,,11,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 41
+      "~~_,******,,,,1,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 42
+      "~~_,******,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 43
+      "~~_,,,,,,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 44
+      "~~_,,,,,,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 45
+      "~~________________~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 46
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 47
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 48
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 49
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 50
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 51
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 52
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 53
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 54
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 55
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 56
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 57
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 58
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 59
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 60
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 61
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 62
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 63
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 64
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 65
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 66
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 67
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 68
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 69
+    ],
+    NOMS_LIEUX: [
+      ['GOTHAM', 35, 25], ['Midtown', 30, 17], ['Vieux Gotham', 35, 34], ['Narrows', 27, 29], ['East End', 42, 36], ['Robinson Park', 41, 19],
+      ['Rivière de Gotham', 19, 32], ['Baie de Gotham', 34, 47], ['Port', 37, 42], ['Domaine Wayne', 9, 14], ['Bristol', 10, 33],
+      ['Île d\'Arkham', 52, 2], ['Autoroute', 22, 11],
+    ],
+    PALMIERS: 70,   // (la carte n'a que 70 lignes : aucun palmier à Gotham)
+    GOTHIQUE: { col: 36, ligne: 30, rayon: 6 },
+    BATSIGNAL: true,
+    VISITABLES: 0.1,   // (deux fois plus d'immeubles qu'à Los Santos : on n'entre que dans 1 sur 10, sinon le jeu prend 80 Mo de plus)
+    MONORAIL: { points: [[26.5, 34], [35, 34], [35, 18.5]], gares: [['Narrows', 26.5, 34], ['Vieux Gotham', 35, 28.5], ['Tour Wayne', 35, 18.5]], hauteur: 11, wagons: 3, vitesse: 14, arret: 8 },
   },
 };
 
@@ -2966,6 +3157,14 @@ const FETE_DES_ARMURES = [
   { nom: 'Gemini', couleurs: { rouge: '#e8e8ec', or: '#3a5ac8', acier: '#2a2c30', lumiere: '#d8f8ff' } },
   { nom: 'Python', couleurs: { rouge: '#e8c020', or: '#202226', acier: '#3a3c42', lumiere: '#d8f8ff' } },
 ];
+// LES COSTUMES DE BATMAN ET DE BATGIRL (le code BATMAN ; au chapitre de Batman, la touche H les met et les enlève) : costume (le collant),
+// slip, noir (la cagoule, les gants, les bottes et la cape), jaune (la ceinture et la chauve-souris), ovale: true = la chauve-souris noire
+// dans un ovale jaune (sinon : la chauve-souris jaune, toute seule), cheveux: true = de longs cheveux sortent de la cagoule (ceux de l'héroïne).
+// Batgirl, c'est Barbara Gordon, au chapitre de Batman, avec la fille du menu. Ailleurs (le code BATMAN au chapitre 1), c'est toujours Batman
+const COSTUME_BATMAN =  { nom: 'Batman',  costume: '#5c6068', slip: '#131318', noir: '#131318', jaune: '#f0c41a', ovale: true };
+const COSTUME_BATGIRL = { nom: 'Batgirl', costume: '#3b3448', slip: '#3b3448', noir: '#131318', jaune: '#f0c41a', cheveux: true };
+const batgirl = () => fille() && CHAPITRE.triche === 'BATMAN';
+const cacheBatman = {};   // (les dessins de l'écusson et de la cagoule, faits une fois pour toutes)
 const TRICHES = [
   // mode dieu : plus rien ne fait mal (balles, explosions, morsures, fumée). Retape le code pour redevenir mortel. IDDQD : comme dans Doom.
   // B.J. est en Zeus : cheveux et barbe blancs, tout nu avec juste un pagne en paille et des santiags (les autres codes s'ajoutent par-dessus).
@@ -3024,11 +3223,11 @@ const TRICHES = [
   // Batman : le costume gris, le slip, les gants, les bottes et la cagoule noirs (avec ses deux oreilles pointues), la ceinture jaune,
   // la chauve-souris sur la poitrine et la grande cape noire. Il a le grappin (qu'il prend en main), les batarangs et les filets (touche 9),
   // la cape pour planer (Maj en l'air), et sa Batmobile, qui vole (touche R), apparaît à côté de lui (la touche B la rappelle). Il n'est pas
-  // invincible, et tomber de haut lui fait mal : à lui de planer !
+  // invincible, et tomber de haut lui fait mal : à lui de planer ! Au chapitre de Batman, avec la fille du menu, c'est Batgirl (COSTUME_BATGIRL)
   { code: 'BATMAN', texte: "Batman ! Grappin, batarangs et filets (touche 9), la cape pour planer (Maj en l'air), et la Batmobile qui vole (R ; B la rappelle)", batarang: true, filet: true, grappin: true, cape: true, voiture: 'Batmobile', effet: b => {
-      const gris = '#5c6068', noir = '#131318', jaune = '#f0c41a';
-      habiller(b.torse, gris); habiller(b.bassin, noir); habiller(b.ceinture, jaune);
-      for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, gris);
+      const B = batgirl() ? COSTUME_BATGIRL : COSTUME_BATMAN, noir = B.noir, jaune = B.jaune;
+      habiller(b.torse, B.costume); habiller(b.bassin, B.slip); habiller(b.ceinture, jaune);
+      for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, B.costume);
       for (const [m, c] of [[b.brasD, -1], [b.brasG, 1]]) { // les gants montent jusqu'au coude, avec trois ailerons pointus sur le côté
         habiller(m.bas, noir); habiller(m.main, noir);
         for (const y of [-0.09, -0.15, -0.21]) accessoire(GEO.aileronGant, noir, m.pli, 0.05 * c, y, -0.01).rotation.z = -1.2 * c;
@@ -3038,23 +3237,28 @@ const TRICHES = [
         accessoire(GEO.tigeSantiag, noir, j.pli, 0, 0, 0).material = mat(noir, { side: THREE.DoubleSide });
       }
       for (const x of [-0.1, 0, 0.1]) accessoire(GEO.moustache, jaune, b.ceinture, x, 0, 0.1).scale.set(1.1, 1.9, 1.6);   // les sacoches de la ceinture
-      // l'écusson : un ovale jaune bordé de noir, avec la chauve-souris (la forme du batarang : DESSIN_BATARANG)
-      accessoire(GEO.blason, jaune, b.torse, 0, 0, 0).material = std(toile(128, 128, g => {
+      // l'écusson : un ovale jaune bordé de noir, avec la chauve-souris noire (la forme du batarang : DESSIN_BATARANG) ; chez Batgirl, sans
+      // ovale : la chauve-souris toute seule, jaune. (Les dessins sont gardés : H met et enlève le costume autant qu'on veut)
+      accessoire(GEO.blason, jaune, b.torse, 0, 0, 0).material = cacheBatman[B.nom + ' écusson'] ||= std(toile(128, 128, g => {
         g.translate(64, 62);
-        g.beginPath(); g.ellipse(0, 0, 56, 32, 0, 0, 7); g.fillStyle = jaune; g.fill(); g.lineWidth = 5; g.strokeStyle = noir; g.stroke();
-        g.beginPath(); for (const [x, y] of CONTOUR_BATARANG) g.lineTo(x * 46, -y * 46); g.fillStyle = noir; g.fill();
+        if (B.ovale) { g.beginPath(); g.ellipse(0, 0, 56, 32, 0, 0, 7); g.fillStyle = jaune; g.fill(); g.lineWidth = 5; g.strokeStyle = noir; g.stroke(); }
+        const t = B.ovale ? [46, 46] : [60, 72];   // (chez Batgirl, la chauve-souris toute seule est plus grande)
+        g.beginPath(); for (const [x, y] of CONTOUR_BATARANG) g.lineTo(x * t[0], -y * t[1]); g.fillStyle = B.ovale ? noir : jaune; g.fill();
       }), { alphaTest: 0.5, bumpScale: 0.01 });
       // la cagoule : toute la tête est noire, sauf le bas du visage ; les yeux sont blancs, et deux oreilles pointues se dressent dessus
       b.cheveux.visible = false;
       habiller(b.cou, noir); for (const o of b.tete.children) if (o.userData.habit && o !== b.cheveux) habiller(o, noir);   // (le cou, le nez et les oreilles sont dessous)
-      b.tete.material = new THREE.MeshStandardMaterial({ roughness: 0.75, map: toile(256, 128, (g, l, h) => {   // (le devant de la tête est au quart de l'image)
+      b.tete.material = cacheBatman[B.nom + ' cagoule'] ||= new THREE.MeshStandardMaterial({ roughness: 0.75, map: toile(256, 128, (g, l, h) => {   // (le devant de la tête est au quart de l'image)
         g.fillStyle = noir; g.fillRect(0, 0, l, h);
         g.fillStyle = PEAU_BJ; g.beginPath(); g.moveTo(40, h); g.lineTo(40, 86); g.quadraticCurveTo(64, 68, 88, 86); g.lineTo(88, h); g.fill();
-        g.fillStyle = 'rgba(110,30,30,.75)'; g.fillRect(54, 86, 20, 2.6);                                         // la bouche
+        if (B.cheveux) { g.fillStyle = 'rgba(200,50,80,.85)'; g.beginPath(); g.ellipse(64, 87.5, 8.5, 3, 0, 0, 7); g.fill(); }   // la bouche (Batgirl : des lèvres roses)
+        else { g.fillStyle = 'rgba(110,30,30,.75)'; g.fillRect(54, 86, 20, 2.6); }
         g.fillStyle = '#f4f4f0';
         for (const c of [-1, 1]) { g.beginPath(); g.moveTo(64 + 8 * c, 60); g.lineTo(64 + 23 * c, 52); g.lineTo(64 + 21 * c, 60); g.lineTo(64 + 11 * c, 62.5); g.fill(); }   // les yeux, en amande
       }) });
       for (const c of [-1, 1]) accessoire(GEO.oreilleBatman, noir, b.tete, 0.078 * c, 0.155, -0.012).rotation.z = -0.18 * c;
+      // Batgirl : ses longs cheveux (ceux de Barbara Gordon, roux) sortent de la cagoule et tombent dans son dos
+      if (B.cheveux) accessoire(GEO.criniere, tenueCivile().cheveux || CHEVEUX[heros.cheveux], b.tete, 0, -0.02, -0.075).rotation.x = 0.22;
       mettreCape(b, noir, true);   // la cape, noire, le bas découpé comme une aile de chauve-souris
     } },
   // Spiderman : le costume rouge et bleu, avec les fils noirs de la toile, l'araignée sur la poitrine, et la cagoule rouge aux grands yeux blancs.
@@ -3280,8 +3484,9 @@ const S = 60, R = 14, PAS = S + R, VOIE = 3.2;
 const EAU = -1;                // la hauteur de l'eau : mer, lacs et rivières
 const PASMAX = 0.6;            // la plus haute marche qu'on monte sans sauter
 // le pays du chapitre : Los Santos (la CARTE et ses tableaux), ou la ville du chapitre (VILLES), dont les tableaux les remplacent
-if (VILLES[CHAPITRE.ville]) ({ CARTE, SOMMETS, REMONTEES, PISTES_SKI, NAVETTE, NOMS_LIEUX, GANGS, CASCADES, PANNEAUX, PALMIERS, GALERIE } =
-  { SOMMETS: [], REMONTEES: [], PISTES_SKI: [], NAVETTE: [], NOMS_LIEUX: [], GANGS: [], CASCADES: [], PANNEAUX: [], PALMIERS: 0, GALERIE: null, ...VILLES[CHAPITRE.ville] });
+if (VILLES[CHAPITRE.ville]) ({ CARTE, SOMMETS, REMONTEES, PISTES_SKI, NAVETTE, NOMS_LIEUX, GANGS, CASCADES, PANNEAUX, PALMIERS, GALERIE, GOTHIQUE, BATSIGNAL, MONORAIL, VISITABLES } =
+  { SOMMETS: [], REMONTEES: [], PISTES_SKI: [], NAVETTE: [], NOMS_LIEUX: [], GANGS: [], CASCADES: [], PANNEAUX: [], PALMIERS: 0, GALERIE: null, GOTHIQUE: null, BATSIGNAL: false, MONORAIL: null,
+    VISITABLES: null, ...VILLES[CHAPITRE.ville] });
 const NBX = CARTE[0].length, NBZ = CARTE.length;
 const TAILLE_X = NBX * PAS + R, TAILLE_Z = NBZ * PAS + R;
 CARTE.forEach((l, i) => { if (l.length !== NBX) alert(`Carte : la ligne ${i} n'a pas la bonne longueur !`); });
@@ -3290,7 +3495,7 @@ const centre = (i, j) => ({ x: i * PAS + R + S / 2, z: j * PAS + R + S / 2 });
 const noeud = (i, j) => ({ x: i * PAS + R / 2, z: j * PAS + R / 2 });        // carrefour
 const blocEn = (x, z) => [clamp(Math.floor((x - R / 2) / PAS), 0, NBX - 1), clamp(Math.floor((z - R / 2) / PAS), 0, NBZ - 1)];
 const car = (i, j) => (i >= 0 && j >= 0 && i < NBX && j < NBZ) ? CARTE[j][i] : '~';
-const estBloc = c => /[A-Za-z.%?<>|$()]/.test(c);   // un pâté, avec des rues autour
+const estBloc = c => /[A-Za-z.%?<>|$()[\]{}\/é£°§]/.test(c);   // un pâté, avec des rues autour
 const estPiste = c => '!^@'.includes(c);          // une piste d'aéroport (avec un avion ou un hélicoptère, ou rien)
 const estPlat = c => estBloc(c) || estPiste(c);    // le terrain y est aplani
 const estRoute = c => c === '=' || c === '#';
@@ -4019,6 +4224,13 @@ const scene = new THREE.Scene();
 // La brume : elle commence à 20 % de distanceVue, et ne cache tout qu'à distanceRelief. On voit donc le relief de très loin...
 const VUE_RELIEF = Math.max(R_.distanceRelief, R_.distanceVue);
 scene.fog = new THREE.Fog(0xa9c4e0, R_.distanceVue * 0.2, VUE_RELIEF);
+// ...sauf dans le brouillard d'un chapitre (CHAPITRES : brouillard, à Gotham) : au-delà de BROUILLARD mètres, on ne voit plus rien. Alors on ne
+// dessine rien de plus loin, ni les détails, ni le relief : vueDetails remplace distanceVue (le jeu rame moins). Il fait toujours sombre sous
+// la pluie ou dans le brouillard : le ciel est couvert (COUVERT), sans lune ni étoiles (voir majCiel)
+const BROUILLARD = CHAPITRE.brouillard > 0 ? Math.max(60, CHAPITRE.brouillard) : 0, PLUIE = Math.max(0, +CHAPITRE.pluie || 0), COUVERT = BROUILLARD > 0 || PLUIE > 0;
+if (BROUILLARD) Object.assign(scene.fog, { near: BROUILLARD * 0.06, far: BROUILLARD });
+const vueDetails = () => BROUILLARD ? Math.min(R_.distanceVue, BROUILLARD + 40) : R_.distanceVue;
+const HAUT_NUAGES = 300;   // mètres : le dessous des nuages, quand le ciel est couvert (le Bat-signal s'y dessine : voir majBatSignal)
 // ...mais pas les détails (bâtiments, arbres, routes, voitures, gens) : ils s'effacent point par point entre 80 % de distanceVue et distanceVue,
 // et plus loin on ne les dessine plus du tout (majMorceaux). Le terrain et l'eau, eux, restent : leur matière est marquée RELIEF (voir relief).
 // Pour ça, on retouche le bout de programme de Three.js qui dessine la brume. La distance se compte pour chaque point de l'image, tout autour
@@ -4046,7 +4258,7 @@ THREE.Frustum.prototype.intersectsObject = function (o) {
   if (!dansLeChamp.call(this, o)) return false;
   if (o.material.defines?.RELIEF || o.material.fog === false) return true;   // (sans brouillard : le repère jaune des missions, qu'on voit de partout)
   bouleLoin.copy(o.boundingSphere || o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
-  return bouleLoin.center.distanceTo(camera.position) - bouleLoin.radius < R_.distanceVue;
+  return bouleLoin.center.distanceTo(camera.position) - bouleLoin.radius < vueDetails();
 };
 const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, Math.max(R_.distanceVue * 1.5 + 200, VUE_RELIEF * 1.05));
 camera.rotation.order = 'YXZ';
@@ -4333,6 +4545,93 @@ const visage = (peau, fille) => cacheVisage[peau + (fille ? ' fille' : '')] ||= 
 }) });
 TEX.lignes.repeat.set(1, S / 12);
 TEX.feuilles.repeat.set(4, 3);
+// --- Gotham (chapitre 3) : ses façades, dessinées seulement si la carte a ses signes, ou un vieux quartier gothique (GOTHAM) ---
+const GOTHAM = !!GOTHIQUE || !!MONORAIL || BATSIGNAL || CARTE.some(l => /[[\]{}\/é£°§]/.test(l));
+// une fenêtre en ogive (pointue en haut, comme dans une église) : son contour, dans le dessin g. L'arc commence aux trois quarts de sa largeur
+function ogive(g, x, y, w, h) {
+  const a = y + Math.min(w * 0.75, h * 0.6);
+  g.beginPath(); g.moveTo(x, y + h); g.lineTo(x, a);
+  g.quadraticCurveTo(x, y + w * 0.2, x + w / 2, y); g.quadraticCurveTo(x + w, y + w * 0.2, x + w, a);
+  g.lineTo(x + w, y + h); g.closePath();
+}
+// les lumières de la nuit derrière les vieilles fenêtres gothiques : jaune chaud, orange (comme des bougies) ; et celles des vitraux de la cathédrale
+const LUMIERES_CHAUDES = ['#ffb050', '#ffc870', '#ff9e40', '#ffd890', '#ffe0a8'], VITRAUX = ['#4a6aff', '#ff4a5a', '#ffc84a', '#5adf8a', '#b86aff', '#3ac8ff'];
+// une vitre en ogive : comme vitre, mais pointue en haut. vitrail : true = de petits carreaux de couleur (allumés la nuit : part, de 0 à 1)
+function vitreOgive(g, x, y, w, h, [r, v, b] = [36, 42, 56], couleurs = LUMIERES_CHAUDES, vitrail = false, part = null) {
+  const carreaux = (ctx, X, Y, W, H, cols) => { // (dans l'ogive : on la découpe, puis on la remplit de carreaux)
+    ctx.save(); ogive(ctx, X, Y, W, H); ctx.clip();
+    const t = Math.max(1.5, W / 5);
+    for (let yy = Y; yy < Y + H; yy += t) for (let xx = X; xx < X + W; xx += t) { ctx.fillStyle = hasard(cols); ctx.fillRect(xx, yy, t - 0.5, t - 0.5); }
+    ctx.restore();
+  };
+  if (vitrail) carreaux(g, x, y, w, h, ['#1c2a5a', '#5a1c24', '#5a4a1c', '#1c4a2c', '#3a1c5a']);
+  else {
+    const gr = g.createLinearGradient(x, y, x + w * 0.4, y + h);
+    gr.addColorStop(0, `rgb(${r + 80},${v + 85},${b + 90})`); gr.addColorStop(0.5, `rgb(${r},${v},${b})`); gr.addColorStop(1, `rgb(${r >> 1},${v >> 1},${b >> 1})`);
+    ogive(g, x, y, w, h); g.fillStyle = gr; g.fill();
+    if (g.reflets) { ogive(g.reflets, x, y, w, h); g.reflets.fillStyle = '#001ae6'; g.reflets.fill(); }
+  }
+  if (g.lumieres) for (let a = 0; a < 3; a++) for (let c = 0; c < 3; c++) if (Math.random() < (part ?? g.allumees)) {
+    const X = (x + a * g.largeur) / 3, Y = (y + c * g.hauteur) / 3;
+    if (vitrail) { carreaux(g.lumieres, X, Y, w / 3, h / 3, couleurs); continue; }
+    const d = g.lumieres.createLinearGradient(0, Y, 0, Y + h / 3), col = hasard(couleurs);
+    d.addColorStop(0, col); d.addColorStop(1, col + '88');
+    ogive(g.lumieres, X, Y, w / 3, h / 3); g.lumieres.fillStyle = d; g.lumieres.fill();
+  }
+}
+// des pierres taillées, rangée par rangée (le fond d'une façade de pierre), et une corniche tous les « etage » points
+const pierresDe = (rangee, etage = 0) => (g, l, h) => {
+  g.fillStyle = 'rgba(0,0,0,.26)'; for (let y = 0; y < h; y += rangee) { g.fillRect(0, y, l, 1); for (let x = (y / rangee % 2) * rangee * 1.4; x < l; x += rangee * 2.8) g.fillRect(x, y, 1, rangee); }
+  if (etage) { g.fillStyle = 'rgba(125,118,110,.3)'; for (let y = 0; y < h; y += etage) g.fillRect(0, y + etage - 7, l, 5); }
+};
+if (GOTHAM) Object.assign(TEX, {
+  // les vieux immeubles du quartier gothique : de la pierre noire, des fenêtres en ogive dans leur encadrement, une corniche à chaque étage
+  gothique: facade('#2b2a2e', 3, 4, (g, x, y, w, h) => {
+    g.fillStyle = '#423f44'; ogive(g, x + w * .25 - 3, y + h * .12 - 3, w * .5 + 6, h * .74 + 4); g.fill();
+    vitreOgive(g, x + w * .25, y + h * .12, w * .5, h * .72);
+  }, pierresDe(8, 64), 256, 0.55),
+  // les vieux gratte-ciel gothiques : de la pierre noire, de grands piliers du haut en bas, des fenêtres étroites entre eux
+  gothiqueTour: facade('#232228', 6, 4, (g, x, y, w, h) => {
+    vitre(g, x + w * .26, y + h * .14, w * .5, h * .72, [34, 40, 54]);
+    g.fillStyle = '#36343b'; g.fillRect(x, y, w * .16, h);
+  }, (g, l, h) => { g.fillStyle = 'rgba(0,0,0,.32)'; for (let y = 0; y < h; y += h / 4) g.fillRect(0, y, l, 6); }, 256, 0.5),
+  // le manoir Wayne : de la pierre grise, des fenêtres à meneaux (une croix blanche), presque toutes allumées la nuit
+  manoir: facade('#6c675f', 3, 3, (g, x, y, w, h) => {
+    g.fillStyle = '#8c877e'; g.fillRect(x + w * .25 - 4, y + h * .14 - 4, w * .5 + 8, h * .66 + 8);
+    vitre(g, x + w * .25, y + h * .14, w * .5, h * .66, [40, 48, 60]);
+    g.fillStyle = '#ddd6c8'; g.fillRect(x + w * .5 - 1.5, y + h * .14, 3, h * .66); g.fillRect(x + w * .25, y + h * .38, w * .5, 3);
+  }, pierresDe(10), 256, 0.75),
+  // la cathédrale : de la pierre grise, de grands vitraux en ogive (des carreaux de couleur, qui brillent la nuit) et leurs plombs
+  cathedrale: facade('#4c4846', 2, 1, (g, x, y, w, h) => {
+    const fx = x + w * .3, fy = y + h * .16, fw = w * .4, fh = h * .7;
+    g.fillStyle = '#625d59'; ogive(g, fx - 5, fy - 5, fw + 10, fh + 7); g.fill();
+    vitreOgive(g, fx, fy, fw, fh, undefined, VITRAUX, true, 0.9);
+  }, pierresDe(12), 256, 0.9),
+  // l'asile d'Arkham : de la pierre sombre, de petites fenêtres à barreaux, peu allumées
+  arkham: facade('#38342f', 4, 3, (g, x, y, w, h) => {
+    vitre(g, x + w * .3, y + h * .22, w * .4, h * .5, [30, 40, 38]);
+    g.fillStyle = '#121212'; for (let k = 1; k < 4; k++) g.fillRect(x + w * .3 + w * .4 * k / 4 - 1, y + h * .22, 2, h * .5);
+  }, pierresDe(9), 256, 0.35),
+  // la tour Wayne : du verre presque noir, entre de fines lames dorées
+  wayne: facade('#0f1218', 8, 4, (g, x, y, w, h) => { vitre(g, x + 2.5, y + 1, w - 5, h - 2, [22, 32, 50]); g.fillStyle = '#c8a55a'; g.fillRect(x, y, 2.5, h); }, null, 256, 0.22),
+  // la rosace de la cathédrale : une grande fenêtre ronde, ses pétales de vitrail autour d'un cœur, dans un cercle de pierre
+  rosace: toile(128, 128, (g) => {
+    g.fillStyle = '#3c3836'; g.fillRect(0, 0, 128, 128);
+    for (let k = 0; k < 16; k++) {
+      const a = k * Math.PI / 8; g.fillStyle = VITRAUX[k % VITRAUX.length];
+      g.beginPath(); g.moveTo(64 + Math.cos(a - 0.17) * 20, 64 + Math.sin(a - 0.17) * 20); g.lineTo(64 + Math.cos(a - 0.15) * 58, 64 + Math.sin(a - 0.15) * 58);
+      g.lineTo(64 + Math.cos(a + 0.15) * 58, 64 + Math.sin(a + 0.15) * 58); g.lineTo(64 + Math.cos(a + 0.17) * 20, 64 + Math.sin(a + 0.17) * 20); g.fill();
+    }
+    g.fillStyle = '#ffd860'; g.beginPath(); g.arc(64, 64, 15, 0, 7); g.fill();
+    g.strokeStyle = '#3c3836'; g.lineWidth = 3; for (const r of [16, 38]) { g.beginPath(); g.arc(64, 64, r, 0, 7); g.stroke(); }
+  }),
+  // la pelouse du stade : des bandes d'herbe claires et foncées
+  pelouse: toile(128, 128, (g, l, h) => { for (let y = 0; y < h; y += 16) { g.fillStyle = (y / 16) % 2 ? '#3f7a35' : '#4b8a3e'; g.fillRect(0, y, l, 16); } grain(g, l, h, 2500, 0.05); }),
+  // les gradins : des rangées de sièges bleus et gris
+  gradins: toile(64, 64, (g, l, h) => { g.fillStyle = '#2a2c30'; g.fillRect(0, 0, l, h); for (let y = 2; y < h; y += 8) for (let x = 1; x < l; x += 6) { g.fillStyle = (x + y) % 3 ? '#2a4a9a' : '#9a9ea6'; g.fillRect(x, y, 4, 4); } }),
+  // le point d'interrogation vert du Sphinx, en néon (là où rien n'est dessiné, on voit à travers)
+  interrogation: toile(128, 128, (g) => { g.fillStyle = '#3aff5a'; g.font = 'bold 120px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', 64, 70); }),
+});
 
 // le dessin sert aussi de relief (clair = bosse, foncé = creux). Une façade a des fenêtres qui s'allument la nuit : MATS_FENETRES les garde
 // toutes, pour les allumer (voir « Le jour et la nuit »)
@@ -4400,12 +4699,34 @@ const MAT = {
   falaise: std(TEX.sol, { color: '#a27b59', roughness: 1, flatShading: true, side: THREE.DoubleSide, bumpScale: 0.3 }), terre: std(TEX.sol, { color: '#8c7154', roughness: 1, bumpScale: 0.2 }),
 };
 MAT.dalle = MAT.platre;   // la dalle du toit d'un bâtiment où l'on entre : comme le plâtre, mais elle fait de l'ombre
+// Gotham : ses façades (voir TEX), sa pierre noire et ses ardoises noires, ses enseignes, le liquide vert des cuves d'Ace Chemicals, le néon du Sphinx...
+if (GOTHAM) Object.assign(MAT, {
+  gothique: std(TEX.gothique), gothiqueTour: std(TEX.gothiqueTour), manoir: std(TEX.manoir), cathedrale: std(TEX.cathedrale), arkham: std(TEX.arkham), wayne: std(TEX.wayne),
+  pierreNoire: std(null, { color: '#3d3b39', roughness: 0.9 }), ardoiseNoire: std(TEX.tuiles, { color: '#3c404c' }), bronze: std(null, { color: '#8a6a3a', metalness: 0.7, roughness: 0.4 }),
+  rosace: std(TEX.rosace, { emissive: '#fff', emissiveMap: TEX.rosace, emissiveIntensity: 0, bumpScale: 0.02 }),   // (elle s'allume la nuit, comme les fenêtres)
+  pelouse: std(TEX.pelouse, { roughness: 1, bumpScale: 0.02, emissive: '#fff', emissiveMap: TEX.pelouse, emissiveIntensity: 0.35 }),   // (elle brille, comme sous les projecteurs)
+  gradins: std(TEX.gradins, { bumpScale: 0.05 }), glace: std(null, { color: '#e2eef6', roughness: 0.55 }),
+  acide: std(null, { color: '#2a8a1a', emissive: '#3aff22', emissiveIntensity: 0.8, roughness: 0.25 }),   // le liquide des cuves d'Ace Chemicals : il brille, vert
+  interrogation: std(TEX.interrogation, { emissive: '#fff', emissiveMap: TEX.interrogation, emissiveIntensity: 1.3, alphaTest: 0.5, side: THREE.DoubleSide, bumpMap: null }),
+  monorail: std(null, { color: '#d6dae0', metalness: 0.5, roughness: 0.35 }), vitreTrain: std(null, { color: '#1a2230', emissive: '#ffe2a8', emissiveIntensity: 0.9, roughness: 0.2 }),
+  or: std(null, { color: '#d8b060', emissive: '#f0c060', emissiveIntensity: 0.9, metalness: 0.6, roughness: 0.3 }),   // les lignes d'or qui brillent sur la tour Wayne
+  gcpd: enseigne('GCPD', '#fff', '#16244a'),   // le commissariat de Gotham (la police de Gotham : GCPD)
+  wayneEnseigne: enseigne('WAYNE', '#f2d27a', '#0b0d12'), wayneEntreprises: enseigne('WAYNE ENTERPRISES', '#f2d27a', '#0b0d12'), banqueGotham: enseigne('BANQUE DE GOTHAM', '#fff', '#16301e'),
+  arkhamEnseigne: enseigne("ASILE D'ARKHAM", '#e8e4d8', '#151515'), aceEnseigne: enseigne('ACE CHEMICALS', '#7aff3a', '#0c140c'), zooEnseigne: enseigne('ZOO DE GOTHAM', '#fff', '#1e4a24'),
+  stadeEnseigne: enseigne('STADE DE GOTHAM', '#fff', '#1a2a5a'), monorailEnseigne: enseigne('MONORAIL', '#fff', '#5a1a1a'),
+});
+if (MAT.rosace) MATS_FENETRES.push(MAT.rosace);
+// sous un ciel couvert (à Gotham), les fenêtres des tours et des immeubles modernes brillent moins : la ville reste sombre (eclat : 1 = comme d'habitude)
+if (COUVERT) for (const k of ['verre', 'verre2', 'moderne', 'beton', 'brique', 'hopital', 'magasin', 'stark']) MAT[k].userData.eclat = 0.45;
+// sous la pluie (CHAPITRES : pluie, à Gotham), les rues, les trottoirs et les pavés sont mouillés : ils brillent sous les lampadaires et les phares
+if (PLUIE) for (const [m, r] of [[MAT.route, 0.4], [MAT.routeCampagne, 0.4], [MAT.trottoir, 0.55], [MAT.paves, 0.5]]) m.roughness = r;
 // taille (en mètres) couverte par une répétition de chaque texture
 const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [12, 12], verre2: [12, 12], hopital: [12, 12],
   maison1: [6, 6], maison2: [6, 6], maison3: [6, 6], villa: [8, 9], magasin: [12, 6], bunker: [8, 8], toit: [8, 8], trottoir: [4, 4],
   herbe: [6, 6], paves: [4, 4], chateau: [4, 4], carrelage: [2, 2], parquet: [3, 3], planches: [3, 3], grange: [6, 6], tole: [6, 6],
   conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2],
-  marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2], stark: [12, 12], villaStark: [8, 10.8], vueMer: [16, 3.2] };
+  marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2], stark: [12, 12], villaStark: [8, 10.8], vueMer: [16, 3.2],
+  gothique: [12, 12], gothiqueTour: [12, 12], manoir: [9, 9], cathedrale: [12, 12], arkham: [9, 9], wayne: [12, 12], pelouse: [8, 8], gradins: [3, 3], pierreNoire: [4, 4] };
 // Les trous que B.J. fait dans un toit ou un plancher en tombant de très haut (voir trouer). On ne peut pas enlever un morceau de dalle
 // de son dessin : toutes les formes d'une même matière sont fusionnées en une seule. Alors on retouche le programme qui dessine les matières
 // des bâtiments : un point qui tombe dans un trou n'est pas dessiné, et on voit au travers (les étages du dessus, le ciel).
@@ -4683,12 +5004,13 @@ const interieurDe = o => interieurs.find(d => o.x > d.x1 && o.x < d.x2 && o.z > 
 // un immeuble des pâtés I. La plupart sont pleins, avec une porte fermée sur la rue. Certains se visitent (REGLAGES.immeublesVisitables) :
 // on entre par la porte, un escalier monte d'étage en étage, et on arrive sur le toit par cet escalier, par une échelle ou par un escalier
 // de secours, dehors ; ou bien sur une terrasse, par l'intérieur ou par dehors, avec un étage plus petit posé dessus.
-// porte : 'n' ou 's' ; cote : le côté des échelles et des escaliers de dehors (-1 à gauche de la porte, 1 à droite, vu du bâtiment)
+// porte : 'n' ou 's' ; cote : le côté des échelles et des escaliers de dehors (-1 à gauche de la porte, 1 à droite, vu du bâtiment) ;
+// plein : ce qui fait un immeuble plein (immeuble, ou à Gotham, un vieil immeuble gothique : immeubleGothique)
 const OPPOSE = { n: 's', s: 'n', e: 'o', o: 'e' };
 const immeubles = [];   // ceux où l'on entre (pour les essais)
-function immeubleI(mat, x, z, l, p, etages, porte, cote, rnd) {
-  if (rnd() >= R_.immeublesVisitables) {
-    immeuble(mat, x, z, l, p, etages, rnd);
+function immeubleI(mat, x, z, l, p, etages, porte, cote, rnd, plein = immeuble) {
+  if (rnd() >= (VISITABLES ?? R_.immeublesVisitables)) {   // (une ville de VILLES peut en avoir moins : VISITABLES)
+    plein(mat, x, z, l, p, etages, rnd);
     boite('porte', x, 0.2, z + (porte === 'n' ? -1 : 1) * (p / 2 + 0.06), 2, 2.5, 0.12);   // une porte fermée
     return;
   }
@@ -4900,6 +5222,7 @@ let camp = null, bunkerSecret = null;   // le camp militaire (%) et le bunker se
 // l'ancien réacteur de Tony Stark (au salon de sa villa), le trône du Mandarin (dans son repaire) et le toit des tours (T) : toursT['46,42'] =
 // les toits de la case colonne 46, ligne 42
 let grotte = null, usine = null, vieuxReacteur = null, trone = null, repaire = null, tourStark = null;
+let projecteurBat = null;   // le Bat-signal, sur le toit du commissariat (à Gotham : BATSIGNAL) : voir majBatSignal
 const toursT = {};
 // --- la grotte des Dix Anneaux ()), à Malibu : le camp au pied de la colline, la falaise de l'entrée, la galerie et la cellule ---
 // (Ses morceaux, son sol et son plafond, et les carrés du terrain percés à l'entrée : voir « la galerie de la grotte », avec les routes.)
@@ -5114,6 +5437,348 @@ function construireGrotte(o, X, Z, rnd) {
     sorties: { galerie: postes, tentes, chef: [{ x: X(30), z: Z(4), y: G.sol }] },
     zones: { camp: [o.x + 3, o.z + 3, o.x + S - 3, G.zs - 1], galerie: [G.x1, G.zs - 1, G.x2, G.z2] } };   // (ceux du camp s'arrêtent à l'entrée : ils ne grimpent pas sur la colline)
 }
+// --- Gotham (chapitre 3) : le vieux quartier gothique, et ses monuments (voir VILLES : à Gotham) ---
+// une pyramide (un toit pointu, une flèche, un clocheton) : l mètres le long de x, p le long de z, h de haut, posée sur son milieu en (0, 0, 0).
+// cotes : 4 (un toit carré), 8 (une flèche octogonale)
+const pyramide = (l, h, p, cotes = 4) => new THREE.ConeGeometry(Math.SQRT1_2, 1, cotes).rotateY(Math.PI / 4).scale(l, h, p).translate(0, h / 2, 0);
+// ses boîtes de collision : trois marches, de plus en plus étroites (en x, y, z : le milieu de son pied, au-dessus du pâté)
+function collisionsPyramide(x, y, z, l, h, p) {
+  for (let k = 0; k < 3; k++) { const f = 1 - (k + 0.5) / 3; ajouterCollision(x - l * f / 2, z - p * f / 2, x + l * f / 2, z + p * f / 2, Y0 + y + h * (k + 1) / 3, Y0 + y + h * k / 3); }
+}
+// un toit à deux pentes (un prisme couché), comme toitPente, mais le long de z (nordSud) ou de x
+function toitLong(mat, x, y, z, l, p, pente, nordSud) {
+  const r = (p + 1) / Math.sqrt(3), t = new THREE.CylinderGeometry(r, r, l + 0.8, 3).rotateX(-Math.PI / 2).rotateY(Math.PI / 2).scale(1, pente, 1);
+  if (nordSud) t.rotateY(Math.PI / 2);
+  geoBloc(mat, t.translate(x, y + r * 0.5 * pente, z));
+  const haut = r * 1.5 * pente, [lx, lz] = nordSud ? [p, l] : [l, p];   // (deux marches : on ne passe pas à travers)
+  ajouterCollision(x - lx * 0.4, z - lz * 0.4, x + lx * 0.4, z + lz * 0.4, Y0 + y + haut * 0.45, Y0 + y);
+  ajouterCollision(x - lx * (nordSud ? 0.15 : 0.45), z - lz * (nordSud ? 0.45 : 0.15), x + lx * (nordSud ? 0.15 : 0.45), z + lz * (nordSud ? 0.45 : 0.15), Y0 + y + haut * 0.8, Y0 + y);
+}
+// une gargouille : une bête de pierre accroupie au bord d'un toit, les ailes repliées, la gueule tendue vers la rue (vers +z, puis tournée de a)
+const GEO_GARGOUILLE = GOTHAM ? mergeGeometries([
+  new THREE.BoxGeometry(0.42, 0.18, 0.5).translate(0, 0.09, 0),                            // le socle, sous ses pattes
+  new THREE.BoxGeometry(0.36, 0.42, 0.62).rotateX(0.5).translate(0, 0.42, 0.06),           // le corps, ramassé
+  new THREE.BoxGeometry(0.3, 0.26, 0.34).translate(0, 0.66, 0.36),                         // la tête, penchée en avant
+  new THREE.ConeGeometry(0.11, 0.3, 4).rotateX(Math.PI / 2).translate(0, 0.62, 0.66),      // le museau
+  ...[-1, 1].map(s => new THREE.ConeGeometry(0.05, 0.22, 4).translate(s * 0.1, 0.88, 0.3)),                  // les cornes
+  ...[-1, 1].map(s => new THREE.BoxGeometry(0.04, 0.55, 0.5).rotateZ(-s * 0.5).translate(s * 0.3, 0.7, -0.1)),   // les ailes
+]).scale(1.6, 1.6, 1.6) : null;
+// une statue sur son socle : un ange, les ailes dans le dos, un bras levé (tourné vers +z, puis de a)
+const GEO_STATUE = GOTHAM ? mergeGeometries([
+  new THREE.BoxGeometry(0.9, 0.9, 0.9).translate(0, 0.45, 0),
+  new THREE.CylinderGeometry(0.22, 0.42, 1.5, 8).translate(0, 1.65, 0),
+  new THREE.SphereGeometry(0.17, 8, 6).translate(0, 2.55, 0),
+  ...[-1, 1].map(s => new THREE.BoxGeometry(0.06, 1.2, 0.5).rotateZ(s * 0.35).translate(s * 0.32, 2.05, -0.22)),
+  new THREE.BoxGeometry(0.12, 0.6, 0.12).rotateX(-0.6).translate(0.22, 2.2, 0.2),
+]) : null;
+const COINS = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
+const gargouille = (x, y, z, a) => geoBloc('pierreNoire', GEO_GARGOUILLE.clone().rotateY(a).translate(x, y, z));
+function statue(x, y, z, a) { geoBloc('pierreNoire', GEO_STATUE.clone().rotateY(a).translate(x, y, z)); ajouterCollision(x - 0.45, z - 0.45, x + 0.45, z + 0.45, Y0 + y + 2.7, Y0 + y); }
+// un clocheton : une petite pyramide pointue, au coin d'un toit plat ou d'un gradin (et sa boîte : on ne passe pas à travers)
+function clocheton(x, y, z, l = 1.3, h = 4.5) { geoBloc('pierreNoire', pyramide(l, h, l).translate(x, y, z)); ajouterCollision(x - l * 0.4, z - l * 0.4, x + l * 0.4, z + l * 0.4, Y0 + y + h * 0.5, Y0 + y); }
+// les boîtes d'un rond (une cuve, un dôme, une abside) de rayon r autour de (x, z), de bas à haut : huit boîtes en croix, de plus en
+// plus larges et de moins en moins profondes, dont les coins sont juste au-dehors du rond (on ne rentre pas dans le mur qu'on voit).
+// demi : seulement sa moitié nord (une abside, collée au mur de la nef)
+function collisionRonde(x, z, r, bas, haut, demi = false) {
+  for (let k = 0; k < 8; k++) {
+    const a = (k + 0.5) / 8 * Math.PI / 2, u = r * 1.05 * Math.cos(a), w = r * 1.05 * Math.sin(a);
+    ajouterCollision(x - u, z - w, x + u, demi ? z : z + w, haut, bas);
+  }
+}
+// le vieux quartier gothique (GOTHIQUE) : la case i, j y est-elle ? Tout près de son milieu, oui ; un peu plus loin, de moins en moins
+// souvent (rnd : le hasard du pâté)
+function estGothique(i, j, rnd) {
+  if (!GOTHIQUE) return false;
+  const d = Math.hypot(i - GOTHIQUE.col, j - GOTHIQUE.ligne) / GOTHIQUE.rayon;
+  return d < 1 || (d < 1.35 && rnd() < (1.35 - d) / 0.35);
+}
+// Un vieil immeuble gothique (dans un pâté I du vieux quartier) : de la pierre noire, des fenêtres en ogive, une corniche avec une
+// gargouille à chaque coin, et un toit pointu en ardoise noire (parfois avec une flèche de métal), ou un toit plat entouré de clochetons
+// (et parfois une statue). Il est plein, comme la plupart des immeubles (ceux où l'on entre sont faits par immeubleI)
+function immeubleGothique(x, z, l, p, etages, rnd) {
+  const h = etages * 3, y = 0.2 + h, haut = y + 0.6;
+  boite('gothique', x, 0.2, z, l, h, p, true);
+  boite('pierreNoire', x, y, z, l + 0.9, 0.6, p + 0.9, true);   // la corniche (on se pose dessus)
+  for (const [sx, sz] of COINS) gargouille(x + sx * (l / 2 + 0.05), haut, z + sz * (p / 2 + 0.05), Math.atan2(sx, sz));
+  const r = rnd();
+  if (r < 0.6) {
+    const ht = Math.min(l, p) * (0.5 + 0.35 * rnd());
+    geoBloc('ardoiseNoire', pyramide(l - 0.6, ht, p - 0.6).translate(x, haut, z));
+    collisionsPyramide(x, haut, z, l - 0.6, ht, p - 0.6);
+    if (r < 0.25) geoBloc('metal', new THREE.ConeGeometry(0.12, 5, 6).translate(x, haut + ht + 2.2, z));
+  } else {
+    for (const [sx, sz] of COINS) clocheton(x + sx * (l / 2 - 1.2), haut, z + sz * (p / 2 - 1.2));
+    if (r > 0.85) statue(x, haut, z, rnd() * 2 * Math.PI);
+  }
+}
+// Un vieux gratte-ciel gothique (dans un pâté T du vieux quartier) : trois gradins de pierre noire de plus en plus étroits, des gargouilles
+// au premier, des clochetons aux coins, et tout en haut une grande flèche d'ardoise noire, avec sa pointe de métal.
+// l : la largeur du bas ; etages : sa hauteur ; toits : la liste où noter le dessus de son dernier gradin (toursT)
+function tourGothique(x, z, l, etages, rnd, toits) {
+  const e1 = Math.round(etages * 0.55), e2 = Math.round(etages * 0.3), e3 = Math.max(2, etages - e1 - e2);
+  let y = 0.2, L = l;
+  [e1, e2, e3].forEach((e, k) => {
+    boite('gothiqueTour', x, y, z, L, e * 3, L, true);
+    y += e * 3;
+    boite('pierreNoire', x, y, z, L + 0.8, 0.5, L + 0.8, true); y += 0.5;
+    for (const [sx, sz] of COINS) {
+      if (k === 0) gargouille(x + sx * (L / 2 + 0.1), y, z + sz * (L / 2 + 0.1), Math.atan2(sx, sz));
+      if (k < 2) clocheton(x + sx * (L / 2 - 0.9), y, z + sz * (L / 2 - 0.9), 1.4, 5);
+    }
+    if (k < 2) L = Math.round(L * (k ? 0.68 : 0.76));
+  });
+  toits.push({ x, z, l: L, p: L, y: Y0 + y });
+  const hf = L * (1.6 + rnd());
+  geoBloc('ardoiseNoire', pyramide(L, hf, L).translate(x, y, z)); collisionsPyramide(x, y, z, L, hf, L);
+  geoBloc('metal', new THREE.ConeGeometry(0.2, 8, 6).translate(x, y + hf + 3, z));
+}
+// un panneau (une enseigne, une croix...) de l × h mètres, tourné vers le sud (a : de combien il tourne), son milieu en x, y, z
+function panneau(mat, x, y, z, l, h, a = 0) { const g = new THREE.PlaneGeometry(l, h); if (a) g.rotateY(a); geoBloc(mat, g.translate(x, y, z)); }
+
+// Le manoir Wayne ({) : un grand manoir de pierre grise sur sa colline, en U autour de sa cour (ouverte au sud), avec une tourelle à chaque
+// coin, de grands toits d'ardoise, des cheminées, et ses fenêtres presque toutes allumées. Dans la cour, une fontaine ; dans le jardin, le
+// vieux puits (Bruce y est tombé, enfant : la Batcave est dessous ; elle viendra avec sa première mission). Sa Lamborghini attend devant
+let manoir = null;
+function construireManoir(X, Z, rnd) {
+  sol('herbe', X(30), 0.21, Z(30), S - 4, S - 4);
+  sol('paves', X(30), 0.215, Z(48), 10, 20); sol('paves', X(30), 0.216, Z(31), 16, 18);   // l'allée, de la rue au sud jusqu'à la porte
+  const H = 12;
+  boite('manoir', X(30), 0.2, Z(15), 40, H, 14, true); toitLong('ardoiseNoire', X(30), 0.2 + H, Z(15), 40, 14, 0.95, false);   // le corps, au nord
+  for (const a of [16, 44]) { boite('manoir', X(a), 0.2, Z(31), 12, H, 18, true); toitLong('ardoiseNoire', X(a), 0.2 + H, Z(31), 18, 12, 0.95, true); }   // les ailes
+  for (const [a, b] of [[10, 8], [50, 8], [10, 40], [50, 40]]) { // les tourelles, et leur toit pointu
+    geoBloc('manoir', new THREE.CylinderGeometry(3.2, 3.2, 17, 16).translate(X(a), 0.2 + 8.5, Z(b)));
+    geoBloc('ardoiseNoire', new THREE.ConeGeometry(3.9, 8, 16).translate(X(a), 0.2 + 17 + 4, Z(b)));
+    ajouterCollision(X(a) - 2.9, Z(b) - 2.9, X(a) + 2.9, Z(b) + 2.9, Y0 + 17.2, Y0); empreintes.push([X(a) - 3.2, Z(b) - 3.2, 6.4, 6.4]);
+  }
+  for (const [a, b] of [[20, 13], [40, 13], [16, 28], [44, 34]]) boite('pierreNoire', X(a), H + 2, Z(b), 1.4, 6, 1.4, true);   // les cheminées
+  // la porte, sous son porche : deux colonnes et un petit toit
+  boite('porte', X(30), 0.2, Z(22.06), 3, 4.4, 0.12);
+  for (const a of [27, 33]) geoBloc('pierre', new THREE.CylinderGeometry(0.35, 0.4, 5, 10).translate(X(a), 2.7, Z(25)));
+  boite('pierre', X(30), 5.2, Z(23.8), 8, 0.6, 3.2);
+  // la fontaine de la cour
+  geoBloc('pierre', new THREE.CylinderGeometry(3, 3.2, 0.7, 20).translate(X(30), 0.55, Z(34))); geoBloc('eau', new THREE.CircleGeometry(2.7, 20).rotateX(-Math.PI / 2).translate(X(30), 0.92, Z(34)));
+  geoBloc('pierre', new THREE.CylinderGeometry(0.3, 0.45, 2.4, 8).translate(X(30), 1.4, Z(34))); ajouterCollision(X(30) - 2.8, Z(34) - 2.8, X(30) + 2.8, Z(34) + 2.8, Y0 + 0.9, Y0);
+  // le vieux puits, dans le jardin : un cercle de pierres, son petit toit sur deux poteaux, et le trou noir
+  geoBloc('pierre', new THREE.CylinderGeometry(1.1, 1.15, 0.9, 14, 1, true).translate(X(12), 0.65, Z(50))); geoBloc('noirMeuble', new THREE.CircleGeometry(1.05, 14).rotateX(-Math.PI / 2).translate(X(12), 0.6, Z(50)));
+  for (const s of [-1, 1]) boite('bois', X(12 + s * 1.1), 0.2, Z(50), 0.15, 2.4, 0.15);
+  toitLong('ardoiseNoire', X(12), 2.6, Z(50), 2.8, 2.4, 0.9, false); ajouterCollision(X(12) - 1.15, Z(50) - 1.15, X(12) + 1.15, Z(50) + 1.15, Y0 + 1.1, Y0);
+  for (const [a, b] of [[5, 5], [55, 5], [5, 22], [55, 22], [4, 36], [56, 36], [22, 52], [40, 52], [50, 50]]) arbre(X(a), Z(b), 1 + rnd() * 0.3);
+  voituresGarees.push({ x: X(37), z: Z(44), a: Math.PI, type: 'Lamborghini' });
+  manoir = { x: X(30), z: Z(15), y: Y0 + 0.2, puits: { x: X(12), z: Z(50), y: Y0 + 0.2 } };   // (pour la première mission : la Batcave, sous le puits)
+}
+// La tour Wayne (/), Wayne Enterprises : la plus haute de la ville. En bas, un grand hall de 9 m de haut (le magasin de Lucius Fox y sera),
+// sa porte au sud ; au-dessus, la tour de verre presque noir, en trois gradins, avec WAYNE en lettres d'or sur les quatre côtés de sa couronne,
+// et son antenne. Un ascenseur monte du fond du hall jusqu'au toit. La gare du monorail est contre son côté ouest (voir MONORAIL)
+let tourWayne = null;
+function construireTourWayne(X, Z, rnd) {
+  sol('paves', X(30), 0.21, Z(53), 56, 10);
+  const b = batiment({ x: X(30), z: Z(28), l: 46, p: 34, mat: 'wayne', hEtage: 9, largeurPorte: 8, hauteurPorte: 5, sol: 'marbre' });
+  b.meuble('blanc', 0, 0, 8, 12, 1.1, 1.4);                                          // l'accueil
+  for (const u of [-3, 3]) b.meuble('metal', u, 0, -b.iw + 0.08, 2, 3, 0.1);         // les portes de l'ascenseur, au fond
+  for (const [u, w] of [[-15, -8], [15, -8], [-15, 6], [15, 6]]) b.meuble('noirMeuble', u, 0, w, 1.2, 9, 1.2);   // de grandes colonnes noires
+  panneau('wayneEntreprises', X(30), 7.1, Z(45.07), 20, 2.4);                  // WAYNE ENTERPRISES, au-dessus de la porte
+  const yh = b.niveau(1) + 0.4, etages = [[30, 117], [24, 33], [18, 13]];
+  let y = yh;
+  for (const [l, h] of etages) { // chaque gradin, et en haut de chacun, une ligne d'or qui brille (on la reconnaît de loin, la nuit)
+    boite('wayne', X(30), y, Z(28), l, h, l, true); y += h;
+    boite('metal', X(30), y, Z(28), l + 0.6, 0.5, l + 0.6, true);
+    for (const [dx, dz, ll, pp] of [[0, -1, l + 0.7, 0.2], [0, 1, l + 0.7, 0.2], [-1, 0, 0.2, l + 0.7], [1, 0, 0.2, l + 0.7]]) boite('or', X(30) + dx * (l / 2 + 0.3), y - 0.6, Z(28) + dz * (l / 2 + 0.3), ll, 0.35, pp);
+    for (const [sx, sz] of COINS) boite('or', X(30) + sx * (l / 2 + 0.05), y - h, Z(28) + sz * (l / 2 + 0.05), 0.25, h, 0.25);   // et ses arêtes
+    y += 0.5;
+  }
+  for (let a = 0; a < 4; a++) geoBloc('wayneEnseigne', new THREE.PlaneGeometry(14, 3.4).translate(0, 0, 9.06).rotateY(a * Math.PI / 2).translate(X(30), y - 7.5, Z(28)));   // WAYNE, sur la couronne
+  for (const [x, z, l, p] of [[30, 19.25, 18.5, 0.5], [30, 36.75, 18.5, 0.5], [21.25, 28, 0.5, 18.5], [38.75, 28, 0.5, 18.5]]) boite('metal', X(x), y, Z(z), l, 1.2, p, true);   // le garde-fou du toit
+  boite('metal', X(30), y, Z(24), 4, 3, 3, true);                                    // la cabine de l'ascenseur, en haut
+  boite('metal', X(33), y, Z(31), 0.6, 26, 0.6, true);                               // l'antenne
+  for (const z of [27, 29]) boite('lampe', X(33), y + 26, Z(z - 2), 0.4, 0.3, 0.4);
+  ascenseurs.push({ bas: b.point(0, 0, -b.iw + 1.2), haut: { x: X(30), z: Z(26.5), y: Y0 + y } });
+  tourWayne = { x: X(30), z: Z(28), y: Y0 + y, hall: b, porte: b.point(0, 0, b.iw - 1) };   // (le hall : le magasin de Lucius Fox, plus tard)
+  Object.assign(lieux['/'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(52) });   // le lieu des missions : sur la place, devant la porte
+}
+// La banque de Gotham (£) : une tour de verre, et en bas, son hall de marbre : des colonnes devant, les guichets, et au fond la porte du coffre
+function construireBanque(X, Z, rnd) {
+  sol('paves', X(30), 0.21, Z(52), 56, 12);
+  const b = batiment({ x: X(30), z: Z(28), l: 40, p: 30, mat: 'verre', hEtage: 6, largeurPorte: 5, hauteurPorte: 4, sol: 'marbre', mur: 'marbre' });
+  for (let k = -3; k <= 3; k++) if (k) boite('pierre', X(30 + k * 5.5), 0.2, Z(45.5), 1.2, 6, 1.2, true);   // les colonnes, devant
+  boite('pierre', X(30), 6.2, Z(45), 40, 0.8, 3); panneau('banqueGotham', X(30), 6.6, Z(46.57), 18, 1.7);
+  b.meuble('bois', 0, 0, 1, 26, 1.2, 1); for (const u of [-9, 0, 9]) b.meuble('ecran', u, 0, 0.8, 0.6, 0.4, 0.08, 1.2);   // les guichets
+  b.meuble('metal', 0, 0, -b.iw + 0.3, 5, 4, 0.5);                                   // la porte du coffre, fermée
+  const yh = b.niveau(1) + 0.4;
+  boite('verre', X(30), yh, Z(28), 28, 84, 24, true); boite('toit', X(30), yh + 84, Z(28), 28.5, 0.6, 24.5, true);
+  boite('metal', X(36), yh + 84.6, Z(24), 0.5, 14, 0.5, true);
+}
+// La cathédrale (é) : la nef de pierre grise (32 m de long, 20 m de haut), ses grands vitraux qui brillent la nuit, son toit d'ardoise noire,
+// ses bas-côtés et leurs arcs-boutants, l'abside ronde au nord. Au sud, sur le parvis, le clocher : 56 m de pierre, son portail, sa grande
+// rosace ; en haut, une plateforme (on y monte au grappin : on pourra s'y battre), ses clochetons et ses gargouilles, et quatre piliers sous
+// lesquels pend la cloche ; puis la flèche, jusqu'à 98 m
+let cathedrale = null;
+function construireCathedrale(X, Z, rnd) {
+  sol('paves', X(30), 0.21, Z(30), S - 2, S - 2);
+  boite('cathedrale', X(30), 0.2, Z(26), 16, 20, 32, true); toitLong('ardoiseNoire', X(30), 20.2, Z(26), 32, 16, 1.1, true);   // la nef
+  for (const [sx, sz] of COINS) gargouille(X(30 + sx * 8.1), 20.2, Z(26 + sz * 16.1), Math.atan2(sx, sz));
+  for (const s of [-1, 1]) {
+    boite('cathedrale', X(30 + s * 11), 0.2, Z(26), 6, 10, 28, true);                                   // les bas-côtés...
+    geoBloc('ardoiseNoire', new THREE.BoxGeometry(6.8, 0.4, 28.6).rotateZ(-s * 0.35).translate(X(30 + s * 11), 11.4, Z(26)));   // ...et leur toit en pente
+    for (let k = 0; k < 5; k++) { // les arcs-boutants : une culée, et l'arc qui monte jusqu'au mur de la nef
+      const z = Z(14 + k * 6);
+      boite('pierreNoire', X(30 + s * 14.6), 0.2, z, 1.3, 15, 1.3, true);
+      geoBloc('pierreNoire', new THREE.BoxGeometry(7.4, 0.7, 0.9).rotateZ(-s * 0.5).translate(X(30 + s * 11.3), 16.9, z));
+      clocheton(X(30 + s * 14.6), 15.2, z, 1.3, 3.5);
+    }
+  }
+  geoBloc('cathedrale', new THREE.CylinderGeometry(7, 7, 20, 16, 1, false, Math.PI / 2, Math.PI).translate(X(30), 10.2, Z(10)));   // l'abside, au nord
+  geoBloc('ardoiseNoire', new THREE.ConeGeometry(7.6, 8, 16, 1, false, Math.PI / 2, Math.PI).translate(X(30), 24.2, Z(10)));
+  collisionRonde(X(30), Z(10), 7, Y0, Y0 + 20.2, true); empreintes.push([X(30) - 7, Z(3), 14, 7]);
+  // le clocher : sa tour carrée, une corniche à mi-hauteur (et ses gargouilles), le portail, la rosace
+  const T = 48.5, h = 56;
+  boite('cathedrale', X(30), 0.2, Z(T), 13, h, 13, true);
+  boite('pierreNoire', X(30), 30.2, Z(T), 13.8, 0.6, 13.8, true);
+  for (const [sx, sz] of COINS) gargouille(X(30 + sx * 6.9), 30.8, Z(T + sz * 6.9), Math.atan2(sx, sz));
+  boite('porte', X(30), 0.2, Z(T + 6.56), 4.6, 7.4, 0.12);
+  geoBloc('pierreNoire', pyramide(6.6, 4.4, 0.7).translate(X(30), 7.6, Z(T + 6.75)));   // le gâble, en pointe, au-dessus du portail
+  geoBloc('rosace', new THREE.CircleGeometry(4.6, 32).translate(X(30), 23, Z(T + 6.57)));
+  geoBloc('pierreNoire', new THREE.TorusGeometry(4.8, 0.35, 6, 32).translate(X(30), 23, Z(T + 6.6)));
+  for (const a of [23.5, 36.5]) statue(X(a), 0.2, Z(T + 7.5), 0);                   // deux anges, de chaque côté du portail
+  // en haut : la plateforme, son parapet (assez bas pour l'enjamber), ses clochetons, ses gargouilles
+  boite('pierreNoire', X(30), h + 0.2, Z(T), 15, 0.8, 15, true);
+  const sol0 = h + 1;
+  for (const [x, z, l, p] of [[30, T - 7.3, 15, 0.4], [30, T + 7.3, 15, 0.4], [22.7, T, 0.4, 15], [37.3, T, 0.4, 15]]) boite('pierreNoire', X(x), sol0, Z(z), l, 0.55, p, true);
+  for (const [sx, sz] of COINS) { clocheton(X(30 + sx * 6.6), sol0, Z(T + sz * 6.6), 1.6, 7); gargouille(X(30 + sx * 7.6), h + 0.2, Z(T + sz * 7.6), Math.atan2(sx, sz)); }
+  // le beffroi : quatre piliers, une dalle, et la cloche qui pend dessous ; puis la flèche, et sa croix
+  for (const [sx, sz] of COINS) boite('pierreNoire', X(30 + sx * 3.8), sol0, Z(T + sz * 3.8), 1.3, 8, 1.3, true);
+  boite('pierreNoire', X(30), sol0 + 8, Z(T), 9.4, 0.8, 9.4, true);
+  geoBloc('bronze', new THREE.LatheGeometry([[0, 0], [1.25, 0], [1.15, 0.35], [0.85, 1.4], [0.55, 2.6], [0, 2.8]].map(([r, y]) => new THREE.Vector2(r, y)), 16).translate(X(30), sol0 + 5.1, Z(T)));
+  geoBloc('bronze', new THREE.SphereGeometry(0.25, 8, 6).translate(X(30), sol0 + 4.9, Z(T)));
+  ajouterCollision(X(30) - 1, Z(T) - 1, X(30) + 1, Z(T) + 1, Y0 + sol0 + 8, Y0 + sol0 + 4.8);
+  const hf = 32;
+  geoBloc('ardoiseNoire', pyramide(8.6, hf, 8.6, 8).translate(X(30), sol0 + 8.8, Z(T))); collisionsPyramide(X(30), sol0 + 8.8, Z(T), 8.6, hf, 8.6);
+  geoBloc('metal', new THREE.BoxGeometry(0.25, 3.2, 0.25).translate(X(30), sol0 + 8.8 + hf + 1.4, Z(T))); geoBloc('metal', new THREE.BoxGeometry(1.6, 0.25, 0.25).translate(X(30), sol0 + 8.8 + hf + 2, Z(T)));
+  cathedrale = { x: X(30), z: Z(26), clocher: { x: X(30), z: Z(T + 5.4), y: Y0 + sol0 }, sommet: Y0 + sol0 + 8.8 + hf };   // (la plateforme du clocher : pour le grand final, plus tard)
+  Object.assign(lieux['é'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(58) });   // le lieu des missions : sur le parvis, devant le portail
+}
+// L'asile d'Arkham ([), sur son île : un grand mur de pierre noire, des tours de guet aux coins (et leurs projecteurs), la grille au sud sous
+// son arche de fer, avec le nom de l'asile. Dedans, le bâtiment principal et ses deux ailes (de la pierre sombre, des fenêtres à barreaux,
+// de grands toits pointus) et, au milieu, la tour de l'horloge, son cadran qui brille
+let arkham = null;
+function construireArkham(X, Z, rnd) {
+  sol('herbe', X(30), 0.21, Z(30), S - 2, S - 2);
+  sol('paves', X(30), 0.215, Z(44), 12, 28);
+  const mur = (a, b, l, p) => boite('pierreNoire', X(a), 0.2, Z(b), l, 5, p, true);
+  mur(30, 2, 56, 1); mur(2, 30, 1, 56); mur(58, 30, 1, 56); mur(13, 58, 22, 1); mur(47, 58, 22, 1);   // (la grille, au sud : 12 m)
+  for (const [a, b] of [[2, 2], [58, 2], [2, 58], [58, 58]]) { boite('pierreNoire', X(a), 0.2, Z(b), 2.6, 9, 2.6, true); boite('lampe', X(a), 9.2, Z(b), 1.2, 0.7, 1.2); }
+  for (const a of [24, 36]) { boite('pierreNoire', X(a), 0.2, Z(58), 1.8, 7.5, 1.8, true); clocheton(X(a), 7.7, Z(58), 1.8, 3); }
+  boite('metal', X(30), 6.6, Z(58), 10.4, 0.35, 0.3); panneau('arkhamEnseigne', X(30), 7.6, Z(58.2), 10, 1.5);
+  boite('arkham', X(30), 0.2, Z(16), 38, 13, 14, true); toitLong('ardoiseNoire', X(30), 13.2, Z(16), 38, 14, 0.9, false);
+  for (const [sx, sz] of COINS) gargouille(X(30 + sx * 19.1), 13.2, Z(16 + sz * 7.1), Math.atan2(sx, sz));
+  for (const a of [12, 48]) { boite('arkham', X(a), 0.2, Z(31), 11, 10, 16, true); toitLong('ardoiseNoire', X(a), 10.2, Z(31), 16, 11, 0.9, true); }
+  boite('arkham', X(30), 0.2, Z(25), 8, 28, 8, true); geoBloc('ardoiseNoire', pyramide(8.8, 9, 8.8).translate(X(30), 28.2, Z(25))); collisionsPyramide(X(30), 28.2, Z(25), 8.8, 9, 8.8);
+  geoBloc('lampe', new THREE.CircleGeometry(2.2, 24).translate(X(30), 23, Z(29.06)));   // le cadran de l'horloge, et ses aiguilles
+  geoBloc('noirMeuble', new THREE.BoxGeometry(0.15, 1.8, 0.05).translate(X(30), 23.6, Z(29.1))); geoBloc('noirMeuble', new THREE.BoxGeometry(1.2, 0.15, 0.05).translate(X(30.5), 23, Z(29.1)));
+  boite('porte', X(30), 0.2, Z(29.06), 3, 4, 0.12);
+  arkham = { x: X(30), z: Z(30), y: Y0 + 0.2, porte: { x: X(30), z: Z(31), y: Y0 + 0.2 } };
+  Object.assign(lieux['['].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(44) });   // le lieu des missions : dans la cour, devant la porte
+}
+// Ace Chemicals (]), au bord du port : l'usine de tôle, son nom en grandes lettres vertes sur le toit, quatre grandes cuves d'acier ouvertes,
+// pleines d'un liquide vert qui brille, et une grande cuve basse au bord de l'eau (celle où le Joker est tombé), des tuyaux, une passerelle,
+// deux cheminées
+let aceChemicals = null;
+function construireAce(X, Z, rnd) {
+  sol('beton2', X(30), 0.21, Z(30), S - 2, S - 2);
+  boite('tole', X(17), 0.2, Z(16), 28, 12, 20, true); boite('toit', X(17), 12.2, Z(16), 28.5, 0.5, 20.5, true);
+  boite('porte', X(17), 0.2, Z(26.06), 7, 5.5, 0.12);
+  for (const a of [7, 27]) boite('metal', X(a), 12.7, Z(24.5), 0.3, 6, 0.3);
+  panneau('aceEnseigne', X(17), 16.4, Z(24.7), 22, 4.2);
+  const cuve = (a, b, r, h) => {
+    geoBloc('metal', new THREE.CylinderGeometry(r, r, h, 20, 1, true).translate(X(a), 0.2 + h / 2, Z(b)));
+    geoBloc('metal', new THREE.TorusGeometry(r, 0.18, 6, 24).rotateX(Math.PI / 2).translate(X(a), 0.2 + h, Z(b)));
+    geoBloc('acide', new THREE.CircleGeometry(r - 0.1, 20).rotateX(-Math.PI / 2).translate(X(a), 0.2 + h - 0.6, Z(b)));
+    collisionRonde(X(a), Z(b), r, Y0, Y0 + 0.2 + h - 0.6); empreintes.push([X(a) - r, Z(b) - r, 2 * r, 2 * r]);
+  };
+  cuve(40, 10, 4.2, 11); cuve(51, 10, 4.2, 11); cuve(40, 23, 4.2, 11); cuve(51, 23, 4.2, 11); cuve(44, 45, 7, 2.6);
+  for (const [a, b, l] of [[35.8, 10, 4.6], [35.8, 23, 4.6], [45.5, 10, 2.6], [45.5, 23, 2.6]]) geoBloc('metal', new THREE.CylinderGeometry(0.45, 0.45, l, 8).rotateZ(Math.PI / 2).translate(X(a), 7.5, Z(b)));   // les tuyaux
+  geoBloc('metal', new THREE.CylinderGeometry(0.45, 0.45, 13, 8).rotateX(Math.PI / 2).translate(X(45.5), 4, Z(16.5)));
+  boite('metal', X(45.5), 11.2, Z(16.5), 1.8, 0.2, 9, true); for (const s of [-1, 1]) boite('rambarde', X(45.5 + s * 0.9), 11.4, Z(16.5), 0.08, 1, 9);   // la passerelle
+  for (const [a, b] of [[7, 40], [13, 46]]) { geoBloc('beton2', new THREE.CylinderGeometry(1.3, 1.7, 26, 12).translate(X(a), 13.2, Z(b))); ajouterCollision(X(a) - 1.4, Z(b) - 1.4, X(a) + 1.4, Z(b) + 1.4, Y0 + 26.2, Y0); }
+  for (const [a, b] of [[30, 30], [30, 52], [8, 30]]) boite('lampe', X(a), 6, Z(b), 0.6, 0.3, 0.6);
+  voituresGarees.push({ x: X(24), z: Z(36), a: Math.PI / 2, type: '4x4 du désert' });
+  aceChemicals = { x: X(30), z: Z(30), y: Y0 + 0.2, cuve: { x: X(44), z: Z(45), y: Y0 + 2.2 } };   // (la grande cuve basse : pour le Joker, plus tard)
+}
+// Le zoo de Gotham (}), au milieu de Robinson Park : son entrée au sud, sous une arche avec son nom ; ses allées ; au milieu, le monde
+// arctique (le repaire du Pingouin) : un bassin, des rochers de glace, un dôme blanc et ses pingouins, derrière une barrière ; aux
+// coins, des arbres et des rochers
+let zoo = null;
+const GEO_PINGOUIN = GOTHAM ? { // un pingouin, debout : le dos noir, le ventre blanc, le bec rouge
+  noirMeuble: mergeGeometries([new THREE.SphereGeometry(0.26, 8, 6).scale(1, 1.5, 0.9).translate(0, 0.42, 0), new THREE.SphereGeometry(0.16, 8, 6).translate(0, 0.86, 0.02)]),
+  blanc: new THREE.SphereGeometry(0.22, 8, 6).scale(0.85, 1.3, 0.6).translate(0, 0.4, 0.1), rouge: new THREE.ConeGeometry(0.05, 0.16, 6).rotateX(Math.PI / 2).translate(0, 0.84, 0.2),
+} : null;
+function construireZoo(X, Z, rnd) {
+  sol('herbe', X(30), 0.21, Z(30), S - 2, S - 2);
+  sol('paves', X(30), 0.22, Z(50), 5, 18);                                          // l'allée, de l'entrée au monde arctique...
+  for (const [x, z, l, p] of [[30, 11, 40, 4], [30, 43, 40, 4], [12, 27, 4, 36], [48, 27, 4, 36]]) sol('paves', X(x), 0.222, Z(z), l, p);   // ...et autour de lui
+  for (const a of [26, 34]) boite('pierre', X(a), 0.2, Z(54), 1.4, 5, 1.4, true);
+  boite('pierre', X(30), 5.2, Z(54), 9.4, 0.8, 1.4); panneau('zooEnseigne', X(30), 6.4, Z(54.75), 8.6, 1.4);
+  for (const [x, z, l, p] of [[30, 14.5, 30, 0.12], [30, 40.5, 30, 0.12], [15, 27.5, 0.12, 26], [45, 27.5, 0.12, 26]]) boite('rambarde', X(x), 0.2, Z(z), l, 1.2, p, true);
+  sol('glace', X(30), 0.23, Z(27.5), 29.6, 25.6);
+  geoBloc('eau', new THREE.PlaneGeometry(18, 11).rotateX(-Math.PI / 2).translate(X(30), 0.26, Z(30)));
+  for (let k = 0; k < 9; k++) {
+    const a = k * 0.7, r = 10 + (k % 3) * 1.5, s = 1.2 + rnd() * 1.4, x = X(30 + Math.cos(a) * r), z = Z(28 + Math.sin(a) * r * 0.6);
+    geoBloc('glace', new THREE.SphereGeometry(s, 6, 4).rotateY(k).scale(1.3, 0.8, 1).translate(x, 0.2 + s * 0.5, z)); ajouterCollision(x - s * 1.1, z - s * 0.85, x + s * 1.1, z + s * 0.85, Y0 + 0.2 + s * 1.2, Y0);
+  }
+  geoBloc('glace', new THREE.SphereGeometry(4.6, 16, 8, 0, 2 * Math.PI, 0, Math.PI / 2).translate(X(30), 0.2, Z(20))); collisionRonde(X(30), Z(20), 4.6, Y0, Y0 + 3.6);
+  geoBloc('noirMeuble', new THREE.PlaneGeometry(2, 2.4).translate(X(30), 1.4, Z(24.55)));   // la porte du dôme (le repaire du Pingouin, dessous : plus tard)
+  const pingouins = { noirMeuble: [], blanc: [], rouge: [] };
+  for (let k = 0; k < 16; k++) {
+    const a = rnd() * 6.3, x = X(30 + Math.cos(a) * (6 + rnd() * 6)), z = Z(30 + Math.sin(a) * (4 + rnd() * 5)), r = rnd() * 6.3, t = 0.9 + rnd() * 0.3;
+    for (const m in pingouins) pingouins[m].push(GEO_PINGOUIN[m].clone().scale(t, t, t).rotateY(r).translate(x, 0.24, z));
+  }
+  for (const m in pingouins) geoBloc(m, mergeGeometries(pingouins[m]));
+  for (const [a, b] of [[5, 5], [8, 7], [55, 6], [52, 4], [5, 53], [55, 53], [8, 50], [52, 51]]) arbre(X(a), Z(b), 1 + rnd() * 0.4);
+  for (const [a, b] of [[54, 22], [6, 22], [54, 36]]) { geoBloc('rocher', new THREE.IcosahedronGeometry(1.8, 0).scale(1.2, 0.8, 1).translate(X(a), 1, Z(b))); ajouterCollision(X(a) - 1.9, Z(b) - 1.6, X(a) + 1.9, Z(b) + 1.6, Y0 + 2.2, Y0); }
+  zoo = { x: X(30), z: Z(30), y: Y0 + 0.2, dome: { x: X(30), z: Z(25), y: Y0 + 0.2 } };   // (le dôme du monde arctique : l'entrée du repaire du Pingouin, plus tard)
+  Object.assign(lieux['}'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(47) });   // le lieu des missions : dans l'allée, devant le monde arctique
+}
+// Le stade (°) : la pelouse et ses lignes blanches, ses buts ; tout autour, des gradins de sièges bleus et gris qui montent en marches (on
+// y grimpe), le toit au-dessus des grandes tribunes, et quatre grands mâts d'éclairage aux coins : la pelouse brille, comme un soir de match
+let stade = null;
+function construireStade(X, Z, rnd) {
+  sol('beton2', X(30), 0.21, Z(30), S - 2, S - 2);
+  sol('pelouse', X(30), 0.225, Z(30), 36, 22);
+  const ligne = (x, z, l, p) => sol('blanc', X(x), 0.23, Z(z), l, p);
+  ligne(30, 19.6, 34, 0.15); ligne(30, 40.4, 34, 0.15); ligne(13.2, 30, 0.15, 21); ligne(46.8, 30, 0.15, 21); ligne(30, 30, 0.15, 21);
+  geoBloc('blanc', new THREE.RingGeometry(3.6, 3.75, 32).rotateX(-Math.PI / 2).translate(X(30), 0.235, Z(30)));
+  for (const a of [13.2, 46.8]) { for (const z of [26.4, 33.6]) boite('blanc', X(a), 0.2, Z(z), 0.12, 2.44, 0.12, true); boite('blanc', X(a), 2.64, Z(30), 0.12, 0.12, 7.3); }   // les buts
+  for (let k = 0; k < 6; k++) {
+    const hk = 1.1 * (k + 1);
+    for (const s of [-1, 1]) {
+      boite('gradins', X(30), 0.2, Z(30 + s * (11.75 + k * 1.5)), 44, hk, 1.5, true);                // les grandes tribunes, au nord et au sud
+      if (k < 5) for (const z of [23.5, 36.5]) boite('gradins', X(30 + s * (19.75 + k * 1.5)), 0.2, Z(z), 1.5, hk, 9, true);   // les petites, à l'est et à l'ouest (l'entrée au milieu)
+    }
+  }
+  for (const s of [-1, 1]) { boite('beton2', X(30), 0.2, Z(30 + s * 21.3), 46, 11.5, 0.5, true); boite('tole', X(30), 11.7, Z(30 + s * 17.6), 46, 0.3, 7.6); }   // les murs du fond et les toits
+  for (const [sx, sz] of COINS) { // les mâts d'éclairage, et leurs projecteurs tournés vers la pelouse
+    const a = 30 + sx * 26, b = 30 + sz * 26;
+    geoBloc('metal', new THREE.CylinderGeometry(0.3, 0.45, 28, 8).translate(X(a), 14.2, Z(b))); ajouterCollision(X(a) - 0.4, Z(b) - 0.4, X(a) + 0.4, Z(b) + 0.4, Y0 + 28.2, Y0);
+    geoBloc('lampe', new THREE.BoxGeometry(4, 2.6, 0.5).rotateX(0.5).rotateY(Math.atan2(-sx, -sz)).translate(X(a), 28.6, Z(b)));
+  }
+  panneau('stadeEnseigne', X(30), 9, Z(51.85), 20, 2.4);
+  stade = { x: X(30), z: Z(30), y: Y0 + 0.2 };
+}
+// Le repaire du Sphinx (§) : une vieille bâtisse de brique, et sur son toit, un grand point d'interrogation vert en néon qu'on voit de loin ;
+// devant, une cour fermée par un mur, avec des points d'interrogation verts sur les piliers de son portail et sur ses murs.
+// La DeLorean y attend, le nez vers le portail (la cachette du chapitre 3 : CHAPITRES, cachette)
+let sphinx = null;
+function construireSphinx(X, Z, rnd) {
+  sol('paves', X(30), 0.215, Z(43), 50, 26);
+  boite('brique', X(30), 0.2, Z(16), 46, 13, 22, true); boite('toit', X(30), 13.2, Z(16), 46.5, 0.5, 22.5, true);
+  boite('porte', X(30), 0.2, Z(27.06), 3, 3.6, 0.12);
+  boite('metal', X(30), 13.7, Z(21), 0.3, 2.2, 0.3); geoBloc('interrogation', new THREE.PlaneGeometry(14, 14).translate(X(30), 21.5, Z(21)));
+  const mur = (a, b, l, p) => boite('brique', X(a), 0.2, Z(b), l, 3.6, p, true);
+  mur(4, 42, 0.8, 30); mur(56, 42, 0.8, 30); mur(14, 56.6, 20, 0.8); mur(46, 56.6, 20, 0.8);   // (le portail, au sud : 12 m)
+  for (const a of [24, 36]) { boite('brique', X(a), 0.2, Z(56.6), 1.6, 4.4, 1.6, true); geoBloc('interrogation', new THREE.PlaneGeometry(1.5, 1.5).translate(X(a), 5.4, Z(57.45))); }
+  for (const z of [36, 48]) for (const s of [-1, 1]) geoBloc('interrogation', new THREE.PlaneGeometry(2.4, 2.4).rotateY(-s * Math.PI / 2).translate(X(30 + s * 25.55), 2, Z(z)));   // peints sur les murs de la cour
+  sphinx = { x: X(30), z: Z(16), y: Y0 + 0.2 };
+  Object.assign(lieux['§'].find(q => q.x === X(30) && q.z === Z(30)), { x: X(30), z: Z(42), a: 0 });   // la DeLorean, dans la cour, le nez vers le portail
+}
 function genererBloc(i, j) {
   const c = CARTE[j][i], o = origine(i, j), rnd = graine(i * 7919 + j * 104729);
   const X = v => o.x + v, Z = v => o.z + v;
@@ -5126,7 +5791,6 @@ function genererBloc(i, j) {
     }
   }
   const herbe = () => sol('herbe', X(S / 2), 0.21, Z(S / 2), S - 4, S - 4);
-  const panneau = (mat, x, y, z, l, h) => geoBloc(mat, new THREE.PlaneGeometry(l, h).translate(x, y, z));   // un panneau tourné vers le sud
   // un pâté à braquer : combien d'étoiles donne son alarme, et où garer la voiture devant (le lieu des missions)
   const braquage = (etoiles, garer) => {
     const B = { lettre: c, x: X(30), z: Z(30), y: Y0, etoiles, gyros: [], lasers: [], tourelles: [] };
@@ -5139,15 +5803,19 @@ function genererBloc(i, j) {
   if (c === 'T') {
     const mats = ['verre', 'verre2', 'moderne'], toits = toursT[i + ',' + j] = [];
     const tour = (m, x, z, l, p, e) => { immeuble(m, x, z, l, p, e, rnd); toits.push({ x, z, l, p, y: Y0 + 0.2 + e * 3 + 0.6 }); };   // (le dessus de son toit)
-    if (rnd() < 0.5) {
+    if (estGothique(i, j, rnd)) { // à Gotham, dans le vieux quartier : de vieux gratte-ciel gothiques, pointus
+      if (rnd() < 0.5) tourGothique(X(30), Z(30), 34, 20 + Math.floor(rnd() * 18), rnd, toits);
+      else for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) tourGothique(X(a), Z(b), 22, 12 + Math.floor(rnd() * 16), rnd, toits);
+    } else if (rnd() < 0.5) {
       const e = 20 + Math.floor(rnd() * 20), m = hasardR(mats, rnd);
       tour(m, X(30), Z(30), 33, 33, e);
       tour(m, X(30), Z(30), 24, 24, e + 3 + Math.floor(rnd() * 4));
     } else for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) tour(hasardR(mats, rnd), X(a), Z(b), 21, 21, 12 + Math.floor(rnd() * 18));
   } else if (c === 'I') {
-    const mats = ['brique', 'beton', 'moderne'];
+    const gothique = estGothique(i, j, rnd), mats = gothique ? ['gothique'] : ['brique', 'beton', 'moderne'];   // (à Gotham, dans le vieux quartier : de vieux immeubles gothiques)
+    const plein = gothique ? (m, x, z, l, p, e, r) => immeubleGothique(x, z, l, p, e, r) : immeuble;
     // la porte donne sur la rue la plus proche, au nord ou au sud ; les échelles et les escaliers de secours, sur le côté qui donne sur la rue
-    const bat = (m, a, b, l, e) => { const porte = b < 30 ? 'n' : 's'; immeubleI(m, X(a), Z(b), l, 21, e, porte, (a < 30 ? -1 : 1) * (porte === 's' ? 1 : -1), rnd); };
+    const bat = (m, a, b, l, e) => { const porte = b < 30 ? 'n' : 's'; immeubleI(m, X(a), Z(b), l, 21, e, porte, (a < 30 ? -1 : 1) * (porte === 's' ? 1 : -1), rnd, plein); };
     if (rnd() < 0.6) for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) bat(hasardR(mats, rnd), a, b, 21, 4 + Math.floor(rnd() * 7));
     else { bat(hasardR(mats, rnd), 30, 17, 45, 5 + Math.floor(rnd() * 6)); bat(hasardR(mats, rnd), 30, 43, 45, 3 + Math.floor(rnd() * 6)); }
   } else if (c === 'M') {
@@ -5183,7 +5851,17 @@ function genererBloc(i, j) {
     pickupsDepart.push({ type: 'gilet', ...b.point(12.5, 0, 5), reapparait: true });
   } else if (c === 'C') { // le commissariat : un étage de bureaux, et le toit
     const b = batiment({ x: X(30), z: Z(22), l: 30, p: 20, mat: 'beton', etages: 2, toit: true, largeurPorte: 3 });
-    panneau('police', X(30), 3.9, Z(32.06), 8, 1.5);
+    panneau(BATSIGNAL ? 'gcpd' : 'police', X(30), 3.9, Z(32.06), 8, 1.5);
+    if (BATSIGNAL && !projecteurBat) { // à Gotham, la police de Gotham (GCPD), et sur son toit, le Bat-signal : un grand projecteur rond sur son pied,
+      // tourné vers le ciel, au-dessus de la ville (voir majBatSignal : il s'allume à chaque appel de la police)
+      const p = b.point(6, 2, -4), cible = V3(p.x - 45, HAUT_NUAGES, p.z - 100), y = p.y + 1.9, dir = V3(cible.x - p.x, cible.y - y, cible.z - p.z).normalize();
+      boite('metal', p.x, p.y - Y0, p.z, 1.4, 0.5, 1.4, true);                                        // le pied
+      for (const s of [-1, 1]) boite('metal', p.x + s * 0.95, p.y - Y0 + 0.5, p.z, 0.12, 1.5, 0.3);  // la fourche
+      const q = new THREE.Quaternion().setFromUnitVectors(V3(0, 1, 0), dir);
+      geoBloc('metal', new THREE.CylinderGeometry(0.85, 0.75, 1.3, 20, 1, true).applyQuaternion(q).translate(p.x, y - Y0, p.z));   // le tambour
+      geoBloc('noirMeuble', new THREE.CylinderGeometry(0.45, 0.55, 0.6, 12).applyQuaternion(q).translate(p.x - dir.x * 0.85, y - Y0 - dir.y * 0.85, p.z - dir.z * 0.85));
+      projecteurBat = { x: p.x + dir.x * 0.66, y: y + dir.y * 0.66, z: p.z + dir.z * 0.66, dir, cible, q };   // (le verre, au bout du tambour)
+    }
     sol('paves', X(30), 0.21, Z(44), 50, 20);
     b.meuble('bois', 3, 0, 4, 8, 1.1, 1); b.meuble('ecran', 3, 0, 3.8, 0.6, 0.4, 0.1, 1.1);   // l'accueil
     for (const u of [-10, -5]) b.meuble('bois', u, 0, 8, 4, 0.45, 0.6);              // les bancs
@@ -5742,7 +6420,16 @@ function genererBloc(i, j) {
   } else if (c === ')') { // la grotte des Dix Anneaux : le camp de ses combattants, au pied d'une colline, et la galerie qui s'y enfonce, jusqu'à
     // la cellule où Tony se réveille (voir construireGrotte)
     if (galerie) construireGrotte(o, X, Z, rnd);
-  } else if (c === 'Y') { // une station de ski : une place enneigée et un chalet, derrière la gare du télésiège (construite avec le télésiège)
+  } else if (c === '{') construireManoir(X, Z, rnd);   // les monuments de Gotham (voir plus haut, et VILLES)
+  else if (c === '/') construireTourWayne(X, Z, rnd);
+  else if (c === '£') construireBanque(X, Z, rnd);
+  else if (c === 'é') construireCathedrale(X, Z, rnd);
+  else if (c === '[') construireArkham(X, Z, rnd);
+  else if (c === ']') construireAce(X, Z, rnd);
+  else if (c === '}') construireZoo(X, Z, rnd);
+  else if (c === '°') construireStade(X, Z, rnd);
+  else if (c === '§') construireSphinx(X, Z, rnd);
+  else if (c === 'Y') { // une station de ski : une place enneigée et un chalet, derrière la gare du télésiège (construite avec le télésiège)
     sol('neige', X(30), 0.21, Z(30), S, S);
     const l = TELESIEGES.find(q => q.bas.x === X(30) && q.bas.z === Z(30));
     if (l) maison('maison3', 'ardoise', X(30) - Math.sin(l.a) * 20 - l.droite.x * 12, Z(30) - Math.cos(l.a) * 20 - l.droite.z * 12);
@@ -5752,6 +6439,7 @@ function genererBloc(i, j) {
     voituresGarees.push({ x: X(20), z: Z(14), a: Math.PI / 2 }, { x: X(40), z: Z(46), a: -Math.PI / 2 });
     // des bornes en béton tout autour, tous les 3 m, sauf au milieu de chaque côté : c'est par là qu'on entre en voiture
     for (let k = 6; k <= 54; k += 3) if (k < 24 || k > 36) for (const [x, z] of [[k, 3], [k, 57], [3, k], [57, k]]) morceauEn(X(x), Z(z)).bornes.push({ x: X(x), z: Z(z), y: Y0 + 0.2 });
+    if (estGothique(i, j, rnd)) statue(X(30), 0.2, Z(30), rnd() * 2 * Math.PI);   // à Gotham, dans le vieux quartier : une statue au milieu
   }
   Y0 = 0;
 }
@@ -5793,6 +6481,167 @@ for (const n of NAVETTE) {
   }
   arrets.push({ nom: n.nom, x, y, z, quai: P(-2.7, 3.4), a });
 }
+
+// --- le monorail (VILLES : MONORAIL ; à Gotham) ---
+// Sa voie : une poutre de béton au-dessus du milieu des rues, portée par des piliers (jamais dans un carrefour), qui va tout droit d'un
+// carrefour de MONORAIL.points au suivant, et tourne en douceur. Elle dépasse de 22 m les deux bouts, pour que le train puisse s'y arrêter
+// (ses wagons de chaque côté de la gare). Ses gares : un quai couvert, à côté de la voie (à l'est ou au sud), et un ascenseur qui monte du
+// trottoir jusqu'au quai. Son train : des wagons blancs, une bande rouge, des fenêtres allumées (voir majMonorail)
+const monorail = MONORAIL ? (() => {
+  const M = MONORAIL, auCarrefour = ([c, l]) => ({ x: c * PAS + R / 2, z: l * PAS + R / 2 });
+  let pts = M.points.map(auCarrefour);
+  if (pts.length < 2) { alert('MONORAIL : il faut au moins 2 points !'); return null; }
+  const prolonger = (a, b) => { const d = dist(a, b) || 1; return { x: a.x + (a.x - b.x) / d * 22, z: a.z + (a.z - b.z) / d * 22 }; };
+  pts = [prolonger(pts[0], pts[1]), ...pts.slice(1, -1), prolonger(pts.at(-1), pts.at(-2))];
+  // les tournants : une courbe de 10 m de chaque côté du coin (elle reste au-dessus du carrefour)
+  const chemin = [pts[0]];
+  for (let q = 1; q < pts.length - 1; q++) {
+    const P = pts[q], a = pts[q - 1], b = pts[q + 1], da = dist(a, P) || 1, db = dist(b, P) || 1, r = Math.min(10, da / 2, db / 2);
+    const A = { x: P.x + (a.x - P.x) / da * r, z: P.z + (a.z - P.z) / da * r }, B = { x: P.x + (b.x - P.x) / db * r, z: P.z + (b.z - P.z) / db * r };
+    for (let k = 0; k <= 8; k++) { const t = k / 8; chemin.push({ x: (1 - t) ** 2 * A.x + 2 * (1 - t) * t * P.x + t * t * B.x, z: (1 - t) ** 2 * A.z + 2 * (1 - t) * t * P.z + t * t * B.z }); }
+  }
+  chemin.push(pts.at(-1));
+  chemin.forEach((p, k) => { p.s = k ? chemin[k - 1].s + dist(chemin[k - 1], p) : 0; });
+  const long = chemin.at(-1).s, sol = baseNoeud(Math.round(M.points[0][0]), Math.round(M.points[0][1])), haut = M.hauteur || 11, y = sol + haut;
+  // le point de la voie à s mètres du début : x, z, et dx, dz (vers où elle va)
+  const en = s => {
+    s = clamp(s, 0, long);
+    let k = 1; while (k < chemin.length - 1 && chemin[k].s < s) k++;
+    const a = chemin[k - 1], b = chemin[k], t = (s - a.s) / ((b.s - a.s) || 1), l = dist(a, b) || 1;
+    return { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t, dx: (b.x - a.x) / l, dz: (b.z - a.z) / l };
+  };
+  // la poutre : des morceaux de béton de 20 m au plus (chacun est rangé avec le morceau du pays où il est, et dessiné avec lui)
+  for (let k = 1; k < chemin.length; k++) {
+    const a = chemin[k - 1], b = chemin[k], l = dist(a, b), n = Math.ceil(l / 20);
+    for (let q = 0; q < n && l > 0.01; q++) {
+      const t = (q + 0.5) / n;
+      const cx = a.x + (b.x - a.x) * t, cz = a.z + (b.z - a.z) * t, ex = (Math.abs(b.x - a.x) / l * (l / n) + Math.abs(b.z - a.z) / l * 1.5) / 2, ez = (Math.abs(b.z - a.z) / l * (l / n) + Math.abs(b.x - a.x) / l * 1.5) / 2;
+      ajouterGeo('beton2', new THREE.BoxGeometry(1.5, 1.1, l / n + 0.06).rotateY(Math.atan2(b.x - a.x, b.z - a.z)).translate(cx, y - 0.55, cz));
+      ajouterCollision(cx - ex, cz - ez, cx + ex, cz + ez, y, y - 1.1);   // (on peut marcher dessus)
+    }
+  }
+  // les piliers : un tous les 30 m, sauf dans les carrefours (les voitures y tournent)
+  const carrefourProche = (x, z) => [x, z].every(v => Math.abs(v - R / 2 - Math.round((v - R / 2) / PAS) * PAS) < 12);
+  for (let s = 8; s < long - 4;) {
+    const p = en(s);
+    if (carrefourProche(p.x, p.z)) { s += 6; continue; }   // (on essaie un peu plus loin)
+    boite('beton2', p.x, sol, p.z, 1.1, haut - 1.1, 1.1, true);
+    s += 30;
+  }
+  // les gares : [nom, colonne, ligne]. s : où elle est le long de la voie ; c : de quel côté est son quai (à l'est, ou au sud)
+  const gares = (M.gares || []).map(([nom, c, l]) => {
+    const q = auCarrefour([c, l]);
+    let s = 0, dmin = Infinity;
+    for (let t = 0; t <= long; t += 0.5) { const p = en(t), d = Math.hypot(p.x - q.x, p.z - q.z); if (d < dmin) { dmin = d; s = t; } }
+    const p = en(s), c1 = { x: p.dz, z: -p.dx }, cote = c1.x + c1.z > 0 ? c1 : { x: -c1.x, z: -c1.z };
+    return { nom, s, ...p, cote };
+  }).sort((a, b) => a.s - b.s);
+  for (const g of gares) {
+    const { dx, dz, cote: c } = g, a = Math.atan2(dx, dz), P = (u, w) => ({ x: g.x + c.x * u + dx * w, z: g.z + c.z * u + dz * w });   // u : vers le quai ; w : le long de la voie
+    const poser = (mat, l, h, p, u, yb, w) => { const q = P(u, w); ajouterGeo(mat, new THREE.BoxGeometry(l, h, p).rotateY(a).translate(q.x, yb + h / 2, q.z)); };
+    const bloquer = (u1, u2, w1, w2, y1, y2) => { const A = P(u1, w1), B = P(u2, w2); ajouterCollision(Math.min(A.x, B.x), Math.min(A.z, B.z), Math.max(A.x, B.x), Math.max(A.z, B.z), y2, y1); };
+    poser('beton2', 4.5, 0.8, 38, 3.95, y - 0.3, 0); bloquer(1.7, 6.2, -19, 19, y - 0.3, y + 0.5);              // le quai
+    poser('beton2', 3.8, 0.8, 3, 8.1, y - 0.3, 10); bloquer(6.2, 10, 8.5, 11.5, y - 0.3, y + 0.5);             // le passage jusqu'à l'ascenseur
+    poser('rambarde', 0.08, 1, 27.4, 6.15, y + 0.5, -5.3); bloquer(6.1, 6.2, -19, 8.4, y + 0.5, y + 1.5);     // la rambarde (sauf devant l'ascenseur)
+    poser('rambarde', 0.08, 1, 7.4, 6.15, y + 0.5, 15.3); bloquer(6.1, 6.2, 11.6, 19, y + 0.5, y + 1.5);
+    poser('tole', 6.2, 0.25, 38, 3.9, y + 4.2, 0);                                                               // le toit, sur ses poteaux
+    for (const w of [-17, -6, 6, 17]) { poser('metal', 0.2, 3.7, 0.2, 6, y + 0.5, w); bloquer(5.9, 6.1, w - 0.1, w + 0.1, y + 0.5, y + 4.2); }
+    for (const w of [-12, 0, 12]) poser('lampe', 0.6, 0.1, 1.2, 3.9, y + 4.1, w);
+    const enseigne = P(1.05, 0);   // MONORAIL, sous le bord du toit, tourné vers la rue
+    ajouterGeo('monorailEnseigne', new THREE.PlaneGeometry(6, 1.1).rotateY(Math.atan2(-c.x, -c.z)).translate(enseigne.x, y + 3.5, enseigne.z));
+    poser('beton2', 3, y + 3.4 - sol, 3, 11.5, sol, 10); bloquer(10, 13, 8.5, 11.5, sol, y + 3.4);             // l'ascenseur, sur le trottoir (les passants passent devant)
+    poser('porte', 1.6, 2.4, 0.1, 11.5, sol + 0.2, 11.52);                                                       // sa porte, sur le côté
+    ascenseurs.push({ bas: { ...P(11.5, 12.6), y: sol + 0.2 }, haut: { ...P(5.2, 10), y: y + 0.5 } });
+  }
+  // le train : ses wagons, l'un derrière l'autre. Un wagon est creux (on monte dedans) : un plancher, des parois, des fenêtres tout autour,
+  // un plafond avec sa lampe. [matière, largeur, hauteur, longueur, x, bas, z]
+  const morceaux = [['noirMeuble', 2.7, 1.1, 10.6, 0, -0.65, 0], ['monorail', 3, 0.05, 10.6, 0, 0.45, 0], ['monorail', 3, 0.1, 10.6, 0, 3.05, 0],
+    ['monorail', 2.6, 0.3, 10.2, 0, 3.15, 0], ['lampe', 0.5, 0.05, 8, 0, 3.0, 0]];
+  for (const c of [-1, 1]) {
+    morceaux.push(['monorail', 0.1, 1.05, 10.6, c * 1.45, 0.5, 0], ['rouge', 0.04, 0.22, 10.6, c * 1.52, 0.95, 0], ['vitreTrain', 0.06, 0.95, 9.4, c * 1.47, 1.55, 0],
+      ['monorail', 0.1, 0.55, 10.6, c * 1.45, 2.5, 0], ['monorail', 0.1, 0.95, 0.6, c * 1.45, 1.55, c * 5],   // (côtés : bas, bande rouge, fenêtre, haut, montant)
+      ['monorail', 3, 1.05, 0.1, 0, 0.5, c * 5.25], ['monorail', 3, 0.55, 0.1, 0, 2.5, c * 5.25], ['vitreTrain', 2.4, 0.95, 0.06, 0, 1.55, c * 5.27],   // (les bouts)
+      ['monorail', 0.3, 0.95, 0.1, c * 1.35, 1.55, 5.25], ['monorail', 0.3, 0.95, 0.1, c * 1.35, 1.55, -5.25]);
+  }
+  const geos = {};
+  for (const [mat, l, h, p, x, yb, z] of morceaux) (geos[mat] ||= []).push(new THREE.BoxGeometry(l, h, p).translate(x, yb + h / 2, z));
+  for (const mat in geos) geos[mat] = mergeGeometries(geos[mat]);   // (un seul dessin par matière ; tous les wagons partagent la même forme)
+  const n = Math.max(1, Math.round(M.wagons || 3)), wagons = [];
+  for (let k = 0; k < n; k++) {
+    const w = new THREE.Group();
+    for (const mat in geos) {
+      const m = new THREE.Mesh(geos[mat], MAT[mat]); m.castShadow = mat !== 'lampe'; w.add(m);
+      if (mat === 'vitreTrain') w.userData.vitres = m;
+    }
+    scene.add(w); wagons.push(w);
+  }
+  const s0 = gares[0]?.s ?? long / 2;
+  return { y, sol, long, en, gares, wagons, s: s0, v: 0, sens: 1, cible: 0, attente: M.arret ?? 8, vitesse: M.vitesse || 14, arret: M.arret ?? 8, longWagon: 11.4 };
+})() : null;
+// le train du monorail, à chaque image : il roule vers la gare suivante (il démarre et freine en douceur), s'y arrête « arret » secondes,
+// puis repart ; au bout de la voie, il repart dans l'autre sens. Ses wagons suivent la voie, l'un derrière l'autre. B.J., s'il est dedans,
+// roule avec lui (J.monorail : { k : son wagon, w : où il est dans le wagon, en mètres vers l'avant })
+const A_MONORAIL = 1.2;   // m/s² : le train démarre et freine en douceur
+function majMonorail(dt) {
+  const T = monorail;
+  if (!T) return;
+  if (T.gares.length < 2) T.attente = 1;   // (une seule gare : il ne bouge pas)
+  else if (T.attente > 0) {
+    T.attente -= dt;
+    if (T.attente <= 0) { T.cible += T.sens; if (T.cible < 0 || T.cible >= T.gares.length) { T.sens = -T.sens; T.cible += 2 * T.sens; } }
+  } else {
+    const d = (T.gares[T.cible].s - T.s) * T.sens;
+    T.v = Math.min(T.v + A_MONORAIL * dt, T.vitesse, Math.sqrt(2 * A_MONORAIL * Math.max(0, d)) + 0.2);
+    if (d <= T.v * dt) { // il arrive à la gare
+      T.s = T.gares[T.cible].s; T.v = 0; T.attente = T.arret;
+      if (J.monorail) { annonce(tr('MONORAIL'), tr('Gare : {gare}', { gare: tr(T.gares[T.cible].nom) }), 2.5); bip(700, 900, 0.3, 'sine', 0.08); }
+    } else T.s += T.sens * T.v * dt;
+  }
+  const n = T.wagons.length, voir = Math.hypot(T.en(T.s).x - camera.position.x, T.en(T.s).z - camera.position.z) < vueDetails() + n * T.longWagon;
+  T.wagons.forEach((w, k) => {
+    w.visible = voir;
+    w.userData.vitres.visible = !(J.monorail?.k === k && J.vue === 1);   // (dans son wagon, avec ses yeux : on voit dehors par les fenêtres)
+    const p = T.en(T.s + (k - (n - 1) / 2) * T.longWagon);
+    w.position.set(p.x, T.y, p.z); w.rotation.y = Math.atan2(p.dx, p.dz);
+  });
+  if (J.monorail) { // B.J. est debout dans son wagon, et roule avec lui
+    const w = T.wagons[J.monorail.k], a = w.rotation.y;
+    J.x = w.position.x + Math.sin(a) * J.monorail.w; J.z = w.position.z + Math.cos(a) * J.monorail.w; J.y = T.y + 0.5;
+    J.vy = 0; J.vitesse = T.v; J.angleCorps = a + (T.sens > 0 ? 0 : Math.PI); J.sol = true;
+    placerHumain(joueurH, J.x, J.y, J.z, 0, J.angleCorps, 0);
+    animerHumain(joueurH, 0, dt);
+    if (joueurH.arme) joueurH.arme.visible = false;
+  }
+}
+// la gare où le train attend, et B.J. sur son quai, tout près : { g : la gare, k : le wagon le plus proche }, ou null
+function monorailProche() {
+  const T = monorail;
+  if (!T || J.monorail || T.attente <= 0 || J.voiture || J.robot || J.mort) return null;
+  const g = T.gares.find(g => Math.abs(g.s - T.s) < 0.5);
+  if (!g || Math.abs(J.y - (T.y + 0.5)) > 1.2) return null;
+  const u = (J.x - g.x) * g.cote.x + (J.z - g.z) * g.cote.z, w = (J.x - g.x) * g.dx + (J.z - g.z) * g.dz;   // (sur le quai : de 1,7 à 6,2 m de la voie)
+  if (u < 1 || u > 6.5 || Math.abs(w) > 19) return null;
+  const n = T.wagons.length, k = clamp(Math.round(w / T.longWagon + (n - 1) / 2), 0, n - 1);
+  return { g, k };
+}
+// E, sur le quai : il monte dans le wagon le plus proche. Dedans, on voit avec ses yeux (V : de dehors), et sa vue revient en descendant
+function monterMonorail({ k }) {
+  J.monorail = { k, w: entre(-2.5, 2.5), vue: J.vue }; J.vue = 1;
+  J.danse = 0; J.accroupi = false; J.superman = null; J.grappin = J.balance = J.mur = J.plane = J.lance = null;
+  annonce(tr('MONORAIL'), tr('E à une gare : descendre'), 2.5); bip(500, 750, 0.3, 'sine', 0.15);
+}
+// E, dans le train : à une gare, il descend sur le quai ; en route, il attend (les portes sont fermées)
+function descendreMonorail() {
+  const T = monorail, g = T.attente > 0 && T.gares.find(g => Math.abs(g.s - T.s) < 0.5);
+  if (!g) { annonce('', tr('Les portes sont fermées : attends la prochaine gare !'), 2); return; }
+  const w = (J.monorail.k - (T.wagons.length - 1) / 2) * T.longWagon + J.monorail.w;
+  Object.assign(J, { x: g.x + g.cote.x * 3.6 + g.dx * w, z: g.z + g.cote.z * 3.6 + g.dz * w, y: T.y + 0.5, vy: 0, vitesse: 0, vue: J.monorail.vue, monorail: null });
+  J.lacet = J.angleCorps = Math.atan2(g.cote.x, g.cote.z);
+  dernierJ = null;   // (il n'est pas venu en courant : peupler ne doit pas croire qu'il file à toute vitesse)
+}
+// ce que dit l'aide dans le train
+const aideMonorail = () => monorail.attente > 0 ? tr('Appuie sur <b>E</b> pour descendre du monorail')
+  : tr('Monorail : prochaine gare, {gare}', { gare: tr(monorail.gares[monorail.cible]?.nom || '') });
 
 // les rues des villes : un morceau de chaussée par rue, avec ses lignes, ses passages piétons et parfois un dos d'âne
 const geoDosDAne = () => { // une bosse en travers de la rue (qui va vers z)
@@ -6116,7 +6965,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
       const ombre = clamp(0.85 - (n.x + n.z) * 1.5, 0.45, 1.3), srgb = v => 255 * Math.min(1, v * ombre) ** (1 / 2.2);
       imageTerrain.set(y < EAU ? [63, 121, 163, 255] : [srgb(coul.r), srgb(coul.g), srgb(coul.b), 255], (iz * NXT + ix) * 4);
       // sous une ville, le terrain est gris : de près, les rues et les trottoirs le cachent ; de très loin, c'est tout ce qu'on voit de la ville
-      if (estBloc(CARTE[j][i]) && !'PM)'.includes(CARTE[j][i])) coul.copy(COUL.ville);   // (pas sous le camp de la grotte : il est en terre)
+      if (estBloc(CARTE[j][i]) && !'PM){}['.includes(CARTE[j][i])) coul.copy(COUL.ville);   // (pas sous le camp de la grotte : il est en terre ; ni sous le parc du manoir Wayne, le zoo ou Arkham : de l'herbe)
       col.set([coul.r, coul.g, coul.b], k * 3);
       if (a < nx - 1 && b < nz - 1 && !trousTerrain.has(iz * NXT + ix)) idx.push(k, k + nx, k + 1, k + nx, k + nx + 1, k + 1);   // (sauf les carrés percés, à l'entrée de la grotte)
     }
@@ -6288,12 +7137,14 @@ const eau = new THREE.Mesh(new THREE.PlaneGeometry(TAILLE_X + LARGE, TAILLE_Z + 
   relief(new THREE.MeshStandardMaterial({ color: '#2b6384', roughness: 0.12, metalness: 0.15, bumpMap: TEX.vagues, bumpScale: 0.35 })));
 TEX.vagues.repeat.set((TAILLE_X + LARGE) / 14, (TAILLE_Z + LARGE) / 14);
 eau.position.set(TAILLE_X / 2, EAU, TAILLE_Z / 2); eau.receiveShadow = true; scene.add(eau);
+if (COUVERT) eau.material.color.set('#17262e');   // (sous un ciel couvert, la nuit, l'eau est sombre : le bleu du ciel ne s'y reflète pas)
 
 // fusion : quelques gros objets par morceau au lieu de milliers de petits (beaucoup plus rapide)
 const batiments = [];
 // les intérieurs (planchers, marches, meubles) ne font pas d'ombre : les murs et le toit la font déjà
-const SANS_OMBRE = ['terre', 'garde', 'platre', 'boisClair', 'parquet', 'carrelage', 'moquette', 'cuir', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'croix', 'enseigne', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'police', 'superette', 'customs', 'banque', 'yellowjack', 'essence', 'maze'];
-const PAS_UN_MUR = ['terre', 'tente', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'cable', 'trottoir', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'rambarde'];
+const SANS_OMBRE = ['terre', 'garde', 'platre', 'boisClair', 'parquet', 'carrelage', 'moquette', 'cuir', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'croix', 'enseigne', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'police', 'superette', 'customs', 'banque', 'yellowjack', 'essence', 'maze', 'gcpd',
+  'wayneEnseigne', 'wayneEntreprises', 'banqueGotham', 'arkhamEnseigne', 'aceEnseigne', 'zooEnseigne', 'stadeEnseigne', 'monorailEnseigne', 'pelouse', 'or', 'acide'];
+const PAS_UN_MUR = ['terre', 'tente', 'lignes', 'zebra', 'dosDAne', 'herbe', 'paves', 'neige', 'neigePiste', 'cable', 'trottoir', 'route', 'routeCampagne', 'helipad', 'piscine', 'lampe', 'rambarde', 'pelouse', 'acide'];
 const GEO_ARBRE = {
   rond: [new THREE.CylinderGeometry(0.15, 0.25, 3, 7).translate(0, 1.5, 0),
          mergeGeometries([[0, 4.4, 0, 1.7], [0.9, 3.9, 0.3, 1.2], [-0.8, 4, -0.5, 1.25], [0.1, 4.1, 0.9, 1.1], [-0.2, 5.3, -0.1, 1.2]].map(([x, y, z, r]) => new THREE.IcosahedronGeometry(r, 1).translate(x, y, z)))],
@@ -6327,8 +7178,10 @@ function instances(dans, geo, mat, liste, placer) {
 const GEO_BORNE = new THREE.LatheGeometry([[0.2, 0], [0.2, 0.3], [0.16, 0.4], [0.08, 0.45], [0, 0.46]].map(([r, y]) => new THREE.Vector2(r, y * R_.hauteurBornes / 0.45)), 12);
 const MAT_BORNE = std(null, { color: '#b8b4aa', roughness: 0.9 });
 // les formes de chaque matière, fusionnées en un seul objet, dans le groupe g
+const MATIERES_INCONNUES = new Set();   // (une matière qui n'est pas dans MAT : ses formes seraient toutes blanches, et brilleraient la nuit)
 function fusionner(geos, g, ombre = true) {   // ombre = false : rien ne fait d'ombre (l'intérieur des bâtiments, où le soleil n'entre pas)
   for (const [nom, liste] of Object.entries(geos)) {
+    if (!MAT[nom] && !MATIERES_INCONNUES.has(nom)) { MATIERES_INCONNUES.add(nom); alert(`La matière "${nom}" n'existe pas dans MAT : ses formes seront toutes blanches !`); }
     const mesh = new THREE.Mesh(mergeGeometries(liste), MAT[nom]);
     mesh.castShadow = ombre && !SANS_OMBRE.includes(nom); mesh.receiveShadow = true;
     mesh.raycast = raycastTroue;   // (les rayons passent par les trous des toits et des planchers)
@@ -6411,11 +7264,11 @@ function majLampadaires(dt) {
 function majMorceaux() {
   for (const m of morceaux.values()) {
     const d = Math.hypot(m.x - camera.position.x, m.z - camera.position.z) - MORCEAU * 0.71;
-    m.g.visible = d < R_.distanceVue;
-    if (m.loin) m.loin.visible = !m.g.visible && d < VUE_RELIEF;   // (plus loin encore, la brume cache tout)
+    m.g.visible = d < vueDetails();
+    if (m.loin) m.loin.visible = !m.g.visible && d < (BROUILLARD ? BROUILLARD + 40 : VUE_RELIEF);   // (plus loin encore, la brume, ou le brouillard, cache tout)
   }
   for (const d of interieurs) d.g.visible = !d.cache && Math.hypot(d.x - camera.position.x, d.z - camera.position.z) < 100;   // l'intérieur des bâtiments, seulement de près (pas celui d'une villa tombée dans la mer)
-  if (villaStark) villaStark.pivot.visible = Math.hypot(villaStark.x - camera.position.x, villaStark.z - camera.position.z) - 40 < R_.distanceVue;
+  if (villaStark) villaStark.pivot.visible = Math.hypot(villaStark.x - camera.position.x, villaStark.z - camera.position.z) - 40 < vueDetails();
   majTrous();
 }
 
@@ -6737,6 +7590,8 @@ GEO.cheveuxFille = mergeGeometries([GEO.cheveux, mergeGeometries([new THREE.Sphe
   tour([[0, -0.36], [0.026, -0.34], [0.044, -0.24], [0.05, -0.12], [0.042, -0.03], [0.03, 0.01]], 10).scale(1, 1, 0.8).rotateX(0.14).translate(0, 0.03, -0.15),
   ...[-1, 1].map(c => new THREE.SphereGeometry(0.03, 8, 8).scale(0.5, 3, 0.9).translate(0.108 * c, -0.03, 0.04))])
   .translate(0, -0.012, 0.012).rotateX(0.6)]);
+// les longs cheveux de Batgirl, qui sortent de sa cagoule et tombent dans son dos (faits au tour, aplatis : [rayon, hauteur], de bas en haut)
+GEO.criniere = tour([[0, -0.44], [0.05, -0.42], [0.085, -0.32], [0.1, -0.18], [0.095, -0.05], [0.08, 0.04], [0.05, 0.09], [0, 0.1]], 14).scale(1.3, 1, 0.5);
 function piece(geo, couleur, parent, x, y, z) {
   const m = new THREE.Mesh(geo, mat(couleur));
   m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m;
@@ -8194,7 +9049,7 @@ function eteindre(v) { if (v.brule > 0) { v.m.remove(v.feu); v.feu = null; v.bru
 // =====================================================================
 //  Sons (fabriqués par le programme)
 // =====================================================================
-let audio = null, bruitBuf, moteurs, roulement, crissement, sirene, sireneGain, alarmeSon, alarmeGain, reacteursIronman;
+let audio = null, bruitBuf, moteurs, roulement, crissement, sirene, sireneGain, alarmeSon, alarmeGain, reacteursIronman, pluieSon, pluieGrave;
 function initAudio() {
   if (audio) return;
   audio = new AudioContext();
@@ -8207,6 +9062,7 @@ function initAudio() {
     souffle.connect(f).connect(g).connect(audio.destination); return g.gain; };
   roulement = voie('lowpass', 350, 0.7); crissement = voie('bandpass', 1500, 5);
   reacteursIronman = voie('bandpass', 700, 0.8);   // le grondement des réacteurs d'Iron Man, quand il vole
+  if (PLUIE) { pluieSon = voie('bandpass', 2600, 0.35); pluieGrave = voie('lowpass', 420, 0.6); }   // la pluie (CHAPITRES : pluie) : un souffle aigu, et un plus grave
   sirene = audio.createOscillator(); sirene.type = 'square';
   sireneGain = audio.createGain(); sireneGain.gain.value = 0;
   sirene.connect(sireneGain).connect(audio.destination); sirene.start();
@@ -8373,14 +9229,18 @@ function majCape(dt) {
 // même taille (aux talons près), mêmes forces
 const vetir = (m, matiere) => { m.material = m.userData.habit = matiere; };   // la tenue normale d'une pièce (rhabillerBJ la lui remet)
 // Dans un chapitre de héros, il est en civil (CHAPITRES : civil, civilFille) : Tony Stark en costume sombre et chemise blanche, avec ses
-// lunettes de soleil et sa barbiche ; Pepper Potts en tailleur clair. Sa veste, ouverte sur la chemise, a des manches longues
+// lunettes de soleil et sa barbiche ; Pepper Potts en tailleur clair ; Bruce Wayne en costume bleu nuit et cravate ; Barbara Gordon en veste
+// verte, ses lunettes et ses cheveux roux. Sa veste, ouverte sur la chemise, a des manches longues
 const tenueCivile = () => (fille() ? CHAPITRE.civilFille : CHAPITRE.civil) || {};
 const enCivil = () => Object.keys(tenueCivile()).length > 0;   // commence-t-il le chapitre en civil ?
 const cacheVestes = {};
-const veste = C => cacheVestes[C.veste + C.chemise] ||= std(toile(128, 128, (g, l, h) => {
+const veste = C => cacheVestes[C.veste + C.chemise + (C.cravate || '')] ||= std(toile(128, 128, (g, l, h) => {
   g.fillStyle = C.veste; g.fillRect(0, 0, l, h);
   for (const x of [0, l]) { // le devant (au bord gauche de l'image, et au bord droit) : la chemise, dans l'ouverture de la veste, les revers et deux boutons
     g.fillStyle = C.chemise || '#fff'; g.beginPath(); g.moveTo(x - 17, 0); g.lineTo(x + 17, 0); g.lineTo(x, 66); g.fill();
+    if (C.cravate) { // la cravate : le nœud sous le col, puis elle s'élargit vers le bas, et finit en pointe
+      g.fillStyle = C.cravate; g.beginPath(); for (const [dx, y] of [[-4, 2], [4, 2], [3, 9], [6.5, 54], [0, 63], [-6.5, 54], [-3, 9]]) g.lineTo(x + dx, y); g.fill();
+    }
     g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 2;
     for (const c of [-1, 1]) { g.beginPath(); g.moveTo(x + 17 * c, 0); g.lineTo(x + 26 * c, 30); g.lineTo(x + 7 * c, 50); g.stroke(); }
     g.fillStyle = 'rgba(0,0,0,.6)'; for (const y of [76, 92]) { g.beginPath(); g.arc(x + 3, y, 2.2, 0, 7); g.fill(); }
@@ -8473,7 +9333,7 @@ function boutSceptreVM(v) {
 function changerArme(i) {
   if (!J.possede[i] || J.arme === i) return;
   J.arme = i; donnerArme(joueurH, i); construireVM();
-  if (joueurH.arme && (J.voiture || J.telesiege)) joueurH.arme.visible = false;   // en voiture ou sur un télésiège, il la garde rangée
+  if (joueurH.arme && (J.voiture || J.telesiege || J.monorail)) joueurH.arme.visible = false;   // en voiture, sur un télésiège ou dans le monorail, il la garde rangée
   if (joueurH.arme && TRICHES.some(t => t.actif && t.invisible)) rendreInvisible(joueurH.arme);   // le code INVISIBLE : son arme aussi
 }
 construireVM();
@@ -10164,13 +11024,57 @@ function mettreIronman(civil = false) {
   if (!civil && !appelerArmure()) J.ironman.pieces = toutesLesPieces();
 }
 // H : il met son armure (elle arrive à sa façon), ou il en sort. Comme A Z E, mais d'une seule touche. S'il en porte une autre que celle
-// qu'il a choisie (touche J), il en sort, et la nouvelle arrive aussitôt
+// qu'il a choisie (touche J), il en sort, et la nouvelle arrive aussitôt. Au chapitre de Batman, il met son costume, ou repasse en civil
 function costume() {
+  if (costumeCivil()) { changerCostume(); return; }
   if (!J.ironman || J.ironman.anim || J.ironman.tour) return;
   if (sansArmure()) { pasEncoreDArmure(); return; }
   if (sansReacteur()) { annonce('', tr('Sans ton réacteur, ton armure ne marche plus : vite, ton ancien réacteur !'), 2); return; }   // (mission « Iron Monger »)
   if (!surPlace() && !J.superman) { annonce('', tr('Sois à pied, debout par terre !'), 2); return; }
   basculerArmure();
+}
+// --- le costume de Batman (au chapitre de Batman : CHAPITRES, civil) ---
+// Bruce Wayne (ou Barbara Gordon) commence le chapitre en civil : le code de son chapitre (BATMAN) reste éteint, il n'a ni gadgets, ni cape.
+// La touche H l'allume : il met son costume, dans une nuée de chauves-souris. H encore : il repasse en civil (le code s'éteint)
+const tricheHeros = () => TRICHES.find(t => t.code === CHAPITRE.triche);   // le code du héros du chapitre
+const costumeCivil = () => { const t = tricheHeros(); return !!t && !t.ironman && enCivil(); };   // (Iron Man, lui, a son armure : voir mettreIronman)
+// pas encore de costume ? Pour l'instant, il l'a dès le début du chapitre. Pour le lui faire gagner dans une mission (comme la toute
+// première armure de Tony Stark : voir sansArmure), c'est ici
+const sansCostume = () => false;
+// en civil, au chapitre de Batman : ni grappin, ni batarangs, ni filets, ni cape, ni Batmobile (G, 9, B et Maj le disent ; H : son costume)
+const sansGadgets = () => costumeCivil() && !tricheHeros().actif;
+function changerCostume() {
+  const t = tricheHeros();
+  if (sansCostume()) { annonce(tr('PAS ENCORE DE COSTUME'), tr('Ton costume, tu vas le trouver : suis le point jaune !'), 3); bip(300, 200, 0.1, 'square', 0.1); return; }
+  if (J.mort || J.voiture || J.robot || J.telesiege || J.monorail) { annonce('', tr('Sois à pied, debout par terre !'), 2); return; }
+  if (t.actif && (!J.sol || accroche() || J.echelle || J.superman)) { annonce('', tr("Pose-toi d'abord !"), 2); return; }   // (en civil, sans sa cape, il tomberait)
+  basculerTriche(t, false, false, false);   // (sans faire venir la Batmobile : B la rappelle)
+  voleeDeChauvesSouris(J, 26);
+  annonce(t.actif ? tr(nomSuper().toUpperCase() + ' !') : nomHeros(),   // (« BATMAN ! », « BATGIRL ! » : dans TRADUCTIONS)
+          t.actif ? '' : tr('En civil : ni gadgets, ni cape. H : ton costume'), 2);
+}
+// Une nuée de chauves-souris : Batman qui met son costume, ou qui le quitte. Des chauves-souris noires (la forme du batarang) qui battent des
+// ailes et s'envolent en tournant autour de lui, avec un grand souffle et leurs petits cris
+const TEX_CHAUVE_SOURIS = toile(64, 32, g => { g.translate(32, 16); g.beginPath(); for (const [x, y] of CONTOUR_BATARANG) g.lineTo(x * 30, -y * 30); g.fillStyle = '#0c0c10'; g.fill(); });
+const M_CHAUVE_SOURIS = new THREE.SpriteMaterial({ map: TEX_CHAUVE_SOURIS, alphaTest: 0.5 });
+const chauvesSouris = [];   // { s : son image, c : le centre de la nuée, a, r : où elle est autour (angle, distance), y, et comment ça change }
+function voleeDeChauvesSouris(o, n) {
+  for (let k = 0; k < n; k++) {
+    const s = new THREE.Sprite(M_CHAUVE_SOURIS);
+    s.scale.set(0.5, 0.25, 1); scene.add(s);
+    chauvesSouris.push({ s, c: { x: o.x, z: o.z }, a: entre(0, 2 * Math.PI), r: entre(0.15, 0.6), y: o.y + entre(0.2, 1.9), vy: entre(1.5, 4.5), vr: entre(2, 5), va: entre(2, 4) * (Math.random() < 0.5 ? -1 : 1), vie: entre(1, 1.6), phase: entre(0, 6) });
+  }
+  bruit(0.35, 3000, 0.6);
+  for (let k = 0; k < 4; k++) setTimeout(() => bip(entre(3500, 5000), entre(5000, 6500), 0.05, 'sine', 0.03), k * 90);   // leurs petits cris
+}
+function majChauvesSouris(dt) {
+  for (const b of chauvesSouris) {
+    b.vie -= dt; b.a += b.va * dt; b.r += b.vr * dt; b.y += b.vy * dt;
+    b.s.position.set(b.c.x + Math.cos(b.a) * b.r, b.y, b.c.z + Math.sin(b.a) * b.r);
+    b.s.scale.x = 0.5 * (0.25 + 0.75 * Math.abs(Math.sin(temps * 22 + b.phase)));   // elle bat des ailes
+    if (b.vie <= 0) scene.remove(b.s);
+  }
+  for (let k = chauvesSouris.length - 1; k >= 0; k--) if (chauvesSouris[k].vie <= 0) chauvesSouris.splice(k, 1);
 }
 // J, au chapitre d'Iron Man : il choisit une autre de ses armures (celles qu'il a achetées au magasin de Stark Industries). H la fera venir
 function changerArmure() {
@@ -10254,7 +11158,7 @@ function copierPiece(h, k, matiere = null) {
   return g;
 }
 // peut-il attendre son armure, ou en sortir ? Debout, à pied, sur le sol (pas en l'air, ni dans l'eau, ni sur une échelle, ni accroché)
-const surPlace = () => !J.mort && !J.voiture && !J.robot && !J.telesiege && !J.superman && J.sol && !J.nage && !J.roule && !J.echelle && !accroche();
+const surPlace = () => !J.mort && !J.voiture && !J.robot && !J.telesiege && !J.monorail && !J.superman && J.sol && !J.nage && !J.roule && !J.echelle && !accroche();
 // A Z E (IRONMAN.touches : Q W E sur un clavier anglais) : l'armure arrive, ou il en sort (et, s'il en a choisi une autre, elle arrive ensuite)
 function basculerArmure() {
   const I = J.ironman;
@@ -11042,12 +11946,14 @@ addEventListener('keydown', e => {
   else if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
   if (e.code === 'KeyL' && im) leverMasque();   // Iron Man : L lève ou baisse le masque
   if (e.code === 'KeyG' && im && chezStark) tirerMissiles();   // Iron Man, au chapitre d'Iron Man : les mini-missiles
+  else if (e.code === 'KeyG' && sansGadgets() && !J.voiture && !J.monorail) annonce('', tr('Mets ton costume (H) pour lancer ton grappin'), 2);   // en civil
   else if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
   if (e.code === 'KeyX' && im && chezStark) lancerLaser();   // Iron Man, au chapitre d'Iron Man : le laser des bras
-  if (e.code === 'KeyB') rappelerVoiture();   // Batman rappelle sa Batmobile
+  if (e.code === 'KeyB') { if (sansGadgets()) annonce('', tr('Mets ton costume (H) pour appeler ta Batmobile'), 2); else rappelerVoiture(); }   // Batman rappelle sa Batmobile (pas en civil)
   if (e.code === 'KeyT' && !voyage) appuyerT();   // la DeLorean : choisir le chapitre où aller (dedans), ou la faire venir
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
-  if (e.code.startsWith('Digit') && !J.robot) choisirArme((+e.code.slice(5) + 9) % 10);
+  if (e.code === 'Digit9' && sansGadgets() && !J.robot) annonce('', tr('Mets ton costume (H) pour avoir tes batarangs et tes filets'), 2);   // en civil
+  else if (e.code.startsWith('Digit') && !J.robot) choisirArme((+e.code.slice(5) + 9) % 10);
 });
 // les touches 1 à 9 (et 0 pour une 10e arme) : une arme chacune. Les armes des codes de triche (les yeux laser, le sceptre de foudre)
 // sont toutes sur la touche de la première (9) : si on en a plusieurs, chaque appui passe à la suivante
@@ -11103,12 +12009,16 @@ function validerTriche() {
   if (!t) { annonce('', tr('Code inconnu'), 1.5); return; }
   if (t.action) { t.action(n); if (t.code !== 'MISSION' && t.code !== 'CHAPITRE') annonce('', tr(t.texte), 2.5); return; }
   // dans un chapitre de super-héros, son code est toujours allumé, et ceux des autres super-héros ne marchent pas
-  if (CHAPITRE.triche && CHAPITRES.some(c => c.triche === t.code)) { annonce('', t.code === CHAPITRE.triche ? tr('Tu es déjà {super} !', { super: nomSuper() }) : tr('Pas dans ce chapitre !'), 2); return; }
+  if (CHAPITRE.triche && CHAPITRES.some(c => c.triche === t.code)) {
+    annonce('', t.code !== CHAPITRE.triche ? tr('Pas dans ce chapitre !') : costumeCivil() && !t.actif ? tr('Appuie sur H pour mettre ton costume') : tr('Tu es déjà {super} !', { super: nomSuper() }), 2);
+    return;
+  }
   basculerTriche(t);
 }
 // allume un code de triche, ou l'éteint s'il était allumé (dire : l'annoncer). Le jeu allume aussi celui du héros du chapitre (CHAPITRES : triche),
-// en civil s'il a une tenue de tous les jours (CHAPITRES : civil) : il mettra son armure avec la touche H
-function basculerTriche(t, dire = true, civil = false) {
+// en civil s'il a une tenue de tous les jours (CHAPITRES : civil) : il mettra son armure avec la touche H. voiture = false : sa voiture (la
+// Batmobile) ne vient pas (Batman qui met son costume avec H)
+function basculerTriche(t, dire = true, civil = false, voiture = true) {
   t.actif = !t.actif; // retaper un code annule son effet
   if (t.ironman) { if (t.actif) mettreIronman(civil); else enleverIronman(); }   // l'armure d'Iron Man arrive en volant (pas en civil), ou s'en va
   rhabillerBJ();
@@ -11116,7 +12026,7 @@ function basculerTriche(t, dire = true, civil = false) {
   if (!J.possede[J.arme]) changerArme(0);
   if (t.actif && !J.robot) changerArme(ARMES.findIndex(a => (a.modele || a.toile) && t[pouvoirArme(a)]));   // une arme qui se tient (le sceptre, le grappin), ou la toile : il la prend en main
   if (t.actif && t.biceps) poserBiceps(t.biceps);
-  if (t.actif && t.voiture) amenerVoiture(t.voiture);   // sa voiture (la Batmobile) apparaît à côté de lui
+  if (t.actif && t.voiture && voiture) amenerVoiture(t.voiture);   // sa voiture (la Batmobile) apparaît à côté de lui
   // on n'a plus le pouvoir : il lâche son grappin ou sa toile, tombe du mur, replie sa cape
   if (!pouvoir('grappin')) J.grappin = null;
   if (!pouvoir('toile')) J.balance = J.prise = null;
@@ -11127,7 +12037,7 @@ function basculerTriche(t, dire = true, civil = false) {
 // La pose du culturiste (un code de triche qui a « biceps: 1.3 » : le nombre de secondes) : B.J. se tourne vers la caméra et gonfle son
 // biceps droit. On le regarde de dehors, le temps de la pose. Seulement à pied ; bouger, sauter, s'accroupir, tirer ou viser l'arrête
 function poserBiceps(duree) {
-  if (J.voiture || J.robot || J.telesiege || J.nage || J.mort || J.superman || J.roule || J.echelle || accroche()) return;
+  if (J.voiture || J.robot || J.telesiege || J.monorail || J.nage || J.mort || J.superman || J.roule || J.echelle || accroche()) return;
   J.biceps = { reste: duree, duree, vue: J.vue }; J.vue = 3; J.danse = 0; J.accroupi = false;
 }
 function finirBiceps() { J.vue = J.biceps.vue; J.biceps = null; bicepsBJ.visible = false; }
@@ -11186,7 +12096,7 @@ const accroche = () => !!(J.grappin || J.balance || J.mur || J.plane);   // au b
 const SUITE_DANSE = (R_.touchesDanse.join(' ') + ' ').repeat(3);
 let suite = '';   // les dernières touches tapées
 function danser() {
-  if (J.voiture || J.robot || J.nage || J.mort || J.superman || accroche()) return;   // on ne danse qu'à pied
+  if (J.voiture || J.robot || J.nage || J.mort || J.superman || J.monorail || accroche()) return;   // on ne danse qu'à pied
   for (const k in touches) touches[k] = false;  // la dernière touche est encore enfoncée : on l'oublie, sinon elle arrêterait la danse
   J.danse = 0.001; J.angleDanse = J.lacet + Math.PI / 2; J.vue = 3; J.accroupi = false;
   annonce('', tr('Moonwalk !'), 2);
@@ -11251,7 +12161,7 @@ function prendreNavette({ vers }) {
 }
 // la remontée dont B.J. est au départ (à pied, ou sur ses skis, son snowboard ou sa luge), ou null
 function telesiegeProche() {
-  if (J.telesiege || J.robot || (J.voiture && !J.voiture.type.glisse)) return null;
+  if (J.telesiege || J.monorail || J.robot || (J.voiture && !J.voiture.type.glisse)) return null;
   return TELESIEGES.find(l => Math.hypot(J.x - l.bas.x - l.droite.x * ROUE, J.z - l.bas.z - l.droite.z * ROUE) < 3.5 && Math.abs(J.y - l.bas.y) < 2) || null;
 }
 // l'horaire d'une remontée : où en est un siège le long de sa boucle (en mètres : la montée, le tour de la roue du haut, la descente,
@@ -11372,6 +12282,9 @@ function action() {
     if (v) Object.assign(v, { x: J.x, z: J.z, y: J.y, vy: 0, tangage: 0, vol: true, decollage: { x: J.x, z: J.z, t: temps } });   // (ses skis reviennent sous lui)
     return true;
   }
+  if (J.monorail) { descendreMonorail(); return true; }   // dans le monorail : il descend (à une gare)
+  const mono = monorailProche();
+  if (mono) { monterMonorail(mono); return true; }   // sur le quai d'une gare du monorail, quand le train y attend
   const tl = telesiegeProche(), siege = tl && siegeLibre(tl);   // il s'assoit sur le siège libre le plus proche (s'il y en a un dans la gare)
   if (siege) { J.telesiege = siege; J.danse = 0; J.accroupi = false; if (J.voiture) Object.assign(J.voiture, { tour: 0, derape: 0, pas: 0, transition: 0 }); bip(500, 750, 0.3, 'sine', 0.15); return true; }
   if (tl) return true;
@@ -12223,7 +13136,7 @@ function superman(dt) {
 const elanJ = () => { const e = J.lance || J.plane || J.balance; return e ? { vx: e.vx, vz: e.vz } : { vx: J.pasX || 0, vz: J.pasZ || 0 }; };   // sa vitesse à l'horizontale
 function accrocher(a = ARMES.find(x => x[pouvoir('grappin') ? 'grappin' : 'toile']), souris = false) {
   const grappin = !!a.grappin;
-  if (!pouvoir(grappin ? 'grappin' : 'toile') || J.voiture || J.robot || J.mort || J.telesiege || J.grappin || J.balance || J.prise) return;
+  if (!pouvoir(grappin ? 'grappin' : 'toile') || J.voiture || J.robot || J.mort || J.telesiege || J.monorail || J.grappin || J.balance || J.prise) return;
   const epaule = new THREE.Vector3(J.x, J.y + 1.5, J.z), main = J.vue === 1 ? positionTir().clone() : epaule;
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
   raycaster.near = J.vue === 3 ? camera.position.distanceTo(epaule) : 0; raycaster.far = raycaster.near + a.portee;
@@ -13731,7 +14644,7 @@ function apparaitrePersonne(type, tenue) {
   const [bi, bj] = blocEn(J.x, J.z);
   for (let essai = 0; essai < 20; essai++) {
     const i = bi + Math.floor(entre(-2, 3)), j = bj + Math.floor(entre(-2, 3));
-    if (!typeBloc(i, j) || (type !== 'flic' && '%?v)'.includes(car(i, j)))) continue;   // (personne ne se promène autour du camp militaire, du bunker secret, des villas de B.J. ni dans le camp de la grotte des Dix Anneaux)
+    if (!typeBloc(i, j) || (type !== 'flic' && '%?v){['.includes(car(i, j)))) continue;   // (personne ne se promène autour du camp militaire, du bunker secret, des villas de B.J., ni dans le camp de la grotte des Dix Anneaux, ni autour du manoir Wayne ou de l'asile d'Arkham)
     const p = coin(i, j, Math.floor(Math.random() * 4)), d = dist(p, J);
     if (d < 45 || d > 170 || (type === 'pieton' && derriere(p)) || (d < 110 && voit(p, J))) continue;
     return creerPersonne(type, p.x, p.z, tenue);
@@ -13763,9 +14676,11 @@ function peupler(dt) {
   // autant que choisi dans le menu (FOULES). Il en apparaît jusqu'à un huitième à la fois : en voiture, la ville se remplit devant B.J.
   // aussi vite qu'elle se vide derrière lui (mais pas tout d'un coup, ce qui ferait sauter l'image)
   const pietons = personnes.filter(p => p.type === 'pieton').length, civiles = voitures.filter(v => v.conducteur === 'civil').length;
-  // (la nuit, il y en a moins : REGLAGES.pietonsNuit et voituresNuit)
+  // (la nuit, il y en a moins : REGLAGES.pietonsNuit et voituresNuit ; mais pas dans une ville où il fait toujours nuit, comme Gotham :
+  // CHAPITRES, heure. Elle ne se vide pas, puisque le jour ne revient jamais)
   // (pendant la course de la mission « Whiplash », les rues sont fermées : aucune voiture)
-  const voulus = Math.round(FOULES[foule.pietons].pietons * lerp(1, R_.pietonsNuit, lumiere.nuit)), voulues = course ? 0 : Math.round(FOULES[foule.voitures].voitures * lerp(1, R_.voituresNuit, lumiere.nuit));
+  const nuit = CHAPITRE.heure == null ? lumiere.nuit : 0;
+  const voulus = Math.round(FOULES[foule.pietons].pietons * lerp(1, R_.pietonsNuit, nuit)), voulues = course ? 0 : Math.round(FOULES[foule.voitures].voitures * lerp(1, R_.voituresNuit, nuit));
   if (PISTES_SKI.length && voitures.filter(v => v.ski).length < R_.skieurs) creerSkieur();   // les autres skieurs : un de plus à la fois, sur une piste au hasard
   TELESIEGES.forEach(garnir);   // les skis, les snowboards et les luges pris aux gares reviennent
   for (let k = pietons; k < Math.min(voulus, pietons + Math.ceil(voulus / 8)); k++) apparaitrePersonne('pieton');
@@ -13946,7 +14861,7 @@ function amenerVoiture(nom) {
 // (La touche T fait pareil avec la DeLorean, dans un chapitre fini : voir appuyerT)
 function rappelerVoiture(nom = TRICHES.find(t => t.actif && t.voiture)?.voiture) {
   const type = typeNomme(nom);
-  if (!type || J.mort || J.telesiege || J.voiture?.triche === nom) return;   // (il est déjà dedans)
+  if (!type || J.mort || J.telesiege || J.monorail || J.voiture?.triche === nom) return;   // (il est déjà dedans)
   if (J.voiture || J.robot) { annonce('', tr("Descends d'abord !"), 1.5); return; }
   if (amenerVoiture(nom)) annonce('', tr('{voiture} : à côté de toi !', { voiture: tr(nom) }), 1.5);
   else { annonce('', tr('{voiture} : pas de place ici !', { voiture: tr(nom) }), 1.5); bip(300, 200, 0.1, 'square', 0.1); }
@@ -16195,14 +17110,20 @@ const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital
   U: ['#8a6a2a', 'U', 'Musée d\'art'], V: ['#b8901a', 'V', 'Bijouterie Vangelico'], Q: ['#1a5a3a', 'Q', 'Banque Pacific Standard'],
   '%': ['#4a5a2a', '★', 'Camp militaire'], '?': ['#3a3a44', '?', 'Bunker secret'], v: ['#d89a18', '⌂', 'Ta villa (pour dormir)'],
   '<': ['#b8141c', '⌂', 'Villa de Tony Stark'], '|': ['#2a5ab8', 'T', 'Tour Stark'], '$': ['#6a6e76', '⚙', 'Stark Industries'],
-  '(': ['#1a8aa8', '◉', 'Stark Expo'], '>': ['#b8860b', '◎', 'Repaire du Mandarin'], ')': ['#6a4a2a', '∩', 'Grotte des Dix Anneaux'] };
+  '(': ['#1a8aa8', '◉', 'Stark Expo'], '>': ['#b8860b', '◎', 'Repaire du Mandarin'], ')': ['#6a4a2a', '∩', 'Grotte des Dix Anneaux'],
+  '{': ['#6a5a3a', '⌂', 'Manoir Wayne'], '/': ['#1a2e5a', 'W', 'Tour Wayne'], '£': ['#1a7a3a', '$', 'Banque de Gotham'], 'é': ['#4a3a62', '†', 'Cathédrale'],
+  '[': ['#6a2a6a', 'A', "Asile d'Arkham"], ']': ['#2a8a2a', '⚗', 'Ace Chemicals'], '}': ['#3a7a2a', 'Z', 'Zoo de Gotham'], '°': ['#2a5a8a', '◯', 'Stade'],
+  '§': ['#1f9a3a', '?', 'Repaire du Sphinx'] };
+if (BATSIGNAL) ICONES.C = ['#1a3a9a', 'P', 'Commissariat (Bat-signal)'];   // à Gotham, le Bat-signal est sur son toit
 // les ronds de la légende de la grande carte : seulement ce qu'il y a dans la ville du chapitre
 const LEGENDE = [...Object.entries(ICONES).filter(([c]) => lieux[c]).map(([, v]) => v),
-  ...CASCADES.length ? [['#d8501a', 'C', 'Piste de cascades']] : [], ...arrets.length ? [['#0a9a9a', 'N', 'Navette des pistes']] : []];
+  ...CASCADES.length ? [['#d8501a', 'C', 'Piste de cascades']] : [], ...arrets.length ? [['#0a9a9a', 'N', 'Navette des pistes']] : [],
+  ...monorail ? [['#8a1a1a', 'M', 'Gare du monorail']] : []];
 const REPERES = [];   // [lieu, couleur, lettre, nom]
 for (const [c, [fond, lettre, nom]] of Object.entries(ICONES)) for (const p of lieux[c] || []) REPERES.push([p, fond, lettre, nom]);
 for (const c of CASCADES) REPERES.push([c.depart, '#d8501a', 'C', c.nom]);   // le départ des pistes de cascades
 for (const q of arrets) REPERES.push([q, '#0a9a9a', 'N', 'Navette des pistes']);   // les arrêts du bus « SKI SHUTTLE »
+for (const g of monorail?.gares || []) REPERES.push([g, '#8a1a1a', 'M', g.nom]);   // les gares du monorail (à Gotham), avec leur nom
 const COULEUR_MER = '#3f79a3';
 // le terrain vu du ciel, un point par point de la grille, éclairé depuis le nord-ouest
 const terrainImg = document.createElement('canvas');
@@ -16230,7 +17151,7 @@ function dessinerPlan(g) {
   for (const l of TELESIEGES) { g.moveTo(l.bas.x, l.bas.z); g.lineTo(l.haut.x, l.haut.z); }
   g.stroke(); g.setLineDash([]);
   const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', v: '#4d6b44', F: '#5a7040', R: '#8a7a5a', '%': '#5a5a44', '?': '#4a4a52',
-    '<': '#4d6b44', '(': '#3f6b3a', '>': '#4d6b44', ')': '#7a6a52' };
+    '<': '#4d6b44', '(': '#3f6b3a', '>': '#4d6b44', ')': '#7a6a52', '{': '#4d6b44', '}': '#3f6b3a', '°': '#3a6a3a', '[': '#4a4a52', ']': '#4a5244' };
   for (const [c, o] of PLAN.pates) { g.fillStyle = couleurs[c] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
   g.globalAlpha = 0.65; for (const gang of GANGS) { const o = origine(gang.col, gang.ligne); g.fillStyle = gang.couleur; g.fillRect(o.x - R / 2, o.z - R / 2, S + R, S + R); } g.globalAlpha = 1;   // le quartier des gangs
   g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
@@ -16459,7 +17380,7 @@ function dessinerCasque(dt) {
       c.beginPath(); c.roundRect(x, y, l, h, k === 'casque' ? 9 : 4);
       c.globalAlpha = 0.35; c.fillStyle = col; c.fill(); c.globalAlpha = 1; c.strokeStyle = col; c.lineWidth = 1.5; c.stroke();
     }
-    c.font = police(11); c.textAlign = 'center'; c.fillStyle = 'rgba(127, 228, 255, .7)'; c.fillText(tr('G'), 98, 120); c.fillText(tr('D'), 152, 120);
+    c.font = police(11); c.textAlign = 'center'; c.fillStyle = 'rgba(127, 228, 255, .7)'; c.fillText(tr('G (gauche)'), 98, 120); c.fillText(tr('D (droite)'), 152, 120);
     c.fillStyle = 'rgba(127, 228, 255, .4)'; c.fillRect(12, 166, W - 24, 1);
     // en dessous, les 6 parties, l'une sous l'autre (le casque, le torse, les bras, les jambes) : leur nom, leur jauge et leur %
     c.font = police(12);
@@ -16518,7 +17439,9 @@ function majHUD(dt) {
   const perce = braquages.find(B => B.perceuse > 0 && !B.ouvert && dist(B.porte, J) < 40), ech = aPied && !J.echelle && echelles.find(e => dist(e, J) < 1.5 && Math.abs(J.y - e.bas) < 1);
   const tl = telesiegeProche(), nav = aPied && navetteProche(), lit = aPied && litProche(), autreLit = aPied && autreLitProche();
   const bouton = boutonProche() && !camp.ouvert && (aPied || ar), secours = aPied && !porte && attendProche();
-  const aide = J.telesiege ? tr(J.telesiege.l.cabines ? 'Appuie sur <b>E</b> pour sauter de la cabine' : 'Appuie sur <b>E</b> pour sauter du télésiège')
+  const mono = aPied && monorailProche();
+  const aide = J.monorail ? aideMonorail() : mono ? tr('Appuie sur <b>E</b> pour monter dans le monorail')
+    : J.telesiege ? tr(J.telesiege.l.cabines ? 'Appuie sur <b>E</b> pour sauter de la cabine' : 'Appuie sur <b>E</b> pour sauter du télésiège')
     : secours?.type === 'ami' ? tr(armureIronman() ? 'Appuie sur <b>E</b> pour prendre {ami} dans tes bras' : 'Mets ton armure (<b>H</b>) pour porter {ami}', { ami: nomAmi() })   // {ami}, à emmener ou à repêcher
     : secours ? tr(armureIronman() ? 'Appuie sur <b>E</b> pour le prendre dans tes bras' : 'Mets ton armure (<b>H</b>) pour le porter')   // la tour en feu (mission « Le pompier volant »)
     : tl ? tr(tl.cabines ? 'Appuie sur <b>E</b> pour prendre la télécabine' : 'Appuie sur <b>E</b> pour prendre le télésiège')
@@ -16543,6 +17466,7 @@ function majHUD(dt) {
     : J.balance ? tr(J.balance.souris ? "Lâche le bouton pour lâcher la toile · Z Q S D : prendre de l'élan" : "Lâche <b>G</b> pour lâcher la toile · Z Q S D : prendre de l'élan")
     : J.prise ? tr(J.prise.souris ? 'Lâche le bouton pour lancer la voiture là où tu regardes' : 'Lâche <b>G</b> pour lancer la voiture là où tu regardes') : J.grappin ? tr('<b>Espace</b> : lâcher le grappin')
     : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape')
+    : !J.sol && !J.nage && !J.superman && !J.voiture && J.vy < -6 && sansGadgets() ? tr('Pas de cape en civil : <b>H</b>, ton costume, et tu planes !')
     : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping')   // en volant : les figures
     : ironmanLibre() ? aideIronman() : '';   // dans l'armure d'Iron Man
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
@@ -16735,6 +17659,116 @@ function majPhares() {
     if (o.faisceau) o.faisceau.visible = voir;
   }
 }
+// --- le ciel couvert, la pluie (CHAPITRES : pluie, brouillard ; à Gotham) ---
+// Sous la pluie ou dans le brouillard, le ciel est couvert : pas de ciel de Three.js, ni lune, ni étoiles, mais un fond de la couleur du
+// brouillard (ce qui est loin s'y fond, sans qu'on voie où l'on arrête de le dessiner), des nuages bas, éclairés par-dessous par les lumières
+// de la ville, et la lumière grise et douce d'une nuit en ville. brume : la couleur du brouillard la nuit (brumeJour : le jour) ; nuit : celle
+// de la lumière qui tombe des nuages ; ciel, sol : celles de la lumière d'ambiance (d'en haut, d'en bas)
+const C_COUVERT = { brume: new THREE.Color('#2b2632'), brumeJour: new THREE.Color('#8e939c'), nuit: new THREE.Color('#9d94b0'), ciel: new THREE.Color('#857b94'), sol: new THREE.Color('#2e2722') };
+// les nuages : une grande nappe au-dessus de la caméra, faite de taches claires et sombres qui se raccordent d'un bord à l'autre ; elle se fond
+// dans le fond du ciel au loin (fondu : de plus en plus transparente vers son bord), et dérive doucement
+const nuages = COUVERT ? (() => {
+  const t = toile(256, 256, (g, l, h) => {
+    g.fillStyle = '#9a9a9a'; g.fillRect(0, 0, l, h);
+    for (let k = 0; k < 160; k++) {
+      const x = Math.random() * l, y = Math.random() * h, r = entre(12, 55), v = entre(-1, 1);
+      for (const dx of [-l, 0, l]) for (const dy of [-h, 0, h]) {
+        const d = g.createRadialGradient(x + dx, y + dy, 0, x + dx, y + dy, r);
+        d.addColorStop(0, v > 0 ? `rgba(255,250,255,${0.45 * v})` : `rgba(10,8,14,${-0.5 * v})`); d.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = d; g.fillRect(x + dx - r, y + dy - r, 2 * r, 2 * r);
+      }
+    }
+  });
+  t.repeat.set(9, 9);
+  const fondu = toile(128, 128, (g, l, h) => { const d = g.createRadialGradient(64, 64, 0, 64, 64, 64); d.addColorStop(0, '#fff'); d.addColorStop(0.5, '#fff'); d.addColorStop(1, '#000'); g.fillStyle = d; g.fillRect(0, 0, l, h); });
+  Object.assign(fondu, { colorSpace: THREE.NoColorSpace, wrapS: THREE.ClampToEdgeWrapping, wrapT: THREE.ClampToEdgeWrapping });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(3600, 3600).rotateX(Math.PI / 2),
+    new THREE.MeshBasicMaterial({ map: t, alphaMap: fondu, transparent: true, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide }));
+  m.renderOrder = -1; m.frustumCulled = false; scene.add(m);
+  return m;
+})() : null;
+// la pluie : des gouttes tout autour de la caméra, dans une boîte de 60 × 60 m sur 45 m de haut, un trait chacune (2 600 pour pluie: 1).
+// Elles restent à leur place dans le monde (on passe à travers en avançant) ; celle qui sort de la boîte revient de l'autre côté.
+// Pas dans une maison. vitesse, vent : en m/s
+const pluie = PLUIE ? (() => {
+  const n = Math.round(2600 * Math.min(PLUIE, 3)), G = new Float32Array(n * 3), pos = new Float32Array(n * 6);
+  for (let k = 0; k < n; k++) G.set([entre(-30, 30), entre(-15, 30), entre(-30, 30)], k * 3);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage));
+  const l = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: '#8e98a6', transparent: true, opacity: 0.5, depthWrite: false, toneMapped: false }));
+  l.frustumCulled = false; scene.add(l);
+  return { l, n, G, pos, vitesse: 24, vent: 3 };
+})() : null;
+const auSec = () => !!interieurDe(J) || sousTerre() || !!J.monorail;   // à l'abri de la pluie : dans une maison, sous la terre, ou dans le monorail
+function majPluie(dt) {
+  if (nuages) {
+    nuages.position.set(camera.position.x, Math.max(HAUT_NUAGES, camera.position.y + 60), camera.position.z);   // (on ne passe jamais au-dessus)
+    nuages.material.map.offset.x += dt * 0.0012;   // ils dérivent avec le vent
+    nuages.material.color.copy(scene.fog.color).multiplyScalar(2.2);
+  }
+  if (!pluie) return;
+  const p = pluie, c = camera.position, B = 30, H0 = -15, H = 45, G = p.G, pos = p.pos, ox = p.vent / p.vitesse * 0.9;
+  p.l.visible = !auSec();
+  p.l.position.copy(c);
+  const ramener = (v, a) => ((v - a) % (2 * B) + 2 * B) % (2 * B) - B;   // (dans la boîte, autour de la caméra)
+  for (let k = 0; k < p.n; k++) {
+    const i = k * 3;
+    let x = G[i] + p.vent * dt, y = G[i + 1] - p.vitesse * dt, z = G[i + 2];
+    if (y < c.y + H0) y += H; else if (y > c.y + H0 + H) y -= H;
+    const rx = ramener(x, c.x), rz = ramener(z, c.z); x = c.x + rx; z = c.z + rz;
+    G[i] = x; G[i + 1] = y; G[i + 2] = z;
+    pos[k * 6] = rx; pos[k * 6 + 1] = y - c.y; pos[k * 6 + 2] = rz;   // le haut du trait...
+    pos[k * 6 + 3] = rx + ox; pos[k * 6 + 4] = y - c.y - 0.9; pos[k * 6 + 5] = rz;   // ...et le bas, dans le sens où tombe la goutte
+  }
+  p.l.geometry.attributes.position.needsUpdate = true;
+}
+// Le ciel couvert, à chaque image (h : la hauteur du soleil, en degrés) : le fond du ciel et le brouillard, d'une même couleur ; la lumière
+// grise qui tombe des nuages la nuit (pas de lune) ; la lumière d'ambiance
+function couvrirCiel(h) {
+  ciel.visible = cielEtoile.visible = lune.visible = false;
+  scene.fog.color.copy(C_COUVERT.brume).lerp(C_COUVERT.brumeJour, lumiere.jour);
+  scene.background = scene.fog.color;
+  if (h <= -0.5) { soleil.color.copy(C_COUVERT.nuit); soleil.intensity = 0.9 * doux(h, -1, -8); }
+  ambiance.color.copy(C_COUVERT.ciel).lerp(C.cielJour, lumiere.jour); ambiance.groundColor.copy(C_COUVERT.sol).lerp(C.solJour, lumiere.jour);
+  ambiance.intensity = lerp(1.1, 0.35, lumiere.jour);
+}
+// --- le Bat-signal (VILLES : BATSIGNAL ; à Gotham) ---
+// Sur le toit du commissariat, un grand projecteur (projecteurBat, construit avec le pâté C). À chaque appel de la police, il s'allume : son
+// verre brille, un faisceau monte jusqu'aux nuages, et la chauve-souris s'y dessine, au milieu d'un grand ovale de lumière. On le voit de
+// partout, même dans le brouillard (fog: false). Il s'éteint quand l'appel est fini
+const batSignal = projecteurBat ? (() => {
+  const P = projecteurBat, c = P.cible, lumineux = (map, o = {}) => new THREE.MeshBasicMaterial({ map, color: '#000', transparent: true, depthWrite: false, fog: false, toneMapped: false,
+    blending: THREE.AdditiveBlending, side: THREE.DoubleSide, ...o });
+  // la chauve-souris sur les nuages : un ovale de lumière qui s'efface sur ses bords, et la chauve-souris noire au milieu (l'additif n'y ajoute rien)
+  const tEmbleme = toile(128, 128, (g, l, h) => {   // (dessiné rond, et posé sur un ovale deux fois plus large que haut)
+    const d = g.createRadialGradient(64, 64, 8, 64, 64, 64); d.addColorStop(0, '#fff'); d.addColorStop(0.78, '#fff'); d.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = d; g.fillRect(0, 0, l, h);
+    g.fillStyle = '#000'; g.beginPath(); for (const [x, y] of CONTOUR_BATARANG) g.lineTo(64 + x * 50, 64 - y * 100); g.fill();
+  });
+  const embleme = new THREE.Mesh(new THREE.PlaneGeometry(160, 80).rotateX(Math.PI / 2), lumineux(tEmbleme));
+  embleme.position.set(c.x, HAUT_NUAGES - 3, c.z); embleme.renderOrder = 1; embleme.frustumCulled = false;
+  // le faisceau : un cône ouvert, du verre du projecteur jusqu'à l'ovale, plus clair en bas
+  const tFaisceau = toile(4, 128, (g, l, h) => { const d = g.createLinearGradient(0, 0, 0, h); d.addColorStop(0, 'rgba(255,255,255,.05)'); d.addColorStop(1, 'rgba(255,255,255,.7)'); g.fillStyle = d; g.fillRect(0, 0, l, h); });
+  const long = Math.hypot(c.x - P.x, HAUT_NUAGES - 3 - P.y, c.z - P.z);
+  const faisceau = new THREE.Mesh(new THREE.CylinderGeometry(52, 0.7, long, 24, 1, true).translate(0, long / 2, 0), lumineux(tFaisceau));
+  faisceau.position.set(P.x, P.y, P.z); faisceau.quaternion.setFromUnitVectors(V3(0, 1, 0), V3(c.x - P.x, HAUT_NUAGES - 3 - P.y, c.z - P.z).normalize());
+  faisceau.frustumCulled = false; faisceau.renderOrder = 1;
+  // le verre du projecteur : un disque qui s'allume
+  const verre = new THREE.Mesh(new THREE.CircleGeometry(0.72, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#202020', toneMapped: false }));
+  verre.position.set(P.x, P.y, P.z); verre.quaternion.copy(P.q);
+  scene.add(embleme, faisceau, verre);
+  return { embleme, faisceau, verre, force: 0 };
+})() : null;
+const COULEUR_BATSIGNAL = new THREE.Color('#fff2c0');
+function majBatSignal(dt) {
+  const B = batSignal;
+  if (!B) return;
+  B.force += ((appel ? 1 : 0) - B.force) * Math.min(1, dt * 1.5);   // il s'allume (et s'éteint) en une seconde environ
+  const f = B.force * (0.94 + 0.06 * Math.sin(temps * 9) * Math.sin(temps * 2.3));   // (sa lumière tremble un peu)
+  B.embleme.visible = B.faisceau.visible = f > 0.01;
+  B.embleme.material.color.copy(COULEUR_BATSIGNAL).multiplyScalar(0.9 * f);
+  B.faisceau.material.color.copy(COULEUR_BATSIGNAL).multiplyScalar(0.14 * f);
+  B.verre.material.color.setScalar(0.12).lerp(COULEUR_BATSIGNAL, f);
+}
 // à chaque image : le soleil, la lune, le ciel, la brume, les lumières et les fenêtres
 function majCiel(dt) {
   const { a } = ouEnEst(), u = ciel.material.uniforms;
@@ -16769,11 +17803,13 @@ function majCiel(dt) {
   lune.position.copy(camera.position).addScaledVector(soleilDir, -380);
   lune.material.color.setScalar(lumiere.nuit * doux(-soleilDir.y, -0.05, 0.02));   // (sous l'horizon, on ne la voit pas)
   // ce qui s'allume : les fenêtres, les lampadaires, les phares et les feux arrière
-  for (const m of MATS_FENETRES) m.emissiveIntensity = 1.1 * lumiere.nuit;
+  for (const m of MATS_FENETRES) m.emissiveIntensity = 1.1 * lumiere.nuit * (m.userData.eclat ?? 1);
   MAT_LAMPE.emissiveIntensity = 0.4 + 6 * lumiere.nuit;
   M_HALO.color.copy(C.halo).multiplyScalar(lumiere.nuit);
   M_PHARE.emissiveIntensity = 1.5 + 4 * lumiere.nuit; M_FEU.emissiveIntensity = 1 + 2 * lumiere.nuit;
   majLumieresNuit(dt); majPhares();
+  if (COUVERT) couvrirCiel(h);   // sous la pluie, ou dans le brouillard : le ciel couvert (à Gotham)
+  majPluie(dt); majBatSignal(dt);
 }
 // dormir dans une villa de B.J. : on passe au début du moment suivant de la journée, avec toute sa vie
 let sommeil = null;   // { t : depuis combien de secondes il dort (à l'horloge), fait : le moment suivant est arrivé }
@@ -16806,12 +17842,12 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   if (CHAPITRE.sansReproche) { pardonner(dt); majAppel(dt); }
   if ((tSauve -= dt) <= 0) { tSauve = 2; sauverPartie(); }
   if (J.mort || J.voiture || J.robot) { J.danse = 0; J.echelle = null; J.superman = null; }   // on ne danse, ne grimpe et ne vole qu'à pied
-  if (J.mort || J.voiture || J.robot || J.telesiege) J.grappin = J.balance = J.mur = J.plane = J.lance = null;   // ni grappin, ni toile, ni mur, ni cape
-  if (J.biceps && (J.mort || J.voiture || J.robot || J.telesiege || J.superman || J.roule || J.echelle || accroche())) finirBiceps();   // et on ne montre son biceps que debout
+  if (J.mort || J.voiture || J.robot || J.telesiege || J.monorail) J.grappin = J.balance = J.mur = J.plane = J.lance = null;   // ni grappin, ni toile, ni mur, ni cape
+  if (J.biceps && (J.mort || J.voiture || J.robot || J.telesiege || J.monorail || J.superman || J.roule || J.echelle || accroche())) finirBiceps();   // et on ne montre son biceps que debout
   cable.visible = crochetCable.visible = false;   // le câble du grappin, la toile : ce qui s'en sert le retend à chaque image
   if (joueurH.arme?.userData.crochet) joueurH.arme.userData.crochet.visible = !J.grappin;   // le crochet revient au bout du pistolet à grappin
   if (J.mort) {
-    J.mort += dt; J.telesiege = null;
+    J.mort += dt; J.telesiege = null; if (J.monorail) { J.vue = J.monorail.vue; J.monorail = null; }
     if (!J.roule?.chute || J.roule.fin !== undefined) J.roule = null;
     const k = Math.min(1, J.mort * 1.25);
     if (J.roule) rouler(dt);   // tué en tombant d'une voiture lancée : il finit de rouler par terre, et y reste couché (voir chuter)
@@ -16825,7 +17861,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
     if (J.mort > 3.5) reapparaitre();
   }
   else if (!sommeil && !voyage) { // (quand il dort, ou que la DeLorean vient de disparaître avec lui, il ne bouge plus)
-    if (J.telesiege) { monterTelesiege(dt); J.danse = 0; } else if (J.voiture) conduire(J.voiture, dt); else if (J.robot) piloterRobot(J.robot, dt); else majJoueur(dt);
+    if (J.telesiege) { monterTelesiege(dt); J.danse = 0; } else if (J.voiture) conduire(J.voiture, dt); else if (J.robot) piloterRobot(J.robot, dt); else if (J.monorail) J.danse = 0; else majJoueur(dt);   // (dans le monorail : voir majMonorail)
     J.cooldown -= dt; J.frappe = Math.max(0, J.frappe - dt * 3.3); J.recul = Math.max(0, J.recul - dt * 8);
     if (J.robot) { // dans le heavy robot : clic gauche = la mitrailleuse, clic droit = les roquettes
       const r = J.robot; for (const k in r.cdJ) r.cdJ[k] -= dt;
@@ -16834,12 +17870,14 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
         if (sourisG && r.cdJ.lourde <= 0) tirer(ARMES_ROBOT.lourde);
         if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
       }
-    } else if (sourisG && !J.voiture && !J.telesiege && !J.nage && !J.roule && !J.ironman?.anim && !(J.superman && (ARMES[J.arme].corps || J.superman.looping)) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
+    } else if (sourisG && !J.voiture && !J.telesiege && !J.monorail && !J.nage && !J.roule && !J.ironman?.anim && !(J.superman && (ARMES[J.arme].corps || J.superman.looping)) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(R_.viesJoueur, J.vie + R_.regeneration * dt);
   }
   tenirPrise(dt);   // la voiture que Spiderman fait tourner au bout de sa toile
   majFete(dt);      // la grande roue et les montagnes russes de la jetée (Malibu)
+  majMonorail(dt);  // le monorail de Gotham (et B.J., s'il est dedans)
   majIronman(dt);   // l'armure d'Iron Man : son masque, ses répulseurs, son plastron, ses réacteurs
+  majChauvesSouris(dt);   // Batman qui met son costume (ou qui l'enlève) : la nuée de chauves-souris
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
   auraBJ.material.map.offset.y -= dt * 1.5; auraBJ.material.opacity = (0.45 + Math.random() * 0.25) * (auraBJ.userData.avantInvisible ? 0.15 : 1);   // l'aura monte et tremble (on la voit à peine quand il est invisible)
   if (capeBJ.parent) majCape(dt);   // la cape de Superman flotte au vent
@@ -16912,6 +17950,10 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
     roulement.setTargetAtTime(v ? Math.min(0.07, Math.abs(v.vitesse) * 0.002) * (1 + 2.5 * Math.abs(v.derape || 0)) : 0, t, 0.1);   // (à ski, un dérapage racle la neige)
     crissement.setTargetAtTime(v && touches.Space && !v.type.glisse && Math.abs(v.vitesse) > 6 ? 0.05 : 0, t, 0.05);
     reacteursIronman.setTargetAtTime(J.superman && armureIronman() ? 0.04 + 0.05 * Math.min(1, J.vitesse / 40) : 0, t, 0.1);   // Iron Man vole : plus fort quand il va vite
+    if (pluieSon) { // la pluie : plus doux à l'abri, ou dans une voiture
+      const pleut = Math.min(PLUIE, 2) * (auSec() ? 0.2 : J.voiture ? 0.6 : 1);
+      pluieSon.setTargetAtTime(0.022 * pleut, t, 0.3); pluieGrave.setTargetAtTime(0.03 * pleut, t, 0.3);
+    }
     let dp = Infinity; for (const v of voitures) if (v.police && v.conducteur) dp = Math.min(dp, dist(v, J));
     sireneGain.gain.value = dp < 180 ? 0.035 * (1 - dp / 180) : 0;
     sirene.frequency.value = Math.sin(temps * 5) > 0 ? 700 : 950;
@@ -16965,7 +18007,7 @@ etat('Clique pour jouer');
 // et son écran, qui attendait que le pays soit construit
 if (CHAPITRE.heure != null) fixerHeure(CHAPITRE.heure);
 cacherDeLorean();
-{ const t = TRICHES.find(t => t.code === CHAPITRE.triche); if (t && !t.actif) basculerTriche(t, false, enCivil()); }
+{ const t = tricheHeros(); if (t && !t.actif && !costumeCivil()) basculerTriche(t, false, enCivil()); }   // (Batman en civil : il le mettra avec H)
 if (ecranChapitre.visible) { ecranChapitre.texte = 'Clique pour jouer'; ecranChapitre.clic = lancerJeu; }
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
@@ -16998,6 +18040,9 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get chute() { return chute; }, get facture() { return facture; }, FETE_DES_ARMURES, tourStark,
   galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
   mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; },
+  // Gotham (chapitre 3)
+  costume, changerCostume, costumeCivil, tricheHeros, sansCostume, chauvesSouris, monorail, monorailProche, monterMonorail, descendreMonorail, majMonorail, batSignal, majBatSignal, projecteurBat,
+  pluie, nuages, majPluie, COUVERT, BROUILLARD, PLUIE, vueDetails, estGothique, manoir, tourWayne, cathedrale, arkham, aceChemicals, zoo, stade, sphinx, GOTHAM,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>

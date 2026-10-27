@@ -25,7 +25,7 @@ Dans GTAxel, tu peux :
 - [Vie, armes et police](#vie-armes-et-police)
 - [Voitures](#voitures) : dégâts, accidents, cascades
 - [Les missions du chapitre 1](#les-missions-du-chapitre-1) : braquages, camp militaire
-- [Les chapitres de super-héros](#les-chapitres-de-super-héros) : la DeLorean, Malibu
+- [Les chapitres de super-héros](#les-chapitres-de-super-héros) : la DeLorean, Malibu, Gotham
 - [Les codes de triche](#les-codes-de-triche)
 - [Modifier le jeu](#modifier-le-jeu)
 
@@ -83,6 +83,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 
 - **monter** dans une voiture, un bateau, un avion, un hélicoptère, le heavy robot, une armure, des skis, un snowboard, une luge ou des skis de rando, et **en descendre** (en marche, ou en plein accident, tu sautes et tu tombes par terre) ;
 - prendre l'**ascenseur**, le bus « SKI SHUTTLE », un **télésiège** ou la **télécabine** (et en sauter en route !) ;
+- à Gotham, monter dans le **monorail**, dans une gare, quand il attend (et en descendre à une autre gare) ;
 - **acheter** à l'armurerie, parler au **garagiste** ;
 - **voler le butin**, poser la **perceuse** ou l'**explosif** ;
 - **éjecter le pilote** du heavy robot ;
@@ -111,6 +112,7 @@ Elles changent selon ce que tu pilotes et le héros que tu es :
 | **A** et **E** | [Iron Man](#iron-man) | Tirer de la main gauche (A) ou de la main droite (E) ; dans la **Mark 50** : A, le bouclier ; E, le canon |
 | **A**, **Z**, **E** (vite) | [Iron Man](#iron-man), avec le code `IRONMAN` | L'armure arrive en volant, pièce par pièce, ou tu en sors |
 | **H** | [Iron Man](#iron-man) | Appeler ton armure, ou en sortir |
+| **H** | [Gotham](#gotham-chapitre-3) | Mettre ton costume (tu deviens Batman, ou Batgirl), même en l'air, ou repasser en civil (les pieds par terre) |
 | **J** | [Iron Man](#iron-man) | Choisir une autre de tes armures |
 | **X** | [Iron Man](#iron-man) | Le laser des bras (si tu l'as acheté) |
 | **L** | [Iron Man](#iron-man) | Lever ou baisser ton masque |
@@ -217,7 +219,7 @@ Superman n'est pas invincible : les balles lui font mal.
 
 ### Batman
 
-Le code `BATMAN` t'habille en Batman (cagoule aux oreilles pointues, cape noire), et la **Batmobile** apparaît à côté de toi.
+Le code `BATMAN` t'habille en Batman (cagoule aux oreilles pointues, cape noire), et la **Batmobile** apparaît à côté de toi. À Gotham (le chapitre 3), tu commences en civil : **H** met ton costume (voir [Gotham](#gotham-chapitre-3)).
 
 - **Le grappin** : tu l'as en main. Vise un bâtiment et clique (ou appuie sur **G**, même avec une autre arme en main) : le crochet part, et le câble te tire jusque sur le toit (**Espace** pour lâcher en route).
 - **La cape** : saute dans le vide et garde **Maj** enfoncé. Ta cape se déploie et tu planes là où tu regardes, en descendant tout doucement ; regarde vers le bas pour piquer et aller plus vite. Sans la cape, attention : tomber de haut fait mal !
@@ -358,6 +360,7 @@ Les touches sont dans [Ski, snowboard et luge](#ski-snowboard-et-luge).
 - L'heure est en haut à droite (☀ le jour, ☾ la nuit), et le jeu te prévient quand le soleil se couche.
 - La nuit est sombre et bleue, au clair de lune. À la campagne, on distingue juste les formes, les étoiles et la lune, et les phares de ta voiture s'allument tout seuls. En ville, les lampadaires et les fenêtres sont allumés.
 - La nuit, il y a moins de passants et de voitures, mais les gangs sont deux fois plus nombreux, et certains de leurs membres se promènent par deux dans les rues : ne t'approche pas d'eux une arme à la main !
+- À [Gotham](#gotham-chapitre-3), il fait toujours nuit, il pleut et il y a du brouillard. Mais la ville ne dort jamais : ses rues restent pleines de monde.
 
 ### Tes villas
 
@@ -391,6 +394,9 @@ Quelques signes de la mini-carte :
 | ? | Le bunker secret |
 | Point rouge | Un appel de la police (dans les chapitres de super-héros) |
 | ⚙ | L'usine Stark Industries (à Malibu) |
+| ⌂ W $ † A ⚗ Z ◯ | À Gotham : le manoir Wayne, la tour Wayne, la banque de Gotham, la cathédrale, l'asile d'Arkham, Ace Chemicals, le zoo, le stade |
+| ? vert | Le repaire du Sphinx (à Gotham) : la DeLorean y est cachée |
+| M rouge | Une gare du monorail (à Gotham) |
 
 ## Vie, armes et police
 
@@ -551,14 +557,14 @@ Le jeu se joue en chapitres, un par héros :
 |---|---|---|---|
 | 1 | Los Santos | B.J. (les 11 missions) | Jess |
 | 2 | Malibu | **Tony Stark**, alias **Iron Man** | Pepper Potts |
-| 3 | Gotham, où il fait toujours nuit | **Bruce Wayne**, alias **Batman** | Barbara Gordon |
+| 3 | Gotham, où il fait toujours nuit, sous la pluie | **Bruce Wayne**, alias **Batman** | **Barbara Gordon**, alias **Batgirl** |
 | 4 | Metropolis | **Clark Kent**, alias **Superman** | Kara Danvers |
 | 5 | New York | **Peter Parker**, alias **Spiderman** | Gwen Stacy |
 
 - Malibu a ses 12 missions d'Iron Man, avant celle de la DeLorean. Les autres chapitres n'ont pour l'instant qu'une mission (retrouver la DeLorean) : les vraies arrivent bientôt !
-- Gotham, Metropolis et New York se passent encore à Los Santos ; Malibu a déjà sa ville.
+- Metropolis et New York se passent encore à Los Santos ; Malibu et Gotham ont déjà leur ville.
 - Chaque chapitre commence par le logo de son héros (« CHAPITRE 2 »), qui s'en va à sa façon, et par des bulles d'aide qui t'apprennent ses pouvoirs.
-- Dans les chapitres 2 à 5, le code de triche de ton super-héros est toujours allumé, et ceux des autres super-héros ne marchent pas.
+- Dans les chapitres 2 à 5, le code de triche de ton super-héros est toujours allumé (à Gotham, quand tu es en costume), et ceux des autres super-héros ne marchent pas.
 - Tu gardes ton argent d'un chapitre à l'autre, mais pas tes armes : chaque chapitre garde les siennes, et tu les retrouves en y revenant (ses missions recommencent).
 
 ### La DeLorean
@@ -603,6 +609,29 @@ La côte de Los Angeles. Tu commences devant la **villa de Tony Stark**, au bout
 12. **L'armée d'Ultron** : abats l'armée d'**Ultron** avec War Machine, puis Ultron lui-même, qui t'attend en haut de la tour Stark.
 13. **Le repaire du Mandarin** : le Mandarin a caché la DeLorean dans son repaire, gardée par ses soldats Extremis. Va la reprendre !
 
+### Gotham (chapitre 3)
+
+La ville de Batman. Il y fait **toujours nuit**, il **pleut** et il y a du **brouillard** : au loin, tout disparaît dans la brume, les rues mouillées brillent sous les lampadaires, et des milliers de fenêtres sont allumées. Tu commences devant le **manoir Wayne**, sur sa colline, à l'ouest de la rivière.
+
+**À voir** :
+
+- le **vieux Gotham**, au centre : de vieux immeubles et de vieux gratte-ciel de pierre noire, aux fenêtres pointues, avec des toits pointus, des gargouilles et des statues ;
+- la **cathédrale**, au milieu du vieux Gotham : ses vitraux qui brillent, sa rosace, et son clocher (grimpe au grappin sur sa plateforme, à 57 m !) ;
+- la **tour Wayne**, la plus haute de la ville (174 m), avec WAYNE en lettres d'or ; un ascenseur monte du hall jusqu'au toit ;
+- les tours de verre de **Midtown**, la **banque de Gotham**, et **Robinson Park** avec son **zoo** (et ses pingouins) ;
+- le **commissariat** (GCPD), avec le **Bat-signal** sur son toit ;
+- le **canal**, qui coupe la ville en deux, l'**autoroute**, le **stade**, le **port** et l'usine **Ace Chemicals** et ses cuves vertes ;
+- l'**asile d'Arkham**, sur son île, au bout d'un pont ;
+- le **repaire du Sphinx** (un grand ? vert sur son toit) : la DeLorean y est cachée.
+
+**En civil, puis en costume** : tu es **Bruce Wayne**, en costume sombre et cravate rouge (ou **Barbara Gordon**, veste verte, lunettes et cheveux roux). Appuie sur **H** : des chauves-souris tourbillonnent autour de toi, et tu deviens **Batman** (ou **Batgirl**, ses longs cheveux roux qui sortent de la cagoule) ! Tu peux le mettre n'importe où, même en tombant d'un toit (et hop, tu planes !) ; **H** encore : tu repasses en civil, mais seulement les pieds par terre. En civil, pas de gadgets : ni grappin, ni batarangs, ni cape, et **B** n'appelle pas la Batmobile (mais si elle est déjà là, tu peux la conduire).
+
+**Le monorail** : un train qui roule en hauteur au-dessus des rues, des Narrows à la tour Wayne, en passant par le vieux Gotham. Prends l'ascenseur jusqu'au quai d'une gare (M rouge sur la carte), attends le train, et appuie sur **E** pour monter. Tu regardes la ville par la fenêtre, et **E** à la gare suivante pour descendre.
+
+**Le Bat-signal** : quand la police t'appelle (des voyous braquent un magasin), un grand faisceau monte du toit du commissariat, et la chauve-souris se dessine sur les nuages.
+
+Les missions de Batman arrivent bientôt !
+
 ### Un héros sans reproche
 
 - Dans les chapitres de super-héros, la police est de ton côté (jamais d'étoiles), et les conducteurs te prêtent leur voiture.
@@ -619,6 +648,7 @@ La côte de Los Angeles. Tu commences devant la **villa de Tony Stark**, au bout
 - Tu as 2 min 30 pour arriver, sinon ils s'enfuient avec la caisse (une fois sur place, tu as tout ton temps).
 - C'est la façon de regagner de l'argent entre les missions, autant de fois que tu veux… mais attention aux passants autour !
 - À Malibu, la police n'appelle qu'une fois que tu as ta première armure.
+- À Gotham, le **Bat-signal** s'allume dans les nuages à chaque appel.
 
 ## Les codes de triche
 
@@ -678,7 +708,7 @@ Les tableaux, dans l'ordre où ils sont dans le fichier, de haut en bas :
 | Tableau | Ce que tu y changes |
 |---|---|
 | [`HEROS` et `CHEVEUX`](#heros-et-cheveux) | Les héros du menu et leurs couleurs de cheveux |
-| [`CHAPITRES`](#chapitres) | Les chapitres : ville, héros, tenue, logo... |
+| [`CHAPITRES`](#chapitres) | Les chapitres : ville, héros, tenue, logo, pluie, brouillard... |
 | [`FOULES`](#foules) | Le nombre de piétons et de voitures |
 | [`TRADUCTIONS` et `LANGUES`](#traductions-et-langues) | Les phrases du jeu dans les autres langues |
 | [`REGLAGES`](#reglages) | Les nombres de tout le jeu |
@@ -687,7 +717,7 @@ Les tableaux, dans l'ordre où ils sont dans le fichier, de haut en bas :
 | [`ENNEMIS`, `CAMP` et `ARMURE`](#ennemis-camp-et-armure) | Les ennemis, le camp militaire et son armure |
 | [`CARTE`](#carte) | Le pays, case par case (et la montagne, le ski, le bus) |
 | [`GANGS`](#gangs) | Les gangs |
-| [`VILLES`](#villes) | La ville des autres chapitres (Malibu) |
+| [`VILLES`](#villes) | La ville des autres chapitres (Malibu, Gotham) |
 | [`MISSIONS`](#missions) | Les missions |
 | [`CASCADES`](#cascades) | Les pistes de cascades |
 | [`TENUES_GLISSE`](#tenues_glisse) | Les tenues de ski |
@@ -702,9 +732,10 @@ Tout en haut : le nom et la carrure de chaque héros du menu (épaules, taille, 
 
 Juste après `HEROS` et `CHEVEUX`. Pour chaque chapitre :
 
-- sa ville, le nom de ton héros (et de ton héroïne), son nom de super-héros, et son code de triche (allumé tout le chapitre) ;
-- sa tenue de tous les jours (`civil`, `civilFille` : la veste, la chemise, le pantalon ou la jupe, les chaussures, les cheveux, les lunettes de soleil, la barbiche) ;
+- sa ville, le nom de ton héros (et de ton héroïne), son nom de super-héros, et son code de triche (allumé tout le chapitre ; avec une tenue civile, seulement en costume) ;
+- sa tenue de tous les jours (`civil`, `civilFille` : la veste, la chemise, la cravate, le pantalon ou la jupe, les chaussures, les cheveux, les lunettes, la barbiche) ;
 - son logo, et son heure (`heure: 1` : toujours la nuit) ;
+- sa météo : `pluie` (1 : une bonne pluie, 2 : un déluge, 0.3 : quelques gouttes) et `brouillard` (au-delà de tant de mètres, tout disparaît : 300, c'est épais ; 1000, c'est léger). Si le jeu rame, mets moins de pluie, ou plus de brouillard (le jeu ne dessine pas ce qu'on ne voit plus) ;
 - la cachette de la DeLorean (une lettre de la carte) ;
 - `sansReproche` : pas de police, mais l'amende ;
 - ses bulles d'aide, et la liste des touches du menu (`touches` : `['H', 'ton armure arrive en volant']`, une ligne chacune ; pense à leur traduction dans `TRADUCTIONS`).
@@ -856,6 +887,28 @@ Après les gangs : la ville des autres chapitres. Malibu y a :
 - ses `NOMS_LIEUX` ;
 - `PANNEAUX` : les grandes lettres blanches sur la colline (change `'HOLLYWOOD'` et écris ton nom sur la colline !) ;
 - `GALERIE` : la galerie de la grotte des Dix Anneaux, qui s'enfonce dans la colline. Dessine ta galerie : ce sont les coins de son chemin, en mètres (`chemin`), sa largeur, sa hauteur, et la vie de ses deux portes à casser.
+
+Gotham y a :
+
+- sa propre `CARTE`, avec en plus ces signes :
+
+  | Signe | Lieu |
+  |---|---|
+  | `{` | Le manoir Wayne |
+  | `/` | La tour Wayne |
+  | `£` | La banque de Gotham |
+  | `é` | La cathédrale |
+  | `[` | L'asile d'Arkham |
+  | `]` | Ace Chemicals |
+  | `}` | Le zoo de Gotham |
+  | `°` | Le stade |
+  | `§` | Le repaire du Sphinx (la DeLorean) |
+
+- ses `NOMS_LIEUX` ;
+- `GOTHIQUE` : le vieux quartier gothique, autour d'une case (`col`, `ligne`), sur `rayon` cases. Mets un plus grand rayon, et toute la ville devient gothique !
+- `BATSIGNAL: true` : le Bat-signal, sur le toit du commissariat (`C`) ;
+- `MONORAIL` : le monorail. `points` : les carrefours par où passe sa voie (colonne, ligne) ; `gares` : où il s'arrête (un nom, colonne, ligne) ; sa `hauteur`, ses `wagons`, sa `vitesse` (en m/s) et combien de secondes il attend à chaque gare (`arret`). Ajoute une gare, ou fais-le aller jusqu'au port !
+- `VISITABLES` : la part des immeubles où l'on entre (à Gotham, 1 sur 10 : il y a tellement d'immeubles que le jeu prendrait trop de mémoire).
 
 #### `MISSIONS`
 
