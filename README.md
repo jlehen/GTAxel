@@ -84,7 +84,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 - **monter** dans une voiture, un bateau, un avion, un hélicoptère, le heavy robot, une armure, des skis, un snowboard, une luge ou des skis de rando, et **en descendre** (en marche, ou en plein accident, tu sautes et tu tombes par terre) ;
 - prendre l'**ascenseur**, le bus « SKI SHUTTLE », un **télésiège** ou la **télécabine** (et en sauter en route !) ;
 - à Gotham, monter dans le **monorail**, dans une gare, quand il attend (et en descendre à une autre gare) ;
-- **acheter** à l'armurerie, parler au **garagiste** ;
+- **acheter** à l'armurerie (et dans les magasins des super-héros : Stark Industries à Malibu, Lucius Fox à Gotham), parler au **garagiste** ;
 - **voler le butin**, poser la **perceuse** ou l'**explosif** ;
 - **éjecter le pilote** du heavy robot ;
 - appuyer sur le **bouton rouge** du camp militaire ;
@@ -103,18 +103,24 @@ Elles changent selon ce que tu pilotes et le héros que tu es :
 | **F** | [Iron Man](#iron-man) | Voler (F encore : arrêter de voler) |
 | **R** | [Skis de rando](#skis-de-rando) | Coller ou enlever les peaux |
 | **R** | [Batmobile](#la-batmobile) | Déployer les ailes et s'envoler, ou se poser |
+| **R** | [Les autres Batmobiles](#le-magasin-de-lucius-fox) | Leur pouvoir : le turbo (celle de *The Batman*), le saut (le Tumbler), et avec Q ou D, le virage au grappin (celle de 1989) |
 | **R** | [Iron Man](#iron-man) | Le rayon du plastron (dans **War Machine** : la mitrailleuse d'épaule, tant que tu gardes R enfoncé) |
 | **G** | [Batman](#batman) | Lancer le grappin sur le bâtiment que tu vises, même avec une autre arme en main |
 | **G** | [Spiderman](#spiderman) | Y lancer une toile (garde G enfoncé pour te balancer) |
 | **G** | [Iron Man](#iron-man) | Les mini-missiles (si tu les as achetés) |
-| **B** | [Batman](#batman), à pied | Rappeler la Batmobile |
+| **B** | [Batman](#batman), à pied | Rappeler la Batmobile (à Gotham : celle que tu as choisie) |
+| **N** | [Gotham](#le-magasin-de-lucius-fox) | Choisir une autre de tes Batmobiles (B la fait venir) |
+| **O** | [Gotham](#le-magasin-de-lucius-fox), en costume | La vision de détective : tu vois les ennemis à travers les murs (si tu l'as achetée) |
+| **K** | [Gotham](#le-magasin-de-lucius-fox), en costume | Un fumigène à tes pieds (si tu en as acheté) |
 | **T** | [DeLorean](#la-delorean) | Choisir le chapitre où aller ; à pied, dans un chapitre fini : faire venir la DeLorean |
 | **A** et **E** | [Iron Man](#iron-man) | Tirer de la main gauche (A) ou de la main droite (E) ; dans la **Mark 50** : A, le bouclier ; E, le canon |
 | **A**, **Z**, **E** (vite) | [Iron Man](#iron-man), avec le code `IRONMAN` | L'armure arrive en volant, pièce par pièce, ou tu en sors |
 | **H** | [Iron Man](#iron-man) | Appeler ton armure, ou en sortir |
 | **H** | [Gotham](#gotham-chapitre-3) | Mettre ton costume (tu deviens Batman, ou Batgirl), même en l'air, ou repasser en civil (les pieds par terre) |
 | **J** | [Iron Man](#iron-man) | Choisir une autre de tes armures |
+| **J** | [Gotham](#le-magasin-de-lucius-fox) | Changer de costume (en costume, tout de suite, dans une nuée de chauves-souris) |
 | **X** | [Iron Man](#iron-man) | Le laser des bras (si tu l'as acheté) |
+| **X** | [Gotham](#le-magasin-de-lucius-fox), en costume | Le gel explosif (si tu l'as acheté) : X, tu en projettes là où tu vises ; X encore, boum ! (ça, même en civil ou en voiture) |
 | **L** | [Iron Man](#iron-man) | Lever ou baisser ton masque |
 
 ### La danse
@@ -242,6 +248,44 @@ Elle roule à 223 km/h, et elle est blindée.
 - **Les figures** : garde **Maj** enfoncé, comme Superman. Avec Q ou D un tonneau, avec Espace ou C un looping (à l'arrêt : un salto !). Elle est blindée, elle ne craint pas le sol.
 - **R** encore : elle replie ses ailes et descend vite se poser sur ses réacteurs, les roues à plat, en freinant juste avant le sol (pas sur l'eau !).
 - **B** : tu l'as laissée loin, ou elle a explosé ? À pied, appuie sur B : une Batmobile toute neuve apparaît à côté de toi, et l'ancienne s'en va (il n'y en a jamais qu'une à la fois).
+
+#### Le magasin de Lucius Fox
+
+À Gotham, va voir **Lucius Fox** au pied de la **tour Wayne** (⚙ sur la carte) : il t'attend derrière l'accueil du grand hall de Wayne Enterprises, avec ses « nouveaux jouets ». Les costumes sont sur des mannequins, les Batmobiles sur de grands plateaux qui tournent, les gadgets et les améliorations près de la porte, avec leur prix au-dessus. Le magasin ouvre quand tu as ton premier costume.
+
+- **E** devant un stand : tu l'achètes, ou tu le choisis si tu l'as déjà.
+- **J**, n'importe où : tu changes de costume (en costume, tout de suite ; en civil, H le met).
+- **N**, n'importe où : tu choisis une autre de tes Batmobiles, et **B** la fait venir.
+
+| Costume | Prix | Ce qu'il change |
+|---|---|---|
+| **Costume blindé** | 15 000 $ | Des plaques d'armure : tu ne prends que 60 % des dégâts |
+| **Costume de 1989** | 10 000 $ | Tout noir, la chauve-souris dans un ovale jaune, comme dans le film de 1989 : 85 % des dégâts |
+| **Batman Beyond** | 40 000 $ | Noir, la chauve-souris rouge : tu planes presque deux fois plus loin, tu cours plus vite, 85 % des dégâts |
+| **Armure anti-Superman** | 100 000 $ | Une énorme armure de métal, comme dans *Batman v Superman* : tu ne prends que 25 % des dégâts, et tes coups de poing envoient tout valser, mais tu es lent, et tu planes moins loin |
+
+| Batmobile | Prix | Son pouvoir (**R**) |
+|---|---|---|
+| **Batmobile de 1989** | 25 000 $ | Très longue, avec sa grosse turbine devant : 238 km/h. **R** avec Q ou D : le **virage au grappin**, elle lance un crochet sur le côté et tourne d'un coup, sans ralentir (R tout seul : demi-tour !) |
+| **Batmobile de *The Batman*** | 45 000 $ | Une voiture de course musclée, la plus rapide sur la route : 252 km/h. **R** : le **turbo**, une grande flamme, et 340 km/h pendant 3 secondes |
+| **Tumbler** | 70 000 $ | Le char de *The Dark Knight* : 180 km/h, mais il tient 8 roquettes et pousse les voitures sans s'arrêter. **R** : il **saute** (4 m de haut !) et retombe sans casse |
+
+Les gadgets, quand tu es en costume :
+
+| Gadget | Prix | Touche | Ce qu'il fait |
+|---|---|---|---|
+| **Vision de détective** | 12 000 $ | **O** | Tu vois les gens à travers les murs : les ennemis en rouge, les autres en bleu |
+| **Fumigènes** | 8 000 $ | **K** | Une épaisse fumée grise à tes pieds : les ennemis qui y sont (ou qui y entrent) toussent, et ils ne te voient pas à travers, ni dedans |
+| **Gel explosif** | 20 000 $ | **X** | Tu en projettes sur un mur, une voiture ou le sol ; **X** encore : boum ! Il ouvre un trou dans un mur mince (on passe au travers) ou dans un toit, et casse les voitures ; il n'est pas fait pour tuer (mais attention : il te fait mal aussi, si tu es tout près) |
+| **Gants électriques** | 30 000 $ | les poings (**1**) | Tes coups de poing électrocutent : ceux que tu frappes restent paralysés, et les voitures tombent en panne |
+
+Et des **améliorations**, niveau par niveau :
+
+- plus de **vie** (de 100 à 200 points) ;
+- un **grappin** plus rapide et qui porte plus loin (de 90 à 198 m) ;
+- une **cape** qui plane plus loin.
+
+Avec **Batgirl**, les costumes gardent tes cheveux roux. Le jeu se souvient de tout ce que tu as acheté.
 
 ### Spiderman
 
@@ -393,8 +437,8 @@ Quelques signes de la mini-carte :
 | ★ vert | Le camp militaire |
 | ? | Le bunker secret |
 | Point rouge | Un appel de la police (dans les chapitres de super-héros) |
-| ⚙ | L'usine Stark Industries (à Malibu) |
-| ⌂ W $ † A ⚗ Z ◯ | À Gotham : le manoir Wayne, la tour Wayne, la banque de Gotham, la cathédrale, l'asile d'Arkham, Ace Chemicals, le zoo, le stade |
+| ⚙ | Un magasin de super-héros : l'usine Stark Industries (à Malibu), la tour Wayne et le magasin de Lucius Fox (à Gotham) |
+| ⌂ $ † A ⚗ Z ◯ | À Gotham : le manoir Wayne, la banque de Gotham, la cathédrale, l'asile d'Arkham, Ace Chemicals, le zoo, le stade |
 | ? vert | Le repaire du Sphinx (à Gotham) : la DeLorean y est cachée |
 | M rouge | Une gare du monorail (à Gotham) |
 
@@ -617,14 +661,14 @@ La ville de Batman. Il y fait **toujours nuit**, il **pleut** et il y a du **bro
 
 - le **vieux Gotham**, au centre : de vieux immeubles et de vieux gratte-ciel de pierre noire, aux fenêtres pointues, avec des toits pointus, des gargouilles et des statues ;
 - la **cathédrale**, au milieu du vieux Gotham : ses vitraux qui brillent, sa rosace, et son clocher (grimpe au grappin sur sa plateforme, à 57 m !) ;
-- la **tour Wayne**, la plus haute de la ville (174 m), avec WAYNE en lettres d'or ; un ascenseur monte du hall jusqu'au toit ;
+- la **tour Wayne**, la plus haute de la ville (174 m), avec WAYNE en lettres d'or ; dans son grand hall, le magasin de **Lucius Fox** (voir [Le magasin de Lucius Fox](#le-magasin-de-lucius-fox)), et un ascenseur qui monte jusqu'au toit ;
 - les tours de verre de **Midtown**, la **banque de Gotham**, et **Robinson Park** avec son **zoo** (et ses pingouins) ;
 - le **commissariat** (GCPD), avec le **Bat-signal** sur son toit ;
 - le **canal**, qui coupe la ville en deux, l'**autoroute**, le **stade**, le **port** et l'usine **Ace Chemicals** et ses cuves vertes ;
 - l'**asile d'Arkham**, sur son île, au bout d'un pont ;
 - le **repaire du Sphinx** (un grand ? vert sur son toit) : la DeLorean y est cachée.
 
-**En civil, puis en costume** : tu es **Bruce Wayne**, en costume sombre et cravate rouge (ou **Barbara Gordon**, veste verte, lunettes et cheveux roux). Appuie sur **H** : des chauves-souris tourbillonnent autour de toi, et tu deviens **Batman** (ou **Batgirl**, ses longs cheveux roux qui sortent de la cagoule) ! Tu peux le mettre n'importe où, même en tombant d'un toit (et hop, tu planes !) ; **H** encore : tu repasses en civil, mais seulement les pieds par terre. En civil, pas de gadgets : ni grappin, ni batarangs, ni cape, et **B** n'appelle pas la Batmobile (mais si elle est déjà là, tu peux la conduire).
+**En civil, puis en costume** : tu es **Bruce Wayne**, en costume sombre et cravate rouge (ou **Barbara Gordon**, veste verte, lunettes et cheveux roux). Appuie sur **H** : des chauves-souris tourbillonnent autour de toi, et tu deviens **Batman** (ou **Batgirl**, ses longs cheveux roux qui sortent de la cagoule) ! Tu peux le mettre n'importe où, même en tombant d'un toit (et hop, tu planes !) ; **H** encore : tu repasses en civil, mais seulement les pieds par terre. En civil, pas de gadgets : ni grappin, ni batarangs, ni cape, et **B** n'appelle pas la Batmobile (mais si elle est déjà là, tu peux la conduire). Au magasin de Lucius Fox, achète d'autres costumes, d'autres Batmobiles, des gadgets et des améliorations : voir [Le magasin de Lucius Fox](#le-magasin-de-lucius-fox).
 
 **Le monorail** : un train qui roule en hauteur au-dessus des rues, des Narrows à la tour Wayne, en passant par le vieux Gotham. Prends l'ascenseur jusqu'au quai d'une gare (M rouge sur la carte), attends le train, et appuie sur **E** pour monter. Tu regardes la ville par la fenêtre, et **E** à la gare suivante pour descendre.
 
@@ -722,6 +766,7 @@ Les tableaux, dans l'ordre où ils sont dans le fichier, de haut en bas :
 | [`CASCADES`](#cascades) | Les pistes de cascades |
 | [`TENUES_GLISSE`](#tenues_glisse) | Les tenues de ski |
 | [Les armures d'Iron Man](#les-armures-diron-man) | Les couleurs, les armures du magasin, les améliorations |
+| [Le magasin de Batman](#le-magasin-de-batman) | Les costumes, les Batmobiles, les gadgets et les améliorations de Lucius Fox |
 | [`TRICHES`](#triches) | Les codes de triche |
 
 #### `HEROS` et `CHEVEUX`
@@ -779,6 +824,7 @@ Vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de v
 
 - La Batmobile a aussi sa vitesse en l'air (`vitesseVol`) : donne-la à une autre voiture, et elle volera avec R... mais sans ailes ! Et `descente`, la vitesse à laquelle elle descend pour se poser (25 = 90 km/h ; mets 6 pour un atterrissage tout doux, 60 pour tomber comme une pierre : elle freine toujours avant le sol).
 - Pour l'avion : la vitesse pour décoller, et celles de ses figures (`tonneau` et `looping`). Pour l'hélicoptère : la vitesse à laquelle il monte.
+- Les autres Batmobiles (celles du magasin de Lucius Fox) ont chacune leur pouvoir, sur la touche R : `grappin: true` (le virage au grappin), `turbo` (sa `vitesse`, sa `duree`, sa `recharge`), `saut` (à quelle vitesse elle saute vers le haut). Et `roquettes` (combien elle en encaisse), `belier: true` (elle pousse les voitures sans s'arrêter).
 - Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
 
 #### `ENNEMIS`, `CAMP` et `ARMURE`
@@ -979,6 +1025,17 @@ Juste avant les codes de triche :
 - **`AMELIORATIONS_STARK`** : les améliorations du magasin (les mini-missiles, le laser des bras, le réacteur).
 
 Donne une mitrailleuse à la Hulkbuster, ou invente une armure toute rose !
+
+#### Le magasin de Batman
+
+Juste après les armures d'Iron Man, les costumes de Batman et de Batgirl (`COSTUME_BATMAN`, `COSTUME_BATGIRL`), puis les quatre tableaux du magasin de Lucius Fox :
+
+- **`COSTUMES_WAYNE`** : les costumes. Leur prix, leurs couleurs (le collant, le slip, la cagoule et la cape, la chauve-souris, la ceinture, l'ovale), leurs `plaques` (`'blinde'` ou `'armure'`), la couleur de leurs `yeux` qui brillent, et ce qu'ils changent : `protection` (la part des dégâts que tu prends), `cape` (2 = tu planes 2 fois plus loin), `vitesse`, `taille`, `poings`.
+- **`BATMOBILES_WAYNE`** : les Batmobiles du magasin et leur prix. Leur vitesse et leur pouvoir sont dans [`VOITURES`](#voitures-1). Le hall n'a que 6 places : une 7e Batmobile ne serait pas dans le magasin.
+- **`GADGETS_WAYNE`** : la vision de détective (`portee`), les fumigènes (`rayon`, `duree`, `recharge`), le gel explosif (la taille du `trou`, ses `degats`) et les gants électriques (`degats`, `paralyse`). Un gadget de plus aurait son socle, mais ne ferait rien : ce qu'il fait est dans le code.
+- **`AMELIORATIONS_WAYNE`** : la vie, le grappin et la cape, avec le prix de chaque niveau (ajoute un prix, tu as un niveau de plus !).
+
+Invente ton costume : un Batman tout rose, qui plane 5 fois plus loin !
 
 #### `TRICHES`
 
