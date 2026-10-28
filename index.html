@@ -1921,6 +1921,7 @@ const REGLAGES = {
   ombresPersonnages: 30,     // mètres : les passants, policiers et ennemis plus près que ça de la caméra ont une vraie ombre ; plus loin, une tache sombre sous les pieds, bien moins de travail (toi, tu gardes toujours la tienne). 0 = une tache pour tous. Si le jeu rame, mets 15 ; 150 = de vraies ombres pour presque tous, presque comme avant
   sommeilVoitures: 60,       // mètres : une voiture garée plus loin que ça de toi, qui ne bouge plus depuis 2 s, « dort » : le jeu ne la recalcule plus à chaque image (la plupart des voitures du pays sont garées). Elle se réveille dès que tu t'approches, ou qu'on la touche. 0 = aucune ne dort (le jeu recalcule tout, comme avant : deux fois plus de calcul). Si le jeu rame, surtout pas 0 ; 30, si tu veux, mais ça ne gagne presque rien de plus
   detailsVoitures: 60,       // mètres : une voiture plus loin que ça de la caméra est dessinée d'un seul bloc (toutes ses pièces collées ensemble, roues comprises) : de loin, on ne voit pas la différence, et c'est deux fois moins de travail pour la carte graphique. Son ombre, elle, vient toujours de ce bloc, même de près (c'est la même ombre, en un seul dessin au lieu de 17). Une voiture abîmée, en feu, en accident, ou la police, garde toujours toutes ses pièces et leurs ombres. 0 = toutes les voitures ont toujours toutes leurs pièces (comme avant). Si le jeu rame, mets 30 (c'est ce que fait la qualité Basse)
+  personnagesEnBloc: true,   // true = chaque passant, policier ou ennemi est dessiné d'un seul bloc : toutes ses pièces collées ensemble, qui suivent ses vraies pièces comme une marionnette (un dessin pour son corps et un pour son visage, au lieu d'une vingtaine). On ne voit pas la différence, même de tout près, et la carte graphique a bien moins de travail avec la foule. false = pièce par pièce, comme avant. Toi, tu es toujours dessiné pièce par pièce. Si le jeu rame, laisse true
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   distanceInterieurs: 150,   // mètres : on ne voit l'intérieur d'un bâtiment (planchers, marches, meubles) qu'à moins de 100 m. Son dessin n'est fabriqué que quand la caméra est plus près que ça, et il est défait 100 m plus loin : ça garde beaucoup de mémoire libre. 100 = au dernier moment (encore moins de mémoire, mais en volant vite, le jeu peut accrocher en fabriquant plusieurs intérieurs à la fois) ; 100000 = tous les intérieurs, peu à peu, et jamais défaits (comme avant)
@@ -7097,7 +7098,14 @@ function toucheSol(a, b) {
 //  Personnages (faits de formes simples, animés)
 // =====================================================================
 const cacheMat = {};
-const mat = (c, o = {}) => cacheMat[c + JSON.stringify(o)] ||= new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, ...o });
+// MATS_SIMPLES : celles qui n'ont rien d'autre que leur couleur (mat(couleur), sans o) : un personnage les dessine toutes d'un seul coup
+// (voir « Les personnages d'un seul bloc »)
+const MATS_SIMPLES = new WeakSet();
+// la rugosité des matières de mat (0 : lisse et brillant, 1 : mat) ; la matière du corps des personnages d'un seul bloc (M_CORPS) prend la
+// même : change-la ici, pas dans mat, sinon les personnages ne seraient plus d'un seul bloc
+const RUGOSITE_MAT = 0.75;
+const mat = (c, o = {}) => cacheMat[c + JSON.stringify(o)] ||= noterSimple(new THREE.MeshStandardMaterial({ color: c, roughness: RUGOSITE_MAT, ...o }), o);
+const noterSimple = (m, o) => { if (!Object.keys(o).length) MATS_SIMPLES.add(m); return m; };
 // une forme ronde faite au tour, comme un vase : une liste de [rayon, hauteur], de bas en haut
 const tour = (points, n = 20, angle = Math.PI * 2) => new THREE.LatheGeometry(points.map(([r, y]) => new THREE.Vector2(r, y)), n, 0, angle);
 // un morceau de bras ou de jambe, de longueur l, qui pend sous son articulation : rond aux deux bouts, plus fin en bas qu'en haut
@@ -7629,6 +7637,246 @@ function membresMous(h, dt, o) {
     os.updateMatrixWorld(true);
   });
 }
+
+// Les personnages d'un seul bloc (REGLAGES.personnagesEnBloc). Un personnage, c'est une vingtaine de pièces (la tête, le cou, le torse, le
+// bassin, la ceinture, les bras, les avant-bras, les mains, les cuisses, les tibias, les chaussures, les cheveux, le nez, les oreilles...) :
+// chacune coûtait un dessin à la carte graphique, et un de plus pour son ombre. Avec la foule, ça faisait des centaines de dessins par image.
+// Alors chaque personnage (sauf toi) est dessiné d'un seul bloc : sa « forme », toutes ses pièces collées ensemble, comme une marionnette
+// dont chaque morceau suit un « os » (un squelette : THREE.SkinnedMesh, comme les personnages des dessins animés en 3D). Ses os, ce sont
+// ses vraies pièces : à chaque image, chaque morceau de la forme se met exactement là où est sa pièce, quoi que fassent ses bras et ses
+// jambes. La couleur de chaque pièce passe avec son os : tout son corps est un seul dessin, et son visage (une image) un deuxième.
+// Ses vraies pièces sont toujours là, mais rangées sur un autre « calque » (CALQUE_PIECES), que la caméra ne dessine pas : les balles les
+// touchent (les rayons des tirs regardent tous les calques), on les cache, on les change de couleur, on leur accroche une arme... comme
+// avant. Ce qu'on lui accroche (une arme, un filet...), et une pièce d'une autre sorte (brillante, transparente, avec une image...), est
+// dessiné à part, comme avant. Si une pièce change de matière, de forme ou de place dans le corps, la forme est refaite avant l'image
+// (voir majFormes) ; si ça arrive tout le temps, il reste en pièces un moment.
+// Attention : un rayon que tu ajoutes (new THREE.Raycaster()) ne voit que le calque 0, et traverse donc les personnages ; écris
+// tousCalques(new THREE.Raycaster()), comme pour les rayons des tirs
+const CALQUE_PIECES = 1, MASQUE_PIECES = 1 << CALQUE_PIECES;
+const tousCalques = r => { r.layers.enableAll(); return r; };   // un rayon (THREE.Raycaster) qui touche aussi les vraies pièces des personnages
+const IDENTITE = new THREE.Matrix4();
+// La matière du corps : celle de mat(couleur), toute blanche. La carte graphique colore chaque morceau de la couleur de sa pièce, rangée
+// avec son os (dans la dernière ligne de sa matrice, qui ne sert à rien d'autre ici). Et un morceau étiré (une main aplatie, un torse
+// élargi) garde la même lumière : ses « normales » (le sens de sa surface) tournent comme Three.js les tourne pour une pièce seule
+const M_CORPS = new THREE.MeshStandardMaterial({ roughness: RUGOSITE_MAT });
+M_CORPS.onBeforeCompile = s => {
+  const os = '#include <skinbase_vertex>', normales = '#include <skinnormal_vertex>', couleur = '#include <color_fragment>';
+  if (!s.vertexShader.includes(os) || !s.vertexShader.includes(normales) || !s.fragmentShader.includes(couleur)) alert('Personnages : le programme « MeshStandardMaterial » de Three.js a changé !');
+  // (chaque sommet ne suit qu'un os, le premier : on ne va chercher que celui-là)
+  s.vertexShader = 'flat varying vec3 vCouleur;\n' + s.vertexShader.replace(os, `vCouleur = vec3( 1.0 );
+	#ifdef USE_SKINNING
+		mat4 boneMatX = getBoneMatrix( skinIndex.x );
+		mat4 boneMatY = boneMatX, boneMatZ = boneMatX, boneMatW = boneMatX;
+		vCouleur = vec3( boneMatX[ 0 ].w, boneMatX[ 1 ].w, boneMatX[ 2 ].w );
+	#endif`).replace(normales, `#ifdef USE_SKINNING
+		objectNormal = transpose( inverse( mat3( boneMatX ) ) ) * objectNormal;
+	#endif`);
+  s.fragmentShader = 'flat varying vec3 vCouleur;\n' + s.fragmentShader.replace(couleur, couleur + '\n\tdiffuseColor.rgb *= vCouleur;');
+};
+// une matière toute simple : celle de mat(couleur), restée telle quelle (sa couleur passe avec l'os). Si on la change sur place (elle
+// brille, devient transparente...), la pièce n'est plus toute simple : la forme est refaite sans elle (voir formeIntacte)
+const matiereSimple = m => MATS_SIMPLES.has(m) && m.roughness === RUGOSITE_MAT && !m.metalness && !m.transparent && m.opacity === 1 && m.side === THREE.FrontSide
+  && !m.map && !m.emissive.r && !m.emissive.g && !m.emissive.b && !m.alphaTest && !m.wireframe;
+const estVisage = m => Object.values(cacheVisage).includes(m);
+// la pièce o est-elle bien dans le personnage g, et pas retournée comme dans un miroir ? (uniforme : et elle, et tout ce qui la porte,
+// de la même taille dans les trois sens : le visage n'a pas la retouche des normales de M_CORPS)
+const miroir = o => ((o.scale.x < 0) + (o.scale.y < 0) + (o.scale.z < 0)) & 1;   // (1 : o est retourné, comme dans un miroir)
+const memeTaille = o => { const s = o.scale; return Math.abs(s.x - s.y) <= 1e-6 * Math.abs(s.x) && Math.abs(s.x - s.z) <= 1e-6 * Math.abs(s.x); };
+function enPlace(o, g, uniforme) {
+  let m = 0;
+  for (; o !== g; o = o.parent) {
+    if (!o) return false;
+    m ^= miroir(o);
+    if (uniforme && !memeTaille(o)) return false;
+  }
+  return !m;
+}
+// une pièce qu'on peut coller dans la forme : 'corps' (de la matière de mat(couleur)), 'visage', ou rien (elle reste à part). Un objet tout
+// simple (pas un lot, pas une image, pas un trait), qui fait de l'ombre et n'en reçoit pas, sur le calque de tout le monde, d'une forme
+// entière et partagée (pas une forme faite pour lui seul, comme celles d'une arme : aJeter)
+function piecePourForme(o, g) {
+  if (o.constructor !== THREE.Mesh || o.userData.aJeter || !o.castShadow || o.receiveShadow || !o.frustumCulled || o.renderOrder || o.layers.mask !== 1) return null;
+  const f = o.geometry, P = f.attributes.position, N = f.attributes.normal, U = f.attributes.uv;
+  if (P?.itemSize !== 3 || N?.itemSize !== 3 || f.morphAttributes.position || f.drawRange.start || f.drawRange.count !== Infinity || P.count > 30000) return null;
+  if (matiereSimple(o.material)) return enPlace(o, g, false) ? 'corps' : null;
+  return estVisage(o.material) && U?.itemSize === 2 && enPlace(o, g, true) ? 'visage' : null;
+}
+// Les recettes : la forme collée de toutes les pièces, la même pour tous ceux qui ont les mêmes formes de pièces dans le même ordre (la même
+// sorte de personnage, quelles que soient ses couleurs) ; n : combien de personnages s'en servent (à 0, elle est jetée)
+const recettes = new Map();
+// colle les pièces : les sommets de chacune, tels qu'ils sont dans sa forme, avec le numéro de son os ; puis les triangles, rangés par
+// matière (groupes : 0 pour le corps, 1, 2... pour les visages)
+function collerPieces(pieces, groupes, nGroupes) {
+  let nv = 0, ni = 0;
+  for (const o of pieces) { const f = o.geometry; nv += f.attributes.position.count; ni += f.index ? f.index.count : f.attributes.position.count; }
+  const pos = new Float32Array(nv * 3), nor = new Float32Array(nv * 3), uv = new Float32Array(nv * 2), os = new Uint8Array(nv * 4), poids = new Uint8Array(nv * 4);
+  const index = new (nv > 65535 ? Uint32Array : Uint16Array)(ni), debut = [];
+  let v = 0;
+  pieces.forEach((o, i) => {
+    const f = o.geometry, P = f.attributes.position, N = f.attributes.normal, U = f.attributes.uv;
+    debut.push(v);
+    for (let k = 0; k < P.count; k++, v++) {
+      pos[v * 3] = P.getX(k); pos[v * 3 + 1] = P.getY(k); pos[v * 3 + 2] = P.getZ(k);
+      nor[v * 3] = N.getX(k); nor[v * 3 + 1] = N.getY(k); nor[v * 3 + 2] = N.getZ(k);
+      if (U) { uv[v * 2] = U.getX(k); uv[v * 2 + 1] = U.getY(k); }
+      os[v * 4] = i; poids[v * 4] = 255;   // (son os, à 100 %)
+    }
+  });
+  const f = new THREE.BufferGeometry();
+  let t = 0;
+  for (let gr = 0; gr < nGroupes; gr++) {
+    const t0 = t;
+    pieces.forEach((o, i) => {
+      if (groupes[i] !== gr) return;
+      const I = o.geometry.index, n = I ? I.count : o.geometry.attributes.position.count;
+      for (let k = 0; k < n; k++) index[t++] = debut[i] + (I ? I.getX(k) : k);
+    });
+    f.addGroup(t0, t - t0, gr);
+  }
+  f.setAttribute('position', new THREE.BufferAttribute(pos, 3)); f.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); f.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  f.setAttribute('skinIndex', new THREE.BufferAttribute(os, 4)); f.setAttribute('skinWeight', new THREE.BufferAttribute(poids, 4, true));
+  f.setIndex(new THREE.BufferAttribute(index, 1));
+  return f;
+}
+// les personnages qui ont leur forme ; et ce qu'on y garde : F = { h, g, pieces (ses os), simple (la couleur de chaque pièce passe-t-elle
+// avec son os ?), etat (ce qu'était chaque pièce : sa matière, sa forme), noeuds (voir plus bas), maille (la forme, dans g), squelette,
+// recette, matieres }
+const formes = new Set();
+const bouleForme = new THREE.Sphere(), relForme = new THREE.Matrix4(), invForme = new THREE.Matrix4();
+function faireForme(h) {
+  const g = h.g, pieces = [], groupes = [], matieres = [M_CORPS];
+  g.updateMatrixWorld(true);
+  g.traverse(o => {
+    const sorte = o !== g && piecePourForme(o, g);
+    if (!sorte) return;
+    let k = 0;
+    if (sorte === 'visage') { k = matieres.indexOf(o.material); if (k < 0) k = matieres.push(o.material) - 1; }
+    pieces.push(o); groupes.push(k);
+  });
+  if (!groupes.includes(0) || pieces.length > 255) return false;   // (rien pour le corps : il reste en pièces)
+  const cle = pieces.map((o, i) => { const a = o.geometry.attributes; return o.geometry.id + '.' + a.position.version + '.' + a.normal.version + ':' + groupes[i]; }).join(' ');
+  let r = recettes.get(cle);
+  if (!r) recettes.set(cle, r = { cle, n: 0, geo: collerPieces(pieces, groupes, matieres.length) });
+  r.n++;
+  // la boule qui l'entoure, dans son repère (Three.js ne dessine pas ce qui est hors de l'image) : celle de ses pièces maintenant, 1 m plus
+  // grande, parce que ses bras et ses jambes bougent
+  invForme.copy(g.matrixWorld).invert();
+  const boule = new THREE.Sphere();
+  for (const o of pieces) {
+    if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+    relForme.multiplyMatrices(invForme, o.matrixWorld);
+    boule.union(bouleForme.copy(o.geometry.boundingSphere).applyMatrix4(relForme));
+  }
+  boule.radius += 1;
+  const squelette = new THREE.Skeleton(pieces, pieces.map(() => IDENTITE)), maille = new THREE.SkinnedMesh(r.geo, matieres);
+  maille.name = 'forme'; maille.castShadow = true;
+  maille.raycast = () => {};   // les balles passent à travers : elles touchent les vraies pièces, comme avant
+  maille.bindMode = THREE.DetachedBindMode; maille.bind(squelette, IDENTITE);   // (les os sont donnés dans son repère : voir majOs)
+  maille.boundingSphere = boule; maille.boundingBox = boule.getBoundingBox(new THREE.Box3());
+  // ses nœuds : les pièces, et ce qui les porte jusqu'à lui (le haut du corps, les bras, les coudes...), chacun une fois, le parent avant
+  // l'enfant ; pour chacun, son parent (p : le numéro de son nœud, -1 pour g), s'il est retourné (miroir), et s'il porte un visage (il doit
+  // alors garder la même taille dans les trois sens)
+  const noeuds = [], numero = new Map();
+  const noter = o => { if (o === g || numero.has(o)) return; noter(o.parent); numero.set(o, noeuds.length); noeuds.push(o); };
+  for (const o of pieces) noter(o);
+  const etatNoeuds = noeuds.map(o => ({ parent: o.parent, p: o.parent === g ? -1 : numero.get(o.parent), miroir: miroir(o), uniforme: false }));
+  pieces.forEach((o, i) => { if (groupes[i]) for (let n = o; n !== g; n = n.parent) etatNoeuds[numero.get(n)].uniforme = true; });
+  const F = { h, g, pieces, simple: groupes.map(k => k === 0), maille, squelette, recette: r, matieres, noeuds, etatNoeuds, numeros: pieces.map(o => numero.get(o)),
+    vus: new Uint8Array(noeuds.length),
+    etat: pieces.map(o => ({ matiere: o.material, forme: o.geometry, vp: o.geometry.attributes.position.version, vn: o.geometry.attributes.normal.version })) };
+  squelette.update = majOs; squelette.forme = F;
+  for (const o of pieces) o.layers.set(CALQUE_PIECES);   // (ses vraies pièces ne sont plus dessinées : la forme les remplace)
+  g.add(maille); h.forme = F; formes.add(F);
+  return true;
+}
+// il reprend ses vraies pièces (elles sont de nouveau dessinées), et la forme s'en va
+function defaireForme(F) {
+  for (const o of F.pieces) if (o.layers.mask === MASQUE_PIECES) o.layers.set(0);
+  F.maille.removeFromParent(); F.squelette.dispose();   // (la texture de ses os)
+  if (--F.recette.n === 0) { recettes.delete(F.recette.cle); F.recette.geo.dispose(); }
+  formes.delete(F); if (F.h.forme === F) F.h.forme = null;
+}
+// ses pièces sont-elles toujours celles de la forme ? (même matière, restée toute simple, même forme, sur le calque des pièces... ; et
+// chaque nœud au même endroit, avec le même parent, pas retourné, et un visage de la même taille dans les trois sens)
+function formeIntacte(F) {
+  for (let i = 0; i < F.pieces.length; i++) {
+    const o = F.pieces[i], e = F.etat[i], a = o.geometry.attributes;
+    if (o.material !== e.matiere || o.geometry !== e.forme || a.position?.version !== e.vp || a.normal?.version !== e.vn
+      || !o.castShadow || o.receiveShadow || o.layers.mask !== MASQUE_PIECES
+      || (F.simple[i] && !matiereSimple(o.material))) return false;   // (sa matière, partagée, a été changée sur place : elle brille...)
+  }
+  for (let k = 0; k < F.noeuds.length; k++) {
+    const o = F.noeuds[k], e = F.etatNoeuds[k];
+    if (o.parent !== e.parent || miroir(o) !== e.miroir || (e.uniforme && !memeTaille(o))) return false;
+  }
+  return true;
+}
+// Les os, juste avant que la carte graphique dessine la forme (Three.js l'appelle une fois par image, à la place de Skeleton.update) :
+// la place de chaque pièce dans le personnage (sa matrice, depuis la forme), et sa couleur dans la dernière ligne. Une pièce cachée
+// (elle, ou ce qui la porte, ou sa matière) a un os tout à zéro : son morceau de la forme est réduit à un point, on ne le voit pas
+function majOs() {
+  const F = this.forme, a = this.boneMatrices, vus = F.vus, inv = invForme.copy(F.maille.matrixWorld).invert().elements;
+  for (let n = 0; n < vus.length; n++) { const p = F.etatNoeuds[n].p; vus[n] = F.noeuds[n].visible && (p < 0 || vus[p]) ? 1 : 0; }   // (le parent avant l'enfant)
+  for (let i = 0; i < F.pieces.length; i++) {
+    const o = F.pieces[i], k = i * 16;
+    if (!vus[F.numeros[i]] || !o.material.visible) { a.fill(0, k, k + 16); continue; }
+    placeDansForme(inv, o.matrixWorld.elements, a, k);
+    if (F.simple[i]) { const c = o.material.color; a[k + 3] = c.r; a[k + 7] = c.g; a[k + 11] = c.b; }
+  }
+  if (this.boneTexture) this.boneTexture.needsUpdate = true;
+}
+// la place d'une pièce dans la forme : l'inverse de la forme (i) fois la pièce (m), deux matrices « affines » (leur dernière ligne est
+// 0 0 0 1 : on ne calcule pas ce qu'on sait déjà), écrite dans le tableau a à partir de k, colonne par colonne, comme Three.js
+function placeDansForme(i, m, a, k) {
+  for (let c = 0; c < 16; c += 4) {
+    const x = m[c], y = m[c + 1], z = m[c + 2], w = c === 12 ? 1 : 0;
+    a[k + c] = i[0] * x + i[4] * y + i[8] * z + i[12] * w;
+    a[k + c + 1] = i[1] * x + i[5] * y + i[9] * z + i[13] * w;
+    a[k + c + 2] = i[2] * x + i[6] * y + i[10] * z + i[14] * w;
+    a[k + c + 3] = w;
+  }
+}
+// où en est g : 0 = plus dans le pays (on l'a enlevé), 1 = dans le pays mais pas dessiné (trop loin, dans une voiture cachée...), 2 = dessiné
+function dansLePays(g) { let vu = 2; for (let o = g; o; o = o.parent) { if (o === scene) return vu; if (!o.visible) vu = 1; } return 0; }
+// essaie de lui faire sa forme (s'il est dessiné, et pas en pièces pour un moment)
+function essayerForme(h, t) {
+  if (!h.g || h.helico || h.forme || h.enPieces > t || dansLePays(h.g) !== 2) return;
+  if (!faireForme(h)) h.enPieces = t + 2000;   // (rien à coller : on réessaiera dans 2 s)
+}
+// Avant chaque image du pays (renderer.render est retouché pour l'appeler : voir plus bas, après les ombres des personnages) : les formes
+// des personnages qui s'en vont sont défaites ; celles dont une pièce a changé sont refaites ; les personnages qui arrivent ont la leur.
+// Ceux qui sont refaits plus de 3 fois en 3 s restent en pièces 10 s. Toi (B.J.), tu restes toujours en pièces : tes tenues, tes codes
+// de triche et tes armures changent sans cesse
+function majFormes() {
+  const oui = R_.personnagesEnBloc, t = performance.now();
+  if (!temoinForme.visible && temoinForme.parent) { temoinForme.removeFromParent(); temoinForme.geometry.dispose(); temoinForme.skeleton.dispose(); }   // (il a servi)
+  for (const F of formes) {
+    const ou = oui ? dansLePays(F.g) : 0;
+    if (ou === 0) { defaireForme(F); continue; }
+    if (ou === 1) continue;   // (pas dessiné : on regardera quand il le sera)
+    if (formeIntacte(F)) continue;
+    const h = F.h; defaireForme(F);
+    h.refaite = (h.refaite || []).filter(x => t - x < 3000); h.refaite.push(t);
+    if (h.refaite.length > 3) h.enPieces = t + 10000; else essayerForme(h, t);
+  }
+  if (!oui) return;
+  for (const p of personnes) essayerForme(p.h, t);
+  for (const v of voitures) if (v.pilote) essayerForme(v.pilote, t);   // (ceux des motos, des tricycles, des Segway, les autres skieurs)
+}
+// Le programme des ombres d'un personnage d'un seul bloc : Three.js le compile à son premier dessin dans la carte des ombres. Pour que ce
+// ne soit pas en pleine partie, quand le premier passant s'approche, un « témoin » réduit à un point (on ne le voit pas) est dessiné avec
+// la toute première image, ombres comprises, puis enlevé (voir majFormes)
+const temoinForme = (() => {
+  const f = new THREE.BufferGeometry();
+  f.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(9), 3)); f.setAttribute('normal', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 0], 3));
+  f.setAttribute('skinIndex', new THREE.Uint8BufferAttribute(new Uint8Array(12), 4)); f.setAttribute('skinWeight', new THREE.Uint8BufferAttribute([255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0], 4, true));
+  const t = new THREE.SkinnedMesh(f, M_CORPS);
+  t.bindMode = THREE.DetachedBindMode; t.bind(new THREE.Skeleton([new THREE.Object3D()], [IDENTITE]), IDENTITE);
+  t.castShadow = true; t.frustumCulled = false; t.raycast = () => {};
+  t.onAfterRender = () => { t.visible = false; };   // (l'image est dessinée après les ombres : il a servi aux deux)
+  scene.add(t);
+  return t;
+})();
 
 // armes en 3D (le canon pointe vers +Z)
 const M_METAL = mat('#2b2b2b', { metalness: 0.8, roughness: 0.35 }), M_LAME = mat('#d0d0d0', { metalness: 1, roughness: 0.2 }), M_BOIS = mat('#6b4423'), M_KAKI = mat('#4a5a2a');
@@ -9438,7 +9686,7 @@ function exploserVoiture(v, pos = v, parJoueur = !!v.faute) {
 }
 // roquettes : elles volent tout droit et explosent sur le premier mur, voiture ou personnage touché, ou par terre
 const M_FUMEE = new THREE.SpriteMaterial({ map: TEX.fumee, color: '#9a9a9a', transparent: true, depthWrite: false });
-const roquettes = [], rayonRoquette = Object.assign(new THREE.Raycaster(), { camera }), GEO_ROQUETTE = new THREE.CylinderGeometry(0.07, 0.07, 0.6, 6).rotateX(Math.PI / 2);
+const roquettes = [], rayonRoquette = tousCalques(Object.assign(new THREE.Raycaster(), { camera })), GEO_ROQUETTE = new THREE.CylinderGeometry(0.07, 0.07, 0.6, 6).rotateX(Math.PI / 2);
 // ignore : un robot que la roquette traverse (celui qui l'a tirée)
 function lancerRoquette(depart, vers, portee, rayon, degatsPNJ, degatsJoueur, tireur, ignore = tireur) {
   if (![depart, vers].every(p => Number.isFinite(p.x + p.y + p.z))) return console.error('Roquette vers un point impossible (NaN) : pas tirée', depart, vers, tireur);   // F12 : la pile dit qui a tiré
@@ -9625,7 +9873,7 @@ function eclats(mesh, n = 16) {
 const GEO_IMPACT = new THREE.PlaneGeometry(1, 1), AXE_Z = V3(0, 0, 1);
 const matImpact = (map, o = {}) => new THREE.MeshStandardMaterial({ map, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, roughness: 0.9, ...o });
 const M_IMPACT = matImpact(TEX.impact), M_TROU_BALLE = matImpact(TEX.trou, { metalness: 0.4, roughness: 0.5 });
-const rayonImpact = Object.assign(new THREE.Raycaster(), { camera });
+const rayonImpact = tousCalques(Object.assign(new THREE.Raycaster(), { camera }));
 // sur les murs : un seul objet pour tous les impacts (R_.impactsMurs au plus). Quand il est plein, le plus vieux laisse sa place
 const impactsMurs = new THREE.InstancedMesh(GEO_IMPACT, M_IMPACT, Math.max(1, R_.impactsMurs)), poseImpact = new THREE.Object3D();
 impactsMurs.count = 0; impactsMurs.frustumCulled = false; impactsMurs.receiveShadow = true; scene.add(impactsMurs);
@@ -12125,7 +12373,8 @@ function sortirVoiture() {
   }
 }
 
-const raycaster = new THREE.Raycaster(), vTmp = new THREE.Vector3(), vTmp2 = new THREE.Vector3();
+// (un nouveau rayon : écris tousCalques(new THREE.Raycaster()), sinon il traverse les passants : voir « Les personnages d'un seul bloc »)
+const raycaster = tousCalques(new THREE.Raycaster()), vTmp = new THREE.Vector3(), vTmp2 = new THREE.Vector3();
 // d'où part le tir : du bout du canon. cote = -1 ou 1 : de l'œil droit ou gauche (les yeux laser)
 function positionTir(cote = 0) {
   if (J.vue === 1 && !cote && vm.userData.arme?.userData.sceptre) return boutSceptreVM(vTmp);
@@ -17462,6 +17711,11 @@ const sansVraieOmbre = [];
     try { return dessinerOmbres.call(this, lumieres, s, c); } finally { for (const g of sansVraieOmbre) g.visible = g.userData.vu; for (const v of voituresEnBloc) ombreEnBloc(v, false); }
   };
 }
+// juste avant chaque image du pays, les personnages d'un seul bloc (voir majFormes) : c'est là, et pas plus tôt, qu'on sait ce qui a changé
+{
+  const dessiner = renderer.render;
+  renderer.render = function (s, c) { if (s === scene) majFormes(); return dessiner.call(this, s, c); };
+}
 // la force d'une tache : ce qu'une vraie ombre enlève de lumière au sol (mesuré : 20 à 30 % quand le soleil est haut, 45 % quand il est bas),
 // moins quand il se couche, et bien moins au clair de lune
 const forceDesOmbres = () => (0.45 - 0.24 * Math.max(0, directionLumiere.y)) * Math.min(1, soleil.intensity / 4.5);
@@ -17898,9 +18152,10 @@ function boucle(t) {
 // sait compiler en arrière-plan le fait sans geler la page (les autres gèlent encore, mais avant de jouer).
 // A_PREPARER : ce qu'on ne voit qu'en jouant (une explosion, un code de triche...). Une matière, et la sorte d'objet qui la porte :
 // 'forme' (un objet tout simple), 'lot' (beaucoup d'objets pareils dessinés d'un coup), 'image' (une image toujours face à la caméra),
-// 'trait' (une ligne) ; 'vm' : dans la main, à la 1re personne (d'autres lumières, donc d'autres programmes). Ce qui compte, c'est la sorte
-// de matière (à pleine lumière ou non, transparente, à deux faces, découpée, avec une image...), pas sa couleur : une seule suffit pour
-// toutes celles qui lui ressemblent, et si une matière de la même sorte est déjà dans le pays, même cachée, la ligne ne coûte rien.
+// 'trait' (une ligne), 'squelette' (un objet qui suit des os, comme les personnages d'un seul bloc) ; 'vm' : dans la main, à la
+// 1re personne (d'autres lumières, donc d'autres programmes). Ce qui compte, c'est la sorte de matière (à pleine lumière ou non,
+// transparente, à deux faces, découpée, avec une image...), pas sa couleur : une seule suffit pour toutes celles qui lui ressemblent,
+// et si une matière de la même sorte est déjà dans le pays, même cachée, la ligne ne coûte rien.
 // Tu as inventé une matière qu'on ne voit qu'en jouant ? Ajoute-la ici, sinon elle fera peut-être un petit accroc la première fois qu'on
 // la verra (c'est tout)
 const IMAGE_PREPARER = TEX.flash;   // (n'importe quelle image : seul compte qu'il y en ait une)
@@ -17924,11 +18179,14 @@ const A_PREPARER = [
   // le diamant d'un objet à voler (le gros diamant, la bague) : une matière « physique », transparente, à facettes (à Malibu, où il
   // n'y a pas de bijouterie, il n'est nulle part dans le pays avant qu'on s'approche d'un de ces objets)
   [M_DIAMANT, 'forme'],
+  // les personnages d'un seul bloc (voir M_CORPS) : leur corps, et leur visage (une image : n'importe lequel)
+  [M_CORPS, 'squelette'], [Object.values(cacheVisage)[0], 'squelette'],
   // à la 1re personne : l'éclair au bout du canon, le gant d'Iron Man (à deux faces)
   [M_FLASH, 'image', 'vm'], [M_ECLAT, 'forme', 'vm'],
 ];
 const GEO_PREPARER = new THREE.BoxGeometry(), GEO_PREPARER_TRAIT = new THREE.BufferGeometry().setFromPoints([V3(0, 0, 0), V3(0, 1, 0)]);   // (un trait n'a que des points)
 const objetAPreparer = (m, sorte) => sorte === 'image' ? new THREE.Sprite(m) : sorte === 'trait' ? new THREE.Line(GEO_PREPARER_TRAIT, m)
+  : sorte === 'squelette' ? new THREE.SkinnedMesh(GEO_PREPARER, m)
   : sorte === 'lot' ? new THREE.InstancedMesh(GEO_PREPARER, m, 1) : new THREE.Mesh(GEO_PREPARER, m);
 const preparation = { ms: 0, programmes: 0, rate: null };   // (pour les essais : ce qu'elle a duré, les programmes qu'il y a ensuite, et si elle a raté)
 async function preparerProgrammes() {
@@ -17998,6 +18256,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   majDetailsVoitures, voituresEnBloc, ombreEnBloc, enBloc, montrerDeLoin, formeDeLoin, cacheLoin, majPhares,
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
   majInterieurs, construireInterieur, defaireInterieur, formeBoite, VUE_INTERIEURS,
+  formes, recettes, majFormes, faireForme, defaireForme, formeIntacte, M_CORPS, CALQUE_PIECES, temoinForme,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 // les boutons du menu cliqués pendant la construction (un héros, un chapitre, « Nouvelle partie ») : le jeu s'en occupe maintenant (voir prevenirJeu)
 jeuConstruit();
