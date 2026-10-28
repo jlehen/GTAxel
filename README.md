@@ -83,7 +83,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 
 - **monter** dans une voiture, un bateau, un avion, un hélicoptère, le heavy robot, une armure, des skis, un snowboard, une luge ou des skis de rando, et **en descendre** (en marche, ou en plein accident, tu sautes et tu tombes par terre) ;
 - prendre l'**ascenseur**, le bus « SKI SHUTTLE », un **télésiège** ou la **télécabine** (et en sauter en route !) ;
-- à Gotham, monter dans le **monorail**, dans une gare, quand il attend (et en descendre à une autre gare) ; dans les missions de Batman, prendre ton **premier costume** (dans la Batcave), **brouiller les antennes** du Pingouin, **désamorcer les bombes** de Double-Face et **sauter du Bat** ;
+- à Gotham, monter dans le **monorail**, dans une gare, quand il attend (et en descendre à une autre gare) ; dans les missions de Batman, prendre ton **premier costume** (dans la Batcave), **brouiller les antennes** du Pingouin, **désamorcer les bombes** de Double-Face, **sauter du Bat** et **monter sur le Batpod** ;
 - **acheter** à l'armurerie (et dans les magasins des super-héros : Stark Industries à Malibu, Lucius Fox à Gotham), parler au **garagiste** ;
 - **voler le butin**, poser la **perceuse** ou l'**explosif** ;
 - **éjecter le pilote** du heavy robot ;
@@ -104,13 +104,15 @@ Elles changent selon ce que tu pilotes et le héros que tu es :
 | **R** | [Skis de rando](#skis-de-rando) | Coller ou enlever les peaux |
 | **R** | [Batmobile](#la-batmobile) | Déployer les ailes et s'envoler, ou se poser |
 | **R** | [Le Bat](#le-bat) | Décoller, ou se poser |
+| **R** | [Le Batpod](#le-batpod) | Le câble : il renverse la voiture juste devant toi |
 | **R** | [Les autres Batmobiles](#le-magasin-de-lucius-fox) | Leur pouvoir : le turbo (celle de *The Batman*), le saut (le Tumbler), et avec Q ou D, le virage au grappin (celle de 1989) |
 | **R** | [Iron Man](#iron-man) | Le rayon du plastron (dans **War Machine** : la mitrailleuse d'épaule, tant que tu gardes R enfoncé) |
 | **G** | [Batman](#batman) | Lancer le grappin sur le bâtiment que tu vises, même avec une autre arme en main |
 | **G** | [Spiderman](#spiderman) | Y lancer une toile (garde G enfoncé pour te balancer) |
 | **G** | [Iron Man](#iron-man) | Les mini-missiles (si tu les as achetés) |
-| **B** | [Batman](#batman), à pied | Rappeler la Batmobile (à Gotham : celle que tu as choisie, dès la 2e mission, ou le [Bat](#le-bat), dès la 8e, même quand tu nages) |
-| **N** | [Gotham](#le-magasin-de-lucius-fox) | Choisir une autre de tes Batmobiles, ou le Bat (B le fait venir) |
+| **B** | [Batman](#batman), à pied | Rappeler la Batmobile (à Gotham : celle que tu as choisie, dès la 2e mission, ou le [Bat](#le-bat), dès la 8e, même quand tu nages, ou le [Batpod](#le-batpod), dès la 10e) |
+| **N** | [Gotham](#le-magasin-de-lucius-fox) | Choisir une autre de tes Batmobiles, le Bat ou le Batpod (B le fait venir) |
+| **1**, **2**, **3** | [Gotham](#gotham-chapitre-3) | Devant une devinette du Sphinx : ta réponse (ça ne change pas ton arme) |
 | **O** | [Gotham](#le-magasin-de-lucius-fox), en costume | La vision de détective : tu vois les ennemis à travers les murs (si tu l'as achetée) |
 | **K** | [Gotham](#le-magasin-de-lucius-fox), en costume | Un fumigène à tes pieds (si tu en as acheté) |
 | **T** | [DeLorean](#la-delorean) | Choisir le chapitre où aller ; à pied, dans un chapitre fini : faire venir la DeLorean |
@@ -259,6 +261,14 @@ Elle roule à 223 km/h, et elle est blindée.
 - **R** encore : il se pose (pas sur l'eau !). Au sol, il n'avance que tout doucement.
 - Il est blindé : il tient 6 roquettes. S'il explose, **B** en fait venir un autre.
 
+#### Le Batpod
+
+À Gotham, la 10e mission (« Le camion du Joker ») te donne le **Batpod**, la moto de Batman dans *The Dark Knight* : deux énormes roues, un corps noir blindé, et toi couché dessus. Il roule à 187 km/h !
+
+- **N** : choisis-le, et **B** : il arrive à côté de toi. **E** pour monter dessus.
+- Ses grosses roues le tiennent toujours debout : il ne part jamais en accident, et il pousse les voitures. Mais il est ouvert : ce qui te touche te fait mal.
+- **R** : le **câble** ! Deux câbles partent devant lui, s'enroulent autour des roues de la voiture juste devant toi (à moins de 22 m)... et elle se retourne par-dessus son nez ! Le gros camion du Joker est plus dur : reste juste derrière lui pendant que le câble s'enroule. Ensuite, il faut 2 secondes pour ravoir le câble.
+
 #### Le magasin de Lucius Fox
 
 À Gotham, va voir **Lucius Fox** au pied de la **tour Wayne** (⚙ sur la carte) : il t'attend derrière l'accueil du grand hall de Wayne Enterprises, avec ses « nouveaux jouets ». Les costumes sont sur des mannequins, les Batmobiles sur de grands plateaux qui tournent, les gadgets et les améliorations près de la porte, avec leur prix au-dessus. Le magasin ouvre quand tu as ton premier costume.
@@ -280,7 +290,7 @@ Elle roule à 223 km/h, et elle est blindée.
 | **Batmobile de *The Batman*** | 45 000 $ | Une voiture de course musclée, la plus rapide sur la route : 252 km/h. **R** : le **turbo**, une grande flamme, et 340 km/h pendant 3 secondes |
 | **Tumbler** | 70 000 $ | Le char de *The Dark Knight* : 180 km/h, mais il tient 8 roquettes et pousse les voitures sans s'arrêter. **R** : il **saute** (4 m de haut !) et retombe sans casse |
 
-Le [Bat](#le-bat) n'est pas à vendre : c'est la 8e mission qui te le donne.
+Le [Bat](#le-bat) et le [Batpod](#le-batpod) ne sont pas à vendre : ce sont la 8e et la 10e mission qui te les donnent.
 
 Les gadgets, quand tu es en costume :
 
@@ -617,7 +627,7 @@ Le jeu se joue en chapitres, un par héros :
 | 4 | Metropolis | **Clark Kent**, alias **Superman** | Kara Danvers |
 | 5 | New York | **Peter Parker**, alias **Spiderman** | Gwen Stacy |
 
-- Malibu a ses 12 missions d'Iron Man, avant celle de la DeLorean ; Gotham, ses 8 premières missions de Batman, contre le Pingouin, Double-Face et Bane (les autres arrivent bientôt). Metropolis et New York n'ont pour l'instant qu'une mission (retrouver la DeLorean) : les vraies arrivent bientôt !
+- Malibu a ses 12 missions d'Iron Man, avant celle de la DeLorean ; Gotham, ses 12 missions de Batman, contre le Pingouin, Double-Face, Bane et le Joker, avant celle du Sphinx et de la DeLorean. Metropolis et New York n'ont pour l'instant qu'une mission (retrouver la DeLorean) : les vraies arrivent bientôt !
 - Metropolis et New York se passent encore à Los Santos ; Malibu et Gotham ont déjà leur ville.
 - Chaque chapitre commence par le logo de son héros (« CHAPITRE 2 »), qui s'en va à sa façon, et par des bulles d'aide qui t'apprennent ses pouvoirs.
 - Dans les chapitres 2 à 5, le code de triche de ton super-héros est toujours allumé (à Gotham, quand tu es en costume), et ceux des autres super-héros ne marchent pas.
@@ -678,6 +688,7 @@ La ville de Batman. Il y fait **toujours nuit**, il **pleut** et il y a du **bro
 - le **commissariat** (GCPD), avec le **Bat-signal** sur son toit ;
 - le **canal**, qui coupe la ville en deux, l'**autoroute**, le **stade**, le **port** et l'usine **Ace Chemicals** et ses cuves vertes ;
 - l'**asile d'Arkham**, sur son île, au bout d'un pont ;
+- le **bas de la ville** : l'autoroute passe le long des quais dans un long tunnel de béton, sombre, sous un parc (comme dans *The Dark Knight*) ;
 - le **repaire du Sphinx** (un grand ? vert sur son toit) : la DeLorean y est cachée ;
 - la **Batcave**, sous le manoir Wayne : une grotte immense, son lac, ses chauves-souris, le Batordinateur sur son île (on y descend par le vieux puits du jardin, et on en remonte par le vieil ascenseur) ;
 - les **égouts**, sous la colline de Bristol : leur grande bouche s'ouvre sur la rivière.
@@ -686,7 +697,7 @@ La ville de Batman. Il y fait **toujours nuit**, il **pleut** et il y a du **bro
 
 **Le monorail** : un train qui roule en hauteur au-dessus des rues, des Narrows à la tour Wayne, en passant par le vieux Gotham. Prends l'ascenseur jusqu'au quai d'une gare (M rouge sur la carte), attends le train, et appuie sur **E** pour monter. Tu regardes la ville par la fenêtre, et **E** à la gare suivante pour descendre.
 
-**Le Bat-signal** : quand la police t'appelle (des voyous braquent un magasin, ou au début de la 5e mission, quand le commissaire Gordon a besoin de toi), un grand faisceau monte du toit du commissariat, et la chauve-souris se dessine sur les nuages.
+**Le Bat-signal** : quand la police t'appelle (des voyous braquent un magasin, ou au début de la 5e et de la 9e mission, quand le commissaire Gordon a besoin de toi), un grand faisceau monte du toit du commissariat, et la chauve-souris se dessine sur les nuages. À la dernière mission, c'est un point d'interrogation : le Sphinx l'a détourné !
 
 **Batman ne tue jamais** : à Gotham, ceux que tu bats ne meurent pas. Ils tombent **assommés**, avec trois étoiles qui tournent au-dessus de leur tête, même avec le batarang explosif, le gel explosif ou la Batmobile (et tombés à l'eau, ils flottent jusqu'au bord). Une voiture de police arrive, sirène hurlante : deux policiers leur passent les menottes et les emmènent. Un passant assommé se relève au bout de 10 secondes et s'enfuit... mais il compte quand même comme une victime !
 
@@ -700,7 +711,11 @@ La ville de Batman. Il y fait **toujours nuit**, il **pleut** et il y a du **bro
 6. **Le stade** : il y a match au stade de Gotham, et les tribunes sont pleines... **Bane** fait sauter le terrain ! Les gens s'enfuient (personne n'est blessé) : assomme ses 10 mercenaires.
 7. **Bane** : il t'attend au fond des égouts. Il est énorme, et très fort : quand il lève le poing, recule ! Quand il charge, saute de côté : s'il fonce dans un mur, il est sonné, et tes coups comptent double. S'il gagne, tu te réveilles dans la rue pour **la revanche**, avec toute la police de Gotham à tes côtés.
 8. **La bombe de Bane** : Lucius Fox t'a préparé une surprise, à la tour Wayne : le **Bat** ! Vole au-dessus de la bombe, au stade : elle s'accroche dessous. Emporte-la loin au-dessus de la mer, saute (**E**), et plane avec ta cape jusqu'à la côte... BOUM ! Le Bat est à toi.
-9. **La DeLorean a disparu** : le Sphinx l'a cachée dans son repaire. Va la reprendre !
+9. **Le braquage des clowns** : les clowns du Joker, masqués, braquent la banque de Gotham ! La police fait évacuer la ville. Assomme-les quand ils sortent avec les sacs d'argent, puis rattrape en Batmobile le **bus scolaire** où s'enfuit le Joker, et rentre-lui dedans 4 fois.
+10. **Le camion du Joker** : le Joker attaque dans le **bas de la ville**, le long tunnel des quais, avec son gros camion violet (« HA HA HA » sur les flancs) et un bazooka. Ta Batmobile est touchée... et le **Batpod** en sort ! (Arrive par la route du tunnel, à pied ou en voiture : pas en volant.) Rattrape le camion, et quand il est juste devant toi, **R** : le câble s'enroule autour de ses roues (reste juste derrière lui !)... et il se retourne. Puis assomme les clowns qui en sortent. Le Batpod est à toi.
+11. **La parade au gaz** : Gotham fête ses 200 ans, et le Joker a sa parade : des chars tirent des **ballons géants** à sa tête, pleins de gaz qui fait rire. Crève-les (batarangs, filets, grappin, ou fonce dedans en volant) avant qu'ils arrivent au-dessus de la foule ! Trop tard, et les gens rient... puis tombent (personne n'en meurt), et le Joker en lâche un autre. Puis ses clowns sautent de son char, et il s'enfuit en hélicoptère.
+12. **La cathédrale** : le grand final ! Monte au grappin en haut du clocher, à 57 m, où t'attend le **Joker** : son revolver (sa première balle sort un drapeau « BANG ! »), ses dentiers à remontoir qui explosent (un coup de poing les casse), sa fleur qui crache de l'acide et son gaz qui fait rire. Pendant le combat, un garde-fou invisible t'empêche de tomber du clocher. Quand son hélicoptère vient le chercher, et qu'il s'enfuit pendu à l'échelle : ton **grappin** (**G**), sur lui !
+13. **Les devinettes du Sphinx** : le Sphinx a volé la DeLorean, et détourné le Bat-signal (un point d'interrogation !). Ses devinettes t'attendent sous de grands ? verts, dans Gotham : réponds avec **1**, **2** ou **3**, et la réponse te dit où est la suivante. Une mauvaise réponse ? Un piège : ses hommes arrivent ! Au bout, assomme le Sphinx dans son repaire, et pars avec la DeLorean.
 
 ### Un héros sans reproche
 
@@ -744,7 +759,7 @@ Appuie sur **Entrée**, tape le code, puis **Entrée**. Retape un code pour l'an
 | `IDKFA` (ou `ARMES`, `WAFFEN`, `WEAPONS`) | Toutes les armes et plein de munitions, comme dans *Doom* |
 | `RICHE` | 100 000 $ |
 | `MILLIARDAIRE` | Un milliard de dollars |
-| `MISSION` suivi d'un numéro | Saute directement à cette mission du chapitre où tu es (`MISSION8` : le musée ; `MISSION11` : le camp militaire, qui repart de zéro), avec une voiture blindée à côté s'il en faut une, et ce que les missions d'avant t'auraient donné (l'armure de Tony Stark, le costume et la Batmobile de Batman) |
+| `MISSION` suivi d'un numéro | Saute directement à cette mission du chapitre où tu es (`MISSION8` : le musée ; `MISSION11` : le camp militaire, qui repart de zéro), avec une voiture blindée à côté s'il en faut une, et ce que les missions d'avant t'auraient donné (l'armure de Tony Stark ; le costume, la Batmobile, le Bat et le Batpod de Batman) ; ce qu'elles ne t'ont pas encore donné, il te le reprend |
 | `CHAPITRE` suivi d'un numéro | Va dans ce chapitre (`CHAPITRE2` : Iron Man, à Malibu) |
 
 ### La touche 9
@@ -833,7 +848,7 @@ Les nombres de tout le jeu :
 - **La montagne et le ski** : hauteur des montagnes, pente des routes qui partent d'une ville ou d'un croisement (`penteRoute` : 0.35, pas plus de 35 m de montée pour 100 m), vitesse des remontées (en ligne et dans les gares), ce que la neige freine à ski, jusqu'où descend la neige, hauteur du saut à ski (et ce qu'on gagne en sautant sur une bosse), vitesse des vrilles et des saltos, force du dérapage, vitesse de montée en skis de rando (et de descente avec les peaux), ce que la neige amortit des chutes, la chance que tes skis restent plantés à côté de toi quand tu tombes, nombre d'autres skieurs.
 - **Les super-héros** : ce qu'écrase la chute de Superman (à combien de mètres à la ronde, les dégâts, et de quelle hauteur on passe à travers un toit), vitesse de vol de Superman, vitesse du grappin de Batman, vitesse de sa cape (et de combien elle descend), vitesse de Spiderman sur un mur et au bout de sa toile, vitesse de la voiture qu'il lance, vitesse des batarangs.
 - **Le jour et la nuit** : la durée du jour, du coucher du soleil, de la nuit et du lever du soleil (`dureeJour`, `dureeCrepuscule`, `dureeNuit`, `dureeLever`, en secondes : mets `dureeNuit: 30` pour une nuit toute courte), la lumière de la lune (`clairDeLune`), combien de lampadaires éclairent vraiment la nuit (`lumieresNuit`), combien de piétons et de voitures il reste la nuit, combien de gangs en plus.
-- **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
+- **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), ce que les batarangs explosifs font à Batman lui-même (`explosifsBatman`, et `armeExplosifs` : après combien de mètres de vol ils peuvent exploser), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
 - **Jusqu'où on voit** : `distanceRelief`, les montagnes et la mer (10 km) ; `distanceVue`, les bâtiments et les arbres (900 m).
 
 **Si le jeu rame**, mets `distanceVue: 500`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`.
@@ -852,7 +867,8 @@ Vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de v
 - La Batmobile a aussi sa vitesse en l'air (`vitesseVol`) : donne-la à une autre voiture, et elle volera avec R... mais sans ailes ! Et `descente`, la vitesse à laquelle elle descend pour se poser (25 = 90 km/h ; mets 6 pour un atterrissage tout doux, 60 pour tomber comme une pierre : elle freine toujours avant le sol).
 - Pour l'avion : la vitesse pour décoller, et celles de ses figures (`tonneau` et `looping`). Pour l'hélicoptère : la vitesse à laquelle il monte.
 - Les autres Batmobiles (celles du magasin de Lucius Fox) ont chacune leur pouvoir, sur la touche R : `grappin: true` (le virage au grappin), `turbo` (sa `vitesse`, sa `duree`, sa `recharge`), `saut` (à quelle vitesse elle saute vers le haut). Et `roquettes` (combien elle en encaisse), `belier: true` (elle pousse les voitures sans s'arrêter).
-- À Gotham, les véhicules du Pingouin : sa voiture (une vieille limousine violet sombre), son canard géant à moteur (un bateau) et les camions de la poursuite. Ils ont `chance: 0` : on ne les croise que dans ses missions.
+- À Gotham, les véhicules du Pingouin : sa voiture (une vieille limousine violet sombre), son canard géant à moteur (un bateau) et les camions de la poursuite ; et ceux du Joker : son bus scolaire, son gros camion violet et son hélicoptère. Ils ont `chance: 0` : on ne les croise que dans leurs missions.
+- Le **Batpod** : `stable: true` (il ne part jamais en accident) et son `cable` (`portee` : jusqu'où il attrape la voiture devant lui ; `tenir` : combien de secondes il faut rester derrière le camion du Joker ; `recharge` : les secondes avant de pouvoir recommencer).
 - Le **Bat** : `vitesseVol` (sa vitesse en l'air : 80 = 288 km/h), `descente`, `roquettes` (celles qu'il encaisse) et `vitesse` (au sol, tout doucement).
 - Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
 
@@ -862,7 +878,7 @@ Vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de v
 
 - policiers, policiers d'élite, soldats nazis, Kommandant, Hitler, vigiles, membres de gang, chiens de garde, militaires du camp et leur commandante Irene Engel ;
 - à Malibu : les combattants des Dix Anneaux et leur chef Raza (au bazooka : `arme: 6` ; `explosions` : la part des dégâts des explosions qu'il prend ; `recule` : il recule quand tu t'approches à moins de tant de mètres), Iron Monger, Whiplash et ses fouets (`portee` : leur longueur), les drones de Hammer, les hélicoptères du Mandarin, les soldats Extremis et Aldrich Killian (`guerison` : ce qu'ils guérissent par seconde ; `boss: true` : sa barre de vie en haut de l'écran), les passagers d'Air Force One, Hulk (`degatsVoiture` : quand il te lance une voiture ; `degatsSaut` : quand il retombe à côté de toi), les sentinelles d'Ultron et Ultron (`degatsGrandRayon`) ;
-- à Gotham : les hommes du Pingouin, et le Pingouin lui-même (`degatsRoquette` : les roquettes de son parapluie ; `recule` : il garde ses distances) ; les hommes de Double-Face, et Double-Face (`piece` : les secondes entre deux lancers de sa pièce ; `rafale` : les secondes où il tire des deux mains, quand elle tombe sur pile ; `hesite` : celles où il hésite, sur face ; `renforts` : ses hommes qui arrivent à la moitié de sa vie) ; les mercenaires de Bane, et Bane (`elan` : les secondes où il lève le poing avant de frapper ; `charge`, `degatsCharge`, `vitesseCharge` : sa charge ; `sonne` : les secondes où il est sonné ; `sonneDegats` : tes coups comptent tant de fois ; `pris` : les secondes où un filet le tient ; `taille` : sa taille) ;
+- à Gotham : les hommes du Pingouin, et le Pingouin lui-même (`degatsRoquette` : les roquettes de son parapluie ; `recule` : il garde ses distances) ; les hommes de Double-Face, et Double-Face (`piece` : les secondes entre deux lancers de sa pièce ; `rafale` : les secondes où il tire des deux mains, quand elle tombe sur pile ; `hesite` : celles où il hésite, sur face ; `renforts` : ses hommes qui arrivent à la moitié de sa vie) ; les mercenaires de Bane, et Bane (`elan` : les secondes où il lève le poing avant de frapper ; `charge`, `degatsCharge`, `vitesseCharge` : sa charge ; `sonne` : les secondes où il est sonné ; `sonneDegats` : tes coups comptent tant de fois ; `pris` : les secondes où un filet le tient ; `taille` : sa taille) ; les clowns du Joker, et le Joker (`dentier` : les secondes entre deux dentiers à remontoir, `degatsDentier`, `rayonDentier` ; `degatsFleur` : sa fleur à l'acide ; `degatsGaz` : son gaz qui fait rire, par seconde ; `degatsRoquette` : son bazooka ; `helico` : à cette part de sa vie, son hélicoptère vient le chercher) ; les hommes du Sphinx, et le Sphinx (`degats` : sa canne électrique ; `souffle` : les secondes où il reste planté là après un coup de canne, le moment de le frapper ; `bombe` : les secondes entre deux points d'interrogation qui explosent, `degatsBombe` ; `renforts`) ;
 - les voyous des appels de la police ;
 - la vitre, les dégâts et la vitesse du heavy robot.
 
@@ -987,6 +1003,7 @@ Gotham y a :
 - `VISITABLES` : la part des immeubles où l'on entre (à Gotham, 1 sur 10 : il y a tellement d'immeubles que le jeu prendrait trop de mémoire) ;
 - `BATCAVE` : la Batcave, sous le vieux puits du manoir Wayne. Ses `morceaux` (des rectangles, en mètres autour du puits, et la hauteur de leur sol : le lac est à -4), son `plafond`, la `corniche` où l'on monte au grappin, l'`ile` du Batordinateur, la vitrine du `costume`, le vieil `ascenseur` et les `lampes`. Agrandis-la, ou ajoute une île !
 - `EGOUT` : l'égout, sous la colline de Bristol : sa `bouche` sur la rivière (colonne, ligne), sa `longueur`, sa `largeur`, celle de son `canal`, sa `hauteur`, la `salle` du bout (longueur, largeur) et le mur du `quai`.
+- `TUNNEL` : le bas de la ville, le tunnel de l'autoroute le long des quais : sa `route` (la colonne de l'autoroute), de la ligne `de` à la ligne `a`, sa `largeur` et sa `hauteur`. Allonge-le jusqu'au port !
 
 #### `MISSIONS`
 
@@ -1038,10 +1055,15 @@ Et pour Batman :
 | `stade` | Aller au stade, où il y a match : Bane fait sauter le terrain |
 | `bat` | Monter dans le Bat, qui arrive du ciel au lieu (la tour Wayne) |
 | `bombe` | Emporter la bombe de Bane sous le Bat, à plus de `loin` mètres de la terre (le point jaune : `large`), avant la fin des `secondes`, puis sauter (E) |
+| `parade` | Crever les `ballons` géants du Joker, tirés par des chars qui descendent la rue (du carrefour `de` au carrefour `a`, à `vitesse` m/s), avant qu'ils arrivent au-dessus de la foule |
+| `devinettes` | Répondre aux devinettes du Sphinx (le tableau **`DEVINETTES`**, plus bas) ; une mauvaise réponse : `pieges` hommes du Sphinx arrivent |
+
+Pour `poursuite`, `qui: 'joker'` : c'est le Joker qui s'enfuit (le bus, le camion), et à la fin, il disparaît dans un nuage de fumée ; `camions` et `feux` : combien de camions roulent devant lui, combien de feux brûlent au bord de la route ; `batpod: true` : quand tu arrives, le Joker tire sur ta voiture, et le Batpod en sort ; `cable: true` : il faut le renverser avec le câble du Batpod (R) ; `bazooka` : les secondes entre deux roquettes du Joker.
 
 Pour l'étape `eliminer` :
 
-- les ennemis : `soldat`, `boss`, `hitler`, `militaire`, `engel`, ou à Malibu `anneaux`, `raza`, `monger`, `whiplash`, `drone`, `helico`, `extremis`, `killian`, `hulk`, `sentinelle`, `ultron`, ou à Gotham `homme` (un homme du Pingouin), `pingouin` (le Pingouin), `bandit` (un homme de Double-Face), `doubleFace`, `mercenaire` (un mercenaire de Bane), `bane`... ;
+- les ennemis : `soldat`, `boss`, `hitler`, `militaire`, `engel`, ou à Malibu `anneaux`, `raza`, `monger`, `whiplash`, `drone`, `helico`, `extremis`, `killian`, `hulk`, `sentinelle`, `ultron`, ou à Gotham `homme` (un homme du Pingouin), `pingouin` (le Pingouin), `bandit` (un homme de Double-Face), `doubleFace`, `mercenaire` (un mercenaire de Bane), `bane`, `clown` (un clown du Joker), `joker`, `acolyte` (un homme du Sphinx), `sphinx`... ;
+- avec `pres: 'camion'`, ils sortent du camion renversé du Joker ; avec `pres: 'char'`, ils sautent de son char, à la parade ;
 - avec `revanche` (contre Bane) : s'il te bat, tu te réveilles dans la rue (`noeud`), avec `policiers` policiers et `voitures` voitures de police, et Bane revient avec ses `mercenaires` ;
 - avec `nombre`, ils arrivent au début de l'étape ;
 - avec `allies: ['War Machine']`, une armure se bat avec toi (ou celles de **`FETE_DES_ARMURES`**, juste après `ARMURE_MONGER` : change leurs couleurs !) ;
@@ -1052,11 +1074,13 @@ Les lieux :
 - Un lieu est une lettre de la carte : `'G'` veut dire « le garage le plus proche ».
 - Ou un carrefour : `noeud: [colonne, ligne]`, ou le milieu d'une case : `case: [colonne, ligne]`.
 - À la grotte des Dix Anneaux, `depuis` dit d'où arrivent les ennemis (`'galerie'`, `'tentes'` ou `'chef'`).
-- À Gotham, `point` : un endroit de la Batcave (`'corniche'`, `'ile'`, `'manoir'`), de l'égout (`'salle'`) ou du canal (`'ponton'`).
+- À Gotham, `point` : un endroit de la Batcave (`'corniche'`, `'ile'`, `'manoir'`), de l'égout (`'salle'`), du canal (`'ponton'`) ou la plateforme en haut du clocher de la cathédrale (`'clocher'`).
 
-Une étape `aller` avec `signal: true` allume le Bat-signal ; une mission avec `donne: 'Bat'` te donne le Bat.
+Une étape `aller` avec `signal: true` allume le Bat-signal ; une mission avec `donne: 'Bat'` te donne le Bat (`donne: 'Batpod'` : le Batpod) ; avec `evacuer: true`, la police fait évacuer la ville pendant toute la mission (4 fois moins de passants et de voitures).
 
-Les missions des autres chapitres sont dans **`MISSIONS_CHAPITRES`**, juste après (celles d'Iron Man dans **`MISSIONS_MALIBU`**, celles de Batman dans **`MISSIONS_GOTHAM`**). Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
+**`DEVINETTES`**, juste après `MISSIONS_GOTHAM` : les devinettes du Sphinx, dans l'ordre. Pour chacune : `lieu` (où t'attend son point d'interrogation : une lettre de la carte de Gotham, ou une case [colonne, ligne]), `question`, ses 3 `reponses` (dans l'ordre des touches 1, 2, 3) et `bonne` (le numéro de la bonne). Fais en sorte que la réponse dise où est la suivante ! Invente les tiennes (et ajoute leur traduction dans `TRADUCTIONS`, pour qu'elles marchent aussi en allemand et en anglais).
+
+Les missions des autres chapitres sont dans **`MISSIONS_CHAPITRES`**, juste après (celles d'Iron Man dans **`MISSIONS_MALIBU`**, celles de Batman dans **`MISSIONS_GOTHAM`**, et la dernière de Gotham, celle du Sphinx, dans **`DELOREAN_SPHINX`**). Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
 
 #### `CASCADES`
 
@@ -1082,7 +1106,7 @@ Donne une mitrailleuse à la Hulkbuster, ou invente une armure toute rose !
 Juste après les armures d'Iron Man, les costumes de Batman et de Batgirl (`COSTUME_BATMAN`, `COSTUME_BATGIRL`), puis les quatre tableaux du magasin de Lucius Fox :
 
 - **`COSTUMES_WAYNE`** : les costumes. Leur prix, leurs couleurs (le collant, le slip, la cagoule et la cape, la chauve-souris, la ceinture, l'ovale), leurs `plaques` (`'blinde'` ou `'armure'`), la couleur de leurs `yeux` qui brillent, et ce qu'ils changent : `protection` (la part des dégâts que tu prends), `cape` (2 = tu planes 2 fois plus loin), `vitesse`, `taille`, `poings`.
-- **`BATMOBILES_WAYNE`** : les Batmobiles du magasin et leur prix. Leur vitesse et leur pouvoir sont dans [`VOITURES`](#voitures-1). Le hall n'a que 6 places : une 7e Batmobile ne serait pas dans le magasin. Le Bat y est aussi, avec `mission: true` : pas à vendre, une mission le donne (`donne`).
+- **`BATMOBILES_WAYNE`** : les Batmobiles du magasin et leur prix. Leur vitesse et leur pouvoir sont dans [`VOITURES`](#voitures-1). Le hall n'a que 6 places : une 7e Batmobile ne serait pas dans le magasin. Le Bat et le Batpod y sont aussi, avec `mission: true` : pas à vendre, une mission les donne (`donne`).
 - **`GADGETS_WAYNE`** : la vision de détective (`portee`), les fumigènes (`rayon`, `duree`, `recharge`), le gel explosif (la taille du `trou`, ses `degats`) et les gants électriques (`degats`, `paralyse`). Un gadget de plus aurait son socle, mais ne ferait rien : ce qu'il fait est dans le code.
 - **`AMELIORATIONS_WAYNE`** : la vie, le grappin et la cape, avec le prix de chaque niveau (ajoute un prix, tu as un niveau de plus !).
 
