@@ -1922,6 +1922,7 @@ const REGLAGES = {
   sommeilVoitures: 60,       // mètres : une voiture garée plus loin que ça de toi, qui ne bouge plus depuis 2 s, « dort » : le jeu ne la recalcule plus à chaque image (la plupart des voitures du pays sont garées). Elle se réveille dès que tu t'approches, ou qu'on la touche. 0 = aucune ne dort (le jeu recalcule tout, comme avant : deux fois plus de calcul). Si le jeu rame, surtout pas 0 ; 30, si tu veux, mais ça ne gagne presque rien de plus
   detailsVoitures: 60,       // mètres : une voiture plus loin que ça de la caméra est dessinée d'un seul bloc (toutes ses pièces collées ensemble, roues comprises) : de loin, on ne voit pas la différence, et c'est deux fois moins de travail pour la carte graphique. Son ombre, elle, vient toujours de ce bloc, même de près (c'est la même ombre, en un seul dessin au lieu de 17). Une voiture abîmée, en feu, en accident, ou la police, garde toujours toutes ses pièces et leurs ombres. 0 = toutes les voitures ont toujours toutes leurs pièces (comme avant). Si le jeu rame, mets 30 (c'est ce que fait la qualité Basse)
   personnagesEnBloc: true,   // true = chaque passant, policier ou ennemi est dessiné d'un seul bloc : toutes ses pièces collées ensemble, qui suivent ses vraies pièces comme une marionnette (un dessin pour son corps et un pour son visage, au lieu d'une vingtaine). On ne voit pas la différence, même de tout près, et la carte graphique a bien moins de travail avec la foule. false = pièce par pièce, comme avant. Toi, tu es toujours dessiné pièce par pièce. Si le jeu rame, laisse true
+  cacheDerriere: true,       // true = ce qui est tout entier caché derrière un immeuble ou une maison (une voiture dans la rue d'à côté, les passants derrière, l'intérieur d'un bâtiment de l'autre côté du pâté...) n'est pas dessiné : on ne le verrait pas, et la carte graphique a moins de travail. On ne voit pas la différence (son ombre, elle, est toujours dessinée). false = tout est dessiné, même caché (comme avant). Si le jeu rame, laisse true
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   distanceInterieurs: 150,   // mètres : on ne voit l'intérieur d'un bâtiment (planchers, marches, meubles) qu'à moins de 100 m. Son dessin n'est fabriqué que quand la caméra est plus près que ça, et il est défait 100 m plus loin : ça garde beaucoup de mémoire libre. 100 = au dernier moment (encore moins de mémoire, mais en volant vite, le jeu peut accrocher en fabriquant plusieurs intérieurs à la fois) ; 100000 = tous les intérieurs, peu à peu, et jamais défaits (comme avant)
@@ -4115,6 +4116,8 @@ const VUE_RELIEF = Math.max(R_.distanceRelief, R_.distanceVue);
 scene.fog = new THREE.Fog(0xa9c4e0, R_.distanceVue * 0.2, VUE_RELIEF);
 // ...mais pas les détails (bâtiments, arbres, routes, voitures, gens) : ils s'effacent point par point entre 80 % de distanceVue et distanceVue,
 // et plus loin on ne les dessine plus du tout (majMorceaux). Le terrain et l'eau, eux, restent : leur matière est marquée RELIEF (voir relief).
+// POINTILLES : là où ils commencent, fixé au chargement (comme distanceVue : il attend F5). Voir aussi choisirPleins
+const POINTILLES = R_.distanceVue * 0.8;
 // Pour ça, on retouche le bout de programme de Three.js qui dessine la brume. La distance se compte pour chaque point de l'image, tout autour
 // de la caméra, et pas seulement devant elle : sinon tout changerait quand on tourne la tête
 {
@@ -4122,7 +4125,7 @@ scene.fog = new THREE.Fog(0xa9c4e0, R_.distanceVue * 0.2, VUE_RELIEF);
     if (!THREE.ShaderChunk[nom].includes(avant)) alert(`Brume : le programme « ${nom} » de Three.js a changé !`);
     THREE.ShaderChunk[nom] = THREE.ShaderChunk[nom].replace(avant, apres);
   };
-  const debut = (R_.distanceVue * 0.8).toFixed(1), large = (R_.distanceVue * 0.2).toFixed(1);
+  const debut = POINTILLES.toFixed(1), large = (R_.distanceVue * 0.2).toFixed(1);
   retoucher('fog_pars_vertex', 'varying float vFogDepth;', 'varying vec3 vFogPosition;');
   retoucher('fog_vertex', 'vFogDepth = - mvPosition.z;', 'vFogPosition = mvPosition.xyz;');
   retoucher('fog_pars_fragment', 'varying float vFogDepth;', 'varying vec3 vFogPosition;');
@@ -4141,8 +4144,91 @@ THREE.Frustum.prototype.intersectsObject = function (o) {
   if (!dansLeChamp.call(this, o)) return false;
   if (o.material.defines?.RELIEF || o.material.fog === false) return true;   // (sans brouillard : le repère jaune des missions, qu'on voit de partout)
   bouleLoin.copy(o.boundingSphere || o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
-  return bouleLoin.center.distanceTo(camera.position) - bouleLoin.radius < R_.distanceVue;
+  if (bouleLoin.center.distanceTo(camera.position) - bouleLoin.radius >= R_.distanceVue) return false;
+  return !(occulter && o.isMesh && cacheParUnPlein(bouleLoin, o, this));   // caché derrière un immeuble plein (voir cacheParUnPlein)
 };
+// Ce qui est tout entier caché derrière un immeuble n'est pas dessiné (REGLAGES.cacheDerriere) : une voiture dans la rue d'à côté, les
+// passants derrière, l'intérieur d'un bâtiment de l'autre côté du pâté... Les immeubles pleins (ceux où l'on n'entre pas) et les maisons
+// sont notés en construisant le pays (noterPlein) : ce sont des boîtes fermées, sans porte ni fenêtre ouverte (les fenêtres sont peintes).
+// Juste avant chaque image, on prend ceux qui sont près de la caméra (choisirPleins) ; puis, pour chaque objet que Three.js va dessiner,
+// on regarde si l'un d'eux le cache tout entier : les 8 coins d'une boîte autour de l'objet sont tous derrière le même immeuble, vus de
+// la caméra (le trajet de la caméra à chaque coin le traverse). Une boîte fermée cache alors aussi tout ce qui est entre ces coins.
+// En cas de doute, on dessine : un objet plus grand qu'un immeuble, ou au bord de l'image, un immeuble tout contre la caméra ou trop loin,
+// un trou dans son toit ; et ce qui n'est pas un objet plein (des points, un trait, une image toujours tournée vers nous).
+// Seulement pour l'image de la caméra : la carte des ombres dessine tout (une voiture cachée fait de l'ombre dans la rue qu'on voit)
+const pleins = new Map();   // les immeubles pleins, par case de la carte : { x1, z1, x2, z2, bas, haut }, et leur boule (cx, cy, cz, r)
+const pleinsVus = [];       // ceux de cette image, près de la caméra, du plus proche au plus loin
+const PORTEE_PLEINS = 300;  // mètres : un immeuble plus loin que ça de la caméra cache trop peu de choses pour qu'on le regarde
+let occulter = false;       // vrai pendant que Three.js choisit ce qu'il dessine pour la caméra du jeu (pas pour la carte des ombres)
+// un immeuble plein, de la matière mat : (x, z) son milieu, l × p sa taille, de bas à haut. Seulement s'il est opaque (une tour de verre
+// transparente, une matière découpée ou invisible : on verrait au travers) ; pas dans un intérieur, ni dans un monument qui bouge (aPart)
+const opaque = m => m.visible && m.colorWrite && !m.transparent && m.opacity === 1 && !m.alphaTest && !m.alphaMap;
+function noterPlein(mat, x, z, l, p, bas, haut) {
+  if (interieur || aPart || !opaque(MAT[mat])) return;
+  const [i, j] = blocEn(x, z), k = j * NBX + i, b = { x1: x - l / 2, z1: z - p / 2, x2: x + l / 2, z2: z + p / 2, bas, haut };
+  Object.assign(b, { cx: x, cy: (bas + haut) / 2, cz: z, r: Math.hypot(l, haut - bas, p) / 2 });
+  if (!pleins.has(k)) pleins.set(k, []);
+  pleins.get(k).push(b);
+}
+// juste avant l'image de la caméra c : les immeubles qui peuvent cacher quelque chose (rien, si c n'est pas la caméra du jeu)
+function choisirPleins(c) {
+  pleinsVus.length = 0;
+  occulter = R_.cacheDerriere && c === camera;
+  if (!occulter) return;
+  // (tout entier plus près que les pointillés de la brume, fixés au chargement : plus loin, elle efface les détails, on voit au travers)
+  const e = c.position, portee = Math.min(PORTEE_PLEINS, POINTILLES - 1), n = Math.ceil(portee / PAS) + 1, [ci, cj] = blocEn(e.x, e.z);
+  for (let j = Math.max(0, cj - n); j <= Math.min(NBZ - 1, cj + n); j++) for (let i = Math.max(0, ci - n); i <= Math.min(NBX - 1, ci + n); i++) {
+    for (const b of pleins.get(j * NBX + i) ?? []) {
+      const d = Math.hypot(b.cx - e.x, b.cy - e.y, b.cz - e.z);
+      if (d + b.r > portee) continue;
+      // la caméra dehors, à 1 m au moins (tout contre un mur, le bord de l'image pourrait le couper : on verrait au travers)
+      const dMin = Math.hypot(e.x - clamp(e.x, b.x1, b.x2), e.y - clamp(e.y, b.bas, b.haut), e.z - clamp(e.z, b.z1, b.z2));
+      if (dMin < 1) continue;
+      // (un trou dans un toit tout près : les matières n'y sont pas dessinées, voir trous)
+      if (trous.some(t => t.x1 < b.x2 + 1 && t.x2 > b.x1 - 1 && t.z1 < b.z2 + 1 && t.z2 > b.z1 - 1 && t.bas < b.haut + 1 && t.haut > b.bas - 1)) continue;
+      // sa direction, et l'angle de sa boule vue de la caméra (pour écarter vite ce qui n'est pas derrière lui)
+      b.dMin = dMin; b.ux = (b.cx - e.x) / d; b.uy = (b.cy - e.y) / d; b.uz = (b.cz - e.z) / d; b.cos = b.r >= d ? -1 : Math.sqrt(1 - (b.r / d) ** 2);
+      pleinsVus.push(b);
+    }
+  }
+  pleinsVus.sort((a, b) => a.dMin - b.dMin);
+}
+// le trajet de la caméra jusqu'au point (x, y, z) passe-t-il dans l'immeuble b ? (25 cm à l'intérieur de ses murs, pour être sûr)
+// On garde la partie du trajet (de 0, la caméra, à 1, le point) qui est dans l'immeuble le long de chaque axe : il en reste, ou pas
+let debutTrajet = 0, finTrajet = 1;
+function axePlein(o, d, min, max) {   // le long d'un axe : o, la caméra ; d, le trajet ; l'immeuble de min à max
+  if (Math.abs(d) < 1e-9) return o > min && o < max;
+  let a = (min - o) / d, c = (max - o) / d;
+  if (a > c) { const t = a; a = c; c = t; }
+  debutTrajet = Math.max(debutTrajet, a); finTrajet = Math.min(finTrajet, c);
+  return debutTrajet <= finTrajet;
+}
+function traversePlein(b, x, y, z) {
+  const e = camera.position, m = 0.25;
+  debutTrajet = 0; finTrajet = 1;
+  return axePlein(e.x, x - e.x, b.x1 + m, b.x2 - m) && axePlein(e.y, y - e.y, b.bas + m, b.haut - m) && axePlein(e.z, z - e.z, b.z1 + m, b.z2 - m);
+}
+// une matière qui se dessine par-dessus tout, ou autrement que d'habitude : on la dessine toujours
+const parDessus = m => !m.depthTest || m.depthFunc !== THREE.LessEqualDepth;
+// l'objet o, dans sa boule s (dans le monde), est-il tout entier caché par un des immeubles de cette image ? (champ : ce que voit la caméra)
+function cacheParUnPlein(s, o, champ) {
+  const r = s.radius + (o.isSkinnedMesh ? 0.5 : 0), c = s.center, e = camera.position, mat = o.material;   // (un personnage d'un seul bloc : 50 cm de plus, pour ses bras et ses jambes)
+  if (r > 30 || !pleinsVus.length) return false;   // plus grand qu'un immeuble : on ne cherche pas
+  if (Array.isArray(mat) ? mat.some(parDessus) : parDessus(mat)) return false;
+  const dx = c.x - e.x, dy = c.y - e.y, dz = c.z - e.z, d = Math.hypot(dx, dy, dz);
+  // tout entier dans l'image, et pas tout au bord : au bord de l'image, la carte graphique peut laisser passer quelques points de ce qui est
+  // derrière un mur (mesuré : une voiture à 317 m, au bord gauche, se voyait en 7 points). 2 % de la distance : une dizaine de points de l'écran
+  for (let k = 0; k < 4; k++) if (champ.planes[k].distanceToPoint(c) < r + 0.02 * d) return false;
+  for (const b of pleinsVus) {
+    if (b.dMin > d - r) break;   // cet immeuble (et les suivants, plus loin) n'est pas tout entier devant l'objet
+    if (dx * b.ux + dy * b.uy + dz * b.uz < d * b.cos) continue;   // l'objet n'est pas dans sa direction
+    if (!traversePlein(b, c.x, c.y, c.z)) continue;   // son milieu n'est pas derrière
+    let tous = true;   // ses 8 coins ?
+    for (let k = 0; k < 8 && tous; k++) tous = traversePlein(b, c.x + (k & 1 ? r : -r), c.y + (k & 2 ? r : -r), c.z + (k & 4 ? r : -r));
+    if (tous) return true;
+  }
+  return false;
+}
 const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, Math.max(R_.distanceVue * 1.5 + 200, VUE_RELIEF * 1.05));
 camera.rotation.order = 'YXZ';
 scene.add(camera);
@@ -4735,6 +4821,7 @@ function solMonde(mat, x1, z1, x2, z2, y, taille = 8) {
 function immeuble(mat, x, z, l, p, etages, rnd) {
   const h = etages * 3;
   boite(mat, x, 0.2, z, l, h, p, true);
+  noterPlein(mat, x, z, l, p, Y0 + 0.2, Y0 + 0.2 + h);   // une boîte fermée et opaque : elle cache ce qui est derrière (voir cacheParUnPlein) ; si tu la perces, enlève cette ligne
   boite('toit', x, 0.2 + h, z, l + 0.5, 0.6, p + 0.5, true);   // on se pose dessus (un hélicoptère, B.J.), pas 60 cm dedans
   if (rnd() < 0.8) boite('metal', x + (rnd() - 0.5) * l * 0.5, 0.8 + h, z + (rnd() - 0.5) * p * 0.5, 3, 1.6, 2, true);
   if (rnd() < 0.5) boite('metal', x + (rnd() - 0.5) * l * 0.5, 0.8 + h, z + (rnd() - 0.5) * p * 0.5, 1.5, 3, 1.5, true);
@@ -4749,6 +4836,7 @@ function toitPente(mat, x, y, z, l, p, pente = 0.55) {
 function maison(mat, toitMat, x, z) {
   const l = 12, p = 9, h = 6;
   boite(mat, x, 0.2, z, l, h, p, true);
+  noterPlein(mat, x, z, l, p, Y0 + 0.2, Y0 + 0.2 + h);   // une boîte fermée et opaque : elle cache ce qui est derrière (voir cacheParUnPlein) ; si tu la perces, enlève cette ligne
   toitPente(toitMat, x, 0.2 + h, z, l, p);
   boite('porte', x, 0.2, z + p / 2, 1.2, 2.2, 0.1);
 }
@@ -17705,16 +17793,22 @@ const sansVraieOmbre = [];
 {
   const dessinerOmbres = renderer.shadowMap.render;
   renderer.shadowMap.render = function (lumieres, s, c) {
+    occulter = false;   // (la carte des ombres dessine aussi ce qui est caché derrière un immeuble : voir cacheParUnPlein)
     if (s !== scene || (!sansVraieOmbre.length && !voituresEnBloc.length)) return dessinerOmbres.call(this, lumieres, s, c);
     for (const g of sansVraieOmbre) { g.userData.vu = g.visible; g.visible = false; }   // (on retient s'il était visible, pour le remettre comme avant)
     for (const v of voituresEnBloc) ombreEnBloc(v, true);
     try { return dessinerOmbres.call(this, lumieres, s, c); } finally { for (const g of sansVraieOmbre) g.visible = g.userData.vu; for (const v of voituresEnBloc) ombreEnBloc(v, false); }
   };
 }
-// juste avant chaque image du pays, les personnages d'un seul bloc (voir majFormes) : c'est là, et pas plus tôt, qu'on sait ce qui a changé
+// juste avant chaque image du pays, les personnages d'un seul bloc (voir majFormes) : c'est là, et pas plus tôt, qu'on sait ce qui a changé ;
+// et les immeubles qui cachent ce qui est derrière eux, vus d'où est la caméra à ce moment-là (voir cacheParUnPlein)
 {
   const dessiner = renderer.render;
-  renderer.render = function (s, c) { if (s === scene) majFormes(); return dessiner.call(this, s, c); };
+  renderer.render = function (s, c) {
+    if (s !== scene) return dessiner.call(this, s, c);
+    majFormes(); choisirPleins(c);
+    try { return dessiner.call(this, s, c); } finally { occulter = false; }
+  };
 }
 // la force d'une tache : ce qu'une vraie ombre enlève de lumière au sol (mesuré : 20 à 30 % quand le soleil est haut, 45 % quand il est bas),
 // moins quand il se couche, et bien moins au clair de lune
@@ -18257,6 +18351,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
   majInterieurs, construireInterieur, defaireInterieur, formeBoite, VUE_INTERIEURS,
   formes, recettes, majFormes, faireForme, defaireForme, formeIntacte, M_CORPS, CALQUE_PIECES, temoinForme,
+  pleins, pleinsVus, choisirPleins, cacheParUnPlein, traversePlein, PORTEE_PLEINS,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 // les boutons du menu cliqués pendant la construction (un héros, un chapitre, « Nouvelle partie ») : le jeu s'en occupe maintenant (voir prevenirJeu)
 jeuConstruit();
