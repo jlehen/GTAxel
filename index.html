@@ -116,6 +116,8 @@
   #boss { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(420px, 60%); text-align: center; display: none; font: 22px 'Anton', Impact, sans-serif; letter-spacing: 2px; }
   #boss > div { height: 12px; background: rgba(0,0,0,.6); border: 2px solid #ddd; margin-top: 2px; }
   #boss > div > div { height: 100%; width: 100%; background: linear-gradient(90deg, #c0392b, #ff7a50); transition: width .2s; }
+  /* la pièce de Double-Face (missions de Batman) : elle tourne en l'air, sous la barre de vie du boss, puis retombe : pile ou face */
+  #piece { position: absolute; left: 50%; top: 62px; transform: translateX(-50%); width: 126px; height: 140px; display: none; pointer-events: none; }
   /* l'affichage du casque d'Iron Man : à droite, l'armure et ses 6 parties ; à gauche, la batterie ; et, à la 1re personne, les bords de la visière */
   /* (leur hauteur : --casque-haut et --batterie-haut, d'après IRONMAN.affichage et zoomBatterie ; leur largeur suit. Sur un écran pas assez haut, ils rapetissent) */
   #casque { position: absolute; right: 18px; --haut: min(var(--casque-haut), 100% - 330px); top: max(230px, calc(50% - var(--haut) / 2)); height: var(--haut); display: none; }   /* (sous l'argent et l'arme, au-dessus de la vitesse) */
@@ -169,6 +171,7 @@
     <div class="aide"></div>
   </div>
   <div id="boss"><span>IRON MONGER</span><div><div></div></div></div>
+  <canvas id="piece" width="180" height="200"></canvas>
   <div id="voile"></div>
   <canvas id="grande-carte"></canvas>
   <div id="triche"></div>
@@ -315,10 +318,10 @@ const CHAPITRES = [
     ['J', "changer de costume (Lucius Fox en vend d'autres, à Wayne Enterprises : ⚙ sur la carte)"],
     ['G', 'en costume : le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher'],
     ['9', 'en costume : le grappin, les batarangs et les filets'],
-    ['B, N', 'en costume : ta Batmobile arrive à côté de toi (dès la 2e mission) · N : changer de Batmobile'],
-    ['R', 'dans la Batmobile : voler, ou se poser (les autres Batmobiles : le turbo, le saut, ou R + Q ou D : le virage au grappin)'],
+    ['B, N', 'en costume : ta Batmobile arrive à côté de toi (dès la 2e mission) · N : changer de Batmobile (ou le Bat, dès la 8e mission)'],
+    ['R', 'dans la Batmobile ou le Bat : voler, ou se poser (les autres Batmobiles : le turbo, le saut, ou R + Q ou D : le virage au grappin)'],
     ['O, K, X', 'en costume, une fois achetés : la vision de détective, un fumigène, le gel explosif (X encore : boum !)'],
-    ['E', 'monter / descendre (voiture, bateau, monorail), ascenseur, magasin de Lucius Fox · missions : prendre, brouiller'],
+    ['E', 'monter / descendre (voiture, bateau, monorail, le Bat), ascenseur, magasin de Lucius Fox · missions : prendre, brouiller, désamorcer'],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
     ['Entrée', 'code de triche'], ['Échap', 'pause'],
@@ -889,6 +892,7 @@ const TRADUCTIONS = {
     en: 'W: faster · S: slower · the mouse steers · Space: climb · C: descend · R: land', gsw: 'W: schnäller · S: langsamer · d Muus stüürt · Läärtaschte: stiige · C: sinke · R: lande' },
   'Atterrissage':     { de: 'Landung', en: 'Landing', gsw: 'Landig' },
   "Pas sur l'eau : elle coulerait !": { de: 'Nicht auf dem Wasser: es würde sinken!', en: 'Not on the water: it would sink!', gsw: 'Nöd ufem Wasser: es würd undergah!' },
+  "Pas sur l'eau : il coulerait !": { de: 'Nicht auf dem Wasser: er würde sinken!', en: 'Not on the water: it would sink!', gsw: 'Nöd ufem Wasser: er würd undergah!' },
   'Assez vite : regarde vers le haut (souris ou Espace) pour décoller !': { de: 'Schnell genug: schau nach oben (Maus oder Leertaste), um abzuheben!', en: 'Fast enough: look up (mouse or Space) to take off!', gsw: 'Schnäll gnueg: lueg ufe (Muus oder Läärtaschte) zum abhebe!' },
   'Pilote éjecté ! Monte dans le robot (touche E)': { de: 'Pilot rausgeworfen! Steig in den Roboter (Taste E)', en: 'Pilot thrown out! Climb into the robot (E key)', gsw: 'Pilot usegrüert! Stiig in Roboter ii (Taschte E)' },
   // l'aide en haut à gauche
@@ -1056,22 +1060,22 @@ const TRADUCTIONS = {
   'en costume : le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher': { de: 'im Kostüm: der Greifhaken, um auf die Dächer zu kommen (oder Linksklick, mit dem Greifhaken in der Hand) · Leertaste: loslassen',
     en: 'in your suit: the grapple, to get onto the roofs (or left click, with the grapple in your hand) · Space: let go', gsw: 'im Kostüm: de Griifhaagge, zum uf d Dächer cho (oder Linksklick, mit em Griifhaagge i de Hand) · Läärtaschte: loslaa' },
   'en costume : le grappin, les batarangs et les filets': { de: 'im Kostüm: Greifhaken, Batarangs und Netze', en: 'in your suit: grapple, batarangs and nets', gsw: 'im Kostüm: Griifhaagge, Batarangs und Netz' },
-  'en costume : ta Batmobile arrive à côté de toi (dès la 2e mission) · N : changer de Batmobile': {
-    de: 'im Kostüm: dein Batmobil kommt neben dich (ab der 2. Mission) · N: Batmobil wechseln',
-    en: 'in your suit: your Batmobile comes next to you (from the 2nd mission on) · N: switch Batmobile',
-    gsw: 'im Kostüm: dis Batmobil chunnt näb di (ab de 2. Mission) · N: Batmobil wächsle' },
+  'en costume : ta Batmobile arrive à côté de toi (dès la 2e mission) · N : changer de Batmobile (ou le Bat, dès la 8e mission)': {
+    de: 'im Kostüm: dein Batmobil kommt neben dich (ab der 2. Mission) · N: Batmobil wechseln (oder der Bat, ab der 8. Mission)',
+    en: 'in your suit: your Batmobile comes next to you (from the 2nd mission on) · N: switch Batmobile (or the Bat, from the 8th mission on)',
+    gsw: 'im Kostüm: dis Batmobil chunnt näb di (ab de 2. Mission) · N: Batmobil wächsle (oder de Bat, ab de 8. Mission)' },
   'tu mets ton costume (trouvé à la 1re mission), et tu deviens {super} · H encore : tu repasses en civil (sans tes gadgets)': {
     de: 'du ziehst dein Kostüm an (gefunden in der 1. Mission) und wirst {super} · H noch einmal: wieder in Zivil (ohne deine Ausrüstung)',
     en: 'you put on your suit (found in the 1st mission), and you become {super} · H again: back in plain clothes (without your gadgets)',
     gsw: 'du leisch dis Kostüm aa (gfunde i de 1. Mission) und wirsch {super} · H nomal: wieder in Zivil (ohni dini Usrüschtig)' },
-  'monter / descendre (voiture, bateau, monorail), ascenseur, magasin de Lucius Fox · missions : prendre, brouiller': {
-    de: 'einsteigen / aussteigen (Auto, Boot, Einschienenbahn), Aufzug, Laden von Lucius Fox · Missionen: nehmen, stören',
-    en: "get in / out (car, boat, monorail), elevator, Lucius Fox's store · missions: take, jam",
-    gsw: 'iistiige / uusstiige (Auto, Boot, Einschiinebahn), Lift, Lade vom Lucius Fox · Missione: näh, störe' },
-  'dans la Batmobile : voler, ou se poser (les autres Batmobiles : le turbo, le saut, ou R + Q ou D : le virage au grappin)': {
-    de: 'im Batmobil: fliegen oder landen (die anderen Batmobile: der Turbo, der Sprung, oder R + A oder D: die Greifhaken-Kurve)',
-    en: 'in the Batmobile: fly, or land (the other Batmobiles: the turbo, the jump, or R + A or D: the grapple turn)',
-    gsw: 'im Batmobil: flüüge oder lande (di andere Batmobil: de Turbo, de Gump, oder R + A oder D: d Griifhaagge-Kurve)' },
+  'monter / descendre (voiture, bateau, monorail, le Bat), ascenseur, magasin de Lucius Fox · missions : prendre, brouiller, désamorcer': {
+    de: 'einsteigen / aussteigen (Auto, Boot, Einschienenbahn, der Bat), Aufzug, Laden von Lucius Fox · Missionen: nehmen, stören, entschärfen',
+    en: "get in / out (car, boat, monorail, the Bat), elevator, Lucius Fox's store · missions: take, jam, defuse",
+    gsw: 'iistiige / uusstiige (Auto, Boot, Einschiinebahn, de Bat), Lift, Lade vom Lucius Fox · Missione: näh, störe, entschärfe' },
+  'dans la Batmobile ou le Bat : voler, ou se poser (les autres Batmobiles : le turbo, le saut, ou R + Q ou D : le virage au grappin)': {
+    de: 'im Batmobil oder im Bat: fliegen oder landen (die anderen Batmobile: der Turbo, der Sprung, oder R + A oder D: die Greifhaken-Kurve)',
+    en: 'in the Batmobile or the Bat: fly, or land (the other Batmobiles: the turbo, the jump, or R + A or D: the grapple turn)',
+    gsw: 'im Batmobil oder im Bat: flüüge oder lande (di andere Batmobil: de Turbo, de Gump, oder R + A oder D: d Griifhaagge-Kurve)' },
   "changer de costume (Lucius Fox en vend d'autres, à Wayne Enterprises : ⚙ sur la carte)": { de: 'Kostüm wechseln (Lucius Fox verkauft andere, bei Wayne Enterprises: ⚙ auf der Karte)',
     en: 'switch suit (Lucius Fox sells others, at Wayne Enterprises: ⚙ on the map)', gsw: 'Kostüm wächsle (de Lucius Fox verchauft anderi, bi Wayne Enterprises: ⚙ uf de Charte)' },
   'en costume, une fois achetés : la vision de détective, un fumigène, le gel explosif (X encore : boum !)': {
@@ -1774,6 +1778,199 @@ const TRADUCTIONS = {
   'Voiture du Pingouin': { de: 'Auto des Pinguins', en: "Penguin's car", gsw: 'Auto vom Pinguin' },
   'Canard du Pingouin': { de: 'Ente des Pinguins', en: "Penguin's duck", gsw: 'Ente vom Pinguin' },
   'Camion': { de: 'Lastwagen', en: 'Truck', gsw: 'Lastwage' },
+  // les missions de Batman, suite (chapitre 3) : Double-Face, Bane, le Bat
+  'Pile ou face': { de: 'Kopf oder Zahl', en: 'Heads or tails', gsw: 'Chopf oder Zahl' },
+  "Le Bat-signal ! Le commissaire Gordon t'appelle : va au commissariat (point jaune)": {
+    de: 'Das Bat-Signal! Commissioner Gordon ruft dich: Geh zum Polizeirevier (gelber Punkt)',
+    en: 'The Bat-Signal! Commissioner Gordon is calling you: go to the police station (yellow dot)',
+    gsw: 'S Bat-Signal! De Commissioner Gordon rüeft di: Gang uf de Polizeiposchte (gääle Punkt)' },
+  'Désamorce les bombes de Double-Face (E tout près) : encore {n} · la prochaine saute dans {t} s · la Batmobile qui vole (R) passe au-dessus des passants': {
+    de: 'Entschärfe die Bomben von Two-Face (E ganz nah): noch {n} · die nächste explodiert in {t} s · das fliegende Batmobil (R) fliegt über die Passanten',
+    en: "Defuse Two-Face's bombs (E up close): {n} left · the next one blows in {t} s · the flying Batmobile (R) goes over the passers-by",
+    gsw: 'Entschärf d Bombe vom Two-Face (E ganz nöch): no {n} · di nächscht explodiert i {t} s · s flüügend Batmobil (R) flüügt über d Passante' },
+  "Double-Face t'attend au port : assomme-le ! Quand il lance sa pièce, regarde bien : pile, il tire des deux mains !": {
+    de: 'Two-Face wartet am Hafen auf dich: Schlag ihn k.o.! Wenn er seine Münze wirft, pass gut auf: Zahl, er schießt mit beiden Händen!',
+    en: 'Two-Face is waiting for you at the harbor: knock him out! When he flips his coin, watch out: tails, he shoots with both hands!',
+    gsw: 'De Two-Face wartet am Hafe uf di: Schlag en k.o.! Wänn er sini Münze wirft, pass guet uf: Zahl, er schüsst mit beidne Händ!' },
+  'Le stade': { de: 'Das Stadion', en: 'The stadium', gsw: 'S Stadion' },
+  'Ce soir, il y a match au stade de Gotham... {ami} : « Bane prépare quelque chose ! » Vas-y vite (point jaune)': {
+    de: 'Heute Abend ist ein Spiel im Stadion von Gotham... {ami}: „Bane plant etwas!“ Schnell hin (gelber Punkt)',
+    en: 'Tonight there is a game at the Gotham stadium... {ami}: "Bane is up to something!" Hurry there (yellow dot)',
+    gsw: 'Hüt Abig isch en Match im Stadion vo Gotham... {ami}: «De Bane plant öppis!» Schnäll hii (gääle Punkt)' },
+  'Les mercenaires de Bane sont partout dans le stade ! Assomme-les : il en reste {n}': {
+    de: 'Banes Söldner sind überall im Stadion! Schlag sie k.o.: noch {n}',
+    en: "Bane's mercenaries are everywhere in the stadium! Knock them out: {n} left",
+    gsw: 'Em Bane sini Söldner sind überall im Stadion! Schlag si k.o.: no {n}' },
+  'Bane': { de: 'Bane', en: 'Bane', gsw: 'Bane' },
+  "Bane se cache au fond de l'égout, dans l'ancien repaire du Pingouin : l'égout s'ouvre au bord de la rivière (point jaune)": {
+    de: 'Bane versteckt sich tief in der Kanalisation, im alten Versteck des Pinguins: Die Kanalisation öffnet sich am Flussufer (gelber Punkt)',
+    en: "Bane is hiding deep in the sewer, in the Penguin's old hideout: the sewer opens on the riverbank (yellow dot)",
+    gsw: 'De Bane verschteckt sich zhinderst i de Kanalisation, im alte Verschteck vom Pinguin: D Kanalisation gaht am Flussufer uf (gääle Punkt)' },
+  'La revanche ! Toute la police de Gotham est avec toi : assomme Bane !': {
+    de: 'Die Revanche! Die ganze Polizei von Gotham ist bei dir: Schlag Bane k.o.!',
+    en: 'The rematch! The whole Gotham police is with you: knock Bane out!',
+    gsw: 'D Revanche! Di ganz Polizei vo Gotham isch bi dir: Schlag de Bane k.o.!' },
+  "BANE ! Quand il charge, saute de côté : s'il fonce dans un mur, il est sonné... et tes coups comptent double !": {
+    de: 'BANE! Wenn er angreift, spring zur Seite: Rennt er gegen eine Wand, ist er benommen... und deine Schläge zählen doppelt!',
+    en: 'BANE! When he charges, jump aside: if he runs into a wall, he is dazed... and your hits count double!',
+    gsw: 'BANE! Wänn er aagrifft, gump uf d Siite: Rännt er gäg e Wand, isch er benoo... und dini Schläg zelled doppelt!' },
+  'La bombe de Bane': { de: 'Banes Bombe', en: "Bane's bomb", gsw: 'Em Bane sini Bombe' },
+  "Lucius Fox t'a préparé une surprise : va à la tour Wayne (point jaune)": {
+    de: 'Lucius Fox hat eine Überraschung für dich: Geh zum Wayne Tower (gelber Punkt)',
+    en: 'Lucius Fox has a surprise for you: go to Wayne Tower (yellow dot)',
+    gsw: 'De Lucius Fox hät e Überraschig für di: Gang zum Wayne Tower (gääle Punkt)' },
+  "La bombe de Bane est au stade, et sa minuterie tourne ! Vole au-dessus d'elle avec le Bat : elle s'accrochera dessous (point jaune)": {
+    de: 'Banes Bombe ist im Stadion, und ihr Zeitzünder läuft! Flieg mit dem Bat über sie: Sie hängt sich darunter (gelber Punkt)',
+    en: "Bane's bomb is at the stadium, and its timer is running! Fly over it with the Bat: it will hook on underneath (yellow dot)",
+    gsw: 'Em Bane sini Bombe isch im Stadion, und ihre Zitzünder lauft! Flüüg mit em Bat drüber: Si hänkt sich drunder (gääle Punkt)' },
+  'Homme de Double-Face': { de: 'Mann von Two-Face', en: "Two-Face's henchman", gsw: 'Maa vom Two-Face' },
+  'Double-Face': { de: 'Two-Face', en: 'Two-Face', gsw: 'Two-Face' },
+  'Mercenaire de Bane': { de: 'Söldner von Bane', en: "Bane's mercenary", gsw: 'Söldner vom Bane' },
+  'Bat': { de: 'Bat', en: 'Bat', gsw: 'Bat' },
+  'PILE': { de: 'ZAHL', en: 'TAILS', gsw: 'ZAHL' },
+  'FACE': { de: 'KOPF', en: 'HEADS', gsw: 'CHOPF' },
+  'PILE !': { de: 'ZAHL!', en: 'TAILS!', gsw: 'ZAHL!' },
+  'FACE !': { de: 'KOPF!', en: 'HEADS!', gsw: 'CHOPF!' },
+  'PILE OU FACE ?': { de: 'KOPF ODER ZAHL?', en: 'HEADS OR TAILS?', gsw: 'CHOPF ODER ZAHL?' },
+  'PILE... BOUM !': { de: 'ZAHL... BUMM!', en: 'TAILS... BOOM!', gsw: 'ZAHL... BUMM!' },
+  'DOUBLE-FACE :': { de: 'TWO-FACE:', en: 'TWO-FACE:', gsw: 'TWO-FACE:' },
+  'DOUBLE-FACE !': { de: 'TWO-FACE!', en: 'TWO-FACE!', gsw: 'TWO-FACE!' },
+  "« J'ai caché {n} bombes dans Gotham. Quand une minuterie arrive à zéro, ma pièce décide : face, elle attend ; pile, BOUM ! »": {
+    de: '„Ich habe {n} Bomben in Gotham versteckt. Wenn ein Zeitzünder auf null steht, entscheidet meine Münze: Kopf, sie wartet; Zahl, BUMM!“',
+    en: '"I have hidden {n} bombs in Gotham. When a timer hits zero, my coin decides: heads, it waits; tails, BOOM!"',
+    gsw: '«Ich ha {n} Bombe in Gotham verschteckt. Wänn en Zitzünder uf null isch, entscheidet mini Münze: Chopf, si wartet; Zahl, BUMM!»' },
+  'BOMBE DÉSAMORCÉE !': { de: 'BOMBE ENTSCHÄRFT!', en: 'BOMB DEFUSED!', gsw: 'BOMBE ENTSCHÄRFT!' },
+  'Encore {n} bombes': { de: 'Noch {n} Bomben', en: '{n} more bombs', gsw: 'No {n} Bombe' },
+  'Encore une bombe !': { de: 'Noch eine Bombe!', en: 'One more bomb!', gsw: 'No ei Bombe!' },
+  'Toutes les bombes sont désamorcées !': { de: 'Alle Bomben sind entschärft!', en: 'All the bombs are defused!', gsw: 'All Bombe sind entschärft!' },
+  'Une minuterie est à zéro : Double-Face lance sa pièce...': {
+    de: 'Ein Zeitzünder steht auf null: Two-Face wirft seine Münze...',
+    en: 'A timer is at zero: Two-Face flips his coin...',
+    gsw: 'En Zitzünder isch uf null: De Two-Face wirft sini Münze...' },
+  'Double-Face épargne cette bombe... pour {n} secondes. Vite !': {
+    de: 'Two-Face verschont diese Bombe... für {n} Sekunden. Schnell!',
+    en: 'Two-Face spares this bomb... for {n} seconds. Hurry!',
+    gsw: 'De Two-Face verschont die Bombe... für {n} Sekunde. Schnäll!' },
+  "Personne n'est blessé : la police avait fait évacuer. Mais Double-Face en a caché une autre (point jaune) !": {
+    de: 'Niemand ist verletzt: Die Polizei hatte alles geräumt. Aber Two-Face hat eine andere versteckt (gelber Punkt)!',
+    en: 'Nobody is hurt: the police had cleared the area. But Two-Face has hidden another one (yellow dot)!',
+    gsw: 'Niemer isch verletzt: D Polizei hät alles grüümt gha. Aber de Two-Face hät en anderi verschteckt (gääle Punkt)!' },
+  '« Ma pièce va décider de ton sort, la chauve-souris... »': {
+    de: '„Meine Münze entscheidet über dein Schicksal, Fledermaus...“',
+    en: '"My coin will decide your fate, bat..."',
+    gsw: '«Mini Münze entscheidet über dis Schicksal, Flädermuus...»' },
+  "Double-Face tire des deux mains : à l'abri !": { de: 'Two-Face schießt mit beiden Händen: in Deckung!', en: 'Two-Face shoots with both hands: take cover!', gsw: 'De Two-Face schüsst mit beidne Händ: in Deckig!' },
+  'Double-Face hésite... Fonce !': { de: 'Two-Face zögert... Los!', en: 'Two-Face hesitates... Go!', gsw: 'De Two-Face zögeret... Los!' },
+  '« Mes hommes ! Pile, vous gagnez ; face, je perds ! »': {
+    de: '„Meine Männer! Zahl, ihr gewinnt; Kopf, ich verliere!“',
+    en: '"My men! Tails, you win; heads, I lose!"',
+    gsw: '«Mini Manne! Zahl, ihr gwünned; Chopf, ich verlüür!»' },
+  'DOUBLE-FACE EST ASSOMMÉ !': { de: 'TWO-FACE IST K.O.!', en: 'TWO-FACE IS KNOCKED OUT!', gsw: 'DE TWO-FACE ISCH K.O.!' },
+  "Sa pièce roule par terre... La police va l'embarquer : direction Arkham !": {
+    de: 'Seine Münze rollt über den Boden... Die Polizei holt ihn ab: ab nach Arkham!',
+    en: 'His coin rolls on the ground... The police will take him away: off to Arkham!',
+    gsw: 'Sini Münze rollt über de Bode... D Polizei holt en ab: ab uf Arkham!' },
+  'Bane fait sauter le terrain, en plein match !': { de: 'Bane sprengt das Spielfeld, mitten im Spiel!', en: 'Bane blows up the pitch, right in the middle of the game!', gsw: 'De Bane sprängt s Spielfäld, mitts im Match!' },
+  "« Ce stade est à moi... et bientôt, toute la ville ! Mes hommes s'occupent de toi, la chauve-souris. »": {
+    de: '„Dieses Stadion gehört mir... und bald die ganze Stadt! Meine Männer kümmern sich um dich, Fledermaus.“',
+    en: '"This stadium is mine... and soon, the whole city! My men will take care of you, bat."',
+    gsw: '«Das Stadion ghört mir... und bald di ganz Stadt! Mini Manne kümmered sich um di, Flädermuus.»' },
+  '« Tu reviens te battre, la chauve-souris ? »': { de: '„Du kommst zurück, um zu kämpfen, Fledermaus?“', en: '"You come back to fight, bat?"', gsw: '«Du chunnsch zrugg go kämpfe, Flädermuus?»' },
+  '« Ah ! Tu es venu... Je vais te briser ! »': { de: '„Ah! Du bist gekommen... Ich werde dich zerbrechen!“', en: '"Ah! You came... I will break you!"', gsw: '«Ah! Du bisch cho... Ich mach di kaputt!»' },
+  '« Ah ! Tu es venue... Je vais te briser ! »': { de: '„Ah! Du bist gekommen... Ich werde dich zerbrechen!“', en: '"Ah! You came... I will break you!"', gsw: '«Ah! Du bisch cho... Ich mach di kaputt!»' },
+  'BANE !': { de: 'BANE!', en: 'BANE!', gsw: 'BANE!' },
+  'BANE :': { de: 'BANE:', en: 'BANE:', gsw: 'BANE:' },
+  '« Mon venin me rend plus fort ! »': { de: '„Mein Venom macht mich stärker!“', en: '"My venom makes me stronger!"', gsw: '«Mis Venom macht mi stärcher!»' },
+  'BANE EST SONNÉ !': { de: 'BANE IST BENOMMEN!', en: 'BANE IS DAZED!', gsw: 'DE BANE ISCH BENOO!' },
+  'Frappe vite : tes coups comptent double !': { de: 'Schlag schnell zu: Deine Schläge zählen doppelt!', en: 'Hit him fast: your hits count double!', gsw: 'Schlag schnäll zue: Dini Schläg zelled doppelt!' },
+  'BANE VA CHARGER !': { de: 'BANE GREIFT GLEICH AN!', en: 'BANE IS ABOUT TO CHARGE!', gsw: 'DE BANE GRIFFT GLII AA!' },
+  "Saute de côté (Q ou D) : s'il fonce dans un mur, il est sonné !": {
+    de: 'Spring zur Seite (A oder D): Rennt er gegen eine Wand, ist er benommen!',
+    en: 'Jump aside (A or D): if he runs into a wall, he is dazed!',
+    gsw: 'Gump uf d Siite (A oder D): Rännt er gäg e Wand, isch er benoo!' },
+  'BANE EST ASSOMMÉ !': { de: 'BANE IST K.O.!', en: 'BANE IS KNOCKED OUT!', gsw: 'DE BANE ISCH K.O.!' },
+  "Le plus fort de tous est à terre ! La police va l'emmener à la prison de Blackgate": {
+    de: 'Der Stärkste von allen liegt am Boden! Die Polizei bringt ihn ins Gefängnis von Blackgate',
+    en: 'The strongest of them all is down! The police will take him to Blackgate prison',
+    gsw: 'De Stärchscht vo allne lit am Bode! D Polizei bringt en is Gfängnis vo Blackgate' },
+  "BANE T'A BATTU...": { de: 'BANE HAT DICH BESIEGT...', en: 'BANE BEAT YOU...', gsw: 'DE BANE HÄT DI BESIEGT...' },
+  "BANE T'A BATTUE...": { de: 'BANE HAT DICH BESIEGT...', en: 'BANE BEAT YOU...', gsw: 'DE BANE HÄT DI BESIEGT...' },
+  'Debout ! Bane est encore là... et la police aussi.': { de: 'Steh auf! Bane ist noch da... und die Polizei auch.', en: 'Get up! Bane is still there... and so are the police.', gsw: 'Stah uf! De Bane isch no da... und d Polizei au.' },
+  'LA REVANCHE !': { de: 'DIE REVANCHE!', en: 'THE REMATCH!', gsw: 'D REVANCHE!' },
+  "{ami} t'a sortie de l'égout. Bane est dans la rue... et toute la police de Gotham est avec toi !": {
+    de: '{ami} hat dich aus der Kanalisation geholt. Bane ist auf der Straße... und die ganze Polizei von Gotham ist bei dir!',
+    en: '{ami} got you out of the sewer. Bane is in the street... and the whole Gotham police is with you!',
+    gsw: '{ami} hät di us de Kanalisation gholt. De Bane isch uf de Strass... und di ganz Polizei vo Gotham isch bi dir!' },
+  "{ami} t'a sorti de l'égout. Bane est dans la rue... et toute la police de Gotham est avec toi !": {
+    de: '{ami} hat dich aus der Kanalisation geholt. Bane ist auf der Straße... und die ganze Polizei von Gotham ist bei dir!',
+    en: '{ami} got you out of the sewer. Bane is in the street... and the whole Gotham police is with you!',
+    gsw: '{ami} hät di us de Kanalisation gholt. De Bane isch uf de Strass... und di ganz Polizei vo Gotham isch bi dir!' },
+  "« Le Bat, {nom}. Il vole, il se pose où vous voulez... et il vient quand vous l'appelez. »": {
+    de: '„Der Bat, {nom}. Er fliegt, er landet, wo Sie wollen... und er kommt, wenn Sie ihn rufen.“',
+    en: '"The Bat, {nom}. It flies, it lands wherever you want... and it comes when you call it."',
+    gsw: '«De Bat, {nom}. Er flüügt, er landet, wo Sie wänd... und er chunnt, wänn Sie en rüefed.»' },
+  'LA BOMBE DE BANE !': { de: 'BANES BOMBE!', en: "BANE'S BOMB!", gsw: 'EM BANE SINI BOMBE!' },
+  "Avant d'être arrêté, Bane a lancé sa minuterie. Seul le Bat peut l'emporter loin de Gotham !": {
+    de: 'Bevor er verhaftet wurde, hat Bane den Zeitzünder gestartet. Nur der Bat kann sie weit weg von Gotham bringen!',
+    en: 'Before he was arrested, Bane started the timer. Only the Bat can carry it far away from Gotham!',
+    gsw: 'Bevor er verhaftet worde isch, hät de Bane de Zitzünder gstartet. Nur de Bat cha si wiit wäg vo Gotham bringe!' },
+  'LA BOMBE EST ACCROCHÉE !': { de: 'DIE BOMBE HÄNGT DRAN!', en: 'THE BOMB IS HOOKED!', gsw: 'D BOMBE HÄNKT DRAA!' },
+  'Emporte-la au large, loin de la terre (point jaune) : vite !': {
+    de: 'Bring sie aufs offene Meer, weit weg vom Land (gelber Punkt): schnell!',
+    en: 'Carry it out to sea, far from land (yellow dot): hurry!',
+    gsw: 'Bring si uf s offe Meer, wiit wäg vom Land (gääle Punkt): schnäll!' },
+  "« La bombe est retombée... je l'ai fait reposer au stade. Allez la reprendre, avec un autre Bat ! »": {
+    de: '„Die Bombe ist heruntergefallen... ich habe sie wieder ins Stadion gebracht. Holen Sie sie, mit einem anderen Bat!“',
+    en: '"The bomb fell... I had it put back at the stadium. Go and get it, with another Bat!"',
+    gsw: '«D Bombe isch abegheit... ich ha si wieder is Stadion bracht. Holed Sie si, mit emne andere Bat!»' },
+  'ASSEZ LOIN !': { de: 'WEIT GENUG!', en: 'FAR ENOUGH!', gsw: 'WIIT GNUEG!' },
+  "E : saute du Bat ! Il emportera la bombe plus loin tout seul. Puis garde Maj : tu planes jusqu'à la côte": {
+    de: 'E: Spring aus dem Bat! Er bringt die Bombe allein weiter weg. Dann Umschalt halten: Du gleitest bis zur Küste',
+    en: 'E: jump out of the Bat! It will carry the bomb further on its own. Then hold Shift: you glide to the coast',
+    gsw: 'E: Gump us em Bat! Er bringt d Bombe elei wiiter wäg. Dänn Umschalt bhalte: Du gleitisch bis a d Chüschte' },
+  'LE SIÈGE ÉJECTABLE !': { de: 'DER SCHLEUDERSITZ!', en: 'THE EJECTOR SEAT!', gsw: 'DE SCHLÜDERSITZ!' },
+  "Le Bat t'éjecte tout seul ! Garde Maj : tu planes jusqu'à la côte": {
+    de: 'Der Bat schleudert dich von allein heraus! Umschalt halten: Du gleitest bis zur Küste',
+    en: 'The Bat ejects you on its own! Hold Shift: you glide to the coast',
+    gsw: 'De Bat schlüderet di elei use! Umschalt bhalte: Du gleitisch bis a d Chüschte' },
+  "« J'ai ralenti la minuterie : {n} secondes de plus ! Vite, au large ! »": {
+    de: '„Ich habe den Zeitzünder verlangsamt: {n} Sekunden mehr! Schnell, aufs Meer hinaus!“',
+    en: '"I slowed down the timer: {n} more seconds! Quick, out to sea!"',
+    gsw: '«Ich ha de Zitzünder verlangsamt: {n} Sekunde meh! Schnäll, uf s Meer use!»' },
+  'La bombe a explosé au large : Gotham est sauvée !': { de: 'Die Bombe ist auf dem Meer explodiert: Gotham ist gerettet!', en: 'The bomb exploded out at sea: Gotham is saved!', gsw: 'D Bombe isch uf em Meer explodiert: Gotham isch grettet!' },
+  'Appuie sur <b>E</b> pour désamorcer la bombe': { de: 'Drücke <b>E</b>, um die Bombe zu entschärfen', en: 'Press <b>E</b> to defuse the bomb', gsw: 'Drück <b>E</b>, zum d Bombe entschärfe' },
+  'Appuie sur <b>E</b> pour sauter du Bat': { de: 'Drücke <b>E</b>, um aus dem Bat zu springen', en: 'Press <b>E</b> to jump out of the Bat', gsw: 'Drück <b>E</b>, zum us em Bat gumpe' },
+  "B : il arrive du ciel (même sur l'eau)": { de: 'B: Er kommt vom Himmel (sogar übers Wasser)', en: 'B: it comes from the sky (even over water)', gsw: 'B: Er chunnt vom Himmel (sogar übers Wasser)' },
+  'R : décoller ou se poser': { de: 'R: abheben oder landen', en: 'R: take off or land', gsw: 'R: abhebe oder lande' },
+  'R : décoller (R encore : se poser)': { de: 'R: abheben (R noch einmal: landen)', en: 'R: take off (R again: land)', gsw: 'R: abhebe (R nomal: lande)' },
+  'La bombe est accrochée sous ton Bat : garde-le !': { de: 'Die Bombe hängt an deinem Bat: Behalte ihn!', en: 'The bomb is hooked under your Bat: keep it!', gsw: 'D Bombe hänkt a dim Bat: Bhalt en!' },
+  'Le Bat arrive !': { de: 'Der Bat kommt!', en: 'The Bat is coming!', gsw: 'De Bat chunnt!' },
+  'Le Bat a sauté avec la bombe... mais Lucius Fox en a un autre : il est à toi ! <b>B</b> : il arrive du ciel (même si tu nages) ; <b>N</b> : reprendre une Batmobile. Dedans, <b>R</b> : décoller ou se poser.': {
+    de: 'Der Bat ist mit der Bombe explodiert... aber Lucius Fox hat noch einen: Er gehört dir! <b>B</b>: Er kommt vom Himmel (sogar wenn du schwimmst); <b>N</b>: wieder ein Batmobil nehmen. Drinnen, <b>R</b>: abheben oder landen.',
+    en: 'The Bat blew up with the bomb... but Lucius Fox has another one: it is yours! <b>B</b>: it comes from the sky (even if you are swimming); <b>N</b>: back to a Batmobile. Inside, <b>R</b>: take off or land.',
+    gsw: 'De Bat isch mit de Bombe explodiert... aber de Lucius Fox hät no eine: Er ghört dir! <b>B</b>: Er chunnt vom Himmel (sogar wänn du schwümmsch); <b>N</b>: wieder es Batmobil näh. Drin, <b>R</b>: abhebe oder lande.' },
+  'Pile ou face ? Double-Face lance sa pièce... Encore {n} bombes à désamorcer': {
+    de: 'Kopf oder Zahl? Two-Face wirft seine Münze... Noch {n} Bomben zu entschärfen',
+    en: 'Heads or tails? Two-Face flips his coin... {n} bombs left to defuse',
+    gsw: 'Chopf oder Zahl? De Two-Face wirft sini Münze... No {n} Bombe z entschärfe' },
+  "BOUM ! Le terrain saute, les gens s'enfuient... Regarde : Bane, au bout du terrain !": {
+    de: 'BUMM! Das Spielfeld fliegt in die Luft, die Leute fliehen... Schau: Bane, am Ende des Spielfelds!',
+    en: 'BOOM! The pitch blows up, people run away... Look: Bane, at the end of the pitch!',
+    gsw: 'BUMM! S Spielfäld flüügt i d Luft, d Lüüt flüchted... Lueg: De Bane, am Änd vom Spielfäld!' },
+  'Le Bat ! Monte dedans (E), puis R : il décolle': { de: 'Der Bat! Steig ein (E), dann R: Er hebt ab', en: 'The Bat! Get in (E), then R: it takes off', gsw: 'De Bat! Stiig ii (E), dänn R: Er hebt ab' },
+  'Emporte la bombe au large (point jaune) : la terre est à {d} m, il en faut {loin} · encore {t} s': {
+    de: 'Bring die Bombe aufs Meer (gelber Punkt): Das Land ist {d} m entfernt, nötig sind {loin} · noch {t} s',
+    en: 'Carry the bomb out to sea (yellow dot): land is {d} m away, you need {loin} · {t} s left',
+    gsw: 'Bring d Bombe uf s Meer (gääle Punkt): S Land isch {d} m wiit wäg, es bruucht {loin} · no {t} s' },
+  'Assez loin ! E : saute du Bat (il emportera la bombe tout seul) · encore {t} s': {
+    de: 'Weit genug! E: Spring aus dem Bat (er bringt die Bombe allein weg) · noch {t} s',
+    en: 'Far enough! E: jump out of the Bat (it will carry the bomb on its own) · {t} s left',
+    gsw: 'Wiit gnueg! E: Gump us em Bat (er bringt d Bombe elei wäg) · no {t} s' },
+  'Garde Maj enfoncé : plane avec ta cape, vers la côte !': {
+    de: 'Halte Umschalt gedrückt: Gleite mit deinem Umhang zur Küste!',
+    en: 'Hold Shift down: glide with your cape, towards the coast!',
+    gsw: 'Halt Umschalt druckt: Gleit mit dim Umhang a d Chüschte!' },
+  'BOUM ! Gotham est sauvée !': { de: 'BUMM! Gotham ist gerettet!', en: 'BOOM! Gotham is saved!', gsw: 'BUMM! Gotham isch grettet!' },
 };
 
 // la langue choisie : le navigateur s'en souvient pour la prochaine fois
@@ -2436,6 +2633,13 @@ const VOITURES = [
     son: { grave: 55, aigu: 220, rapports: 1, rauque: 0.8, volume: 0.06, petarade: true } },
   { nom: 'Camion', modele: 'camion', vitesse: 26, acceleration: 6, virage: 0.7, chance: 0, couleurs: ['#b8b4ac', '#8a2a20', '#2a4a7a', '#3a5a3a', '#d8b030'],
     son: { grave: 24, aigu: 90, rapports: 8, rauque: 0.7, volume: 0.07 } },
+  // le Bat (The Dark Knight Rises) : le vaisseau volant de Batman. Lucius Fox le lui donne à la mission « La bombe de Bane » ; ensuite, N le
+  // choisit (comme une Batmobile) et B le fait venir : il descend du ciel et se pose à côté de toi (si tu nages, il t'attend en l'air, juste
+  // au-dessus de l'eau). Il vole comme la Batmobile qui vole (vitesseVol : sa vitesse en l'air, en m/s ; descente : celle à laquelle il descend
+  // pour se poser) : R pour décoller ou se poser. Au sol, il n'avance que tout doucement (vitesse). roquettes : celles qu'il encaisse.
+  // Ses quatre rotors tournent dans ses ailes (la forme : MODELES, 'bat')
+  { nom: 'Bat', modele: 'bat', vitesse: 8, acceleration: 22, virage: 1.4, chance: 0, couleurs: ['#1b1c22'], blinde: true, vitesseVol: 80, descente: 20, roquettes: 6,
+    son: { grave: 22, aigu: 110, rapports: 1, rauque: 0.6, volume: 0.08 } },
 ];
 
 // =====================================================================
@@ -2507,6 +2711,21 @@ const ENNEMIS = {
   // dégâts d'une explosion qu'il prend (0.3 = 30 %). Batman ne tue jamais : à 0, il est assommé, et la police l'embarque
   homme:     { nom: 'Homme du Pingouin', vie: 80, arme: 2, degats: 5, precision: 0.3,  vue: 45, tir: [1.2, 2.2], vitesse: 4.5 },
   pingouin:  { nom: 'Le Pingouin',   vie: 800, degats: 5, degatsRoquette: 25, precision: 0.35, vue: 70, tir: [1.6, 2.6], vitesse: 3.2, recule: 9, explosions: 0.3, boss: true },
+  // Double-Face (Harvey Dent), au pistolet dans chaque main, et ses hommes, en costume noir et blanc. De temps en temps (piece : les secondes
+  // entre deux lancers, au hasard entre les deux nombres), il lance sa pièce : pile (le côté brûlé), il tire des deux mains, très vite,
+  // pendant « rafale » secondes ; face (le côté propre), il hésite, et ne tire pas pendant « hesite » secondes. renforts : quand il n'a plus que
+  // la moitié de sa vie, ses hommes arrivent (combien)
+  bandit:    { nom: 'Homme de Double-Face', vie: 80, arme: 2, degats: 5, precision: 0.3, vue: 45, tir: [1.2, 2.2], vitesse: 4.5 },
+  doubleFace: { nom: 'Double-Face',  vie: 700, arme: 2, degats: 5, precision: 0.35, vue: 70, tir: [1, 1.8], vitesse: 3.4, recule: 9, explosions: 0.3, boss: true,
+    piece: [7, 10], rafale: 3.5, hesite: 3, renforts: 2 },
+  // Bane : énorme, très fort, un masque sur la bouche, et ses mercenaires, au fusil d'assaut (arme 5). Bane se bat aux poings : degats (un
+  // coup de poing ; elan : les secondes où il lève le poing avant de frapper, le temps de reculer ; tir : les secondes entre deux coups), et
+  // toutes les « charge » secondes (ou après 3 coups), il charge, tête baissée (degatsCharge, s'il te rentre dedans ; vitesseCharge, en m/s).
+  // S'il fonce dans un mur, il est sonné pendant « sonne » secondes, et tes coups comptent alors « sonneDegats » fois. pris : un filet, une
+  // décharge électrique ne le tiennent que tant de secondes (il les arrache). taille : combien de fois plus grand que toi
+  mercenaire: { nom: 'Mercenaire de Bane', vie: 80, arme: 5, degats: 4, precision: 0.22, vue: 50, tir: [1.5, 2.5], vitesse: 4.5 },
+  bane:      { nom: 'Bane',          vie: 1200, degats: 12, elan: 0.7, degatsCharge: 25, vitesseCharge: 13, vue: 80, tir: [1, 1.4], vitesse: 4.2, charge: [5, 8],
+    sonne: 3, sonneDegats: 2, pris: 1, explosions: 0.2, taille: 1.15, boss: true },
 };
 
 // =====================================================================
@@ -3005,7 +3224,8 @@ const VILLES = {
 //  LES MISSIONS : invente les tiennes !
 //  lieu : une lettre de la CARTE. S'il y en a plusieurs (un garage 'G'...), c'est la plus proche qui compte.
 //  aller (lieu) · voiture (lieu, en voiture) · eliminer (cible: 'soldat', 'boss', 'hitler', 'militaire', 'engel', ou à Malibu 'anneaux', 'raza',
-//    'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian' : voir ENNEMIS)
+//    'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian'..., ou à Gotham 'homme', 'pingouin', 'bandit',
+//    'doubleFace', 'mercenaire', 'bane' : voir ENNEMIS)
 //  etoiles (nombre) · semer · arme (le nom d'une arme à posséder)
 //  blindage (avoir une voiture blindée par le garagiste) · voler (lieu : tout le butin de ce pâté est dans le sac)
 //  bouton (le bouton rouge du camp militaire est enfoncé) · conduire (voiture : être au volant d'une voiture de ce nom)
@@ -3091,7 +3311,7 @@ const MISSIONS = [
 // =====================================================================
 //  LES MISSIONS DES AUTRES CHAPITRES (voir CHAPITRES, tout en haut du fichier) : une liste par chapitre, comme MISSIONS.
 //  La dernière mission de chaque chapitre : retrouver la DeLorean, cachée dans la ville (sa cachette, dans CHAPITRES), puis repartir avec.
-//  Au chapitre 2, Iron Man a ses 12 missions avant celle-là ; au chapitre 3, Batman en a 4 (les autres arrivent bientôt) ; pour Superman et
+//  Au chapitre 2, Iron Man a ses 12 missions avant celle-là ; au chapitre 3, Batman en a 8 (les autres arrivent bientôt) ; pour Superman et
 //  Spiderman, il n'y a encore que la DeLorean.
 // =====================================================================
 const RETROUVER_DELOREAN = { nom: 'La DeLorean a disparu', recompense: 1000, etapes: [
@@ -3193,8 +3413,8 @@ const MISSIONS_MALIBU = [
     { type: 'eliminer', cible: 'ultron', nombre: 1, lieu: '|', allies: ['War Machine'], texte: 'Ultron t\'attend, en haut de la tour Stark : c\'est le combat final !' },
   ]},
 ];
-// les missions de Batman, à Gotham (chapitre 3) : un méchant après l'autre, en commençant par le Pingouin (Double-Face, Bane, le Joker et le
-// Sphinx arrivent bientôt). Batman ne tue jamais (CHAPITRES : neTuePas) : les méchants sont assommés, et la police les embarque.
+// les missions de Batman, à Gotham (chapitre 3) : un méchant après l'autre : le Pingouin, Double-Face, puis Bane (le Joker et le Sphinx
+// arrivent bientôt). Batman ne tue jamais (CHAPITRES : neTuePas) : les méchants sont assommés, et la police les embarque.
 // Les nouvelles étapes :
 //  puits (le vieux puits du jardin du manoir Wayne : approche-toi... et tu tombes dedans, jusqu'à la Batcave, 90 m plus bas, dans son lac)
 //  costume (prends ton premier costume, dans sa vitrine, au fond de la Batcave, avec E : tu deviens Batman, ou Batgirl)
@@ -3207,10 +3427,27 @@ const MISSIONS_MALIBU = [
 //  brouiller (antennes : où sont les antennes du Pingouin, des cases [colonne, ligne] ; gardes : combien d'hommes autour de chacune ;
 //    pingouins : combien de pingouins-missiles marchent sur la ville ; secondes : le temps avant qu'ils arrivent. E tout près d'une
 //    antenne la brouille, un batarang ou le gel explosif aussi)
+//  bombes (bombes : où Double-Face les a cachées, des carrefours [colonne, ligne] : chacune est sur le trottoir, au coin du pâté ; secondes :
+//    le temps avant que chacune saute ; gardes : combien d'hommes la gardent. Quand une minuterie arrive à zéro, Double-Face lance sa pièce :
+//    face, la bombe attend encore « encore » secondes ; pile, elle saute (personne n'est blessé : la police a fait évacuer), et il en cache
+//    une autre dans une de ses « cachettes », qui sautera dans « nouvelle » secondes. E tout près d'une bombe la désamorce)
+//  stade (lieu : le stade. Il y a match : des joueurs sur la pelouse, des spectateurs sur les gradins. Quand tu arrives, Bane fait sauter le
+//    terrain : les gens s'enfuient, et Bane se montre)
+//  bat (lieu : là où Lucius Fox t'envoie le Bat, le vaisseau volant de Batman. Il arrive du ciel quand tu approches : monte dedans)
+//  bombe (lieu : là où est la bombe de Bane. Vole au-dessus d'elle avec le Bat : elle s'accroche dessous, et sa minuterie part (secondes).
+//    Emporte-la au large (large : une case [colonne, ligne] de la mer, où va le point jaune), à plus de « loin » mètres de toute terre, puis
+//    saute du Bat (E) : il emporte la bombe plus loin tout seul, et BOUM. Si la minuterie arrive à zéro trop près de la terre, Lucius Fox la
+//    ralentit : « encore » secondes de plus)
 //  Pour « aller » (et « eliminer »), point : à la place d'un lieu, un endroit de la Batcave ou de l'égout ('corniche', 'ile', 'manoir' : en
 //  haut du vieil ascenseur, devant la porte du manoir ; 'salle' : la salle au bout de l'égout ; 'ponton' : celui du canal)
+//  Pour « aller », signal: true : le Bat-signal s'allume dans le ciel tant que tu n'y es pas
+//  Pour « eliminer », revanche : si le méchant gagne (tu es battu), ce n'est pas fini : tu te réveilles au carrefour « noeud » [colonne,
+//    ligne], et c'est la revanche, dans la rue, avec « policiers » policiers de Gotham à tes côtés (et « voitures » voitures de police en
+//    travers de la rue). Le méchant revient avec « vie » (0.6 : 60 %) de sa vie, et « mercenaires » de ses hommes ; « texte » : ce que dit
+//    alors le bas de l'écran
 // costume: true (sur la mission) : avant de l'avoir finie, pas de costume (H ne fait rien, et le magasin de Lucius Fox attend) ;
-// batmobile: true : avant de l'avoir finie, pas de Batmobile (B ne la fait pas venir)
+// batmobile: true : avant de l'avoir finie, pas de Batmobile (B ne la fait pas venir) ; donne: 'Bat' : avant de l'avoir finie, pas de Bat (une
+// des BATMOBILES_WAYNE qui ont « mission: true »)
 const MISSIONS_GOTHAM = [
   // Batman Begins (2005) : enfant, Bruce Wayne est tombé dans le vieux puits du manoir... Dessous, une grotte immense, pleine de
   // chauves-souris : la Batcave. Il y trouve son premier costume, et apprend à se servir de son grappin et de sa cape
@@ -3242,6 +3479,36 @@ const MISSIONS_GOTHAM = [
     { type: 'brouiller', lieu: '}', antennes: [[40, 16.3], [42, 16.3], [41, 15.2]], gardes: 3, pingouins: 20, secondes: 150,
       texte: 'Brouille les antennes du Pingouin (E tout près, ou un batarang) : encore {n} · les pingouins arrivent dans {t} s' },
     { type: 'eliminer', cible: 'pingouin', nombre: 1, lieu: '}', texte: 'Le Pingouin sort de son dôme, furieux, avec son parapluie : assomme-le !' },
+  ]},
+  // The Dark Knight (2008) : le procureur Harvey Dent est devenu Double-Face. Il a caché des bombes dans Gotham... et c'est sa pièce qui
+  // décide lesquelles sautent. Puis il attend Batman au port, ses deux pistolets à la main
+  { nom: 'Pile ou face', recompense: 30000, etapes: [
+    { type: 'aller', lieu: 'C', signal: true, texte: 'Le Bat-signal ! Le commissaire Gordon t\'appelle : va au commissariat (point jaune)' },
+    { type: 'bombes', bombes: [[37, 31], [42, 33], [35, 39], [27, 33]], secondes: [75, 115, 160, 210], gardes: 2, encore: 20, nouvelle: 90,
+      cachettes: [[33, 27], [40, 25], [29, 37], [44, 30], [27, 26], [41, 37], [36, 23], [33, 35]],
+      texte: 'Désamorce les bombes de Double-Face (E tout près) : encore {n} · la prochaine saute dans {t} s · la Batmobile qui vole (R) passe au-dessus des passants' },
+    { type: 'eliminer', cible: 'doubleFace', nombre: 1, noeud: [36, 40],
+      texte: 'Double-Face t\'attend au port : assomme-le ! Quand il lance sa pièce, regarde bien : pile, il tire des deux mains !' },
+  ]},
+  // The Dark Knight Rises (2012) : en plein match, Bane fait sauter le terrain du stade. Ses mercenaires sont partout
+  { nom: 'Le stade', recompense: 40000, etapes: [
+    { type: 'stade', lieu: '°', texte: 'Ce soir, il y a match au stade de Gotham... {ami} : « Bane prépare quelque chose ! » Vas-y vite (point jaune)' },
+    { type: 'eliminer', cible: 'mercenaire', nombre: 10, ensemble: 3, lieu: '°', texte: 'Les mercenaires de Bane sont partout dans le stade ! Assomme-les : il en reste {n}' },
+  ]},
+  // The Dark Knight Rises : Bane attend Batman dans l'égout, dans l'ancien repaire du Pingouin. Un vrai combat ! S'il gagne, ce n'est pas fini :
+  // c'est la revanche, dans la rue, avec toute la police de Gotham
+  { nom: 'Bane', recompense: 50000, etapes: [
+    { type: 'aller', point: 'salle', texte: 'Bane se cache au fond de l\'égout, dans l\'ancien repaire du Pingouin : l\'égout s\'ouvre au bord de la rivière (point jaune)' },
+    { type: 'eliminer', cible: 'bane', nombre: 1, point: 'salle',
+      revanche: { noeud: [38, 29], policiers: 10, voitures: 4, mercenaires: 4, vie: 0.6, texte: 'La revanche ! Toute la police de Gotham est avec toi : assomme Bane !' },
+      texte: 'BANE ! Quand il charge, saute de côté : s\'il fonce dans un mur, il est sonné... et tes coups comptent double !' },
+  ]},
+  // The Dark Knight Rises : avant d'être arrêté, Bane a lancé la minuterie de sa bombe. Batman l'emporte au large avec le Bat, le vaisseau
+  // volant que Lucius Fox lui a construit... et saute au dernier moment (donne: 'Bat' : le Bat est à toi à la fin de la mission)
+  { nom: 'La bombe de Bane', recompense: 60000, donne: 'Bat', etapes: [
+    { type: 'bat', lieu: '/', texte: 'Lucius Fox t\'a préparé une surprise : va à la tour Wayne (point jaune)' },
+    { type: 'bombe', lieu: '°', large: [53, 28], secondes: 90, loin: 400, encore: 40,
+      texte: 'La bombe de Bane est au stade, et sa minuterie tourne ! Vole au-dessus d\'elle avec le Bat : elle s\'accrochera dessous (point jaune)' },
   ]},
 ];
 const MISSIONS_CHAPITRES = {
@@ -3573,12 +3840,15 @@ const COSTUMES_WAYNE = [
 // LES BATMOBILES : la première, tu l'as (elle vole) ; les autres s'achètent. Leur forme, leur vitesse et ce qu'elles savent faire (avec
 // la touche R) sont dans le tableau VOITURES. B : ta Batmobile arrive à côté de toi ; N : passer à la Batmobile suivante (B la fera venir)
 //  voiture : son nom dans VOITURES ; prix (0 : la première)
+//  mission: true : pas au magasin, c'est une mission qui te le donne (celle qui a « donne » : le Bat, à la mission « La bombe de Bane »).
+//    Ensuite, N le choisit et B le fait venir, comme une Batmobile
 //  (le hall n'a que 6 places : une 7e Batmobile ne serait ni exposée, ni à vendre)
 const BATMOBILES_WAYNE = [
   { voiture: 'Batmobile', prix: 0 },
   { voiture: 'Batmobile de 1989', prix: 25000 },
   { voiture: 'Batmobile de The Batman', prix: 45000 },
   { voiture: 'Tumbler', prix: 70000 },
+  { voiture: 'Bat', mission: true },
 ];
 // LES GADGETS : une fois achetés, ils marchent quand tu es en costume
 //  vision (touche O) : la vision de détective. O l'allume ou l'éteint : tu vois les ennemis à travers les murs (en rouge), et les autres
@@ -6131,8 +6401,9 @@ function construireTourWayne(X, Z, rnd) {
     standsWayne.push({ sorte: 'costume', k, ...q }); ajouterCollision(q.x - 0.6, q.z - 0.6, q.x + 0.6, q.z + 0.6, q.y + 2.4, Y0);
   });
   const places = [[-18.9, 1], [18.9, 1], [-18.9, -12.5], [18.9, -12.5], [-9.5, -13], [9.5, -13]];   // (6 places pour les Batmobiles)
-  BATMOBILES_WAYNE.slice(0, places.length).forEach((V, k) => {
-    const q = b.point(places[k][0], 0, places[k][1]);
+  const aVendre = BATMOBILES_WAYNE.map((V, k) => ({ V, k })).filter(({ V }) => !V.mission).slice(0, places.length);   // (pas le Bat : une mission le donne)
+  aVendre.forEach(({ k }, n) => {
+    const q = b.point(places[n][0], 0, places[n][1]);
     standsWayne.push({ sorte: 'batmobile', k, ...q }); ajouterCollision(q.x - 3.4, q.z - 3.4, q.x + 3.4, q.z + 3.4, q.y + 1.6, Y0);
   });
   // la nuit, le magasin est bien éclairé : des spots au plafond, au-dessus des mannequins, des Batmobiles, des socles et de l'accueil. Ce sont
@@ -6140,7 +6411,7 @@ function construireTourWayne(X, Z, rnd) {
   // portent loin (portee), comme les 4 lampes du plafond
   const salle = interieurs.at(-1);   // (le hall : le dernier bâtiment construit)
   for (const q of salle.lampes) Object.assign(q, { haut: true, force: 45, portee: 24 });
-  for (const [u, w] of [[-6, -5.5], [6, -5.5], ...places.slice(0, BATMOBILES_WAYNE.length), [-11.3, 12.5], [9.7, 12.5], [0, 6.5]]) {
+  for (const [u, w] of [[-6, -5.5], [6, -5.5], ...places.slice(0, aVendre.length), [-11.3, 12.5], [9.7, 12.5], [0, 6.5]]) {
     b.dedans(() => b.B('lampe', u, b.niveau(1) - 0.36, w, 0.8, 0.06, 0.8, false));
     const p = b.point(u, 1, w); salle.lampes.push({ x: p.x, y: p.y - 0.6, z: p.z, dedans: true, haut: true, force: 70, portee: 20 });
   }
@@ -9281,6 +9552,34 @@ const MODELES = {
         ...[-0.6, 1.1].flatMap(z => deux(c => new THREE.CylinderGeometry(0.05, 0.05, 0.75, 6).rotateZ(0.35 * c).translate(0.82 * c, 0.45, z))));   // ...et leurs montants
       f.phares.push(rond(0.1, 0, 0.75, 2.25)); f.feux.push(rond(0.08, 0, 2.5, -7.55));
     } },
+  // le Bat (The Dark Knight Rises) : un vaisseau tout noir, plat et anguleux, en forme de chauve-souris vue du ciel. Au milieu, son fuselage
+  // et la verrière du cockpit ; dans ses ailes, quatre rotors dans leurs conduits ronds (deux grands derrière, deux petits devant) ; dessous,
+  // trois pieds pour se poser. Comme l'avion, seul son fuselage (largeur) cogne : ses ailes font 9 m. aile : l'aile gauche vue du ciel,
+  // [vers l'extérieur, vers l'avant], en mètres, le bord arrière découpé comme une aile de chauve-souris
+  bat: { longueur: 6.4, largeur: 2.4, hauteur: 1.7, roue: 0.3, roues: [], oeil: [0, 1.62, 0.75], plaque: false,
+    rotors: [[-2.75, 0.84, -1.15, 1.05, 'y'], [2.75, 0.84, -1.15, 1.05, 'y'], [-1.55, 0.84, 1.55, 0.5, 'y'], [1.55, 0.84, 1.55, 0.5, 'y']],
+    aile: [[0, 3.3], [0.7, 2.3], [1.25, 1.35], [2.4, 0.95], [3.7, 0.25], [4.55, -0.55], [4.4, -1.25], [3.65, -1.15], [3.3, -2.15], [2.55, -1.65], [1.85, -2.6], [1.15, -2.0], [0, -2.75]],
+    plus: f => {
+      const A = MODELES.bat.aile, contour = [...A, ...[...A].reverse().slice(1, -1).map(([x, z]) => [-x, z])];   // (l'aile droite : la gauche, retournée)
+      const trous = [[-2.75, -1.15, 1.13], [2.75, -1.15, 1.13], [-1.55, 1.55, 0.58], [1.55, 1.55, 0.58]];   // (les rotors passent à travers les ailes)
+      const s = new THREE.Shape(contour.map(([x, z]) => new THREE.Vector2(x, z)));
+      for (const [x, z, r] of trous) { const t = new THREE.Path(); t.absarc(x, z, r, 0, Math.PI * 2, true); s.holes.push(t); }
+      f.peint.push(new THREE.ExtrudeGeometry(s, { depth: 0.22, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.04, bevelSegments: 1, curveSegments: 20 }).rotateX(Math.PI / 2).translate(0, 0.98, 0));   // les ailes
+      // le fuselage, vu de côté [vers l'avant, vers le haut] : un coin, plus haut au cockpit
+      f.peint.push(new THREE.ExtrudeGeometry(new THREE.Shape([[-2.7, 0.62], [3.1, 0.78], [2.2, 1.12], [0.55, 1.58], [-1.5, 1.5], [-2.7, 1.08]].map(([z, y]) => new THREE.Vector2(z, y))),
+        { depth: 1.3, bevelEnabled: false }).rotateY(-Math.PI / 2).translate(0.65, 0, 0));
+      f.vitres.push(new THREE.BoxGeometry(0.95, 0.03, 1.05).rotateX(0.33).translate(0, 1.43, 1.1));                     // la verrière du cockpit
+      for (const [x, z, r] of trous) { // les conduits des rotors : un anneau épais, et sa grille dessous
+        f.noir.push(new THREE.TorusGeometry(r - 0.02, 0.09, 6, 32).rotateX(Math.PI / 2).translate(x, 0.88, z));
+        f.chrome.push(new THREE.TorusGeometry(r * 0.25, 0.05, 6, 16).rotateX(Math.PI / 2).translate(x, 0.8, z));   // (le moyeu)
+        f.phares.push(new THREE.TorusGeometry(r - 0.12, 0.022, 4, 32).rotateX(Math.PI / 2).translate(x, 0.74, z));   // (un anneau de lumière, dessous : on le voit voler, la nuit)
+      }
+      f.noir.push(...deux(c => tube(0.06, 1.2, 0.35 * c, 0.6, 2.35, 'z')));                                         // ses deux canons, sous le nez
+      f.noir.push(...[[-0.8, -1.4], [0.8, -1.4], [0, 1.9]].map(([x, z]) => tube(0.07, 0.65, x, 0.33, z, 'y')));   // ses trois pieds...
+      f.noir.push(...[[-0.8, -1.4], [0.8, -1.4], [0, 1.9]].map(([x, z]) => bloc(0.32, 0.06, 0.32, x, 0.03, z)));   // ...et leurs semelles
+      f.feux.push(...deux(c => bloc(0.18, 0.06, 0.18, 4.45 * c, 0.9, -0.85, 0.02)));                                // les feux, au bout des ailes
+      f.phares.push(...deux(c => bloc(0.3, 0.04, 0.06, 0.4 * c, 0.86, 3.05, 0.01)));                                // deux fentes de lumière, devant
+    } },
 };
 VOITURES.forEach(t => { if (!MODELES[t.modele]) alert(`Voitures : le modèle "${t.modele}" de "${t.nom}" n'existe pas !`); });
 
@@ -10267,21 +10566,32 @@ const TENUES = {
   // Gotham : un homme du Pingouin (costume sombre, casquette grise) ; le Pingouin, petit et tout rond (son habit, son chapeau : voir creerPingouin)
   homme: () => ({ peau: hasard(PEAUX), haut: hasard(['#26272c', '#2e2a26', '#1e2430']), bas: hasard(['#1c1c20', '#26272c']), chaussures: '#111', casquette: hasard(['#5a5a5e', '#3e3e44']), carrure: entre(1, 1.12) }),
   pingouin: () => ({ peau: '#e6c2a6', haut: '#141418', bas: '#141418', chaussures: '#0c0c0e', cheveux: '#2a2420', taille: 0.84, carrure: 1.42 }),
+  // Gotham, suite : un homme de Double-Face (un costume moitié blanc, moitié noir : voir creerBandit) ; Double-Face lui-même (son visage brûlé :
+  // voir creerDoubleFace) ; un mercenaire de Bane (treillis sombre, cagoule, gilet : voir creerMercenaire) ; Bane (voir creerBane) ; un
+  // joueur du match, au stade (equipe : les Gotham Rogues, en noir et or, ou les visiteurs, en blanc et bleu)
+  bandit: () => ({ peau: hasard(PEAUX), haut: '#e8e4da', bas: '#e8e4da', chaussures: '#111', casquette: '#141418', carrure: entre(1, 1.1) }),
+  doubleFace: () => ({ peau: '#e2b896', haut: '#e8e4da', bas: '#e8e4da', chaussures: '#141418', cheveux: '#5a4430', carrure: 1.05 }),
+  mercenaire: () => ({ peau: hasard(PEAUX), haut: hasard(['#3a3d34', '#33352f', '#2c2f2a']), bas: '#25271f', chaussures: '#111', bonnet: '#18181a', carrure: entre(1.02, 1.12) }),
+  bane: () => ({ peau: '#d9b08c', haut: '#2d2b26', bas: '#26261f', chaussures: '#0e0e0c', cheveux: '#1a1410' }),
+  joueur: equipe => ({ peau: hasard(PEAUX), haut: equipe ? '#141416' : '#f0f0ee', bas: equipe ? '#d8a818' : '#1a3a8a', chaussures: equipe ? '#d8a818' : '#f0f0ee',
+    cheveux: hasard(['#1a1208', '#3a2a1a', '#8a6a3a', '#d8c080']), manchesCourtes: true, short: true, carrure: entre(1, 1.1) }),
 };
 // ceux qui restent dans leur pâté (le camp, le bunker, le château, une grotte...) et attaquent dès qu'ils te voient : les nazis, les militaires
-// du camp et leur commandante, et, à Malibu, les Dix Anneaux, Iron Monger, Whiplash, les soldats Extremis et Killian ; et les voyous des
-// appels de la police (chapitres de super-héros), devant le magasin qu'ils braquent. Les drones et les hélicoptères attaquent aussi, mais ils
-// volent partout (VOLANTS), comme Whiplash, qui marche dans les rues. Les vigiles, les chiens et les gangs restent aussi dans leur pâté, mais
-// n'attaquent que si on les provoque
-const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'raza', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron', 'voyou', 'homme', 'pingouin'], VIGILES = ['garde', 'chien', 'gang'];
-const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron'], LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron', 'raza', 'pingouin'];
+// du camp et leur commandante, et, à Malibu, les Dix Anneaux, Iron Monger, Whiplash, les soldats Extremis et Killian ; à Gotham, les hommes
+// du Pingouin et de Double-Face, les mercenaires de Bane, et leurs chefs ; et les voyous des appels de la police (chapitres de super-héros),
+// devant le magasin qu'ils braquent. Les drones et les hélicoptères attaquent aussi, mais ils volent partout (VOLANTS), comme Whiplash, qui
+// marche dans les rues. Les vigiles, les chiens et les gangs restent aussi dans leur pâté, mais n'attaquent que si on les provoque
+const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'raza', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron', 'voyou', 'homme', 'pingouin',
+  'bandit', 'doubleFace', 'mercenaire', 'bane'], VIGILES = ['garde', 'chien', 'gang'];
+const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron'], LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron', 'raza', 'pingouin', 'doubleFace', 'bane'];
 const LIBRES = ['whiplash', 'killian', 'hulk'];   // ceux-là ne gardent pas de pâté : ils vont où ils veulent
 const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
 const personnes = [];
 // le corps de ceux qui ne sont pas faits comme tout le monde (voir « Les missions d'Iron Man ») : une armure, des fouets, un hélicoptère...
 const CORPS = { monger: () => creerMonger(), whiplash: t => creerWhiplash(t, false), whiplashArmure: t => creerWhiplash(t, true), drone: () => creerDrone(),
   helico: () => creerHelico(), extremis: t => creerExtremis(t), killian: t => creerExtremis(t, true), trevor: t => creerTrevor(t), ami: () => creerAmi(),
-  hulk: t => creerHulk(t), raza: t => creerRaza(t), pingouin: t => creerPingouin(t), sentinelle: () => creerDrone(ARMURE_SENTINELLE, false), ultron: () => creerDrone({ ...ARMURE_ULTRON, taille: ENNEMIS.ultron.taille }, false) };
+  hulk: t => creerHulk(t), raza: t => creerRaza(t), pingouin: t => creerPingouin(t), sentinelle: () => creerDrone(ARMURE_SENTINELLE, false), ultron: () => creerDrone({ ...ARMURE_ULTRON, taille: ENNEMIS.ultron.taille }, false),
+  bandit: t => creerBandit(t), doubleFace: t => creerDoubleFace(t), mercenaire: t => creerMercenaire(t), bane: t => creerBane(t) };
 function creerPersonne(type, x, z, tenue = TENUES[type]?.(), y = hauteurSol(x, z)) {
   const h = type === 'chien' ? creerChien() : CORPS[type] ? CORPS[type](tenue) : creerHumain(tenue);
   if (type === 'boss') h.g.scale.setScalar(1.15);
@@ -12801,8 +13111,10 @@ if (chezWayne) { // (par leur nom : on peut ajouter un costume ou une Batmobile 
   for (const c in AMELIORATIONS_WAYNE) wayne[c] = clamp(Math.round(m[c]) || 1, 1, AMELIORATIONS_WAYNE[c].prix.length + 1);
   // le premier costume (la mission « La Batcave ») et la première Batmobile (« Poursuite sous la pluie ») : une partie d'avant les a déjà, si
   // elle a passé ces missions, ou fini le chapitre
-  const passe = cle => (partie.missions[chapitre] || 0) > MISSIONS_CH.findIndex(x => x[cle]) || partie.ouvert > chapitre || !!partie.trouvee[chapitre];
+  const passe = cle => (partie.missions[chapitre] || 0) > MISSIONS_CH.findIndex(typeof cle === 'function' ? cle : x => x[cle]) || partie.ouvert > chapitre || !!partie.trouvee[chapitre];
   wayne.gagne = !!m.gagne || passe('costume'); wayne.donnee = !!m.donnee || passe('batmobile');
+  // le Bat (BATMOBILES_WAYNE : mission: true), que donne une mission (donne: 'Bat') : une partie d'avant qui l'a passée l'a déjà
+  BATMOBILES_WAYNE.forEach((V, k) => { if (V.mission && MISSIONS_CH.some(x => x.donne === V.voiture) && passe(x => x.donne === V.voiture) && !wayne.batmobiles.includes(k)) wayne.batmobiles = [...wayne.batmobiles, k].sort((a, b) => a - b); });
   J.vie = vieMax();
 }
 // un costume (son numéro dans COSTUMES_WAYNE), tel qu'il le porte : avec la fille du menu, ce que « fille » y change (Batgirl), et ses
@@ -12860,7 +13172,7 @@ function batmobileSuivante() {
   if (l.length < 2) { annonce('', tr("Tu n'as que cette Batmobile : les autres s'achètent chez Lucius Fox, à Wayne Enterprises (⚙ sur la carte)"), 3); bip(300, 200, 0.1, 'square', 0.1); return; }
   wayne.batmobile = l[(l.indexOf(wayne.batmobile) + 1) % l.length];
   const t = typeBatmobile(wayne.batmobile);
-  annonce(tr(t.nom).toUpperCase(), `${tr('B : elle arrive à côté de toi')} · ${pouvoirBatmobile(t)}`, 3);
+  annonce(tr(t.nom).toUpperCase(), estBat(t) ? `${tr("B : il arrive du ciel (même sur l'eau)")} · ${tr('R : décoller ou se poser')}` : `${tr('B : elle arrive à côté de toi')} · ${pouvoirBatmobile(t)}`, 3);
   bip(600, 900, 0.12, 'sine', 0.06);
   sauverPartie();
 }
@@ -13669,6 +13981,7 @@ function action() {
   const tl = telesiegeProche(), siege = tl && siegeLibre(tl);   // il s'assoit sur le siège libre le plus proche (s'il y en a un dans la gare)
   if (siege) { J.telesiege = siege; J.danse = 0; J.accroupi = false; if (J.voiture) Object.assign(J.voiture, { tour: 0, derape: 0, pas: 0, transition: 0 }); bip(500, 750, 0.3, 'sine', 0.15); return true; }
   if (tl) return true;
+  if (J.voiture && J.voiture === bombeBane?.v && bombeBane.phase === 'emporte' && bombeBane.assezLoin) { sauterDuBat(); return true; }   // avec la bombe de Bane, assez loin de la terre : il saute du Bat
   if (J.voiture?.enVol) { annonce('', tr("Pose-toi d'abord !"), 1.5); return true; }   // pas en plein vol
   if (J.voiture) { if (!J.voiture.rail) sortirVoiture(); return true; }   // pas en plein looping. En plein accident (tonneaux, tête-à-queue), on peut : B.J. saute, et tombe par terre
   if (boutonProche() && !camp.ouvert && (!J.robot || J.robot.armure)) { appuyerBouton(); return true; }   // le bouton rouge du camp militaire (même depuis l'armure)
@@ -13679,6 +13992,8 @@ function action() {
   if (costumeProche()) { prendreCostume(); return true; }   // le premier costume de Batman, dans sa vitrine, au fond de la Batcave
   const an = antenneProche();
   if (an) { brouiller(an); return true; }   // une antenne du Pingouin (mission « Les pingouins-missiles »)
+  const bo = bombeProche();
+  if (bo) { desamorcer(bo); return true; }   // une bombe de Double-Face (mission « Pile ou face »)
   const s = standProche();
   if (s) { acheter(s); return true; }
   const g = garagisteProche();
@@ -13699,7 +14014,7 @@ function action() {
 // la voiture dans laquelle on peut monter : la plus proche, si on est à moins de 1,30 m de son bout
 function voitureProche() {
   let v = null, best = Infinity;
-  for (const o of voitures) { const d = dist(o, J); if (d < best && d < o.forme.longueur / 2 + 1.3 && !o.detruite && !o.coule && !o.accident && !o.fantome && !o.fuyard && !o.entree && !o.embarque && Math.abs(o.y - J.y) < 2.5) { best = d; v = o; } }   // (pas la DeLorean qui va repartir toute seule, ni la voiture du Pingouin)
+  for (const o of voitures) { const d = dist(o, J); if (d < best && d < o.forme.longueur / 2 + 1.3 && !o.detruite && !o.coule && !o.accident && !o.fantome && !o.fuyard && !o.entree && !o.embarque && !o.arriveeBat && !o.autopilote && Math.abs(o.y - J.y) < 2.5) { best = d; v = o; } }   // (pas la DeLorean qui va repartir toute seule, ni la voiture du Pingouin, ni le Bat qui arrive)
   return v;
 }
 const garagisteProche = () => garagistes.find(g => dist(g, J) < 2.5 && Math.abs(g.y - J.y) < 1.5);
@@ -13750,7 +14065,11 @@ function entrerVoiture(v) {
   if (v.type.vole) { // on regarde droit devant, et on rappelle les commandes
     J.lacet = v.angle; J.tangage = 0;
     annonce(tr(v.type.nom).toUpperCase(), v.type.vole === 'avion' ? tr('Z : accélérer · S : ralentir · la souris dirige (ou Q D, Espace et C)') : tr('Espace : monter · C : descendre · Z Q S D : avancer · la souris tourne'), 5);
-  } else if (v.type.vitesseVol) annonce(tr(v.type.nom).toUpperCase(), tr("R : déployer les ailes et s'envoler"), 4);   // la Batmobile
+  } else if (v.attend) { // le Bat, qui l'attendait en l'air au-dessus de l'eau : il décolle tout de suite
+    v.attend = false; v.envole = true; J.lacet = v.angle; J.tangage = 0;
+    annonce(tr(v.type.nom).toUpperCase(), tr('Z : accélérer · S : ralentir · la souris dirige · Espace : monter · C : descendre · R : se poser'), 5);
+  } else if (estBat(v.type)) annonce(tr(v.type.nom).toUpperCase(), tr('R : décoller (R encore : se poser)'), 4);   // le Bat
+  else if (v.type.vitesseVol) annonce(tr(v.type.nom).toUpperCase(), tr("R : déployer les ailes et s'envoler"), 4);   // la Batmobile
   else annonce(tr(v.type.nom).toUpperCase(), !v.type.glisse ? '' : v.forme.rando ? tr(TEXTES_RANDO[!!v.montee]) : tr('Z : pousser · S : freiner · Espace : sauter · Maj : déraper'), v.type.glisse ? 4 : 2);   // le nom du véhicule dans lequel on monte
   if (prete) annonce(tr(v.type.nom).toUpperCase(), tr('« Tiens, {super} : je te la prête ! »', { super: nomSuper() }), 2.5);
   if (v.filet) oterFilet(v);   // prise dans un filet : B.J. l'arrache
@@ -13975,6 +14294,8 @@ function alerter(p) {
 // parJoueur = false quand c'est Hitler qui le blesse : pas d'étoile pour B.J.
 function blesser(p, degats, parJoueur = true) {
   if (p.vie <= 0 || p.invincible) return;   // ({ami} et Trevor Slattery, dans les missions d'Iron Man : on ne peut pas les blesser)
+  if (p.sonne > 0) degats *= fiche(p)?.sonneDegats || 1;   // (Bane, sonné : les coups comptent double)
+  if (p.affaibli && !parJoueur) degats = Math.min(degats, Math.max(0, p.vie - fiche(p).vie * 0.25));   // (à la revanche, ni la police ni une voiture qui explose ne l'achèvent : c'est Batman qui finit le travail)
   p.vie -= degats; alerter(p);   // un vigile ou un chien touché : l'alarme sonne ; un membre de gang : tout le gang attaque
   if (degats > 0) p.dernierCoup = temps;   // (un soldat Extremis ne guérit que quand on ne le touche plus)
   if (p.type === 'pieton') p.peur = 8;
@@ -14036,29 +14357,39 @@ function blesserJoueur(degats, gilet = true, de = null) {
   const d = degats * (abrite() ? R_.protectionVoiture : J.robot ? R_.protectionRobot : armureIronman() ? protectionIronman() : protectionCostume()), g = gilet ? Math.min(J.gilet, d) : 0; // le gilet prend les dégâts en premier (l'armure d'Iron Man en prend la plus grosse part)
   J.gilet -= g; J.vie -= d - g;
   if (armureIronman() && !J.voiture) abimerArmure(d, de);   // dans l'armure d'Iron Man : le coup abîme une de ses parties
-  J.dernierDegat = temps;
+  J.dernierDegat = temps; J.dernierDe = de;   // (qui l'a blessé en dernier : voir mourir)
   $('rouge').style.opacity = 0.9;
   bip(180, 90, 0.15, 'triangle', 0.3);
   if (J.vie <= 0) mourir();
 }
-function mourir() { if (J.voiture?.virage) J.voiture.virage = null; J.vie = 0; J.mort = 0.001; $('wasted').style.display = 'block'; renderer.domElement.style.filter = 'grayscale(1) brightness(.7)'; bip(200, 50, 1.5, 'sine', 0.4); }
+function mourir() {
+  if (J.voiture?.virage) J.voiture.virage = null; J.vie = 0; J.mort = 0.001; $('wasted').style.display = 'block'; renderer.domElement.style.filter = 'grayscale(1) brightness(.7)'; bip(200, 50, 1.5, 'sine', 0.4);
+  if (battuParBane()) { combatBane.phase = 'battu'; $('wasted').textContent = fille() ? tr("BANE T'A BATTUE...") : tr("BANE T'A BATTU..."); }   // (pas de « WASTED » : la revanche)
+}
 function reapparaitre() {
-  J.mort = 0; J.vie = vieMax(); J.argent = Math.min(J.argent, Math.max(0, J.argent - 100));   // (sans descendre sous 0 ; mais une dette d'amendes reste)
+  const revanche = combatBane?.phase === 'battu';   // battu par Bane : il se réveille dans la rue, pour la revanche (et ça ne coûte rien)
+  J.mort = 0; J.vie = vieMax(); if (!revanche) J.argent = Math.min(J.argent, Math.max(0, J.argent - 100));   // (sans descendre sous 0 ; mais une dette d'amendes reste)
   if (J.voiture) { J.voiture.vitesse = 0; sortirVoiture(); }   // arrêté d'abord : on ne roule pas par terre en se réveillant
   if (J.robot) sortirRobot();
   if (J.ironman) Object.assign(J.ironman, { batterie: 100, secours: false, parties: partiesNeuves(), cassees: {} });   // l'armure d'Iron Man : batterie pleine, toute réparée
   // l'hôpital le plus proche ; pendant l'évasion de la grotte des Dix Anneaux, les Dix Anneaux le ramènent dans sa cellule (avec une Mark I neuve)
   // dans la Batcave, on se réveille au bord du lac ; dans l'égout, à son entrée (sur le trottoir)
-  const cellule = enEvasion(), cave = !cellule && chezWayne && dansBatcave(J), dansEgout = !cellule && !cave && !!egout && souterrainEn(J.x, J.z, J.y)?.zone === egout.S;
-  const h = cellule ? grotte.reveil : cave ? POINTS.reveilBatcave : dansEgout ? POINTS.reveilEgout : hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);
-  const sous = cave || dansEgout;
+  const cellule = enEvasion(), cave = !cellule && chezWayne && dansBatcave(J), dansEgout = !revanche && !cellule && !cave && !!egout && souterrainEn(J.x, J.z, J.y)?.zone === egout.S;
+  const h = revanche ? lieuRevanche() : cellule ? grotte.reveil : cave ? POINTS.reveilBatcave : dansEgout ? POINTS.reveilEgout : hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);
+  const sous = cave || dansEgout || revanche;
   J.x = h.x; J.z = h.z; J.y = sous ? hauteurSol(J.x, J.z, h.y + 1) : hauteurSol(J.x, J.z); J.vy = 0; J.lacet = cellule || sous ? h.angle : 0; J.accroupi = false; J.nage = false; J.roule = null; J.genou = J.atterri = J.energie = 0;
   if (cellule && (!markI || markI.supprimer || dist(markI, grotte.poste) > 1)) { if (markI && !markI.supprimer) markI.supprimer = true; poserMarkI(); }
   etoiles = 0;
   for (const p of personnes) { p.alerte = false; if (p.renfort) p.supprimer = true; }
   for (const v of voitures) if (v.police && v.renfort) v.supprimer = true;
   for (const r of robots) if (r.pilote === 'police') r.supprimer = true;
-  $('wasted').style.display = 'none'; renderer.domElement.style.filter = '';
+  $('wasted').style.display = 'none'; $('wasted').textContent = 'WASTED'; renderer.domElement.style.filter = '';
+  if (revanche && combatBane.lieu) { // (battu pendant la revanche : il se relève dans la même rue, et le combat continue)
+    combatBane.phase = 'revanche';
+    annonce(tr('LA REVANCHE !'), tr('Debout ! Bane est encore là... et la police aussi.'), 4);
+    return;
+  }
+  if (revanche) { commencerRevanche(); return; }   // (la rue, la police de Gotham, et Bane qui revient : voir « Les missions de Batman »)
   annonce('', cellule ? tr('Les Dix Anneaux te ramènent dans ta cellule (-100 $)') : cave ? tr('Tu te réveilles au bord du lac de la Batcave (-100 $)') : dansEgout ? tr("Tu te réveilles à l'entrée de l'égout (-100 $)") : tr("Tu te réveilles à l'hôpital le plus proche (-100 $)"), 3);
 }
 
@@ -15354,7 +15685,7 @@ function pilotageHelico(v, dt, pilote) {
 // v.envole : on lui a demandé de voler (R) ; v.enVol : elle est en l'air ; v.ailes : de 0 (rangées) à 1 (déployées), voir majVoiture
 function deployerAiles(v) {
   if (v.detruite || v.coule || v.accident || v.rail || J.telesiege || v.looping || v.tonneau) return;   // (ni en pleine figure : elle la finit d'abord)
-  if (v.envole && v.enVol && hauteurSol(v.x, v.z, v.y) < EAU - 1) { annonce('', tr("Pas sur l'eau : elle coulerait !"), 2); return; }
+  if (v.envole && v.enVol && hauteurSol(v.x, v.z, v.y) < EAU - 1) { annonce('', estBat(v.type) ? tr("Pas sur l'eau : il coulerait !") : tr("Pas sur l'eau : elle coulerait !"), 2); return; }
   v.envole = !v.envole;
   if (!v.envole) { annonce('', tr('Atterrissage'), 2); return; }
   if (!v.enVol) Object.assign(v, { enVol: true, vy: Math.max(0, v.vy), vol: false, decollage: null });
@@ -15434,6 +15765,10 @@ function majPersonne(p, dt) {
   if (p.pris) { majPris(p, dt); return; }   // emballé dans un filet, ou paralysé
   if (p.embarque) { majFlicEmbarque(p, dt); return; }   // un policier venu embarquer les assommés (à Gotham)
   if (p.type === 'pingouin') { majPingouin(p, dt, d); return; }   // le Pingouin, à Gotham : son parapluie (voir « Les missions de Batman »)
+  if (p.type === 'doubleFace') { majDoubleFace(p, dt, d); return; }   // Double-Face : ses deux pistolets, et sa pièce
+  if (p.type === 'bane') { majBane(p, dt, d); return; }               // Bane : ses coups de poing, et ses charges
+  if (p.allie) { majPolicierAllie(p, dt); return; }                    // un policier de Gotham, avec Batman (la revanche contre Bane)
+  if (p.foot) { majFootballeur(p, dt); return; }                       // un joueur du match, au stade
   if (p.h.chien) { majChien(p, dt, d); return; }
   if (p.type === 'monger') { majMonger(p, dt, d); return; }   // Iron Monger : il marche, il vole, il tire (voir « Les missions d'Iron Man »)
   if (p.secours) { majSecours(p, dt); return; }               // quelqu'un à sauver (la tour en feu, {ami}) : il attend Iron Man, ou Iron Man le porte
@@ -15675,6 +16010,7 @@ function relever(p, dt) {
 // (il tremble, des éclairs courent sur les mailles) : il peut en mourir
 function prendre(p, sorte, duree, electrique = 0) {
   if (p.vie <= 0) return;
+  duree = Math.min(duree, fiche(p)?.pris ?? duree);   // (Bane arrache le filet, et se remet d'une décharge, en 1 s : ENNEMIS, pris)
   liberer(p);
   p.pris = { sorte, reste: duree, t: 0, electrique }; p.voitJ = false;
   if (sorte !== 'filet') return;
@@ -15923,6 +16259,9 @@ function majVoiture(v, dt) {
   if (v.gyro) { const on = Math.sin(temps * 14) > 0; v.gyro[0].material.emissiveIntensity = on ? 4 : 0.1; v.gyro[1].material.emissiveIntensity = on ? 0.1 : 4; }
   if (v === J.voiture) v.faute = true;   // sa voiture : ce qui lui arrivera sera sa faute (voir exploserVoiture)
   else if (v.type.vole) piloterAeronef(v, dt, false);
+  else if (v.arriveeBat) majArriveeBat(v, dt);     // le Bat qui arrive du ciel (voir « Les missions de Batman »)
+  else if (v.attend) majAttenteBat(v, dt);         // le Bat qui attend en l'air, au-dessus de l'eau
+  else if (v.autopilote) majAutopilote(v, dt);     // le Bat qui file tout seul, avec la bombe de Bane
   else if (v.enVol && v.type.vitesseVol) piloterBatmobile(v, dt, false);   // la Batmobile en l'air, sans personne dedans : elle se pose toute seule
   else if (v.accident) majAccident(v, dt);
   else if (v.happy) majRolls(v, dt);   // la Rolls de Happy Hogan fonce sur Whiplash (mission « Whiplash »)
@@ -15971,6 +16310,7 @@ function majVoiture(v, dt) {
       if (j.arriere) j.scale.set(1, 1, l); else j.scale.set(1, l, 1);
     }
   }
+  if (v.rotors.length && v.type.vitesseVol) v.rotor = clamp((v.rotor || 0) + (v.enVol || v === J.voiture ? 1.5 : -0.5) * dt, 0, 1);   // (les rotors du Bat : ils tournent quand il vole, ou que Batman est dedans)
   for (const r of v.rotors) r.pales.rotation[r.axe] += (v.rotor || 0) * (r.axe === 'y' ? 28 : 45) * dt;   // les pales de l'hélicoptère
   if (v.turboReste > 0 && (v.turboReste -= dt) <= 0) v.turboAttente = v.type.turbo.recharge;   // le turbo d'une Batmobile : il dure, puis il faut attendre
   else if (v.turboAttente > 0) v.turboAttente -= dt;
@@ -16116,7 +16456,7 @@ function peupler(dt) {
   tPeupler = 0.5;
   if (dernierJ) elan = { x: (J.x - dernierJ.x) / 0.5, z: (J.z - dernierJ.z) / 0.5 };
   dernierJ = { x: J.x, z: J.z };
-  for (const p of personnes) if ((p.type === 'pieton' || p.rodeur) && (dist(p, J) > 200 || (dist(p, J) > 60 && derriere(p)))) p.supprimer = true;
+  for (const p of personnes) if ((p.type === 'pieton' || p.rodeur) && !p.foot && (dist(p, J) > 200 || (dist(p, J) > 60 && derriere(p)))) p.supprimer = true;   // (pas les joueurs du match, au stade)
   for (const p of personnes) if (p.rodeur && !estNuit() && !p.alerte && dist(p, J) > 80) p.supprimer = true;   // au lever du jour, les gangs rentrent chez eux
   // la police semée, les policiers venus en renfort s'en vont, dès qu'on ne les voit plus ; de même, un passant qui attend à l'étage d'un bâtiment
   // (il ne sait pas descendre l'escalier : voir marcher), ou enfermé, sans chemin pour sortir (voir cheminVers)
@@ -16138,16 +16478,20 @@ function peupler(dt) {
   const pietons = personnes.filter(p => p.type === 'pieton').length, civiles = voitures.filter(v => v.conducteur === 'civil').length;
   // (la nuit, il y en a moins : REGLAGES.pietonsNuit et voituresNuit ; mais pas dans une ville où il fait toujours nuit, comme Gotham :
   // CHAPITRES, heure. Elle ne se vide pas, puisque le jour ne revient jamais)
-  // (pendant la course de la mission « Whiplash », les rues sont fermées : aucune voiture ; pendant la poursuite du Pingouin, à Gotham, moins)
+  // (pendant la course de la mission « Whiplash », les rues sont fermées : aucune voiture ; pendant la poursuite du Pingouin, à Gotham, moins ;
+  // pendant la revanche contre Bane, aucune, et trois fois moins de passants ; pendant la mission des bombes de Double-Face, quatre fois moins
+  // des deux)
   const nuit = CHAPITRE.heure == null ? lumiere.nuit : 0;
-  const voulus = Math.round(FOULES[foule.pietons].pietons * lerp(1, R_.pietonsNuit, nuit)), voulues = course ? 0 : Math.round(FOULES[foule.voitures].voitures * lerp(1, R_.voituresNuit, nuit) * (poursuite ? 0.4 : 1));
+  const revanche = combatBane?.phase === 'revanche' && dist(J, combatBane.lieu) < 250;   // (la revanche contre Bane : la police a fermé les rues)
+  const evacue = MISSIONS_CH[missionIndex]?.etapes.some(e => e.type === 'bombes') ? 0.25 : 1;   // (« Pile ou face » : la police a fait évacuer la ville)
+  const voulus = Math.round(FOULES[foule.pietons].pietons * lerp(1, R_.pietonsNuit, nuit) * (revanche ? 0.3 : evacue)), voulues = course || revanche ? 0 : Math.round(FOULES[foule.voitures].voitures * lerp(1, R_.voituresNuit, nuit) * (poursuite ? 0.4 : evacue));
   if (PISTES_SKI.length && voitures.filter(v => v.ski).length < R_.skieurs) creerSkieur();   // les autres skieurs : un de plus à la fois, sur une piste au hasard
   TELESIEGES.forEach(garnir);   // les skis, les snowboards et les luges pris aux gares reviennent
   for (let k = pietons; k < Math.min(voulus, pietons + Math.ceil(voulus / 8)); k++) apparaitrePersonne('pieton');
   // des piétons en trop (la nuit tombe, ou on a choisi moins de monde) rentrent chez eux, un huitième à la fois : ceux qu'on ne voit pas
   for (let n = Math.min(pietons - voulus, Math.ceil(voulus / 8) + 1), k = 0; n > 0 && k < personnes.length; k++) {
     const p = personnes[k];
-    if (p.type === 'pieton' && !p.supprimer && p.vie > 0 && horsDeVue(p)) { p.supprimer = true; n--; }
+    if (p.type === 'pieton' && !p.foot && !p.supprimer && p.vie > 0 && horsDeVue(p)) { p.supprimer = true; n--; }
   }
   for (let k = civiles; k < Math.min(voulues, civiles + Math.ceil(voulues / 8)); k++) apparaitreVoiture(false);
 }
@@ -16216,6 +16560,10 @@ function etapeFinie(et) {
     case 'poursuite': return !!poursuite?.fini;
     case 'suivre': return !!suivi?.fini;
     case 'brouiller': return !!brouillage && !antennesRestantes();
+    case 'bombes': return !!bombesDF && !bombesDF.liste.length;   // toutes les bombes de Double-Face sont désamorcées
+    case 'stade': return matchStade?.phase === 'fini';            // Bane a fait sauter le terrain, et il est reparti
+    case 'bat': return !!J.voiture && estBat(J.voiture.type);      // il est dans le Bat
+    case 'bombe': return bombeBane?.phase === 'fini';              // la bombe de Bane a explosé au large
     case 'aller': return arrive(lieuEtape(et)) && (!et.sansPolice || etoiles === 0);   // sansPolice : 0 étoile
     case 'voiture': { const v = J.voiture;   // rapide : une voiture rapide · blindee : une voiture blindée · sansPolice : 0 étoile
       return !!v && dist(J, lieuProche(et.lieu, J)) < 7 && (!et.rapide || v.type.vitesse >= R_.vitesseBlindable) && (!et.blindee || estBlindee(v)) && (!et.sansPolice || etoiles === 0); }
@@ -16266,6 +16614,10 @@ function cibleMission() {
   if (et.type === 'poursuite') return poursuite?.pingouin || poursuite?.v || null;
   if (et.type === 'suivre') return suivi?.pingouin || suivi?.v || null;
   if (et.type === 'brouiller') return proche(brouillage?.antennes.filter(a => !a.brouillee) || []);
+  // la bombe de Double-Face qui va sauter la première ; le stade ; le Bat, une fois arrivé ; la bombe de Bane, puis la mer (large)
+  if (et.type === 'bombes') return bombesDF?.liste.reduce((m, b) => !m || b.reste < m.reste ? b : m, null) || null;
+  if (et.type === 'bat') return livraison?.v && !livraison.v.supprimer ? livraison.v : lieuEtape(et);
+  if (et.type === 'bombe') return !bombeBane ? null : bombeBane.phase === 'attente' ? bombeBane : bombeBane.phase === 'emporte' && !bombeBane.assezLoin && et.large ? { ...centre(...et.large), y: EAU } : null;
   if (et.type === 'eliminer' && et.nombre) return proche(personnes.filter(p => p.type === et.cible && p.vie > 0)) || lieuEtape(et);
   if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule && !v.fantome))
     || (et.voiture === 'DeLorean' ? placeDeLorean() : null);   // (la DeLorean a explosé : sa cachette, où une neuve va revenir)
@@ -16283,6 +16635,7 @@ function missions(dt) {
   majEtape(et, dt);
   if (!m || !etapeFinie(et)) return;
   if (et.type === 'conduire' && et.voiture === 'DeLorean') partie.trouvee[chapitre] = true;   // la DeLorean de ce chapitre est retrouvée : elle peut voyager
+  if (et.type === 'bat') donnerVehicule('Bat');   // (il est monté dans le Bat : il est à lui, même s'il l'avait reperdu par le code MISSION)
   bip(500, 1500, 0.5, 'triangle', 0.3);
   if (++etapeIndex < m.etapes.length) return;
   J.argent += m.recompense; J.sac = 0;   // le butin est livré à la planque
@@ -16292,6 +16645,8 @@ function missions(dt) {
   }
   if (m.costume && chezWayne) bulles = { liste: ['Ton costume est à toi : <b>H</b> pour le mettre ou l\'enlever, partout. Le magasin de <b>Lucius Fox</b> est ouvert (⚙ sur la carte) !'], k: 0, t: 4.5, montree: false };
   if (m.batmobile && chezWayne) bulles = { liste: ['Ta Batmobile est à toi : en costume, <b>B</b> la fait venir, n\'importe où. Dedans, <b>R</b> : elle vole !'], k: 0, t: 4.5, montree: false };
+  if (m.donne && chezWayne) donnerVehicule(m.donne);   // (le Bat : à lui, à la fin de la mission)
+  if (m.donne === 'Bat' && chezWayne) bulles = { liste: ['Le Bat a sauté avec la bombe... mais Lucius Fox en a un autre : il est à toi ! <b>B</b> : il arrive du ciel (même si tu nages) ; <b>N</b> : reprendre une Batmobile. Dedans, <b>R</b> : décoller ou se poser.'], k: 0, t: 4.5, montree: false };
   missionIndex++; etapeIndex = 0;
   const fini = missionIndex >= MISSIONS_CH.length;
   annonce(tr(fini ? 'BRAVO !' : 'MISSION RÉUSSIE'), fini ? tr('Toutes les missions sont finies !') : m.recompense ? tr('{mission} : +{argent}', { mission: tr(m.nom), argent: montant(m.recompense) }) : tr(m.nom), 4);
@@ -16315,6 +16670,12 @@ function sauterMission(n) {
   if (chezWayne) {
     wayne.gagne = passee('costume'); wayne.donnee = passee('batmobile');
     if (!wayne.gagne && enCostume()) basculerTriche(tricheHeros(), false, false, false);   // (pas encore de costume : il repasse en civil)
+    BATMOBILES_WAYNE.forEach((V, k) => { // le Bat (mission: true) : seulement après la mission qui le donne (donne: 'Bat')
+      if (!V.mission || !MISSIONS_CH.some(x => x.donne === V.voiture)) return;
+      const a = missionIndex > MISSIONS_CH.findIndex(x => x.donne === V.voiture);
+      wayne.batmobiles = a ? [...new Set([...wayne.batmobiles, k])].sort((x, y) => x - y) : wayne.batmobiles.filter(q => q !== k);
+      if (!a && wayne.batmobile === k) wayne.batmobile = 0;
+    });
   }
   sauverPartie();
   annonce(`MISSION ${missionIndex + 1}`, tr(m ? m.nom : 'Pays libre'), 3);
@@ -16322,11 +16683,16 @@ function sauterMission(n) {
 // une voiture de ce type apparaît à une place libre autour de B.J., à 5 m (puis 8, puis 11), au même niveau que lui, de côté par rapport à lui.
 // Renvoie la voiture, ou rien s'il n'y a pas de place (il est dans une pièce, sur un toit, dans l'eau)
 function garerPres(type) {
-  for (const d of [5, 8, 11]) for (let k = 0; k < 16; k++) {
+  const q = placeLibre();
+  if (q) return creerVoiture(q.x, q.z, q.a, false, type);
+}
+// une place libre autour de B.J. (à 5 m, puis 8, puis 11 : distances), pour une voiture : { x, y, z, a : vers où elle regarde }, ou rien
+function placeLibre(distances = [5, 8, 11]) {
+  for (const d of distances) for (let k = 0; k < 16; k++) {
     const a = J.lacet + Math.PI / 2 + k * Math.PI / 8, x = J.x + Math.sin(a) * d, z = J.z + Math.cos(a) * d, y = hauteurSol(x, z, J.y + 0.6);
     if (Math.abs(y - J.y) > 0.8 || y < EAU || Math.abs(hauteurSol(x, z) - y) > 0.3 || [-1, 0, 1].some(e => dansBatiment(x + Math.cos(a) * e * 2.5, y + 1, z - Math.sin(a) * e * 2.5))
       || voitures.some(o => dist(o, { x, z }) < 4)) continue;
-    return creerVoiture(x, z, a + Math.PI / 2, false, type);
+    return { x, y, z, a: a + Math.PI / 2 };
   }
 }
 // un code de triche qui a « voiture: 'Batmobile' » : elle apparaît à côté de B.J. quand on tape le code, ou quand on appuie sur B (voir
@@ -16350,6 +16716,11 @@ function rappelerVoiture(nom = TRICHES.find(t => t.actif && t.voiture)?.voiture)
   if (!type || J.mort || J.telesiege || J.monorail || (J.voiture?.triche === nom && J.voiture.type === type)) return;   // (il est déjà dedans)
   if (J.voiture?.triche === nom) { annonce('', tr("Descends d'abord (E), puis B : {voiture} viendra à côté de toi", { voiture: tr(type.nom) }), 2.5); return; }   // (dans une autre de ses Batmobiles : N en a choisi une autre)
   if (J.voiture || J.robot) { annonce('', tr("Descends d'abord !"), 1.5); return; }
+  if (estBat(type)) { // le Bat : il arrive du ciel (même au-dessus de l'eau, quand Batman nage)
+    if (bombeBane?.v && !bombeBane.v.supprimer && bombeBane.phase === 'emporte') { annonce('', tr('La bombe est accrochée sous ton Bat : garde-le !'), 2.5); return; }
+    if (amenerBat(type)) annonce('', tr('Le Bat arrive !'), 1.5); else { annonce('', tr('{voiture} : pas de place ici !', { voiture: tr(type.nom) }), 1.5); bip(300, 200, 0.1, 'square', 0.1); }
+    return;
+  }
   if (amenerVoiture(nom)) annonce('', tr('{voiture} : à côté de toi !', { voiture: tr(type.nom) }), 1.5);
   else { annonce('', tr('{voiture} : pas de place ici !', { voiture: tr(type.nom) }), 1.5); bip(300, 200, 0.1, 'square', 0.1); }
 }
@@ -16449,6 +16820,11 @@ function commencerEtape(et) {
   if (et.type === 'poursuite') commencerPoursuite(et);
   if (et.type === 'suivre') commencerSuivre(et);
   if (et.type === 'brouiller') commencerBrouiller(et);
+  if (et.type === 'bombes') commencerBombes(et);
+  if (et.type === 'stade') commencerStade(et);
+  if (et.revanche) commencerCombat(et);
+  if (et.type === 'bat') commencerLivraison(et);
+  if (et.type === 'bombe') commencerBombe(et);
 }
 function majEtape(et, dt) {
   majMarkI(); majPortes(dt); majVague(dt); majObadiah(dt); majPorte(); majAllies(dt);
@@ -16471,12 +16847,18 @@ function majEtape(et, dt) {
   if (poursuite) majPoursuite(dt);
   if (suivi) majSuivre(dt);
   if (brouillage) majBrouiller(dt);
+  if (bombesDF) majBombesDF(dt);
+  if (matchStade) majStade(dt);
+  if (terrainDetruit) majTerrainDetruit(dt);
+  if (livraison) majLivraison();
+  if (bombeBane) majBombe(dt);
   // la villa tombée dans la mer revient comme avant, quand on est loin et que la mission n'a plus besoin d'elle
   if (villaStark?.tombee && !repechage && Math.hypot(J.x - villaStark.x, J.z - villaStark.z) > 600) releverVilla();
 }
 function finirEtape(avant, suite) {   // (avant : l'étape qui finit ; suite : celle qui commence)
   finirVague(); finirEmbuscade(); finirAnneaux(); finirSauvetage(); finirPanne(); finirCourse(); finirEmmener(); finirRepecher(); finirParler(); finirHappy(); finirChuteLibre(); facture = null;
   puits = null; finirEntree(suite); finirPoursuite(); finirSuivre(); finirBrouiller();   // (les missions de Batman)
+  finirBombesDF(); finirStade(suite); finirCombat(); livraison = null; finirBombe();
   givre = null; $('givre').style.opacity = 0;
 }
 // le texte de l'étape, en bas de l'écran ({n} : ce qu'il reste ; {t} : les secondes qui restent ; {h}, {y} : la hauteur à atteindre, et celle où
@@ -16484,7 +16866,9 @@ function finirEtape(avant, suite) {   // (avant : l'étape qui finit ; suite : c
 // ou quand Iron Man porte quelqu'un, il dit ce qu'il faut faire tout de suite
 function texteEtape(et) {
   const reste = et.type === 'anneaux' && anneaux ? anneaux.liste.length - anneaux.k : et.type === 'sauver' && sauvetage ? sauvetage.nombre - sauvetage.sauves
-    : et.type === 'course' && course ? course.portes.length - course.k : et.type === 'chute' && chute ? tombent() : et.type === 'eliminer' ? resteAEliminer(et.cible) : et.type === 'poursuite' && poursuite ? Math.max(0, (et.coups || 3) - (poursuite.v.fuyard.coups || 0)) : et.type === 'brouiller' ? antennesRestantes() : 0;
+    : et.type === 'course' && course ? course.portes.length - course.k : et.type === 'chute' && chute ? tombent() : et.type === 'eliminer' ? resteAEliminer(et.cible) : et.type === 'poursuite' && poursuite ? Math.max(0, (et.coups || 3) - (poursuite.v.fuyard.coups || 0)) : et.type === 'brouiller' ? antennesRestantes()
+    : et.type === 'bombes' && bombesDF ? bombesDF.liste.length : 0;
+  const B = bombeBane, rev = combatBane?.phase === 'revanche';
   const texte = et.type === 'givre' && givre?.gel ? (givre.fond ? 'Le givre fond : vite, F pour rallumer tes réacteurs !' : "Ton armure gèle : ses réacteurs s'éteignent, tu tombes... attends que le givre fonde !")
     : et.type === 'sauver' && porte ? 'Descends le poser en bas, près des pompiers (point jaune) : pose-toi à côté d\'eux. Encore {n} à sauver'
     : et.type === 'repecher' && porte ? 'Ramène {ami} en haut de la falaise, sur la place du départ (point jaune), et pose-toi'
@@ -16500,9 +16884,17 @@ function texteEtape(et) {
     : et.type === 'poursuite' && poursuite && !poursuite.v.fuyard.parti ? 'La voiture du Pingouin t\'attend, sur l\'autoroute (point jaune) : en Batmobile, fonce !'
     : et.type === 'suivre' && suivi && !suivi.v.fuyard.parti ? 'Le canard du Pingouin, sur le canal (point jaune) ! Prends le hors-bord du ponton (E), et suis-le'
     : et.type === 'suivre' && suivi?.v.fuyard.fini && !suivi.pingouin ? 'Le canard s\'est arrêté au bout de l\'égout : rejoins-le !'
-    : et.type === 'costume' && !dansBatcave(J) ? 'Ton costume t\'attend au fond de la Batcave : prends le vieil ascenseur, devant la porte du manoir (E), ou saute dans le puits' : et.texte;
-  const t = explosionExpo ? explosionExpo.reste : panne?.reste ?? brouillage?.t ?? 0;
-  return tr(texte, { n: reste, t: Math.max(0, Math.ceil(t)), h: et.hauteur, y: Math.max(0, Math.round(J.y)), ami: nomAmi(), f: montant(facture?.montant || 0), loin: et.loin, d: Math.round(loinDeLExpo()) });
+    : et.type === 'costume' && !dansBatcave(J) ? 'Ton costume t\'attend au fond de la Batcave : prends le vieil ascenseur, devant la porte du manoir (E), ou saute dans le puits'
+    : et.type === 'bombes' && bombesDF?.piece ? 'Pile ou face ? Double-Face lance sa pièce... Encore {n} bombes à désamorcer'
+    : et.type === 'stade' && matchStade && matchStade.phase !== 'match' ? 'BOUM ! Le terrain saute, les gens s\'enfuient... Regarde : Bane, au bout du terrain !'
+    : rev ? et.revanche.texte
+    : et.type === 'bat' && livraison?.v && !livraison.v.supprimer ? 'Le Bat ! Monte dedans (E), puis R : il décolle'
+    : et.type === 'bombe' && B?.phase === 'emporte' && !B.assezLoin ? 'Emporte la bombe au large (point jaune) : la terre est à {d} m, il en faut {loin} · encore {t} s'
+    : et.type === 'bombe' && B?.phase === 'emporte' ? 'Assez loin ! E : saute du Bat (il emportera la bombe tout seul) · encore {t} s'
+    : et.type === 'bombe' && B?.phase === 'saute' ? 'Garde Maj enfoncé : plane avec ta cape, vers la côte !'
+    : et.type === 'bombe' && B && B.phase !== 'attente' ? 'BOUM ! Gotham est sauvée !' : et.texte;
+  const t = explosionExpo ? explosionExpo.reste : panne?.reste ?? brouillage?.t ?? (et.type === 'bombes' && bombesDF?.liste.length ? Math.min(...bombesDF.liste.map(b => b.reste)) : et.type === 'bombe' && B ? B.reste : 0);
+  return tr(texte, { n: reste, t: Math.max(0, Math.ceil(t)), h: et.hauteur, y: Math.max(0, Math.round(J.y)), ami: nomAmi(), f: montant(facture?.montant || 0), loin: et.loin, d: et.type === 'bombe' ? Math.round(B?.terre || 0) : Math.round(loinDeLExpo()) });
 }
 
 // --- la Mark I, dans la grotte des Dix Anneaux (mission « La grotte des Dix Anneaux ») ---
@@ -16704,7 +17096,9 @@ function creerRaza(t) {
 // Ceux qui sont encore là quand on quitte l'étape s'en vont
 let vague = null;   // { cible, reste : combien doivent encore arriver, ensemble, sorties, t : avant le suivant, partis : ceux qui sont arrivés, zone, poste }
 // (un carrefour, noeud : tous arrivent juste là ; un hélicoptère ou un drone arrive du ciel, à 50 m de haut)
-const sortiesDe = (et, c) => et.point && POINTS[et.point]?.sorties ? POINTS[et.point].sorties : et.cible === 'pingouin' && zoo ? [{ x: zoo.dome.x, z: zoo.dome.z + 1.5, y: zoo.dome.y }] : et.noeud ? [{ x: c.x, z: c.z, y: c.y }] : et.lieu === ')' && grotte ? grotte.sorties[et.depuis || 'tentes'] : et.lieu === '$' && usine ? [{ x: usine.x, z: usine.z, y: usine.y }]
+const sortiesDe = (et, c) => et.cible === 'bane' && et.point === 'salle' && egout ? [{ x: egout.xs - EGOUT.salle[0] + 4, z: egout.z, y: egout.trottoir }]   // (Bane, au fond de la salle de l'égout)
+  : et.point && POINTS[et.point]?.sorties ? POINTS[et.point].sorties : et.cible === 'pingouin' && zoo ? [{ x: zoo.dome.x, z: zoo.dome.z + 1.5, y: zoo.dome.y }] : et.noeud ? [{ x: c.x, z: c.z, y: c.y }] : et.lieu === ')' && grotte ? grotte.sorties[et.depuis || 'tentes'] : et.lieu === '$' && usine ? [{ x: usine.x, z: usine.z, y: usine.y }]
+  : et.lieu === '°' && stade ? sortiesStade()   // (le stade : les tunnels, la pelouse, et le haut des tribunes)
   : et.lieu === '>' && repaire ? (et.cible === 'killian' ? [repaire.killian] : repaire.sorties) : et.cible === 'ultron' && tourStark ? [tourStark]
   : VOLANTS.includes(et.cible) ? [[-60, -40], [60, -40], [-60, 40], [60, 40]].map(([a, b]) => ({ x: c.x + a, z: c.z + b, y: Math.max(hauteurSol(c.x + a, c.z + b, 1e4), c.y ?? 0) + 50 }))
   : [[-20, -20], [20, -20], [-20, 20], [20, 20]].map(([a, b]) => ({ x: c.x + a, z: c.z + b }));
@@ -16716,11 +17110,13 @@ function commencerVague(et) {
 }
 function faireArriver() {
   const V = vague, libres = V.sorties.filter(s => !personnes.some(p => p.vie > 0 && dist(p, s) < 1.5)), s = hasard(libres.length ? libres : V.sorties);
-  const x = s.x + entre(-0.6, 0.6), z = s.z + entre(-0.6, 0.6), p = creerPersonne(V.cible, x, z, undefined, s.y ?? hauteurSol(x, z));
-  p.alerte = !['monger', 'whiplash', 'whiplashArmure', 'killian'].includes(V.cible); p.angle = angleVers(p, J);   // (les boss attendent, eux, qu'on vienne : voir majMonger)
+  const x = s.x + entre(-0.6, 0.6), z = s.z + entre(-0.6, 0.6), p = creerPersonne(V.cible, x, z, undefined, s.poste ? hauteurSol(x, z, s.y + 1) : s.y ?? hauteurSol(x, z));
+  p.alerte = !['monger', 'whiplash', 'whiplashArmure', 'killian', 'doubleFace', 'bane'].includes(V.cible); p.angle = angleVers(p, J);   // (les boss attendent, eux, qu'on vienne : voir majMonger)
   if (V.zone) p.zone = V.zone;
   if (V.zoneSalle) p.zone = V.zoneSalle;   // (dans la salle de l'égout : ils y restent)
-  if (V.poste) p.poste = { x: p.x, y: p.y, z: p.z };   // (posté : il ne bouge pas, il tire)
+  if (V.poste || s.poste) p.poste = { x: p.x, y: p.y, z: p.z };   // (posté : il ne bouge pas, il tire ; au stade, en haut des tribunes)
+  if (p.type === 'doubleFace') p.zone = [s.x - 30, s.z - 30, s.x + 30, s.z + 30];   // (Double-Face, au port : il reste autour du carrefour)
+  if (p.type === 'bane' && egout && V.zoneSalle) { p.zone = [egout.xs - EGOUT.salle[0] + 0.3, egout.z - EGOUT.salle[1] / 2 + 0.3, egout.xs - 1, egout.z + EGOUT.salle[1] / 2 - 0.3]; p.angle = Math.PI / 2; }   // (Bane : dans la salle, pas dans le tunnel ; ses murs l'arrêtent avant le bord de sa zone, et le sonnent)
   if (p.type === 'pingouin') {
     annonce(tr('LE PINGOUIN !'), tr('« Tu vas regretter d\'avoir brouillé mes pingouins, la chauve-souris ! »'), 4); bruit(0.5, 600, 0.5);
     // au zoo : il sort de son dôme, passe la porte de la barrière du monde arctique, et se bat sur la pelouse, devant (pas au milieu des rochers de glace)
@@ -17071,7 +17467,7 @@ function mongerVaincu(p) {
 // tant qu'il est à moins de 300 m
 function majBarreBoss() {
   let p = null;
-  for (const q of personnes) if (q.vie > 0 && fiche(q)?.boss && dist(q, J) < 300 && (!p || dist(q, J) < dist(p, J))) p = q;
+  for (const q of personnes) if (q.vie > 0 && fiche(q)?.boss && !q.figurant && dist(q, J) < 300 && (!p || dist(q, J) < dist(p, J))) p = q;   // (pas Bane, quand il ne fait que se montrer au stade)
   $('boss').style.display = p ? 'block' : 'none';
   if (!p) return;
   $('boss').firstElementChild.textContent = tr(fiche(p).nom).toUpperCase();
@@ -17669,19 +18065,25 @@ TEX_BOULE_FEU.repeat.set(3, 1);
 const GEO_BOULE_FEU = new THREE.SphereGeometry(1, 48, 24), GEO_ONDE = new THREE.RingGeometry(0.86, 1, 96).rotateX(-Math.PI / 2);
 // (ajoute = true : en lumière ajoutée, pour le cœur blanc et l'onde de choc, qui brillent ; sinon, un feu bien orange, même sur un ciel clair)
 const matBoum = (couleur, map, ajoute) => new THREE.MeshBasicMaterial({ map, color: couleur, transparent: true, blending: ajoute ? THREE.AdditiveBlending : THREE.NormalBlending, depthWrite: false, side: THREE.DoubleSide, fog: false, toneMapped: false });
-let boumExpo = null;   // { centre, rayon, t, feu, coeur, onde, explosions : [{ r, x, y, z, fait }], fumees : [{ o, vx, vy, vz, t, vie, taille }], blanc }
-function commencerBoumExpo(c, rayon) {
+let boumExpo = null;   // { centre, rayon, t, feu, coeur, onde, explosions : [{ r, x, y, z, fait }], fumees : [{ o, vx, vy, vz, t, vie, taille }], blanc, mer }
+// (mer : au-dessus de la mer, comme la bombe de Bane, au large de Gotham : à la place des morceaux de l'Expo, de grandes gerbes d'eau)
+function commencerBoumExpo(c, rayon, mer = false) {
   finirBoumExpo();
-  const B = boumExpo = { centre: c, rayon, t: 0, explosions: [], fumees: [] };
+  const B = boumExpo = { centre: c, rayon, t: 0, explosions: [], fumees: [], mer };
   B.feu = new THREE.Mesh(GEO_BOULE_FEU, matBoum('#ffffff', TEX_BOULE_FEU)); B.coeur = new THREE.Mesh(GEO_BOULE_FEU, matBoum('#ffe0a0', TEX_BOULE_FEU, true)); B.onde = new THREE.Mesh(GEO_ONDE, matBoum('#ffd8a0', null, true));
   B.coeur.renderOrder = 1;   // (le cœur brille par-dessus le feu)
   for (const o of [B.feu, B.coeur, B.onde]) { o.position.set(c.x, c.y, c.z); o.scale.setScalar(0.01); scene.add(o); }
   B.onde.position.y += 0.6;
   for (let k = 0; k < 28; k++) { // les explosions, là où la boule de feu passera
     const a = entre(0, 6.28), r = entre(8, rayon * 0.95), x = c.x + Math.sin(a) * r, z = c.z + Math.cos(a) * r;
-    B.explosions.push({ r, x, z, y: hauteurSol(x, z, c.y + 30) + entre(1, 12) });
+    B.explosions.push({ r, x, z, y: (mer ? EAU : hauteurSol(x, z, c.y + 30)) + entre(1, 12) });
   }
-  for (let k = 0; k < 30; k++) { // des morceaux de l'Expo qui volent
+  if (mer) for (let k = 0; k < 40; k++) { // au-dessus de la mer : de grandes gerbes d'eau, qui montent
+    const s = new THREE.Sprite(M_FUMEE.clone()), a = entre(0, 6.28), r = entre(4, 45);
+    s.material.color.set('#e4eef4'); s.position.set(c.x + Math.sin(a) * r, EAU + entre(0, 4), c.z + Math.cos(a) * r); scene.add(s);
+    B.fumees.push({ o: s, vx: Math.sin(a) * entre(2, 8), vz: Math.cos(a) * entre(2, 8), vy: entre(18, 42), t: 0, vie: entre(3, 4.5), taille: entre(10, 22) });
+  }
+  else for (let k = 0; k < 30; k++) { // des morceaux de l'Expo qui volent
     const e = new THREE.Mesh(new THREE.BoxGeometry(entre(0.6, 2.5), entre(0.3, 1.2), entre(0.5, 2)), MAT.betonBlanc), a = entre(0, 6.28), v = entre(18, 40);
     e.position.set(c.x + Math.sin(a) * entre(2, 25), c.y + entre(1, 6), c.z + Math.cos(a) * entre(2, 25)); scene.add(e);
     lancerDebris(e, V3(Math.sin(a) * v, entre(12, 30), Math.cos(a) * v), entre(4, 6), true);
@@ -17702,7 +18104,7 @@ function majBoumExpo(dt) {
   for (const q of B.explosions) if (!q.fait && f >= q.r) { q.fait = true; exploser(V3(q.x, q.y, q.z), entre(7, 12), 0, 0, null, false, false, false); }
   if (u < 1) for (B.poussiere = (B.poussiere || 0) + dt * 80; B.poussiere >= 1; B.poussiere--) { // la poussière soulevée, tout le long de son bord (80 bouffées par seconde)
     const a = entre(0, 6.28), x = c.x + Math.sin(a) * f, z = c.z + Math.cos(a) * f, s = new THREE.Sprite(M_FUMEE.clone());
-    s.material.color.set('#b0a088'); s.position.set(x, hauteurSol(x, z, c.y + 40) + 3, z); scene.add(s); effets.push({ o: s, vie: 2, fumee: 2, taille: 14 });
+    s.material.color.set(B.mer ? '#dfe8ee' : '#b0a088'); s.position.set(x, (B.mer ? EAU : hauteurSol(x, z, c.y + 40)) + 3, z); scene.add(s); effets.push({ o: s, vie: 2, fumee: 2, taille: 14 });   // (sur la mer : des embruns)
   }
   if (t > DUREE_BOUM && t < 5 && (B.tFumee = (B.tFumee || 0) - dt) <= 0) { // le champignon de fumée : une colonne, et son chapeau, plus large et plus haut
     B.tFumee = 0.06;
@@ -18294,7 +18696,8 @@ function ultronVaincu(p) {
 //  Les missions de Batman (MISSIONS_GOTHAM, au chapitre 3) : « Batman ne tue jamais » (les assommés, et la police qui les embarque),
 //  son premier costume et sa Batmobile, la Batcave (le puits, la vitrine, ses chauves-souris), la poursuite sous la pluie (la voiture du
 //  Pingouin, les camions, le mur de feu, la Batmobile qui surgit des flammes), le canard du Pingouin et l'égout, les pingouins-missiles et
-//  les antennes à brouiller, les hommes du Pingouin, et le Pingouin lui-même, avec son parapluie
+//  les antennes à brouiller, les hommes du Pingouin, et le Pingouin lui-même, avec son parapluie ; Double-Face, ses hommes, sa pièce et ses
+//  bombes ; le stade qui saute, les mercenaires de Bane, Bane lui-même et la revanche avec la police ; le Bat et la bombe de Bane
 // =====================================================================
 
 // --- « Batman ne tue jamais » (CHAPITRES : neTuePas, à Gotham) ---
@@ -18310,7 +18713,7 @@ function assommer(p) {
   for (let k = 0; k < 3; k++) { const s = new THREE.Sprite(M_ETOILE); s.scale.setScalar(0.2); s.raycast = () => {}; g.add(s); }   // (les tirs passent à travers)
   p.h.g.add(g);
   p.assomme = { t: 0, innocent: innocent(p), etoiles: g };
-  if (p.type === 'pingouin') pingouinAssomme(p);
+  bossAssomme(p);   // (le Pingouin, Double-Face, Bane : on le dit)
 }
 function majAssomme(p, dt) {
   const A = p.assomme;
@@ -18918,34 +19321,14 @@ function majPingouin(p, dt, d) {
     }
   }
   p.angle = lerpAngle(p.angle, vise, 6 * dt);
-  if (vitesse) {
-    const ax = p.x, az = p.z, sens = vitesse < 0 ? angleVers(J, p) : p.angle, v = Math.abs(vitesse);
-    p.x += Math.sin(sens) * v * dt; p.z += Math.cos(sens) * v * dt;
-    resoudre(p, 0.4, 1.6, { x: ax, z: az });
-    if (p.zone) { p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]); }
-    const y = hauteurSol(p.x, p.z, p.y + 0.6);
-    if (EAU - y > 0.9 && !p.fuit) { p.x = ax; p.z = az; } else p.y = y;
-  }
+  if (vitesse) bougerBoss(p, vitesse, dt);   // (comme Double-Face et Bane : voir bougerBoss)
   if (!h.g.visible) return;
   h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, p.angle, Math.sin(temps * 9) * 0.12 * Math.min(1, Math.abs(vitesse)));   // (il se dandine, comme un pingouin)
   animerHumain(h, Math.abs(vitesse) * 0.7, dt, { arme: p.alerte && !p.fuit, touche: p.touche / 0.3 });
   membresMous(h, dt, p.touche > 0 ? { raideur: 12, sol: p.y, jambes: false } : { sol: p.y });
 }
-// ses hommes arrivent en courant, du bord du pâté (ou de la salle de l'égout)
-function renfortsPingouin(p, n) {
-  annonce(tr('LE PINGOUIN :'), tr('« À moi, mes hommes ! »'), 3);
-  for (let k = 0; k < n; k++) {
-    const a = entre(0, 6.3), q = { x: p.x + Math.sin(a) * 22, z: p.z + Math.cos(a) * 22 };
-    const o = creerPersonne('homme', q.x, q.z, undefined, hauteurSol(q.x, q.z, p.y + 2)); resoudre(o, 0.35);
-    o.alerte = true; if (p.zone) o.zone = p.zone; (p.renforts ||= []).push(o);
-    if (vague) vague.partis.push(o);   // (à la fin de l'étape, ceux qui sont encore debout s'en vont : voir finirVague)
-  }
-}
-function pingouinAssomme(p) {
-  if (p.fuit) return;
-  annonce(tr('LE PINGOUIN EST ASSOMMÉ !'), tr('La police va l\'embarquer : direction Arkham !'), 5);
-  bip(500, 1500, 0.6, 'triangle', 0.2);
-}
+// ses hommes arrivent en courant (voir appelerRenforts : de 22 m autour de lui)
+function renfortsPingouin(p, n) { appelerRenforts(p, n, 'homme', tr('LE PINGOUIN :'), tr('« À moi, mes hommes ! »')); }
 
 // --- les pingouins-missiles et les antennes du Pingouin (étape « brouiller », mission « Les pingouins-missiles ») ---
 // Une armée de pingouins sort du dôme du zoo, des roquettes sur le dos, et marche sur la ville, guidée par les antennes du Pingouin (une
@@ -19066,6 +19449,849 @@ function majArmeeQuiRentre(dt) {
   if (A.armee.every(q => q.s <= 0) || A.t > 120) { enleverArmee(A.dessin); armeeQuiRentre = null; }
 }
 
+// --- les gens de Double-Face et de Bane : leurs corps (voir CORPS) ---
+// un costume moitié d'une couleur, moitié de l'autre (gauche : la moitié gauche du personnage, droite : sa moitié droite). Le devant du torse
+// est au bord de l'image (voir veste) : chaque couleur en prend une moitié, et la ligne qui les sépare passe juste devant, et juste derrière
+const cacheDeuxTons = {};
+const costumeDeuxTons = (gauche, droite) => cacheDeuxTons[gauche + droite] ||= std(toile(64, 32, (g, l, h) => {
+  g.fillStyle = gauche; g.fillRect(0, 0, l / 2, h); g.fillStyle = droite; g.fillRect(l / 2, 0, l / 2, h);
+}), { roughness: 0.8, bumpScale: 0.01 });
+function habillerDeuxTons(h, gauche, droite) {
+  h.torse.material = costumeDeuxTons(gauche, droite);
+  habillerMembre(h.brasG, gauche); habillerMembre(h.brasD, droite); habillerMembre(h.jambeG, gauche); habillerMembre(h.jambeD, droite);
+}
+// un homme de Double-Face : son costume moitié blanc, moitié noir (comme son chef)
+function creerBandit(t) {
+  const h = creerHumain(t);
+  habillerDeuxTons(h, '#e8e4da', '#18181c');
+  return h;
+}
+// le visage de Double-Face : la moitié gauche est celle de Harvey Dent ; la droite est brûlée (la peau à vif, rouge sombre et rose, les dents
+// qui se voient, un œil tout rond, sans paupière, et plus de sourcil). Le devant de la tête est au quart de l'image (voir visage)
+const DROITE_VISAGE = -1;   // (de quel côté du devant, dans l'image, est la moitié droite du visage : 1, ou -1)
+const visageDoubleFace = peau => cacheVisage[peau + ' double'] ||= new THREE.MeshStandardMaterial({ roughness: 0.7, map: toile(256, 128, (g, l) => {
+  g.drawImage(visage(peau).map.image, 0, 0, l, 128);
+  const x0 = l / 4, c = DROITE_VISAGE, x1 = x0 + c * l / 2;   // la moitié brûlée : du devant jusqu'à l'arrière de la tête
+  g.save(); g.beginPath();   // son bord, au milieu du visage, en zigzag
+  g.moveTo(x0, 0); for (let y = 0; y <= 128; y += 8) g.lineTo(x0 + c * (y % 16 ? 2.5 : -1.5), y); g.lineTo(x1, 128); g.lineTo(x1, 0); g.closePath(); g.clip();
+  for (const dx of [0, c * l]) { // (dessiné aussi un tour plus loin : l'image fait le tour de la tête)
+    g.fillStyle = '#93362f'; g.fillRect(Math.min(x0, x1) - dx, 0, l / 2, 128);
+    for (let k = 0; k < 220; k++) { const r = 1 + Math.random() * 4.5; g.fillStyle = hasard(['#c25a4a', '#7a2626', '#d8846e', '#5a1c1a', '#b8473c']); g.beginPath(); g.arc(Math.min(x0, x1) + Math.random() * l / 2 - dx, Math.random() * 128, r, 0, 7); g.fill(); }
+  }
+  g.restore();
+  const xo = x0 + 15 * c;   // l'œil, tout rond, qui fixe (pas de sourcil, pas de paupière)
+  g.fillStyle = '#f6f0e4'; g.beginPath(); g.arc(xo, 57, 7.5, 0, 7); g.fill();
+  g.fillStyle = '#5a1a14'; g.lineWidth = 1.5; g.strokeStyle = '#4a0c0c'; g.stroke();
+  g.fillStyle = '#2a1a10'; g.beginPath(); g.arc(xo, 57, 2.4, 0, 7); g.fill();
+  g.fillStyle = '#efe6d0'; for (let k = 0; k < 4; k++) g.fillRect(x0 + c * (1 + k * 3.2) - (c < 0 ? 2.6 : 0), 83, 2.6, 4.2);   // les dents
+}) });
+// Double-Face : son costume blanc à gauche, noir à droite, ses cheveux gris du côté brûlé, un pistolet dans chaque main, et sa pièce
+const M_PIECE = mat('#d8d8dc', { metalness: 0.9, roughness: 0.25 });
+function creerDoubleFace(t) {
+  const h = creerHumain(t);
+  habillerDeuxTons(h, '#e8e4da', '#18181c');
+  h.tete.material = visageDoubleFace(t.peau);
+  h.arme2 = creerArme(ARMES.findIndex(a => a.modele === 'pistolet'));   // le pistolet de sa main gauche (celui de la droite : donnerArme)
+  if (h.arme2) { h.arme2.position.set(0, -0.3, 0.03); h.arme2.rotation.x = Math.PI / 2; h.brasG.pli.add(h.arme2); }
+  h.piece = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.006, 16), M_PIECE); h.piece.visible = false; h.g.add(h.piece);   // (en l'air, quand il la lance)
+  return h;
+}
+// un mercenaire de Bane : treillis sombre, cagoule noire, un gilet plein de poches
+const GEO_GILET_MERCENAIRE = new RoundedBoxGeometry(0.47, 0.4, 0.3, 2, 0.06);
+function creerMercenaire(t) {
+  const h = creerHumain(t);
+  piece(GEO_GILET_MERCENAIRE, '#20221c', h.haut, 0, 0.42, 0);
+  for (const x of [-0.1, 0.1]) piece(GEO.moustache, '#2c2e26', h.haut, x, 0.33, 0.16).scale.set(1.4, 2.4, 1.6);   // ses poches
+  return h;
+}
+// Bane : énorme, les bras nus et tout en muscles, le crâne rasé, un gilet de cuir sombre, et son masque, sur la bouche et le nez : du métal
+// sombre, une grille devant, et des tuyaux qui partent derrière ses oreilles
+const GEO_MASQUE_BANE = new THREE.SphereGeometry(0.128, 18, 10, Math.PI * 0.12, Math.PI * 0.76, Math.PI * 0.47, Math.PI * 0.36).scale(1.05, 1, 1.12);
+const M_MASQUE_BANE = mat('#6a6e76', { metalness: 0.6, roughness: 0.35 });
+const GEO_TUYAUX_BANE = [-1, 1].flatMap(c => [0.0, -0.035].map(dy => new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[0.07, -0.035, 0.105], [0.118, -0.01, 0.03], [0.1, 0.0, -0.06], [0.05, -0.1, -0.11]]
+  .map(([x, y, z]) => V3(x * c, y + dy, z))), 10, 0.011, 6)));
+function creerBane(t) {
+  const h = creerHumain({ ...t, manchesCourtes: true });
+  if (h.cheveux) h.cheveux.visible = false;   // le crâne rasé
+  h.torse.scale.set(1.32, 1.06, 1.3); h.cou.scale.set(1.55, 1, 1.55);
+  for (const b of [h.brasD, h.brasG]) { habiller(b.haut, t.peau); b.haut.scale.set(1.55, 1.04, 1.55); b.bas.scale.set(1.45, 1, 1.45); b.main.scale.multiplyScalar(1.3); b.position.x *= 1.3; }
+  for (const j of [h.jambeD, h.jambeG]) { j.haut.scale.set(1.35, 1, 1.35); j.bas.scale.set(1.25, 1, 1.25); }
+  piece(new RoundedBoxGeometry(0.62, 0.46, 0.4, 2, 0.08), '#2a221a', h.haut, 0, 0.44, 0);   // son gilet de cuir
+  const m = piece(GEO_MASQUE_BANE, '#3e4146', h.tete, 0, -0.012, 0.012); m.material = M_MASQUE_BANE;
+  for (const x of [-0.024, -0.008, 0.008, 0.024]) piece(new THREE.BoxGeometry(0.008, 0.06, 0.01), '#101012', h.tete, x, -0.055, 0.14);   // la grille
+  for (const g of GEO_TUYAUX_BANE) piece(g, '#232428', h.tete, 0, 0, 0);
+  h.g.scale.setScalar(ENNEMIS.bane.taille);
+  return h;
+}
+
+// --- la pièce de Double-Face, à l'écran (en haut, au milieu) : elle tourne en l'air, puis retombe, pile (le côté brûlé, noirci et griffé)
+// ou face (le côté propre, en argent) ; on lit dessous ce qu'elle a donné. Elle sert aux bombes, et au combat contre Double-Face ---
+let pileOuFace = null;   // { t, resultat : 'pile' ou 'face' }
+const DUREE_PIECE = 1.3;   // les secondes où elle tourne en l'air, avant de retomber
+function lancerPieceDF(resultat) { pileOuFace = { t: 0, resultat }; bip(2600, 3600, 0.08, 'sine', 0.06); setTimeout(() => bip(2900, 2400, 0.05, 'sine', 0.04), 120); }
+function dessinerPieceDF(dt) {
+  const c = $('piece');
+  if (!pileOuFace) { if (c.style.display !== 'none') c.style.display = 'none'; return; }
+  const P = pileOuFace, g = c.getContext('2d');
+  P.t += dt;
+  c.style.display = 'block';
+  const a = P.t < DUREE_PIECE ? P.t * 19 : 0, cote = P.t < DUREE_PIECE ? (Math.cos(a) >= 0 ? 'face' : 'pile') : P.resultat;
+  const k = P.t < DUREE_PIECE ? Math.max(0.06, Math.abs(Math.cos(a))) : 1, haut = P.t < DUREE_PIECE ? Math.sin(P.t / DUREE_PIECE * Math.PI) * 26 : 0;
+  c.style.opacity = clamp(DUREE_PIECE + 2 - P.t, 0, 1);
+  g.clearRect(0, 0, 180, 200);
+  g.save(); g.translate(90, 82 - haut); g.scale(1, k);
+  const r = 58, d = g.createRadialGradient(-18, -20, 6, 0, 0, r);
+  if (cote === 'face') { d.addColorStop(0, '#ffffff'); d.addColorStop(0.6, '#c9cbd2'); d.addColorStop(1, '#7c7e86'); }
+  else { d.addColorStop(0, '#8a8478'); d.addColorStop(0.6, '#4a4540'); d.addColorStop(1, '#22201e'); }
+  g.fillStyle = d; g.beginPath(); g.arc(0, 0, r, 0, 7); g.fill();
+  g.lineWidth = 5; g.strokeStyle = cote === 'face' ? '#e8e8ee' : '#3a3530'; g.beginPath(); g.arc(0, 0, r - 5, 0, 7); g.stroke();
+  g.fillStyle = cote === 'face' ? '#8a8c94' : '#1a1816'; g.font = "bold 62px 'Anton', Impact, sans-serif"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('2', 0, 4);
+  if (cote === 'pile') { // le côté brûlé : des griffures rouges, qui barrent le 2
+    g.strokeStyle = '#b8241c'; g.lineWidth = 4;
+    for (const [x1, y1, x2, y2] of [[-40, -30, 36, 26], [-34, 18, 30, -34], [-16, -46, 8, 44], [10, -40, 44, 6]]) { g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); }
+  }
+  g.restore();
+  if (P.t >= DUREE_PIECE) { // retombée : ce qu'elle a donné
+    g.font = "34px 'Anton', Impact, sans-serif"; g.textAlign = 'center'; g.fillStyle = cote === 'face' ? '#f4f4f4' : '#ff6a4a';
+    g.lineWidth = 5; g.strokeStyle = 'rgba(0,0,0,.8)'; g.strokeText(tr(cote === 'face' ? 'FACE' : 'PILE'), 90, 178); g.fillText(tr(cote === 'face' ? 'FACE' : 'PILE'), 90, 178);
+  }
+  if (P.t > DUREE_PIECE + 2) pileOuFace = null;
+}
+
+// --- les bombes de Double-Face (étape « bombes », mission « Pile ou face ») ---
+// Des valises de métal, moitié blanches, moitié noires (comme Double-Face), posées sur le trottoir, au coin d'un pâté, avec une lumière rouge
+// qui clignote ; au-dessus, leur minuterie, en grand (on la voit à travers les murs, jusqu'à 160 m). Deux hommes de Double-Face gardent
+// chacune (ils arrivent quand Batman approche). E tout près : elle est désamorcée. Quand une minuterie arrive à zéro, Double-Face lance sa
+// pièce (à l'écran, une bombe à la fois) : face, elle attend encore un peu (encore) ; pile, elle saute (personne n'est blessé : la police a
+// fait évacuer la rue), et il en cache une autre ailleurs (dans une de ses cachettes), qui sautera plus tard (nouvelle). On ne perd jamais
+// les bombes déjà désamorcées : une bombe ratée, c'est seulement une bombe à aller chercher plus loin
+let bombesDF = null;   // { et, liste : [{ x, y, z, g, reste, lampe, ecran, venus }], gardes, traces, piece : { bombe, t, resultat }, faites }
+const M_BOMBE_BLANC = mat('#e8e6e0', { metalness: 0.4, roughness: 0.45 }), M_BOMBE_NOIR = mat('#18181c', { metalness: 0.5, roughness: 0.4 });
+const M_TRACE_BOMBE = new THREE.MeshStandardMaterial({ color: '#0c0b0a', transparent: true, opacity: 0.8, depthWrite: false, roughness: 1 });   // (la trace noire d'une bombe qui a sauté)
+// une minuterie, à lire de loin : un petit écran (une image qu'on redessine quand le nombre change) sur un sprite qu'on voit à travers les murs
+function ecranMinuterie(largeur = 2.6) {
+  const c = document.createElement('canvas'); c.width = 128; c.height = 56;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false, depthWrite: false, toneMapped: false, fog: false, transparent: true }));
+  s.scale.set(largeur, largeur * 56 / 128, 1); s.renderOrder = 5; s.raycast = () => {};
+  return { c, t, s, texte: null };
+}
+function ecrireMinuterie(e, secondes) {
+  const n = Math.max(0, Math.ceil(secondes)), texte = `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`, urgent = n <= 10;
+  if (texte + urgent === e.texte) return;
+  e.texte = texte + urgent;
+  const g = e.c.getContext('2d');
+  g.clearRect(0, 0, 128, 56); g.fillStyle = 'rgba(10,10,12,.85)'; g.beginPath(); g.roundRect(4, 4, 120, 48, 8); g.fill();
+  g.strokeStyle = urgent ? '#ff3a2a' : '#7a2a24'; g.lineWidth = 3; g.stroke();
+  g.font = "38px 'Anton', Impact, monospace"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = urgent ? '#ff5a3a' : '#ff9a4a'; g.fillText(texte, 64, 30);
+  e.t.needsUpdate = true;
+}
+// où poser la bombe du carrefour [c, l] : le coin nord-ouest du pâté [c, l], sur le trottoir (un autre coin si un mur y est)
+function placeBombe(c, l) {
+  const o = origine(c, l);
+  for (const [dx, dz] of [[2.4, 2.4], [S - 2.4, 2.4], [2.4, S - 2.4], [S - 2.4, S - 2.4]]) {
+    const x = o.x + dx, z = o.z + dz, y = hauteurSol(x, z);
+    if (!dansBatiment(x, y + 0.5, z) && !dansBatiment(x + 0.6, y + 0.5, z) && !dansBatiment(x, y + 0.5, z + 0.6)) return { x, y, z };
+  }
+  return { x: o.x + 2.4, y: hauteurSol(o.x + 2.4, o.z + 2.4), z: o.z + 2.4 };
+}
+function creerBombeDF(c, l, reste) {
+  const q = placeBombe(c, l), g = new THREE.Group();
+  const m = (geo, matiere, x, y, z) => { const e = new THREE.Mesh(geo, matiere); e.position.set(x, y, z); e.castShadow = true; g.add(e); return e; };
+  m(new THREE.BoxGeometry(0.3, 0.4, 0.48), M_BOMBE_BLANC, -0.15, 0.2, 0); m(new THREE.BoxGeometry(0.3, 0.4, 0.48), M_BOMBE_NOIR, 0.15, 0.2, 0);   // la valise
+  m(new THREE.BoxGeometry(0.05, 0.05, 0.22), M_METAL, 0, 0.43, 0);   // sa poignée
+  for (const x of [-0.18, -0.06, 0.06, 0.18]) m(new THREE.CylinderGeometry(0.03, 0.03, 0.46, 8).rotateX(Math.PI / 2), MAT.rouge, x, 0.43, 0);   // les bâtons de dynamite, dessus
+  const lampe = m(new THREE.SphereGeometry(0.05, 8, 6), M_LUMIERE_ROUGE, 0.12, 0.48, 0.2);
+  const ecran = ecranMinuterie(); ecran.s.position.y = 2.3; g.add(ecran.s);
+  g.position.set(q.x, q.y, q.z); g.rotation.y = entre(0, 6.3); g.scale.setScalar(1.4); scene.add(g);
+  ecrireMinuterie(ecran, reste);
+  return { ...q, g, lampe, ecran, reste, venus: false, case: [c, l] };
+}
+function commencerBombes(et) {
+  const B = bombesDF = { et, liste: [], gardes: [], traces: [], piece: null, faites: 0 };
+  et.bombes.forEach(([c, l], k) => B.liste.push(creerBombeDF(c, l, et.secondes[k] ?? et.secondes.at(-1))));
+  annonce(tr('DOUBLE-FACE :'), tr('« J\'ai caché {n} bombes dans Gotham. Quand une minuterie arrive à zéro, ma pièce décide : face, elle attend ; pile, BOUM ! »', { n: B.liste.length }), 6);
+  bip(300, 150, 0.6, 'square', 0.08);
+}
+const bombeProche = () => bombesDF?.liste.find(b => Math.hypot(b.x - J.x, b.z - J.z) < 2.6 && Math.abs(b.y - J.y) < 2 && !J.voiture);
+// enlever une bombe (ou la bombe de Bane) : ses formes, et l'écran de sa minuterie (sa toile, sa matière) ; les matières, elles, servent à toutes
+function jeterBombe(g, ecran) {
+  scene.remove(g); g.traverse(o => { if (o.isMesh) o.geometry.dispose(); });
+  ecran.s.material.dispose(); ecran.t.dispose();
+}
+function desamorcer(b) {
+  const B = bombesDF;
+  jeterBombe(b.g, b.ecran); B.liste.splice(B.liste.indexOf(b), 1); B.faites++;
+  if (B.piece?.bombe === b) { B.piece = null; pileOuFace = null; }   // (sa pièce était en l'air : trop tard pour Double-Face, elle s'efface)
+  etincelles(V3(b.x, b.y + 0.4, b.z), 10, 3); bip(1800, 900, 0.3, 'square', 0.06); setTimeout(() => bip(600, 1500, 0.4, 'sine', 0.12), 200);
+  const n = B.liste.length;
+  annonce(tr('BOMBE DÉSAMORCÉE !'), n > 1 ? tr('Encore {n} bombes', { n }) : n ? tr('Encore une bombe !') : tr('Toutes les bombes sont désamorcées !'), 3);
+}
+function majBombesDF(dt) {
+  const B = bombesDF, et = B.et;
+  for (const b of B.liste) {
+    const d = Math.hypot(b.x - J.x, b.z - J.z);
+    if (!b.venus && d < 130) { // ses gardes arrivent (ils étaient cachés dans le coin)
+      b.venus = true;
+      for (let k = 0; k < (et.gardes ?? 2); k++) {
+        const a = k * 2.4 + entre(0, 1), x = b.x + Math.sin(a) * 4.5, z = b.z + Math.cos(a) * 4.5, p = creerPersonne('bandit', x, z, undefined, hauteurSol(x, z, b.y + 1));
+        resoudre(p, 0.35); p.angle = angleVers(p, J); p.zone = [b.x - 16, b.z - 16, b.x + 16, b.z + 16]; B.gardes.push(p);
+      }
+    }
+    if (B.piece?.bombe !== b) b.reste = Math.max(0, b.reste - dt);   // (pendant que Double-Face lance sa pièce, elle attend)
+    ecrireMinuterie(b.ecran, b.reste);
+    b.ecran.s.visible = d < 160;
+    b.lampe.visible = Math.sin(temps * (b.reste < 10 ? 20 : 8)) > 0;
+    if (d < 25 && Math.ceil(b.reste) !== b.bip) { b.bip = Math.ceil(b.reste); bip(1500, 1500, 0.05, 'square', 0.03 * (1 - d / 25)); }   // tic, tic...
+  }
+  // une minuterie arrive à zéro : Double-Face lance sa pièce (une bombe à la fois)
+  if (!B.piece) {
+    const b = B.liste.find(q => q.reste <= 0);
+    if (b) { B.piece = { bombe: b, t: 0, resultat: Math.random() < 0.5 ? 'face' : 'pile' }; lancerPieceDF(B.piece.resultat); annonce(tr('PILE OU FACE ?'), tr('Une minuterie est à zéro : Double-Face lance sa pièce...'), 1.6); }
+    return;
+  }
+  if ((B.piece.t += dt) < DUREE_PIECE) return;
+  const b = B.piece.bombe, resultat = B.piece.resultat;
+  B.piece = null;
+  if (resultat === 'face') { b.reste = et.encore; annonce(tr('FACE !'), tr('Double-Face épargne cette bombe... pour {n} secondes. Vite !', { n: et.encore }), 3.5); return; }
+  // pile : elle saute. La police avait fait évacuer : personne n'est blessé (à part Batman, s'il est tout contre)
+  const pos = V3(b.x, b.y + 0.5, b.z);
+  exploser(pos, 6, 0, 30, null, false, false, false); J.secousse = Math.max(J.secousse || 0, 0.3 * clamp(1 - dist(b, J) / 80, 0, 1));
+  const trace = new THREE.Mesh(new THREE.CircleGeometry(1.8, 16).rotateX(-Math.PI / 2), M_TRACE_BOMBE);
+  trace.position.set(b.x, b.y + 0.03, b.z); scene.add(trace); B.traces.push(trace);   // la trace noire, sur le trottoir
+  jeterBombe(b.g, b.ecran); B.liste.splice(B.liste.indexOf(b), 1);
+  // il en cache une autre : dans une de ses cachettes, plutôt loin de Batman (et pas là où il y en a déjà une)
+  const libres = et.cachettes.filter(([c, l]) => !B.liste.some(q => q.case[0] === c && q.case[1] === l)), loin = libres.filter(([c, l]) => dist(centre(c, l), J) > 250);
+  const [c, l] = hasard(loin.length ? loin : libres.length ? libres : et.cachettes);
+  B.liste.push(creerBombeDF(c, l, et.nouvelle));
+  annonce(tr('PILE... BOUM !'), tr("Personne n'est blessé : la police avait fait évacuer. Mais Double-Face en a caché une autre (point jaune) !"), 5);
+}
+function finirBombesDF() {
+  const B = bombesDF;
+  if (!B) return;
+  for (const b of B.liste) jeterBombe(b.g, b.ecran);
+  for (const t of B.traces) { scene.remove(t); t.geometry.dispose(); }
+  for (const p of B.gardes) if (p.vie > 0) p.supprimer = true;
+  if (pileOuFace && B.piece) pileOuFace = null;
+  bombesDF = null;
+}
+
+// --- Double-Face (Harvey Dent) : il garde ses distances (comme le Pingouin), un pistolet dans chaque main. Toutes les 7 à 10 s (piece), il
+// lance sa pièce (à l'écran, et en l'air au-dessus de sa main) : pendant qu'elle tourne, il ne tire pas. Pile : il tire des deux mains, très
+// vite (rafale : 3,5 s). Face : il hésite, planté là, et ne tire pas (hesite : 3 s). À la moitié de sa vie, ses hommes arrivent ---
+const bout2 = (h, v) => h.arme2 ? h.arme2.localToWorld(v.set(0, 0.03, h.arme2.userData.bout)) : boutDuCanon(h, v);
+function majDoubleFace(p, dt, d) {
+  const E = fiche(p), h = p.h;
+  p.cooldown -= dt; p.touche = Math.max(0, (p.touche || 0) - dt);
+  let vitesse = 0, sens = angleVers(p, J);   // (sens : là où il marche ; il regarde toujours Batman, pour tirer)
+  if (!J.mort) {
+    if ((p.vuTimer -= dt) <= 0) { p.vuTimer = 0.3; p.voitJ = d < E.vue && voitBJ(p); }
+    if (p.voitJ && !p.alerte) { p.alerte = true; annonce(tr('DOUBLE-FACE !'), tr('« Ma pièce va décider de ton sort, la chauve-souris... »'), 4); bruit(0.5, 600, 0.5); }
+    if (p.alerte) {
+      p.tPiece = (p.tPiece ?? entre(3, 5)) - dt;
+      if (!p.lance && !p.mode && p.tPiece <= 0 && p.voitJ && d < 60) { p.lance = { t: 0, resultat: Math.random() < 0.5 ? 'pile' : 'face' }; lancerPieceDF(p.lance.resultat); }
+      if (p.lance && (p.lance.t += dt) >= DUREE_PIECE) {
+        const pile = p.lance.resultat === 'pile';
+        p.mode = { pile, reste: pile ? E.rafale : E.hesite }; p.lance = null; p.tPiece = entre(...E.piece); p.cooldown = pile ? 0.15 : p.cooldown;
+        annonce(pile ? tr('PILE !') : tr('FACE !'), pile ? tr('Double-Face tire des deux mains : à l\'abri !') : tr('Double-Face hésite... Fonce !'), 2.5);
+      }
+      if (p.mode && (p.mode.reste -= dt) <= 0) p.mode = null;
+      // il garde ses distances : il s'approche à 18 m, recule à moins de 9 (recule), et tourne un peu autour de Batman ; pas pendant que sa
+      // pièce tourne, ni quand il hésite
+      if (!p.lance && !(p.mode && !p.mode.pile)) {
+        if (!p.voitJ || d > 18) vitesse = E.vitesse; else if (d < E.recule) vitesse = -E.vitesse;
+        else { vitesse = E.vitesse * 0.6; sens += (p.sens ??= Math.random() < 0.5 ? 1 : -1) * 1.3; }
+      }
+      if (p.touche > 0.25) p.cooldown = Math.max(p.cooldown, 0.5);   // un coup l'arrête net
+      const rafale = !!p.mode?.pile;
+      if (p.voitJ && !p.lance && !(p.mode && !p.mode.pile) && p.cooldown <= 0 && Math.abs(diffAngle(p.angle, angleVers(p, J))) < 0.5) {
+        p.main = !p.main; h.g.updateMatrixWorld(true);
+        tirSurJoueur(p, d, p.main ? bout2(h, V3()) : boutDuCanon(h, V3()), E.degats * parTriche('balles'), E.precision * (rafale ? 0.8 : 1));
+        p.cooldown = rafale ? 0.2 : entre(...E.tir) / 2;   // (deux pistolets : une main, puis l'autre)
+      }
+      if (p.vie < E.vie / 2 && !p.appel) { p.appel = true; appelerRenforts(p, E.renforts || 2, 'bandit', tr('DOUBLE-FACE :'), tr('« Mes hommes ! Pile, vous gagnez ; face, je perds ! »')); }
+    }
+  }
+  p.angle = lerpAngle(p.angle, angleVers(p, J), 6 * dt);
+  if (vitesse) bougerBoss(p, vitesse, dt, sens);
+  // sa pièce, en l'air au-dessus de sa main gauche
+  h.piece.visible = !!p.lance;
+  if (p.lance) { const k = p.lance.t / DUREE_PIECE; h.piece.position.set(0.32, 1.25 + Math.sin(k * Math.PI) * 0.7, 0.35); h.piece.rotation.x += 22 * dt; }
+  if (!h.g.visible) return;
+  h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, p.angle, 0);
+  animerHumain(h, Math.abs(vitesse), dt, { arme: p.alerte && !p.lance, touche: p.touche / 0.3 });
+  if (p.alerte && !p.lance) { h.brasD.rotation.set(-1.45, 0, -0.1); h.brasG.rotation.set(-1.45, 0, 0.1); h.brasG.pli.rotation.x = h.brasD.pli.rotation.x = 0; }   // un pistolet dans chaque main, les bras tendus
+  else if (p.lance) { h.brasG.rotation.set(-1.1, 0, 0.3); h.brasG.pli.rotation.x = -0.6; }   // la main gauche lance la pièce
+  membresMous(h, dt, p.touche > 0 ? { raideur: 12, sol: p.y, jambes: false } : { sol: p.y });
+}
+// un boss qui marche (vers « vers » ; sinon, là où il regarde ; vitesse < 0 : il recule, loin de Batman), sans quitter sa zone ni entrer dans
+// l'eau. Renvoie de combien il a avancé ; p.contreMur : un vrai mur l'a arrêté (pas le bord de sa zone, ni l'eau)
+function bougerBoss(p, vitesse, dt, vers = p.angle) {
+  const ax = p.x, az = p.z, sens = vitesse < 0 ? angleVers(J, p) : vers, v = Math.abs(vitesse);
+  p.x += Math.sin(sens) * v * dt; p.z += Math.cos(sens) * v * dt;
+  resoudre(p, p.type === 'bane' ? 0.6 : 0.4, p.type === 'bane' ? 2.1 : p.type === 'pingouin' ? 1.6 : 1.7, { x: ax, z: az });
+  p.contreMur = Math.hypot(p.x - ax, p.z - az) < v * dt * 0.35;
+  if (p.zone) { p.x = clamp(p.x, p.zone[0], p.zone[2]); p.z = clamp(p.z, p.zone[1], p.zone[3]); }
+  const y = hauteurSol(p.x, p.z, p.y + 0.6);
+  if (EAU - y > 0.9) { p.x = ax; p.z = az; } else p.y = y;
+  return Math.hypot(p.x - ax, p.z - az);
+}
+// ses hommes arrivent en courant, de 22 m autour de lui (ceux qui sont encore debout quand l'étape finit s'en vont : voir finirVague)
+function appelerRenforts(p, n, type, titre, texte) {
+  annonce(titre, texte, 3);
+  for (let k = 0; k < n; k++) {
+    const a = entre(0, 6.3), q = { x: p.x + Math.sin(a) * 22, z: p.z + Math.cos(a) * 22 };
+    const o = creerPersonne(type, q.x, q.z, undefined, hauteurSol(q.x, q.z, p.y + 2)); resoudre(o, 0.35);
+    o.alerte = true; if (p.zone) o.zone = p.zone; (p.renforts ||= []).push(o);
+    if (vague) vague.partis.push(o);
+  }
+}
+// un méchant de Gotham est assommé (voir assommer) : on le dit. La police vient l'embarquer
+const ASSOMMES = {
+  pingouin: ['LE PINGOUIN EST ASSOMMÉ !', "La police va l'embarquer : direction Arkham !"],
+  doubleFace: ['DOUBLE-FACE EST ASSOMMÉ !', "Sa pièce roule par terre... La police va l'embarquer : direction Arkham !"],
+  bane: ['BANE EST ASSOMMÉ !', "Le plus fort de tous est à terre ! La police va l'emmener à la prison de Blackgate"],
+};
+function bossAssomme(p) {
+  const t = ASSOMMES[p.type];
+  if (!t || p.fuit || p.figurant) return;
+  annonce(tr(t[0]), tr(t[1]), 5);
+  bip(500, 1500, 0.6, 'triangle', 0.2);
+}
+
+// --- le stade (étape « stade », mission « Le stade ») ---
+// Il y a match : les spectateurs sur les gradins, qui se lèvent et applaudissent (tous dessinés d'un coup : deux InstancedMesh, les corps et
+// les têtes), et 8 joueurs qui courent après le ballon (les Gotham Rogues, en noir et or, contre les visiteurs, en blanc et bleu). Quand
+// Batman arrive (à 80 m), Bane fait sauter le terrain : des explosions tout le long de la pelouse, de grands trous, des mottes qui volent, de
+// la fumée et du feu. Personne n'est blessé : les spectateurs s'enfuient par les côtés des gradins, les joueurs en courant. Bane se montre au
+// bout du terrain, dit ce qu'il a à dire, et repart par le tunnel. Les trous restent jusqu'à la fin de la mission (terrainDetruit)
+let matchStade = null;   // { et, phase : 'match', 'boum' ou 'fini', t, foule : { dessin, gens }, joueurs, ballon, trous, bane }
+let terrainDetruit = null;   // { objets : les trous et les mottes ; fumees : d'où monte la fumée ; t }
+const M_FOULE = new THREE.MeshStandardMaterial({ roughness: 0.85 }), GEO_SPECTATEUR = new THREE.CapsuleGeometry(0.2, 0.42, 3, 8).translate(0, 0.42, 0), GEO_TETE_SPECTATEUR = new THREE.SphereGeometry(0.12, 10, 8).translate(0, 0.98, 0);
+const COULEURS_FOULE = ['#141416', '#d8a818', '#f0f0ee', '#1a3a8a', '#8a1a1a', '#3a6a3a', '#5a5a62', '#c8c0b0'];
+// un trou dans la pelouse : noir au fond, la terre retournée tout autour, et des mottes sur le bord (dessiné la première fois qu'il sert : au
+// chargement, il prendrait des nombres au hasard aux autres chapitres)
+let M_TROU = null;
+const GEO_TROU = new THREE.CircleGeometry(1, 20).rotateX(-Math.PI / 2);   // (un trou de 1 m de rayon, agrandi à sa taille)
+const matTrou = () => M_TROU ||= new THREE.MeshStandardMaterial({ transparent: true, depthWrite: false, roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, map: toile(128, 128, g => {
+  const d = g.createRadialGradient(64, 64, 4, 64, 64, 64); d.addColorStop(0, 'rgba(4,3,2,1)'); d.addColorStop(0.45, 'rgba(14,10,6,1)'); d.addColorStop(0.62, 'rgba(58,40,24,.95)'); d.addColorStop(0.82, 'rgba(70,52,30,.6)'); d.addColorStop(1, 'rgba(60,45,25,0)');
+  g.fillStyle = d; g.fillRect(0, 0, 128, 128);
+  for (let k = 0; k < 40; k++) { const a = Math.random() * 6.3, r = 34 + Math.random() * 22; g.fillStyle = Math.random() < 0.4 ? 'rgba(46,82,30,.9)' : 'rgba(52,36,20,.9)'; g.beginPath(); g.arc(64 + Math.cos(a) * r, 64 + Math.sin(a) * r, 1.5 + Math.random() * 3.5, 0, 7); g.fill(); }
+}) });
+function commencerStade(et) {
+  const c = stade || lieuEtape(et), M = matchStade = { et, phase: 'match', t: 0, joueurs: [], trous: [] };
+  // la foule, sur les gradins : les grandes tribunes (au nord et au sud, 6 rangs) et les petites (à l'est et à l'ouest, 5 rangs, deux de chaque côté de l'entrée)
+  const gens = [];
+  for (const s of [-1, 1]) for (let k = 0; k < 6; k++) for (let x = -20.5; x <= 20.5; x += 1.6) if (Math.random() < 0.72)
+    gens.push({ x: c.x + x + entre(-0.25, 0.25), z: c.z + s * (11.75 + 1.5 * k), y: c.y + 1.1 * (k + 1), a: s > 0 ? Math.PI : 0, sortie: x < 0 ? -1 : 1, axe: 'x' });
+  for (const s of [-1, 1]) for (let k = 0; k < 5; k++) for (const zc of [-6.5, 6.5]) for (let z = -3.8; z <= 3.8; z += 1.6) if (Math.random() < 0.72)
+    gens.push({ x: c.x + s * (19.75 + 1.5 * k), z: c.z + zc + z, y: c.y + 1.1 * (k + 1), a: s > 0 ? -Math.PI / 2 : Math.PI / 2, sortie: zc < 0 ? -1 : 1, axe: 'z' });
+  for (const q of gens) Object.assign(q, { phase: Math.random() * 6, part: entre(0, 1.4), parti: false, x0: q.x, z0: q.z });
+  const dessin = [GEO_SPECTATEUR, GEO_TETE_SPECTATEUR].map(geo => { const i = new THREE.InstancedMesh(geo, M_FOULE, gens.length); i.frustumCulled = false; i.castShadow = false; scene.add(i); return i; });
+  const coul = new THREE.Color();
+  gens.forEach((q, k) => { dessin[0].setColorAt(k, coul.set(hasard(COULEURS_FOULE))); dessin[1].setColorAt(k, coul.set(hasard(PEAUX))); });
+  M.foule = { dessin, gens, o: new THREE.Object3D() };
+  // les joueurs : 4 de chaque équipe, chacun à sa place sur la pelouse
+  for (let k = 0; k < 8; k++) {
+    const equipe = k % 2, poste = { x: c.x + (equipe ? -1 : 1) * entre(3, 15), z: c.z + entre(-8, 8) }, p = creerPersonne('pieton', poste.x, poste.z, TENUES.joueur(equipe), c.y + 0.03);
+    p.foot = { poste, equipe, vitesse: entre(3.6, 4.6) }; M.joueurs.push(p);
+  }
+  // le ballon
+  M.ballon = { m: new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 8), mat('#f4f4f4')), x: c.x, z: c.z, vx: 0, vz: 0, y: c.y + 0.15 };
+  M.ballon.m.castShadow = true; scene.add(M.ballon.m);
+  M.centre = { x: c.x, y: c.y, z: c.z };
+}
+// un joueur, pendant le match : le plus près du ballon court dessus et le frappe ; les autres restent vers leur place, tournés vers le ballon
+function majFootballeur(p, dt) {
+  const M = matchStade, B = M?.ballon;
+  if (!B || M.phase !== 'match') { p.foot = null; return; }
+  const F = p.foot, proche = M.joueurs.reduce((m, q) => q.foot && (!m || dist(q, B) < dist(m, B)) ? q : m, null) === p;
+  const but = proche ? B : { x: lerp(F.poste.x, B.x, 0.35), z: lerp(F.poste.z, B.z, 0.35) }, d = dist(p, but);
+  let vitesse = 0;
+  if (d > (proche ? 0.5 : 2)) { vitesse = proche ? F.vitesse : Math.min(F.vitesse * 0.6, d); p.angle = lerpAngle(p.angle, angleVers(p, but), 8 * dt); }
+  else p.angle = lerpAngle(p.angle, angleVers(p, B), 4 * dt);
+  if (proche && dist(p, B) < 0.8 && Math.hypot(B.vx, B.vz) < 3) { // il frappe : vers l'autre moitié du terrain, au hasard
+    const c = M.centre, vers = { x: c.x + (F.equipe ? -1 : 1) * entre(-4, 14), z: c.z + entre(-8, 8) }, a = angleVers(B, vers), v = entre(6, 11);
+    B.vx = Math.sin(a) * v; B.vz = Math.cos(a) * v; bruit(0.12 * clamp(1 - dist(p, J) / 60, 0, 1), 500, 0.06);
+  }
+  p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt;
+  if (p.h.g.visible) { p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle; animerHumain(p.h, vitesse, dt, {}); membresMous(p.h, dt, { sol: p.y }); }
+}
+function majStade(dt) {
+  const M = matchStade, c = M.centre, F = M.foule;
+  M.t += dt;
+  // le ballon roule, et ralentit ; il reste sur la pelouse
+  const B = M.ballon;
+  if (B) {
+    B.x += B.vx * dt; B.z += B.vz * dt; const f = Math.pow(0.45, dt); B.vx *= f; B.vz *= f;
+    if (Math.abs(B.x - c.x) > 17.5) { B.vx = -B.vx * 0.5; B.x = c.x + Math.sign(B.x - c.x) * 17.5; }
+    if (Math.abs(B.z - c.z) > 10.5) { B.vz = -B.vz * 0.5; B.z = c.z + Math.sign(B.z - c.z) * 10.5; }
+    B.m.position.set(B.x, B.y, B.z); B.m.rotation.x += B.vz * dt / 0.12; B.m.rotation.z -= B.vx * dt / 0.12;
+  }
+  // la foule : avant, elle applaudit (debout, elle saute un peu) ; après, chacun court le long de son rang jusqu'au bout des gradins, et disparaît
+  const o = F.o, loin = dist(c, J) > 260;
+  F.gens.forEach((q, k) => {
+    if (M.phase !== 'match' && !q.parti && M.t - M.tBoum > q.part) {
+      const fin = q.axe === 'x' ? 23 : 10.6, v = 3.4 * dt;
+      if (q.axe === 'x') { q.x += q.sortie * v; if (Math.abs(q.x - c.x) > fin) q.parti = true; } else { q.z += q.sortie * v; if (Math.abs(q.z - c.z) > fin) q.parti = true; }
+    }
+    const saute = M.phase === 'match' ? Math.abs(Math.sin(temps * 5 + q.phase)) * 0.12 : Math.abs(Math.sin(temps * 14 + q.phase)) * 0.06;
+    o.position.set(q.x, q.y + saute, q.z); o.rotation.set(0, q.axe === 'x' && M.phase !== 'match' && !q.parti && M.t - M.tBoum > q.part ? q.sortie * Math.PI / 2 : q.a, 0);
+    o.scale.setScalar(q.parti || loin ? 0 : 1); o.updateMatrix();
+    for (const i of F.dessin) i.setMatrixAt(k, o.matrix);
+  });
+  for (const i of F.dessin) i.instanceMatrix.needsUpdate = true;
+  if (M.phase === 'match') {
+    if (J.mort || Math.hypot(J.x - c.x, J.z - c.z) > 80) return;
+    // BOUM : Bane fait sauter le terrain
+    M.phase = 'boum'; M.tBoum = M.t; M.explosions = [];
+    for (let k = 0; k < 11; k++) M.explosions.push({ t: 0.15 + k * 0.22, x: c.x - 15 + k * 3 + entre(-1, 1), z: c.z + (k % 2 ? 1 : -1) * entre(2.5, 7) });
+    annonce(tr('BOUM !'), tr('Bane fait sauter le terrain, en plein match !'), 4);
+    bruit(1, 120, 2); J.secousse = Math.max(J.secousse || 0, 0.35);
+    for (const p of M.joueurs) if (!p.supprimer) { p.foot = null; p.peur = 25; }   // les joueurs s'enfuient
+    if (B) { scene.remove(B.m); B.m.geometry.dispose(); M.ballon = null; }
+    terrainDetruit = { objets: [], fumees: [], t: 0 };
+    return;
+  }
+  // les explosions, l'une après l'autre, tout le long de la pelouse : un trou à chacune
+  for (const q of M.explosions || []) if (!q.fait && M.t - M.tBoum > q.t) {
+    q.fait = true;
+    const y = c.y + 0.25, r = entre(2.4, 3.6), pos = V3(q.x, y + 0.6, q.z);
+    exploser(pos, 5, 0, 0, null, false, false, false);
+    // le trou : un de plus dans la forme des trous (tous dessinés d'un coup : un InstancedMesh)
+    const T = terrainDetruit;
+    if (!T.trous) { T.trous = new THREE.InstancedMesh(GEO_TROU, matTrou(), M.explosions.length); T.trous.count = 0; T.trous.frustumCulled = false; scene.add(T.trous); T.objets.push(T.trous); }
+    const o = new THREE.Object3D(); o.position.set(q.x, c.y + 0.035, q.z); o.rotation.y = entre(0, 6.3); o.scale.set(r, 1, r); o.updateMatrix();
+    T.trous.setMatrixAt(T.trous.count++, o.matrix); T.trous.instanceMatrix.needsUpdate = true;
+    for (let k = 0; k < 3; k++) { // des mottes de pelouse qui volent, et retombent autour (sans ombre)
+      const e = new THREE.Mesh(new THREE.BoxGeometry(entre(0.3, 0.7), entre(0.15, 0.3), entre(0.3, 0.7)), hasard([MAT.pelouse || MAT.herbe || M_NOIR, mat('#3a2814')])), a = entre(0, 6.3);
+      e.position.copy(pos); scene.add(e); lancerDebris(e, V3(Math.sin(a) * entre(3, 8), entre(6, 13), Math.cos(a) * entre(3, 8)), entre(4, 7), true);
+    }
+    if (terrainDetruit.fumees.length < 5) terrainDetruit.fumees.push({ x: q.x, y: c.y + 0.5, z: q.z, t: 0 });
+    if (M.explosions.indexOf(q) % 4 === 1) allumerFeu(q.x + entre(-1, 1), q.z + entre(-1, 1), 1.3);
+    J.secousse = Math.max(J.secousse || 0, 0.25 * clamp(1 - dist(pos, J) / 150, 0.2, 1));
+  }
+  // Bane se montre, au bout du terrain (il sort du tunnel ouest), dit ce qu'il a à dire, et repart
+  if (!M.bane && M.t - M.tBoum > 2.5) {
+    const x = c.x - 21.5, z = c.z, p = M.bane = creerPersonne('bane', x, z, undefined, c.y);
+    Object.assign(p, { invincible: true, figurant: { chemin: [{ x: c.x - 15.5, z: c.z }], t: 0, part: false } });
+  }
+  if (M.bane && M.bane.figurant?.parti) { M.bane.supprimer = true; M.bane = null; M.phase = 'fini'; }
+  if (M.t - M.tBoum > 22) M.phase = 'fini';   // (au cas où Bane serait resté coincé)
+}
+// la fumée qui monte des trous du terrain (tant que la mission dure)
+function majTerrainDetruit(dt) {
+  const T = terrainDetruit;
+  T.t += dt;
+  if (T.t > 40 || dist(T.fumees[0] || J, J) > 300) return;
+  for (const f of T.fumees) if ((f.t -= dt) <= 0) {
+    f.t = 0.35; const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#3a3836');
+    s.position.set(f.x + entre(-1, 1), f.y + entre(0, 1), f.z + entre(-1, 1)); scene.add(s); effets.push({ o: s, vie: 3, fumee: 3, taille: 2.5 });
+  }
+}
+function finirStade(suite) {
+  const M = matchStade;
+  if (M) {
+    for (const i of M.foule.dessin) { scene.remove(i); i.dispose(); }
+    for (const p of M.joueurs) if (p.foot && !p.supprimer) p.supprimer = true;
+    if (M.ballon) { scene.remove(M.ballon.m); M.ballon.m.geometry.dispose(); }
+    if (M.bane && !M.bane.supprimer) M.bane.supprimer = true;
+    matchStade = null;
+  }
+  if (terrainDetruit && !(suite?.type === 'eliminer' && suite.lieu === '°')) reparerTerrain();   // (on quitte le stade : le terrain revient comme avant)
+}
+function reparerTerrain() {
+  for (const o of terrainDetruit.objets) { scene.remove(o); if (o.isInstancedMesh) o.dispose(); }
+  eteindreFeux(); terrainDetruit = null;
+}
+// les mercenaires, dans le stade : ils sortent des deux tunnels (à l'est et à l'ouest), arrivent sur la pelouse, et certains se postent en haut
+// des grandes tribunes (poste : ils ne bougent pas, et tirent d'en haut)
+function sortiesStade() {
+  const c = stade, Y = c.y;
+  return [{ x: c.x - 20.5, z: c.z, y: Y }, { x: c.x + 20.5, z: c.z, y: Y }, { x: c.x - 14, z: c.z - 7, y: Y }, { x: c.x + 14, z: c.z + 7, y: Y }, { x: c.x + 12, z: c.z - 8, y: Y },
+    ...[[-9, -1], [9, 1]].map(([x, s]) => ({ x: c.x + x, z: c.z + s * 19.25, y: Y + 6.6, poste: true }))];
+}
+
+// --- Bane : il marche sur Batman et frappe : il lève le poing (elan : on le voit venir, on a le temps de reculer), puis frappe (degats) ;
+// au 3e coup, un grand revers, qui envoie Batman en arrière... et il charge : il se prépare (il gronde, se baisse : 0,8 s), puis fonce, tête
+// baissée, tout droit, très vite (vitesseCharge). Il charge aussi, de loin, toutes les 5 à 8 s (charge). S'il rentre dans Batman : un énorme
+// coup (degatsCharge), qui l'envoie voler. S'il fonce dans un mur (ou une voiture) : il est sonné (sonne), des étoiles tournent au-dessus de
+// sa tête, et tes coups comptent double (sonneDegats : voir blesser). Quand il a perdu le tiers de sa vie, il pompe son venin : il va 20 %
+// plus vite. À la revanche, il est affaibli (son masque est abîmé) : il frappe moins fort, et charge moins souvent ---
+function majBane(p, dt, d) {
+  const E = fiche(p), h = p.h;
+  if (p.figurant) { majBaneFigurant(p, dt); return; }
+  p.cooldown -= dt; p.touche = Math.max(0, (p.touche || 0) - dt);
+  if ((p.vuTimer -= dt) <= 0) { p.vuTimer = 0.25; p.voitJ = !J.mort && d < E.vue && voitBJ(p); }
+  if (p.voitJ && !p.alerte) {
+    p.alerte = true;
+    annonce(tr('BANE !'), p.affaibli ? tr('« Tu reviens te battre, la chauve-souris ? »') : fille() ? tr('« Ah ! Tu es venue... Je vais te briser ! »') : tr('« Ah ! Tu es venu... Je vais te briser ! »'), 4); bruit(0.8, 130, 1);
+  }
+  const venin = p.vie < E.vie * 0.66 ? 1.2 : 1, force = p.affaibli ? 0.7 : 1;
+  if (venin > 1 && !p.venin) { p.venin = true; annonce(tr('BANE :'), tr('« Mon venin me rend plus fort ! »'), 3); bruit(0.5, 200, 0.6); }
+  let vitesse = 0, vise = angleVers(p, J), pose = {};
+  if (p.sonne > 0) { // sonné : il titube sur place, des étoiles autour de la tête
+    p.sonne -= dt; pose = { plie: 0.35, bascule: Math.sin(temps * 3) * 0.12 }; vise = p.angle + Math.sin(temps * 2) * 0.4;
+    if (!p.etoiles) { p.etoiles = new THREE.Group(); for (let k = 0; k < 3; k++) { const s = new THREE.Sprite(M_ETOILE); s.scale.setScalar(0.22); s.raycast = () => {}; p.etoiles.add(s); } h.g.add(p.etoiles); }
+    p.etoiles.children.forEach((s, k) => { const a = temps * 4 + k * 2.1; s.position.set(Math.cos(a) * 0.32, 2.05 + Math.sin(a * 2) * 0.05, Math.sin(a) * 0.32); });
+    if (p.sonne <= 0) { p.etoiles.removeFromParent(); p.etoiles = null; p.cdCharge = entre(...E.charge) * (p.affaibli ? 1.5 : 1); }
+  } else if (p.charge) {
+    const C = p.charge;
+    C.t += dt;
+    if (C.phase === 'prepare') { // il se baisse, et gronde
+      pose = { plie: 0.5 * Math.min(1, C.t * 3), bascule: 0.3 };
+      if (C.t > 0.8) { C.phase = 'fonce'; C.t = 0; C.angle = angleVers(p, J); bruit(0.7, 180, 0.6); }
+    } else { // il fonce, tout droit
+      p.angle = vise = C.angle;
+      const v = (E.vitesseCharge || 13) * venin, fait = bougerBoss(p, v, dt);
+      pose = { bascule: 0.45 };
+      if (!C.touche && Math.hypot(J.x - p.x, J.z - p.z) < 1.6 * h.g.scale.y && Math.abs(J.y - p.y) < 2.2 && !J.mort) { // il rentre dans Batman
+        C.touche = true; blesserJoueur(E.degatsCharge * force, true, p);
+        if (!J.voiture) { J.superman = null; J.lance = { vx: Math.sin(C.angle) * 16, vz: Math.cos(C.angle) * 16 }; J.vy = 7; J.sol = false; }
+        J.secousse = Math.max(J.secousse || 0, 0.35); bruit(0.9, 220, 0.4);
+      }
+      const voiture = voitures.find(o => !o.detruite && !pasDeTole(o) && !o.accident && dist(o, p) < o.rayon + 1.4 && Math.abs(o.y - p.y) < 2);
+      if (voiture) { voiture.faute = false; heurter(voiture, V3(voiture.x, voiture.y + 0.6, voiture.z), V3(Math.sin(C.angle) * 8, 3, Math.cos(C.angle) * 8)); }
+      if ((C.t > 0.15 && p.contreMur) || voiture) { // dans un mur (ou une voiture) : il est sonné
+        p.charge = null; p.sonne = E.sonne;
+        annonce(tr('BANE EST SONNÉ !'), tr('Frappe vite : tes coups comptent double !'), 2.5);
+        bruit(1, 160, 0.6); J.secousse = Math.max(J.secousse || 0, 0.3 * clamp(1 - d / 40, 0, 1));
+        for (let k = 0; k < 8; k++) { const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#8a8278'); s.position.set(p.x + entre(-1, 1), p.y + entre(0.5, 2), p.z + entre(-1, 1)); scene.add(s); effets.push({ o: s, vie: 1.2, fumee: 1.2, taille: 1.5 }); }
+      } else if (C.t > 2.2 || (C.t > 0.15 && fait < v * dt * 0.35)) { p.charge = null; p.cdCharge = entre(...E.charge) * (p.affaibli ? 1.5 : 1) / venin; }   // (à bout de souffle, ou au bord de sa zone, ou de l'eau)
+    }
+  } else if (p.alerte && !J.mort) {
+    p.cdCharge = (p.cdCharge ?? entre(2.5, 4)) - dt;
+    if (p.coup) { // le coup de poing : il lève le poing (elan), puis frappe ; le 3e de suite, un grand revers qui repousse Batman, avant de charger
+      const elan = E.elan || 0.7, revers = p.coup.n >= 3;
+      p.coup.t += dt; pose = { frappe: p.coup.t < elan ? 0 : 1 - (p.coup.t - elan) / 0.4, recule: p.coup.t < elan ? Math.min(1, p.coup.t / elan) : 0 };
+      if (p.coup.t > elan && !p.coup.fait) {
+        p.coup.fait = true; bruit(0.5, revers ? 220 : 300, 0.15);
+        if (d < 2.9 * h.g.scale.y && Math.abs(diffAngle(p.angle, angleVers(p, J))) < 0.9 && Math.abs(J.y - p.y) < 2.2) {
+          blesserJoueur(E.degats * force, true, p); J.secousse = Math.max(J.secousse || 0, revers ? 0.3 : 0.2);
+          if (!J.voiture) { const a = angleVers(p, J), k = revers ? 12 : 5; J.lance = { vx: Math.sin(a) * k, vz: Math.cos(a) * k }; J.vy = revers ? 6 : 3; J.sol = false; }
+        }
+      }
+      if (p.coup.t > elan + 0.4) { p.serie = revers ? 0 : p.coup.n; p.coup = null; p.cooldown = entre(...E.tir); if (revers) p.cdCharge = Math.min(p.cdCharge, 0.6); }
+    } else if (p.cdCharge <= 0 && d > 4.5 && d < 30 && p.voitJ && !J.voiture) { // il va charger : il se prépare
+      p.charge = { phase: 'prepare', t: 0 };
+      if (!p.dejaCharge) { p.dejaCharge = true; annonce(tr('BANE VA CHARGER !'), tr('Saute de côté (Q ou D) : s\'il fonce dans un mur, il est sonné !'), 3); }
+      bruit(0.6, 110, 0.8); bip(90, 60, 0.7, 'sawtooth', 0.1);
+    } else if (d < 2.4 * h.g.scale.y && p.cooldown <= 0) p.coup = { t: 0, n: (p.serie || 0) + 1 };
+    else if (d > 1.9 * h.g.scale.y) vitesse = E.vitesse * venin;
+  }
+  if (!p.charge || p.charge.phase !== 'fonce') p.angle = lerpAngle(p.angle, vise, (p.coup ? 3 : 6) * dt);
+  if (vitesse) bougerBoss(p, vitesse, dt);
+  if (!h.g.visible) return;
+  h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(pose.bascule || 0, p.angle, 0);
+  const court = p.charge?.phase === 'fonce' ? (E.vitesseCharge || 13) : Math.abs(vitesse);
+  animerHumain(h, court, dt, { plie: pose.plie || 0, frappe: pose.frappe || 0, touche: p.touche / 0.3 });
+  if (p.charge?.phase === 'prepare') { h.brasD.rotation.set(0.6, 0, -0.5); h.brasG.rotation.set(0.6, 0, 0.5); }   // (les bras en arrière : il va foncer)
+  if (pose.recule) { h.brasD.rotation.set(-0.4 - 1.6 * pose.recule, 0, -0.3 - 0.4 * pose.recule); h.brasD.pli.rotation.x = -1.6 * pose.recule; }   // (il lève le poing, loin en arrière : il va frapper)
+  if ((p.tPas = (p.tPas ?? 0) - dt) <= 0 && court > 1) { p.tPas = court > 8 ? 0.22 : 0.45; bruit(0.25 * clamp(1 - d / 60, 0, 1), 140, 0.15); if (court > 8) J.secousse = Math.max(J.secousse || 0, 0.06 * clamp(1 - d / 30, 0, 1)); }   // ses pas lourds
+  membresMous(h, dt, p.touche > 0 ? { raideur: 12, sol: p.y, jambes: false } : { sol: p.y });
+}
+// Bane, au stade (figurant : il ne se bat pas, et rien ne le touche) : il sort du tunnel, s'arrête au bord du trou, parle, et repart
+function majBaneFigurant(p, dt) {
+  const F = p.figurant, h = p.h;
+  F.t += dt;
+  let vitesse = 0;
+  const q = F.chemin[0];
+  if (q) { const d = dist(p, q); vitesse = Math.min(2.4, d * 3); p.angle = lerpAngle(p.angle, angleVers(p, q), 6 * dt); if (d < 0.3) F.chemin.shift(); }
+  else if (!F.dit) { // il parle
+    F.dit = true; F.tDit = F.t;
+    annonce(tr('BANE :'), tr('« Ce stade est à moi... et bientôt, toute la ville ! Mes hommes s\'occupent de toi, la chauve-souris. »'), 5); bruit(0.6, 120, 1);
+  } else if (!F.part) { p.angle = lerpAngle(p.angle, angleVers(p, J), 3 * dt); if (F.t - F.tDit > 4) { F.chemin.push({ x: p.x - 7, z: p.z }); F.part = true; } }
+  if (F.part && !F.chemin.length) F.parti = true;
+  p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt;
+  if (!h.g.visible) return;
+  h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, p.angle, 0);
+  animerHumain(h, vitesse, dt, {}); membresMous(h, dt, { sol: p.y });
+}
+
+// --- le combat contre Bane (une étape « eliminer » qui a une « revanche », mission « Bane ») ---
+// Dans l'égout, c'est un vrai combat : on peut le gagner. Si Bane gagne (la vie de Batman tombe à 0 : voir mourir), ce n'est pas « WASTED » :
+// « BANE T'A BATTU... », l'écran s'assombrit, et Batman se réveille dans la rue (au carrefour de la revanche), où toute la police de Gotham
+// l'attend : des policiers en ligne en travers de la rue, leurs voitures, gyrophares allumés. Bane revient, affaibli, avec ses mercenaires ;
+// les policiers leur tirent dessus (rien ne les blesse : personne ne les vise), et Batman finit le travail
+let combatBane = null;   // { et, phase : 'egout', 'battu' ou 'revanche', policiers, voitures, lieu }
+function commencerCombat(et) { combatBane = { et, phase: 'egout', policiers: [], voitures: [] }; }
+// Batman meurt : est-ce Bane qui l'a battu ? Oui s'il est encore debout, et que Batman est mort dans l'égout ou dans la rue de la revanche, ou
+// que le dernier coup venait de lui (ou de ses mercenaires). Une chute ailleurs, c'est la mort habituelle
+function battuParBane() {
+  const C = combatBane;
+  if (!C || (C.phase !== 'egout' && C.phase !== 'revanche') || !personnes.some(p => p.type === 'bane' && p.vie > 0 && !p.supprimer)) return false;
+  const deLui = ['bane', 'mercenaire'].includes(J.dernierDe?.type) && temps - J.dernierDegat < 1;
+  const la = C.phase === 'egout' ? !!egout && souterrainEn(J.x, J.z, J.y)?.zone === egout.S : dist(J, C.lieu) < 120;
+  return deLui || la;
+}
+// où se réveiller pour la revanche : à 9 m du carrefour, du côté opposé à Bane (la rue qui va vers l'est, ou une autre s'il n'y en a pas)
+function lieuRevanche() {
+  const R = combatBane.et.revanche, [i, j] = R.noeud, c = noeud(i, j), y = baseNoeud(i, j);
+  const sens = rueH(i, j) ? { x: 1, z: 0 } : rueV(i, j) ? { x: 0, z: 1 } : rueH(i - 1, j) ? { x: -1, z: 0 } : { x: 0, z: -1 };   // (la rue où arrive Bane)
+  return { x: c.x - sens.x * 9, z: c.z - sens.z * 9, y, c, sens, angle: Math.atan2(sens.x, sens.z) };
+}
+function commencerRevanche() {
+  const C = combatBane, R = C.et.revanche, L = C.lieu = lieuRevanche(), { c, sens } = L, cote = { x: -sens.z, z: sens.x };
+  C.phase = 'revanche';
+  // Bane quitte l'égout... et revient dans la rue, avec le reste de sa vie (au plus « vie » : il est affaibli), et ses mercenaires
+  const vieille = personnes.find(p => p.type === 'bane' && p.vie > 0), vie = Math.min(vieille?.vie ?? Infinity, ENNEMIS.bane.vie * (R.vie ?? 0.6));
+  finirVague();
+  const zone = [Math.min(c.x - 30, c.x + sens.x * 90) - Math.abs(cote.x) * 9, Math.min(c.z - 30, c.z + sens.z * 90) - Math.abs(cote.z) * 9,
+    Math.max(c.x + 30, c.x + sens.x * 90) + Math.abs(cote.x) * 9, Math.max(c.z + 30, c.z + sens.z * 90) + Math.abs(cote.z) * 9];
+  vague = { cible: 'bane', reste: 0, ensemble: 1, sorties: [], t: 0, partis: [] };
+  const bx = c.x + sens.x * 48, bz = c.z + sens.z * 48, bane = creerPersonne('bane', bx, bz, undefined, hauteurSol(bx, bz, L.y + 2));
+  Object.assign(bane, { vie, affaibli: true, alerte: false, zone, angle: L.angle + Math.PI }); vague.partis.push(bane);
+  for (let k = 0; k < (R.mercenaires ?? 4); k++) {
+    const u = (k - ((R.mercenaires ?? 4) - 1) / 2) * 3, x = bx + cote.x * u + sens.x * 4, z = bz + cote.z * u + sens.z * 4, p = creerPersonne('mercenaire', x, z, undefined, hauteurSol(x, z, L.y + 2));
+    Object.assign(p, { zone, alerte: true, angle: L.angle + Math.PI }); vague.partis.push(p);
+  }
+  // la police : une ligne de policiers en travers de la rue, devant Batman ; leurs voitures derrière eux, gyrophares allumés
+  for (let k = 0; k < (R.policiers ?? 10); k++) {
+    const u = (k / Math.max(1, (R.policiers ?? 10) - 1) - 0.5) * 11, x = c.x + cote.x * u + sens.x * entre(2, 4), z = c.z + cote.z * u + sens.z * entre(2, 4);
+    const f = creerPersonne('flic', x, z, undefined, hauteurSol(x, z, L.y + 2));
+    Object.assign(f, { allie: { degats: R.degats ?? 8, hommes: k % 2 === 1 }, invincible: true, angle: L.angle, cooldown: entre(0, 1.5) }); donnerArme(f.h, 2); C.policiers.push(f);
+  }
+  for (let k = 0; k < (R.voitures ?? 4); k++) {
+    const u = (k / Math.max(1, (R.voitures ?? 4) - 1) - 0.5) * 12, x = c.x + cote.x * u - sens.x * 2.5, z = c.z + cote.z * u - sens.z * 2.5;
+    const v = creerVoiture(x, z, L.angle + Math.PI / 2 + entre(-0.5, 0.5), true); v.renfort = false; C.voitures.push(v);
+  }
+  // la police a fermé la rue : plus de voitures ni de passants autour
+  for (const v of voitures) if (v.conducteur === 'civil' && dist(v, c) < 160) v.supprimer = true;
+  for (const p of personnes) if (p.type === 'pieton' && dist(p, c) < 120) p.supprimer = true;
+  annonce(tr('LA REVANCHE !'), fille() ? tr("{ami} t'a sortie de l'égout. Bane est dans la rue... et toute la police de Gotham est avec toi !", { ami: nomAmi() })
+    : tr("{ami} t'a sorti de l'égout. Bane est dans la rue... et toute la police de Gotham est avec toi !", { ami: nomAmi() }), 6);
+  bip(400, 1200, 0.8, 'sine', 0.15);
+}
+// un policier de Gotham, avec Batman : il reste à sa place, vise l'ennemi le plus proche qu'il voit (à 70 m au plus), et tire au pistolet.
+// Un policier sur deux vise d'abord les hommes du méchant (hommes), s'il en voit. Ils ne tirent que si Batman est là (à 70 m), et leurs balles
+// ne descendent pas un boss sous le quart de sa vie : c'est Batman qui finit le travail
+function majPolicierAllie(p, dt) {
+  const A = p.allie;
+  p.cooldown -= dt;
+  if (J.mort || dist(J, p) > 70) A.cible = null;
+  else if ((A.tCible = (A.tCible ?? 0) - dt) <= 0) {
+    A.tCible = 0.5; A.cible = null;
+    const vus = personnes.filter(q => ennemi(q) && !q.figurant && dist(q, p) < 70 && voit(p, q)), hommes = A.hommes ? vus.filter(q => !fiche(q)?.boss) : [];
+    for (const q of hommes.length ? hommes : vus) if (!A.cible || dist(q, p) < dist(A.cible, p)) A.cible = q;
+  }
+  const c = A.cible && A.cible.vie > 0 && !A.cible.supprimer ? A.cible : null;
+  if (c) {
+    const vise = angleVers(p, c);
+    p.angle = lerpAngle(p.angle, vise, 6 * dt);
+    if (p.cooldown <= 0 && Math.abs(diffAngle(p.angle, vise)) < 0.3) {
+      p.cooldown = entre(0.9, 1.7);
+      p.h.g.updateMatrixWorld(true);
+      const depart = boutDuCanon(p.h, V3()), touche = Math.random() < 0.45, arrivee = V3(c.x, c.y + 1.1 * c.h.g.scale.y, c.z);
+      if (!touche) arrivee.add(V3(entre(-1.5, 1.5), entre(-0.5, 1.5), entre(-1.5, 1.5)));
+      traceur(depart, arrivee); flash(depart, 0.4); bruit(0.3 * clamp(1 - dist(p, J) / 120, 0.05, 1), 1800, 0.12);
+      if (touche) blesser(c, A.degats, false);   // (Bane : pas sous le quart de sa vie, voir blesser)
+    }
+  }
+  if (!p.h.g.visible) return;
+  p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle;
+  animerHumain(p.h, 0, dt, { arme: !!c }); membresMous(p.h, dt, { sol: p.y });
+}
+function finirCombat() {
+  const C = combatBane;
+  if (!C) return;
+  for (const f of C.policiers) f.supprimer = true;
+  for (const v of C.voitures) if (v !== J.voiture && !v.supprimer) v.supprimer = true;
+  $('wasted').textContent = 'WASTED';
+  combatBane = null;
+}
+
+// --- le Bat (VOITURES : 'Bat'), le vaisseau volant de Batman ---
+// Il vole comme la Batmobile qui vole (piloterBatmobile) ; ses rotors tournent tant qu'il vole, ou que Batman est dedans (voir majVoiture).
+// Une mission le donne (« La bombe de Bane » : donne: 'Bat'), et il reste à lui : N le choisit, comme une Batmobile, et B le fait venir.
+// Il arrive du ciel, et se pose à côté de Batman ; s'il nage, il l'attend en l'air, juste au-dessus de l'eau (E : il monte dedans, et le
+// Bat décolle). Détruit, coulé ou laissé loin, B en fait venir un autre : Lucius Fox en a toujours un de rechange
+const estBat = t => t?.modele === 'bat';
+// une Batmobile (ou le Bat) qu'une mission donne (BATMOBILES_WAYNE : mission: true ; la mission : donne) : elle est à lui, et c'est celle qu'il
+// a choisie (N : en changer ; B : elle arrive). La partie s'en souvient
+function donnerVehicule(nom) {
+  const k = BATMOBILES_WAYNE.findIndex(V => V.voiture === nom);
+  if (!chezWayne || k < 0) return;
+  if (!wayne.batmobiles.includes(k)) wayne.batmobiles = [...wayne.batmobiles, k].sort((a, b) => a - b);
+  wayne.batmobile = k; sauverPartie();
+}
+// le Bat arrive : il descend du ciel (de 45 m plus haut, 40 m derrière), jusqu'à « vers » (sinon, une place libre à côté de Batman ; s'il
+// nage, au-dessus de l'eau, à 4 m de lui). Il n'y en a qu'un à la fois, Batmobile ou Bat : celle d'avant s'en va. Renvoie le Bat, ou rien
+function amenerBat(type, vers = null) {
+  if (!vers && souterrainEn(J.x, J.z, J.y)) return null;   // (dans la Batcave ou l'égout, même à la nage : pas de place, comme pour la Batmobile)
+  let q = vers;
+  if (!q && J.nage) { const a = J.lacet + Math.PI / 2; q = { x: J.x + Math.sin(a) * 4, z: J.z + Math.cos(a) * 4, y: EAU + 0.9, eau: true, a: J.lacet }; }
+  if (!q) q = placeLibre([7, 10, 13]);
+  if (!q) return null;
+  for (const o of voitures) if (o.triche === 'Batmobile' && o !== J.voiture) o.supprimer = true;
+  const a = q.a ?? 0, v = creerVoiture(q.x - Math.sin(a) * 40, q.z - Math.cos(a) * 40, a, false, type);
+  Object.assign(v, { triche: 'Batmobile', volee: true, y: q.y + 45, enVol: true, envole: false, rotor: 1, arriveeBat: { vers: q, t: 0 } });
+  bruit(0.6, 120, 2); bip(80, 260, 1.5, 'sawtooth', 0.08);
+  return v;
+}
+// il descend vers sa place, de plus en plus doucement ; arrivé, il se pose (ou attend en l'air, au-dessus de l'eau)
+function majArriveeBat(v, dt) {
+  const A = v.arriveeBat, q = A.vers, y = q.eau ? EAU + 0.9 : q.y;
+  A.t += dt;
+  const dx = q.x - v.x, dz = q.z - v.z, dh = Math.hypot(dx, dz), dy = y - v.y, vh = Math.min(28, dh * 1.1 + 0.5), vy = clamp(dy * 1.4, -14, 6);
+  if (dh > 0.05) { v.x += dx / dh * Math.min(vh * dt, dh); v.z += dz / dh * Math.min(vh * dt, dh); }
+  v.y += vy * dt; v.vitesse = Math.min(vh, dh); v.vy = vy;
+  v.angle = lerpAngle(v.angle, q.a ?? v.angle, dt * 2); v.tangage = clamp(-v.vitesse / 120, -0.2, 0); v.roulis *= Math.pow(0.1, dt);
+  if ((dh < 0.4 && Math.abs(dy) < 0.25) || A.t > 15) {
+    v.arriveeBat = null; v.vitesse = 0; v.vy = 0; v.tangage = 0;
+    if (q.eau) { v.attend = true; v.y = y; }
+    else { v.enVol = false; v.y = hauteurSol(v.x, v.z, v.y + 1); }
+    bruit(0.3, 300, 0.3);
+  }
+}
+// au-dessus de l'eau, il attend en l'air que Batman monte dedans (ses rotors tournent, il se balance un peu)
+function majAttenteBat(v, dt) {
+  v.vitesse = 0; v.vy = 0; v.enVol = true; v.envole = false;
+  v.y += (EAU + 0.9 + Math.sin(temps * 1.7) * 0.12 - v.y) * Math.min(1, dt * 2);
+  v.tangage = Math.sin(temps * 1.3) * 0.02; v.roulis = Math.sin(temps * 1.1) * 0.03;
+}
+// sauter du Bat, en plein vol (seulement avec la bombe de Bane, assez loin de la terre : voir action) : Batman jaillit au-dessus du Bat, avec
+// un peu de son élan ; le Bat continue tout seul (son pilote automatique : majAutopilote), vers le large, et emporte la bombe plus loin.
+// Il n'est plus à Batman (triche : null) : B en fait venir un autre, sans enlever celui-là
+function sauterDuBat() {
+  const v = J.voiture;
+  if (!v) return;
+  J.voiture = null; J.decalage = 0;
+  const k = Math.min(v.vitesse, 25) * 0.35;
+  Object.assign(J, { x: v.x, z: v.z, y: v.y + 2.6, vy: 5, sol: false, nage: false, saute: true, accroupi: false, lance: { vx: Math.sin(v.angle) * k, vz: Math.cos(v.angle) * k } });
+  v.autopilote = { t: 0, cap: capVersLeLarge(v.x, v.z) }; v.envole = true; v.triche = null;
+  bruit(0.6, 900, 0.3); bip(400, 1200, 0.3, 'sine', 0.1);
+}
+// vers où est la mer libre, en partant de (x, z) : de 24 directions, celle où l'on va le plus loin sans rencontrer de terre (jusqu'à 1 km)
+function capVersLeLarge(x, z) {
+  let cap = 0, meilleur = -1;
+  for (let k = 0; k < 24; k++) {
+    const a = k * Math.PI / 12;
+    let d = 25;
+    while (d <= 1000 && hauteurTerrain(x + Math.sin(a) * d, z + Math.cos(a) * d) <= EAU - 0.3) d += 25;
+    if (d > meilleur) { meilleur = d; cap = a; }
+  }
+  return cap;
+}
+// le pilote automatique : le Bat se tourne vers le large, et file, à toute vitesse, en montant un peu
+function majAutopilote(v, dt) {
+  v.autopilote.t += dt; v.enVol = true; v.angle = lerpAngle(v.angle, v.autopilote.cap, 1.5 * dt);
+  v.vitesse = Math.min(v.type.vitesseVol, v.vitesse + (v.type.acceleration || 20) * dt); v.vy = 3; v.tangage = 0.05; v.roulis *= Math.pow(0.2, dt);
+  v.x += Math.sin(v.angle) * v.vitesse * dt; v.z += Math.cos(v.angle) * v.vitesse * dt; v.y = Math.min(v.y + v.vy * dt, PLAFOND);
+}
+
+// --- le Bat livré par Lucius Fox (étape « bat », mission « La bombe de Bane ») ---
+// Quand Batman approche du lieu (à 45 m : la place de la tour Wayne), le Bat descend du ciel et s'y pose ; Lucius Fox le présente. Il est à
+// lui (la partie s'en souvient) : l'étape est finie quand il monte dedans
+let livraison = null;   // { et, lieu, v : le Bat arrivé }
+function commencerLivraison(et) { const c = lieuEtape(et) || J; livraison = { et, lieu: { x: c.x, z: c.z, y: hauteurSol(c.x, c.z) }, v: null }; }
+function majLivraison() {
+  const L = livraison;
+  if (L.v && (L.v.supprimer || L.v.detruite || L.v.coule)) L.v = null;
+  if (L.v || J.mort || dist(J, L.lieu) > 45) return;
+  donnerVehicule('Bat');
+  const type = typeNomme('Bat'), q = { ...L.lieu, a: angleVers(L.lieu, J) + Math.PI / 2 };
+  if (!type) return;
+  L.v = amenerBat(type, voitures.some(o => dist(o, q) < 5) ? null : q);
+  annonce('LUCIUS FOX', tr('« Le Bat, {nom}. Il vole, il se pose où vous voulez... et il vient quand vous l\'appelez. »', { nom: fille() ? tr('mademoiselle Gordon') : tr('monsieur Wayne') }), 6);
+}
+
+// --- la bombe de Bane (étape « bombe », mission « La bombe de Bane ») ---
+// Un gros cylindre d'acier, son cœur qui brille en bleu, et sa minuterie, posé au milieu du stade. Avec le Bat, on vole au-dessus (à moins de
+// 20 m de côté, jusqu'à 40 m plus haut), ou on se pose à côté : elle s'accroche sous lui, à ses câbles, et sa minuterie part. Il faut l'emporter au large, à
+// plus de « loin » mètres de toute terre (le point jaune montre la mer : large), puis sauter du Bat (E). Le Bat continue tout seul, et
+// quand il est à 300 m de Batman et à 250 m de toute terre (12 s au plus)... BOUM : une énorme boule de feu au-dessus de la mer, loin de Gotham. Si la minuterie
+// arrive à zéro trop près de la terre, Lucius Fox la ralentit à distance (encore) ; si elle y arrive au large, le siège éjectable fait
+// sauter Batman tout seul
+let bombeBane = null;   // { et, phase : 'attente', 'emporte', 'saute', 'boum' ou 'fini', x, y, z, g, ecran, v : le Bat, reste, terre, assezLoin, t }
+const M_COEUR_BOMBE = new THREE.MeshBasicMaterial({ color: '#5ac8ff', toneMapped: false }), M_CABLE_BAT = new THREE.LineBasicMaterial({ color: '#111' });
+function creerBombeBane() {
+  const g = new THREE.Group(), m = (geo, matiere, y = 0) => { const e = new THREE.Mesh(geo, matiere); e.position.y = y; e.castShadow = true; g.add(e); return e; };
+  m(new THREE.CylinderGeometry(0.75, 0.75, 1.9, 20), M_METAL, 0.95);
+  for (const y of [0.35, 0.95, 1.55]) m(new THREE.CylinderGeometry(0.78, 0.78, 0.12, 20), M_COEUR_BOMBE, y);   // les anneaux qui brillent
+  m(new THREE.CylinderGeometry(0.3, 0.42, 0.35, 12), M_METAL, 2.07); m(new THREE.TorusGeometry(0.22, 0.05, 6, 16).rotateX(Math.PI / 2), M_CHROME, 2.25);   // le dessus, et l'anneau où s'accrochent les câbles
+  const ecran = ecranMinuterie(3); ecran.s.position.y = 3.6; g.add(ecran.s);
+  scene.add(g);
+  return { g, ecran };
+}
+function commencerBombe(et) {
+  const c = lieuEtape(et) || J, { g, ecran } = creerBombeBane();
+  bombeBane = { et, phase: 'attente', x: c.x, y: hauteurSol(c.x, c.z), z: c.z, g, ecran, v: null, reste: et.secondes, terre: 0, assezLoin: false, t: 0, cables: null };
+  g.position.set(c.x, bombeBane.y, c.z);
+  ecrireMinuterie(ecran, et.secondes);
+  annonce(tr('LA BOMBE DE BANE !'), tr('Avant d\'être arrêté, Bane a lancé sa minuterie. Seul le Bat peut l\'emporter loin de Gotham !'), 5);
+}
+// la terre la plus proche de (x, z) : à combien de mètres (on cherche en cercles, tous les 25 m, jusqu'à max)
+function terreProche(x, z, max) {
+  for (let d = 0; d <= max; d += 25) for (let k = 0, n = d ? 24 : 1; k < n; k++) {
+    const a = k * 2 * Math.PI / n, X = x + Math.sin(a) * d, Z = z + Math.cos(a) * d;
+    if (hauteurTerrain(X, Z) > EAU - 0.3) return d;
+  }
+  return max;
+}
+function majBombe(dt) {
+  const B = bombeBane, et = B.et;
+  B.t += dt;
+  if (B.phase === 'attente') { // le Bat vole au-dessus d'elle (ou se pose à côté) : elle s'accroche, et la minuterie part
+    const v = J.voiture && estBat(J.voiture.type) && !J.mort ? J.voiture : null;
+    if (v && Math.hypot(v.x - B.x, v.z - B.z) < 20 && v.y - B.y > -1 && v.y - B.y < 40) {
+      B.phase = 'emporte'; B.v = v; B.tTerre = 0; B.reste = et.secondes;   // (la minuterie part : toujours de « secondes », même la 2e fois)
+      annonce(tr('LA BOMBE EST ACCROCHÉE !'), tr('Emporte-la au large, loin de la terre (point jaune) : vite !'), 4); bip(500, 900, 0.3, 'square', 0.08);
+    }
+  }
+  if (B.phase === 'emporte' || B.phase === 'saute') {
+    const v = B.v;
+    if (!v || v.supprimer || v.detruite || v.coule || (J.mort && B.phase === 'emporte')) { // (le Bat a disparu, ou Batman est mort dedans : la bombe se repose au stade)
+      const c = lieuEtape(et) || J;
+      Object.assign(B, { phase: 'attente', v: null, x: c.x, y: hauteurSol(c.x, c.z), z: c.z, assezLoin: false });
+      annonce('LUCIUS FOX', tr('« La bombe est retombée... je l\'ai fait reposer au stade. Allez la reprendre, avec un autre Bat ! »'), 5);
+    } else {
+      // elle pend sous le Bat, à 7 m, au bout de ses câbles, et se balance un peu (posé, le Bat la pose par terre à côté)
+      const k = Math.min(1, dt * 3), sol = hauteurSol(v.x, v.z, v.y);
+      B.x += (v.x - B.x) * k; B.z += (v.z - B.z) * k; B.y = Math.max(sol, B.y + (v.y - 7.5 - B.y) * k);
+      if (B.phase === 'emporte') {
+        B.reste -= dt;
+        if ((B.tTerre -= dt) <= 0) { B.tTerre = 0.25; B.terre = terreProche(v.x, v.z, et.loin + 25); const avant = B.assezLoin; B.assezLoin = B.terre >= et.loin && v.enVol;
+          if (B.assezLoin && !avant) { annonce(tr('ASSEZ LOIN !'), tr('E : saute du Bat ! Il emportera la bombe plus loin tout seul. Puis garde Maj : tu planes jusqu\'à la côte'), 5); bip(800, 1600, 0.3, 'sine', 0.1); } }
+        if (B.reste <= 0) {
+          if (B.assezLoin && J.voiture === v) { sauterDuBat(); annonce(tr('LE SIÈGE ÉJECTABLE !'), tr('Le Bat t\'éjecte tout seul ! Garde Maj : tu planes jusqu\'à la côte'), 4); }
+          else { B.reste = et.encore; annonce('LUCIUS FOX', tr('« J\'ai ralenti la minuterie : {n} secondes de plus ! Vite, au large ! »', { n: et.encore }), 5); bip(900, 600, 0.3, 'square', 0.06); }
+        }
+        if (v.autopilote) { B.phase = 'saute'; B.t = 0; }
+      } else if (B.t > 12 || (B.t > 2.5 && dist(v, J) > 300 && terreProche(v.x, v.z, 275) >= 250)) { // BOUM, au-dessus de la mer, loin de Gotham (et de Batman)
+        const c = { x: v.x, y: Math.max(EAU + 2, B.y), z: v.z };
+        commencerBoumExpo(c, 200, true);
+        v.supprimer = true; v.m.visible = false; jeterBombe(B.g, B.ecran); B.g = null; B.phase = 'boum'; B.t = 0;
+        annonce(tr('BOUM !'), tr('La bombe a explosé au large : Gotham est sauvée !'), 5);
+      }
+    }
+  }
+  if (B.phase === 'boum' && B.t > 5) B.phase = 'fini';
+  // la bombe, sa minuterie et ses câbles
+  if (B.g) {
+    B.g.position.set(B.x, B.y, B.z); B.g.rotation.y += dt * 0.3;
+    ecrireMinuterie(B.ecran, B.phase === 'attente' ? et.secondes : B.reste); B.ecran.s.visible = dist(B, J) < 400;
+    for (const e of B.g.children) if (e.material === M_COEUR_BOMBE) e.visible = B.phase === 'attente' || Math.sin(temps * (B.reste < 10 ? 16 : 6)) > -0.3;
+    const v = B.v, avec = !!v && !v.supprimer && (B.phase === 'emporte' || B.phase === 'saute');
+    if (avec && !B.cables) { B.cables = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([V3(), V3(), V3(), V3(), V3(), V3(), V3(), V3()]), M_CABLE_BAT); B.cables.frustumCulled = false; scene.add(B.cables); }
+    if (B.cables) {
+      B.cables.visible = avec;
+      if (avec) {
+        const p = B.cables.geometry.attributes.position, haut = V3(B.x, B.y + 2.3, B.z);
+        [[-0.9, -0.9], [0.9, -0.9], [-0.9, 0.9], [0.9, 0.9]].forEach(([a, b], k) => { const q = local(v, a, b); p.setXYZ(k * 2, q.x, v.y + 0.6, q.z); p.setXYZ(k * 2 + 1, haut.x, haut.y, haut.z); });
+        p.needsUpdate = true;
+      }
+    }
+  }
+}
+function finirBombe() {
+  const B = bombeBane;
+  if (!B) return;
+  if (B.g) jeterBombe(B.g, B.ecran);
+  if (B.cables) { scene.remove(B.cables); B.cables.geometry.dispose(); }
+  if (B.v && B.v.autopilote && !B.v.supprimer) B.v.supprimer = true;
+  bombeBane = null;
+}
+
 // =====================================================================
 //  Les chapitres : la partie sauvegardée, l'amende des héros sans reproche, la DeLorean qui voyage d'un chapitre à l'autre
 // =====================================================================
@@ -19155,12 +20381,14 @@ const MAGASINS_BRAQUES = { S: ['Supérette', 'la supérette'], E: ['Station-serv
 let appel = null, tAppel = 0;   // appel : { x, y, z, nom, le, voyous, reste : les secondes pour arriver } ; tAppel : depuis le dernier appel
 const voyousDebout = () => appel ? appel.voyous.filter(p => p.vie > 0 && !p.supprimer) : [];
 // il est occupé : mort, en voyage, pendant les bulles d'aide, sans armure (à Malibu, avant de s'évader de la grotte), pendant l'embuscade,
-// un compte à rebours, la course, quelqu'un dans ses bras, des anneaux à passer, le givre, Trevor qui parle, les passagers qui tombent, un
-// ennemi à moins de 300 m, ou l'objectif de sa mission à moins de 250 m
+// un compte à rebours, la course, quelqu'un dans ses bras, des anneaux à passer, le givre, Trevor qui parle, les passagers qui tombent, les
+// bombes de Double-Face, le stade qui saute, la revanche contre Bane, la bombe de Bane accrochée au Bat, un ennemi à moins de 300 m, ou
+// l'objectif de sa mission à moins de 250 m
 function occupe() {
   const c = cibleMission();
   return J.mort || voyage || arrivee || bulles || sansArmure() || sansCostume() || sceneEmbuscade() || panne || explosionExpo || course?.t0 || porte || givre || anneaux || discours
     || (puits && puits.phase !== 'attente') || entree || poursuite?.v.fuyard.parti || suivi?.v.fuyard.parti || brouillage || dansBatcave(J)
+    || bombesDF || (matchStade && matchStade.phase !== 'match') || combatBane?.phase === 'revanche' || (bombeBane && bombeBane.phase !== 'attente' && bombeBane.phase !== 'fini')
     || (chute && chute.phase !== 'avion')
     || (c && dist(c, J) < 250) || personnes.some(p => ennemi(p) && dist(p, J) < 300);
 }
@@ -19739,6 +20967,8 @@ function majHUD(dt) {
     : bouton ? tr('Appuie sur <b>E</b> pour appuyer sur le bouton rouge')
     : aPied && costumeProche() ? tr('Appuie sur <b>E</b> pour prendre ton premier costume')   // (dans la Batcave, mission « La Batcave »)
     : aPied && antenneProche() ? tr("Appuie sur <b>E</b> pour brouiller l'antenne")          // (mission « Les pingouins-missiles »)
+    : aPied && bombeProche() ? tr('Appuie sur <b>E</b> pour désamorcer la bombe')              // (mission « Pile ou face »)
+    : J.voiture && J.voiture === bombeBane?.v && bombeBane.phase === 'emporte' && bombeBane.assezLoin ? tr('Appuie sur <b>E</b> pour sauter du Bat')   // (mission « La bombe de Bane »)
     : ar ? tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · <b>F</b> : fusées · <b>E</b> : sortir')
     : !aPied ? (faitFigures(J.voiture) ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping') : '')
     : lit ? (sommeil ? '' : etoiles > 0 ? tr("Sème d'abord la police, puis reviens dormir") : tr(MOMENTS[journee.moment].dormir))   // dans sa villa, près du lit
@@ -19765,6 +20995,7 @@ function majHUD(dt) {
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   majBarreBoss();   // Iron Monger : sa barre de vie, en haut de l'écran
   dessinerCasque(dt);   // dans l'armure d'Iron Man : sa batterie et ses parties
+  dessinerPieceDF(dt);   // la pièce de Double-Face, quand il la lance
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
   if (tempsAnnonce <= 0) $('annonce').style.opacity = 0;
@@ -20055,7 +21286,7 @@ const COULEUR_BATSIGNAL = new THREE.Color('#fff2c0');
 function majBatSignal(dt) {
   const B = batSignal;
   if (!B) return;
-  B.force += ((appel ? 1 : 0) - B.force) * Math.min(1, dt * 1.5);   // il s'allume (et s'éteint) en une seconde environ
+  B.force += ((appel || etapeVue?.signal ? 1 : 0) - B.force) * Math.min(1, dt * 1.5);   // il s'allume (et s'éteint) en une seconde environ (aussi pour une mission : signal)
   const f = B.force * (0.94 + 0.06 * Math.sin(temps * 9) * Math.sin(temps * 2.3));   // (sa lumière tremble un peu)
   B.embleme.visible = B.faisceau.visible = f > 0.01;
   B.embleme.material.color.copy(COULEUR_BATSIGNAL).multiplyScalar(0.9 * f);
@@ -20352,6 +21583,11 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get embarquement() { return embarquement; }, get puits() { return puits; }, get entree() { return entree; }, get poursuite() { return poursuite; }, get suivi() { return suivi; }, get brouillage() { return brouillage; },
   get armeeQuiRentre() { return armeeQuiRentre; }, lancerEntree, cheminRues, cheminEau, surChemin, toucherFuyard, arreterFuyard, brouiller, antenneProche, antennesRestantes, toucherAntennes, feux3, allumerFeu,
   creerPingouin, majPingouin, renfortsPingouin, calculerDistPolice, majEmbarquement, accrocher, grappiner, typeNomme,
+  // Double-Face, Bane et le Bat (chapitre 3, missions 5 à 8)
+  get bombesDF() { return bombesDF; }, get matchStade() { return matchStade; }, get terrainDetruit() { return terrainDetruit; }, get combatBane() { return combatBane; },
+  get livraison() { return livraison; }, get bombeBane() { return bombeBane; }, get pileOuFace() { return pileOuFace; }, set pileOuFace(v) { pileOuFace = v; },
+  bombeProche, desamorcer, creerBombeDF, placeBombe, majDoubleFace, majBane, creerBane, creerDoubleFace, creerBandit, creerMercenaire, commencerRevanche, lieuRevanche,
+  amenerBat, sauterDuBat, donnerVehicule, estBat, terreProche, placeLibre, sortiesStade, appelerRenforts, lancerPieceDF, dessinerPieceDF, commencerBoumExpo, rueH, rueV,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 </script>
 </body>
