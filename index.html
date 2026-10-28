@@ -1924,6 +1924,7 @@ const REGLAGES = {
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   distanceInterieurs: 150,   // mètres : on ne voit l'intérieur d'un bâtiment (planchers, marches, meubles) qu'à moins de 100 m. Son dessin n'est fabriqué que quand la caméra est plus près que ça, et il est défait 100 m plus loin : ça garde beaucoup de mémoire libre. 100 = au dernier moment (encore moins de mémoire, mais en volant vite, le jeu peut accrocher en fabriquant plusieurs intérieurs à la fois) ; 100000 = tous les intérieurs, peu à peu, et jamais défaits (comme avant)
+  ombreCoins: 0.75,          // l'ombre des coins, de 0 à 1 : le pied des murs, le sol tout contre eux, le dessous des auvents et des ponts sont un peu plus sombres, comme en vrai (la lumière y arrive moins bien). 0 = pas d'ombre des coins (comme avant) ; 1 = très marquée (plus que 1, c'est comme 1). Elle est calculée une fois pour toutes en construisant le pays (puis F5) : elle ne coûte presque rien quand on joue, alors même si le jeu rame, tu peux la garder
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
   vitesseTelesiege: 42,      // m/s : les télésièges et la télécabine des stations de ski (le rond bleu ❄ sur la carte du jeu). 42 = 45 secondes pour monter en haut du mont Gordo. Mets 5 pour un vrai télésiège, tout lent
   vitesseGare: 2,            // m/s : dans les gares, les sièges ralentissent pour qu'on monte dessus (un télésiège « débrayable »). Mets 42 pour qu'ils ne ralentissent plus
@@ -3385,8 +3386,8 @@ document.getElementById('remettre').onclick = () => { for (const i of boiteRegla
 // (elles deviennent jaunes). Le menu montre le niveau dont tous les nombres sont ceux du jeu ; s'il n'y en a aucun (une case changée à la
 // main), la qualité est « personnalisée ». Tout remettre revient aux nombres du code : Haute.
 // AU_LANCEMENT : ce que le jeu ne lit qu'en se chargeant (la carte graphique, les ombres, la brume, les lumières sont réglées une fois pour
-// toutes, et les textures peintes) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
-const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines'];
+// toutes, les textures peintes et l'ombre des coins calculée) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
+const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins'];
 for (const nom in QUALITES) for (const k in QUALITES[nom]) if (!cases['REGLAGES.' + k]) alert(`Qualité "${nom}" : "${k}" n'est pas un nombre de REGLAGES !`);
 function remplirQualite(nom) { for (const k in QUALITES[nom]) cases['REGLAGES.' + k]?.mettre(QUALITES[nom][k]); }
 function qualiteActuelle() {
@@ -4767,8 +4768,9 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
   const B = (m, u, y, w, lu, h, lw, coll = true) => { const [X, Z] = P(u, w); return boite(m, X, y, Z, b ? lw : lu, h, b ? lu : lw, coll); };
   const Plan = (m, u, y, w, lu, lw) => { const [X, Z] = P(u, w); sol(m, X, y, Z, b ? lw : lu, b ? lu : lw); };
   const y0 = 0.2 + bas, niveau = k => y0 + 0.05 + k * hEtage, hVisite = etages * hEtage + 0.05, hMur = hVisite + (toit ? 1.1 : 0);
-  // ce qui est dedans ne se voit que de près : on en garde la recette, et son dessin (formes) n'est fabriqué qu'à l'approche (voir majInterieurs)
-  const moi = { x, z, recette: {}, formes: null, lampes: [] }, dedans = f => { const avant = interieur; interieur = moi; f(); interieur = avant; };
+  // ce qui est dedans ne se voit que de près : on en garde la recette, et son dessin (formes) n'est fabriqué qu'à l'approche (voir majInterieurs).
+  // sol0, hEtage : la hauteur du plancher du bas, et d'un étage à l'autre (l'ombre des coins y cherche les meubles posés : voir formeBoites)
+  const moi = { x, z, recette: {}, formes: null, lampes: [], sol0: Y0 + niveau(0), hEtage }, dedans = f => { const avant = interieur; interieur = moi; f(); interieur = avant; };
   interieurs.push(moi);
   const iu = l / 2 - E, iw = p / 2 - E, g1 = decalagePorte - largeurPorte / 2, g2 = decalagePorte + largeurPorte / 2, pe = 0.02;
   // où il est (pour savoir si B.J. est dedans), et ses lampes : la nuit, celles de la maison où est B.J. éclairent vraiment (voir « Le jour et la nuit »).
@@ -6445,6 +6447,250 @@ const eau = new THREE.Mesh(new THREE.PlaneGeometry(TAILLE_X + LARGE, TAILLE_Z + 
 TEX.vagues.repeat.set((TAILLE_X + LARGE) / 14, (TAILLE_Z + LARGE) / 14);
 eau.position.set(TAILLE_X / 2, EAU, TAILLE_Z / 2); eau.receiveShadow = true; scene.add(eau);
 
+// L'ombre des coins. Dans la réalité, les coins reçoivent moins de lumière que le reste : le pied d'un mur, le sol tout contre lui, le
+// dessous d'un auvent, d'un pont ou d'un toit qui dépasse (on dit « l'occlusion ambiante »). Le jeu les assombrit une fois pour toutes, en
+// construisant le pays : chaque sommet des formes fusionnées (voir fusionner) reçoit une couleur, du blanc (toute la lumière) au gris (un
+// coin), que la carte graphique multiplie à la couleur de la matière (vertexColors). À chaque image, presque rien de plus à dessiner. Ce
+// sont les boîtes (boite) qui font de l'ombre aux autres : un bâtiment que tu ajoutes avec boite(...) a ses coins sombres tout seul.
+// La force : REGLAGES.ombreCoins, de 0 (pas d'ombre des coins, comme avant) à 1 (plus, ce serait comme 1).
+// Une forme n'a des sommets qu'à ses coins, et sa couleur ne change qu'entre deux sommets : alors un mur haut est coupé à PIED mètres du
+// sol (le gris fonce de là jusqu'au sol), et un sol (un trottoir, une cour, un toit) est découpé autour de ce qui est posé dessus
+const COINS = clamp(auLancement.ombreCoins, 0, 1);
+const PIED = 1.5;     // mètres : la bande sombre au pied d'un mur
+const CONTRE = 1.5;   // mètres : la bande sombre par terre, contre un mur (moins contre un muret, un objet d'un mètre)
+// ce que chaque sorte de coin enlève de la lumière, au plus (puis on multiplie par ombreCoins) : au pied d'un mur et par terre contre lui,
+// toute ; et sous une boîte (un auvent, un pont, un toit qui dépasse), que seul le sol éclaire, la moitié
+const FORCE_COINS = { pied: 1, contre: 1, dessous: 0.5 };
+// ce qui n'a pas d'ombre des coins (et n'en fait pas) : ce qu'on voit au travers ou qui brille (les vitrines, les lignes de la route, les
+// enseignes, les lampes), ce qui a déjà ses couleurs (la neige des pistes), l'eau, et les câbles (fins : des milliers de sommets pour rien)
+const SANS_COINS = ['eau', 'piscine', 'cable', 'lampe', 'frigo', 'ecran', 'croix'];
+const avecCoins = nom => COINS > 0 && !SANS_COINS.includes(nom) && !MAT[nom].transparent && !MAT[nom].vertexColors && !MAT[nom].userData.enseigne;
+// les boîtes qui font de l'ombre : toutes celles des formes fusionnées, rangées par cases de 8 m (les autres formes n'en font pas), et
+// les sols plats (sol : true ; une pelouse, des pavés, le gravier d'un toit), qui cachent peut-être un autre sol juste dessous.
+// Celles de la villa de Tony Stark n'en font qu'à la villa (villa : true) : elle peut tomber dans la mer, son ombre ne doit pas rester
+const boitesCoins = new Map(), RIEN = [], CASE_COINS = 8;   // (CASE_COINS : la taille des cases, en mètres)
+let vuCoins = 0;   // (une boîte rangée dans plusieurs cases n'est vue qu'une fois)
+function rangerBoitesCoins(geos, villa = false) {
+  for (const [nom, liste] of Object.entries(geos)) if (avecCoins(nom)) for (const g of liste) {
+    const p = g.attributes.position.array, sol = p.length === 12 && g.index?.count === 6 && g.attributes.normal?.array[1] > 0.99;
+    if (!sol && (p.length !== 72 || g.index?.count !== 36)) continue;   // une boîte : 24 sommets, 12 triangles ; un sol : 4 sommets, 2 triangles
+    const o = { x1: Infinity, y1: Infinity, z1: Infinity, x2: -Infinity, y2: -Infinity, z2: -Infinity, villa, sol, vu: 0 };
+    for (let i = 0; i < p.length; i += 3) {
+      o.x1 = Math.min(o.x1, p[i]); o.y1 = Math.min(o.y1, p[i + 1]); o.z1 = Math.min(o.z1, p[i + 2]);
+      o.x2 = Math.max(o.x2, p[i]); o.y2 = Math.max(o.y2, p[i + 1]); o.z2 = Math.max(o.z2, p[i + 2]);
+    }
+    if (!sol && Math.min(o.x2 - o.x1, o.z2 - o.z1) < 0.15) continue;   // (une barre fine, une porte contre sa façade : presque pas d'ombre)
+    for (let cx = Math.floor(o.x1 / CASE_COINS); cx <= Math.floor(o.x2 / CASE_COINS); cx++) for (let cz = Math.floor(o.z1 / CASE_COINS); cz <= Math.floor(o.z2 / CASE_COINS); cz++) {
+      const k = cx * 10000 + cz;
+      if (!boitesCoins.has(k)) boitesCoins.set(k, []);
+      boitesCoins.get(k).push(o);
+    }
+  }
+}
+// f(o) pour chaque boîte o qui touche le rectangle [x1, z1, x2, z2] (celles de la villa seulement si villa)
+function pourBoitesCoins(x1, z1, x2, z2, villa, f) {
+  vuCoins++;
+  for (let cx = Math.floor(x1 / CASE_COINS); cx <= Math.floor(x2 / CASE_COINS); cx++) for (let cz = Math.floor(z1 / CASE_COINS); cz <= Math.floor(z2 / CASE_COINS); cz++)
+    for (const o of boitesCoins.get(cx * 10000 + cz) ?? RIEN) if (o.vu !== vuCoins && (villa || !o.villa)) { o.vu = vuCoins; f(o); }
+}
+// le sol sous le point (x, y, z) : le terrain, un trottoir, une rue, une route... ou le dessus d'une boîte (un toit, une dalle)
+function solSous(x, y, z, villa) {
+  let h = hauteurSol(x, z, y - PASMAX + 0.05);   // (ce qui n'est pas plus haut que le point)
+  pourBoitesCoins(x, z, x, z, villa, o => { if (x >= o.x1 && x <= o.x2 && z >= o.z1 && z <= o.z2 && o.y2 <= y + 0.05 && o.y2 > h) h = o.y2; });
+  return h;
+}
+// la bande sombre par terre (un sol à la hauteur y) contre la boîte o : sa largeur, CONTRE contre un mur, moins contre un muret ou un
+// objet d'un mètre ; 0 si o n'est pas posée sur ce sol, ou trop petite (moins d'un mètre de long, ou de 50 cm de haut : un poteau, une
+// bordure), ou qui ne monte pas au-dessus
+const bandeContre = (o, y) => o.y1 > y + 0.3 || o.y2 - y < 0.5 || Math.max(o.x2 - o.x1, o.z2 - o.z1) < 1 ? 0 : clamp(0.5 * Math.min(Math.max(o.x2 - o.x1, o.z2 - o.z1), o.y2 - y), 0.3, CONTRE);
+// l'angle sous lequel on voit le rectangle de la boîte o depuis (x, z), en tournant sur soi-même : π tout contre un mur, peu pour un poteau
+function angleVu(x, z, o) {
+  if (x > o.x1 && x < o.x2 && z > o.z1 && z < o.z2) return 2 * Math.PI;   // (dessous)
+  const vers = Math.atan2((o.z1 + o.z2) / 2 - z, (o.x1 + o.x2) / 2 - x);
+  let min = 0, max = 0;
+  for (let c = 0; c < 4; c++) { // ses 4 coins
+    let a = Math.atan2((c < 2 ? o.z1 : o.z2) - z, (c % 2 ? o.x2 : o.x1) - x) - vers;
+    a -= 2 * Math.PI * Math.round(a / (2 * Math.PI));
+    min = Math.min(min, a); max = Math.max(max, a);
+  }
+  return max - min;
+}
+// la lumière (de 0 à 1) qui arrive au sommet (x, y, z) d'une face tournée vers (nx, ny, nz) : 1 en plein air, moins dans un coin.
+// voisines : les boîtes autour ; pied : la force de la bande sombre au pied d'un mur, de 0 à 1 (moins sur une marche ou une bordure de
+// trottoir, qui seraient grises de haut en bas ; 0 si la forme n'a pas de sommet là où la bande s'arrête : sinon le gris s'étalerait sur
+// tout le mur) ; dessous : ce qu'on enlève sous une boîte (0 si c'est le plafond d'un bâtiment) ; villa : un sommet de la villa de Tony Stark ;
+// sol : la hauteur du sol devant ce mur, si on la connaît déjà (sinon, on la cherche)
+function lumiereCoin(x, y, z, nx, ny, nz, voisines, pied, dessous, villa, sol = null) {
+  if (ny < -0.7) return 1 - COINS * dessous;   // le dessous de quelque chose : seul le sol (plus sombre que le ciel) l'éclaire
+  let reste = 1;   // la part de la lumière qui arrive : chaque chose qui gêne en enlève un peu
+  if (ny < 0.7) { // une face debout : un mur. Le sol à son pied
+    if (pied > 0) { const h = y - (sol ?? solSous(x + nx * 0.1, y, z + nz * 0.1, villa)); if (h < PIED) reste *= 1 - FORCE_COINS.pied * pied * (1 - Math.max(h, 0) / PIED) ** 2; }
+  } else { // une face vers le haut : un sol, un toit. Ce qui est posé dessus (d'autant moins que c'est loin, ou petit, vu d'ici)
+    for (const o of voisines) {
+      const b = bandeContre(o, y), d = b && Math.hypot(Math.max(o.x1 - x, 0, x - o.x2), Math.max(o.z1 - z, 0, z - o.z2));
+      if (d < b) reste *= 1 - FORCE_COINS.contre * (1 - d / b) ** 2 * Math.min(1, angleVu(x, z, o) / Math.PI);
+    }
+  }
+  return 1 - COINS * (1 - reste);
+}
+// Un sol (le rectangle r = [x1, z1, x2, z2]), découpé en morceaux (feuilles) le long des bords des ombres de ce qui est posé dessus :
+// tant qu'un bord passe au milieu d'un morceau, on le coupe en deux le long de ce bord (celui qui traverse le moins d'autres ombres),
+// puis chaque moitié de même. Chaque coupe ne traverse que son morceau, pas tout le sol : quelques morceaux par boîte, pas des milliers.
+// (Pas de morceau de moins de 40 cm (l'épaisseur d'un mur) : un bord si près d'un autre ne change presque rien. Ni dans un morceau caché sous un autre sol)
+function couperSol(r, ombres, feuilles, caches = RIEN) {
+  if (caches.some(o => o.x1 <= r[0] + 0.01 && o.x2 >= r[2] - 0.01 && o.z1 <= r[1] + 0.01 && o.z2 >= r[3] - 0.01)) { feuilles.push(r); return; }
+  const ici = ombres.filter(o => o.X1 < r[2] && o.X2 > r[0] && o.Z1 < r[3] && o.Z2 > r[1]);
+  let mieux = null;
+  for (const o of ici) {
+    for (const x of o.xs) if (x > r[0] + 0.4 && x < r[2] - 0.4) {
+      let n = 0; for (const p of ici) if (p.X1 < x && p.X2 > x && ++n >= (mieux?.n ?? Infinity)) break;
+      if (!mieux || n < mieux.n) mieux = { n, x };
+    }
+    for (const z of o.zs) if (z > r[1] + 0.4 && z < r[3] - 0.4) {
+      let n = 0; for (const p of ici) if (p.Z1 < z && p.Z2 > z && ++n >= (mieux?.n ?? Infinity)) break;
+      if (!mieux || n < mieux.n) mieux = { n, z };
+    }
+    if (mieux?.n === 0) break;   // (un bord qui ne traverse aucune autre ombre : on ne trouvera pas mieux)
+  }
+  if (!mieux) feuilles.push(r);
+  else if (mieux.x !== undefined) { couperSol([r[0], r[1], mieux.x, r[3]], ici, feuilles, caches); couperSol([mieux.x, r[1], r[2], r[3]], ici, feuilles, caches); }
+  else { couperSol([r[0], r[1], r[2], mieux.z], ici, feuilles, caches); couperSol([r[0], mieux.z, r[2], r[3]], ici, feuilles, caches); }
+}
+// (des tableaux de nombres gardés d'une forme à l'autre, et agrandis quand il le faut : bien plus rapide que de les refaire à chaque fois)
+const T_COINS = { placeS: 0, placeT: 0 };
+// Une forme faite de rectangles (une boîte, un plan : 4 sommets par face et 2 triangles, comme les fait Three.js), avec sa couleur, et des
+// sommets en plus là où elle doit changer : un mur qui touche le sol est coupé là où la bande sombre de son pied s'arrête (et au tiers,
+// pour qu'elle fonce de plus en plus vite vers le sol), et un sol (un trottoir, une cour, un toit) le long des bords de l'ombre des boîtes
+// posées dessus. Rend la nouvelle forme, ou null si g n'est pas faite de rectangles
+function decouper(g, voisines, villa) {
+  const n = g.attributes.position.count, idx = g.index?.array;
+  if (!idx || n % 4 || idx.length !== n * 1.5 || !g.attributes.normal || !g.attributes.uv || Object.keys(g.attributes).length !== 3) return null;
+  for (let k = 0; k < n; k += 4) { const i = k * 1.5; if (idx[i] !== k || idx[i + 1] !== k + 2 || idx[i + 2] !== k + 1 || idx[i + 3] !== k + 2 || idx[i + 4] !== k + 3 || idx[i + 5] !== k + 1) return null; }
+  const P = g.attributes.position.array, N = g.attributes.normal.array, U = g.attributes.uv.array, faits = new Map();
+  let ns = 0, nt = 0;   // les sommets et les coins de triangles déjà faits
+  const T = T_COINS, agrandir = (A, taille, garder, Type) => { const B = new Type(taille); if (A) B.set(A.subarray(0, garder)); return B; };
+  const place = () => { // de la place pour un morceau de plus : 4 sommets, 6 coins de triangles
+    if (ns + 4 > T.placeS) { const p = Math.max(2 * T.placeS, 4096); T.pos = agrandir(T.pos, 3 * p, 3 * ns, Float32Array); T.sens = agrandir(T.sens, 3 * p, 3 * ns, Float32Array); T.uv = agrandir(T.uv, 2 * p, 2 * ns, Float32Array); T.coul = agrandir(T.coul, 3 * p, 3 * ns, Uint8Array); T.placeS = p; }
+    if (nt + 6 > T.placeT) { const p = Math.max(2 * T.placeT, 8192); T.tri = agrandir(T.tri, p, nt, Uint32Array); T.placeT = p; }
+  };
+  // la valeur d'un attribut (A, de m nombres par sommet) au point (s, t) de la face qui commence au sommet k
+  const entre4 = (A, m, k, q, s, t) => { const a = A[m * k + q], b = A[m * (k + 1) + q], c = A[m * (k + 2) + q], d = A[m * (k + 3) + q]; return a + s * (b - a) + t * (c - a) + s * t * (a - b - c + d); };
+  for (let k = 0; k < n; k += 4) {
+    // les 4 coins de la face : (s, t) = (0, 0), (1, 0), (0, 1), (1, 1). Ses morceaux : [s1, s2, t1, t2] (au départ, un seul : toute la face)
+    const nx = N[3 * k], ny = N[3 * k + 1], nz = N[3 * k + 2], ax = P[3 * k], ay = P[3 * k + 1], az = P[3 * k + 2];
+    const sx = P[3 * k + 3] - ax, sy = P[3 * k + 4] - ay, sz = P[3 * k + 5] - az, tx = P[3 * k + 6] - ax, ty = P[3 * k + 7] - ay, tz = P[3 * k + 8] - az;
+    let morceaux = [[0, 1, 0, 1]], pied = 0, dessous = 0, sol = null;   // pied, dessous, sol : voir lumiereCoin
+    if (ny < -0.7) { // le dessous d'une boîte : un auvent, un pont, un toit qui dépasse... mais pas le plafond d'un bâtiment où l'on entre
+      const m = { x: ax + (sx + tx) / 2, y: ay - 0.5, z: az + (sz + tz) / 2 };
+      dessous = interieurDe(m) ? 0 : FORCE_COINS.dessous;
+    } else if (Math.abs(ny) < 0.3) { // debout : un mur. S'il touche presque le sol, on le coupe là où la bande sombre de son pied s'arrête, et au tiers
+      const debout = Math.abs(ty) > Math.abs(sy), dh = debout ? ty : sy, H = Math.abs(dh), bas = Math.min(ay, ay + dh), large = debout ? Math.hypot(sx, sz) : Math.hypot(tx, tz);
+      const coupes = [];   // (en mètres au-dessus du bas du mur ; le sol devant lui, une fois pour toute la face)
+      sol = solSous(ax + (sx + tx) / 2 + nx * 0.1, bas, az + (sz + tz) / 2 + nz * 0.1, villa);
+      for (const c of [sol + PIED / 3 - bas, sol + PIED - bas]) if (c > 0.05 && c < H - 0.1) coupes.push(c);
+      pied = Math.min(1, H / PIED);
+      if (sol + PIED - bas >= H - 0.1) coupes.length = 0;   // (un mur pas plus haut que la bande : le gris va jusqu'en haut, pas besoin de couper)
+      else if (coupes.length && large < 0.25) { pied = 0; coupes.length = 0; }   // (un poteau tout fin : pas de bande, ça ne se verrait pas)
+      if (coupes.length) {
+        const C = [0, ...coupes.map(c => dh > 0 ? c / H : 1 - c / H).sort((p, q) => p - q), 1];
+        morceaux = C.slice(1).map((c, i) => debout ? [0, 1, C[i], c] : [C[i], c, 0, 1]);
+      }
+    } else if (ny > 0.7) { // à plat, vers le haut : un sol, un toit (assez grand, et bien droit, le long de x et de z)
+      const sSelonX = Math.abs(sz) < 1e-3 && Math.abs(tx) < 1e-3, lx = sSelonX ? sx : tx, lz = sSelonX ? tz : sz;
+      if ((sSelonX || (Math.abs(sx) < 1e-3 && Math.abs(tz) < 1e-3)) && Math.abs(lx) >= 1 && Math.abs(lz) >= 1) {
+        // les boîtes posées dessus ; deux qui se touchent et ne font ensemble qu'un rectangle (une porte contre sa façade, deux morceaux
+        // d'un même mur) ne comptent que pour une (mais pas deux murs en équerre : leur rectangle couvrirait le sol entre eux)
+        let posees = [];
+        for (const o of voisines) { const b = bandeContre(o, ay); if (b) posees.push({ x1: o.x1, z1: o.z1, x2: o.x2, z2: o.z2, b }); }
+        const aire = p => (p.x2 - p.x1) * (p.z2 - p.z1);
+        for (let fini = false; !fini;) {
+          fini = true;
+          for (let i = 0; i < posees.length; i++) for (let j = posees.length - 1; j > i; j--) {
+            const p = posees[i], q = posees[j];
+            if (p.x1 > q.x2 + 0.05 || q.x1 > p.x2 + 0.05 || p.z1 > q.z2 + 0.05 || q.z1 > p.z2 + 0.05) continue;
+            if ((Math.max(p.x2, q.x2) - Math.min(p.x1, q.x1)) * (Math.max(p.z2, q.z2) - Math.min(p.z1, q.z1)) > aire(p) + aire(q) + 0.5) continue;
+            posees[i] = { x1: Math.min(p.x1, q.x1), z1: Math.min(p.z1, q.z1), x2: Math.max(p.x2, q.x2), z2: Math.max(p.z2, q.z2), b: Math.max(p.b, q.b) };
+            posees.splice(j, 1); fini = false;
+          }
+        }
+        // ce qui est caché sous un autre sol (le gravier d'un toit sur sa dalle, une pelouse sur le trottoir, le plancher d'un bâtiment) :
+        // pas besoin d'y couper
+        const caches = [], cache = (x1, z1, x2, z2) => caches.some(o => o.x1 <= x1 + 0.01 && o.x2 >= x2 - 0.01 && o.z1 <= z1 + 0.01 && o.z2 >= z2 - 0.01);
+        pourBoitesCoins(Math.min(ax, ax + lx), Math.min(az, az + lz), Math.max(ax, ax + lx), Math.max(az, az + lz), villa, o => { if (o.sol && o.y2 > ay + 0.001 && o.y2 < ay + 0.06) caches.push(o); });
+        // l'ombre de chacune : son rectangle, et les lignes où elle commence et où la boîte commence (on coupe là), de chaque côté qu'on
+        // voit (pas du côté de l'intérieur d'un bâtiment, caché sous son plancher)
+        const ombres = posees.map(({ x1, z1, x2, z2, b }) => ({ X1: x1 - b, X2: x2 + b, Z1: z1 - b, Z2: z2 + b,
+          xs: [...(cache(x1 - b, z1, x1, z2) ? [] : [x1 - b, x1]), ...(cache(x2, z1, x2 + b, z2) ? [] : [x2 + b, x2])],
+          zs: [...(cache(x1, z1 - b, x2, z1) ? [] : [z1 - b, z1]), ...(cache(x1, z2, x2, z2 + b) ? [] : [z2 + b, z2])] }));
+        const feuilles = [], ranges = (a, b) => a < b ? [a, b] : [b, a];
+        couperSol([Math.min(ax, ax + lx), Math.min(az, az + lz), Math.max(ax, ax + lx), Math.max(az, az + lz)], ombres, feuilles, caches);
+        morceaux = feuilles.map(([x1, z1, x2, z2]) => { const S = ranges((x1 - ax) / lx, (x2 - ax) / lx), T = ranges((z1 - az) / lz, (z2 - az) / lz); return sSelonX ? [...S, ...T] : [...T, ...S]; });
+      }
+    }
+    // chaque morceau : 4 sommets (leur place, leur dessin, leur couleur ; un coin partagé avec un morceau voisin n'est fait qu'une fois)
+    // et 2 triangles, tournés comme la face
+    faits.clear();
+    const sommet = (s, t) => {
+      const cle = Math.round(s * 1e6) * 2e6 + Math.round(t * 1e6);   // (un seul nombre pour (s, t))
+      let i = faits.get(cle);
+      if (i === undefined) {
+        const x = entre4(P, 3, k, 0, s, t), y = entre4(P, 3, k, 1, s, t), z = entre4(P, 3, k, 2, s, t), l = Math.round(255 * lumiereCoin(x, y, z, nx, ny, nz, voisines, pied, dessous, villa, sol));
+        faits.set(cle, i = ns++);
+        T.pos[3 * i] = x; T.pos[3 * i + 1] = y; T.pos[3 * i + 2] = z; T.sens[3 * i] = nx; T.sens[3 * i + 1] = ny; T.sens[3 * i + 2] = nz;
+        T.uv[2 * i] = entre4(U, 2, k, 0, s, t); T.uv[2 * i + 1] = entre4(U, 2, k, 1, s, t); T.coul[3 * i] = T.coul[3 * i + 1] = T.coul[3 * i + 2] = l;
+      }
+      return i;
+    };
+    for (const [s1, s2, t1, t2] of morceaux) {
+      place();
+      const a = sommet(s1, t1), b = sommet(s2, t1), c = sommet(s1, t2), d = sommet(s2, t2);
+      // (coupé en deux triangles le long de la diagonale dont les bouts sont les plus différents : un seul coin sombre, dans un coin
+      // dehors, donne alors un dégradé tout doux, et pas un triangle sombre à bord net)
+      if (Math.abs(T.coul[3 * a] - T.coul[3 * d]) > Math.abs(T.coul[3 * b] - T.coul[3 * c])) { T.tri[nt++] = a; T.tri[nt++] = c; T.tri[nt++] = d; T.tri[nt++] = a; T.tri[nt++] = d; T.tri[nt++] = b; }
+      else { T.tri[nt++] = a; T.tri[nt++] = c; T.tri[nt++] = b; T.tri[nt++] = c; T.tri[nt++] = d; T.tri[nt++] = b; }
+    }
+  }
+  const f = new THREE.BufferGeometry();
+  f.setAttribute('position', new THREE.BufferAttribute(T.pos.slice(0, 3 * ns), 3)); f.setAttribute('normal', new THREE.BufferAttribute(T.sens.slice(0, 3 * ns), 3));
+  f.setAttribute('uv', new THREE.BufferAttribute(T.uv.slice(0, 2 * ns), 2));
+  f.setAttribute('color', new THREE.BufferAttribute(T.coul.slice(0, 3 * ns), 3, true));   // (3 octets par sommet : 0 = noir, 255 = toute la couleur de la matière)
+  f.setIndex(new THREE.BufferAttribute(ns > 65535 ? T.tri.slice(0, nt) : new Uint16Array(T.tri.subarray(0, nt)), 1));
+  return f;
+}
+// la forme g toute blanche : sans ombre des coins, mais avec des couleurs à ses sommets, comme les autres formes de sa matière (sans
+// elles, elle serait noire)
+const blanchir = g => { g.setAttribute('color', new THREE.BufferAttribute(new Uint8Array(3 * g.attributes.position.count).fill(255), 3, true)); return g; };
+// la forme g, avec l'ombre de ses coins : la couleur de chacun de ses sommets (et de nouveaux sommets, s'il en faut). villa : une forme de
+// la villa de Tony Stark
+function assombrirCoins(g, villa) {
+  if (!g.boundingBox) g.computeBoundingBox();
+  const B = g.boundingBox, voisines = [], taille = B.getSize(new THREE.Vector3());   // (voisines : les boîtes tout près, qui peuvent lui faire de l'ombre)
+  if ([taille.x, taille.y, taille.z].filter(v => v < 0.15).length >= 2) return blanchir(g);   // une barre fine (un barreau d'échelle, un montant) : rien ne se verrait
+  pourBoitesCoins(B.min.x - CONTRE, B.min.z - CONTRE, B.max.x + CONTRE, B.max.z + CONTRE, villa, o => {
+    if (o.y2 > B.min.y + 0.5 && o.y1 < B.max.y + 1 && o.x2 > B.min.x - CONTRE && o.x1 < B.max.x + CONTRE && o.z2 > B.min.z - CONTRE && o.z1 < B.max.z + CONTRE) voisines.push(o);
+  });
+  const f = decouper(g, voisines, villa);   // une boîte, un plan : découpés là où il faut, et colorés
+  if (f) { g.dispose(); return f; }
+  // une autre forme (un cylindre, un toit en pente...) garde ses sommets. Si elle fait plus de 2 × PIED de haut, pas de bande à son pied :
+  // elle s'étalerait sur toute sa hauteur. Et son dessous ne fonce pas : ce peut être le plafond d'un bâtiment (les dalles arrondies de la villa de Tony Stark)
+  const P = g.attributes.position.array, N = g.attributes.normal?.array, c = new Uint8Array(P.length), H = B.max.y - B.min.y, pied = H <= 2 * PIED ? Math.min(1, H / PIED) : 0;
+  for (let i = 0; i < P.length; i += 3) c[i] = c[i + 1] = c[i + 2] = N ? Math.round(255 * lumiereCoin(P[i], P[i + 1], P[i + 2], N[i], N[i + 1], N[i + 2], voisines, pied, 0, villa)) : 255;
+  g.setAttribute('color', new THREE.BufferAttribute(c, 3, true));
+  return g;
+}
+// la copie de la matière m qui prend la couleur de ses sommets (vertexColors), faite une seule fois : les objets de m qui ne sont pas
+// fusionnés (une vitrine, un débris...) n'ont pas de couleurs à leurs sommets, et seraient noirs avec elle
+const MATS_COINS = new Map();
+function matCoins(m) {
+  if (!MATS_COINS.has(m)) {
+    const c = m.clone();
+    c.vertexColors = true; c.onBeforeCompile = m.onBeforeCompile;   // (clone ne reprend pas la retouche des trous : voir percer)
+    if (MATS_FENETRES.includes(m)) MATS_FENETRES.push(c);           // (ses fenêtres s'allument aussi la nuit)
+    MATS_COINS.set(m, c);
+  }
+  return MATS_COINS.get(m);
+}
+
 // fusion : quelques gros objets par morceau au lieu de milliers de petits (beaucoup plus rapide)
 const batiments = [];
 // les intérieurs (planchers, marches, meubles) ne font pas d'ombre : les murs et le toit la font déjà
@@ -6488,9 +6734,12 @@ const MAT_BORNE = std(null, { color: '#b8b4aa', roughness: 0.9 });
 // que les autres matières (flatShading en demande un de plus), pour un peu plus de mémoire (3 points par triangle)
 const aFacettes = g => { const f = g.toNonIndexed(); f.computeVertexNormals(); g.dispose(); return f; };
 function fusionner(geos, g, ombre = true) {   // ombre = false : rien ne fait d'ombre (l'intérieur des bâtiments, où le soleil n'entre pas)
-  const faits = [];   // (les objets qu'elle a faits)
+  const faits = [], villa = !!villaStark && g === villaStark.g;   // (les objets qu'elle a faits)
   for (const [nom, liste] of Object.entries(geos)) {
-    const forme = mergeGeometries(liste), mesh = new THREE.Mesh(MAT[nom].userData.facettes ? aFacettes(forme) : forme, MAT[nom]);
+    const coins = avecCoins(nom);   // l'ombre des coins (voir assombrirCoins ; l'intérieur des bâtiments a déjà la sienne : voir formeBoites)
+    // (une forme sans couleurs à ses sommets serait noire avec la copie de la matière : dans l'intérieur d'un bâtiment, elle reste blanche)
+    if (coins) liste.forEach((f, k) => { if (!f.attributes.color) liste[k] = ombre ? assombrirCoins(f, villa) : blanchir(f); });
+    const forme = mergeGeometries(liste), mesh = new THREE.Mesh(MAT[nom].userData.facettes ? aFacettes(forme) : forme, coins ? matCoins(MAT[nom]) : MAT[nom]);
     mesh.castShadow = ombre && !SANS_OMBRE.includes(nom); mesh.receiveShadow = true;
     mesh.raycast = raycastTroue;   // (les rayons passent par les trous des toits et des planchers)
     g.add(mesh); faits.push(mesh);
@@ -6501,6 +6750,13 @@ function fusionner(geos, g, ombre = true) {   // ombre = false : rien ne fait d'
 }
 // chaque intérieur a son groupe, vide pour l'instant : son dessin n'est fabriqué que quand la caméra s'en approche (voir majInterieurs)
 for (const d of interieurs) { d.g = new THREE.Group(); scene.add(d.g); }
+// l'ombre des coins : toutes les boîtes du pays, qui font de l'ombre aux autres formes (voir assombrirCoins), et le plancher du bas de
+// chaque bâtiment où l'on entre (il cache le trottoir dessous : pas besoin d'y couper)
+if (COINS > 0) {
+  for (const m of morceaux.values()) rangerBoitesCoins(m.geos);
+  if (villaStark) rangerBoitesCoins(villaStark.geos, true);
+  for (const d of interieurs) { const plancher = new THREE.PlaneGeometry(d.x2 - d.x1, d.z2 - d.z1).rotateX(-Math.PI / 2).translate((d.x1 + d.x2) / 2, d.y1 + 0.05, (d.z1 + d.z2) / 2); rangerBoitesCoins({ platre: [plancher] }, villaStark?.interieurs.includes(d)); }
+}
 // la villa de Tony Stark, dans son groupe, accroché à un pivot au pied de son mur sud (c'est autour de lui qu'elle bascule dans la mer)
 if (villaStark) {
   const V = villaStark;
@@ -6524,6 +6780,7 @@ for (const m of morceaux.values()) {
   instances(m.g, GEO_BORNE, MAT_BORNE, m.bornes, (o, e) => o.position.set(e.x, e.y, e.z));
   m.bornes.forEach(e => Object.assign(ajouterCollision(e.x - 0.2, e.z - 0.2, e.x + 0.2, e.z + 0.2, e.y + R_.hauteurBornes, e.y, true), { borne: true, bx: e.x, bz: e.z }));
 }
+boitesCoins.clear();   // (l'ombre des coins est faite : on n'en a plus besoin)
 // les bornes sous la voiture v : dans son empreinte, et plus hautes que le dessous de sa caisse
 function bornesSous(v) {
   const L = v.forme.longueur / 2 + 0.2, W = v.forme.largeur / 2 + 0.2, res = [];
@@ -6602,7 +6859,9 @@ function majInterieurs() {
   }
   if (suivant) construireInterieur(suivant);   // un seul de plus par image : pas d'accroc, même en volant au-dessus de la ville
 }
-// fabriquer le dessin de l'intérieur d, d'après sa recette : toutes ses formes, fusionnées en un objet par matière, dans son groupe
+// fabriquer le dessin de l'intérieur d, d'après sa recette : toutes ses formes, fusionnées en un objet par matière, dans son groupe.
+// Avec l'ombre des coins, chaque forme a ses couleurs, toujours les mêmes (voir formeBoites ; les autres formes, un sol, une plante,
+// restent blanches : voir fusionner)
 function construireInterieur(d) {
   const geos = {};
   for (const [mat, recette] of Object.entries(d.recette)) {
@@ -6610,7 +6869,7 @@ function construireInterieur(d) {
     for (let k = 0; k < recette.length;) {
       if (typeof recette[k] !== 'number') { const r = recette[k++]; formes.push(typeof r === 'function' ? r() : r); continue; }   // une forme, ou la fonction qui la fabrique
       let fin = k; while (typeof recette[fin] === 'number') fin += 6;   // des boîtes à la suite (6 nombres chacune) : toutes d'un coup
-      formes.push(formeBoites(mat, recette, k, fin)); k = fin;
+      formes.push(formeBoites(mat, recette, k, fin, avecCoins(mat) ? d : null)); k = fin;
     }
   }
   d.formes = fusionner(geos, d.g, false);
@@ -6620,23 +6879,35 @@ function construireInterieur(d) {
 const BOITE1 = new THREE.BoxGeometry();
 const B1 = { pos: BOITE1.attributes.position.array, sens: BOITE1.attributes.normal.array, uv: BOITE1.attributes.uv.array, tri: BOITE1.index.array };
 // les boîtes de la recette r, de la case k à la case fin, en une seule forme : au point près ce que donneraient formeBoite pour chacune,
-// puis leur fusion, mais bien plus vite (le plus gros intérieur de Los Santos : 4 ms au lieu de 25)
-function formeBoites(mat, r, k, fin) {
+// puis leur fusion, mais bien plus vite (le plus gros intérieur de Los Santos : 4 ms au lieu de 25).
+// d : avec l'ombre des coins, l'intérieur où sont ces boîtes. Chaque boîte est vue seule (on ne cherche pas ses voisines, pour aller
+// vite) : un petit meuble (pas plus haut que la bande du pied d'un mur, et d'au moins 10 cm d'épaisseur) posé sur un plancher fonce vers
+// son pied ; le reste ne change pas (les murs, les cloisons, les sols, les plafonds, les grandes armoires, et ce qui est accroché : un
+// tableau, un miroir, une étagère)
+function formeBoites(mat, r, k, fin, d = null) {
   const n = (fin - k) / 6, pos = new Float32Array(72 * n), sens = new Float32Array(72 * n), uv = new Float32Array(48 * n), tri = new Uint32Array(36 * n);
+  const coul = d ? new Uint8Array(72 * n) : null;
   const [tl, th] = DIM_TEX[mat] || [];   // (la taille du dessin de la matière, s'il en a une : voir ajusterUV)
   for (let b = 0; b < n; b++, k += 6) {
     const x = r[k], y = r[k + 1], z = r[k + 2], l = r[k + 3], h = r[k + 4], p = r[k + 5];
     const faces = [p, h, p, h, l, p, l, p, l, h, l, h];   // la taille de chacune des 6 faces, dans l'ordre (comme dans formeBoite)
+    const etage = d && (y - h / 2 - d.sol0) / d.hEtage;   // (sur quel plancher est son bas : un nombre entier si elle est posée)
+    const posee = d && h <= PIED && Math.min(l, p) >= 0.1 && etage > -0.01 && Math.abs(etage - Math.round(etage)) * d.hEtage < 0.02;
     for (let s = 0; s < 24; s++) {   // ses 24 points
       const i = 72 * b + 3 * s, j = 48 * b + 2 * s, f = s >> 2;   // (f : sa face)
       pos[i] = Math.fround(B1.pos[3 * s] * l) + x; pos[i + 1] = Math.fround(B1.pos[3 * s + 1] * h) + y; pos[i + 2] = Math.fround(B1.pos[3 * s + 2] * p) + z;
       sens[i] = B1.sens[3 * s]; sens[i + 1] = B1.sens[3 * s + 1]; sens[i + 2] = B1.sens[3 * s + 2];
       uv[j] = tl ? B1.uv[2 * s] * faces[2 * f] / tl : B1.uv[2 * s]; uv[j + 1] = tl ? B1.uv[2 * s + 1] * faces[2 * f + 1] / th : B1.uv[2 * s + 1];
+      if (!coul) continue;
+      let lum = 1;   // la lumière à ce point (voir lumiereCoin) : au pied d'un petit meuble posé (ses côtés foncent vers le plancher)
+      if (posee && Math.abs(B1.sens[3 * s + 1]) < 0.3) lum = 1 - COINS * FORCE_COINS.pied * (h / PIED) * (1 - (B1.pos[3 * s + 1] + 0.5) * h / PIED) ** 2;
+      coul[i] = coul[i + 1] = coul[i + 2] = Math.round(255 * lum);
     }
     for (let t = 0; t < 36; t++) tri[36 * b + t] = B1.tri[t] + 24 * b;   // ses 12 triangles
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(sens, 3)); g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  if (coul) g.setAttribute('color', new THREE.BufferAttribute(coul, 3, true));
   g.setIndex(new THREE.BufferAttribute(tri, 1));
   return g;
 }
@@ -17663,7 +17934,7 @@ const preparation = { ms: 0, programmes: 0, rate: null };   // (pour les essais 
 async function preparerProgrammes() {
   const debut = performance.now(), dehors = new THREE.Group(), main = new THREE.Group();   // (jamais ajoutés au pays : on ne les voit pas)
   for (const [m, sorte, ou] of A_PREPARER) (ou === 'vm' ? main : dehors).add(objetAPreparer(m, sorte));
-  for (const nom of new Set(interieurs.flatMap(d => Object.keys(d.recette)))) dehors.add(objetAPreparer(MAT[nom], 'forme'));   // (les intérieurs)
+  for (const nom of new Set(interieurs.flatMap(d => Object.keys(d.recette)))) dehors.add(objetAPreparer(avecCoins(nom) ? matCoins(MAT[nom]) : MAT[nom], 'forme'));   // (les intérieurs ; avec l'ombre des coins, leurs copies : voir matCoins)
   try { // (sans réponse au bout de 15 s, on y va quand même : ce qui manque se compilera en dessinant, comme avant)
     const fin = await Promise.race([Promise.all([
       renderer.compileAsync(scene, camera), renderer.compileAsync(dehors, camera, scene),   // (avec les lumières, la brume et les reflets du pays)
