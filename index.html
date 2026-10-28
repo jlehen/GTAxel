@@ -6973,8 +6973,10 @@ function piece(geo, couleur, parent, x, y, z) {
 }
 const habiller = (m, couleur) => { m.material = mat(couleur); };
 const habillerMembre = (m, couleur) => { habiller(m.haut, couleur); habiller(m.bas, couleur); };
-// une pièce ajoutée par un code de triche : rhabillerBJ l'enlève
-const accessoire = (geo, couleur, parent, x, y, z) => { const m = piece(geo, couleur, parent, x, y, z); m.name = 'accessoire'; return m; };
+// une pièce ajoutée par un code de triche : rhabillerBJ l'enlève. Et il jette sa forme (aJeter) si elle a été fabriquée pour elle
+// (new THREE...) : celles de GEO servent à tout le monde, elles restent. Une forme pour plusieurs pièces : range-la dans GEO
+// (GEO.maForme = ...), sinon elle serait jetée, puis renvoyée à la carte graphique, chaque fois qu'on rhabille B.J.
+const accessoire = (geo, couleur, parent, x, y, z) => { const m = piece(geo, couleur, parent, x, y, z); m.name = 'accessoire'; m.userData.aJeter = !Object.values(GEO).includes(geo); return m; };
 // un bras ou une jambe : deux morceaux de longueur l, avec un pli entre les deux (le coude ou le genou)
 function membre(parent, x, y, l, geoHaut, geoBas, couleurHaut, couleurBas) {
   const m = new THREE.Group(); m.position.set(x, y, 0); parent.add(m);
@@ -7013,10 +7015,11 @@ function creerHumain(s) {
   return { g, haut, tete, cou, cheveux, torse, bassin, ceinture, brasD, brasG, jambeD, jambeG, tenue: s, phase: Math.random() * 6, arme: null, air: 0, t: 0 };
 }
 // les bâtons de ski : un dans chaque main, avec sa rondelle. Ils suivent l'avant-bras, la pointe vers la neige quand les mains sont en avant.
-// poser : piece (pour de bon) ou accessoire (pour B.J., qui les lâche en quittant ses skis)
+// poser : piece (pour de bon) ou accessoire (pour B.J., qui les lâche en quittant ses skis). Tous les bâtons ont la même forme (GEO.baton)
+GEO.baton = mergeGeometries([new THREE.CylinderGeometry(0.012, 0.012, 1.15, 5).rotateX(Math.PI / 2).translate(0, 0, -0.5),
+  new THREE.CylinderGeometry(0.05, 0.05, 0.012, 8).rotateX(Math.PI / 2).translate(0, 0, -1)]);
 function batons(h, poser = piece) {
-  for (const b of [h.brasD, h.brasG]) poser(mergeGeometries([new THREE.CylinderGeometry(0.012, 0.012, 1.15, 5).rotateX(Math.PI / 2).translate(0, 0, -0.5),
-    new THREE.CylinderGeometry(0.05, 0.05, 0.012, 8).rotateX(Math.PI / 2).translate(0, 0, -1)]), '#222', b.pli, 0, -0.29, 0);
+  for (const b of [h.brasD, h.brasG]) poser(GEO.baton, '#222', b.pli, 0, -0.29, 0);
 }
 // La pose d'un personnage. o : ce qu'il fait. En plus de marcher, courir, s'accroupir, viser, nager, danser :
 //   saut : sa vitesse de montée, quand il est en l'air ; atterri : de 0 à 1, quand il vient de retomber (il amortit en pliant les genoux)
@@ -7378,9 +7381,11 @@ const GEO_BATARANG = new THREE.ExtrudeGeometry(new THREE.Shape(CONTOUR_BATARANG.
 const M_BATARANG = mat('#18181c', { metalness: 0.85, roughness: 0.3 });
 // la couleur de la pastille au milieu du batarang, et de ce qu'il fait en arrivant : le feu, l'électricité, l'explosif
 const COULEURS_BATARANG = { feu: '#ff7a1a', electrique: '#58c8ff', explosif: '#ff2020' };
+const GEO_PASTILLE = new THREE.SphereGeometry(0.024, 10, 8);   // (la même pour tous les batarangs : un batarang lancé ne fabrique aucune forme)
 function creerBatarang(sorte) {
   const g = new THREE.Group(), e = new THREE.Mesh(GEO_BATARANG, M_BATARANG), c = COULEURS_BATARANG[sorte] || '#fff';
-  e.castShadow = true; g.add(e, new THREE.Mesh(new THREE.SphereGeometry(0.024, 10, 8), mat(c, { emissive: c })));
+  e.castShadow = true; g.add(e, new THREE.Mesh(GEO_PASTILLE, mat(c, { emissive: c })));
+  g.traverse(o => o.userData.aJeter = false);   // (deux formes partagées : on ne les jette jamais, voir creerArme)
   return g;
 }
 // le crochet du grappin de Batman : une tige, et trois griffes recourbées vers l'arrière (il pointe vers +Z)
@@ -7390,7 +7395,10 @@ function creerArme(i) {
   const modele = ARMES[i].modele;
   if (!modele) return null;
   const g = new THREE.Group();
-  const b = (l, h, p, m, x, y, z) => { const e = new THREE.Mesh(new THREE.BoxGeometry(l, h, p), m); e.position.set(x, y, z); e.castShadow = true; g.add(e); };
+  // une boîte : sa forme est fabriquée pour cette arme-là (aJeter : jeterArme la jettera). Une pièce que tu fais sans b, avec sa propre
+  // forme (new THREE...) : mets-lui aussi userData.aJeter = true ; avec une forme partagée par toutes les armes (comme GEO_SCEPTRE) :
+  // userData.aJeter = false (on ne la jette jamais, même quand on ramasse une arme lâchée)
+  const b = (l, h, p, m, x, y, z) => { const e = new THREE.Mesh(new THREE.BoxGeometry(l, h, p), m); e.position.set(x, y, z); e.castShadow = true; e.userData.aJeter = true; g.add(e); };
   if (modele === 'couteau') { b(0.025, 0.03, 0.1, M_BOIS, 0, 0, 0); b(0.008, 0.03, 0.2, M_LAME, 0, 0.005, 0.15); g.userData.bout = 0.25; }
   if (modele === 'pistolet') { b(0.035, 0.05, 0.2, M_METAL, 0, 0.03, 0.05); b(0.03, 0.1, 0.045, M_METAL, 0, -0.03, -0.02); g.userData.bout = 0.16; }
   if (modele === 'mitraillette') { b(0.05, 0.08, 0.28, M_METAL, 0, 0.03, 0.08); b(0.03, 0.16, 0.035, M_METAL, 0, -0.07, 0.05); b(0.03, 0.08, 0.04, M_METAL, 0, -0.03, -0.03); g.userData.bout = 0.23; }
@@ -7399,7 +7407,7 @@ function creerArme(i) {
   if (modele === 'sniper') { b(0.045, 0.07, 0.5, M_BOIS, 0, 0.01, 0.05); b(0.022, 0.022, 0.6, M_METAL, 0, 0.04, 0.55); b(0.04, 0.11, 0.28, M_BOIS, 0, -0.02, -0.3); b(0.03, 0.1, 0.04, M_BOIS, 0, -0.06, -0.05); b(0.04, 0.04, 0.26, M_METAL, 0, 0.1, 0.08); g.userData.bout = 0.85; } // la lunette est dessus
   if (modele === 'fusil') { b(0.05, 0.09, 0.5, M_METAL, 0, 0.02, 0.12); b(0.025, 0.025, 0.3, M_METAL, 0, 0.04, 0.5); b(0.035, 0.17, 0.06, M_METAL, 0, -0.09, 0.16); b(0.04, 0.11, 0.26, M_METAL, 0, -0.01, -0.24); g.userData.bout = 0.64; }
   if (modele === 'sceptre') { // un manche doré avec son pommeau, une boule, et le gros éclair qui brille au bout
-    for (const [geo, m] of [[GEO_SCEPTRE.manche, M_MANCHE], [GEO_SCEPTRE.eclair, M_FOUDRE]]) { const e = new THREE.Mesh(geo, m); e.castShadow = true; g.add(e); }
+    for (const [geo, m] of [[GEO_SCEPTRE.manche, M_MANCHE], [GEO_SCEPTRE.eclair, M_FOUDRE]]) { const e = new THREE.Mesh(geo, m); e.castShadow = true; e.userData.aJeter = false; g.add(e); }
     g.userData.bout = 1.15; g.userData.sceptre = true;   // (il se tient debout, dans la main gauche : voir animerHumain)
   }
   if (modele === 'batarang') { // il le tient par le bout d'une aile, le bras levé, prêt à le lancer
@@ -7408,13 +7416,16 @@ function creerArme(i) {
   }
   if (modele === 'grappin') { // le pistolet à grappin : une crosse, un gros canon noir, et au bout le crochet, qui part avec le câble (voir grappiner)
     b(0.045, 0.065, 0.26, M_BATARANG, 0, 0.03, 0.06); b(0.032, 0.11, 0.045, M_METAL, 0, -0.035, -0.02); b(0.06, 0.06, 0.05, M_METAL, 0, 0.03, 0.2);
-    const c = new THREE.Mesh(GEO_CROCHET, M_LAME); c.position.set(0, 0.03, 0.225); c.castShadow = true; g.add(c);
+    const c = new THREE.Mesh(GEO_CROCHET, M_LAME); c.position.set(0, 0.03, 0.225); c.castShadow = true; c.userData.aJeter = false; g.add(c);
     g.userData.bout = 0.25; g.userData.crochet = c;
   }
   return g;
 }
+// une arme qu'on ne reverra plus (on en change, ou celui qui la tenait s'en va) : on jette ses formes, sinon la carte graphique les garde
+// jusqu'à F5. Seulement celles que creerArme a fabriquées pour elle : celles que toutes les armes partagent (GEO_SCEPTRE, GEO_CROCHET...) restent
+const jeterArme = a => a?.traverse(o => { if (o.userData.aJeter) o.geometry.dispose(); });
 function donnerArme(h, i) { // l'arme tient dans la main droite, au bout de l'avant-bras (le sceptre : dans la main gauche)
-  h.arme?.removeFromParent();
+  h.arme?.removeFromParent(); jeterArme(h.arme);
   h.arme = creerArme(i);
   if (h.arme) { h.arme.position.set(0, -0.3, 0.03); h.arme.rotation.x = Math.PI / 2; (h.arme.userData.sceptre ? h.brasG : h.brasD).pli.add(h.arme); }
 }
@@ -7987,14 +7998,20 @@ function creerVoiture(x, z, angle, police = false, type = police ? typePolice : 
 // le bout de la chaussure), sa talonnière (tournée de côté en mode montée : le talon est libre), et sa peau : une bande rose collée dessous,
 // avec son étrier sur la spatule (ski.peau : on la rétrécit vers le talon pour l'enlever)
 const M_PEAU = mat('#e8209a', { roughness: 1 });
+// (leurs formes sont les mêmes pour tous les skis de rando : un engin de plus n'en fabrique aucune, et il n'y a rien à jeter quand il s'en va)
+const GEO_RANDO = {
+  planche: fusion([bloc(0.08, 0.022, 1.42, 0, 0.011, -0.12, 0.01), new THREE.BoxGeometry(0.08, 0.022, 0.28).rotateX(-0.5).translate(0, 0.066, 0.71)]),
+  butee: bloc(0.07, 0.05, 0.07, 0, 0.047, 0.17, 0.015), talon: bloc(0.07, 0.06, 0.1, 0, 0, 0, 0.015),
+  peau: fusion([new THREE.BoxGeometry(0.066, 0.008, 1.42).translate(0, -0.003, 0.71), new THREE.BoxGeometry(0.094, 0.034, 0.05).rotateX(-0.5).translate(0, 0.125, 1.64)]),
+};
 function skisRando(v) {
   v.skis = [-1, 1].map(c => {
     const ski = new THREE.Group(), poser = (geo, matiere, dans = ski) => { const p = new THREE.Mesh(geo, matiere); p.castShadow = true; dans.add(p); return p; };
-    poser(fusion([bloc(0.08, 0.022, 1.42, 0, 0.011, -0.12, 0.01), new THREE.BoxGeometry(0.08, 0.022, 0.28).rotateX(-0.5).translate(0, 0.066, 0.71)]), v.mats.peint);
-    poser(bloc(0.07, 0.05, 0.07, 0, 0.047, 0.17, 0.015), M_NOIR);                   // la butée
-    ski.talon = poser(bloc(0.07, 0.06, 0.1, 0, 0, 0, 0.015), M_CHROME); ski.talon.position.set(0, 0.052, -0.14);   // la talonnière
+    poser(GEO_RANDO.planche, v.mats.peint);
+    poser(GEO_RANDO.butee, M_NOIR);                   // la butée
+    ski.talon = poser(GEO_RANDO.talon, M_CHROME); ski.talon.position.set(0, 0.052, -0.14);   // la talonnière
     ski.peau = new THREE.Group(); ski.peau.position.z = -0.83; ski.add(ski.peau);   // (elle part du talon du ski)
-    poser(fusion([new THREE.BoxGeometry(0.066, 0.008, 1.42).translate(0, -0.003, 0.71), new THREE.BoxGeometry(0.094, 0.034, 0.05).rotateX(-0.5).translate(0, 0.125, 1.64)]), M_PEAU, ski.peau);
+    poser(GEO_RANDO.peau, M_PEAU, ski.peau);
     ski.position.x = ski.x0 = 0.12 * c; v.corps.add(ski);
     return ski;
   });
@@ -8800,10 +8817,12 @@ vmScene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.2));
 { const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(1, 2, 1); vmScene.add(l); }
 vmScene.environment = scene.environment; vmScene.environmentIntensity = 0.25; scenesReflets.push(vmScene);   // (elle reflète le même ciel que le pays : voir photographierCiel)
 const vm = new THREE.Group(); vmScene.add(vm);
+// le bras et la main : toujours les mêmes (seule l'arme change ; l'armure d'Iron Man les repeint : voir majIronman)
+const brasVM = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.085, 0.5), mat('#e0b090')); brasVM.position.set(0, -0.02, 0.25);
+const mainVM = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), mat('#e0b090'));
+vm.add(brasVM, mainVM);
 function construireVM() {
-  vm.clear();
-  const bras = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.085, 0.5), mat('#e0b090')); bras.position.set(0, -0.02, 0.25); vm.add(bras);
-  vm.add(new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), mat('#e0b090')));
+  vm.userData.arme?.removeFromParent(); jeterArme(vm.userData.arme);   // (l'arme d'avant : ses formes ne servent plus)
   const a = vm.userData.arme = creerArme(J.arme);
   if (a) { a.rotation.y = Math.PI; a.position.set(0, 0.03, -0.02); vm.add(a); }
   if (a?.userData.sceptre) { a.rotation.x = 0.8; a.scale.setScalar(0.7); }   // le sceptre : dressé vers le haut, plus petit pour ne pas cacher le viseur (et à gauche de l'écran : voir boucle)
@@ -8909,7 +8928,7 @@ function creerElite(x, z) {
   const E = ENNEMIS.elite;
   p.elite = true; p.vie = E.vie; p.armeIdx = E.arme; donnerArme(p.h, E.arme);
   if (ARMES[E.arme].auto) p.rafale = 0;   // à la mitraillette ou au fusil d'assaut, en rafales
-  piece(new RoundedBoxGeometry(0.49, 0.5, 0.3, 2, 0.08), '#2a2d33', p.h.haut, 0, 0.4, 0);   // son gilet pare-balles
+  piece(giletBJ.geometry, '#2a2d33', p.h.haut, 0, 0.4, 0);   // son gilet pare-balles (la même forme que celui de B.J. : rien à jeter quand il s'en va)
   return p;
 }
 // un gang (tableau GANGS) : ses n membres traînent en rond au milieu de leur pâté, entre les maisons, et se font face (la nuit, ils sont plus
@@ -10436,7 +10455,7 @@ function plaque(geo, nom, parent, x, y, z) {
 // la flamme d'un réacteur (sous une botte, au creux d'une main) : la flamme bleue de la Batmobile. On ne la voit que quand il vole (majIronman)
 function flamme(parent, x, y, z, ou) {
   const m = plaque(GEO_V.jet, 'acier', parent, x, y, z);
-  m.material = M_JET; m.castShadow = false; m.visible = false; m.userData.ou = ou;
+  m.material = M_JET; m.castShadow = false; m.visible = false; m.userData.ou = ou; m.userData.aJeter = false;   // (sa forme est celle de la Batmobile : on la garde)
   corpsEnCours.ironman.flammes.push(m);
 }
 // le canon ou le bouclier d'une main (ARMURES_STARK : canon, bouclier) : caché, il sort du bout du bras quand on tire (voir majIronman).
@@ -11151,7 +11170,7 @@ function majIronman(dt) {
   for (const k in lueursIronman) lueursIronman[k].visible = false;
   rayonPlastron.visible = false;
   if (!J.ironman?.tour) for (const r of rayonsBras) r.visible = false;   // (le tour du laser des bras a peut-être été interrompu)
-  for (const o of vm.children.slice(0, 2)) o.material = armureIronman() ? matIronman('rouge', J.ironman.armure) : mat('#e0b090');   // à la 1re personne : son bras, dans le gant rouge
+  for (const o of [brasVM, mainVM]) o.material = armureIronman() ? matIronman('rouge', J.ironman.armure) : mat('#e0b090');   // à la 1re personne : son bras, dans le gant rouge
   for (const c of capsules) { // elle se referme, puis repart vers le ciel sur ses flammes
     c.t += dt; for (const p of c.g.portes) p.rotation.y *= Math.pow(0.002, dt);
     if (c.t > 0.5) { c.v += 30 * dt; c.g.position.y += c.v * dt; const f = new THREE.Sprite(M_FLASH); f.position.copy(c.g.position).add(V3(entre(-0.5, 0.5), -0.3, entre(-0.5, 0.5))); f.scale.setScalar(entre(1.2, 2.2)); scene.add(f); effets.push({ o: f, vie: 0.1 }); }
@@ -11497,7 +11516,7 @@ function rhabillerBJ() {
     if (o.userData.avantInvisible) { o.material = o.userData.avantInvisible; o.castShadow = o.userData.ombre; delete o.userData.avantInvisible; }   // (le code INVISIBLE)
     if (o.name === 'accessoire') enTrop.push(o); if (o.userData.habit) { o.material = o.userData.habit; o.visible = true; }
   });
-  for (const o of enTrop) o.removeFromParent();
+  for (const o of enTrop) { o.removeFromParent(); if (o.userData.aJeter) o.geometry.dispose(); }   // (sa forme n'était qu'à lui : voir accessoire)
   for (const j of [b.jambeD, b.jambeG]) j.scale.set(1, 1, 1);
   b.bassin.scale.set(1, 1, 1); b.g.scale.setScalar(1); b.tete.scale.setScalar(1);
   TENUES_GLISSE[J.voiture?.forme.tenue || J.voiture?.forme.glisse]?.(b);   // sur des skis, un snowboard ou une luge : sa tenue de glisse
@@ -17388,9 +17407,10 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   lumiereBoum.intensity = Math.max(0, lumiereBoum.intensity - dt * 10000);
   police(dt); peupler(dt); missions(dt);
   // ménage
-  for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); personnes.splice(k, 1); }
+  for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); jeterArme(personnes[k].h.arme); personnes.splice(k, 1); }
   for (let k = voitures.length - 1; k >= 0; k--) if (voitures[k].supprimer && voitures[k] !== J.voiture) { scene.remove(voitures[k].m); voitures.splice(k, 1); }
-  for (let k = objets.length - 1; k >= 0; k--) if (objets[k].supprimer) { scene.remove(objets[k].m); objets[k].m.traverse(o => o.geometry?.dispose()); objets.splice(k, 1); }
+  // (un objet ramassé : ses formes sont jetées, sauf celles marquées partagées, aJeter = false, comme le sceptre ou le batarang d'une arme lâchée)
+  for (let k = objets.length - 1; k >= 0; k--) if (objets[k].supprimer) { scene.remove(objets[k].m); objets[k].m.traverse(o => { if (o.geometry && o.userData.aJeter !== false) o.geometry.dispose(); }); objets.splice(k, 1); }
   for (let k = robots.length - 1; k >= 0; k--) if ((robots[k].supprimer || (!robots[k].pilote && !robots[k].armure && dist(robots[k], J) > 600)) && robots[k] !== J.robot) { scene.remove(robots[k].m.g); robots.splice(k, 1); }
   for (let k = effets.length - 1; k >= 0; k--) if (effets[k].vie <= 0) effets.splice(k, 1);
   // sons : ton moteur, celui de la voiture qui passe le plus près, le roulement, les pneus et la sirène
