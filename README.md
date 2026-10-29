@@ -484,7 +484,7 @@ Quelques signes de la mini-carte :
 
 ### Dans l'eau
 
-Tu nages dans la mer, les lacs et les rivières (sans pouvoir tirer). Une voiture qui entre dans l'eau profonde coule : tu en sors à la nage. Aux pontons, des hors-bord et des jet-skis t'attendent.
+Tu nages dans la mer, les lacs et les rivières (sans pouvoir tirer). Une voiture qui entre dans l'eau profonde coule : tu en sors à la nage. Aux pontons, des hors-bord et des jet-skis t'attendent. En bateau, tu passes sous les ponts : ceux des villes sont bombés, comme sur les canaux d'Amsterdam (4 m au-dessus de la rue, en leur milieu).
 
 ### Les personnages
 
@@ -561,6 +561,7 @@ Il y en a **16 types**, chacun avec sa vitesse et son bruit de moteur :
 - Les **lampadaires** tombent quand tu fonces dedans.
 - Les places sont entourées de **bornes en béton** qui cassent le dessous de la voiture et la font décoller (le 4x4 passe au-dessus).
 - De temps en temps, un **dos d'âne** jaune et noir traverse la rue : les autres voitures ralentissent, mais toi, pris à fond, il te fait sauter !
+- Les **ponts** des villes sont bombés : même lancée à fond, ta voiture reste collée à la route (mais le Tumbler peut y sauter, avec B). Sur tous les ponts, en voiture comme à moto, les **garde-fous** te retiennent : tu glisses le long (des étincelles !) au lieu de tomber à l'eau, même si tu arrives de travers. À pied, tu peux toujours sauter par-dessus ceux des routes de campagne.
 
 ### Les cascades
 
@@ -704,14 +705,14 @@ La ville de Batman. Il y fait **toujours nuit**, il **pleut** et il y a du **bro
 **Les missions de Batman** (avec Batgirl, ce sont les mêmes) :
 
 1. **La Batcave** : approche-toi du vieux puits, dans le jardin du manoir... la margelle s'effondre, et tu tombes 90 m plus bas, dans le lac d'une grotte immense pleine de chauves-souris : la **Batcave** ! Prends ton premier costume dans sa vitrine (**E**), monte au grappin sur la corniche, saute et plane avec ta cape jusqu'à l'île du Batordinateur, puis remonte au manoir par le vieil ascenseur.
-2. **Poursuite sous la pluie** : le Pingouin s'enfuit par l'autoroute. Ses hommes font sauter un camion : un mur de feu ! Appuie sur **B** : ta **Batmobile** surgit des flammes. Rattrape la voiture du Pingouin au milieu des camions, et rentre-lui dedans 4 fois.
-3. **Le canard du Pingouin** : prends le hors-bord du ponton, et suis le canard géant du Pingouin sur le canal, puis la rivière... jusque dans les **égouts**, où ses hommes t'attendent.
+2. **Poursuite sous la pluie** : le Pingouin s'enfuit par l'autoroute. Ses hommes font sauter un camion : un mur de feu ! Appuie sur **B** : ta **Batmobile** surgit des flammes. Rattrape la voiture du Pingouin (elle file à 173 km/h !) au milieu des camions, et rentre-lui dedans 4 fois.
+3. **Le canard du Pingouin** : prends le hors-bord du ponton, et suis le canard géant du Pingouin (il fonce presque aussi vite que toi, sous les ponts du canal) sur le canal, puis la rivière... jusque dans les **égouts**, où ses hommes t'attendent.
 4. **Les pingouins-missiles** : au zoo, une armée de pingouins, des roquettes sur le dos, marche sur la ville ! Brouille les 3 antennes du Pingouin (**E** tout près, ou un batarang) avant qu'ils arrivent, puis assomme le **Pingouin** lui-même, qui sort de son dôme avec son parapluie (il cache une mitraillette et des roquettes !).
 5. **Pile ou face** : le Bat-signal t'appelle au commissariat. **Double-Face** a caché 4 bombes dans Gotham : désamorce-les (**E** tout près) avant leur minuterie ! La police a fait évacuer la ville, et ta Batmobile qui vole (**R**) passe au-dessus de tout le monde. Quand une minuterie arrive à zéro, Double-Face lance sa pièce : face, la bombe attend encore un peu ; pile, BOUM (personne n'est blessé)... et il en cache une autre ailleurs. Puis assomme Double-Face au port : quand sa pièce tombe sur pile, il tire des deux mains, mets-toi à l'abri !
 6. **Le stade** : il y a match au stade de Gotham, et les tribunes sont pleines... **Bane** fait sauter le terrain ! Les gens s'enfuient (personne n'est blessé) : assomme ses 10 mercenaires.
 7. **Bane** : il t'attend au fond des égouts. Il est énorme, et très fort : quand il lève le poing, recule ! Quand il charge, saute de côté : s'il fonce dans un mur, il est sonné, et tes coups comptent double. S'il gagne, tu te réveilles dans la rue pour **la revanche**, avec toute la police de Gotham à tes côtés.
 8. **La bombe de Bane** : Lucius Fox t'a préparé une surprise, à la tour Wayne : le **Bat** ! Vole au-dessus de la bombe, au stade : elle s'accroche dessous. Emporte-la loin au-dessus de la mer, saute (**E**), et plane avec ta cape jusqu'à la côte... BOUM ! Le Bat est à toi.
-9. **Le braquage des clowns** : les clowns du Joker, masqués, braquent la banque de Gotham ! La police fait évacuer la ville. Assomme-les quand ils sortent avec les sacs d'argent, puis rattrape en Batmobile le **bus scolaire** où s'enfuit le Joker, et rentre-lui dedans 4 fois.
+9. **Le braquage des clowns** : les clowns du Joker, masqués, braquent la banque de Gotham ! La police fait évacuer la ville. Assomme-les quand ils sortent avec les sacs d'argent, puis rattrape en Batmobile le **bus scolaire** où s'enfuit le Joker (il fonce, et zigzague quand tu lui colles aux roues), et rentre-lui dedans 6 fois.
 10. **Le camion du Joker** : le Joker attaque dans le **bas de la ville**, le long tunnel des quais, avec son gros camion violet (« HA HA HA » sur les flancs) et un bazooka. Ta Batmobile est touchée... et le **Batpod** en sort ! (Arrive par la route du tunnel, à pied ou en voiture : pas en volant.) Rattrape le camion, et quand il est juste devant toi, **R** : le câble s'enroule autour de ses roues (reste juste derrière lui !)... et il se retourne. Puis assomme les clowns qui en sortent. Le Batpod est à toi.
 11. **La parade au gaz** : Gotham fête ses 200 ans, et le Joker a sa parade : des chars tirent des **ballons géants** à sa tête, pleins de gaz qui fait rire. Crève-les (batarangs, filets, grappin, ou fonce dedans en volant) avant qu'ils arrivent au-dessus de la foule ! Trop tard, et les gens rient... puis tombent (personne n'en meurt), et le Joker en lâche un autre. Puis ses clowns sautent de son char, et il s'enfuit en hélicoptère.
 12. **La cathédrale** : le grand final ! Monte au grappin en haut du clocher, à 57 m, où t'attend le **Joker** : son revolver (sa première balle sort un drapeau « BANG ! »), ses dentiers à remontoir qui explosent (un coup de poing les casse), sa fleur qui crache de l'acide et son gaz qui fait rire. Pendant le combat, un garde-fou invisible t'empêche de tomber du clocher. Quand son hélicoptère vient le chercher, et qu'il s'enfuit pendu à l'échelle : ton **grappin** (**G**), sur lui !
@@ -843,12 +844,12 @@ Les nombres de tout le jeu :
 
 - **Le jeu** : la vitesse de tout le jeu (`vitesseJeu` : 0.87, un peu plus lent que la normale pour avoir le temps de viser ; mets 1 pour la vitesse normale, ou 0.5 pour jouer au ralenti), et la vitesse des roquettes.
 - **B.J.** : vitesses à pied et à la nage, vie, hauteur des chutes qui font mal et leurs dégâts (et ceux d'une chute en sautant d'une voiture, à quelle vitesse on roule alors par terre et combien de temps on reste couché, et ceux des piétons renversés), durée et force de la boisson énergisante, touches et durée de la danse.
-- **La ville** : temps avant qu'un objet volé revienne, nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses.
+- **La ville** : temps avant qu'un objet volé revienne, nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, la hauteur des ponts bombés (`hauteurPont`), prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses.
 - **Les voitures** : gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, impacts de balles (combien il en reste sur les murs et par terre, et sur chaque voiture, et leur taille), accidents (à partir de quelle vitesse, force des tonneaux, temps avant qu'une voiture en feu explose, à partir de quand une voiture abîmée prend feu, hauteur des bornes).
 - **La montagne et le ski** : hauteur des montagnes, pente des routes qui partent d'une ville ou d'un croisement (`penteRoute` : 0.35, pas plus de 35 m de montée pour 100 m), vitesse des remontées (en ligne et dans les gares), ce que la neige freine à ski, jusqu'où descend la neige, hauteur du saut à ski (et ce qu'on gagne en sautant sur une bosse), vitesse des vrilles et des saltos, force du dérapage, vitesse de montée en skis de rando (et de descente avec les peaux), ce que la neige amortit des chutes, la chance que tes skis restent plantés à côté de toi quand tu tombes, nombre d'autres skieurs.
 - **Les super-héros** : ce qu'écrase la chute de Superman (à combien de mètres à la ronde, les dégâts, et de quelle hauteur on passe à travers un toit), vitesse de vol de Superman, vitesse du grappin de Batman, vitesse de sa cape (et de combien elle descend), vitesse de Spiderman sur un mur et au bout de sa toile, vitesse de la voiture qu'il lance, vitesse des batarangs.
 - **Le jour et la nuit** : la durée du jour, du coucher du soleil, de la nuit et du lever du soleil (`dureeJour`, `dureeCrepuscule`, `dureeNuit`, `dureeLever`, en secondes : mets `dureeNuit: 30` pour une nuit toute courte), la lumière de la lune (`clairDeLune`), combien de lampadaires éclairent vraiment la nuit (`lumieresNuit`), combien de piétons et de voitures il reste la nuit, combien de gangs en plus.
-- **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), ce que les batarangs explosifs font à Batman lui-même (`explosifsBatman`, et `armeExplosifs` : après combien de mètres de vol ils peuvent exploser), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
+- **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), ce que les batarangs explosifs font à Batman lui-même (`explosifsBatman`, et `explosifsPres` : à moins de combien de mètres de sa main leur explosion ne lui fait rien), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
 - **Jusqu'où on voit** : `distanceRelief`, les montagnes et la mer (10 km) ; `distanceVue`, les bâtiments et les arbres (900 m).
 
 **Si le jeu rame**, mets `distanceVue: 500`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`.
@@ -941,7 +942,7 @@ Les **autres signes** sont le terrain :
 | `1` à `9` | Collines et montagnes : plus le chiffre est grand, plus c'est haut |
 | `=` | Route |
 | `#` | Pont (une route sur l'eau) |
-| `+` | Pont en ville |
+| `+` | Pont en ville (bombé : les bateaux passent dessous) |
 | `&` | Ponton avec deux bateaux |
 | `!` | Piste d'aéroport |
 | `^` | Piste avec un avion à piloter |
@@ -1048,8 +1049,8 @@ Et pour Batman :
 | `puits` | S'approcher du vieux puits du manoir Wayne... et tomber dedans, jusqu'à la Batcave |
 | `costume` | Prendre son premier costume, dans la vitrine de la Batcave (E) |
 | `batmobile` | Un mur de feu ; appeler la Batmobile (B), qui arrive à travers, et monter dedans (`vers` : d'où elle arrive) |
-| `poursuite` | Rentrer dans la voiture du Pingouin (`coups` fois) ; elle roule par les cases de `chemin`, avec des `camions` devant, à `vite` m/s |
-| `suivre` | Suivre son canard sans le perdre (`chemin` : des cases, ou un endroit comme `'egout'`) |
+| `poursuite` | Rentrer dans la voiture du Pingouin (`coups` fois) ; elle roule par les cases de `chemin`, avec des `camions` devant, à `vite` m/s (`virage` : sa vitesse dans les virages serrés ; `fuite` : après un coup, elle file plus vite, `1.3` = 30 % de plus ; `zigzag` : elle zigzague quand tu lui colles aux roues, `1` = normal) |
+| `suivre` | Suivre son canard sans le perdre (`chemin` : des cases, ou un endroit comme `'egout'`) ; il file à `vite` m/s tant que tu es à moins de `pres` m, puis ralentit, et t'attend à `attend` m (`virage` : sa vitesse dans les virages ; `egout` : dans l'égout) |
 | `brouiller` | Brouiller ses `antennes` (des cases), gardées par des hommes, avant que ses `pingouins` arrivent (`secondes`) |
 | `bombes` | Désamorcer les `bombes` de Double-Face (des cases), chacune avant sa minuterie (`secondes`) ; quand une minuterie arrive à zéro, sa pièce : face, `encore` secondes de plus ; pile, BOUM, et une autre bombe est cachée dans une de ses `cachettes` (pour `nouvelle` secondes) |
 | `stade` | Aller au stade, où il y a match : Bane fait sauter le terrain |

@@ -2487,8 +2487,8 @@ const REGLAGES = {
   protectionRobot: 0.3,      // dans le heavy robot, on ne prend que 30 % des dégâts
   giletMax: 100,             // points du gilet pare-balles : il prend les dégâts à la place de ta vie
   degatsExplosion: 40,       // ce que te fait une explosion (ta roquette, une voiture) si tu es collé dessus
-  explosifsBatman: 0.25,     // à Gotham, Batman sait lancer ses batarangs explosifs : de tout près, il ne prend que ce quart des dégâts de leur explosion (1 : autant qu'une roquette)
-  armeExplosifs: 3,          // ... et ils ne s'arment qu'après ces mètres de vol : celui qui touche un mur plus près de sa main tombe sans exploser
+  explosifsBatman: 0.25,     // à Gotham, Batman sait lancer ses batarangs explosifs : de tout près, il ne prend que ce quart des dégâts de leur explosion (1 : autant qu'une roquette)...
+  explosifsPres: 3,          // ... et rien du tout quand il explose à moins de ces mètres de sa main (contre un mur, un pilier tout proche) : il explose quand même
   vitesseRoquette: 25,       // m/s : plus vite que toi quand tu cours, mais on peut encore l'esquiver de loin
   // le nombre de piétons et de voitures qui circulent autour de toi se choisit dans le menu : voir FOULES, tout en haut
   vitesseCirculation: 11,
@@ -2560,6 +2560,7 @@ const REGLAGES = {
   immeublesVisitables: 0.2,  // la part des immeubles (pâtés I) où l'on entre : des étages, un toit ou une terrasse (0 = aucun, 1 = tous)
   dosDAne: 0.12,             // la part des rues de ville qui ont un dos d'âne au milieu (0 = aucun, 1 = toutes)
   hauteurDosDAne: 0.12,      // mètres : pris vite, un dos d'âne fait sauter la voiture
+  hauteurPont: 4,            // mètres : un pont en ville (+ dans la CARTE) est bombé, comme à Amsterdam, et monte jusque-là en son milieu, pour que les bateaux passent dessous (le canard du Pingouin aussi). Plus haut, il est plus raide ; mets 0 pour un pont plat : les bateaux ne passent plus (puis F5)
   // les braquages
   prixBlindage: 5000,        // ce que le garagiste de LS Customs demande pour blinder une voiture façon Mad Max
   vitesseBlindable: 40,      // m/s : il ne blinde que les voitures rapides (la Porsche va à 50)
@@ -2768,9 +2769,9 @@ const VOITURES = [
     son: { grave: 26, aigu: 180, rapports: 6, rauque: 0.9, volume: 0.08 } },
   // Gotham (missions de Batman) : la voiture du Pingouin (une grosse berline violet sombre), son canard géant à moteur (un bateau : on voit le
   // Pingouin assis dedans), et les camions de l'autoroute. On ne les croise jamais : ce sont ses missions qui les amènent
-  { nom: 'Voiture du Pingouin', modele: 'rolls', vitesse: 46, acceleration: 16, virage: 1, chance: 0, couleurs: ['#2a1f36'],
+  { nom: 'Voiture du Pingouin', modele: 'rolls', vitesse: 55, acceleration: 16, virage: 1, chance: 0, couleurs: ['#2a1f36'],
     son: { grave: 38, aigu: 160, rapports: 6, rauque: 0.6, volume: 0.06 } },
-  { nom: 'Canard du Pingouin', modele: 'canard', vitesse: 24, acceleration: 9, virage: 1, chance: 0, bateau: true, couleurs: ['#f2c21a'],
+  { nom: 'Canard du Pingouin', modele: 'canard', vitesse: 28, acceleration: 9, virage: 1, chance: 0, bateau: true, couleurs: ['#f2c21a'],
     son: { grave: 55, aigu: 220, rapports: 1, rauque: 0.8, volume: 0.06, petarade: true } },
   { nom: 'Camion', modele: 'camion', vitesse: 26, acceleration: 6, virage: 0.7, chance: 0, couleurs: ['#b8b4ac', '#8a2a20', '#2a4a7a', '#3a5a3a', '#d8b030'],
     son: { grave: 24, aigu: 90, rapports: 8, rauque: 0.7, volume: 0.07 } },
@@ -2790,7 +2791,7 @@ const VOITURES = [
     son: { grave: 60, aigu: 380, rapports: 6, rauque: 1, volume: 0.07 } },
   // le Joker : son bus scolaire (The Dark Knight : il s'enfuit de la banque avec), son gros camion violet, « HA HA HA » sur les flancs, et son
   // hélicoptère violet (Batman 1989). On ne les croise jamais : ce sont ses missions qui les amènent
-  { nom: 'Bus du Joker', modele: 'bus', vitesse: 30, acceleration: 9, virage: 0.75, chance: 0, couleurs: ['#f2b51a'],
+  { nom: 'Bus du Joker', modele: 'bus', vitesse: 44, acceleration: 9, virage: 0.75, chance: 0, couleurs: ['#f2b51a'],
     son: { grave: 30, aigu: 110, rapports: 5, rauque: 0.7, volume: 0.07 } },
   { nom: 'Camion du Joker', modele: 'camion', vitesse: 36, acceleration: 8, virage: 0.75, chance: 0, couleurs: ['#5a2a7a'],
     son: { grave: 24, aigu: 95, rapports: 8, rauque: 0.8, volume: 0.07 } },
@@ -3598,9 +3599,15 @@ const MISSIONS_MALIBU = [
 //  batmobile (un mur de feu sur l'autoroute ; B : ta Batmobile surgit des flammes ; monte dedans. vers : la case [colonne, ligne] d'où elle arrive)
 //  poursuite (voiture : celle qu'il faut rattraper ; chemin : les cases [colonne, ligne] par où elle passe, sur les rues et les routes (elle
 //    recommence au début quand elle a fini : elle tourne en rond dans la ville) ; coups : combien de fois il faut lui rentrer dedans ;
-//    camions : combien de camions roulent devant elle ; vite : sa vitesse quand tu lui colles aux roues, en m/s)
+//    camions : combien de camions roulent devant elle ; vite : sa vitesse quand tu lui colles aux roues, en m/s (× 3,6 : en km/h) ; virage :
+//    sa vitesse dans les virages serrés (elle freine juste avant ; sans virage, la voiture du Pingouin ne freine jamais : elle finit dans
+//    les murs ! Le Joker, lui, freine à 15 m/s) ; fuite : après chaque coup, elle file plus vite pendant 3 s (1.3 = 30 % plus vite, sans
+//    fuite aussi) ; zigzag : quand tu lui colles aux roues, elle zigzague d'une voie à l'autre (1 = normal, 1.4 = plus large et plus vite,
+//    0 = jamais ; jamais jusque sur le trottoir))
 //  suivre (voiture : celle qu'il faut suivre, sans la perdre ; chemin : par où elle va (des cases [colonne, ligne], ou un endroit de
-//    POINTS : 'egout', la bouche de l'égout ; 'bassin', au bout de la salle de l'égout) ; elle t'attend quand tu es à plus de « attend » m)
+//    POINTS : 'egout', la bouche de l'égout ; 'bassin', au bout de la salle de l'égout) ; vite : sa vitesse tant que tu la suis à moins de
+//    « pres » mètres (le hors-bord va à 30 m/s) ; plus loin, elle ralentit, et elle t'attend quand tu es à plus de « attend » m ; virage : sa
+//    vitesse dans les virages serrés ; egout : sa vitesse dans l'égout, où le canal est étroit)
 //  brouiller (antennes : où sont les antennes du Pingouin, des cases [colonne, ligne] ; gardes : combien d'hommes autour de chacune ;
 //    pingouins : combien de pingouins-missiles marchent sur la ville ; secondes : le temps avant qu'ils arrivent. E tout près d'une
 //    antenne la brouille, un batarang ou le gel explosif aussi)
@@ -3652,13 +3659,13 @@ const MISSIONS_GOTHAM = [
   { nom: 'Poursuite sous la pluie', recompense: 15000, batmobile: true, etapes: [
     { type: 'aller', case: [22, 22], texte: '{ami} : « Le Pingouin s\'enfuit par l\'autoroute ! » Mets ton costume (H), et fonce (point jaune)' },
     { type: 'batmobile', case: [22, 22], vers: [22, 23.3], texte: 'Ses hommes ont fait sauter un camion : un mur de feu ! B : appelle ta Batmobile' },
-    { type: 'poursuite', voiture: 'Voiture du Pingouin', chemin: [[22, 19.2], [22, 13], [35, 12.5], [35.5, 14.2], [35.5, 19.6], [25.4, 20.4], [22, 20.3]], coups: 4, camions: 6, vite: 34,
+    { type: 'poursuite', voiture: 'Voiture du Pingouin', chemin: [[22, 19.2], [22, 13], [35, 12.5], [35.5, 14.2], [35.5, 19.6], [25.4, 20.4], [22, 20.3]], coups: 4, camions: 6, vite: 48, virage: 22, fuite: 1.1,
       texte: 'Rattrape la voiture du Pingouin, et rentre-lui dedans ! Encore {n} coups' },
   ]},
   // Batman, le défi (1992) : le Pingouin s'enfuit dans son canard géant à moteur, par le canal et la rivière... jusque dans les égouts
   { nom: 'Le canard du Pingouin', recompense: 25000, etapes: [
     { type: 'aller', point: 'ponton', texte: '{ami} a vu le Pingouin sur le canal, dans un canard géant à moteur ! Va au ponton (point jaune)' },
-    { type: 'suivre', voiture: 'Canard du Pingouin', chemin: [[31, 34.2], [31, 24.1], [21.2, 24.1], [19.3, 23.2], [19.3, 22.45], 'egout', 'bouche', 'bassin'], attend: 70, vite: 22,
+    { type: 'suivre', voiture: 'Canard du Pingouin', chemin: [[31, 34.2], [31, 24.1], [21.2, 24.1], [19.3, 23.2], [19.3, 22.45], 'egout', 'bouche', 'bassin'], vite: 27, pres: 40, attend: 90, virage: 14, egout: 16,
       texte: 'Le canard ! Suis-le, sans le perdre (le hors-bord du ponton : E)' },
     { type: 'eliminer', cible: 'homme', nombre: 8, ensemble: 3, point: 'salle', texte: 'Les hommes du Pingouin t\'attendaient, au bout de l\'égout ! Il en reste {n}' },
   ]},
@@ -3704,7 +3711,7 @@ const MISSIONS_GOTHAM = [
   { nom: 'Le braquage des clowns', recompense: 70000, evacuer: true, etapes: [
     { type: 'aller', lieu: '£', signal: true, texte: '{ami} : « Les clowns du Joker braquent la banque de Gotham ! » Vite, à la banque (point jaune)' },
     { type: 'eliminer', cible: 'clown', nombre: 6, ensemble: 3, lieu: '£', texte: 'Les clowns du Joker sortent de la banque, avec les sacs d\'argent ! Assomme-les : il en reste {n}' },
-    { type: 'poursuite', voiture: 'Bus du Joker', qui: 'joker', chemin: [[38.5, 20.4], [44.5, 20.4], [44.5, 26.4], [32.5, 26.4], [32.5, 20.4]], coups: 4, camions: 0, feux: 0, vite: 27,
+    { type: 'poursuite', voiture: 'Bus du Joker', qui: 'joker', chemin: [[38.5, 20.4], [44.5, 20.4], [44.5, 26.4], [32.5, 26.4], [32.5, 20.4]], coups: 6, camions: 0, feux: 0, vite: 34, virage: 22, fuite: 1.6, zigzag: 1.4,
       texte: 'Le Joker s\'enfuit dans un bus scolaire, avec l\'argent ! En Batmobile (B), rentre-lui dedans : encore {n} coups' },
   ]},
   // The Dark Knight : le Joker attaque un fourgon de police dans le bas de la ville, avec son gros camion et un bazooka. Ta voiture est touchée...
@@ -4761,6 +4768,31 @@ function dosDAneEn(x, z) {
   if (Math.abs(x - il * PAS - R / 2) <= R / 2 && dosV.has(il * 1000 + b)) return bosseDosDAne(z - b * PAS - R / 2 - PAS / 2);
   return 0;
 }
+// Les ponts en ville : une rue entre deux cases d'eau (autour d'un + de la CARTE) est un pont bombé, comme sur les canaux d'Amsterdam. Du bord
+// de chaque carrefour, il monte en douceur jusqu'à son milieu, R_.hauteurPont mètres au-dessus de la rue (21 % de pente au plus, avec 4 m),
+// puis redescend : les bateaux passent dessous. Son tablier fait 1,2 m d'épaisseur à ses deux bouts, et 60 cm au milieu.
+// pontsH : les rues rueH(i, j) qui sont des ponts (rangées i * 1000 + j), pontsV : les rueV
+const pontsH = new Set(), pontsV = new Set();
+for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
+  if (rueH(i, j) && surEau(i, j - 1) && surEau(i, j)) pontsH.add(i * 1000 + j);
+  if (rueV(i, j) && surEau(i - 1, j) && surEau(i, j)) pontsV.add(i * 1000 + j);
+}
+// la bosse du pont et l'épaisseur de son tablier, à d mètres de son milieu (dans le sens de la rue) : au bord des carrefours (à S / 2 = 30 m
+// du milieu), la bosse est à 0, et le tablier fait 1,2 m
+const bossePont = d => Math.abs(d) < S / 2 ? R_.hauteurPont * Math.cos(Math.PI * d / S) ** 2 : 0;
+const epaisseurPont = d => 1.2 - (Math.abs(d) < S / 2 ? 0.6 * Math.cos(Math.PI * d / S) ** 2 : 0);
+// le pont en ville qui passe en (x, z) : { y : le dessus de la chaussée, bas : le dessous du tablier, d : à combien de mètres de son milieu,
+// le : 'x' s'il va vers x (une rue est-ouest), 'z' vers z ; w : de combien on est à côté du milieu de la rue (vers +z, ou vers +x) } ;
+// null s'il n'y en a pas (ailleurs, et dans les carrefours, à ses deux bouts)
+function pontEn(x, z) {
+  const jl = Math.round((z - R / 2) / PAS), il = Math.round((x - R / 2) / PAS), a = Math.floor((x - R / 2) / PAS), b = Math.floor((z - R / 2) / PAS);
+  let d = null, y0 = 0, le = 'x', w = z - jl * PAS - R / 2;
+  if (Math.abs(w) <= R / 2 && pontsH.has(a * 1000 + jl)) { d = x - a * PAS - R / 2 - PAS / 2; y0 = baseNoeud(a, jl); }
+  else if (Math.abs(x - il * PAS - R / 2) <= R / 2 && pontsV.has(il * 1000 + b)) { d = z - b * PAS - R / 2 - PAS / 2; y0 = baseNoeud(il, b); le = 'z'; w = x - il * PAS - R / 2; }
+  if (d === null || Math.abs(d) >= S / 2) return null;
+  const y = y0 + bossePont(d);
+  return { y, bas: y - epaisseurPont(d), d, le, w };
+}
 
 // Le terrain est fait de triangles de 9,25 m de côté, deux par carré de la grille : les numéros, dans HT, des trois coins du triangle
 // qui est en (x, z)
@@ -4853,7 +4885,9 @@ const grilleRoutes = new Map();   // case de rangement -> morceaux de route qui 
   for (const [s, v] of graphe) for (const n of v) if (!faits.has(arete(s, n))) suivre(s, n);   // les boucles
   // chaque bout a un numéro dans le réseau (les croisements de campagne sont partagés entre plusieurs routes)
   const numBout = new Map();
-  const hauteurPoint = (x, z) => { const h = terrainNaturel(x, z); return h < EAU + 0.5 ? { y: Math.max(h, EAU + 4.5), pont: true, min: EAU + 4.5 } : { y: h, pont: false, min: -Infinity }; };
+  // (au-dessus de l'eau, un pont : 5 m au-dessus d'elle au moins, pour que les bateaux passent sous son tablier, épais de 1,2 m ; le canard du
+  // Pingouin, haut de 3 m, aussi : avec 4,5 m, il ne lui restait que 8 cm, sous le pont de l'autoroute, à Gotham)
+  const hauteurPoint = (x, z) => { const h = terrainNaturel(x, z); return h < EAU + 0.5 ? { y: Math.max(h, EAU + 5), pont: true, min: EAU + 5 } : { y: h, pont: false, min: -Infinity }; };
   const numero = s => {
     if (s[0] === 'c') return +s.slice(1);
     if (!numBout.has(s)) { const p = pos(s); numBout.set(s, nouveauNoeud(p.x, p.z, hauteurPoint(p.x, p.z).y)); }
@@ -4928,7 +4962,7 @@ const grilleRoutes = new Map();   // case de rangement -> morceaux de route qui 
     for (let q = 1; q < pts.length; q++) {
       const n = q === pts.length - 1 ? n1 : nouveauNoeud(pts[q].x, pts[q].z, pts[q].y);
       relier(prec, n); prec = n;
-      const a = pts[q - 1], b = pts[q], s = { ax: a.x, az: a.z, ay: a.y, bx: b.x, bz: b.z, by: b.y, pont: a.pont && b.pont };
+      const a = pts[q - 1], b = pts[q], s = { ax: a.x, az: a.z, ay: a.y, bx: b.x, bz: b.z, by: b.y, pont: a.pont && b.pont, rambarde: a.pont || b.pont };   // (rambarde : ses garde-fous, voir retenuPont)
       for (let cx = Math.floor((Math.min(a.x, b.x) - 6) / CELL); cx <= Math.floor((Math.max(a.x, b.x) + 6) / CELL); cx++)
         for (let cz = Math.floor((Math.min(a.z, b.z) - 6) / CELL); cz <= Math.floor((Math.max(a.z, b.z) + 6) / CELL); cz++)
           (grilleRoutes.get(cx * 1000 + cz) || grilleRoutes.set(cx * 1000 + cz, []).get(cx * 1000 + cz)).push(s);
@@ -4936,13 +4970,13 @@ const grilleRoutes = new Map();   // case de rangement -> morceaux de route qui 
     ROUTES.push(pts);
   }
 }
-// le morceau de route le plus proche de (x, z), à moins de 6 m : { d, y, pont } ou null
+// le morceau de route le plus proche de (x, z), à moins de 6 m : { d, y, pont, s : le morceau } ou null
 function routeSous(x, z) {
   let r = null;
   for (const s of grilleRoutes.get(Math.floor(x / CELL) * 1000 + Math.floor(z / CELL)) || []) {
     const dx = s.bx - s.ax, dz = s.bz - s.az, t = clamp(((x - s.ax) * dx + (z - s.az) * dz) / (dx * dx + dz * dz || 1), 0, 1);
     const d = Math.hypot(s.ax + dx * t - x, s.az + dz * t - z);
-    if (d < 6 && (!r || d < r.d)) r = { d, y: s.ay + (s.by - s.ay) * t, pont: s.pont };
+    if (d < 6 && (!r || d < r.d)) r = { d, y: s.ay + (s.by - s.ay) * t, pont: s.pont, s };
   }
   return r;
 }
@@ -8021,27 +8055,73 @@ const geoDosDAne = () => { // une bosse en travers de la rue (qui va vers z)
   g.computeVertexNormals();
   return g;
 };
+// Un pont en ville (pontsH, pontsV : voir pontEn) : sa chaussée, ses lignes et ses passages piétons suivent sa bosse ; dessous, son tablier
+// de béton (1,2 m d'épaisseur à ses bouts, 60 cm au milieu) ; de chaque côté, un garde-fou qui suit la bosse. Leurs boîtes de collision :
+// celles du dessous du tablier, un morceau tous les 2 m (la caméra et les balles s'y arrêtent, d'en dessous), et celles des garde-fous.
+// Les bateaux, eux, butent sur le dessous du tablier, là où il est trop bas pour eux (voir bougerVoiture). Le pont part du carrefour n et
+// va vers z (le : 'z', une rue nord-sud) ou vers x ('x', une rue est-ouest). y : la hauteur de la rue
+const MORCEAUX_PONT = 30;   // (le pont est fait de 30 morceaux de 2 m, le long)
+function construirePont(n, y, le) {
+  // un point du pont : u, de combien on avance dans la rue depuis le carrefour n ; w, de combien on est à côté de son milieu (vers +x ou +z)
+  const P = (u, w, h) => le === 'z' ? [n.x + w, h, n.z + u] : [n.x + u, h, n.z + w];
+  const haut = u => y + bossePont(u - PAS / 2), bas = u => haut(u) - epaisseurPont(u - PAS / 2);
+  // une nappe de na × nb carrés : f(a, b) (a et b de 0 à 1) donne chaque sommet, [x, y, z, et ses coordonnées de texture u, v].
+  // vers : 1, elle est tournée vers le haut ; -1, vers le bas ; 0, peu importe (le béton se voit des deux côtés)
+  const nappe = (mat, na, nb, f, vers = 0) => {
+    const pos = [], uv = [], idx = [];
+    for (let kb = 0; kb <= nb; kb++) for (let ka = 0; ka <= na; ka++) { const s = f(ka / na, kb / nb); pos.push(s[0], s[1], s[2]); uv.push(s[3], s[4]); }
+    for (let kb = 0; kb < nb; kb++) for (let ka = 0; ka < na; ka++) { const a = kb * (na + 1) + ka, b = a + 1, c = a + na + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
+    const sommet = k => new THREE.Vector3(pos[3 * k], pos[3 * k + 1], pos[3 * k + 2]), [A, C, B] = [sommet(idx[0]), sommet(idx[1]), sommet(idx[2])];
+    if (vers && Math.sign(C.sub(A).cross(B.sub(A)).y) !== vers) idx.reverse();   // (dans le bon sens : sinon, on ne la voit pas)
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+    g.computeVertexNormals();
+    ajouterGeo(mat, g);
+  };
+  const tex = tu => le === 'z' ? tu : 1 - tu;   // (les lignes et les passages piétons : tournés comme ceux des autres rues)
+  // la chaussée (et les deux carrefours, à plat, comme pour les autres rues), ses lignes, ses deux passages piétons
+  nappe('route', 1, 2 * MORCEAUX_PONT + 14, (a, b) => { const u = -R / 2 + b * (PAS + R), p = P(u, -R / 2 + a * R, haut(u)); return [...p, p[0] / 8, -p[2] / 8]; }, 1);
+  nappe('lignes', 1, MORCEAUX_PONT, (a, b) => { const u = R / 2 + b * S; return [...P(u, -R / 2 + a * R, haut(u) + 0.02), tex(a), 1 - b]; }, 1);
+  for (const u0 of [R / 2 + 2, R / 2 + S - 2]) nappe('zebra', 1, 3, (a, b) => { const u = u0 - 1.5 + 3 * b; return [...P(u, -(R - 2) / 2 + a * (R - 2), haut(u) + 0.025), tex(a), 1 - b]; }, 1);
+  // le tablier : ses deux flancs, son dessous, ses deux bouts
+  const u1 = R / 2, u2 = PAS - R / 2, long = u => u1 + u * (u2 - u1);
+  for (const s of [-1, 1]) nappe('beton2', MORCEAUX_PONT, 1, (a, b) => { const u = long(a), h = b ? bas(u) : haut(u) - 0.01; return [...P(u, s * R / 2, h), u / 4, h / 4]; });
+  nappe('beton2', 1, MORCEAUX_PONT, (a, b) => { const u = long(b); return [...P(u, -R / 2 + a * R, bas(u)), a * R / 4, u / 4]; }, -1);
+  for (const u of [u1, u2]) nappe('beton2', 1, 1, (a, b) => [...P(u, -R / 2 + a * R, b ? bas(u) : haut(u) - 0.01), a * R / 4, b]);
+  // les garde-fous : un morceau de 1 m de haut tous les 2 m, penché comme la chaussée
+  const pas = (u2 - u1) / MORCEAUX_PONT;
+  for (let k = 0; k < MORCEAUX_PONT; k++) for (const s of [-1, 1]) {
+    const ua = long(k / MORCEAUX_PONT), ub = ua + pas, dh = haut(ub) - haut(ua), l = Math.hypot(pas, dh), a = Math.atan2(dh, pas);
+    const g = le === 'z' ? new THREE.BoxGeometry(0.2, 1, l + 0.04).rotateX(-a) : new THREE.BoxGeometry(l + 0.04, 1, 0.2).rotateZ(a);
+    ajouterGeo('rambarde', g.translate(...P((ua + ub) / 2, s * (R / 2 - 0.1), (haut(ua) + haut(ub)) / 2 + 0.5)));
+  }
+  // les boîtes de collision : le dessous du tablier (une dalle mince tous les 2 m, pour la caméra et les balles, d'en dessous), et les
+  // garde-fous (un morceau tous les 6 m : ils retiennent B.J. à pied). Elles sont marquées pont : les voitures ne les voient pas (voir
+  // resoudre). Pour elles, c'était un mur : à 20 images par seconde, une voiture lancée monte de 60 cm par image, et ses roues se
+  // retrouvaient sous le haut de la dalle suivante ; contre un garde-fou, elle partait en accident. Ce sont retenuPont et poserVoiture qui
+  // les gardent sur le pont
+  const boiteP = (ua, ub, wa, wb, h, y0) => { const [x1, , z1] = P(ua, wa, 0), [x2, , z2] = P(ub, wb, 0); ajouterCollision(Math.min(x1, x2), Math.min(z1, z2), Math.max(x1, x2), Math.max(z1, z2), h, y0).pont = true; };
+  for (let k = 0; k < MORCEAUX_PONT; k++) { const ua = long(k / MORCEAUX_PONT), ub = ua + pas; boiteP(ua, ub, -R / 2, R / 2, Math.max(bas(ua), bas(ub)) + 0.1, Math.min(bas(ua), bas(ub))); }
+  for (let k = 0; k < MORCEAUX_PONT; k += 3) for (const s of [-1, 1]) {
+    const ua = long(k / MORCEAUX_PONT), ub = ua + 3 * pas;
+    boiteP(ua, ub, s * (R / 2 - 0.2), s * R / 2, Math.max(haut(ua), haut(ub)) + 1, Math.min(haut(ua), haut(ub)));
+  }
+}
 for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
   const n = noeud(i, j), y = baseNoeud(i, j);
-  if (rueV(i, j)) { // nord-sud
+  if (rueV(i, j) && pontsV.has(i * 1000 + j)) construirePont(n, y, 'z');   // un pont en ville, bombé (nord-sud)
+  else if (rueV(i, j)) { // nord-sud
     if (dosV.has(i * 1000 + j)) ajouterGeo('dosDAne', geoDosDAne().translate(n.x, y + 0.01, n.z + PAS / 2));
     solMonde('route', n.x - R / 2, n.z - R / 2, n.x + R / 2, n.z + PAS + R / 2, y);
     const l = new THREE.PlaneGeometry(R, S).rotateX(-Math.PI / 2); l.translate(n.x, y + 0.02, n.z + R / 2 + S / 2); ajouterGeo('lignes', l);
     for (const dz of [R / 2 + 2, R / 2 + S - 2]) { const z = new THREE.PlaneGeometry(R - 2, 3).rotateX(-Math.PI / 2); z.translate(n.x, y + 0.025, n.z + dz); ajouterGeo('zebra', z); }
-    if (surEau(i - 1, j) && surEau(i, j)) { // un pont en ville, avec ses garde-fous
-      boite('beton2', n.x, y - 1.2, n.z + PAS / 2, R, 1.2, PAS - R);
-      for (const s of [-1, 1]) boite('rambarde', n.x + s * (R / 2 - 0.1), y, n.z + PAS / 2, 0.2, 1, PAS - R, true);
-    }
   }
-  if (rueH(i, j)) { // est-ouest
+  if (rueH(i, j) && pontsH.has(i * 1000 + j)) construirePont(n, y, 'x');   // (est-ouest)
+  else if (rueH(i, j)) { // est-ouest
     if (dosH.has(i * 1000 + j)) ajouterGeo('dosDAne', geoDosDAne().rotateY(Math.PI / 2).translate(n.x + PAS / 2, y + 0.01, n.z));
     solMonde('route', n.x - R / 2, n.z - R / 2, n.x + PAS + R / 2, n.z + R / 2, y);
     const l = new THREE.PlaneGeometry(R, S).rotateX(-Math.PI / 2).rotateY(Math.PI / 2); l.translate(n.x + R / 2 + S / 2, y + 0.02, n.z); ajouterGeo('lignes', l);
     for (const dx of [R / 2 + 2, R / 2 + S - 2]) { const z = new THREE.PlaneGeometry(R - 2, 3).rotateX(-Math.PI / 2).rotateY(Math.PI / 2); z.translate(n.x + dx, y + 0.025, n.z); ajouterGeo('zebra', z); }
-    if (surEau(i, j - 1) && surEau(i, j)) {
-      boite('beton2', n.x + PAS / 2, y - 1.2, n.z, PAS - R, 1.2, R);
-      for (const s of [-1, 1]) boite('rambarde', n.x + PAS / 2, y, n.z + s * (R / 2 - 0.1), PAS - R, 1, 0.2, true);
-    }
   }
 }
 // les routes de campagne : un ruban de 10 m qui suit la route. Sur l'eau, c'est un pont, avec ses piliers
@@ -8079,7 +8159,9 @@ for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
       if (surPont && debut < 0) debut = Math.max(0, k - 1);
       if (!surPont && debut >= 0) {
         const fin = Math.min(pts.length - 1, k), p = pts.slice(debut, fin + 1);
-        ruban(pts, debut, fin, 5.2, 0, 'beton2', 1.2); ruban(pts, debut, fin, 5.1, 1, 'rambarde', 0.12); ruban(pts, debut, fin, 5.1, 0.6, 'rambarde', 0.1);
+        // le tablier : ses deux flancs, et son dessous (sans lui, vu d'un bateau, le pont était transparent : la route ne se voit que d'en haut)
+        ruban(pts, debut, fin, 5.2, 0, 'beton2', 1.2); ruban(pts, debut, fin, 5.2, -1.2, 'beton2');
+        ruban(pts, debut, fin, 5.1, 1, 'rambarde', 0.12); ruban(pts, debut, fin, 5.1, 0.6, 'rambarde', 0.1);   // (les garde-fous : voir retenuPont)
         p.forEach((q, n) => { const t = hauteurTerrain(q.x, q.z); if (n % 3 === 1 && t < q.y - 3) {
           ajouterGeo('beton2', new THREE.CylinderGeometry(0.8, 0.9, q.y - 1.2 - t, 10).translate(q.x, (q.y - 1.2 + t) / 2, q.z));
           ajouterCollision(q.x - 0.8, q.z - 0.8, q.x + 0.8, q.z + 0.8, q.y - 1.3, t - 5); } });
@@ -8658,6 +8740,8 @@ function majMorceaux() {
 // (en courant sur un ordinateur lent, en volant), il sauterait par-dessus un mur fin (une cloison fait 12 cm), ou s'arrêterait au milieu
 // et ressortirait de l'autre côté. Un bout qui le ferait passer à travers une boîte (coincé entre un meuble et un mur, qui le poussent
 // chacun vers l'autre), il ne le fait pas : il reste où il était
+// o.roule : c'est une voiture (ou une moto) qui roule, ou qui part en accident : elle ne voit pas les boîtes des ponts bombés (b.pont : voir
+// construirePont). Ce sont leurs garde-fous qui la retiennent (retenuPont)
 function resoudre(o, r, haut = 1.7, depuis = null) {
   const y = o.y ?? hauteurSol(o.x, o.z);
   let choc = false;
@@ -8670,14 +8754,15 @@ function resoudre(o, r, haut = 1.7, depuis = null) {
       o.x += dx / n; o.z += dz / n;
       if (!pousserHors(o, r, y, haut)) continue;   // (rien ne l'a poussé : un si petit bout ne traverse rien)
       choc = true;
-      if (entreDansUneBoite(ax, az, o.x, o.z, y, haut)) { o.x = ax; o.z = az; break; }
+      if (entreDansUneBoite(ax, az, o.x, o.z, y, haut, o.roule)) { o.x = ax; o.z = az; break; }
     }
   }
   o.x = clamp(o.x, -30, TAILLE_X + 30); o.z = clamp(o.z, -30, TAILLE_Z + 30);
   return choc;
 }
 // une boîte qui gêne quelqu'un dont les pieds sont en y, haut de « haut » : pas une marche qu'on monte, ni quelque chose au-dessus de la tête
-const gene = (b, y, haut) => b.h > y + PASMAX && b.y0 < y + haut;
+// (roule : une voiture, que les boîtes d'un pont bombé ne gênent pas : voir resoudre)
+const gene = (b, y, haut, roule = false) => !(roule && b.pont) && b.h > y + PASMAX && b.y0 < y + haut;
 // une boîte qui commence plus haut que sa taille, et dont le cercle est dessous : un plafond (le plancher du dessus, le haut d'une porte).
 // Elle ne le pousse pas de côté : sinon, la tête dans le plafond (en sautant d'un lit, en volant), il était poussé vers son bord le plus
 // proche, souvent de l'autre côté du mur (dehors). C'est sa tête qui s'y cogne (voir plafondAu)
@@ -8688,7 +8773,7 @@ function pousserHors(o, r, y, haut) {
   for (let passe = 0; passe < 3; passe++) {
     let bouge = false;
     pourBoites(o.x - r, o.z - r, o.x + r, o.z + r, b => {
-      if (!gene(b, y, haut) || plafond(b, o.x, o.z, y, haut)) return;
+      if (!gene(b, y, haut, o.roule) || plafond(b, o.x, o.z, y, haut)) return;
       const px = clamp(o.x, b.x1, b.x2), pz = clamp(o.z, b.z1, b.z2);
       const dx = o.x - px, dz = o.z - pz, d2 = dx * dx + dz * dz;
       if (d2 >= r * r - 1e-6) return;
@@ -8705,10 +8790,10 @@ function pousserHors(o, r, y, haut) {
   return choc;
 }
 // le chemin tout droit de (ax, az) à (bx, bz) entre-t-il dans une boîte qui gêne (voir gene) ? Pas une boîte où il est déjà (il en sort)
-function entreDansUneBoite(ax, az, bx, bz, y, haut) {
+function entreDansUneBoite(ax, az, bx, bz, y, haut, roule = false) {
   let entre = false;
   pourBoites(Math.min(ax, bx), Math.min(az, bz), Math.max(ax, bx), Math.max(az, bz), b => {
-    if (entre || !gene(b, y, haut) || plafond(b, bx, bz, y, haut)) return;
+    if (entre || !gene(b, y, haut, roule) || plafond(b, bx, bz, y, haut)) return;
     const [t1, t2] = traversee([ax, 0, az], [bx - ax, 0, bz - az], [b.x1, -1, b.z1], [b.x2, 1, b.z2]);
     if (t1 >= 0 && t1 < 1 && t1 < t2) entre = true;
   });
@@ -8739,10 +8824,13 @@ function hauteurSol(x, z, y = -Infinity) {
   let h = hauteurTerrain(x, z, y);
   const i = Math.floor((x - R) / PAS), j = Math.floor((z - R) / PAS);
   if (estBloc(car(i, j)) && car(i, j) !== ')' && x - R - i * PAS <= S && z - R - j * PAS <= S) h = Math.max(h, baseCase[j][i] + 0.2);   // le trottoir d'un pâté (pas au camp de la grotte : de la terre)
-  const jl = Math.round((z - R / 2) / PAS), il = Math.round((x - R / 2) / PAS);
-  if (Math.abs(z - jl * PAS - R / 2) <= R / 2) { const a = Math.floor((x - R / 2) / PAS); if (rueH(a, jl)) h = Math.max(h, baseNoeud(a, jl)); }
-  if (Math.abs(x - il * PAS - R / 2) <= R / 2) { const b = Math.floor((z - R / 2) / PAS); if (rueV(il, b)) h = Math.max(h, baseNoeud(il, b)); }
-  h += dosDAneEn(x, z);
+  const jl = Math.round((z - R / 2) / PAS), il = Math.round((x - R / 2) / PAS), p = pontEn(x, z);
+  if (p) { if (y === -Infinity || p.y <= y + PASMAX) h = Math.max(h, p.y); }   // un pont bombé : on est dessus... ou dessous (le sol est alors l'eau, ou la berge)
+  else {
+    if (Math.abs(z - jl * PAS - R / 2) <= R / 2) { const a = Math.floor((x - R / 2) / PAS); if (rueH(a, jl)) h = Math.max(h, baseNoeud(a, jl)); }
+    if (Math.abs(x - il * PAS - R / 2) <= R / 2) { const b = Math.floor((z - R / 2) / PAS); if (rueV(il, b)) h = Math.max(h, baseNoeud(il, b)); }
+    h += dosDAneEn(x, z);
+  }
   const r = routeSous(x, z);
   if (r && r.d < 5.3 && (y === -Infinity || r.y <= y + PASMAX)) h = Math.max(h, r.y);
   if (y > -Infinity) pourBoites(x, z, x, z, b => { if (x >= b.x1 && x <= b.x2 && z >= b.z1 && z <= b.z2 && b.h <= y + PASMAX && b.h > h && !b.mur) h = b.h; });
@@ -8814,12 +8902,16 @@ function balleArrive(tireur, depart, arrivee, ratee = false) {
 }
 // le chemin tout droit du point a au point b : où touche-t-il le sol dehors (rue, trottoir, route, terrain) ou l'eau ?
 // De 0 (en a) à 1 (nulle part avant b). On avance d'un mètre à la fois, puis on cherche l'endroit exact dans le dernier mètre.
-// Sous un pont (son tablier fait 1,2 m d'épaisseur), le sol est le terrain ou l'eau, pas la route du dessus
+// Sous un pont (son tablier fait 1,2 m d'épaisseur ; celui d'un pont bombé, en ville, 60 cm en son milieu), le sol est le terrain ou l'eau,
+// pas la route du dessus. Parti d'un souterrain de Gotham (sous), le chemin qui entre dans la roche (contre une paroi, dans la voûte : la colline
+// est bien au-dessus de lui) n'y touche pas le sol : c'est une paroi, que les boîtes et les rayons trouvent (avant, le gel explosif visé sur un
+// mur de l'égout se posait par terre, au pied du mur)
 function toucheSol(a, b) {
-  const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z, n = Math.ceil(Math.hypot(dx, dy, dz));
+  const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z, n = Math.ceil(Math.hypot(dx, dy, dz)), sous = SOUTERRAINS.length && sousLaTerre(a.x, a.z, a.y);
   const dessous = t => {
-    const x = a.x + dx * t, y = a.y + dy * t, z = a.z + dz * t, bas = Math.max(hauteurTerrain(x, z, y), EAU), h = Math.max(hauteurSol(x, z), bas);   // (au-dessus de la galerie de la grotte : la colline)
-    return y < (h > bas + 1.5 && y < h - 1.2 ? bas : Math.max(h, EAU)) + 0.02;
+    const x = a.x + dx * t, y = a.y + dy * t, z = a.z + dz * t, bas = Math.max(hauteurTerrain(x, z, y), EAU), h = Math.max(hauteurSol(x, z), bas), p = pontEn(x, z);   // (au-dessus de la galerie de la grotte : la colline)
+    if (sous && bas > y + 1.5 && !souterrainEn(x, z, y)) return false;
+    return y < (p ? (y < p.bas ? bas : Math.max(h, EAU)) : h > bas + 1.5 && y < h - 1.2 ? bas : Math.max(h, EAU)) + 0.02;
   };
   for (let i = 1; i <= n; i++) if (dessous(i / n)) {
     let t1 = (i - 1) / n, t2 = i / n;
@@ -10466,6 +10558,7 @@ function majAccident(v, dt) {
   const a = v.accident, k = coqueAccident(v.type.modele), q = v.quat;
   if (a.dort) return;
   a.duree += dt;
+  const depart = { x: a.c.x, z: a.c.z };   // (où était son milieu : voir les garde-fous des ponts, plus bas)
   let pire = null, touche = false;   // pire : le choc le plus fort contre le sol [vitesse, point et direction dans le repère de la voiture, largeur, roue]
   const noter = (choc, P, D, largeur, roue = null) => { if (choc > 3 && (!pire || choc > pire[0])) pire = [choc, P, D, largeur, roue]; };
   const n = 4, h = dt / n, P = V3();
@@ -10490,7 +10583,7 @@ function majAccident(v, dt) {
   // vue du ciel, elle garde sa file de cercles, le long de son axe : pour les murs, les lampadaires et les autres voitures
   const f = V3(0, 0, 1).applyQuaternion(q);
   if (Math.hypot(f.x, f.z) > 0.2) v.angle = Math.atan2(f.x, f.z);
-  const cercle = lz => ({ x: a.c.x + Math.sin(v.angle) * lz, z: a.c.z + Math.cos(v.angle) * lz, y: a.c.y - k.cg });
+  const cercle = lz => ({ x: a.c.x + Math.sin(v.angle) * lz, z: a.c.z + Math.cos(v.angle) * lz, y: a.c.y - k.cg, roule: true });   // (roule : voir resoudre)
   for (const lz of v.cercles) {
     const c = cercle(lz), avant = { ...c };
     faucher(v, c, a.vel.x, a.vel.z);
@@ -10499,6 +10592,15 @@ function majAccident(v, dt) {
     a.c.x += px; a.c.z += pz;
     const choc = toucher(v, P.set(avant.x, a.c.y, avant.z), N, 0.3, 0.4);
     if (choc > 3) abimer(v, versVoiture(v, V3(avant.x - N.x * v.rayon, a.c.y, avant.z - N.z * v.rayon)), versVoiture(v, N, true), (choc - 3) * 0.03);   // comme un choc sur la route
+  }
+  // les garde-fous des ponts (voir retenuPont) : même en tête-à-queue ou en tonneaux, elle rebondit dessus, au lieu de tomber à l'eau
+  // (sauf si elle passe à plus de 1,5 m au-dessus de la chaussée)
+  for (const lz of v.cercles) {
+    const g = retenuPont(cercle(lz), depart, v.rayon, a.c.y - k.cg);
+    if (!g) continue;
+    a.c.x += g.x; a.c.z += g.z;
+    const vn = a.vel.x * g.nx + a.vel.z * g.nz;   // (sa vitesse vers le milieu du pont : moins de 0, elle part vers le garde-fou)
+    if (vn < 0) { a.vel.x -= 1.3 * vn * g.nx; a.vel.z -= 1.3 * vn * g.nz; }
   }
   for (const o of voitures) {
     if (o === v || o.coule || dist(o, a.c) > (v.forme.longueur + o.forme.longueur) / 2 + 1 || Math.abs(o.y - v.y) > 2.5) continue;
@@ -11238,12 +11340,13 @@ function majRoquettes(dt) {
       if (t < avance && v.addScaledVector(r.dir, -t).length() < 1) { avance = t; touche = true; } };
     for (const p of personnes) if (p.vie > 0 && p !== r.tireur) frole(p.x, p.y + 1, p.z);
     if (r.tireur) frole(J.x, J.y + (J.robot?.armure ? 1.4 : J.robot ? 3 : 1), J.z);
+    if (sousLaTerre(pos.x, pos.z, pos.y)) r.dessous = true;   // (sous la terre : voir roche, dans majLances)
     pos.addScaledVector(r.dir, avance); r.reste -= avance;
     // traînée de fumée : une bouffée grise par image, qui grossit et s'efface
     const f = new THREE.Sprite(M_FUMEE.clone()); f.position.copy(pos); scene.add(f); effets.push({ o: f, vie: 1.2, fumee: 1.2 });
-    const sol = hauteurSol(pos.x, pos.z, pos.y);
+    const sol = hauteurSol(pos.x, pos.z, pos.y), roche = r.dessous && sol > pos.y + 1.5;
     if (touche || pos.y <= sol || r.reste <= 0) {
-      pos.y = Math.max(pos.y, sol + 0.1);
+      if (!roche) pos.y = Math.max(pos.y, sol + 0.1);
       r.fini = true; scene.remove(r.m);
       exploser(pos, r.rayon, r.degatsPNJ, r.degatsJoueur, r.tireur, false, !r.tireur, !r.sansVoitures);   // (sansVoitures : la roquette du Joker, qui ne fait rien aux voitures)
       r.apres?.(pos);   // (la roquette du Joker : elle secoue le Batpod)
@@ -11294,16 +11397,20 @@ function majLances(dt) {
       const v = new THREE.Vector3(p.x, p.y + 1, p.z).sub(pos), t = clamp(v.dot(l.dir), 0, pas);
       if (t < avance && v.addScaledVector(l.dir, -t).length() < 0.8) { avance = t; touche = true; }
     }
+    if (sousLaTerre(pos.x, pos.z, pos.y)) l.dessous = true;   // (il vole dans un souterrain de Gotham : voir roche)
     pos.addScaledVector(l.dir, avance); l.reste -= avance;
     l.m.rotateX(30 * dt);   // il tournoie
-    const sol = hauteurSol(pos.x, pos.z, pos.y), parTerre = pos.y <= sol;
+    // roche : sous la terre, contre une paroi ou dans la voûte bosselée, il sort des morceaux du souterrain, et hauteurSol donne la colline (ou
+    // le jardin) au-dessus, 10 à 70 m plus haut. Il a touché la roche : il s'arrête là (avant, un batarang explosif lancé contre un mur de l'égout
+    // remontait exploser sur la colline, où on ne le voyait pas)
+    const sol = hauteurSol(pos.x, pos.z, pos.y), roche = l.dessous && sol > pos.y + 1.5, parTerre = pos.y <= sol;
     if (!touche && !parTerre && l.reste > 0) continue;
-    pos.y = Math.max(pos.y, sol + 0.05);
+    if (!roche) pos.y = Math.max(pos.y, sol + 0.05);
     l.fini = true; scene.remove(l.m);
-    // à Gotham, Batman sait lancer ses batarangs explosifs : ils ne s'arment qu'après 3 m de vol (armeExplosifs). Celui qui touche un pilier
-    // juste devant sa main tombe sans exploser
-    if (l.a.batarang === 'explosif' && CHAPITRE.neTuePas && l.a.portee - l.reste < R_.armeExplosifs) { bip(900, 400, 0.06, 'square', 0.05); continue; }
-    if (touche || parTerre || l.a.batarang === 'explosif') arriver(l.a, pos.clone());
+    // à Gotham, Batman sait lancer ses batarangs explosifs : celui qui explose à moins de 3 m de sa main (contre un mur, un pilier tout proche :
+    // REGLAGES.explosifsPres) ne lui fait rien
+    const epargne = l.a.batarang === 'explosif' && CHAPITRE.neTuePas && l.a.portee - l.reste < R_.explosifsPres;
+    if (touche || parTerre || l.a.batarang === 'explosif') arriver(l.a, pos.clone(), epargne);
   }
   for (let k = lances.length - 1; k >= 0; k--) if (lances[k].fini) lances.splice(k, 1);
   // les filets ouverts (par terre, ou sur une voiture) : ils se déplient d'un coup, et s'en vont à la fin. Le filet électrique grésille : il clignote
@@ -11331,14 +11438,14 @@ function majLances(dt) {
   for (let k = feux.length - 1; k >= 0; k--) if (feux[k].reste <= 0) feux.splice(k, 1);
 }
 // un batarang ou un filet arrive au point pos : ce qu'il fait à tout ce qui est à moins de a.rayon mètres
-function arriver(a, pos) {
+function arriver(a, pos, epargne = false) {   // (epargne : Batman ne prend rien de l'explosion d'un batarang explosif)
   if (brouillage) toucherAntennes(pos);   // (une antenne du Pingouin : un batarang, un filet la brouille aussi)
   if (parade) toucherBallons(pos);        // (un ballon du Joker, à la parade : il crève)
   if (farces.length) toucherDentiers(pos);   // (un dentier du Joker : il saute avant d'arriver)
   const fort = clamp(1.2 - dist(pos, J) / 100, 0, 1);   // (de loin, on l'entend moins)
   for (const p of personnes) if (p.type === 'pieton' && dist(p, pos) < 15) p.peur = 8;   // les passants d'à côté s'enfuient
   if (a.filet) { ouvrirFilet(a, pos); return; }
-  if (a.batarang === 'explosif') { exploser(pos, a.rayon, a.degats, R_.degatsExplosion * (CHAPITRE.neTuePas ? R_.explosifsBatman : 1)); return; }   // (à Gotham, Batman sait les lancer : de tout près, il n'en prend que le quart)
+  if (a.batarang === 'explosif') { exploser(pos, a.rayon, a.degats, epargne ? 0 : R_.degatsExplosion * (CHAPITRE.neTuePas ? R_.explosifsBatman : 1)); return; }   // (à Gotham, Batman sait les lancer : de tout près, il n'en prend que le quart, ou rien)
   const pres = personnes.filter(p => p.vie > 0 && Math.hypot(p.x - pos.x, p.y + 1 - pos.y, p.z - pos.z) < a.rayon);
   const autos = voitures.filter(v => !v.detruite && !v.coule && Math.abs(v.y - pos.y) < 3 && dist(v, pos) < a.rayon + v.rayon);
   for (const r of robots) if (Math.hypot(r.x - pos.x, r.y + 3 - pos.y, r.z - pos.z) < a.rayon + 1.5) toucherRobot(r, a.degats);   // le heavy robot : sa vitre
@@ -13717,7 +13824,7 @@ function allumerTurbo(v) {
 // le saut (VOITURES : saut) : elle saute sur ses réacteurs, et retombe sans casse
 function sauterBatmobile(v) {
   if (v.enAir || v.vol || v.accident || v.rail || v.detruite || v.coule) return;
-  v.vy = v.type.saut; v.sautFeu = 0.6; v.decollage = { x: v.x, z: v.z, t: temps };
+  v.vy = v.type.saut; v.saute = true; v.sautFeu = 0.6; v.decollage = { x: v.x, z: v.z, t: temps };   // (saute : sur un pont bombé, elle n'est pas collée à la chaussée : voir poserVoiture)
   bruit(0.6, 250, 0.7); bip(120, 500, 0.4, 'sawtooth', 0.08);
 }
 // le virage au grappin (VOITURES : grappin), comme dans le film de 1989 : elle lance un crochet sur le côté (R avec Q ou D), qui
@@ -15691,17 +15798,54 @@ const coussin = (x, z) => lerp(1, Math.max(1, R_.amortiNeige), neigeSous(x, z));
 // une voiture qui pousse les autres sans partir en accident : un bélier (le Tumbler), la voiture du Pingouin qui s'enfuit, et la voiture de
 // Batman pendant la poursuite du Pingouin (comme dans le film, elle passe à travers la circulation)
 const belier = v => !!(v.type.belier || v.fuyard || (poursuite && v === J.voiture));
+// le dessous du pont qui passe au-dessus de (x, z) : un pont en ville (son tablier), ou une route de campagne sur l'eau (#) ; Infinity s'il n'y
+// en a pas
+function dessousPont(x, z) {
+  const p = pontEn(x, z); if (p) return p.bas;
+  const r = routeSous(x, z); return r?.pont && r.d < 5.2 ? r.y - 1.2 : Infinity;
+}
+// la hauteur d'un bateau au-dessus de l'eau, avec celui qui est assis dedans (le canard du Pingouin : sa tête, à 3 m ; Batman dans le
+// hors-bord : 2,1 m, plus dans l'armure anti-Superman)
+const tirantDAir = v => Math.max(v.forme.hauteur, v.forme.siege ? v.forme.siege[0] + 1.15 * (v === J.voiture ? tailleHeros() : 1) : 0);
+// Les garde-fous des ponts (un pont bombé de ville, une route de campagne sur l'eau) retiennent les voitures et les motos. La voiture, ses
+// roues à la hauteur y, était en a (son milieu, à l'image d'avant) : si elle roulait sur un pont, son cercle c (de rayon r) ne passe pas son
+// garde-fou : on le ramène contre lui. Renvoie le décalage { x, z }, la direction du garde-fou vers le milieu du pont (nx, nz) et le sens du
+// pont (tx, tz) ; ou null. (On regarde le pont où elle était : lancée à 250 km/h, elle fait plus de 2 m par image, et passerait le garde-fou
+// d'un coup ; et son milieu, pas le cercle, qui tourne avec elle)
+function retenuPont(c, a, r, y) {
+  const p = pontEn(a.x, a.z);
+  if (p) { // un pont de ville : ses garde-fous sont à 20 cm du bord de la rue
+    if (Math.abs(y - p.y) > 1.5) return null;   // (dessous, ou bien plus haut : elle saute par-dessus)
+    const lim = R / 2 - 0.2 - r, w = p.le === 'x' ? c.z - a.z + p.w : c.x - a.x + p.w, e = Math.sign(w) * lim - w;
+    if (Math.abs(w) <= lim) return null;
+    return p.le === 'x' ? { x: 0, z: e, nx: 0, nz: -Math.sign(w), tx: 1, tz: 0 } : { x: e, z: 0, nx: -Math.sign(w), nz: 0, tx: 0, tz: 1 };
+  }
+  // une route de campagne : ses garde-fous sont à 5,1 m de son milieu (là où elle passe sur l'eau). On compte la distance à la route elle-même
+  // (au morceau le plus proche) : dans un virage, la voiture qui va tout droit s'éloigne du morceau où elle était sans passer à côté de lui
+  const q0 = routeSous(a.x, a.z), lim = 5.1 - 0.1 - r;
+  if (!q0?.s.rambarde || Math.abs(y - q0.y) > 1.5 || q0.d > 5.2) return null;   // (son milieu n'était pas sur le pont)
+  const q = routeSous(c.x, c.z), s = q?.s || q0.s;
+  if (!s.rambarde) return null;   // (elle est passée au bout du pont, sur la route d'après : plus de garde-fou)
+  const dx = s.bx - s.ax, dz = s.bz - s.az, l = Math.hypot(dx, dz) || 1, t = clamp(((c.x - s.ax) * dx + (c.z - s.az) * dz) / (l * l), 0, 1);
+  const px = s.ax + dx * t, pz = s.az + dz * t, d = Math.hypot(c.x - px, c.z - pz);   // (le point de la route le plus proche, et la distance)
+  if (d <= lim) return null;
+  const nx = (px - c.x) / d, nz = (pz - c.z) / d;   // (du garde-fou vers le milieu de la route)
+  return { x: nx * (d - lim), z: nz * (d - lim), nx, nz, tx: dx / l, tz: dz / l };
+}
 function bougerVoiture(v, dt, parJoueur) {
   const ax = v.x, az = v.z, vx = Math.sin(v.angle) * v.vitesse, vz = Math.cos(v.angle) * v.vitesse;
   v.x += vx * dt; v.z += vz * dt;
   let choc = false, pire = null;   // pire : le choc le plus fort de cette image [x, z, nx, nz, vitesse du choc, l'autre voiture]
   const noter = (x, z, nx, nz, vn, autre = null) => { if (!pire || vn > pire[4]) pire = [x, z, nx, nz, vn, autre]; };
-  if (v.type.bateau) { // un bateau s'arrête là où l'eau devient trop peu profonde
-    const bout = local(v, 0, Math.sign(v.vitesse || 1) * v.forme.longueur / 2);
-    if (profondeur(bout.x, bout.z, v.y) < 0.5 || profondeur(v.x, v.z, v.y) < 0.5) { v.x = ax; v.z = az; choc = true; }
+  if (v.type.bateau) { // un bateau s'arrête là où l'eau devient trop peu profonde, et sous un pont, là où le tablier est trop bas pour lui
+    // (près des rives) : il y bute, comme contre un mur. Il peut toujours en ressortir (seulement s'il va vers plus bas : pas vers plus haut)
+    const sens = Math.sign(v.vitesse || 1), bout = local(v, 0, sens * v.forme.longueur / 2), avant = { x: bout.x - (v.x - ax), z: bout.z - (v.z - az) };
+    const sous = dessousPont(bout.x, bout.z), bute = sous < v.y + tirantDAir(v) + 0.15 && sous < dessousPont(avant.x, avant.z) + 0.01;
+    if (profondeur(bout.x, bout.z, v.y) < 0.5 || profondeur(v.x, v.z, v.y) < 0.5 || bute) { v.x = ax; v.z = az; choc = true; }
   }
   for (const lz of v.cercles) {
     const c = local(v, 0, lz), avant = { ...c };
+    c.roule = true;   // (les boîtes d'un pont bombé ne la gênent pas : voir resoudre)
     // la hauteur du cercle : un bateau est plus bas (il se cogne aux pontons et aux piliers des ponts) ; sur une rampe, l'avant est plus haut
     c.y = v.type.bateau ? v.y - 1 : Math.max(v.y + lz * Math.sin(v.tangage), pisteSous(c.x, c.z, v.y + 1.2));
     for (const e of faucher(v, c, vx, vz)) { // un lampadaire renversé : il freine un peu, et fait un petit creux étroit
@@ -15714,8 +15858,28 @@ function bougerVoiture(v, dt, parJoueur) {
       noter(avant.x - px / l * v.rayon, avant.z - pz / l * v.rayon, px / l, pz / l, -(vx * px + vz * pz) / l);
     }
   }
+  // les garde-fous des ponts : elle ne tombe pas à l'eau. Elle glisse le long (son nez se tourne dans le sens du pont) ; arrivée de travers, elle
+  // rebondit et perd de sa vitesse, des étincelles volent et la tôle frotte (pas d'accident : il la jetterait par-dessus)
+  let garde = null;
+  if (!v.type.bateau) for (const lz of v.cercles) {
+    const c = local(v, 0, lz), g = retenuPont(c, { x: ax, z: az }, v.rayon, v.y);
+    if (g) { v.x += g.x; v.z += g.z; garde = g; }
+  }
+  if (garde) {
+    const nez = { x: Math.sin(v.angle), z: Math.cos(v.angle) }, t = nez.x * garde.tx + nez.z * garde.tz >= 0 ? 1 : -1;
+    const contre = Math.max(0, -(nez.x * garde.nx + nez.z * garde.nz) * Math.sign(v.vitesse)), vn = Math.abs(v.vitesse) * contre;   // (sa vitesse vers le garde-fou)
+    v.angle = lerpAngle(v.angle, Math.atan2(garde.tx * t, garde.tz * t), 0.5);
+    v.vitesse *= 1 - 0.5 * contre;
+    if (vn > 3) {
+      const P = V3(v.x - garde.nx * v.forme.largeur / 2, v.y + v.forme.garde + 0.35, v.z - garde.nz * v.forme.largeur / 2);
+      abimer(v, versVoiture(v, P), versVoiture(v, V3(garde.nx, 0, garde.nz), true), Math.min(0.4, (vn - 3) * 0.02));
+      if (v.m.visible) etincelles(P, 6, 4);
+      bruit(Math.min(0.6, vn / 30), 1200, 0.25);
+    }
+  }
   for (const o of voitures) {
     if (o === v || dist(o, v) > (v.forme.longueur + o.forme.longueur) / 2 + 1 || Math.abs(o.y - v.y) > 2) continue;
+    if (!!o.type.bateau !== !!v.type.bateau && Math.abs(o.y - v.y) > 0.6) continue;   // (un bateau, et une voiture sur le pont au-dessus de lui, ou sur le quai)
     // chaque cercle de la voiture contre chaque cercle de l'autre. S'ils se touchent en plusieurs points (un choc en plein flanc),
     // le coup est donné au milieu de ces points : sinon, il serait donné à un bout, et l'autre voiture tournerait sur elle-même pour rien
     let n = 0, cx = 0, cz = 0, sx = 0, sz = 0;
@@ -15784,7 +15948,7 @@ function bougerVoiture(v, dt, parJoueur) {
   v.choc = choc;
   if (parJoueur && Math.abs(v.vitesse) > 3) { // on renverse les piétons : ils volent devant la voiture. Doucement, ils s'en relèvent
     const vit = Math.abs(v.vitesse), dx = Math.sin(v.angle) * v.vitesse, dz = Math.cos(v.angle) * v.vitesse;
-    for (const p of personnes) if (p.vie > 0 && !p.vol && Math.abs(p.y - v.y) < 2 && v.cercles.some(lz => dist(p, local(v, 0, lz)) < v.rayon + 0.4)) {
+    for (const p of personnes) if (p.vie > 0 && !p.vol && Math.abs(p.y - v.y) < (v.type.bateau ? 0.6 : 2) && v.cercles.some(lz => dist(p, local(v, 0, lz)) < v.rayon + 0.4)) {   // (en bateau : pas ceux qui sont sur un pont, ou sur le quai)
       blesser(p, p.h.chien ? 200 : (vit - 2) * R_.degatsRenverse);
       projeter(p, dx * 1.1 + entre(-1, 1), 2 + vit * 0.25, dz * 1.1 + entre(-1, 1), 3 + vit * 0.5);
       bruit(Math.min(0.6, vit / 30), 400, 0.15);
@@ -15795,6 +15959,7 @@ function bougerVoiture(v, dt, parJoueur) {
 // qu'elle ne tombe (une bosse, le bout d'un tremplin), puis retombe, plus ou moins fort. Dans l'eau profonde, elle coule.
 // Un bateau, lui, flotte
 function poserVoiture(v, dt) {
+  const roulaitSurPont = v.surPont; v.surPont = null;   // (où elle roulait sur la chaussée d'un pont bombé, à l'image d'avant : voir plus bas)
   if (v.suit || v.plante) { poserSkisTombes(v, dt); return; }
   if (v.type.bateau) {
     v.y = EAU + Math.sin(temps * 2 + v.x) * 0.04;
@@ -15805,7 +15970,12 @@ function poserVoiture(v, dt) {
     v.y = Math.max(hauteurSol(v.x, v.z), v.y - dt * 0.6);
   } else if (v.type.vole === 'helico' || v.enVol) {   // (ce qui vole : piloterAeronef le place)
   } else if (!v.rail && !v.accident) { // (en accident, majAccident la déplace)
-    const L = v.forme.longueur * 0.4, W = v.forme.largeur * 0.4, y = v.y + PASMAX;
+    // sur un pont bombé (en ville) : la voiture qui roulait déjà sur sa chaussée à l'image d'avant, et qui ne saute pas (v.saute : le saut du
+    // Tumbler), y reste, même quand la chaussée monte de plus d'une marche (PASMAX) en une image : lancée au turbo, à 20 images par seconde,
+    // sur un pont plus haut (hauteurPont), sinon, elle passait dessous. Une voiture qui arrive d'en haut (la Batmobile qui vole, une chute)
+    // n'y est pas collée : elle tombe dessus. (Elle ne doit pas avoir été déplacée depuis l'image d'avant : ni plus haut, ni plus loin)
+    const surPont = roulaitSurPont && !v.vol && !v.saute && Math.abs(v.y - roulaitSurPont.y) < 0.001 && dist(roulaitSurPont, v) < 10 ? pontEn(v.x, v.z) : null;
+    const L = v.forme.longueur * 0.4, W = v.forme.largeur * 0.4, y = Math.max(v.y, surPont ? surPont.y : -Infinity) + PASMAX;
     const h = (lx, lz) => { const p = local(v, lx, lz); return hauteurSol(p.x, p.z, y); };
     const av = h(0, L), ar = h(0, -L), ga = h(W, 0), dr = h(-W, 0), hc = hauteurSol(v.x, v.z, y);
     const sol = v.type.glisse ? hc : Math.max(hc, (av + ar) / 2);   // (des skis suivent la neige sous leur milieu : au bout d'un kicker, plus rien ne les porte)
@@ -15827,11 +15997,16 @@ function poserVoiture(v, dt) {
     // une voiture de la circulation (ou de la police) reste collée à la route : elle ne décolle pas en haut d'une côte raide ou d'une bosse
     // (sinon, elle retombait, s'abîmait, et finissait par brûler). Seul un vrai trou, de plus de 1,5 m, la fait tomber
     else if (v.conducteur && !v.type.glisse && v !== J.voiture && !v.vol && v.y > sol && v.y < sol + 1.5) v.y = sol;
+    // sur un pont bombé (en ville), la voiture qui roulait sur sa chaussée y reste collée : sans ça, lancée à 223 km/h, la Batmobile s'envolait
+    // du haut du pont jusqu'à 10 m au-dessus de la rue (à 162 km/h : 6 m, et elle retombait 80 m plus loin)
+    else if (surPont && !v.type.glisse && v.y > sol) v.y = sol;
     if (v.y <= sol) { // les roues touchent le sol
       v.vy = vySol + (v.vol ? atterrir(v, vySol - vy, pente) : 0);
       v.y = sol; v.vol = v.saute = false;
     } else if (!v.vol) { v.vol = true; v.decollage = { x: v.x, z: v.z, t: temps }; }
     v.enAir = v.y > sol + 0.3;   // un tout petit saut ne compte pas : les amortisseurs le prennent
+    const p = !v.vol && pontEn(v.x, v.z);
+    if (p && v.y > p.y - 0.1) v.surPont = { x: v.x, y: v.y, z: v.z };   // (ses roues sont sur la chaussée d'un pont bombé : voir plus haut)
     const k = Math.min(1, dt * 10);
     if (!v.vol) {
       v.tangage += (pente - v.tangage) * k; v.roulis += (Math.atan2(ga - dr, 2 * W) - v.roulis) * k;
@@ -19520,22 +19695,34 @@ function majFuyard(v, dt) {
   }
   const c = surChemin(F, F.s + (v.type.bateau ? 14 : 12) + Math.abs(v.vitesse) * 0.3), d = dist(v, J), aBord = F.batpod ? surBatpod() : !!J.voiture || !F.voiture;   // (le camion du Joker attend Batman sur son Batpod)
   // la voiture du Pingouin zigzague quand Batman lui colle aux roues (à moins de 25 m, derrière elle) : elle change de voie, d'un côté à l'autre
-  // (pas sur un pont : elle tomberait à l'eau) ; une voiture devant elle, sur sa voie : elle la double (par la gauche)
+  // (pas sur un pont : elle tomberait à l'eau) ; une voiture devant elle, sur sa voie : elle la double par la droite, en serrant le bord de la
+  // rue (par la gauche, sur l'autre voie, elle poussait les voitures d'en face sous les roues de Batman). zigzag : 1 = 3,2 m de chaque côté,
+  // une fois toutes les 4,8 s ; 1.4 = 4,5 m, toutes les 3,4 s (le bus du Joker). Mais elle reste toujours sur la chaussée, quel que soit
+  // zigzag : son chemin est sur la voie de droite (à VOIE mètres à droite du milieu de la rue), et elle ne vise jamais plus loin du milieu
+  // que le bord de la rue (7 m ; d'une route de campagne, 5 m), moins sa demi-largeur, et un dixième de sa longueur (un long véhicule, comme
+  // le bus, est de biais quand il change de voie : ses coins dépassent)
   if (F.voiture && F.parti) {
     const a = angleVers(c, surChemin(F, F.s + 30)), devant = voitures.some(o => o !== v && o !== J.voiture && !o.detruite && devantDe({ x: v.x, z: v.z, regard: { x: Math.sin(v.angle), z: Math.cos(v.angle) } }, o, 35, 2.2));
-    const e = devant ? -6.4 : d < 25 && !routeSous(v.x, v.z)?.pont ? Math.sin((temps - F.t0) * 1.3) * 3.2 : 0;
+    const bord = (routeSous(v.x, v.z)?.d < 5.3 ? 5 : R / 2) - v.forme.largeur / 2 - v.forme.longueur / 10 - 0.2;
+    const e = clamp(devant ? -2 * VOIE : d < 25 && !routeSous(v.x, v.z)?.pont ? Math.sin((temps - F.t0) * 1.3 * F.zigzag) * Math.min(4.6, 3.2 * F.zigzag) : 0, VOIE - bord, VOIE + bord);   // (e : de combien elle va vers la gauche ; moins de 0, vers la droite)
     c.x += Math.cos(a) * e; c.z -= Math.sin(a) * e;
   }
   // sa vitesse : il attend Batman (loin, ou à pied pour la voiture), et fonce quand il approche. La voiture du Pingouin roule à « vite »
   // (un peu moins quand Batman est très loin : il le laisse revenir ; un peu plus quand il lui colle aux roues) ; juste après un coup, elle file
-  // (30 % plus vite, pendant 3 s)
+  // (« fuite » fois plus vite, pendant 3 s : 1.3 = 30 % plus vite)
   let voulue = F.vite;
   if (!F.parti) { voulue = 0; if (d < F.depart && aBord) { F.parti = true; F.t0 = temps; } }
-  else if (F.voiture) voulue = !aBord && d > 60 ? 0 : temps - (F.dernierCoup ?? -9) < 3 ? F.vite * 1.3 : d > 250 ? F.vite * 0.3 : d > 140 ? F.vite * 0.55 : d < 40 ? F.vite * (1 + (40 - d) / 40 * 0.1) : F.vite;
-  else voulue = clamp((F.attend - d) * 0.55, 0, F.vite);   // (le canard : il reste devant lui)
-  if (F.qui === 'joker' && F.parti) { // le bus et le camion du Joker ralentissent avant un virage serré (sur le pont du port, ils tomberaient à l'eau)
-    const cap = s => angleVers(surChemin(F, s), surChemin(F, s + 8)), vir = Math.max(...[15, 30, 45].map(k => Math.abs(diffAngle(cap(F.s), cap(F.s + k)))));
-    if (vir > 0.5) voulue = Math.min(voulue, 15);
+  else if (F.voiture) voulue = !aBord && d > 60 ? 0 : temps - (F.dernierCoup ?? -9) < 3 ? F.vite * F.fuite : d > 250 ? F.vite * 0.3 : d > 140 ? F.vite * 0.55 : d < 40 ? F.vite * (1 + (40 - d) / 40 * 0.1) : F.vite;
+  else { // le canard : il file à « vite » tant que Batman le suit à moins de « pres » mètres ; plus loin, il ralentit, et l'attend à « attend »
+    // mètres. Dans l'égout, il ne va pas plus vite que « egout » (le canal n'y fait que 6 m de large)
+    voulue = F.vite * clamp((F.attend - d) / Math.max(1, F.attend - F.pres), 0, 1);
+    if (sousLaTerre(v.x, v.z, v.y + 1)) voulue = Math.min(voulue, F.egout);
+  }
+  if (F.parti && F.virage) { // avant un virage serré (son chemin tourne de plus de 0,5 radian dans les 45 m, ou plus loin quand il va vite), il
+    // ralentit à « virage » m/s : sinon, il finirait dans un mur, ou sur la berge (et sur le pont du port, le camion du Joker tomberait à l'eau)
+    const cap = s => angleVers(surChemin(F, s), surChemin(F, s + 8)), loin = Math.max(45, 15 + (v.vitesse ** 2 - F.virage ** 2) / 28);
+    let vir = 0; for (let k = 15; k <= loin; k += 15) vir = Math.max(vir, Math.abs(diffAngle(cap(F.s), cap(F.s + k))));
+    if (vir > 0.5) voulue = Math.min(voulue, F.virage);
   }
   if (v.panne > 0 || v.filet) voulue = 0;   // (un batarang électrique, un filet : il s'arrête)
   v.vitesse += clamp(voulue - v.vitesse, -14 * dt, (v.type.acceleration || 10) * dt);
@@ -19599,7 +19786,7 @@ function asseoirPingouin(v) {
 }
 function commencerPoursuite(et) {
   const pts = cheminRues(et.chemin, true), long = longueurs(pts);
-  poursuite = { et, F0: { pts, long, boucle: true, vite: et.vite || 42, depart: 70, voiture: true, coupsMax: et.cable ? 0 : et.coups || 3, cable: !!et.cable, batpod: !!et.batpod, qui: et.qui || 'pingouin',
+  poursuite = { et, F0: { pts, long, boucle: true, vite: et.vite || 42, virage: et.virage ?? (et.qui === 'joker' ? 15 : 0), fuite: et.fuite || 1.3, zigzag: et.zigzag ?? 1, depart: 70, voiture: true, coupsMax: et.cable ? 0 : et.coups || 3, cable: !!et.cable, batpod: !!et.batpod, qui: et.qui || 'pingouin',
     bazooka: et.bazooka, precision: ENNEMIS.joker.precision, degats: ENNEMIS.joker.degatsRoquette }, t: 0, fini: false, camions: [], batpod: false, tBazooka: 3 };
   poursuite.v = nouveauFuyard(et, poursuite.F0);
   // des camions, sur l'autoroute et dans les rues, devant lui (ils roulent comme la circulation) ; et des feux au bord de la route
@@ -19660,7 +19847,7 @@ function finirPoursuite(suite) {
 let suivi = null;   // { v : le canard, pingouin, fini, t }
 function commencerSuivre(et) {
   const pts = cheminEau(et.chemin), long = longueurs(pts);
-  suivi = { et, F0: { pts, long, boucle: false, vite: et.vite || 22, depart: 45, attend: et.attend || 70, voiture: false }, t: 0, fini: false };
+  suivi = { et, F0: { pts, long, boucle: false, vite: et.vite || 22, pres: et.pres ?? 30, attend: et.attend || 70, egout: et.egout || et.vite || 22, virage: et.virage || 0, depart: 45, voiture: false }, t: 0, fini: false };
   suivi.v = nouveauFuyard(et, suivi.F0);
   // le hors-bord du ponton : s'il n'y est plus (coulé, ou emmené ailleurs), un autre y attend
   const P = POINTS.ponton, b = bateauxDepart.find(q => q.type === 'Hors-bord');
@@ -21378,8 +21565,11 @@ function majParade(dt) {
   for (const c of [...P.chars, P.charJoker]) {
     if (!c || c.parti) continue;
     c.s += (c === P.charJoker && P.creves >= et.ballons ? 0 : et.vitesse) * dt;
-    const q = positionSurRue(clamp(c.s, -60, fin)), y = hauteurSol(q.x, q.z);
-    c.g.position.set(q.x, y, q.z); c.g.rotation.y = Math.atan2(P.u.x, P.u.z); c.g.visible = c.s > -40 && dist(q, J) < 300;
+    // (ceux qui attendent leur tour sont déjà dans la rue, en file, avant son début : on les voit tous. Avant, ils attendaient cachés, tous au
+    // même endroit, 60 m avant le début de la rue, tant qu'ils n'étaient pas à moins de 40 m de lui : les deux derniers ballons restaient
+    // invisibles 25 et 43 s, et la flèche était au-dessus de rien)
+    const q = positionSurRue(Math.min(c.s, fin)), y = hauteurSol(q.x, q.z);
+    c.g.position.set(q.x, y, q.z); c.g.rotation.y = Math.atan2(P.u.x, P.u.z); c.g.visible = dist(q, J) < (BROUILLARD || R_.distanceVue);   // (plus loin, le brouillard de Gotham le cache : inutile de le dessiner)
     if (c.ballon) {
       c.ballon.position.y = 15 + Math.sin(temps * 0.9 + c.s) * 0.4; c.ballon.rotation.y = Math.sin(temps * 0.4 + c.s) * 0.3;
       if (Math.random() < dt * 2 && c.g.visible) bouffees(c.ballon.getWorldPosition(V3()).add(V3(0, -3.4, 0)), 1, '#6adf4a', 0.9, 1.4, 0.3);   // (un peu de gaz s'échappe)
@@ -22875,7 +23065,9 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   tunnel, DEVINETTES, DELOREAN_SPHINX, repondre, deguiserCamion, tirerCable, renverser, sortirBatpod, surBatpod, seSauver, creerJoker, creerClown, creerSphinx, majJoker, majSphinx, toucherBallons, creverBallon,
   grappinSurJoker, appelerHelicoJoker, finirHelicoJoker, lieuDevinette, HORS_JEU, farces, lancerDentier, lancerGaz, banqueGotham, sousLaTerre,
   get parade() { return parade; }, get devinette() { return devinette; }, get helicoJoker() { return helicoJoker; },
-  get combatJoker() { return combatJoker; }, get epaveCamion() { return epaveCamion; } };
+  get combatJoker() { return combatJoker; }, get epaveCamion() { return epaveCamion; },
+  // les ponts bombés, leurs garde-fous, et les bateaux qui passent dessous
+  pontsH, pontsV, pontEn, bossePont, epaisseurPont, dessousPont, tirantDAir, retenuPont, bougerVoiture, poserVoiture };
 </script>
 </body>
 </html>
