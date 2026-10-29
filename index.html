@@ -424,11 +424,12 @@ for (const k in foule) {
 //    lumieresNuit : combien de lampadaires éclairent vraiment autour de toi la nuit (les autres brillent seulement)
 //    finesse, finesseMin : combien de points l'image a pour chaque point de l'écran, au plus et au moins (voir REGLAGES)
 //    texturesFines : les textures peintes 2 fois plus fin (false : un peu floues de près, mais 4 fois moins de mémoire dans la carte graphique)
+//    effetsImage : le halo des lumières et l'ombre des coins à l'écran, après le dessin (false : l'image sans effets, moins de travail)
 // =====================================================================
 const QUALITES = {
-  'Basse':   { anticrenelage: false, ombres: false, ombreSoleil: 1024, etagesOmbre: [90],          ombresPersonnages: 0,  detailsVoitures: 30, distanceVue: 500, lumieresNuit: 2, finesse: 1,    finesseMin: 0.6,  texturesFines: false },
-  'Moyenne': { anticrenelage: true,  ombres: true,  ombreSoleil: 1024, etagesOmbre: [90],          ombresPersonnages: 15, detailsVoitures: 45, distanceVue: 700, lumieresNuit: 4, finesse: 1.25, finesseMin: 0.75, texturesFines: true },
-  'Haute':   { anticrenelage: true,  ombres: true,  ombreSoleil: 2048, etagesOmbre: [30, 100, 500], ombresPersonnages: 30, detailsVoitures: 60, distanceVue: 900, lumieresNuit: 8, finesse: 1.5,  finesseMin: 0.75, texturesFines: true },
+  'Basse':   { anticrenelage: false, ombres: false, ombreSoleil: 1024, etagesOmbre: [90],          ombresPersonnages: 0,  detailsVoitures: 30, distanceVue: 500, lumieresNuit: 2, finesse: 1,    finesseMin: 0.6,  texturesFines: false, effetsImage: false },
+  'Moyenne': { anticrenelage: true,  ombres: true,  ombreSoleil: 1024, etagesOmbre: [90],          ombresPersonnages: 15, detailsVoitures: 45, distanceVue: 700, lumieresNuit: 4, finesse: 1.25, finesseMin: 0.75, texturesFines: true,  effetsImage: false },
+  'Haute':   { anticrenelage: true,  ombres: true,  ombreSoleil: 2048, etagesOmbre: [30, 100, 500], ombresPersonnages: 30, detailsVoitures: 60, distanceVue: 900, lumieresNuit: 8, finesse: 1.5,  finesseMin: 0.75, texturesFines: true,  effetsImage: true },
 };
 // le niveau que montre le menu : le jeu le trouve d'après les nombres de REGLAGES (null : aucun, la qualité est « personnalisée »).
 // Le navigateur s'en souvient, pour le montrer tout de suite au prochain lancement
@@ -1914,12 +1915,15 @@ const REGLAGES = {
   finesseAuto: true,         // true = le jeu règle tout seul la finesse : si les images arrivent trop lentement parce que la carte graphique n'arrive pas à colorier tous les points, il en dessine moins (un peu plus flou, mais de nouveau fluide), et il remonte quand tout va bien. false = toujours la finesse ci-dessus. Si le jeu rame, laisse true (le compteur, touche P, montre la finesse du moment)
   finesseMin: 0.75,          // ...mais jamais moins fine que ça, même si le jeu rame encore (0.5 = très flou)
   // la qualité du menu (Basse, Moyenne, Haute : voir QUALITES, tout en haut) change d'un coup anticrenelage, ombres, ombreSoleil, etagesOmbre,
-  // ombresPersonnages, detailsVoitures, distanceVue, lumieresNuit, finesse, finesseMin et texturesFines. Haute, ce sont les nombres d'ici
+  // ombresPersonnages, detailsVoitures, distanceVue, lumieresNuit, finesse, finesseMin, texturesFines et effetsImage. Haute, ce sont les nombres d'ici
   anticrenelage: true,       // true = les bords des objets sont bien lisses ; false = un peu en escalier, mais bien moins de travail pour la carte graphique (puis F5). Si le jeu rame, mets false
   ombres: true,              // mets false si le jeu rame
   ombreSoleil: 2048,         // la finesse des ombres du soleil : chaque carte des ombres (une par étage, voir etagesOmbre) fait 2048 × 2048 points. 1024 = un peu plus floues, mais 4 fois moins de points à dessiner ; 4096 = très nettes, et 4 fois plus (puis F5)
   etagesOmbre: [30, 100, 500], // les étages des ombres, en mètres : chaque nombre est une carte des ombres qui couvre un carré de 2 fois ce nombre de côté, un peu devant toi. Le 1er, petit, fait des ombres très nettes près de toi ; les suivants, plus grands, plus floues, mais jusqu'à bien plus loin (500 : on voit l'ombre des immeubles au loin). [90] = une seule carte de 180 × 180 m autour de toi, comme avant (pas d'ombre plus loin) : c'est ce que fait la qualité Moyenne. Au plus 4 étages ; chaque étage de plus redessine ce qu'il couvre. Si le jeu rame, mets [90] (puis F5)
   texturesFines: true,       // true = les textures (les murs, les sols, les enseignes, les visages...) sont peintes 2 fois plus fin : 512 points de côté pour la plupart, nettes même de tout près ; false = 2 fois moins fines, un peu floues de près, mais 4 fois moins de mémoire dans la carte graphique (puis F5). Si le jeu rame, mets false (c'est ce que fait la qualité Basse)
+  effetsImage: true,         // true = deux effets sur toute l'image, une fois le pays dessiné, comme dans GTA 5 : le halo des lumières (halo) et l'ombre des coins à l'écran (ombreEcran), juste en dessous. false = l'image sans effets, comme avant, et moins de travail pour la carte graphique (puis F5) : c'est ce que font les qualités Moyenne et Basse. Ils prennent dans la carte graphique environ 47 octets par point de l'image, d'autant plus que l'écran est grand : 97 Mo pour 1 920 × 1 080 points, près de 400 Mo sur un écran 4K. Si le jeu rame, si l'écran est très grand ou la carte graphique petite, mets false
+  halo: 1,                   // le halo des lumières : ce qui est très clair (les lampadaires, les phares, les fenêtres allumées et les néons la nuit, le soleil sur l'eau, les explosions, les réacteurs d'Iron Man) déborde doucement autour, comme dans un appareil photo. Léger le jour, bien plus visible la nuit. 0 = pas de halo ; 2 = deux fois plus fort. Il compte tout de suite (seulement avec effetsImage)
+  ombreEcran: 1,             // l'ombre des coins à l'écran : là où deux choses se touchent presque (les pieds d'un passant et le trottoir, une voiture et la route, le creux d'un bras), l'image fonce un peu, en plus de l'ombre des coins des bâtiments (ombreCoins). 0 = pas d'ombre à l'écran ; 2 = deux fois plus marquée. Elle compte tout de suite (seulement avec effetsImage)
   ombresPersonnages: 30,     // mètres : les passants, policiers et ennemis plus près que ça de la caméra ont une vraie ombre ; plus loin, une tache sombre sous les pieds, bien moins de travail (toi, tu gardes toujours la tienne). 0 = une tache pour tous. Si le jeu rame, mets 15 ; 150 = de vraies ombres pour presque tous, presque comme avant
   sommeilVoitures: 60,       // mètres : une voiture garée plus loin que ça de toi, qui ne bouge plus depuis 2 s, « dort » : le jeu ne la recalcule plus à chaque image (la plupart des voitures du pays sont garées). Elle se réveille dès que tu t'approches, ou qu'on la touche. 0 = aucune ne dort (le jeu recalcule tout, comme avant : deux fois plus de calcul). Si le jeu rame, surtout pas 0 ; 30, si tu veux, mais ça ne gagne presque rien de plus
   detailsVoitures: 60,       // mètres : une voiture plus loin que ça de la caméra est dessinée d'un seul bloc (toutes ses pièces collées ensemble, roues comprises) : de loin, on ne voit pas la différence, et c'est deux fois moins de travail pour la carte graphique. Son ombre, elle, vient toujours de ce bloc, même de près (c'est la même ombre, en un seul dessin au lieu de 17). Une voiture abîmée, en feu, en accident, ou la police, garde toujours toutes ses pièces et leurs ombres. 0 = toutes les voitures ont toujours toutes leurs pièces (comme avant). Si le jeu rame, mets 30 (c'est ce que fait la qualité Basse)
@@ -3391,8 +3395,9 @@ document.getElementById('remettre').onclick = () => { for (const i of boiteRegla
 // (elles deviennent jaunes). Le menu montre le niveau dont tous les nombres sont ceux du jeu ; s'il n'y en a aucun (une case changée à la
 // main), la qualité est « personnalisée ». Tout remettre revient aux nombres du code : Haute.
 // AU_LANCEMENT : ce que le jeu ne lit qu'en se chargeant (la carte graphique, les ombres, la brume, les lumières sont réglées une fois pour
-// toutes, les textures peintes, l'ombre des coins calculée et la silhouette des villes fabriquée) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
-const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'etagesOmbre', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins', 'silhouetteVille'];
+// toutes, les textures peintes, l'ombre des coins calculée, la silhouette des villes fabriquée, et les images et les programmes des effets
+// d'image préparés) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
+const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'etagesOmbre', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins', 'silhouetteVille', 'effetsImage'];
 for (const nom in QUALITES) for (const k in QUALITES[nom]) if (!cases['REGLAGES.' + k]) alert(`Qualité "${nom}" : "${k}" n'est pas un nombre de REGLAGES !`);
 function remplirQualite(nom) { for (const k in QUALITES[nom]) cases['REGLAGES.' + k]?.mettre(QUALITES[nom][k]); }
 function qualiteActuelle() {
@@ -18241,6 +18246,292 @@ function majSommeil(dt) {
 }
 
 // =====================================================================
+//  Les effets d'image (qualité Haute) : le halo des lumières et l'ombre des coins à l'écran
+// =====================================================================
+// Comme dans les grands jeux (GTA 5), deux retouches de toute l'image, une fois le pays dessiné (effetsImage, dans REGLAGES : la qualité
+// Haute les a, Moyenne et Basse non) :
+//  - le halo des lumières (halo) : ce qui est très clair (les lampadaires, les phares, les fenêtres et les néons la nuit, le soleil sur
+//    l'eau, les explosions, les éclairs, les réacteurs d'Iron Man) déborde doucement autour, comme dans un œil ou un appareil photo : un
+//    peu le jour, bien plus la nuit, quand tout le reste est sombre ;
+//  - l'ombre des coins à l'écran (ombreEcran) : là où deux choses se touchent presque (les pieds d'un passant et le trottoir, une voiture
+//    et la route, une caisse contre un mur, le creux d'un bras), l'image fonce un peu. Elle complète l'ombre des coins calculée en
+//    construisant le pays (ombreCoins), qui ne connaît que les bâtiments, pas ce qui bouge.
+// Comment : le pays n'est plus dessiné tout droit à l'écran, mais dans une image à part (imagePays), qui garde aussi la profondeur de
+// chacun de ses points (leur distance à la caméra). De petits programmes de la carte graphique la retouchent ensuite, chacun en dessinant
+// un triangle qui couvre tout l'écran (une « passe ») : l'ombre à l'écran regarde, autour de chaque point, ce qui est tout près devant lui ;
+// le halo garde ce qui est très clair, et l'étale de plus en plus loin sur des images de plus en plus petites (bien moins de travail que
+// d'étaler en grand) ; la dernière passe recopie l'image à l'écran, foncée par l'ombre, avec le halo autour de ce qui brille (pas sur une
+// grande surface déjà claire, qui deviendrait une tache blanche). La main et l'arme à la 1re personne sont dessinées ensuite, par-dessus,
+// sans effets.
+// Pour les régler, plus ou moins forts (halo et ombreEcran, dans REGLAGES, sont les plus simples : 0 = rien, 1 = normal, 2 = deux fois plus) :
+//  - HALO : ce qui est plus clair que le seuil (de 0, le noir, à 1, le blanc) déborde, avec cette force. Le jour, presque tout est clair
+//    (le ciel bleu va jusqu'à 0.98) : un seuil très haut, pour que seuls le soleil, ses reflets et les flammes débordent (plus bas, l'image
+//    paraîtrait délavée, comme dans du brouillard) ; la nuit, un seuil plus bas (les fenêtres allumées font 0.6 à 0.8) et un halo plus
+//    fort. Il passe de l'un à l'autre en douceur, avec la nuit. niveaux : jusqu'où il s'étale (5 : jusqu'à une soixantaine de points de
+//    l'écran ; 3 : bien plus serré, et un peu moins de travail) ; etale : combien les plus grands comptent (1 : autant que les petits, un
+//    halo serré ; 2 : un grand halo diffus) ;
+//  - OMBRE_ECRAN : rayon, en mètres, autour de chaque point (plus grand : une ombre plus large et plus douce) ; force (plus grand : plus
+//    sombre) ; loin : au-delà (en mètres), plus d'ombre à l'écran (de si loin, elle ne se verrait pas).
+const HALO = { seuilJour: 0.96, forceJour: 2, seuilNuit: 0.6, forceNuit: 4, niveaux: 5, etale: 1.5 };
+const OMBRE_ECRAN = { rayon: 0.7, force: 0.8, loin: 80 };
+// les programmes des passes, écrits pour la carte graphique (en GLSL). Tous dessinent le même triangle ; vUv va de 0 à 1 sur l'image
+const SOMMETS_ECRAN = `
+attribute vec3 position;
+attribute vec2 uv;
+varying vec2 vUv;
+void main() { vUv = uv; gl_Position = vec4( position.xy, 0.0, 1.0 ); }`;
+// l'ombre à l'écran, dans une image 2 fois plus petite : pour chaque point, sa distance (en mètres) et ce qui lui cache le ciel
+const PROGRAMME_OMBRE = `
+precision highp float;
+uniform sampler2D profondeur;   // la profondeur de imagePays : de 0, tout près de la caméra, à 1, le plus loin qu'elle voit
+uniform vec2 taille;            // imagePays, en points
+uniform mat4 versVue;           // de l'image vers la caméra (l'inverse de ce qu'elle fait pour dessiner)
+uniform float projection, rayon, force, loin;
+varying vec2 vUv;
+// le point du pays sous ce point de l'image, vu de la caméra, en mètres (elle regarde vers les z négatifs). Pris au milieu de son point de
+// imagePays : sa profondeur est celle de ce milieu (pris à côté, sur un sol vu de biais, il serait un peu au-dessus ou en dessous du sol)
+vec3 pointVu( vec2 uv ) {
+  uv = ( floor( uv * taille ) + 0.5 ) / taille;
+  vec4 p = versVue * vec4( uv * 2.0 - 1.0, texture2D( profondeur, uv ).x * 2.0 - 1.0, 1.0 );
+  return p.xyz / p.w;
+}
+// un nombre entre 0 et 1, différent pour chacun des 16 points d'un carré de 4 × 4, et pareil d'un carré à l'autre : le flou, ensuite,
+// mélange juste un carré, et chaque point y a tourné sa spirale autrement (16 fois plus de directions regardées, sans grain qui grouille)
+float motif( vec2 p ) {
+  vec2 a = mod( floor( p ), 4.0 ), b = mod( a, 2.0 ), c = floor( a / 2.0 );
+  return ( 4.0 * mod( 2.0 * b.x + 3.0 * b.y, 4.0 ) + mod( 2.0 * c.x + 3.0 * c.y, 4.0 ) + 0.5 ) / 16.0;
+}
+void main() {
+  vec2 pas = 1.0 / taille, uv = ( floor( vUv * taille ) + 0.5 ) * pas;   // (le milieu d'un point de imagePays)
+  vec3 p = pointVu( uv );
+  float z = - p.z;
+  if ( texture2D( profondeur, uv ).x >= 1.0 || z > loin ) { gl_FragColor = vec4( 1.0, z, 0.0, 1.0 ); return; }   // le ciel, ou trop loin : pas d'ombre
+  // le sens de la surface en ce point, d'après ses voisins : de chaque côté, le plus proche (au bord d'un objet, l'autre est loin derrière)
+  vec3 gauche = pointVu( uv - vec2( pas.x, 0.0 ) ), droite = pointVu( uv + vec2( pas.x, 0.0 ) );
+  vec3 dessous = pointVu( uv - vec2( 0.0, pas.y ) ), dessus = pointVu( uv + vec2( 0.0, pas.y ) );
+  vec3 n = normalize( cross( abs( gauche.z - p.z ) < abs( droite.z - p.z ) ? p - gauche : droite - p,
+                             abs( dessous.z - p.z ) < abs( dessus.z - p.z ) ? p - dessous : dessus - p ) );
+  // le rayon, sur l'image : pas plus de 5 % de sa hauteur (de tout près, il irait sinon chercher au bout de l'écran)
+  vec2 r = vec2( taille.y / taille.x, 1.0 ) * min( 0.5 * projection * rayon / z, 0.05 );
+  float m = motif( gl_FragCoord.xy ), cache = 0.0;
+  for ( int i = 0; i < 8; i ++ ) {   // 8 points autour, en spirale, de plus en plus loin
+    float a = 6.2832 * m + 2.4 * float( i ), f = ( float( i ) + m ) / 8.0;
+    vec3 v = pointVu( uv + vec2( cos( a ), sin( a ) ) * r * f ) - p;
+    float l = length( v );
+    // un point devant la surface (du côté où elle regarde) et à moins de rayon lui cache un peu le ciel, d'autant plus qu'il est près et
+    // en face ; plus loin, il ne compte pas : un personnage devant un mur lointain ne lui fait pas de halo sombre
+    if ( l > 0.001 ) cache += max( dot( v, n ) / l - 0.15, 0.0 ) * max( 1.0 - l * l / ( rayon * rayon ), 0.0 );
+  }
+  gl_FragColor = vec4( max( 1.0 - force * cache / 8.0 * ( 1.0 - smoothstep( 0.6 * loin, loin, z ) ), 0.0 ), z, 0.0, 1.0 );
+}`;
+// le flou de l'ombre : 5 points en largeur, puis en hauteur (ceux des bouts à moitié : chaque point du motif compte autant), seulement ceux
+// qui sont à la même distance (l'ombre d'un mur ne déborde pas sur le personnage devant lui, ni l'inverse)
+const PROGRAMME_FLOU = `
+precision highp float;
+uniform sampler2D ombre;   // r : l'ombre ; g : la distance du point, en mètres
+uniform vec2 sens;         // un point de l'image, en largeur, puis en hauteur
+varying vec2 vUv;
+void main() {
+  vec4 c = texture2D( ombre, vUv );
+  float somme = 0.0, poids = 0.0;
+  for ( int i = - 2; i <= 2; i ++ ) {
+    vec4 s = texture2D( ombre, vUv + float( i ) * sens );
+    float w = ( i == - 2 || i == 2 ? 0.5 : 1.0 ) * max( 1.0 - abs( s.g - c.g ) / ( 0.03 * c.g + 0.1 ), 0.0 );
+    somme += s.r * w; poids += w;
+  }
+  gl_FragColor = vec4( somme / poids, c.g, 0.0, 1.0 );
+}`;
+// ce qui, dans une couleur, dépasse le seuil (sa couleur gardée ; en douceur juste en dessous, sur la moitié de ce qui reste du seuil au blanc)
+const FONCTION_CLAIR = `
+uniform float seuil;
+vec3 clair( vec3 c ) {
+  float b = max( c.r, max( c.g, c.b ) ), g = 0.5 * ( 1.0 - seuil ) + 0.001, k = clamp( b - seuil + g, 0.0, 2.0 * g );
+  return c * max( k * k / ( 4.0 * g ), b - seuil ) / max( b, 0.0001 );
+}`;
+// le halo, 1 : ce qui est très clair, dans une image 2 fois plus petite : chacun de ses points couvre 2 × 2 points de imagePays, et les 4
+// comptent (une lampe au loin, d'un seul point, aussi)
+const PROGRAMME_CLAIR = `
+precision highp float;
+uniform sampler2D imagePays;
+uniform vec2 pas;      // un point de imagePays
+varying vec2 vUv;
+${FONCTION_CLAIR}
+void main() {
+  gl_FragColor = vec4( 0.25 * ( clair( texture2D( imagePays, vUv + vec2( - 0.5, - 0.5 ) * pas ).rgb ) + clair( texture2D( imagePays, vUv + vec2( 0.5, - 0.5 ) * pas ).rgb )
+    + clair( texture2D( imagePays, vUv + vec2( - 0.5, 0.5 ) * pas ).rgb ) + clair( texture2D( imagePays, vUv + vec2( 0.5, 0.5 ) * pas ).rgb ) ), 1.0 );
+}`;
+// le halo, 2 : une image 2 fois plus petite que la précédente, chaque point la moyenne de 4 × 4 points d'elle (ceux du milieu comptent plus)
+const PROGRAMME_DESCENDRE = `
+precision highp float;
+uniform sampler2D source;
+uniform vec2 pas;   // un point de l'image d'avant (2 fois plus grande)
+varying vec2 vUv;
+void main() {
+  gl_FragColor = vec4( ( 4.0 * texture2D( source, vUv ).rgb + texture2D( source, vUv - pas ).rgb + texture2D( source, vUv + pas ).rgb
+    + texture2D( source, vUv + vec2( pas.x, - pas.y ) ).rgb + texture2D( source, vUv - vec2( pas.x, - pas.y ) ).rgb ) / 8.0, 1.0 );
+}`;
+// le halo, 3 : on remonte, chaque image agrandie en douceur (8 points autour) et ajoutée à la précédente (plus grande) : la lumière s'étale
+// de plus en plus loin, et de moins en moins fort
+const PROGRAMME_MONTER = `
+precision highp float;
+uniform sampler2D source;
+uniform vec2 pas;   // un point de l'image d'en dessous (2 fois plus petite)
+uniform float etale;
+varying vec2 vUv;
+void main() {
+  vec2 d = 0.5 * pas;
+  vec3 s = texture2D( source, vUv + vec2( - 2.0 * d.x, 0.0 ) ).rgb + texture2D( source, vUv + vec2( 2.0 * d.x, 0.0 ) ).rgb
+    + texture2D( source, vUv + vec2( 0.0, - 2.0 * d.y ) ).rgb + texture2D( source, vUv + vec2( 0.0, 2.0 * d.y ) ).rgb
+    + 2.0 * ( texture2D( source, vUv + d ).rgb + texture2D( source, vUv - d ).rgb + texture2D( source, vUv + vec2( d.x, - d.y ) ).rgb + texture2D( source, vUv - vec2( d.x, - d.y ) ).rgb );
+  gl_FragColor = vec4( etale * s / 12.0, 1.0 );
+}`;
+// la dernière passe, à l'écran : l'image du pays, foncée par l'ombre (les 4 points de l'image de l'ombre autour de celui-ci, ceux qui sont
+// à la même distance que lui : le mur derrière un personnage ne lui donne pas son ombre), avec le halo par-dessus. Le halo, c'est la
+// lumière étalée, moins ce qui est déjà clair ici : il déborde autour des lumières, mais n'éclaircit pas une grande surface déjà claire
+// (le sol éclairé par des phares, une façade pleine de fenêtres allumées), qui deviendrait une tache blanche
+const PROGRAMME_FINAL = `
+precision highp float;
+uniform sampler2D imagePays, profondeur, ombre, halo;
+uniform mat4 versVue;
+uniform vec2 tailleOmbre;
+uniform float avecOmbre, forceHalo, normeHalo;
+varying vec2 vUv;
+${FONCTION_CLAIR}
+void main() {
+  vec3 c = texture2D( imagePays, vUv ).rgb, autour = forceHalo > 0.0 ? max( normeHalo * texture2D( halo, vUv ).rgb - clair( c ), 0.0 ) : vec3( 0.0 );
+  if ( avecOmbre > 0.5 ) {
+    vec4 q = versVue * vec4( vUv * 2.0 - 1.0, texture2D( profondeur, vUv ).x * 2.0 - 1.0, 1.0 );
+    float z = - q.z / q.w;
+    vec2 p = vUv * tailleOmbre - 0.5, f = fract( p ), e = 1.0 / tailleOmbre, b = ( floor( p ) + 0.5 ) * e;
+    vec4 o1 = texture2D( ombre, b ), o2 = texture2D( ombre, b + vec2( e.x, 0.0 ) ), o3 = texture2D( ombre, b + vec2( 0.0, e.y ) ), o4 = texture2D( ombre, b + e );
+    vec4 w = vec4( ( 1.0 - f.x ) * ( 1.0 - f.y ), f.x * ( 1.0 - f.y ), ( 1.0 - f.x ) * f.y, f.x * f.y )
+      * max( 1.0 - abs( vec4( o1.g, o2.g, o3.g, o4.g ) - z ) / ( 0.03 * z + 0.1 ), 0.0 );
+    float s = w.x + w.y + w.z + w.w;
+    if ( s > 0.001 ) c *= dot( w, vec4( o1.r, o2.r, o3.r, o4.r ) ) / s;
+  }
+  c += forceHalo * autour;
+  gl_FragColor = vec4( c, 1.0 );
+}`;
+// Sans effetsImage (dans REGLAGES), rien de tout ça n'est fabriqué (ni image, ni programme) : le jeu d'avant. Ni sur une carte graphique
+// qui ne sait pas dessiner dans des images en nombres à virgule (les « demi-flottants » : la distance de chaque point, et un halo tout doux
+// la nuit, sans marches d'escalier ; presque toutes savent)
+const effetsImage = R_.effetsImage && (renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float')) ? {} : null;
+if (effetsImage) {
+  const { x: l, y: h } = renderer.getDrawingBufferSize(new THREE.Vector2());
+  // imagePays : l'image du pays, avant les effets, et sa profondeur. Elle reçoit exactement ce que l'écran recevrait : le même
+  // anticrénelage (4 échantillons par point), les mêmes couleurs, en 8 bits, déjà passées par la tonalité ACES et l'exposition (et la
+  // brume, que Three.js mélange après elles). Three.js ne fait ça que pour l'écran, ou pour un casque de réalité virtuelle
+  // (isXRRenderTarget) : on lui dit que c'en est un. Ainsi les matières gardent leurs programmes (pas un de plus), et l'image sans effets
+  // est celle d'avant, au point près. (Avec l'EffectComposer de Three.js, la tonalité est faite à la fin, sur toute l'image, par son
+  // OutputPass : ce qui est dessiné à pleine lumière, toneMapped: false, comme la boule de feu d'une explosion, y ternit, et le bord des
+  // objets change, l'anticrénelage y mélangeant les couleurs avant la tonalité.)
+  const imagePays = new THREE.WebGLRenderTarget(l, h, { samples: R_.anticrenelage ? 4 : 0, depthTexture: new THREE.DepthTexture(l, h) });
+  imagePays.texture.colorSpace = THREE.SRGBColorSpace;   // (des couleurs prêtes pour l'écran)
+  imagePays.texture.internalFormat = 'RGBA8';            // (8 bits par couleur, comme l'écran, sans que la carte graphique les convertisse)
+  imagePays.isXRRenderTarget = true;
+  const image = k => new THREE.WebGLRenderTarget(reduite(l, k), reduite(h, k), { type: THREE.HalfFloatType, depthBuffer: false });
+  const programme = (fragmentShader, uniforms, blending = THREE.NoBlending) => new THREE.RawShaderMaterial({ vertexShader: SOMMETS_ECRAN, fragmentShader, uniforms, blending, depthTest: false, depthWrite: false });
+  const triangle = new THREE.BufferGeometry();   // (deux de ses coins dépassent de l'écran : il le couvre tout entier)
+  triangle.setAttribute('position', new THREE.Float32BufferAttribute([-1, 3, 0, -1, -1, 0, 3, -1, 0], 3));
+  triangle.setAttribute('uv', new THREE.Float32BufferAttribute([0, 2, 0, 0, 2, 0], 2));
+  Object.assign(effetsImage, {
+    imagePays,
+    ombres: [image(2), image(2)],   // l'ombre à l'écran, 2 fois plus petite que l'image (4 fois moins de points) : le flou lit l'une et écrit l'autre
+    niveaux: Array.from({ length: clamp(Math.round(HALO.niveaux) || 1, 1, 8) }, (_, i) => image(2 ** (i + 1))),   // le halo : 2, 4, 8, 16, 32 fois plus petites
+    ombre: programme(PROGRAMME_OMBRE, { profondeur: { value: imagePays.depthTexture }, taille: { value: new THREE.Vector2() }, versVue: { value: new THREE.Matrix4() },
+      projection: { value: 1 }, rayon: { value: 1 }, force: { value: 1 }, loin: { value: 1 } }),
+    flou: programme(PROGRAMME_FLOU, { ombre: { value: null }, sens: { value: new THREE.Vector2() } }),
+    clair: programme(PROGRAMME_CLAIR, { imagePays: { value: imagePays.texture }, pas: { value: new THREE.Vector2() }, seuil: { value: 1 } }),
+    descendre: programme(PROGRAMME_DESCENDRE, { source: { value: null }, pas: { value: new THREE.Vector2() } }),
+    monter: programme(PROGRAMME_MONTER, { source: { value: null }, pas: { value: new THREE.Vector2() }, etale: { value: 1 } }, THREE.AdditiveBlending),
+    final: programme(PROGRAMME_FINAL, { imagePays: { value: imagePays.texture }, profondeur: { value: imagePays.depthTexture }, ombre: { value: null }, halo: { value: null }, seuil: { value: 1 }, normeHalo: { value: 1 },
+      versVue: { value: new THREE.Matrix4() }, tailleOmbre: { value: new THREE.Vector2() }, avecOmbre: { value: 0 }, forceHalo: { value: 0 } }),
+    triangle: new THREE.Mesh(triangle), camera: new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1),
+    aPreparer: new THREE.Group(),   // (un triangle par programme, pour les compiler d'avance : voir preparerProgrammes)
+    coupes: false, verifie: false,
+  });
+  effetsImage.triangle.frustumCulled = false;
+  for (const m of [effetsImage.ombre, effetsImage.flou, effetsImage.clair, effetsImage.descendre, effetsImage.monter, effetsImage.final]) effetsImage.aPreparer.add(new THREE.Mesh(triangle, m));
+}
+function reduite(n, k) { return Math.max(1, Math.round(n / k)); }   // (une image k fois plus petite : au moins un point)
+// une passe : le triangle de tout l'écran, dessiné avec ce programme dans cette image (null : à l'écran)
+function dessinerPasse(m, cible) {
+  effetsImage.triangle.material = m;
+  renderer.setRenderTarget(cible);
+  renderer.render(effetsImage.triangle, effetsImage.camera);
+}
+// les images des effets suivent la taille de l'image du jeu (la fenêtre qui change, ou la finesse automatique : voir reglerFinesse)
+const tailleEffets = new THREE.Vector2();
+function ajusterEffets() {
+  const { x: l, y: h } = renderer.getDrawingBufferSize(tailleEffets), E = effetsImage;
+  if (E.imagePays.width === l && E.imagePays.height === h) return;
+  E.imagePays.setSize(l, h);
+  for (const o of E.ombres) o.setSize(reduite(l, 2), reduite(h, 2));
+  E.niveaux.forEach((n, i) => n.setSize(reduite(l, 2 ** (i + 1)), reduite(h, 2 ** (i + 1))));
+}
+// les effets, sur imagePays tout juste dessinée par la caméra c, puis à l'écran
+function appliquerEffets(c) {
+  const E = effetsImage, l = E.imagePays.width, h = E.imagePays.height;
+  // l'ombre à l'écran : calculée, puis floutée en largeur, puis en hauteur (elle revient dans la première image)
+  const avecOmbre = R_.ombreEcran > 0, [o1, o2] = E.ombres;
+  if (avecOmbre) {
+    const u = E.ombre.uniforms;
+    u.taille.value.set(l, h); u.versVue.value.copy(c.projectionMatrixInverse); u.projection.value = c.projectionMatrix.elements[5];
+    u.rayon.value = Math.max(0.01, OMBRE_ECRAN.rayon); u.force.value = R_.ombreEcran * OMBRE_ECRAN.force; u.loin.value = Math.max(1, OMBRE_ECRAN.loin);   // (un rayon de 0 rendrait l'image toute noire)
+    dessinerPasse(E.ombre, o1);
+    E.flou.uniforms.ombre.value = o1.texture; E.flou.uniforms.sens.value.set(1 / o1.width, 0); dessinerPasse(E.flou, o2);
+    E.flou.uniforms.ombre.value = o2.texture; E.flou.uniforms.sens.value.set(0, 1 / o1.height); dessinerPasse(E.flou, o1);
+  }
+  // le halo : ce qui est très clair, dans une image 2 fois plus petite, puis 4, 8, 16 et 32 fois ; puis on remonte, chacune ajoutée à la précédente
+  const N = E.niveaux, forceHalo = Math.max(0, R_.halo) * lerp(HALO.forceJour, HALO.forceNuit, lumiere.nuit);
+  if (forceHalo > 0) {
+    E.clair.uniforms.pas.value.set(1 / l, 1 / h); E.clair.uniforms.seuil.value = lerp(HALO.seuilJour, HALO.seuilNuit, lumiere.nuit);
+    dessinerPasse(E.clair, N[0]);
+    for (let i = 1; i < N.length; i++) { E.descendre.uniforms.source.value = N[i - 1].texture; E.descendre.uniforms.pas.value.set(1 / N[i - 1].width, 1 / N[i - 1].height); dessinerPasse(E.descendre, N[i]); }
+    E.monter.uniforms.etale.value = HALO.etale;
+    for (let i = N.length - 1; i > 0; i--) { E.monter.uniforms.source.value = N[i].texture; E.monter.uniforms.pas.value.set(1 / N[i].width, 1 / N[i].height); dessinerPasse(E.monter, N[i - 1]); }
+  }
+  // à l'écran : l'image, foncée par l'ombre, avec le halo par-dessus (chaque niveau a ajouté sa part, etale fois plus que le précédent :
+  // normeHalo les ramène à une moyenne)
+  const u = E.final.uniforms;
+  u.versVue.value.copy(c.projectionMatrixInverse); u.tailleOmbre.value.set(o1.width, o1.height);
+  u.avecOmbre.value = avecOmbre ? 1 : 0; u.ombre.value = avecOmbre ? o1.texture : null;
+  u.forceHalo.value = forceHalo; u.normeHalo.value = 1 / N.reduce(s => 1 + HALO.etale * s, 0); u.halo.value = forceHalo > 0 ? N[0].texture : null;
+  u.seuil.value = E.clair.uniforms.seuil.value;
+  dessinerPasse(E.final, null);
+}
+// la première fois : Three.js a-t-il bien dessiné dans imagePays comme à l'écran (la tonalité et les couleurs de l'écran) ? Une nouvelle
+// version de Three.js pourrait ne plus le faire : les couleurs changeraient. Alors on prévient, on dessine sans effets, et on jette leurs
+// images (elles prennent de la place dans la carte graphique)
+function verifierEffets() {
+  const p = renderer.properties.get(ciel.material), E = effetsImage;
+  if (!p.currentProgram) return;   // (le ciel n'est pas encore dessiné : on regardera à l'image suivante)
+  E.verifie = true;
+  if (p.toneMapping !== renderer.toneMapping || p.outputColorSpace !== renderer.outputColorSpace) {
+    E.coupes = true;
+    for (const i of [E.imagePays, ...E.ombres, ...E.niveaux]) i.dispose();
+    alert('Effets d\'image : Three.js a changé ! Le jeu les coupe (voir imagePays).');
+  }
+}
+// le pays à l'écran, avec les effets : dessiné dans imagePays, puis retouché. Pour toute autre image (l'aperçu du héros, la main à la 1re
+// personne, une image dessinée ailleurs qu'à l'écran ou dans un coin de l'écran), ou sans effets (halo et ombreEcran à 0) : comme avant
+if (effetsImage) {
+  const dessinerSansEffets = renderer.render, coin = new THREE.Vector4(), taille = new THREE.Vector2();
+  renderer.render = function (s, c) {
+    if (s !== scene || effetsImage.coupes || !(R_.halo > 0 || R_.ombreEcran > 0) || this.getRenderTarget() !== null || this.getScissorTest()) return dessinerSansEffets.call(this, s, c);
+    this.getViewport(coin); this.getSize(taille);
+    if (coin.x || coin.y || coin.z !== taille.x || coin.w !== taille.y) return dessinerSansEffets.call(this, s, c);
+    ajusterEffets();
+    this.setRenderTarget(effetsImage.imagePays); this.clear();
+    try { dessinerSansEffets.call(this, s, c); } finally { this.setRenderTarget(null); }
+    const compte = this.info.autoReset;
+    this.info.autoReset = false;   // (les passes comptent avec l'image : leurs appels de dessin s'ajoutent à ceux du pays)
+    try { appliquerEffets(c); } finally { this.info.autoReset = compte; this.setRenderTarget(null); }
+    if (!effetsImage.verifie) verifierEffets();
+  };
+}
+
+// =====================================================================
 //  Boucle principale
 // =====================================================================
 // dt : le pas de temps du jeu ; horloge : le vrai temps écoulé, en secondes (le jour et la nuit le suivent, même si le jeu rame)
@@ -18604,7 +18895,8 @@ async function preparerProgrammes() {
   try { // (sans réponse au bout de 15 s, on y va quand même : ce qui manque se compilera en dessinant, comme avant)
     const fin = await Promise.race([Promise.all([
       renderer.compileAsync(scene, camera), renderer.compileAsync(dehors, camera, scene),   // (avec les lumières, la brume et les reflets du pays)
-      renderer.compileAsync(vmScene, vmCamera), renderer.compileAsync(main, vmCamera, vmScene), renderer.compileAsync(apercu.scene, apercu.camera)]).then(() => 'fini'),
+      renderer.compileAsync(vmScene, vmCamera), renderer.compileAsync(main, vmCamera, vmScene), renderer.compileAsync(apercu.scene, apercu.camera),
+      ...(effetsImage ? [renderer.compileAsync(effetsImage.aPreparer, effetsImage.camera)] : [])]).then(() => 'fini'),   // (les effets d'image)
       new Promise(ok => setTimeout(() => ok('plus de 15 s'), 15000))]);
     if (fin !== 'fini') preparation.rate = fin;
   } catch (e) { preparation.rate = String(e); }
@@ -18667,6 +18959,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   majInterieurs, construireInterieur, defaireInterieur, formeBoite, VUE_INTERIEURS,
   formes, recettes, majFormes, faireForme, defaireForme, formeIntacte, M_CORPS, CALQUE_PIECES, temoinForme,
   pleins, pleinsVus, choisirPleins, cacheParUnPlein, traversePlein, PORTEE_PLEINS, SILHOUETTES, get silhouette() { return silhouette; }, POINTILLES,
+  effetsImage, HALO, OMBRE_ECRAN, appliquerEffets, ajusterEffets,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 // les boutons du menu cliqués pendant la construction (un héros, un chapitre, « Nouvelle partie ») : le jeu s'en occupe maintenant (voir prevenirJeu)
 jeuConstruit();
