@@ -417,6 +417,7 @@ for (const k in foule) {
 //  Change les nombres, ou invente un niveau ('Très basse': { distanceVue: 300, ... }) ! Ce qu'un niveau ne dit pas ne change pas.
 //    anticrenelage : les bords bien lisses (false : un peu en escalier, mais bien moins de travail pour la carte graphique)
 //    ombres : les ombres du soleil ; ombreSoleil : leur finesse (2048 : nettes ; 1024 : un peu floues, 4 fois moins de points à dessiner)
+//    etagesOmbre : les étages des ombres, en mètres ([30, 100, 500] : nettes de près, et jusqu'à très loin ; [90] : une seule carte, 90 m autour de toi)
 //    ombresPersonnages : jusqu'où (en mètres) les passants ont une vraie ombre ; plus loin, une tache sous les pieds (0 : une tache pour tous)
 //    detailsVoitures : jusqu'où (en mètres) les voitures ont toutes leurs pièces ; plus loin, elles sont dessinées d'un seul bloc
 //    distanceVue : jusqu'où on voit les bâtiments, les arbres et les gens (mètres)
@@ -425,9 +426,9 @@ for (const k in foule) {
 //    texturesFines : les textures peintes 2 fois plus fin (false : un peu floues de près, mais 4 fois moins de mémoire dans la carte graphique)
 // =====================================================================
 const QUALITES = {
-  'Basse':   { anticrenelage: false, ombres: false, ombreSoleil: 1024, ombresPersonnages: 0,  detailsVoitures: 30, distanceVue: 500, lumieresNuit: 2, finesse: 1,    finesseMin: 0.6,  texturesFines: false },
-  'Moyenne': { anticrenelage: true,  ombres: true,  ombreSoleil: 1024, ombresPersonnages: 15, detailsVoitures: 45, distanceVue: 700, lumieresNuit: 4, finesse: 1.25, finesseMin: 0.75, texturesFines: true },
-  'Haute':   { anticrenelage: true,  ombres: true,  ombreSoleil: 2048, ombresPersonnages: 30, detailsVoitures: 60, distanceVue: 900, lumieresNuit: 8, finesse: 1.5,  finesseMin: 0.75, texturesFines: true },
+  'Basse':   { anticrenelage: false, ombres: false, ombreSoleil: 1024, etagesOmbre: [90],          ombresPersonnages: 0,  detailsVoitures: 30, distanceVue: 500, lumieresNuit: 2, finesse: 1,    finesseMin: 0.6,  texturesFines: false },
+  'Moyenne': { anticrenelage: true,  ombres: true,  ombreSoleil: 1024, etagesOmbre: [90],          ombresPersonnages: 15, detailsVoitures: 45, distanceVue: 700, lumieresNuit: 4, finesse: 1.25, finesseMin: 0.75, texturesFines: true },
+  'Haute':   { anticrenelage: true,  ombres: true,  ombreSoleil: 2048, etagesOmbre: [30, 100, 500], ombresPersonnages: 30, detailsVoitures: 60, distanceVue: 900, lumieresNuit: 8, finesse: 1.5,  finesseMin: 0.75, texturesFines: true },
 };
 // le niveau que montre le menu : le jeu le trouve d'après les nombres de REGLAGES (null : aucun, la qualité est « personnalisée »).
 // Le navigateur s'en souvient, pour le montrer tout de suite au prochain lancement
@@ -1912,11 +1913,12 @@ const REGLAGES = {
   finesse: 1.5,              // la finesse de l'image : combien de points le jeu dessine pour chaque point de ton écran (jamais plus que ton écran n'en a). 1 = un pour un ; 0.75 = un peu flou, mais presque deux fois moins de points à colorier pour la carte graphique. Avec finesseAuto, c'est la plus fine ; sans, c'est toujours celle-là
   finesseAuto: true,         // true = le jeu règle tout seul la finesse : si les images arrivent trop lentement parce que la carte graphique n'arrive pas à colorier tous les points, il en dessine moins (un peu plus flou, mais de nouveau fluide), et il remonte quand tout va bien. false = toujours la finesse ci-dessus. Si le jeu rame, laisse true (le compteur, touche P, montre la finesse du moment)
   finesseMin: 0.75,          // ...mais jamais moins fine que ça, même si le jeu rame encore (0.5 = très flou)
-  // la qualité du menu (Basse, Moyenne, Haute : voir QUALITES, tout en haut) change d'un coup anticrenelage, ombres, ombreSoleil,
+  // la qualité du menu (Basse, Moyenne, Haute : voir QUALITES, tout en haut) change d'un coup anticrenelage, ombres, ombreSoleil, etagesOmbre,
   // ombresPersonnages, detailsVoitures, distanceVue, lumieresNuit, finesse, finesseMin et texturesFines. Haute, ce sont les nombres d'ici
   anticrenelage: true,       // true = les bords des objets sont bien lisses ; false = un peu en escalier, mais bien moins de travail pour la carte graphique (puis F5). Si le jeu rame, mets false
   ombres: true,              // mets false si le jeu rame
-  ombreSoleil: 2048,         // la finesse des ombres du soleil : la carte des ombres fait 2048 × 2048 points pour 180 × 180 m autour de toi. 1024 = un peu plus floues, mais 4 fois moins de points à dessiner ; 4096 = très nettes, et 4 fois plus (puis F5)
+  ombreSoleil: 2048,         // la finesse des ombres du soleil : chaque carte des ombres (une par étage, voir etagesOmbre) fait 2048 × 2048 points. 1024 = un peu plus floues, mais 4 fois moins de points à dessiner ; 4096 = très nettes, et 4 fois plus (puis F5)
+  etagesOmbre: [30, 100, 500], // les étages des ombres, en mètres : chaque nombre est une carte des ombres qui couvre un carré de 2 fois ce nombre de côté, un peu devant toi. Le 1er, petit, fait des ombres très nettes près de toi ; les suivants, plus grands, plus floues, mais jusqu'à bien plus loin (500 : on voit l'ombre des immeubles au loin). [90] = une seule carte de 180 × 180 m autour de toi, comme avant (pas d'ombre plus loin) : c'est ce que fait la qualité Moyenne. Au plus 4 étages ; chaque étage de plus redessine ce qu'il couvre. Si le jeu rame, mets [90] (puis F5)
   texturesFines: true,       // true = les textures (les murs, les sols, les enseignes, les visages...) sont peintes 2 fois plus fin : 512 points de côté pour la plupart, nettes même de tout près ; false = 2 fois moins fines, un peu floues de près, mais 4 fois moins de mémoire dans la carte graphique (puis F5). Si le jeu rame, mets false (c'est ce que fait la qualité Basse)
   ombresPersonnages: 30,     // mètres : les passants, policiers et ennemis plus près que ça de la caméra ont une vraie ombre ; plus loin, une tache sombre sous les pieds, bien moins de travail (toi, tu gardes toujours la tienne). 0 = une tache pour tous. Si le jeu rame, mets 15 ; 150 = de vraies ombres pour presque tous, presque comme avant
   sommeilVoitures: 60,       // mètres : une voiture garée plus loin que ça de toi, qui ne bouge plus depuis 2 s, « dort » : le jeu ne la recalcule plus à chaque image (la plupart des voitures du pays sont garées). Elle se réveille dès que tu t'approches, ou qu'on la touche. 0 = aucune ne dort (le jeu recalcule tout, comme avant : deux fois plus de calcul). Si le jeu rame, surtout pas 0 ; 30, si tu veux, mais ça ne gagne presque rien de plus
@@ -3390,7 +3392,7 @@ document.getElementById('remettre').onclick = () => { for (const i of boiteRegla
 // main), la qualité est « personnalisée ». Tout remettre revient aux nombres du code : Haute.
 // AU_LANCEMENT : ce que le jeu ne lit qu'en se chargeant (la carte graphique, les ombres, la brume, les lumières sont réglées une fois pour
 // toutes, les textures peintes, l'ombre des coins calculée et la silhouette des villes fabriquée) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
-const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins', 'silhouetteVille'];
+const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'etagesOmbre', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins', 'silhouetteVille'];
 for (const nom in QUALITES) for (const k in QUALITES[nom]) if (!cases['REGLAGES.' + k]) alert(`Qualité "${nom}" : "${k}" n'est pas un nombre de REGLAGES !`);
 function remplirQualite(nom) { for (const k in QUALITES[nom]) cases['REGLAGES.' + k]?.mettre(QUALITES[nom][k]); }
 function qualiteActuelle() {
@@ -4152,6 +4154,7 @@ const relief = m => { m.defines = { ...m.defines, RELIEF: 1 }; return m; };   //
 const dansLeChamp = THREE.Frustum.prototype.intersectsObject, bouleLoin = new THREE.Sphere();
 THREE.Frustum.prototype.intersectsObject = function (o) {
   if (!dansLeChamp.call(this, o)) return false;
+  if (etageOmbre >= 0 && !utileDansEtage(o, this)) return false;   // un étage des ombres n'a pas besoin de lui (voir utileDansEtage)
   if (o.material.defines?.RELIEF || o.material.fog === false) return true;   // (sans brouillard : le repère jaune des missions, qu'on voit de partout)
   if (o.material.defines?.SILHOUETTE) return true;   // (la silhouette des villes : on ne la voit justement que de loin)
   bouleLoin.copy(o.boundingSphere || o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
@@ -4171,6 +4174,7 @@ const pleins = new Map();   // les immeubles pleins, par case de la carte : { x1
 const pleinsVus = [];       // ceux de cette image, près de la caméra, du plus proche au plus loin
 const PORTEE_PLEINS = 300;  // mètres : un immeuble plus loin que ça de la caméra cache trop peu de choses pour qu'on le regarde
 let occulter = false;       // vrai pendant que Three.js choisit ce qu'il dessine pour la caméra du jeu (pas pour la carte des ombres)
+let etageOmbre = -1;        // l'étage des ombres dont Three.js dessine la carte en ce moment (-1 : aucun ; voir etagesOmbre)
 // un immeuble plein, de la matière mat : (x, z) son milieu, l × p sa taille, de bas à haut. Seulement s'il est opaque (une tour de verre
 // transparente, une matière découpée ou invisible : on verrait au travers) ; pas dans un intérieur, ni dans un monument qui bouge (aPart)
 const opaque = m => m.visible && m.colorWrite && !m.transparent && m.opacity === 1 && !m.alphaTest && !m.alphaMap;
@@ -4282,11 +4286,159 @@ const ambiance = new THREE.HemisphereLight(0xcfe4ff, 0x5a5040, 0.35);   // la lu
 scene.add(ambiance);
 const soleil = new THREE.DirectionalLight(0xfff1dd, 4.5);
 soleil.castShadow = true;
-{ const n = clamp(Math.round(R_.ombreSoleil) || 2048, 256, 4096); soleil.shadow.mapSize.set(n, n); }   // la carte des ombres (ombreSoleil), pour 180 × 180 m
-Object.assign(soleil.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 1, far: 500 });
+{ const n = clamp(Math.round(R_.ombreSoleil) || 2048, 256, 4096); soleil.shadow.mapSize.set(n, n); }   // la carte des ombres (ombreSoleil), pour chaque étage
+// Les étages des ombres (etagesOmbre, dans REGLAGES). Une carte des ombres, c'est une photo du pays prise depuis le soleil : chacun de ses
+// points dit jusqu'où le soleil voit ; ce qui est plus loin que ça, derrière, est à l'ombre. Une seule photo pour tout le pays serait
+// bien trop floue : alors on en prend plusieurs, les « étages », toutes avec autant de points. La 1re couvre un petit carré devant toi
+// (30 m de chaque côté du milieu) : beaucoup de points pour peu de place, des ombres très nettes ; la 2e un plus grand (100 m), la 3e un
+// très grand (500 m) : plus floues, mais on voit les ombres de très loin. Pour chaque point de l'image, le jeu prend le plus net des
+// étages qui le voient, et près du bord d'un étage, un mélange avec le suivant : on ne voit pas où l'un s'arrête. Le prix : tout ce
+// qu'un étage couvre est redessiné dans sa carte. Alors un étage ne redessine pas ce que celui d'avant voit déjà en entier, et un très
+// grand étage (plus de 200 m) ne dessine que les gros objets (pas les gens ni les voitures : de si loin, leur ombre ne se verrait pas).
+// Avec un seul étage (etagesOmbre: [90], la qualité Moyenne), c'est la carte des ombres d'avant : 180 × 180 m autour de B.J.
+const ETAGES = [].concat(R_.etagesOmbre).map(Number).filter(r => r > 0).sort((a, b) => a - b).slice(0, 4);   // (de 1 à 4 étages, du plus petit au plus grand)
+if (!ETAGES.length) ETAGES.push(90);
+const PLUSIEURS_ETAGES = renderer.shadowMap.enabled && ETAGES.length > 1;
+{ const r = ETAGES[0]; Object.assign(soleil.shadow.camera, { left: -r, right: r, top: r, bottom: -r, near: 1, far: 500 }); }
 soleil.shadow.bias = -0.0004;
 soleil.shadow.normalBias = 0.03;
 scene.add(soleil, soleil.target);
+const AVANCE_ETAGES = 0.5;       // chaque étage est un peu devant la caméra, là où elle regarde (de la moitié de sa taille)
+const MELANGE_ETAGES = 0.08;     // la part de chaque étage, le long de son bord, où il se mélange avec le suivant (8 % de sa largeur)
+const BORD_ETAGE = 3 / soleil.shadow.mapSize.x;   // (les 3 derniers points de sa carte ne comptent pas : le flou des ombres irait chercher plus loin)
+const VERS_LE_SOLEIL = 1000;     // mètres : un étage dessine ce qui est jusqu'à 1 000 m de lui vers le soleil (le soir, l'ombre d'une tour de 100 m va à 700 m)
+const GRAND_ETAGE = 200, PETIT_OBJET = 4;   // mètres : un étage plus grand que ça (sauf le 1er) ne dessine pas ce qui est plus petit que ça (une voiture, une personne)
+const etages = [soleil];   // les lumières des étages : le soleil lui-même (le 1er), puis une lumière par étage, qui n'éclaire rien
+const ETAGE_PETITS = Math.max(0, ETAGES.findLastIndex(r => r <= GRAND_ETAGE));   // le dernier étage où les petits objets ont une ombre (au moins le 1er) ; ceux d'après sont « très grands »
+if (PLUSIEURS_ETAGES) {
+  for (let k = 1; k < ETAGES.length; k++) {   // (juste après le soleil, dans cet ordre : Three.js les range comme il les trouve ; une autre lumière qui fait des ombres va après eux)
+    const l = new THREE.DirectionalLight(0xffffff, 0);
+    l.castShadow = true; l.shadow.mapSize.copy(soleil.shadow.mapSize);
+    scene.add(l, l.target); etages.push(l);
+  }
+  etages.forEach((l, k) => {
+    const R = ETAGES[k], t = 2 * R / l.shadow.mapSize.x;   // t : la taille d'un point de sa carte, en mètres
+    // de l'autre côté de son milieu, il voit 2 fois sa taille (le dernier : autant que vers le soleil) ; plus loin, au soir, c'est le suivant
+    const loin = VERS_LE_SOLEIL + (k < ETAGES.length - 1 ? 2 * R : VERS_LE_SOLEIL);
+    l.userData.etage = { R, t, loin, x: 0, y: 0, p: 0 };   // (x, y, p : où est son milieu, vu du soleil, et à quelle profondeur ; voir placerEtages)
+    Object.assign(l.shadow.camera, { left: -R, right: R, top: R, bottom: -R, near: 1, far: loin });
+    l.shadow.camera.updateProjectionMatrix();
+    // le décalage des ombres, pour qu'une surface ne se fasse pas d'ombre à elle-même (des rayures : « l'acné ») : comme avant, d'environ
+    // 2 points de la carte (et un tiers de point le long de la surface), donc plus grand dans un grand étage ; mais pas plus de 25 cm dans
+    // un étage où les petits objets ont une ombre (au-delà, l'ombre d'une personne s'en va)
+    l.shadow.bias = -Math.min(2.3 * t, k <= ETAGE_PETITS ? 0.25 : Infinity) / (loin - 1); l.shadow.normalBias = 0.34 * t;
+    // sa carte, faite ici plutôt que par Three.js : il n'y lit que la profondeur (4 octets par point), et la couleur qu'il y met aussi, pour
+    // rien, n'a qu'un octet par point au lieu de 4 (RedFormat : 20 Mo au lieu de 32 pour 2048 × 2048 points)
+    const n = l.shadow.mapSize.x, profondeur = new THREE.DepthTexture(n, n, THREE.UnsignedIntType);
+    Object.assign(profondeur, { format: THREE.DepthFormat, compareFunction: THREE.LessEqualCompare, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, name: `étage ${k + 1} des ombres` });
+    l.shadow.map = new THREE.WebGLRenderTarget(n, n, { format: THREE.RedFormat, depthTexture: profondeur });
+    const maj = l.shadow.updateMatrices;   // (Three.js l'appelle juste avant de dessiner la carte de cet étage)
+    l.shadow.updateMatrices = function (...a) { etageOmbre = k; return maj.apply(this, a); };
+  });
+  // Dans le programme de chaque matière (retouché pour toutes, comme la brume) : la lumière du soleil prend l'ombre des étages
+  // (ombreEtages), et la lumière des autres étages n'éclaire rien. La tache sous les passants (ShadowMaterial) les prend aussi
+  const changer = (nom, avant, apres) => { // (si Three.js change un jour ce bout de programme, on le voit tout de suite)
+    if (!THREE.ShaderChunk[nom].includes(avant)) alert(`Ombres : le programme « ${nom} » de Three.js a changé !`);
+    THREE.ShaderChunk[nom] = THREE.ShaderChunk[nom].replace(avant, apres);
+  };
+  const ombre = `#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )
+		directionalLightShadow = directionalLightShadows[ i ];
+		directLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowIntensity, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+		#endif
+		RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );`;
+  const N = ETAGES.length;   // (les N premières lumières qui font des ombres : le soleil et les étages ; une lumière ajoutée après eux marche comme d'habitude)
+  changer('lights_fragment_begin', ombre, `#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS >= ${N} && UNROLLED_LOOP_INDEX < ${N}
+		#if UNROLLED_LOOP_INDEX == 0
+		directLight.color *= ( directLight.visible && receiveShadow ) ? ombreEtages() : 1.0;
+		RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );
+		#endif
+		#else
+		${ombre}
+		#endif`);
+  const masque = `#if NUM_DIR_LIGHT_SHADOWS > 0
+	DirectionalLightShadow directionalLight;
+	#pragma unroll_loop_start
+	for ( int i = 0; i < NUM_DIR_LIGHT_SHADOWS; i ++ ) {
+		directionalLight = directionalLightShadows[ i ];
+		shadow *= receiveShadow ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowIntensity, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+	}
+	#pragma unroll_loop_end
+	#endif`, boucle = masque.slice(masque.indexOf('\n') + 1, masque.lastIndexOf('\n'));   // (la boucle de Three.js, sans son #if ni son #endif)
+  changer('shadowmask_pars_fragment', masque, `#if NUM_DIR_LIGHT_SHADOWS >= ${N}
+	shadow *= receiveShadow ? ombreEtages() : 1.0;
+${boucle.replace('int i = 0;', `int i = ${N};`)}
+	#elif NUM_DIR_LIGHT_SHADOWS > 0
+${boucle}
+	#endif`);
+  // l'ombre des étages en un point : chaque étage qui le voit en prend sa part (toute, s'il est loin de son bord), ce qui reste va au
+  // suivant ; ce qu'aucun étage ne voit est au soleil
+  THREE.ShaderChunk.shadowmap_pars_fragment += `
+#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS >= ${N}
+	float ombreEtages() {
+		float ombre = 0.0, reste = 1.0, bord, part;
+		vec3 c;
+		DirectionalLightShadow etage;
+		#pragma unroll_loop_start
+		for ( int i = 0; i < ${N}; i ++ ) {
+			c = vDirectionalShadowCoord[ i ].xyz / vDirectionalShadowCoord[ i ].w;
+			bord = min( min( c.x, 1.0 - c.x ), min( c.y, 1.0 - c.y ) );
+			part = reste * smoothstep( ${BORD_ETAGE.toFixed(5)}, ${(BORD_ETAGE + MELANGE_ETAGES).toFixed(5)}, bord ) * ( 1.0 - smoothstep( 0.97, 1.0, c.z ) ) * step( 0.0, c.z );
+			if ( part > 0.0 ) {
+				etage = directionalLightShadows[ i ];
+				ombre += part * getShadow( directionalShadowMap[ i ], etage.shadowMapSize, etage.shadowIntensity, etage.shadowBias, etage.shadowRadius, vDirectionalShadowCoord[ i ] );
+				reste -= part;
+			}
+		}
+		#pragma unroll_loop_end
+		return ombre + reste;
+	}
+#endif`;
+}
+// juste avant chaque image : chaque étage devant la caméra, posé sur la grille des points de sa carte (une chose qui ne bouge pas tombe
+// toujours sur les mêmes points : son ombre ne scintille pas quand la caméra avance ou tourne). COTE_X, COTE_Y : les côtés des cartes, vus
+// du soleil (comme Three.js les tourne)
+const COTE_X = new THREE.Vector3(), COTE_Y = new THREE.Vector3(), DEVANT = new THREE.Vector3(), MILIEU_ETAGE = new THREE.Vector3(), VERTICALE = new THREE.Vector3(0, 1, 0);
+function placerEtages(c) {
+  const d = directionLumiere;   // (vers le soleil, ou la lune)
+  COTE_X.crossVectors(VERTICALE, d).normalize(); COTE_Y.crossVectors(d, COTE_X);
+  c.getWorldDirection(DEVANT); DEVANT.y = 0;   // (devant la caméra, à l'horizontale : moins loin quand elle regarde vers le bas)
+  const p = MILIEU_ETAGE.setFromMatrixPosition(c.matrixWorld), x = p.x, z = p.z, sol = Math.max(EAU, hauteurSol(x, z, p.y));   // (le sol sous la caméra)
+  for (const l of etages) {
+    const e = l.userData.etage;
+    MILIEU_ETAGE.set(x, sol, z).addScaledVector(DEVANT, e.R * AVANCE_ETAGES);
+    e.x = Math.round(MILIEU_ETAGE.dot(COTE_X) / e.t) * e.t; e.y = Math.round(MILIEU_ETAGE.dot(COTE_Y) / e.t) * e.t;
+    e.p = MILIEU_ETAGE.dot(d);
+    l.target.position.set(0, 0, 0).addScaledVector(COTE_X, e.x).addScaledVector(COTE_Y, e.y).addScaledVector(d, e.p);
+    l.position.copy(l.target.position).addScaledVector(d, VERS_LE_SOLEIL);
+  }
+}
+// un point (ou une boule de rayon r) est-il dans l'étage k, à plus de m mètres de son bord ? (et de son fond, de m + plus mètres : z, sa
+// distance à la lumière de l'étage, vers le sol ; là où le programme passe au suivant, sur les 3 derniers %, c'est déjà dehors)
+function dansEtage(k, p, m = 0, plus = 0) {
+  const e = etages[k].userData.etage, R = e.R - m, z = VERS_LE_SOLEIL - (p.dot(directionLumiere) - e.p);
+  return Math.abs(p.dot(COTE_X) - e.x) <= R && Math.abs(p.dot(COTE_Y) - e.y) <= R && z >= 1 + m && z + plus <= 1 + 0.97 * (e.loin - 1) - m;
+}
+// l'objet o sert-il à la carte de l'étage en train d'être dessiné ? Pas s'il est tout entier dans le cœur de l'étage d'avant (là, le
+// programme ne prend que lui, ou un plus net). Et un très grand étage ne dessine que les gros objets : la silhouette des villes (une boîte
+// par bâtiment : elle fait leur ombre de loin, en un seul dessin), les arbres, et ce qui est plus gros qu'une voiture ; pas les détails du
+// pays (userData.detail : ses bâtiments fusionnés, que la silhouette remplace, et ses lampadaires, ses bornes, ses troncs d'arbres, trop
+// fins pour faire une ombre qui se voie de si loin). Un grand objet (les morceaux du pays : une forme par matière pour 592 × 592 m) est
+// regardé avec sa boîte plutôt qu'avec sa boule, bien plus grande : une matière qu'on ne trouve que dans un coin du morceau (les maisons,
+// la banque...) n'est pas dessinée dans un étage qui ne voit pas ce coin (champ : ce que voit l'étage)
+const BOULE_ETAGE = new THREE.Sphere(), BOITE_ETAGE = new THREE.Box3();
+function utileDansEtage(o, champ) {
+  const k = etageOmbre, tresGrand = k > ETAGE_PETITS;
+  if (o === silhouette) return tresGrand;
+  if (tresGrand && o.userData.detail && (silhouette || o.isInstancedMesh)) return false;   // (sans silhouette, les bâtiments eux-mêmes)
+  const s = BOULE_ETAGE.copy(o.boundingSphere || o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
+  if (tresGrand && s.radius < PETIT_OBJET) return false;
+  // (son ombre descend jusqu'au sol, plus loin du soleil : 2 fois sa taille divisée par la hauteur du soleil, pour un objet posé par terre)
+  if (k > 0 && dansEtage(k - 1, s.center, 2 * ETAGES[k - 1] * (BORD_ETAGE + MELANGE_ETAGES) + s.radius, 2 * s.radius / Math.max(0.05, directionLumiere.y))) return false;
+  if (s.radius < 30) return true;
+  if (o.isInstancedMesh) { if (!o.boundingBox) o.computeBoundingBox(); BOITE_ETAGE.copy(o.boundingBox); }
+  else { if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); BOITE_ETAGE.copy(o.geometry.boundingBox); }
+  return champ.intersectsBox(BOITE_ETAGE.applyMatrix4(o.matrixWorld));
+}
 
 // =====================================================================
 //  Textures dessinées par le programme
@@ -6901,19 +7053,21 @@ if (villaStark) {
 }
 for (const m of morceaux.values()) {
   await respirer(0.88);   // (un morceau à la fois : voir respirer)
-  fusionner(m.geos, m.g);
+  // (detail : un très grand étage des ombres ne dessine pas les bâtiments fusionnés, ni les lampadaires, les bornes et les troncs : voir utileDansEtage)
+  const detail = o => { if (o) o.userData.detail = true; return o; };
+  fusionner(m.geos, m.g).forEach(detail);
   m.geos = null;
   for (const sorte of Object.keys(GEO_ARBRE)) {
     const l = m.arbres.filter(a => a.sorte === sorte), [tronc, feuilles] = GEO_ARBRE[sorte];
     const placer = (o, e) => { o.position.set(e.x, e.y, e.z); o.scale.setScalar(e.s); o.rotation.y = e.x; };
-    instances(m.g, tronc, sorte === 'cactus' ? MAT.cactus : MAT_ARBRE.tronc, l, placer);
+    detail(instances(m.g, tronc, sorte === 'cactus' ? MAT.cactus : MAT_ARBRE.tronc, l, placer));
     instances(m.g, feuilles, MAT_ARBRE[sorte] || MAT_ARBRE.feuilles, l, placer);
   }
   const placer = (o, e) => { o.position.set(e.x, e.y, e.z); o.rotation.y = e.a; };
-  const dessins = [instances(m.g, GEO_POTEAU, MAT_POTEAU, m.lampadaires, placer), instances(m.g, GEO_LAMPE, MAT_LAMPE, m.lampadaires, placer)];
+  const dessins = [instances(m.g, GEO_POTEAU, MAT_POTEAU, m.lampadaires, placer), instances(m.g, GEO_LAMPE, MAT_LAMPE, m.lampadaires, placer)].map(detail);
   m.lampadaires.forEach((e, k) => { Object.assign(e, { k, dessins, boite: ajouterCollision(e.x - 0.15, e.z - 0.15, e.x + 0.15, e.z + 0.15, e.y + 7, e.y) }); e.boite.lampadaire = e; });
   // une borne n'est pas un mur (on passe par-dessus, en s'abîmant) ni un sol : c'est bornesSous qui la trouve
-  instances(m.g, GEO_BORNE, MAT_BORNE, m.bornes, (o, e) => o.position.set(e.x, e.y, e.z));
+  detail(instances(m.g, GEO_BORNE, MAT_BORNE, m.bornes, (o, e) => o.position.set(e.x, e.y, e.z)));
   m.bornes.forEach(e => Object.assign(ajouterCollision(e.x - 0.2, e.z - 0.2, e.x + 0.2, e.z + 0.2, e.y + R_.hauteurBornes, e.y, true), { borne: true, bx: e.x, bz: e.z }));
 }
 boitesCoins.clear();   // (l'ombre des coins est faite : on n'en a plus besoin)
@@ -6923,7 +7077,8 @@ boitesCoins.clear();   // (l'ombre des coins est faite : on n'en a plus besoin)
 // maison), de la couleur de sa façade et de son toit vus de loin, et des fenêtres peintes, allumées la nuit (comme celles des façades :
 // MATS_FENETRES). Pas de couture : dans les pointillés de la brume (de 80 % à 100 % de distanceVue), elle n'apparaît que là où les vrais
 // bâtiments s'effacent, point par point (voir la retouche de la brume : SILHOUETTE) ; plus près, la carte graphique ne la dessine même pas
-// (une boîte toute entière plus près que les pointillés est réduite à un point). Elle n'a ni ombre ni collisions : les balles la traversent
+// (une boîte toute entière plus près que les pointillés est réduite à un point). Elle n'a pas de collisions : les balles la traversent. Elle
+// fait l'ombre des bâtiments loin de toi (dans un très grand étage des ombres : voir etagesOmbre), mais n'en reçoit pas
 let silhouette = null;
 if (SILHOUETTES.length) { await respirer(0.89); silhouette = construireSilhouette(); }   // (respirer : voir « Outils »)
 function construireSilhouette() {
@@ -6969,6 +7124,7 @@ function construireSilhouette() {
   const o = new THREE.Mesh(g, m);
   o.raycast = () => {};       // les balles, le grappin, la toile... la traversent
   o.matrixAutoUpdate = false;
+  o.castShadow = PLUSIEURS_ETAGES;   // (de loin, elle fait l'ombre des bâtiments, dans un très grand étage des ombres : voir utileDansEtage)
   scene.add(o);
   return o;
 }
@@ -17920,7 +18076,8 @@ function majPhares() {
 // Les ombres des personnages (REGLAGES.ombresPersonnages). Chacune des vingt pièces d'un personnage dessine son ombre dans la carte des
 // ombres du soleil : avec la foule, c'était plus de la moitié des appels de dessin de l'image. Alors seuls ceux qui sont près de la caméra
 // ont une vraie ombre. Plus loin, une tache sombre et douce sous leurs pieds, allongée à l'opposé du soleil comme une vraie ombre, et
-// seulement là où le soleil fait des ombres (90 m autour de B.J.). Toutes les taches sont dessinées d'un seul coup (un lot). B.J. garde
+// seulement là où le soleil fait des ombres aux petits objets (90 m autour de B.J., ou les étages des ombres jusqu'à 200 m : voir
+// etagesOmbre). Toutes les taches sont dessinées d'un seul coup (un lot). B.J. garde
 // toujours sa vraie ombre (et un hélicoptère du Mandarin aussi : il est gros comme une voiture).
 // La tache est faite comme l'ombre d'un objet (ShadowMaterial, retouchée) : elle ne noircit que ce que le soleil (ou la lune) éclaire.
 // Dans l'ombre d'un immeuble, ou dans une maison, elle disparaît d'elle-même, comme une vraie ombre
@@ -17948,19 +18105,21 @@ const sansVraieOmbre = [];
   const dessinerOmbres = renderer.shadowMap.render;
   renderer.shadowMap.render = function (lumieres, s, c) {
     occulter = false;   // (la carte des ombres dessine aussi ce qui est caché derrière un immeuble : voir cacheParUnPlein)
-    if (s !== scene || (!sansVraieOmbre.length && !voituresEnBloc.length)) return dessinerOmbres.call(this, lumieres, s, c);
+    if (s !== scene) return dessinerOmbres.call(this, lumieres, s, c);
     for (const g of sansVraieOmbre) { g.userData.vu = g.visible; g.visible = false; }   // (on retient s'il était visible, pour le remettre comme avant)
     for (const v of voituresEnBloc) ombreEnBloc(v, true);
-    try { return dessinerOmbres.call(this, lumieres, s, c); } finally { for (const g of sansVraieOmbre) g.visible = g.userData.vu; for (const v of voituresEnBloc) ombreEnBloc(v, false); }
+    try { return dessinerOmbres.call(this, lumieres, s, c); }
+    finally { for (const g of sansVraieOmbre) g.visible = g.userData.vu; for (const v of voituresEnBloc) ombreEnBloc(v, false); etageOmbre = -1; }   // (etageOmbre : voir etagesOmbre)
   };
 }
 // juste avant chaque image du pays, les personnages d'un seul bloc (voir majFormes) : c'est là, et pas plus tôt, qu'on sait ce qui a changé ;
-// et les immeubles qui cachent ce qui est derrière eux, vus d'où est la caméra à ce moment-là (voir cacheParUnPlein)
+// les immeubles qui cachent ce qui est derrière eux, vus d'où est la caméra à ce moment-là (voir cacheParUnPlein) ; et les étages des ombres
 {
   const dessiner = renderer.render;
   renderer.render = function (s, c) {
     if (s !== scene) return dessiner.call(this, s, c);
     majFormes(); choisirPleins(c);
+    if (PLUSIEURS_ETAGES) placerEtages(c);
     try { return dessiner.call(this, s, c); } finally { occulter = false; }
   };
 }
@@ -17986,9 +18145,10 @@ function majOmbresPersonnages() {
     p.ombreLoin = !(L > 0) || d > L * Math.max(1, taille) + (p.ombreLoin ? -ECART_OMBRE : ECART_OMBRE);   // (un géant, comme Iron Monger, a sa vraie ombre de plus loin)
     if (!p.ombreLoin) continue;
     sansVraieOmbre.push(g);
-    // sa tache : pas la nuit sans lune, pas hors de la zone des ombres, ni s'il vole, flotte dans l'eau ou qu'on le porte
-    const n = ombresLoin.count;
-    if (force < 0.02 || n >= TACHES_MAX || Math.abs(o.x - J.x) > zone || Math.abs(o.z - J.z) > zone || p.vol || p.flotte || p.secours === 'porte') continue;
+    // sa tache : pas la nuit sans lune, pas hors de la zone des ombres, ni s'il vole, flotte dans l'eau ou qu'on le porte. La zone : avec un
+    // seul étage des ombres, 90 m autour de B.J. ; avec plusieurs, les étages où les petits objets font de l'ombre (voir etagesOmbre)
+    const n = ombresLoin.count, hors = PLUSIEURS_ETAGES ? !dansEtage(ETAGE_PETITS, o) : Math.abs(o.x - J.x) > zone || Math.abs(o.z - J.z) > zone;
+    if (force < 0.02 || n >= TACHES_MAX || hors || p.vol || p.flotte || p.secours === 'porte') continue;
     // sa longueur : couché par terre (mort, renversé, pris dans un filet), il ne fait qu'une ombre courte
     const couche = p.vie <= 0 || p.releve !== undefined || p.pris;
     const large = 0.5 * g.scale.x, long = large + allonge * (couche ? 0.3 : p.h.chien ? 0.8 : 1.75) * taille;
@@ -18501,6 +18661,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   galerie, trousTerrain, dansGalerie, portes, toucherPorte, casserPorte, reparerPortes, distPorte, get embuscade() { return embuscade; }, enEvasion, enfermer, sansArmure, poserMarkI, sousTerre,
   mourir, reapparaitre, get ombreGrotte() { return ombreGrotte; }, compteur, allumerCompteur, compter, preparation, A_PREPARER,
   ombresLoin, M_TACHE, majOmbresPersonnages, sansVraieOmbre, forceDesOmbres, finesse, reglerFinesse, FINESSES,
+  ETAGES, etages, PLUSIEURS_ETAGES, placerEtages, dansEtage, utileDansEtage, ETAGE_PETITS, get etageOmbre() { return etageOmbre; }, MAT, MATS_COINS, MAT_ARBRE,
   majDetailsVoitures, voituresEnBloc, ombreEnBloc, enBloc, montrerDeLoin, formeDeLoin, cacheLoin, majPhares,
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
   majInterieurs, construireInterieur, defaireInterieur, formeBoite, VUE_INTERIEURS,
