@@ -1927,6 +1927,7 @@ const REGLAGES = {
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   distanceInterieurs: 150,   // mètres : on ne voit l'intérieur d'un bâtiment (planchers, marches, meubles) qu'à moins de 100 m. Son dessin n'est fabriqué que quand la caméra est plus près que ça, et il est défait 100 m plus loin : ça garde beaucoup de mémoire libre. 100 = au dernier moment (encore moins de mémoire, mais en volant vite, le jeu peut accrocher en fabriquant plusieurs intérieurs à la fois) ; 100000 = tous les intérieurs, peu à peu, et jamais défaits (comme avant)
   ombreCoins: 0.75,          // l'ombre des coins, de 0 à 1 : le pied des murs, le sol tout contre eux, le dessous des auvents et des ponts sont un peu plus sombres, comme en vrai (la lumière y arrive moins bien). 0 = pas d'ombre des coins (comme avant) ; 1 = très marquée (plus que 1, c'est comme 1). Elle est calculée une fois pour toutes en construisant le pays (puis F5) : elle ne coûte presque rien quand on joue, alors même si le jeu rame, tu peux la garder
+  silhouetteVille: true,     // true = de loin, on voit toujours les villes : plus loin que distanceVue, là où les vrais bâtiments s'effacent, chaque immeuble, maison ou tour devient une boîte toute simple, de la couleur de sa façade et de son toit, avec des fenêtres peintes (allumées la nuit), jusqu'au bout de la brume. Toute la silhouette du pays en un seul dessin : presque rien à faire pour la carte graphique. false = au loin, plus de villes, seulement le relief (comme avant). Elle est fabriquée en construisant le pays (puis F5) ; même si le jeu rame, tu peux la garder
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
   vitesseTelesiege: 42,      // m/s : les télésièges et la télécabine des stations de ski (le rond bleu ❄ sur la carte du jeu). 42 = 45 secondes pour monter en haut du mont Gordo. Mets 5 pour un vrai télésiège, tout lent
   vitesseGare: 2,            // m/s : dans les gares, les sièges ralentissent pour qu'on monte dessus (un télésiège « débrayable »). Mets 42 pour qu'ils ne ralentissent plus
@@ -3388,8 +3389,8 @@ document.getElementById('remettre').onclick = () => { for (const i of boiteRegla
 // (elles deviennent jaunes). Le menu montre le niveau dont tous les nombres sont ceux du jeu ; s'il n'y en a aucun (une case changée à la
 // main), la qualité est « personnalisée ». Tout remettre revient aux nombres du code : Haute.
 // AU_LANCEMENT : ce que le jeu ne lit qu'en se chargeant (la carte graphique, les ombres, la brume, les lumières sont réglées une fois pour
-// toutes, les textures peintes et l'ombre des coins calculée) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
-const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins'];
+// toutes, les textures peintes, l'ombre des coins calculée et la silhouette des villes fabriquée) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
+const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins', 'silhouetteVille'];
 for (const nom in QUALITES) for (const k in QUALITES[nom]) if (!cases['REGLAGES.' + k]) alert(`Qualité "${nom}" : "${k}" n'est pas un nombre de REGLAGES !`);
 function remplirQualite(nom) { for (const k in QUALITES[nom]) cases['REGLAGES.' + k]?.mettre(QUALITES[nom][k]); }
 function qualiteActuelle() {
@@ -4130,9 +4131,18 @@ const POINTILLES = R_.distanceVue * 0.8;
   retoucher('fog_vertex', 'vFogDepth = - mvPosition.z;', 'vFogPosition = mvPosition.xyz;');
   retoucher('fog_pars_fragment', 'varying float vFogDepth;', 'varying vec3 vFogPosition;');
   retoucher('fog_fragment', '#ifdef USE_FOG', '#ifdef USE_FOG\n\tfloat vFogDepth = length( vFogPosition );');
+  // le motif des pointillés : un nombre de 0 à 1 pour chaque point de l'écran, toujours le même pour un même point. Un point de détail
+  // s'efface quand ce nombre est plus petit que la part du chemin faite dans les pointillés (de 0 à 80 % de distanceVue, à 1 à distanceVue).
+  // La silhouette des villes (SILHOUETTE, voir construireSilhouette) fait juste l'inverse : elle ne dessine un point que là où celui des
+  // détails s'efface. Au même endroit de l'écran et à la même distance, on voit l'un ou l'autre : jamais les deux, jamais aucun. Et pas
+  // plus loin que la brume, comme le relief (avec distanceRelief: 0, des tours couleur de brume flotteraient sur le ciel, sans collines devant)
+  const motif = 'fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) )';
   THREE.ShaderChunk.fog_fragment += `
-#if defined( USE_FOG ) && ! defined( RELIEF )
-	if ( vFogDepth > ${debut} && fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) ) < ( vFogDepth - ${debut} ) / ${large} ) discard;
+#if defined( USE_FOG ) && ! defined( RELIEF ) && ! defined( SILHOUETTE )
+	if ( vFogDepth > ${debut} && ${motif} < ( vFogDepth - ${debut} ) / ${large} ) discard;
+#endif
+#if defined( USE_FOG ) && defined( SILHOUETTE )
+	if ( ${motif} >= ( vFogDepth - ${debut} ) / ${large} || vFogDepth > ${VUE_RELIEF.toFixed(1)} ) discard;
 #endif`;
 }
 const relief = m => { m.defines = { ...m.defines, RELIEF: 1 }; return m; };   // une matière qu'on voit de très loin
@@ -4143,6 +4153,7 @@ const dansLeChamp = THREE.Frustum.prototype.intersectsObject, bouleLoin = new TH
 THREE.Frustum.prototype.intersectsObject = function (o) {
   if (!dansLeChamp.call(this, o)) return false;
   if (o.material.defines?.RELIEF || o.material.fog === false) return true;   // (sans brouillard : le repère jaune des missions, qu'on voit de partout)
+  if (o.material.defines?.SILHOUETTE) return true;   // (la silhouette des villes : on ne la voit justement que de loin)
   bouleLoin.copy(o.boundingSphere || o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
   if (bouleLoin.center.distanceTo(camera.position) - bouleLoin.radius >= R_.distanceVue) return false;
   return !(occulter && o.isMesh && cacheParUnPlein(bouleLoin, o, this));   // caché derrière un immeuble plein (voir cacheParUnPlein)
@@ -4336,7 +4347,7 @@ function facade(fond, cols, rangs, fenetre, avant, hauteur = 256, allumees = 0.4
     if (avant) avant(g, l, h);
     for (let r = 0; r < rangs; r++) for (let c = 0; c < cols; c++) fenetre(g, c * l / cols, r * h / rangs, l / cols, h / rangs);
   });
-  Object.assign(t, { reflets, lumieres });
+  Object.assign(t, { reflets, lumieres, fond });   // (fond : la couleur de son mur, de loin, si elle n'est pas dans DE_LOIN)
   return t;
 }
 // les lettres et les chiffres des grandes lettres sur les collines (PANNEAUX) : une autre lettre fait un trou
@@ -4354,6 +4365,8 @@ const TEX = {
   paves: toile(256, 256, (g, l, h) => { g.fillStyle = '#8a7a6a'; g.fillRect(0, 0, l, h); for (let y = 0; y < 16; y++) for (let x = 0; x < 9; x++) { g.fillStyle = `hsl(25,${entre(10, 25)}%,${entre(45, 60)}%)`; g.fillRect(x * 32 + (y % 2) * 16 - 16 + 1, y * 16 + 1, 30, 14); } }),
   toit: toile(256, 256, (g, l, h) => { g.fillStyle = '#6d6d6a'; g.fillRect(0, 0, l, h); grain(g, l, h, 12000, 0.15); }),
   tuiles: toile(256, 256, (g, l, h) => { g.fillStyle = '#7a2e1e'; g.fillRect(0, 0, l, h); for (let y = 0; y < 16; y++) { for (let x = 0; x < 17; x++) { g.fillStyle = `rgba(255,${entre(80, 140) | 0},60,${entre(0, 0.15)})`; g.fillRect(x * 16 + (y % 2) * 8 - 8, y * 16, 15, 13); } g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, y * 16 + 13, l, 3); } }),
+  // les façades (et les toits, juste au-dessus) : tu changes leur dessin ou leurs couleurs ? Leur couleur de loin, celle de la silhouette
+  // des villes, est dans DE_LOIN (après MAT) : change-la aussi
   brique: facade('#8c3b2a', 4, 4, (g, x, y, w, h) => { g.fillStyle = '#d8d0c0'; g.fillRect(x + w * .2 - 4, y + h * .2 - 4, w * .6 + 8, h * .55 + 8); vitre(g, x + w * .2, y + h * .2, w * .6, h * .55); },
     (g, l, h) => { g.fillStyle = 'rgba(0,0,0,.22)'; for (let y = 0; y < h; y += 4) { g.fillRect(0, y, l, 1); for (let x = (y / 4 % 2) * 6; x < l; x += 12) g.fillRect(x, y, 1, 4); } }),
   beton: facade('#cbbf9f', 4, 4, (g, x, y, w, h) => vitre(g, x + w * .15, y + h * .2, w * .7, h * .6, [50, 70, 90]),
@@ -4555,7 +4568,7 @@ const MAT = {
   trottoir: std(TEX.trottoir), herbe: std(TEX.herbe, { roughness: 1 }), paves: std(TEX.paves),
   toit: std(TEX.toit, { roughness: 1 }), tuiles: std(TEX.tuiles), ardoise: std(TEX.tuiles, { color: '#667' }),
   brique: std(TEX.brique), beton: std(TEX.beton), moderne: std(TEX.moderne), verre: std(TEX.verre), verre2: std(TEX.verre2),
-  maison1: std(TEX.maison), maison2: std(TEX.maison, { color: '#cfe0ff' }), maison3: std(TEX.maison, { color: '#ffc8b0' }), villa: std(TEX.villa),
+  maison1: std(TEX.maison), maison2: std(TEX.maison, { color: '#cfe0ff' }), maison3: std(TEX.maison, { color: '#ffc8b0' }), villa: std(TEX.villa),   // (une teinte changée : sa couleur de loin est dans DE_LOIN, change-la aussi)
   hopital: std(TEX.hopital), magasin: std(TEX.magasin), bunker: std(TEX.bunker, { roughness: 1 }),
   metal: std(null, { color: '#8a8d90', metalness: 0.6, roughness: 0.4 }), sacs: std(null, { color: '#8a7a5a', roughness: 1 }),
   pierre: std(null, { color: '#b8b2a6' }), eau: std(null, { color: '#2a5a7a', metalness: 0.3, roughness: 0.05 }),
@@ -4610,6 +4623,19 @@ const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [
   herbe: [6, 6], paves: [4, 4], chateau: [4, 4], carrelage: [2, 2], parquet: [3, 3], planches: [3, 3], grange: [6, 6], tole: [6, 6],
   conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2],
   marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2], stark: [12, 12], villaStark: [8, 10.8], vueMer: [16, 3.2] };
+// De très loin, une façade n'a plus qu'une couleur : celle de son dessin, fenêtres comprises, tout mélangé (sa moyenne), qu'on voit dans la
+// silhouette des villes (voir construireSilhouette). Mesurées une fois pour toutes sur les textures du jeu, à Los Santos et à Malibu (les
+// lire à chaque chargement le ralentissait de près de 2 secondes sur un ordinateur sans carte graphique). [couleur de loin, vitres, nuit] :
+// vitres, la part de la façade qui est en vitres (elles brillent comme des miroirs) ; nuit, ses fenêtres allumées, comparées aux fenêtres
+// peintes de la silhouette (1 = autant).
+// Tu inventes une façade, ou tu changes son dessin ? Mets ici sa couleur de loin (sinon, de loin, elle a la couleur de son mur, sans vitres)
+const DE_LOIN = {
+  brique: ['#8a716f', 0.33, 1.5], beton: ['#a19a87', 0.42, 1.3], moderne: ['#6c737a', 0.55, 1.9], verre: ['#4d6c82', 0.89, 3.4], verre2: ['#807459', 0.89, 3.8],
+  hopital: ['#c0c3c6', 0.45, 1.45], magasin: ['#494041', 0.45, 1.55], musee: ['#b8b09a', 0.27, 1.05], banqueQ: ['#b0a284', 0.27, 1.05], luxe: ['#50442e', 0.58, 3.1],
+  maison1: ['#cec7b3', 0.18, 0.55], maison2: ['#a7afb3', 0.18, 0.55], maison3: ['#ce9c7b', 0.18, 0.55], villa: ['#b0b2b0', 0.45, 2.7], stark: ['#55677a', 0.88, 2.9],
+  tole: ['#b4b9bc'], bunker: ['#6d6d65'], chateau: ['#736d68'], grange: ['#852b20'],   // (sans fenêtres)
+  toit: ['#6f6f6d'], tuiles: ['#7c2f1e'], ardoise: ['#2d0c08'],   // (les toits)
+};
 // Les trous que B.J. fait dans un toit ou un plancher en tombant de très haut (voir trouer). On ne peut pas enlever un morceau de dalle
 // de son dessin : toutes les formes d'une même matière sont fusionnées en une seule. Alors on retouche le programme qui dessine les matières
 // des bâtiments : un point qui tombe dans un trou n'est pas dessiné, et on voit au travers (les étages du dessus, le ciel).
@@ -4818,10 +4844,22 @@ function solMonde(mat, x1, z1, x2, z2, y, taille = 8) {
   for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / taille, -p.getZ(i) / taille);
   ajouterGeo(mat, g);
 }
+// La silhouette des villes, de loin (REGLAGES.silhouetteVille) : plus loin que distanceVue, on ne dessine plus les bâtiments. Alors chaque
+// immeuble, chaque maison et chaque bâtiment où l'on entre note ici sa boîte : sa place, sa taille, sa façade et son toit. Une fois le pays
+// construit, toutes ces boîtes deviennent une seule forme toute simple (voir construireSilhouette), qu'on ne voit que là où les vrais
+// bâtiments se sont effacés. Un bâtiment que tu ajoutes avec immeuble(...), maison(...) ou batiment({...}) y est tout seul ; ce que tu
+// fais avec boite(...) n'y est pas (une grue, des conteneurs : de si loin, on ne les verrait pas). Une grande boîte à toi, qu'on doit voir de
+// loin (une tour faite avec boite) ? Appelle noterSilhouette(...) juste après, avec la même place et la même taille
+const SILHOUETTES = [];   // { x, z : le milieu ; l, p : la taille (le long de x, de z) ; bas, haut ; mur, toit : leurs matières (MAT) ; pente : la hauteur d'un toit en pente }
+function noterSilhouette(mur, x, z, l, p, bas, haut, toit = 'toit', pente = 0) {
+  if (!auLancement.silhouetteVille || interieur || aPart) return;   // (pas la villa de Tony Stark : elle peut tomber dans la mer)
+  SILHOUETTES.push({ x, z, l, p, bas, haut, mur, toit, pente });
+}
 function immeuble(mat, x, z, l, p, etages, rnd) {
   const h = etages * 3;
   boite(mat, x, 0.2, z, l, h, p, true);
   noterPlein(mat, x, z, l, p, Y0 + 0.2, Y0 + 0.2 + h);   // une boîte fermée et opaque : elle cache ce qui est derrière (voir cacheParUnPlein) ; si tu la perces, enlève cette ligne
+  noterSilhouette(mat, x, z, l, p, Y0 + 0.2, Y0 + 0.8 + h);   // (de loin : voir noterSilhouette)
   boite('toit', x, 0.2 + h, z, l + 0.5, 0.6, p + 0.5, true);   // on se pose dessus (un hélicoptère, B.J.), pas 60 cm dedans
   if (rnd() < 0.8) boite('metal', x + (rnd() - 0.5) * l * 0.5, 0.8 + h, z + (rnd() - 0.5) * p * 0.5, 3, 1.6, 2, true);
   if (rnd() < 0.5) boite('metal', x + (rnd() - 0.5) * l * 0.5, 0.8 + h, z + (rnd() - 0.5) * p * 0.5, 1.5, 3, 1.5, true);
@@ -4837,6 +4875,7 @@ function maison(mat, toitMat, x, z) {
   const l = 12, p = 9, h = 6;
   boite(mat, x, 0.2, z, l, h, p, true);
   noterPlein(mat, x, z, l, p, Y0 + 0.2, Y0 + 0.2 + h);   // une boîte fermée et opaque : elle cache ce qui est derrière (voir cacheParUnPlein) ; si tu la perces, enlève cette ligne
+  noterSilhouette(mat, x, z, l, p, Y0 + 0.2, Y0 + 0.2 + h, toitMat, 0.866 * (p + 1) * 0.55);   // (de loin, avec son toit en pente : la hauteur de celui de toitPente)
   toitPente(toitMat, x, 0.2 + h, z, l, p);
   boite('porte', x, 0.2, z + p / 2, 1.2, 2.2, 0.1);
 }
@@ -4904,6 +4943,8 @@ function batiment({ x, z, l, p, mat, porte = 's', etages = 1, hEtage = 3, plein 
     boite(mat, X, y0 + hVisite, Z, b ? p : l, plein * 3, b ? l : p, true);
     boite('toit', X, y0 + hVisite + plein * 3, Z, (b ? p : l) + 0.5, 0.6, (b ? l : p) + 0.5, true);
   } else if (!toit) B('toit', 0, y0 + hVisite, 0, l + 0.5, 0.4, p + 0.5);
+  // de loin, tout entier (voir noterSilhouette) : jusqu'en haut des étages pleins, ou du toit, ou du garde-fou d'un toit où l'on monte
+  noterSilhouette(mat, x, z, b ? p : l, b ? l : p, Y0 + y0, Y0 + y0 + (plein ? hVisite + plein * 3 + 0.6 : toit ? hMur : hVisite + 0.4), plein || !toit ? 'toit' : solToit);
   // des lampes au plafond
   if (lampes) dedans(() => { for (let k = 0; k < etages; k++) for (const u of [-iu / 2, iu / 2]) for (const w of [-iw / 2, iw / 2]) {
     B('lampe', u, niveau(k + 1) - 0.36, w, 1.2, 0.06, 0.3, false); noterLampe(u, k, w); } });
@@ -6535,6 +6576,12 @@ const eau = new THREE.Mesh(new THREE.PlaneGeometry(TAILLE_X + LARGE, TAILLE_Z + 
   relief(new THREE.MeshStandardMaterial({ color: '#2b6384', roughness: 0.12, metalness: 0.15, bumpMap: TEX.vagues, bumpScale: 0.35 })));
 TEX.vagues.repeat.set((TAILLE_X + LARGE) / 14, (TAILLE_Z + LARGE) / 14);
 eau.position.set(TAILLE_X / 2, EAU, TAILLE_Z / 2); eau.receiveShadow = true; scene.add(eau);
+// De loin, la carte graphique ne sait plus bien dire lequel est devant, du sol d'une ville (5 cm sous la rue) ou de l'eau (1 m plus bas) :
+// vue d'avion, une ville au bord de la mer se noyait, dès 600 à 900 m. Avec la silhouette des villes (voir construireSilhouette), qui la
+// montre de loin, l'eau est repoussée d'un rien derrière ce qui est à sa hauteur (polygonOffset : 4 crans de la profondeur de la carte
+// graphique, rien de plus). Le prix : sur une plage en pente douce, un peu de sable sous l'eau se voit au bord (le rivage avance d'un
+// ou deux mètres, et vu d'avion, une bande de quelques points le long de la côte). Plus que 4 : la bande s'élargit ; 2 : la ville se noie encore
+if (auLancement.silhouetteVille) Object.assign(eau.material, { polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: 4 });
 
 // L'ombre des coins. Dans la réalité, les coins reçoivent moins de lumière que le reste : le pied d'un mur, le sol tout contre lui, le
 // dessous d'un auvent, d'un pont ou d'un toit qui dépasse (on dit « l'occlusion ambiante »). Le jeu les assombrit une fois pour toutes, en
@@ -6870,6 +6917,113 @@ for (const m of morceaux.values()) {
   m.bornes.forEach(e => Object.assign(ajouterCollision(e.x - 0.2, e.z - 0.2, e.x + 0.2, e.z + 0.2, e.y + R_.hauteurBornes, e.y, true), { borne: true, bx: e.x, bz: e.z }));
 }
 boitesCoins.clear();   // (l'ombre des coins est faite : on n'en a plus besoin)
+
+// La silhouette des villes, de loin (REGLAGES.silhouetteVille ; les boîtes : voir noterSilhouette). Plus loin que distanceVue, les vrais
+// bâtiments ne sont plus dessinés ; à leur place, une seule forme pour tout le pays : une boîte par immeuble (avec un toit en pente pour une
+// maison), de la couleur de sa façade et de son toit vus de loin, et des fenêtres peintes, allumées la nuit (comme celles des façades :
+// MATS_FENETRES). Pas de couture : dans les pointillés de la brume (de 80 % à 100 % de distanceVue), elle n'apparaît que là où les vrais
+// bâtiments s'effacent, point par point (voir la retouche de la brume : SILHOUETTE) ; plus près, la carte graphique ne la dessine même pas
+// (une boîte toute entière plus près que les pointillés est réduite à un point). Elle n'a ni ombre ni collisions : les balles la traversent
+let silhouette = null;
+if (SILHOUETTES.length) { await respirer(0.89); silhouette = construireSilhouette(); }   // (respirer : voir « Outils »)
+function construireSilhouette() {
+  // les fenêtres peintes : 12 étages de 3 m, et 12 fenêtres de 3 m de large (le dessin couvre 36 × 36 m : les mêmes fenêtres allumées ne
+  // reviennent que tous les 36 m, comme sur les façades). Le jour, le mur blanc et les vitres grises (la couleur vient de la façade : voir
+  // aspect) ; la nuit, une vitre sur deux environ est allumée, d'un jaune chaud, d'un blanc ou du bleu d'une télé (comme vitre). Avec
+  // son propre hasard (graine) : le jeu tire ensuite les mêmes nombres, qu'il y ait une silhouette ou non
+  const N = 12, C = 8, rnd = graine(1789), [vx, vy, vl, vh] = [1.5, 2, 5, 4.5];   // C : une case de 3 m, dans le dessin ; v... : sa vitre
+  const jour = toile(N * C, N * C, g => {
+    g.fillStyle = '#fff'; g.fillRect(0, 0, N * C, N * C); g.fillStyle = '#9a9a9a';
+    for (let a = 0; a < N; a++) for (let b = 0; b < N; b++) g.fillRect(a * C + vx, b * C + vy, vl, vh);
+  });
+  const nuit = toile(N * C, N * C, g => {
+    g.fillStyle = '#000'; g.fillRect(0, 0, N * C, N * C);
+    for (let a = 0; a < N; a++) for (let b = 0; b < N; b++) if (rnd() < 0.45) {
+      const c = hasardR(['#ffc070', '#ffd890', '#ffb060', '#fff0d0', '#ffcf80', '#9ab8ff'], rnd), d = g.createLinearGradient(0, b * C + vy, 0, b * C + vy + vh);
+      d.addColorStop(0, c); d.addColorStop(1, c + '99');   // (plus clair en haut, près de la lampe)
+      g.fillStyle = d; g.fillRect(a * C + vx, b * C + vy, vl, vh);
+    }
+  });
+  // les fenêtres peintes assombrissent un mur : en moyenne, de fond (du mur blanc, et des vitres grises). La matière éclaircit tout d'autant
+  // (sa couleur), et un toit, qui n'a pas de fenêtres, est foncé d'autant à ses sommets (voir formeSilhouette)
+  const fond = 1 - (vl * vh) / (C * C) * (1 - new THREE.Color('#9a9a9a').r);
+  const g = formeSilhouette(fond);
+  // la matière : une seule pour toute la silhouette, la couleur de chaque face à ses sommets (vertexColors), avec ce qui brille et les
+  // fenêtres allumées (aspect), qu'on lui ajoute en retouchant son programme ; et la boule de chaque boîte (centre), pour ne même pas
+  // dessiner celles qui sont tout entières plus près que les pointillés de la brume (POINTILLES)
+  const m = new THREE.MeshStandardMaterial({ color: new THREE.Color().setScalar(1 / fond), map: jour, emissiveMap: nuit, emissive: '#fff', emissiveIntensity: 0, vertexColors: true });
+  m.defines = { SILHOUETTE: 1 };   // (voir la retouche de la brume)
+  m.onBeforeCompile = s => {
+    if (!s.vertexShader.includes('#include <fog_vertex>') || !s.fragmentShader.includes('#include <metalnessmap_fragment>') || !s.fragmentShader.includes('#include <emissivemap_fragment>'))
+      alert('Silhouette : le programme des matières de Three.js a changé !');
+    s.vertexShader = 'attribute vec3 aspect;\nattribute vec4 centre;\nvarying vec3 vAspect;\n' + s.vertexShader.replace('#include <fog_vertex>', `#include <fog_vertex>
+	vAspect = aspect;
+	if ( distance( centre.xyz, cameraPosition ) + centre.w < ${POINTILLES.toFixed(1)} ) gl_Position = vec4( 0.0, 0.0, 2.0, 1.0 );   // (toute la boîte en un seul point, hors de l'image)`);
+    s.fragmentShader = 'varying vec3 vAspect;\n' + s.fragmentShader
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\n\troughnessFactor = vAspect.x; metalnessFactor = vAspect.y;')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance *= vAspect.z;');
+  };
+  MATS_FENETRES.push(m);   // (ses fenêtres s'allument la nuit, avec celles des façades : voir majCiel)
+  // (dessinée à son tour, comme les autres objets opaques : après le pays, avant ce qui brille sans cacher, comme l'éclair au bout du canon,
+  // qui reste devant elle)
+  const o = new THREE.Mesh(g, m);
+  o.raycast = () => {};       // les balles, le grappin, la toile... la traversent
+  o.matrixAutoUpdate = false;
+  scene.add(o);
+  return o;
+}
+// la forme de la silhouette : toutes les boîtes de SILHOUETTES (à part, pour que ses grandes listes de nombres soient oubliées ensuite)
+function formeSilhouette(fond) {
+  // ce que devient une matière de MAT, de loin : [rouge, vert, bleu, rugosité, métal, fenêtres allumées la nuit]. Sa couleur de loin (DE_LOIN),
+  // ce qui brille (les vitres d'une façade sont des miroirs : voir facade) et ses fenêtres allumées (un toit n'en a pas). Une matière qui
+  // n'est pas dans DE_LOIN a la couleur de son mur (fond, pour une façade), sans vitres
+  const aspects = {};
+  const aspect = (nom, mur) => aspects[nom + mur] ||= (() => {
+    const m = MAT[nom], [couleur, vitres = m.roughnessMap ? 0 : null, allumees = 1] = DE_LOIN[nom] ?? [];
+    const c = couleur ? new THREE.Color(couleur) : new THREE.Color(m.map?.fond ?? '#fff').multiply(m.color);
+    if (!mur) c.multiplyScalar(fond);
+    if (vitres === null) return [c.r, c.g, c.b, m.roughness, m.metalness, 0];   // (pas une façade : ce qui brille, c'est celui de sa matière)
+    return [c.r, c.g, c.b, lerp(0.88, 0.1, vitres), 0.9 * vitres, mur ? allumees : 0];   // (le mur d'une façade : rugueux, sans métal ; une vitre : lisse, du métal)
+  })();
+  // une face : ses coins (3 ou 4, à la suite), tournée vers n (dehors) ; uvs : où sont ses coins dans les fenêtres peintes (36 m = 1) ;
+  // a : son aspect ; boule : celle de sa boîte (son milieu et son rayon)
+  const pos = [], nor = [], uv = [], coul = [], asp = [], cen = [], idx = [], P = new THREE.Vector3(), A = new THREE.Vector3(), B = new THREE.Vector3();
+  function face(coins, n, uvs, a, boule) {
+    const k = pos.length / 3;
+    coins.forEach((c, i) => { pos.push(...c); nor.push(...n); uv.push(...uvs[i]); coul.push(a[0], a[1], a[2]); asp.push(a[3], a[4], a[5]); cen.push(...boule); });
+    // ses triangles, tournés vers dehors : la carte graphique ne dessine que ceux qu'elle voit de face
+    const dehors = A.fromArray(coins[1]).sub(P.fromArray(coins[0])).cross(B.fromArray(coins[2]).sub(P)).dot(B.fromArray(n)) > 0;
+    for (let t = 1; t < coins.length - 1; t++) idx.push(k, dehors ? k + t : k + t + 1, dehors ? k + t + 1 : k + t);
+  }
+  const SOUS = 5;                // mètres : les murs descendent sous le sol (de loin, le relief simplifié n'est pas toujours juste à la hauteur de la ville)
+  const TOIT_UV = [0.002, 0.002];   // un coin des fenêtres peintes, où il n'y a que du mur (un toit n'a pas de fenêtres)
+  for (const s of SILHOUETTES) {
+    const x1 = s.x - s.l / 2, x2 = s.x + s.l / 2, z1 = s.z - s.p / 2, z2 = s.z + s.p / 2, y1 = s.bas - SOUS, y2 = s.haut, h = s.pente;
+    const mur = aspect(s.mur, true), toit = aspect(s.toit, false), boule = [s.x, (y1 + y2 + h) / 2, s.z, Math.hypot(s.l + 0.8, y2 + h - y1, s.p + 1) / 2];
+    const v1 = (y1 - s.bas) / 36, v2 = (y2 - s.bas) / 36;   // (les étages partent du pied du bâtiment)
+    const cote = ([xa, za], [xb, zb], n, long) => face([[xa, y1, za], [xb, y1, zb], [xb, y2, zb], [xa, y2, za]], n, [[0, v1], [long / 36, v1], [long / 36, v2], [0, v2]], mur, boule);
+    cote([x1, z2], [x2, z2], [0, 0, 1], s.l); cote([x2, z1], [x1, z1], [0, 0, -1], s.l); cote([x2, z2], [x2, z1], [1, 0, 0], s.p); cote([x1, z1], [x1, z2], [-1, 0, 0], s.p);
+    const dessus = (coins, n) => face(coins, n, coins.map(() => TOIT_UV), toit, boule);
+    if (!h) dessus([[x1, y2, z1], [x2, y2, z1], [x2, y2, z2], [x1, y2, z2]], [0, 1, 0]);
+    else { // un toit en pente le long de x, comme celui d'une maison (voir toitPente) : deux pans et deux pignons
+      const X1 = s.x - (s.l + 0.8) / 2, X2 = s.x + (s.l + 0.8) / 2, Z1 = s.z - (s.p + 1) / 2, Z2 = s.z + (s.p + 1) / 2, d = Math.hypot((s.p + 1) / 2, h);
+      dessus([[X1, y2, Z2], [X2, y2, Z2], [X2, y2 + h, s.z], [X1, y2 + h, s.z]], [0, (s.p + 1) / 2 / d, h / d]);
+      dessus([[X1, y2, Z1], [X2, y2, Z1], [X2, y2 + h, s.z], [X1, y2 + h, s.z]], [0, (s.p + 1) / 2 / d, -h / d]);
+      dessus([[X2, y2, Z1], [X2, y2, Z2], [X2, y2 + h, s.z]], [1, 0, 0]);
+      dessus([[X1, y2, Z1], [X1, y2, Z2], [X1, y2 + h, s.z]], [-1, 0, 0]);
+    }
+  }
+  // (le sens des faces et les couleurs tiennent dans un octet chacun : quatre fois moins de mémoire qu'un nombre à virgule)
+  const g = new THREE.BufferGeometry(), octets = (l, k, Type) => new Type(l.map(v => clamp(Math.round(v * k), -k, k)));
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(octets(nor, 127, Int8Array), 3, true));     // (de -1 à 1 : de -127 à 127)
+  g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uv), 2));
+  g.setAttribute('color', new THREE.BufferAttribute(octets(coul, 255, Uint8Array), 3, true));    // (de 0 à 1 : de 0 à 255)
+  g.setAttribute('aspect', new THREE.BufferAttribute(new Float32Array(asp), 3));
+  g.setAttribute('centre', new THREE.BufferAttribute(new Float32Array(cen), 4));
+  g.setIndex(idx); g.computeBoundingSphere();
+  return g;
+}
 // les bornes sous la voiture v : dans son empreinte, et plus hautes que le dessous de sa caisse
 function bornesSous(v) {
   const L = v.forme.longueur / 2 + 0.2, W = v.forme.largeur / 2 + 0.2, res = [];
@@ -18351,7 +18505,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
   majInterieurs, construireInterieur, defaireInterieur, formeBoite, VUE_INTERIEURS,
   formes, recettes, majFormes, faireForme, defaireForme, formeIntacte, M_CORPS, CALQUE_PIECES, temoinForme,
-  pleins, pleinsVus, choisirPleins, cacheParUnPlein, traversePlein, PORTEE_PLEINS,
+  pleins, pleinsVus, choisirPleins, cacheParUnPlein, traversePlein, PORTEE_PLEINS, SILHOUETTES, get silhouette() { return silhouette; }, POINTILLES,
   set sourisG(v) { sourisG = v; }, set visee(v) { visee = v; } };
 // les boutons du menu cliqués pendant la construction (un héros, un chapitre, « Nouvelle partie ») : le jeu s'en occupe maintenant (voir prevenirJeu)
 jeuConstruit();
