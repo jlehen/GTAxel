@@ -40,13 +40,16 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | **Langue** | **Français**, **Deutsch**, **English** ou **Züritüütsch**. Même les enseignes des magasins changent de langue. |
 | **Personnage** | **B.J.**, le garçon tout en muscles, ou sa fille **Jess**, en jupe et talons hauts. Le menu te le montre de face. |
 | **Cheveux** | Blonds, châtains, bruns, noirs, roux, roses, bleus ou verts. |
-| **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. |
+| **Piétons** et **voitures** | Combien vivent autour de toi : **Peu**, **Normal**, **Beaucoup** (au départ) ou **Énorme**. Si le jeu rame, prends moins de monde. Pour voir ce que ça change, appuie sur **P** pendant le jeu : le compteur de performances te dit combien d'images par seconde le jeu dessine (plus il y en a, plus c'est fluide : 60, c'est parfait ; moins de 25, ça rame). Le jeu n'en dessine jamais plus de 60, même sur un écran plus rapide (120 ou 144 Hz) : ça suffit, et l'ordinateur chauffe moins (le réglage `imagesParSeconde`, dans ⚙ Réglages : 0 = autant que l'écran). Et si ta carte graphique n'arrive pas à suivre, le jeu dessine tout seul l'image un peu moins fine (un peu plus floue) pour rester fluide, puis la remet quand tout va bien : le compteur te montre la finesse du moment (« finesse 1,25 (auto) »). |
+| **Qualité** | La qualité des images : **Basse**, **Moyenne** ou **Haute**. Au départ, c'est Haute (le jeu tel qu'il est), avec deux effets sur toute l'image, comme dans GTA 5 : le halo des lumières, qui débordent doucement la nuit (lampadaires, phares, fenêtres allumées, explosions, réacteurs d'Iron Man), et l'ombre des coins à l'écran, discrète, là où deux choses se touchent presque. Si le jeu rame encore, prends Moyenne, puis Basse. Moyenne : plus d'effets d'image, les ombres du soleil en une seule carte, un peu plus floues, et plus d'ombre au-delà de 90 m environ (en Haute, elles sont en trois « étages » : très nettes près de toi, et jusqu'à 750 m devant toi), les bâtiments et les arbres visibles jusqu'à 700 m au lieu de 900, 4 lampadaires qui éclairent vraiment la nuit au lieu de 8, les voitures dessinées d'un seul bloc dès 45 m au lieu de 60, et une image un peu moins fine sur un écran Retina. Basse : plus d'ombres du soleil du tout, des bords un peu en escalier (sans anticrénelage), une vue jusqu'à 500 m, 2 lampadaires, les voitures d'un seul bloc dès 30 m, des textures 2 fois moins fines (les murs, les enseignes, les visages un peu flous de tout près, mais 4 fois moins de mémoire dans la carte graphique), et sur un écran Retina, un point d'image par point d'écran. |
 | **Chapitre** | Retourner dans un chapitre que tu as déjà ouvert. |
 | **↺ Nouvelle partie** | Tout effacer pour recommencer au chapitre 1. |
 | **⚙ Réglages** | Tous les nombres du jeu, à changer sans toucher au code (voir [Modifier le jeu](#modifier-le-jeu)). |
 | **🎮 Codes de triche** | Tous les codes de triche du jeu. |
 
 - Le navigateur se souvient de ta langue, et de **ta partie** : ton chapitre, tes missions, ton argent et tes armes.
+- Pour changer la qualité, le jeu recharge la page (pendant une partie, il te demande d'abord : tu gardes ton argent, tes armes et tes missions réussies, mais tu repars du départ, comme avec F5 : la mission en cours recommence, et tes codes de triche s'éteignent). Le navigateur se souvient de ton choix.
+- La qualité change d'un coup plusieurs cases de **⚙ Réglages** (elles deviennent jaunes) : si tu en changes une toi-même, la qualité devient « personnalisée » (c'est ta case qui compte), et **Tout remettre** revient à Haute.
 - Tu peux changer de personnage quand tu veux, même en pause (Échap).
 - Sous le menu, la liste des touches est celle du chapitre où tu es : à Malibu, celles de l'armure d'Iron Man ; à Gotham, celles de Batman, et ainsi de suite.
 - En allemand et en anglais, les touches pour se déplacer sont W A S D (et l'armure d'Iron Man s'appelle avec Q W E au lieu de A Z E).
@@ -69,6 +72,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | 1 à 8 ou molette | Changer d'arme |
 | 9 | Les armes des codes de triche : voir [La touche 9](#la-touche-9) |
 | M ou Tab | Carte de tout le pays (molette : zoom ; souris ou flèches : se déplacer) |
+| P | Le compteur de performances, en bas à droite de la mini-carte (P encore : il s'éteint) : les images par seconde, le temps de calcul et de dessin de chaque image, les appels de dessin et les triangles, et la finesse de l'image. Pratique pour voir ce qui fait ramer le jeu |
 | Entrée | Taper un code de triche |
 | Échap | Pause |
 | Q S D, 3 fois de suite | Danser comme Michael Jackson : voir [La danse](#la-danse) |
@@ -786,6 +790,7 @@ Pour les tableaux `REGLAGES`, `ARMES`, `ARMES_ROBOT`, `VOITURES`, `ENNEMIS`, `CA
 - Le jeu en tient compte tout de suite (pour la carte, les ombres ou les ennemis déjà là, appuie sur F5).
 - Les cases changées sont en jaune, et le navigateur s'en souvient. **Tout remettre** revient aux nombres du code.
 - Si tu changes le même nombre dans le code, c'est le code qui gagne.
+- La qualité du menu (Basse, Moyenne, Haute) change d'un coup quelques-unes de ces cases (`anticrenelage`, `ombres`, `ombreSoleil`, `etagesOmbre`, `ombresPersonnages`, `detailsVoitures`, `distanceVue`, `lumieresNuit`, `finesse`, `finesseMin`, `texturesFines`, `effetsImage`) ; si tu en changes une à la main, la qualité devient « personnalisée », et c'est ta case qui compte. Haute, ce sont les nombres du code.
 
 ### Dans le code
 
@@ -795,7 +800,7 @@ Les tableaux, dans l'ordre où ils sont dans le fichier, de haut en bas :
 |---|---|
 | [`HEROS` et `CHEVEUX`](#heros-et-cheveux) | Les héros du menu et leurs couleurs de cheveux |
 | [`CHAPITRES`](#chapitres) | Les chapitres : ville, héros, tenue, logo, pluie, brouillard... |
-| [`FOULES`](#foules) | Le nombre de piétons et de voitures |
+| [`FOULES` et `QUALITES`](#foules-et-qualites) | Le nombre de piétons et de voitures, et les qualités du menu |
 | [`TRADUCTIONS` et `LANGUES`](#traductions-et-langues) | Les phrases du jeu dans les autres langues |
 | [`REGLAGES`](#reglages) | Les nombres de tout le jeu |
 | [`ARMES`, `TRESORS` et `ARMES_ROBOT`](#armes-tresors-et-armes_robot) | Les armes et les objets à voler |
@@ -830,9 +835,11 @@ Juste après `HEROS` et `CHEVEUX`. Pour chaque chapitre :
 
 Les nombres de l'amende et du voyage sont dans [`REGLAGES`](#reglages).
 
-#### `FOULES`
+#### `FOULES` et `QUALITES`
 
 Le nombre de piétons et de voitures de chaque choix du menu. Change les nombres, ou invente un choix : `'Personne': { pietons: 0, voitures: 0 }`.
+
+Juste après, `QUALITES` : les nombres de `REGLAGES` que donne chaque qualité du menu (Basse, Moyenne, Haute). Change-les, ou invente un niveau : `'Très basse': { ombres: false, distanceVue: 300 }` (ce qu'un niveau ne dit pas ne change pas). Haute, ce sont les nombres de `REGLAGES` : si tu en changes un dans `REGLAGES`, change-le aussi dans Haute.
 
 #### `TRADUCTIONS` et `LANGUES`
 
@@ -851,8 +858,18 @@ Les nombres de tout le jeu :
 - **Le jour et la nuit** : la durée du jour, du coucher du soleil, de la nuit et du lever du soleil (`dureeJour`, `dureeCrepuscule`, `dureeNuit`, `dureeLever`, en secondes : mets `dureeNuit: 30` pour une nuit toute courte), la lumière de la lune (`clairDeLune`), combien de lampadaires éclairent vraiment la nuit (`lumieresNuit`), combien de piétons et de voitures il reste la nuit, combien de gangs en plus.
 - **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), ce que les batarangs explosifs font à Batman lui-même (`explosifsBatman`, et `explosifsPres` : à moins de combien de mètres de sa main leur explosion ne lui fait rien), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
 - **Jusqu'où on voit** : `distanceRelief`, les montagnes et la mer (10 km) ; `distanceVue`, les bâtiments et les arbres (900 m).
+- **Les ombres des gens** : `ombresPersonnages` : les passants plus près que ça de la caméra (30 m) ont une vraie ombre, les autres une tache sombre sous les pieds (0 = une tache pour tous).
+- **Les voitures garées** : `sommeilVoitures` : les voitures garées à plus de 60 m de toi, qui ne bougent plus, « dorment » : le jeu ne les recalcule plus à chaque image, et elles se réveillent dès que tu t'approches ou qu'on les touche (0 = aucune ne dort).
+- **Les voitures au loin** : `detailsVoitures` : les voitures à plus de 60 m de la caméra sont dessinées d'un seul bloc (de loin, on ne voit pas la différence, et c'est deux fois moins de travail pour la carte graphique ; leur ombre l'est toujours ; 0 = toujours toutes leurs pièces).
+- **Les gens** : `personnagesEnBloc` : chaque passant, policier ou ennemi (sauf toi) est dessiné d'un seul bloc, toutes ses pièces collées ensemble, qui suivent ses vraies pièces comme une marionnette : on ne voit pas la différence, et la carte graphique a bien moins de travail avec la foule (`false` : pièce par pièce, comme avant).
+- **Ce qui est caché** : `cacheDerriere` : ce qui est tout entier caché derrière un immeuble ou une maison (une voiture dans la rue d'à côté, les passants derrière, l'intérieur d'un bâtiment de l'autre côté du pâté) n'est pas dessiné : on ne le verrait pas, et la carte graphique a moins de travail (son ombre, elle, est toujours dessinée ; `false` : tout est dessiné, même caché, comme avant).
+- **L'intérieur des bâtiments** : `distanceInterieurs` : le dessin de l'intérieur des bâtiments (les planchers, les marches, les meubles), qu'on ne voit qu'à moins de 100 m, n'est fabriqué que quand la caméra est à moins de 150 m, et il est défait 100 m plus loin : ça garde beaucoup de mémoire libre (100000 = tous, et jamais défaits, comme avant).
+- **Les bords, les ombres du soleil et les textures** : `anticrenelage` : les bords des objets bien lisses (`false` : un peu en escalier, mais bien moins de travail pour la carte graphique). `ombreSoleil` : la finesse des ombres du soleil (2048 points de côté pour chaque carte des ombres ; 1024 : un peu plus floues, 4 fois moins de points). `etagesOmbre` : les étages des ombres, en mètres (`[30, 100, 500]` : trois cartes, de 60, 200 et 1 000 m de côté, un peu devant toi : des ombres très nettes près de toi, et l'ombre des immeubles et des arbres jusqu'à 750 m ; `[90]` : une seule carte de 180 m autour de toi, comme avant, c'est ce que fait la qualité Moyenne ; au plus 4 étages, chacun redessine ce qu'il couvre ; dans le brouillard de Gotham, le jeu ne fait pas le dernier : on ne le verrait pas ; puis F5). `texturesFines` : les textures (les murs, les sols, les enseignes, les visages) peintes 2 fois plus fin, 512 points de côté pour la plupart (`false` : un peu floues de tout près, mais 4 fois moins de mémoire dans la carte graphique ; c'est ce que fait la qualité Basse ; puis F5).
+- **L'ombre des coins** : `ombreCoins` : de 0 à 1 (0.75) : le pied des murs, le sol tout contre eux, le dessous des auvents sont un peu plus sombres, comme en vrai ; elle est calculée une fois en construisant le pays et ne coûte presque rien quand tu joues, même en qualité Basse (0 = pas d'ombre des coins ; 1 = très marquée ; puis F5).
+- **Les villes de loin** : `silhouetteVille` : de loin, plus loin que `distanceVue`, les villes restent visibles : chaque immeuble, tour ou maison devient une boîte toute simple, de la couleur de sa façade, avec des fenêtres peintes, allumées la nuit ; presque rien à faire pour la carte graphique, même en qualité Basse (`false` = plus de villes au loin, seulement le relief ; puis F5). Dans le brouillard d'un chapitre (`brouillard`, à Gotham), le jeu ne les fabrique pas : on ne les verrait pas (pour les voir, enlève le brouillard : `brouillard: 0`).
+- **Les effets d'image** : `effetsImage` : en qualité Haute, deux effets sur toute l'image, après le dessin : le halo des lumières (`halo`, 1 : ce qui est très clair déborde doucement autour, surtout la nuit ; 0 = pas de halo, 2 = deux fois plus fort) et l'ombre des coins à l'écran (`ombreEcran`, 1 : là où deux choses se touchent presque, l'image fonce un peu ; 0 = rien, 2 = deux fois plus marquée) ; `halo` et `ombreEcran` comptent tout de suite, `effetsImage` attend F5 (`false` : l'image sans effets, comme en Moyenne et en Basse ; si le jeu rame, mets `false`). Plus de réglages pour eux (le seuil du halo le jour et la nuit, son étalement, le rayon de l'ombre) : `HALO` et `OMBRE_ECRAN`, dans le code, juste avant la boucle principale.
 
-**Si le jeu rame**, mets `distanceVue: 500`, `ombres: false`, `distanceRelief: 0` ou `lumieresNuit: 0`.
+**Si le jeu rame**, choisis d'abord la qualité Moyenne ou Basse dans le menu ; ou mets toi-même `distanceVue: 500`, `ombresPersonnages: 15`, `ombres: false`, `anticrenelage: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ). `imagesParSeconde` : le jeu ne dessine pas plus d'images par seconde (60 ; 0 = autant que l'écran ; 30 pour que l'ordinateur chauffe moins ; pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20). `finesse` : combien de points le jeu dessine pour chaque point de ton écran (1,5 ; jamais plus que ton écran n'en a : 1 sur un écran ordinaire ; 0.75 = un peu flou, mais presque deux fois moins de travail pour la carte graphique) ; avec `finesseAuto: true`, le jeu la baisse tout seul quand la carte graphique n'arrive pas à suivre, mais jamais sous `finesseMin` (0.75), et la remonte quand tout va bien (`finesseAuto: false` : toujours `finesse`).
 
 #### `ARMES`, `TRESORS` et `ARMES_ROBOT`
 
