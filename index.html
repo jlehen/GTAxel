@@ -2641,7 +2641,7 @@ const REGLAGES = {
   distanceVue: 900,          // mètres : au-delà, on ne dessine plus les détails (bâtiments, arbres, routes) : il ne reste que le relief (mets 500 si le jeu rame)
   distanceRelief: 10000,     // mètres : le relief (les montagnes, les collines, la mer) se voit jusque-là, de plus en plus pâle dans la brume (mets 0 si le jeu rame encore : on ne verra plus rien au-delà de distanceVue)
   distanceInterieurs: 150,   // mètres : on ne voit l'intérieur d'un bâtiment (planchers, marches, meubles) qu'à moins de 100 m. Son dessin n'est fabriqué que quand la caméra est plus près que ça, et il est défait 100 m plus loin : ça garde beaucoup de mémoire libre. 100 = au dernier moment (encore moins de mémoire, mais en volant vite, le jeu peut accrocher en fabriquant plusieurs intérieurs à la fois) ; 100000 = tous les intérieurs, peu à peu, et jamais défaits (comme avant)
-  ombreCoins: 0.75,          // l'ombre des coins, de 0 à 1 : le pied des murs, le sol tout contre eux, le dessous des auvents et des ponts sont un peu plus sombres, comme en vrai (la lumière y arrive moins bien). 0 = pas d'ombre des coins (comme avant) ; 1 = très marquée (plus que 1, c'est comme 1). Elle est calculée une fois pour toutes en construisant le pays (puis F5) : elle ne coûte presque rien quand on joue, alors même si le jeu rame, tu peux la garder
+  ombreCoins: 0.75,          // l'ombre des coins, de 0 à 1 : le pied des murs, le sol tout contre eux, le dessous des auvents sont un peu plus sombres, comme en vrai (la lumière y arrive moins bien). 0 = pas d'ombre des coins (comme avant) ; 1 = très marquée (plus que 1, c'est comme 1). Elle est calculée une fois pour toutes en construisant le pays (puis F5) : elle ne coûte presque rien quand on joue, alors même si le jeu rame, tu peux la garder
   silhouetteVille: true,     // true = de loin, on voit toujours les villes : plus loin que distanceVue, là où les vrais bâtiments s'effacent, chaque immeuble, maison ou tour devient une boîte toute simple, de la couleur de sa façade et de son toit, avec des fenêtres peintes (allumées la nuit), jusqu'au bout de la brume. Toute la silhouette du pays en un seul dessin : presque rien à faire pour la carte graphique. false = au loin, plus de villes, seulement le relief (comme avant). Elle est fabriquée en construisant le pays (puis F5) ; même si le jeu rame, tu peux la garder
   hauteurMontagnes: 30,      // mètres par chiffre de la CARTE : 9 = 270 m (les très hautes montagnes : voir SOMMETS, après la carte)
   penteRoute: 0.35,          // une route de campagne qui part d'une ville ou d'un croisement ne monte pas plus raide que ça (0.35 = 35 m pour 100 m) : si la colline d'à côté est plus haute, la route s'y enfonce. Mets 5 pour voir des routes qui tombent comme des murs
@@ -4610,9 +4610,9 @@ document.getElementById('remettre').onclick = () => { for (const i of boiteRegla
 // (elles deviennent jaunes). Le menu montre le niveau dont tous les nombres sont ceux du jeu ; s'il n'y en a aucun (une case changée à la
 // main), la qualité est « personnalisée ». Tout remettre revient aux nombres du code : Haute.
 // AU_LANCEMENT : ce que le jeu ne lit qu'en se chargeant (la carte graphique, les ombres, la brume, les lumières sont réglées une fois pour
-// toutes, les textures peintes, l'ombre des coins calculée, la silhouette des villes fabriquée, et les images et les programmes des effets
-// d'image préparés) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
-const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'etagesOmbre', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins', 'silhouetteVille', 'effetsImage'];
+// toutes, les textures peintes, l'ombre des coins calculée, la silhouette des villes fabriquée, les images et les programmes des effets
+// d'image préparés, les ponts et les routes construits) : pour le changer, il recharge la page. Le reste (ombresPersonnages, detailsVoitures, finesse, finesseMin) compte dès l'image suivante
+const AU_LANCEMENT = ['anticrenelage', 'ombres', 'ombreSoleil', 'etagesOmbre', 'distanceVue', 'distanceRelief', 'lumieresNuit', 'texturesFines', 'ombreCoins', 'silhouetteVille', 'effetsImage', 'hauteurPont', 'penteRoute'];
 for (const nom in QUALITES) for (const k in QUALITES[nom]) if (!cases['REGLAGES.' + k]) alert(`Qualité "${nom}" : "${k}" n'est pas un nombre de REGLAGES !`);
 function remplirQualite(nom) { for (const k in QUALITES[nom]) cases['REGLAGES.' + k]?.mettre(QUALITES[nom][k]); }
 function qualiteActuelle() {
@@ -4864,7 +4864,7 @@ function terrainNaturel(x, z) {
 const PT = PAS / 8, NXT = (NBX + 1) * 8 + 1, NZT = (NBZ + 1) * 8 + 1;
 const HT = new Float32Array(NXT * NZT);
 for (let iz = 0; iz < NZT; iz++) {
-  await respirer(0.01 + 0.08 * iz / NZT);   // (une rangée à la fois : voir respirer)
+  await respirer(0.01 + 0.04 * iz / NZT);   // (une rangée à la fois : voir respirer)
   for (let ix = 0; ix < NXT; ix++) HT[iz * NXT + ix] = terrainNaturel(ix * PT, iz * PT);
 }
 // la galerie de la grotte des Dix Anneaux, sous la colline (voir « la galerie de la grotte », plus bas) : ses morceaux (rects), son sol et son
@@ -4967,7 +4967,7 @@ function dosDAneEn(x, z) {
   return 0;
 }
 // Les ponts en ville : une rue entre deux cases d'eau (autour d'un + de la CARTE) est un pont bombé, comme sur les canaux d'Amsterdam. Du bord
-// de chaque carrefour, il monte en douceur jusqu'à son milieu, R_.hauteurPont mètres au-dessus de la rue (21 % de pente au plus, avec 4 m),
+// de chaque carrefour, il monte en douceur jusqu'à son milieu, hauteurPont mètres au-dessus de la rue (21 % de pente au plus, avec 4 m),
 // puis redescend : les bateaux passent dessous. Son tablier fait 1,2 m d'épaisseur à ses deux bouts, et 60 cm au milieu.
 // pontsH : les rues rueH(i, j) qui sont des ponts (rangées i * 1000 + j), pontsV : les rueV
 const pontsH = new Set(), pontsV = new Set();
@@ -4977,7 +4977,7 @@ for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
 }
 // la bosse du pont et l'épaisseur de son tablier, à d mètres de son milieu (dans le sens de la rue) : au bord des carrefours (à S / 2 = 30 m
 // du milieu), la bosse est à 0, et le tablier fait 1,2 m
-const bossePont = d => Math.abs(d) < S / 2 ? R_.hauteurPont * Math.cos(Math.PI * d / S) ** 2 : 0;
+const bossePont = d => Math.abs(d) < S / 2 ? auLancement.hauteurPont * Math.cos(Math.PI * d / S) ** 2 : 0;   // (auLancement : celle du pont construit, qui n'attend pas F5)
 const epaisseurPont = d => 1.2 - (Math.abs(d) < S / 2 ? 0.6 * Math.cos(Math.PI * d / S) ** 2 : 0);
 // le pont en ville qui passe en (x, z) : { y : le dessus de la chaussée, bas : le dessous du tablier, d : à combien de mètres de son milieu,
 // le : 'x' s'il va vers x (une rue est-ouest), 'z' vers z ; w : de combien on est à côté du milieu de la rue (vers +z, ou vers +x) } ;
@@ -5091,7 +5091,8 @@ const grilleRoutes = new Map();   // case de rangement -> morceaux de route qui 
     if (!numBout.has(s)) { const p = pos(s); numBout.set(s, nouveauNoeud(p.x, p.z, hauteurPoint(p.x, p.z).y)); }
     return numBout.get(s);
   };
-  for (const ch of chemins) {
+  for (const [n, ch] of chemins.entries()) {
+    await respirer(0.05 + 0.01 * n / chemins.length);   // (une route à la fois : voir respirer)
     const n0 = numero(ch[0]), n1 = numero(ch.at(-1));
     // les coins sont arrondis 3 fois (on coupe chaque coin au quart et aux trois quarts)
     let pts = ch.map(pos).map(p => ({ x: p.x, z: p.z }));
@@ -5197,7 +5198,7 @@ function presDeChaussee(x, z, marge) {
   return [-marge, marge].some(a => [-marge, marge].some(b => estPiste(car(...blocEn(x + a, z + b)))));
 }
 // le terrain est creusé ou remblayé sous les routes (pas sous les ponts, qui passent au-dessus)
-await respirer(0.1);   // (voir respirer)
+await respirer(0.06);   // (voir respirer)
 for (const pts of ROUTES) for (let q = 1; q < pts.length; q++) {
   const a = pts[q - 1], b = pts[q];
   for (let iz = Math.floor((Math.min(a.z, b.z) - 20) / PT); iz <= Math.ceil((Math.max(a.z, b.z) + 20) / PT); iz++)
@@ -5219,7 +5220,7 @@ for (const pts of ROUTES) for (let q = 1; q < pts.length; q++) {
 {
   const hauteurCoin = new Map();   // numéro du coin -> la hauteur qu'il prend
   for (const [r, pts] of ROUTES.entries()) {
-    await respirer(0.11 + 0.05 * r / ROUTES.length);   // (une route à la fois : voir respirer)
+    await respirer(0.06 + 0.015 * r / ROUTES.length);   // (une route à la fois : voir respirer)
     let q0 = 0, vus = new Set();   // (les coins déjà vus depuis le morceau de route qui finit au point q0)
     surLeRuban(pts, (x, z, y, q) => {
       if (q !== q0) { q0 = q; vus = new Set(); }
@@ -5233,7 +5234,7 @@ for (const pts of ROUTES) for (let q = 1; q < pts.length; q++) {
   // dans un creux (en bas d'une descente), la route s'arrondit, mais le terrain va tout droit d'un coin à l'autre : il passerait au-dessus
   // du goudron. Là, on abaisse les trois coins juste ce qu'il faut, pour que le goudron reste au moins 10 cm au-dessus
   for (const [r, pts] of ROUTES.entries()) {
-    await respirer(0.16 + 0.02 * r / ROUTES.length);   // (une route à la fois)
+    await respirer(0.075 + 0.01 * r / ROUTES.length);   // (une route à la fois)
     surLeRuban(pts, (x, z, y) => {
       const trop = hauteurGrille(x, z) - (y - 0.1);
       if (trop > 0) for (const c of coinsDuTriangle(x, z)) HT[c] -= trop;
@@ -5470,7 +5471,7 @@ function presDePiste(x, z, marge) {
 // =====================================================================
 //  Moteur 3D
 // =====================================================================
-await respirer(0.18);   // (voir respirer)
+await respirer(0.085);   // (voir respirer)
 const renderer = new THREE.WebGLRenderer({ antialias: !!R_.anticrenelage });   // (l'anticrénelage ne se change qu'en recréant tout : il attend F5)
 renderer.setPixelRatio(clamp(R_.finesse, 0.25, devicePixelRatio || 1));   // la finesse de l'image (finesse, dans REGLAGES) ; avec finesseAuto, reglerFinesse la change en jouant
 renderer.setSize(innerWidth, innerHeight);
@@ -5550,8 +5551,9 @@ const PORTEE_PLEINS = 300;  // mètres : un immeuble plus loin que ça de la cam
 let occulter = false;       // vrai pendant que Three.js choisit ce qu'il dessine pour la caméra du jeu (pas pour la carte des ombres)
 let etageOmbre = -1;        // l'étage des ombres dont Three.js dessine la carte en ce moment (-1 : aucun ; voir etagesOmbre)
 // un immeuble plein, de la matière mat : (x, z) son milieu, l × p sa taille, de bas à haut. Seulement s'il est opaque (une tour de verre
-// transparente, une matière découpée ou invisible : on verrait au travers) ; pas dans un intérieur, ni dans un monument qui bouge (aPart)
-const opaque = m => m.visible && m.colorWrite && !m.transparent && m.opacity === 1 && !m.alphaTest && !m.alphaMap;
+// transparente, une matière découpée ou invisible : on verrait au travers) ; pas dans un intérieur, ni dans un monument qui bouge (aPart).
+// (une faute dans le nom de la matière : pas plein, et verifierMatiere le dira quand ses formes seront fusionnées)
+const opaque = m => m?.visible && m.colorWrite && !m.transparent && m.opacity === 1 && !m.alphaTest && !m.alphaMap;
 function noterPlein(mat, x, z, l, p, bas, haut) {
   if (interieur || aPart || !opaque(MAT[mat])) return;
   const [i, j] = blocEn(x, z), k = j * NBX + i, b = { x1: x - l / 2, z1: z - p / 2, x2: x + l / 2, z2: z + p / 2, bas, haut };
@@ -5660,7 +5662,7 @@ function photographierCiel() {
   reflets = r; premierePhoto ??= r;
   for (const s of scenesReflets) s.environment = r.texture;
 }
-await respirer(0.19);   // (voir respirer)
+await respirer(0.09);   // (voir respirer)
 photographierCiel();
 scene.environmentIntensity = 0.7;
 const ambiance = new THREE.HemisphereLight(0xcfe4ff, 0x5a5040, 0.35);   // la lumière du ciel (en haut) et du sol (en bas)
@@ -5889,7 +5891,7 @@ function facade(fond, cols, rangs, fenetre, avant, hauteur = 256, allumees = 0.4
 }
 // les lettres et les chiffres des grandes lettres sur les collines (PANNEAUX) : une autre lettre fait un trou
 const LETTRES_PANNEAUX = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?&-';
-await respirer(0.2);   // (voir respirer)
+await respirer(0.1);   // (voir respirer)
 const TEX = {
   route: toile(256, 256, (g, l, h) => { g.fillStyle = '#3a3a3c'; g.fillRect(0, 0, l, h); grain(g, l, h, 8000, 0.07); }),
   lignes: toile(64, 256, (g) => { g.fillStyle = '#eee'; g.fillRect(30, 0, 4, 80); g.fillRect(3, 0, 3, 256); g.fillRect(58, 0, 3, 256); }),
@@ -5928,7 +5930,7 @@ const TEX = {
 };
 // la suite des textures, après une pause (les peindre toutes d'un coup gelait la page 0,15 s : voir respirer). Une texture à toi peut
 // aller dans l'une ou l'autre liste
-await respirer(0.23);   // (voir respirer)
+await respirer(0.13);   // (voir respirer)
 Object.assign(TEX, {
   // la mer, vue du salon de Tony Stark, dans ses grandes baies : le ciel, l'horizon (à hauteur des yeux), la mer et ses vagues, entre les lames
   vueMer: toile(512, 128, (g, l, h) => {
@@ -6052,7 +6054,7 @@ Object.assign(TEX, {
     g.strokeStyle = 'rgba(25,22,20,.7)'; g.lineWidth = 2; for (const x of [l / 3, l * 2 / 3]) { g.beginPath(); g.moveTo(x + entre(-6, 6), 0); g.lineTo(x + entre(-6, 6), h); g.stroke(); }
     g.fillStyle = '#26221e'; for (let k = 5; k < l; k += 16) for (const y of [4, h - 4]) { g.beginPath(); g.arc(k, y, 1.6, 0, 7); g.fill(); } }),
 });
-await respirer(0.26);   // (voir respirer)
+await respirer(0.15);   // (voir respirer)
 // un panneau : du texte en couleur sur un fond sombre, dans la langue choisie.
 // ENSEIGNES les garde toutes, pour les redessiner quand on change de langue (majEnseignes)
 const ENSEIGNES = [];
@@ -6125,38 +6127,38 @@ const pierresDe = (rangee, etage = 0) => (g, l, h) => {
   g.fillStyle = 'rgba(0,0,0,.26)'; for (let y = 0; y < h; y += rangee) { g.fillRect(0, y, l, 1); for (let x = (y / rangee % 2) * rangee * 1.4; x < l; x += rangee * 2.8) g.fillRect(x, y, 1, rangee); }
   if (etage) { g.fillStyle = 'rgba(125,118,110,.3)'; for (let y = 0; y < h; y += etage) g.fillRect(0, y + etage - 7, l, 5); }
 };
-if (GOTHAM) Object.assign(TEX, {
+const TEX_GOTHAM = {
   // les vieux immeubles du quartier gothique : de la pierre noire, des fenêtres en ogive dans leur encadrement, une corniche à chaque étage
-  gothique: facade('#2b2a2e', 3, 4, (g, x, y, w, h) => {
+  gothique: () => facade('#2b2a2e', 3, 4, (g, x, y, w, h) => {
     g.fillStyle = '#423f44'; ogive(g, x + w * .25 - 3, y + h * .12 - 3, w * .5 + 6, h * .74 + 4); g.fill();
     vitreOgive(g, x + w * .25, y + h * .12, w * .5, h * .72);
   }, pierresDe(8, 64), 256, 0.55),
   // les vieux gratte-ciel gothiques : de la pierre noire, de grands piliers du haut en bas, des fenêtres étroites entre eux
-  gothiqueTour: facade('#232228', 6, 4, (g, x, y, w, h) => {
+  gothiqueTour: () => facade('#232228', 6, 4, (g, x, y, w, h) => {
     vitre(g, x + w * .26, y + h * .14, w * .5, h * .72, [34, 40, 54]);
     g.fillStyle = '#36343b'; g.fillRect(x, y, w * .16, h);
   }, (g, l, h) => { g.fillStyle = 'rgba(0,0,0,.32)'; for (let y = 0; y < h; y += h / 4) g.fillRect(0, y, l, 6); }, 256, 0.5),
   // le manoir Wayne : de la pierre grise, des fenêtres à meneaux (une croix blanche), presque toutes allumées la nuit
-  manoir: facade('#6c675f', 3, 3, (g, x, y, w, h) => {
+  manoir: () => facade('#6c675f', 3, 3, (g, x, y, w, h) => {
     g.fillStyle = '#8c877e'; g.fillRect(x + w * .25 - 4, y + h * .14 - 4, w * .5 + 8, h * .66 + 8);
     vitre(g, x + w * .25, y + h * .14, w * .5, h * .66, [40, 48, 60]);
     g.fillStyle = '#ddd6c8'; g.fillRect(x + w * .5 - 1.5, y + h * .14, 3, h * .66); g.fillRect(x + w * .25, y + h * .38, w * .5, 3);
   }, pierresDe(10), 256, 0.75),
   // la cathédrale : de la pierre grise, de grands vitraux en ogive (des carreaux de couleur, qui brillent la nuit) et leurs plombs
-  cathedrale: facade('#4c4846', 2, 1, (g, x, y, w, h) => {
+  cathedrale: () => facade('#4c4846', 2, 1, (g, x, y, w, h) => {
     const fx = x + w * .3, fy = y + h * .16, fw = w * .4, fh = h * .7;
     g.fillStyle = '#625d59'; ogive(g, fx - 5, fy - 5, fw + 10, fh + 7); g.fill();
     vitreOgive(g, fx, fy, fw, fh, undefined, VITRAUX, true, 0.9);
   }, pierresDe(12), 256, 0.9),
   // l'asile d'Arkham : de la pierre sombre, de petites fenêtres à barreaux, peu allumées
-  arkham: facade('#38342f', 4, 3, (g, x, y, w, h) => {
+  arkham: () => facade('#38342f', 4, 3, (g, x, y, w, h) => {
     vitre(g, x + w * .3, y + h * .22, w * .4, h * .5, [30, 40, 38]);
     g.fillStyle = '#121212'; for (let k = 1; k < 4; k++) g.fillRect(x + w * .3 + w * .4 * k / 4 - 1, y + h * .22, 2, h * .5);
   }, pierresDe(9), 256, 0.35),
   // la tour Wayne : du verre presque noir, entre de fines lames dorées
-  wayne: facade('#0f1218', 8, 4, (g, x, y, w, h) => { vitre(g, x + 2.5, y + 1, w - 5, h - 2, [22, 32, 50]); g.fillStyle = '#c8a55a'; g.fillRect(x, y, 2.5, h); }, null, 256, 0.22),
+  wayne: () => facade('#0f1218', 8, 4, (g, x, y, w, h) => { vitre(g, x + 2.5, y + 1, w - 5, h - 2, [22, 32, 50]); g.fillStyle = '#c8a55a'; g.fillRect(x, y, 2.5, h); }, null, 256, 0.22),
   // la rosace de la cathédrale : une grande fenêtre ronde, ses pétales de vitrail autour d'un cœur, dans un cercle de pierre
-  rosace: toile(128, 128, (g) => {
+  rosace: () => toile(128, 128, (g) => {
     g.fillStyle = '#3c3836'; g.fillRect(0, 0, 128, 128);
     for (let k = 0; k < 16; k++) {
       const a = k * Math.PI / 8; g.fillStyle = VITRAUX[k % VITRAUX.length];
@@ -6167,20 +6169,20 @@ if (GOTHAM) Object.assign(TEX, {
     g.strokeStyle = '#3c3836'; g.lineWidth = 3; for (const r of [16, 38]) { g.beginPath(); g.arc(64, 64, r, 0, 7); g.stroke(); }
   }),
   // la pelouse du stade : des bandes d'herbe claires et foncées
-  pelouse: toile(128, 128, (g, l, h) => { for (let y = 0; y < h; y += 16) { g.fillStyle = (y / 16) % 2 ? '#3f7a35' : '#4b8a3e'; g.fillRect(0, y, l, 16); } grain(g, l, h, 2500, 0.05); }),
+  pelouse: () => toile(128, 128, (g, l, h) => { for (let y = 0; y < h; y += 16) { g.fillStyle = (y / 16) % 2 ? '#3f7a35' : '#4b8a3e'; g.fillRect(0, y, l, 16); } grain(g, l, h, 2500, 0.05); }),
   // les gradins : des rangées de sièges bleus et gris
-  gradins: toile(64, 64, (g, l, h) => { g.fillStyle = '#2a2c30'; g.fillRect(0, 0, l, h); for (let y = 2; y < h; y += 8) for (let x = 1; x < l; x += 6) { g.fillStyle = (x + y) % 3 ? '#2a4a9a' : '#9a9ea6'; g.fillRect(x, y, 4, 4); } }),
+  gradins: () => toile(64, 64, (g, l, h) => { g.fillStyle = '#2a2c30'; g.fillRect(0, 0, l, h); for (let y = 2; y < h; y += 8) for (let x = 1; x < l; x += 6) { g.fillStyle = (x + y) % 3 ? '#2a4a9a' : '#9a9ea6'; g.fillRect(x, y, 4, 4); } }),
   // le point d'interrogation vert du Sphinx, en néon (là où rien n'est dessiné, on voit à travers)
-  interrogation: toile(128, 128, (g) => { g.fillStyle = '#3aff5a'; g.font = 'bold 120px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', 64, 70); }),
+  interrogation: () => toile(128, 128, (g) => { g.fillStyle = '#3aff5a'; g.font = 'bold 120px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', 64, 70); }),
   // les briques de l'égout : sombres, mouillées, avec des traînées noires et verdâtres en bas
-  briqueEgout: toile(128, 128, (g, l, h) => {
+  briqueEgout: () => toile(128, 128, (g, l, h) => {
     g.fillStyle = '#2a211e'; g.fillRect(0, 0, l, h);
     for (let y = 0; y < h; y += 16) for (let x = (y / 16 % 2) * 16; x < l + 16; x += 32) { const v = 70 + Math.random() * 35 | 0; g.fillStyle = `rgb(${v + 22},${v * 0.55 | 0},${v * 0.45 | 0})`; g.fillRect(x - 16 + 1, y + 1, 30, 14); }
     const d = g.createLinearGradient(0, h * 0.55, 0, h); d.addColorStop(0, 'rgba(20,30,18,0)'); d.addColorStop(1, 'rgba(20,34,18,.65)'); g.fillStyle = d; g.fillRect(0, 0, l, h);
     grain(g, l, h, 1500, 0.08);
   }),
   // le grand écran du Batordinateur, dans la Batcave : le plan de Gotham (ses rues), la chauve-souris, et des lignes de chiffres
-  batordinateur: toile(256, 128, (g) => {
+  batordinateur: () => toile(256, 128, (g) => {
     g.fillStyle = '#04101e'; g.fillRect(0, 0, 256, 128);
     g.strokeStyle = '#1e6ab0'; g.lineWidth = 1; for (let x = 8; x < 150; x += 12) { g.beginPath(); g.moveTo(x, 8); g.lineTo(x, 120); g.stroke(); } for (let y = 8; y < 122; y += 12) { g.beginPath(); g.moveTo(8, y); g.lineTo(148, y); g.stroke(); }
     g.fillStyle = '#ff4a3a'; for (const [x, y] of [[44, 32], [92, 68], [116, 44]]) { g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); }
@@ -6188,7 +6190,8 @@ if (GOTHAM) Object.assign(TEX, {
     g.beginPath(); for (const [x, y] of [...aile, ...aile.slice(0, -1).reverse().map(([x, y]) => [-x, y])]) g.lineTo(204 + x, 52 + y); g.fillStyle = '#7fd0ff'; g.fill();
     g.fillStyle = '#5ab0ff'; for (let y = 86; y < 122; y += 8) g.fillRect(164, y, 30 + (y * 7) % 50, 3);
   }),
-});
+};
+if (GOTHAM) for (const [k, nom] of Object.keys(TEX_GOTHAM).entries()) { await respirer(0.15 + 0.01 * k / 12); TEX[nom] = TEX_GOTHAM[nom](); }   // (un dessin à la fois : voir respirer)
 
 // le dessin sert aussi de relief (clair = bosse, foncé = creux). Une façade a des fenêtres qui s'allument la nuit : MATS_FENETRES les garde
 // toutes, pour les allumer (voir « Le jour et la nuit »)
@@ -6297,9 +6300,9 @@ const DE_LOIN = {
   brique: ['#8a716f', 0.33, 1.5], beton: ['#a19a87', 0.42, 1.3], moderne: ['#6c737a', 0.55, 1.9], verre: ['#4d6c82', 0.89, 3.4], verre2: ['#807459', 0.89, 3.8],
   hopital: ['#c0c3c6', 0.45, 1.45], magasin: ['#494041', 0.45, 1.55], musee: ['#b8b09a', 0.27, 1.05], banqueQ: ['#b0a284', 0.27, 1.05], luxe: ['#50442e', 0.58, 3.1],
   maison1: ['#cec7b3', 0.18, 0.55], maison2: ['#a7afb3', 0.18, 0.55], maison3: ['#ce9c7b', 0.18, 0.55], villa: ['#b0b2b0', 0.45, 2.7], stark: ['#55677a', 0.88, 2.9],
-  gothique: ['#2e2f35', 0.3, 1.3], wayne: ['#565351', 0.82, 1.7],   // (à Gotham : on ne les voit que sans son brouillard, voir noterSilhouette)
+  gothique: ['#2e2f35', 0.3, 1.3], gothiqueTour: ['#393b41', 0.36, 1.25], manoir: ['#6f6c67', 0.33, 1.65], cathedrale: ['#4a4547', 0, 1], arkham: ['#3a3833', 0.2, 0.5], wayne: ['#565351', 0.82, 1.7],   // (à Gotham : on ne les voit que sans son brouillard, voir noterSilhouette)
   tole: ['#b4b9bc'], bunker: ['#6d6d65'], chateau: ['#736d68'], grange: ['#852b20'],   // (sans fenêtres)
-  toit: ['#6f6f6d'], tuiles: ['#7c2f1e'], ardoise: ['#2d0c08'],   // (les toits)
+  toit: ['#6f6f6d'], tuiles: ['#7c2f1e'], ardoise: ['#2d0c08'], ardoiseNoire: ['#180503'],   // (les toits)
 };
 // Les trous que B.J. fait dans un toit ou un plancher en tombant de très haut (voir trouer), ou que Batman fait dans un mur avec son gel
 // explosif (voir trouerMur). On ne peut pas enlever un morceau de dalle ou de mur de son dessin : toutes les formes d'une même matière sont
@@ -6537,7 +6540,7 @@ function solMonde(mat, x1, z1, x2, z2, y, taille = 8) {
 // construit, toutes ces boîtes deviennent une seule forme toute simple (voir construireSilhouette), qu'on ne voit que là où les vrais
 // bâtiments se sont effacés. Un bâtiment que tu ajoutes avec immeuble(...), maison(...) ou batiment({...}) y est tout seul ; ce que tu
 // fais avec boite(...) n'y est pas (une grue, des conteneurs : de si loin, on ne les verrait pas). Une grande boîte à toi, qu'on doit voir de
-// loin (une tour faite avec boite) ? Appelle noterSilhouette(...) juste après, avec la même place et la même taille.
+// loin (une tour) ? Fais-la avec boitePleine(...), ou appelle noterSilhouette(...) juste après, avec la même place et la même taille.
 // Dans le brouillard d'un chapitre (CHAPITRES : brouillard, à Gotham), rien n'est noté : on ne verrait que des murs de la couleur du
 // brouillard, qui couperaient le bas du faisceau du Bat-signal. Mets brouillard: 0, et la silhouette revient
 const SILHOUETTES = [];   // { x, z : le milieu ; l, p : la taille (le long de x, de z) ; bas, haut ; mur, toit : leurs matières (MAT) ; pente : la hauteur d'un toit en pente }
@@ -7090,6 +7093,14 @@ const pyramide = (l, h, p, cotes = 4) => new THREE.ConeGeometry(Math.SQRT1_2, 1,
 function collisionsPyramide(x, y, z, l, h, p) {
   for (let k = 0; k < 3; k++) { const f = 1 - (k + 0.5) / 3; ajouterCollision(x - l * f / 2, z - p * f / 2, x + l * f / 2, z + p * f / 2, Y0 + y + h * (k + 1) / 3, Y0 + y + h * k / 3); }
 }
+// une grande boîte fermée et opaque (le corps d'un monument, le gradin d'une tour) : on ne passe pas à travers, elle cache ce qui est derrière
+// (noterPlein ; si tu la perces, mets plutôt boite) et on la voit de loin (noterSilhouette). Comme boite ; toit : ce qui la couvre, de loin ;
+// pente : la hauteur de ce toit, s'il est en pente ; corniche : ce qui dépasse encore au-dessus d'elle
+function boitePleine(mat, x, y, z, l, h, p, toit = 'toit', pente = 0, corniche = 0) {
+  boite(mat, x, y, z, l, h, p, true);
+  noterPlein(mat, x, z, l, p, Y0 + y, Y0 + y + h);
+  noterSilhouette(mat, x, z, l, p, Y0 + y, Y0 + y + h + corniche, toit, pente);
+}
 // un toit à deux pentes (un prisme couché), comme toitPente, mais le long de z (nordSud) ou de x
 function toitLong(mat, x, y, z, l, p, pente, nordSud) {
   const r = (p + 1) / Math.sqrt(3), t = new THREE.CylinderGeometry(r, r, l + 0.8, 3).rotateX(-Math.PI / 2).rotateY(Math.PI / 2).scale(1, pente, 1);
@@ -7143,15 +7154,18 @@ function estGothique(i, j, rnd) {
 function immeubleGothique(x, z, l, p, etages, rnd) {
   const h = etages * 3, y = 0.2 + h, haut = y + 0.6;
   boite('gothique', x, 0.2, z, l, h, p, true);
+  noterPlein('gothique', x, z, l, p, Y0 + 0.2, Y0 + y);   // (une boîte fermée et opaque : voir immeuble)
   boite('pierreNoire', x, y, z, l + 0.9, 0.6, p + 0.9, true);   // la corniche (on se pose dessus)
   for (const [sx, sz] of COINS) gargouille(x + sx * (l / 2 + 0.05), haut, z + sz * (p / 2 + 0.05), Math.atan2(sx, sz));
   const r = rnd();
   if (r < 0.6) {
     const ht = Math.min(l, p) * (0.5 + 0.35 * rnd());
+    noterSilhouette('gothique', x, z, l, p, Y0 + 0.2, Y0 + haut, 'ardoiseNoire', ht);   // (de loin)
     geoBloc('ardoiseNoire', pyramide(l - 0.6, ht, p - 0.6).translate(x, haut, z));
     collisionsPyramide(x, haut, z, l - 0.6, ht, p - 0.6);
     if (r < 0.25) geoBloc('metal', new THREE.ConeGeometry(0.12, 5, 6).translate(x, haut + ht + 2.2, z));
   } else {
+    noterSilhouette('gothique', x, z, l, p, Y0 + 0.2, Y0 + haut, 'pierreNoire');
     for (const [sx, sz] of COINS) clocheton(x + sx * (l / 2 - 1.2), haut, z + sz * (p / 2 - 1.2));
     if (r > 0.85) statue(x, haut, z, rnd() * 2 * Math.PI);
   }
@@ -7161,9 +7175,11 @@ function immeubleGothique(x, z, l, p, etages, rnd) {
 // l : la largeur du bas ; etages : sa hauteur ; toits : la liste où noter le dessus de son dernier gradin (toursT)
 function tourGothique(x, z, l, etages, rnd, toits) {
   const e1 = Math.round(etages * 0.55), e2 = Math.round(etages * 0.3), e3 = Math.max(2, etages - e1 - e2);
-  let y = 0.2, L = l;
+  let y = 0.2, L = l, dernier = 0;
   [e1, e2, e3].forEach((e, k) => {
     boite('gothiqueTour', x, y, z, L, e * 3, L, true);
+    noterPlein('gothiqueTour', x, z, L, L, Y0 + y, Y0 + y + e * 3);
+    if (k < 2) noterSilhouette('gothiqueTour', x, z, L, L, Y0 + y, Y0 + y + e * 3 + 0.5, 'pierreNoire'); else dernier = y;
     y += e * 3;
     boite('pierreNoire', x, y, z, L + 0.8, 0.5, L + 0.8, true); y += 0.5;
     for (const [sx, sz] of COINS) {
@@ -7174,6 +7190,7 @@ function tourGothique(x, z, l, etages, rnd, toits) {
   });
   toits.push({ x, z, l: L, p: L, y: Y0 + y });
   const hf = L * (1.6 + rnd());
+  noterSilhouette('gothiqueTour', x, z, L, L, Y0 + dernier, Y0 + y, 'ardoiseNoire', hf);   // (de loin, sa flèche : un toit en pente, comme une maison)
   geoBloc('ardoiseNoire', pyramide(L, hf, L).translate(x, y, z)); collisionsPyramide(x, y, z, L, hf, L);
   geoBloc('metal', new THREE.ConeGeometry(0.2, 8, 6).translate(x, y + hf + 3, z));
 }
@@ -7189,10 +7206,12 @@ function construireManoir(X, Z, rnd) {
   else for (const [a, b, d, e] of [[2, 2, 58, 49.2], [2, 50.8, 58, 58], [2, 49.2, 11.2, 50.8], [12.8, 49.2, 58, 50.8]]) sol('herbe', X((a + d) / 2), 0.21, Z((b + e) / 2), d - a, e - b);   // (l'herbe, autour du trou du puits : la Batcave est dessous)
   sol('paves', X(30), 0.215, Z(48), 10, 20); sol('paves', X(30), 0.216, Z(31), 16, 18);   // l'allée, de la rue au sud jusqu'à la porte
   const H = 12;
-  boite('manoir', X(30), 0.2, Z(15), 40, H, 14, true); toitLong('ardoiseNoire', X(30), 0.2 + H, Z(15), 40, 14, 0.95, false);   // le corps, au nord
-  for (const a of [16, 44]) { boite('manoir', X(a), 0.2, Z(31), 12, H, 18, true); toitLong('ardoiseNoire', X(a), 0.2 + H, Z(31), 18, 12, 0.95, true); }   // les ailes
+  // (la hauteur de leur toit, de loin : celle de toitLong)
+  boitePleine('manoir', X(30), 0.2, Z(15), 40, H, 14, 'ardoiseNoire', 0.866 * 15 * 0.95); toitLong('ardoiseNoire', X(30), 0.2 + H, Z(15), 40, 14, 0.95, false);   // le corps, au nord
+  for (const a of [16, 44]) { boitePleine('manoir', X(a), 0.2, Z(31), 12, H, 18, 'ardoiseNoire', 0.866 * 13 * 0.95); toitLong('ardoiseNoire', X(a), 0.2 + H, Z(31), 18, 12, 0.95, true); }   // les ailes
   for (const [a, b] of [[10, 8], [50, 8], [10, 40], [50, 40]]) { // les tourelles, et leur toit pointu
     geoBloc('manoir', new THREE.CylinderGeometry(3.2, 3.2, 17, 16).translate(X(a), 0.2 + 8.5, Z(b)));
+    noterSilhouette('manoir', X(a), Z(b), 6.4, 6.4, Y0 + 0.2, Y0 + 17.2, 'ardoiseNoire', 8);
     geoBloc('ardoiseNoire', new THREE.ConeGeometry(3.9, 8, 16).translate(X(a), 0.2 + 17 + 4, Z(b)));
     ajouterCollision(X(a) - 2.9, Z(b) - 2.9, X(a) + 2.9, Z(b) + 2.9, Y0 + 17.2, Y0); empreintes.push([X(a) - 3.2, Z(b) - 3.2, 6.4, 6.4]);
   }
@@ -7230,7 +7249,7 @@ function construireTourWayne(X, Z, rnd) {
   const yh = b.niveau(1) + 0.4, etages = [[30, 117], [24, 33], [18, 13]];
   let y = yh;
   for (const [l, h] of etages) { // chaque gradin, et en haut de chacun, une ligne d'or qui brille (on la reconnaît de loin, la nuit)
-    boite('wayne', X(30), y, Z(28), l, h, l, true); y += h;
+    boitePleine('wayne', X(30), y, Z(28), l, h, l, 'metal', 0, 0.5); y += h;
     boite('metal', X(30), y, Z(28), l + 0.6, 0.5, l + 0.6, true);
     for (const [dx, dz, ll, pp] of [[0, -1, l + 0.7, 0.2], [0, 1, l + 0.7, 0.2], [-1, 0, 0.2, l + 0.7], [1, 0, 0.2, l + 0.7]]) boite('or', X(30) + dx * (l / 2 + 0.3), y - 0.6, Z(28) + dz * (l / 2 + 0.3), ll, 0.35, pp);
     for (const [sx, sz] of COINS) boite('or', X(30) + sx * (l / 2 + 0.05), y - h, Z(28) + sz * (l / 2 + 0.05), 0.25, h, 0.25);   // et ses arêtes
@@ -7281,7 +7300,7 @@ function construireBanque(X, Z, rnd) {
   b.meuble('bois', 0, 0, 1, 26, 1.2, 1); for (const u of [-9, 0, 9]) b.meuble('ecran', u, 0, 0.8, 0.6, 0.4, 0.08, 1.2);   // les guichets
   b.meuble('metal', 0, 0, -b.iw + 0.3, 5, 4, 0.5);                                   // la porte du coffre, fermée
   const yh = b.niveau(1) + 0.4;
-  boite('verre', X(30), yh, Z(28), 28, 84, 24, true); boite('toit', X(30), yh + 84, Z(28), 28.5, 0.6, 24.5, true);
+  boitePleine('verre', X(30), yh, Z(28), 28, 84, 24, 'toit', 0, 0.6); boite('toit', X(30), yh + 84, Z(28), 28.5, 0.6, 24.5, true);
   boite('metal', X(36), yh + 84.6, Z(24), 0.5, 14, 0.5, true);
   banqueGotham = { x: X(30), z: Z(28), y: Y0 + 0.2, portes: [{ x: X(28.6), z: Z(44.3), y: Y0 + 0.2 }, { x: X(31.4), z: Z(44.3), y: Y0 + 0.2 }] };   // (les clowns du Joker en sortent)
   Object.assign(lieux['£'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(52) });   // le lieu des missions : sur la place, devant la porte
@@ -7295,10 +7314,10 @@ let cathedrale = null, gardeFou = [];
 function gardeFouClocher(la) { for (const b of gardeFou) b.h = la ? b.haut : -Infinity; }
 function construireCathedrale(X, Z, rnd) {
   sol('paves', X(30), 0.21, Z(30), S - 2, S - 2);
-  boite('cathedrale', X(30), 0.2, Z(26), 16, 20, 32, true); toitLong('ardoiseNoire', X(30), 20.2, Z(26), 32, 16, 1.1, true);   // la nef
+  boitePleine('cathedrale', X(30), 0.2, Z(26), 16, 20, 32, 'ardoiseNoire', 0.866 * 17 * 1.1); toitLong('ardoiseNoire', X(30), 20.2, Z(26), 32, 16, 1.1, true);   // la nef
   for (const [sx, sz] of COINS) gargouille(X(30 + sx * 8.1), 20.2, Z(26 + sz * 16.1), Math.atan2(sx, sz));
   for (const s of [-1, 1]) {
-    boite('cathedrale', X(30 + s * 11), 0.2, Z(26), 6, 10, 28, true);                                   // les bas-côtés...
+    boitePleine('cathedrale', X(30 + s * 11), 0.2, Z(26), 6, 10, 28, 'ardoiseNoire');                   // les bas-côtés...
     geoBloc('ardoiseNoire', new THREE.BoxGeometry(6.8, 0.4, 28.6).rotateZ(-s * 0.35).translate(X(30 + s * 11), 11.4, Z(26)));   // ...et leur toit en pente
     for (let k = 0; k < 5; k++) { // les arcs-boutants : une culée, et l'arc qui monte jusqu'au mur de la nef
       const z = Z(14 + k * 6);
@@ -7312,7 +7331,7 @@ function construireCathedrale(X, Z, rnd) {
   collisionRonde(X(30), Z(10), 7, Y0, Y0 + 20.2, true); empreintes.push([X(30) - 7, Z(3), 14, 7]);
   // le clocher : sa tour carrée, une corniche à mi-hauteur (et ses gargouilles), le portail, la rosace
   const T = 48.5, h = 56;
-  boite('cathedrale', X(30), 0.2, Z(T), 13, h, 13, true);
+  boitePleine('cathedrale', X(30), 0.2, Z(T), 13, h, 13, 'pierreNoire', 0, 1.6);
   boite('pierreNoire', X(30), 30.2, Z(T), 13.8, 0.6, 13.8, true);
   for (const [sx, sz] of COINS) gargouille(X(30 + sx * 6.9), 30.8, Z(T + sz * 6.9), Math.atan2(sx, sz));
   boite('porte', X(30), 0.2, Z(T + 6.56), 4.6, 7.4, 0.12);
@@ -7332,6 +7351,7 @@ function construireCathedrale(X, Z, rnd) {
   geoBloc('bronze', new THREE.SphereGeometry(0.25, 8, 6).translate(X(30), sol0 + 4.9, Z(T)));
   ajouterCollision(X(30) - 1, Z(T) - 1, X(30) + 1, Z(T) + 1, Y0 + sol0 + 8, Y0 + sol0 + 4.8);
   const hf = 32;
+  noterSilhouette('pierreNoire', X(30), Z(T), 8.6, 8.6, Y0 + sol0, Y0 + sol0 + 8.8, 'ardoiseNoire', hf);   // (de loin : les piliers et la flèche)
   geoBloc('ardoiseNoire', pyramide(8.6, hf, 8.6, 8).translate(X(30), sol0 + 8.8, Z(T))); collisionsPyramide(X(30), sol0 + 8.8, Z(T), 8.6, hf, 8.6);
   geoBloc('metal', new THREE.BoxGeometry(0.25, 3.2, 0.25).translate(X(30), sol0 + 8.8 + hf + 1.4, Z(T))); geoBloc('metal', new THREE.BoxGeometry(1.6, 0.25, 0.25).translate(X(30), sol0 + 8.8 + hf + 2, Z(T)));
   // le garde-fou : des murs invisibles, juste derrière le parapet, jusqu'à 2,2 m au-dessus de la plateforme (on ne les franchit pas d'un saut).
@@ -7356,10 +7376,10 @@ function construireArkham(X, Z, rnd) {
   for (const [a, b] of [[2, 2], [58, 2], [2, 58], [58, 58]]) { boite('pierreNoire', X(a), 0.2, Z(b), 2.6, 9, 2.6, true); boite('lampe', X(a), 9.2, Z(b), 1.2, 0.7, 1.2); }
   for (const a of [24, 36]) { boite('pierreNoire', X(a), 0.2, Z(58), 1.8, 7.5, 1.8, true); clocheton(X(a), 7.7, Z(58), 1.8, 3); }
   boite('metal', X(30), 6.6, Z(58), 10.4, 0.35, 0.3); panneau('arkhamEnseigne', X(30), 7.6, Z(58.2), 10, 1.5);
-  boite('arkham', X(30), 0.2, Z(16), 38, 13, 14, true); toitLong('ardoiseNoire', X(30), 13.2, Z(16), 38, 14, 0.9, false);
+  boitePleine('arkham', X(30), 0.2, Z(16), 38, 13, 14, 'ardoiseNoire', 0.866 * 15 * 0.9); toitLong('ardoiseNoire', X(30), 13.2, Z(16), 38, 14, 0.9, false);
   for (const [sx, sz] of COINS) gargouille(X(30 + sx * 19.1), 13.2, Z(16 + sz * 7.1), Math.atan2(sx, sz));
-  for (const a of [12, 48]) { boite('arkham', X(a), 0.2, Z(31), 11, 10, 16, true); toitLong('ardoiseNoire', X(a), 10.2, Z(31), 16, 11, 0.9, true); }
-  boite('arkham', X(30), 0.2, Z(25), 8, 28, 8, true); geoBloc('ardoiseNoire', pyramide(8.8, 9, 8.8).translate(X(30), 28.2, Z(25))); collisionsPyramide(X(30), 28.2, Z(25), 8.8, 9, 8.8);
+  for (const a of [12, 48]) { boitePleine('arkham', X(a), 0.2, Z(31), 11, 10, 16, 'ardoiseNoire', 0.866 * 12 * 0.9); toitLong('ardoiseNoire', X(a), 10.2, Z(31), 16, 11, 0.9, true); }
+  boitePleine('arkham', X(30), 0.2, Z(25), 8, 28, 8, 'ardoiseNoire', 9); geoBloc('ardoiseNoire', pyramide(8.8, 9, 8.8).translate(X(30), 28.2, Z(25))); collisionsPyramide(X(30), 28.2, Z(25), 8.8, 9, 8.8);
   geoBloc('lampe', new THREE.CircleGeometry(2.2, 24).translate(X(30), 23, Z(29.06)));   // le cadran de l'horloge, et ses aiguilles
   geoBloc('noirMeuble', new THREE.BoxGeometry(0.15, 1.8, 0.05).translate(X(30), 23.6, Z(29.1))); geoBloc('noirMeuble', new THREE.BoxGeometry(1.2, 0.15, 0.05).translate(X(30.5), 23, Z(29.1)));
   boite('porte', X(30), 0.2, Z(29.06), 3, 4, 0.12);
@@ -7372,7 +7392,7 @@ function construireArkham(X, Z, rnd) {
 let aceChemicals = null;
 function construireAce(X, Z, rnd) {
   sol('beton2', X(30), 0.21, Z(30), S - 2, S - 2);
-  boite('tole', X(17), 0.2, Z(16), 28, 12, 20, true); boite('toit', X(17), 12.2, Z(16), 28.5, 0.5, 20.5, true);
+  boitePleine('tole', X(17), 0.2, Z(16), 28, 12, 20, 'toit', 0, 0.5); boite('toit', X(17), 12.2, Z(16), 28.5, 0.5, 20.5, true);
   boite('porte', X(17), 0.2, Z(26.06), 7, 5.5, 0.12);
   for (const a of [7, 27]) boite('metal', X(a), 12.7, Z(24.5), 0.3, 6, 0.3);
   panneau('aceEnseigne', X(17), 16.4, Z(24.7), 22, 4.2);
@@ -7457,7 +7477,7 @@ function construireStade(X, Z, rnd) {
 let sphinx = null;
 function construireSphinx(X, Z, rnd) {
   sol('paves', X(30), 0.215, Z(43), 50, 26);
-  boite('brique', X(30), 0.2, Z(16), 46, 13, 22, true); boite('toit', X(30), 13.2, Z(16), 46.5, 0.5, 22.5, true);
+  boitePleine('brique', X(30), 0.2, Z(16), 46, 13, 22, 'toit', 0, 0.5); boite('toit', X(30), 13.2, Z(16), 46.5, 0.5, 22.5, true);
   boite('porte', X(30), 0.2, Z(27.06), 3, 3.6, 0.12);
   boite('metal', X(30), 13.7, Z(21), 0.3, 2.2, 0.3); geoBloc('interrogation', new THREE.PlaneGeometry(14, 14).translate(X(30), 21.5, Z(21)));
   const mur = (a, b, l, p) => boite('brique', X(a), 0.2, Z(b), l, 3.6, p, true);
@@ -8133,7 +8153,7 @@ function genererBloc(i, j) {
   Y0 = 0;
 }
 for (let j = 0; j < NBZ; j++) {
-  await respirer(0.27 + 0.21 * j / NBZ);   // (une rangée de la CARTE à la fois : voir respirer)
+  await respirer(0.16 + 0.19 * j / NBZ);   // (une rangée de la CARTE à la fois : voir respirer)
   for (let i = 0; i < NBX; i++) if (estBloc(CARTE[j][i])) genererBloc(i, j);
 }
 if (!hopitaux.length) hopitaux.push(depart);
@@ -8179,6 +8199,7 @@ for (const n of NAVETTE) {
 // carrefour de MONORAIL.points au suivant, et tourne en douceur. Elle dépasse de 22 m les deux bouts, pour que le train puisse s'y arrêter
 // (ses wagons de chaque côté de la gare). Ses gares : un quai couvert, à côté de la voie (à l'est ou au sud), et un ascenseur qui monte du
 // trottoir jusqu'au quai. Son train : des wagons blancs, une bande rouge, des fenêtres allumées (voir majMonorail)
+if (MONORAIL) await respirer(0.35);   // (voir respirer)
 const monorail = MONORAIL ? (() => {
   const M = MONORAIL, auCarrefour = ([c, l]) => ({ x: c * PAS + R / 2, z: l * PAS + R / 2 });
   let pts = M.points.map(auCarrefour);
@@ -8423,6 +8444,7 @@ function souterrain(nom, rects, plus = {}) {
   return S;
 }
 // la Batcave, sous le vieux puits du jardin du manoir Wayne (BATCAVE : ses morceaux, en mètres autour du puits)
+if (BATCAVE) await respirer(0.355);   // (voir respirer)
 const batcave = BATCAVE && manoir ? (() => {
   const B = BATCAVE, P = manoir.puits, X = d => P.x + d, Z = d => P.z + d, h = 0.8;   // h : la moitié du trou du puits
   const surface = P.y, toit = B.plafond, rnd = graine(424242), hasardE = (a, b) => a + rnd() * (b - a);
@@ -8498,6 +8520,7 @@ const batcave = BATCAVE && manoir ? (() => {
   return { S, x: P.x, z: P.z, sol: yi, toit, lac: B.morceaux[0][4], ile: ic, costume: vq, ascenseur: aq };
 })() : null;
 // l'égout, sous la colline de Bristol (EGOUT) : il part d'un grand mur de quai, sur la rive ouest de la rivière, et file vers l'ouest
+if (EGOUT) await respirer(0.36);   // (voir respirer)
 const egout = EGOUT ? (() => {
   const E = EGOUT, zc = Math.round(E.bouche[1] * PAS + R / 2), gx = Math.floor((E.bouche[0] * PAS + R / 2) / PT);   // (la bouche tombe sur la grille du terrain)
   const xb = (gx + 1) * PT, xq = gx * PT, L = E.longueur, l = E.largeur / 2, k = E.canal / 2, H = E.hauteur, fond = EAU - 2.2, trottoir = EAU + 1;
@@ -8555,6 +8578,7 @@ const egout = EGOUT ? (() => {
 // The Dark Knight. Dedans, c'est un souterrain (SOUTERRAINS : il y fait sombre, ses lampes éclairent, il n'y pleut pas), mais son sol est la
 // route elle-même (route: true : ni le sol ni l'eau n'y changent). Ses murs, ses piliers, son plafond et ses lampes sont toujours dessinés :
 // on le voit de loin. Sur son toit, le parc des quais : de l'herbe, une rambarde (on y monte au grappin)
+if (TUNNEL) await respirer(0.36);   // (voir respirer)
 const tunnel = TUNNEL ? (() => {
   const T = TUNNEL, x = centre(T.route, T.de).x, z1 = centre(T.route, T.de).z, z2 = centre(T.route, T.a).z, l = T.largeur / 2, e = 1;   // e : l'épaisseur des murs et du toit
   let haut = -Infinity, bas = Infinity;   // la route monte et descend un peu : le plafond est à « hauteur » mètres au-dessus de son point le plus haut
@@ -8605,7 +8629,7 @@ const tunnel = TUNNEL ? (() => {
 })() : null;
 
 // les rues des villes : un morceau de chaussée par rue, avec ses lignes, ses passages piétons et parfois un dos d'âne
-await respirer(0.48);   // (voir respirer)
+await respirer(0.36);   // (voir respirer)
 const geoDosDAne = () => { // une bosse en travers de la rue (qui va vers z)
   const g = new THREE.PlaneGeometry(R, LONG_DOS_ANE, 1, 12).rotateX(-Math.PI / 2), p = g.attributes.position;
   for (let k = 0; k < p.count; k++) p.setY(k, bosseDosDAne(p.getZ(k)));
@@ -8755,7 +8779,7 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
 }
 // La jetée (- dans la carte de Malibu) : un ponton en planches sur des pilotis, de 18 m de large, avec des rambardes et des lampadaires,
 // qui prolonge la rue. La case qui touche la terre est plus large (44 m) : la grande roue et les montagnes russes (voir majFete)
-await respirer(0.49);   // (voir respirer)
+await respirer(0.365);   // (voir respirer)
 const jetees = [];   // le pont de chaque case de jetée [x, z, l, p] : pour les cartes
 const fete = [];   // les manèges qui bougent : la grande roue { roue, nacelles, c : son centre, u : le sens de la jetée }, le train { train, courbe, t, v }
 const MAT_NACELLES = MAT.rouge.clone();   // (une copie n'est pas percée : voir percer)
@@ -8929,7 +8953,7 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
 }
 
 // le terrain : un morceau de grille par morceau du pays, colorié selon le sol (herbe, sable, désert, roche...)
-await respirer(0.5);   // (voir respirer)
+await respirer(0.37);   // (voir respirer)
 const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du ciel, pour les cartes
 {
   // pour une colline ou une route, le sol est celui qu'on trouve le plus autour (mais jamais du sable : la plage, c'est au bord de l'eau)
@@ -8958,7 +8982,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
   };
   const solEn = (i, j) => solCase[clamp(j, 0, NBZ - 1)][clamp(i, 0, NBX - 1)];
   for (let cz = 0; cz * 64 < NZT - 1; cz++) for (let cx = 0; cx * 64 < NXT - 1; cx++) {
-    await respirer(0.51 + 0.28 * cz * 64 / NZT);   // (un morceau de terrain à la fois : voir respirer)
+    await respirer(0.37 + 0.29 * cz * 64 / NZT);   // (un morceau de terrain à la fois : voir respirer)
     const x0 = cx * 64, z0 = cz * 64, nx = Math.min(64, NXT - 1 - x0) + 1, nz = Math.min(64, NZT - 1 - z0) + 1;
     const pos = new Float32Array(nx * nz * 3), nor = new Float32Array(nx * nz * 3), col = new Float32Array(nx * nz * 3), uv = new Float32Array(nx * nz * 2), idx = [];
     for (let b = 0; b < nz; b++) for (let a = 0; a < nx; a++) {
@@ -9018,7 +9042,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
   }
   // la végétation de la campagne : des sapins dans les forêts et les montagnes, des arbres dans l'herbe, des cactus dans le désert, des palmiers sur les plages
   for (let j = 0; j < NBZ; j++) {
-    await respirer(0.79 + 0.04 * j / NBZ);   // (une rangée de la CARTE à la fois)
+    await respirer(0.66 + 0.02 * j / NBZ);   // (une rangée de la CARTE à la fois)
     for (let i = 0; i < NBX; i++) {
       const c = CARTE[j][i], s = solCase[j][i], rnd = graine(i * 7919 + j * 104729 + 17);
       if (estPlat(c) || s === '~') continue;
@@ -9046,7 +9070,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
 }
 // les remontées : deux gares (un quai, quatre poteaux, un toit, et la grande roue où tourne le câble), les pylônes et leurs poulies, le câble,
 // et les sièges (ou les cabines), qui bougent : un seul objet pour tous ceux d'une remontée (majTelesieges les fait avancer)
-await respirer(0.83);   // (voir respirer)
+await respirer(0.68);   // (voir respirer)
 const boites = l => mergeGeometries(l.map(([lg, h, p, x, y, z, rx = 0]) => new THREE.BoxGeometry(lg, h, p).rotateX(rx).translate(x, y, z)));
 // le siège : la perche qui le pend au câble, l'assise, le dossier, et deux montants en haut desquels tourne le garde-corps
 const GEO_SIEGE = boites([[0.06, 2.45, 0.06, 0, -1.2, -0.38], [0.06, 0.06, 0.42, 0, 0, -0.18], [1.2, 0.08, 0.5, 0, -2.4, -0.05], [1.2, 0.55, 0.06, 0, -2.08, -0.36],
@@ -9131,7 +9155,7 @@ MAT.baliseOrange = std(null, { color: '#ff7a10', roughness: 0.6 });
 MAT.neigePiste = std(TEX.sol, { vertexColors: true, roughness: 1, bumpScale: 0.2, polygonOffset: true, polygonOffsetFactor: -1 });
 MAT.bxDepart = enseigne('DÉPART', '#fff', '#d01818'); MAT.bxArrivee = enseigne('ARRIVÉE', '#111', '#f0c020');
 for (const [n, p] of PISTES_SKI.entries()) {
-  await respirer(0.84 + 0.03 * n / PISTES_SKI.length);   // (une piste à la fois : voir respirer)
+  await respirer(0.68 + 0.03 * n / PISTES_SKI.length);   // (une piste à la fois : voir respirer)
   const coul = COULEURS_PISTES[p.couleur] ? p.couleur : 'rouge', bord = p.large + (p.boardercross ? 3.5 : 0);
   const poteau = (x, z, h, r = 0.04, mat = 'balise' + coul, y = 0) => ajouterGeo(mat, new THREE.CylinderGeometry(r, r, h, 6).translate(x, hauteurTerrain(x, z) + y + h / 2, z));
   for (let s = 0; s <= p.long; s += p.boardercross ? 15 : 30) for (const cote of [1, -1]) {
@@ -9170,7 +9194,7 @@ if (COUVERT) eau.material.color.set('#17262e');   // (sous un ciel couvert, la n
 if (auLancement.silhouetteVille && !BROUILLARD) Object.assign(eau.material, { polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: 4 });
 
 // L'ombre des coins. Dans la réalité, les coins reçoivent moins de lumière que le reste : le pied d'un mur, le sol tout contre lui, le
-// dessous d'un auvent, d'un pont ou d'un toit qui dépasse (on dit « l'occlusion ambiante »). Le jeu les assombrit une fois pour toutes, en
+// dessous d'un auvent ou d'un toit qui dépasse (on dit « l'occlusion ambiante »). Le jeu les assombrit une fois pour toutes, en
 // construisant le pays : chaque sommet des formes fusionnées (voir fusionner) reçoit une couleur, du blanc (toute la lumière) au gris (un
 // coin), que la carte graphique multiplie à la couleur de la matière (vertexColors). À chaque image, presque rien de plus à dessiner. Ce
 // sont les boîtes (boite) qui font de l'ombre aux autres : un bâtiment que tu ajoutes avec boite(...) a ses coins sombres tout seul.
@@ -9181,11 +9205,11 @@ const COINS_SOMBRES = clamp(auLancement.ombreCoins, 0, 1);
 const PIED = 1.5;     // mètres : la bande sombre au pied d'un mur
 const CONTRE = 1.5;   // mètres : la bande sombre par terre, contre un mur (moins contre un muret, un objet d'un mètre)
 // ce que chaque sorte de coin enlève de la lumière, au plus (puis on multiplie par ombreCoins) : au pied d'un mur et par terre contre lui,
-// toute ; et sous une boîte (un auvent, un pont, un toit qui dépasse), que seul le sol éclaire, la moitié
+// toute ; et sous une boîte (un auvent, un toit qui dépasse), que seul le sol éclaire, la moitié
 const FORCE_COINS = { pied: 1, contre: 1, dessous: 0.5 };
 // ce qui n'a pas d'ombre des coins (et n'en fait pas) : ce qu'on voit au travers ou qui brille (les vitrines, les lignes de la route, les
-// enseignes, les lampes), ce qui a déjà ses couleurs (la neige des pistes), l'eau, et les câbles (fins : des milliers de sommets pour rien)
-const SANS_COINS = ['eau', 'piscine', 'cable', 'lampe', 'frigo', 'ecran', 'croix'];
+// enseignes, les lampes, à Gotham l'or, l'acide, l'écran de la Batcave, la rosace, les points d'interrogation), ce qui a déjà ses couleurs (la neige des pistes), l'eau, et les câbles (fins : des milliers de sommets pour rien)
+const SANS_COINS = ['eau', 'piscine', 'cable', 'lampe', 'frigo', 'ecran', 'croix', 'or', 'acide', 'batordinateur', 'rosace', 'interrogation'];
 const avecCoins = nom => COINS_SOMBRES > 0 && !!MAT[nom] && !SANS_COINS.includes(nom) && !MAT[nom].transparent && !MAT[nom].vertexColors && !MAT[nom].userData.enseigne;
 // les boîtes qui font de l'ombre : toutes celles des formes fusionnées, rangées par cases de 8 m (les autres formes n'en font pas), et
 // les sols plats (sol : true ; une pelouse, des pavés, le gravier d'un toit), qui cachent peut-être un autre sol juste dessous.
@@ -9302,7 +9326,7 @@ function decouper(g, voisines, villa) {
     const nx = N[3 * k], ny = N[3 * k + 1], nz = N[3 * k + 2], ax = P[3 * k], ay = P[3 * k + 1], az = P[3 * k + 2];
     const sx = P[3 * k + 3] - ax, sy = P[3 * k + 4] - ay, sz = P[3 * k + 5] - az, tx = P[3 * k + 6] - ax, ty = P[3 * k + 7] - ay, tz = P[3 * k + 8] - az;
     let morceaux = [[0, 1, 0, 1]], pied = 0, dessous = 0, sol = null;   // pied, dessous, sol : voir lumiereCoin
-    if (ny < -0.7) { // le dessous d'une boîte : un auvent, un pont, un toit qui dépasse... mais pas le plafond d'un bâtiment où l'on entre
+    if (ny < -0.7) { // le dessous d'une boîte : un auvent, un toit qui dépasse... mais pas le plafond d'un bâtiment où l'on entre
       const m = { x: ax + (sx + tx) / 2, y: ay - 0.5, z: az + (sz + tz) / 2 };
       dessous = interieurDe(m) ? 0 : FORCE_COINS.dessous;
     } else if (Math.abs(ny) < 0.3) { // debout : un mur. S'il touche presque le sol, on le coupe là où la bande sombre de son pied s'arrête, et au tiers
@@ -9487,9 +9511,9 @@ if (villaStark) {
   V.pivot = new THREE.Group(); V.pivot.position.set(V.x, V.y, V.sud); V.g = new THREE.Group(); V.g.position.set(-V.x, -V.y, -V.sud);
   V.pivot.add(V.g); scene.add(V.pivot); fusionner(V.geos, V.g); V.geos = null;
 }
-for (const S of SOUTERRAINS) { S.g = new THREE.Group(); scene.add(S.g); fusionner(S.geos, S.g); S.geos = null; }   // les souterrains de Gotham, chacun dans son groupe
-for (const m of morceaux.values()) {
-  await respirer(0.88);   // (un morceau à la fois : voir respirer)
+for (const S of SOUTERRAINS) { await respirer(0.71); S.g = new THREE.Group(); scene.add(S.g); fusionner(S.geos, S.g); S.geos = null; }   // les souterrains de Gotham, chacun dans son groupe
+for (const [k, m] of [...morceaux.values()].entries()) {
+  await respirer(0.71 + 0.19 * k / morceaux.size);   // (un morceau à la fois : voir respirer)
   // (detail : un très grand étage des ombres ne dessine pas les bâtiments fusionnés, ni les lampadaires, les bornes et les troncs : voir utileDansEtage)
   const detail = o => { if (o) o.userData.detail = true; return o; };
   fusionner(m.geos, m.g).forEach(detail);
@@ -9517,7 +9541,7 @@ boitesCoins.clear();   // (l'ombre des coins est faite : on n'en a plus besoin)
 // (une boîte toute entière plus près que les pointillés est réduite à un point). Elle n'a pas de collisions : les balles la traversent. Elle
 // fait l'ombre des bâtiments loin de toi (dans un très grand étage des ombres : voir etagesOmbre), mais n'en reçoit pas
 let silhouette = null;
-if (SILHOUETTES.length) { await respirer(0.89); silhouette = construireSilhouette(); }   // (respirer : voir « Outils »)
+if (SILHOUETTES.length) { await respirer(0.9); silhouette = construireSilhouette(); }   // (respirer : voir « Outils »)
 function construireSilhouette() {
   // les fenêtres peintes : 12 étages de 3 m, et 12 fenêtres de 3 m de large (le dessin couvre 36 × 36 m : les mêmes fenêtres allumées ne
   // reviennent que tous les 36 m, comme sur les façades). Le jour, le mur blanc et les vitres grises (la couleur vient de la façade : voir
@@ -10108,6 +10132,12 @@ GEO.cheveuxFille = mergeGeometries([GEO.cheveux, mergeGeometries([new THREE.Sphe
   .translate(0, -0.012, 0.012).rotateX(0.6)]);
 // les longs cheveux de Batgirl, qui sortent de sa cagoule et tombent dans son dos (faits au tour, aplatis : [rayon, hauteur], de bas en haut)
 GEO.criniere = tour([[0, -0.44], [0.05, -0.42], [0.085, -0.32], [0.1, -0.18], [0.095, -0.05], [0.08, 0.04], [0.05, 0.09], [0, 0.1]], 14).scale(1.3, 1, 0.5);
+// Une forme faite une seule fois, la première fois qu'on en a besoin, puis partagée par tous ceux qui l'ont (le nez des clowns, le chapeau du
+// Pingouin, l'antenne qu'on brouille...) : elle ne coûte rien dans les chapitres où on ne la voit jamais, et on ne la jette jamais. Un
+// personnage qui vient et repart ne laisse rien dans la carte graphique, et ceux qui ont les mêmes formes se dessinent ensemble (voir
+// « Les personnages d'un seul bloc »). nom : à toi d'en choisir un qui n'est pas déjà pris
+const FORMES_PARTAGEES = {};
+const formePartagee = (nom, fabrique) => FORMES_PARTAGEES[nom] ||= fabrique();
 function piece(geo, couleur, parent, x, y, z) {
   const m = new THREE.Mesh(geo, mat(couleur));
   m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m;
@@ -10713,6 +10743,7 @@ function essayerForme(h, t) {
 function majFormes() {
   const oui = R_.personnagesEnBloc, t = performance.now();
   if (!temoinForme.visible && temoinForme.parent) { temoinForme.removeFromParent(); temoinForme.geometry.dispose(); temoinForme.skeleton.dispose(); }   // (il a servi)
+  for (const t of temoinsOmbres) if (!t.visible && t.parent) { t.removeFromParent(); t.geometry.dispose(); t.dispose?.(); }   // (voir preparerProgrammes)
   for (const F of formes) {
     const ou = oui ? dansLePays(F.g) : 0;
     if (ou === 0) { defaireForme(F); continue; }
@@ -10724,7 +10755,10 @@ function majFormes() {
   }
   if (!oui) return;
   for (const p of personnes) essayerForme(p.h, t);
-  for (const v of voitures) if (v.pilote) essayerForme(v.pilote, t);   // (ceux des motos, des tricycles, des Segway, les autres skieurs)
+  for (const v of voitures) {
+    if (v.pilote) essayerForme(v.pilote, t);   // (ceux des motos, des tricycles, des Segway, les autres skieurs)
+    if (v.joker) essayerForme(v.joker, t);     // (le Joker, sur le toit de son camion)
+  }
 }
 // Le programme des ombres d'un personnage d'un seul bloc : Three.js le compile à son premier dessin dans la carte des ombres. Pour que ce
 // ne soit pas en pleine partie, quand le premier passant s'approche, un « témoin » réduit à un point (on ne le voit pas) est dessiné avec
@@ -11480,7 +11514,7 @@ function modeleVoiture(type, couleur, police, blindee = false) {
   // les pales d'un hélicoptère : deux longues barres en croix, qui tournent autour de leur axe (majVoiture)
   const rotors = (m.rotors || []).map(([x, y, z, r, axe]) => {
     const pales = new THREE.Group(); pales.position.set(x, y, z); corps.add(pales);
-    for (const a of [0, Math.PI / 2]) { const p = poser(new THREE.BoxGeometry(2 * r, 0.05, 0.28).rotateY(a), M_NOIR, pales); if (axe === 'x') p.rotation.z = Math.PI / 2; }
+    for (const a of [0, Math.PI / 2]) { const p = poser(formePartagee(`pale ${r} ${a}`, () => new THREE.BoxGeometry(2 * r, 0.05, 0.28).rotateY(a)), M_NOIR, pales); if (axe === 'x') p.rotation.z = Math.PI / 2; }
     return { pales, axe };
   });
   // la Batmobile : ses ailes, rangées dans ses flancs (l'aile droite est l'aile gauche retournée), et ses réacteurs : une flamme bleue sous chaque
@@ -12356,7 +12390,7 @@ vmScene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.2));
 { const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(1, 2, 1); vmScene.add(l); }
 vmScene.environment = scene.environment; vmScene.environmentIntensity = 0.25; scenesReflets.push(vmScene);   // (elle reflète le même ciel que le pays : voir photographierCiel)
 const vm = new THREE.Group(); vmScene.add(vm);
-// le bras et la main : toujours les mêmes (seule l'arme change ; l'armure d'Iron Man les repeint : voir majIronman)
+// le bras et la main : toujours les mêmes (seule l'arme change ; un costume ou l'armure d'Iron Man les repeignent : voir majIronman)
 const brasVM = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.085, 0.5), mat('#e0b090')); brasVM.position.set(0, -0.02, 0.25);
 const mainVM = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), mat('#e0b090'));
 vm.add(brasVM, mainVM);
@@ -14015,7 +14049,7 @@ scene.add(repereAppel, flecheAppel);
 //  ailes (celles de Rescue : de 0, fermées, à 1, ouvertes), cdMitrailleuse (celle de War Machine), missiles et laser (les secondes avant
 //  les suivants) et tour (le laser des bras, en cours)
 // =====================================================================
-await respirer(0.9);   // (voir respirer)
+await respirer(0.93);   // (voir respirer)
 const cacheIronman = {};
 // l'armure k (son numéro dans ARMURES_STARK) ; avec la fille du menu, au chapitre d'Iron Man, ce que « fille » y change (Rescue).
 // (k peut aussi être une armure toute faite : celle d'Iron Monger)
@@ -14819,7 +14853,11 @@ function majIronman(dt) {
   for (const k in lueursIronman) lueursIronman[k].visible = false;
   rayonPlastron.visible = false;
   if (!J.ironman?.tour) for (const r of rayonsBras) r.visible = false;   // (le tour du laser des bras a peut-être été interrompu)
-  for (const o of [brasVM, mainVM]) o.material = armureIronman() ? matIronman('rouge', J.ironman.armure) : mat('#e0b090');   // à la 1re personne : son bras, dans le gant rouge
+  // à la 1re personne : son bras, dans le gant rouge de l'armure ; ou, s'il a un costume, le bas de sa manche et sa main comme on les voit à la
+  // 3e personne (les gants noirs de Batman, ceux de Spiderman ; invisible, sa vraie matière). Sa peau reste celle d'ici, avec cette lumière-là
+  const commeDehors = o => { const m = o.userData.avantInvisible || o.material; return m === mat(PEAU_BJ) ? mat('#e0b090') : m; };
+  brasVM.material = armureIronman() ? matIronman('rouge', J.ironman.armure) : commeDehors(joueurH.brasD.bas);
+  mainVM.material = armureIronman() ? matIronman('rouge', J.ironman.armure) : commeDehors(joueurH.brasD.main);
   for (const c of capsules) { // elle se referme, puis repart vers le ciel sur ses flammes
     c.t += dt; for (const p of c.g.portes) p.rotation.y *= Math.pow(0.002, dt);
     if (c.t > 0.5) { c.v += 30 * dt; c.g.position.y += c.v * dt; const f = new THREE.Sprite(M_FLASH); f.position.copy(c.g.position).add(V3(entre(-0.5, 0.5), -0.3, entre(-0.5, 0.5))); f.scale.setScalar(entre(1.2, 2.2)); scene.add(f); effets.push({ o: f, vie: 0.1 }); }
@@ -15466,7 +15504,7 @@ function majWayne(dt) {
 // =====================================================================
 //  État du jeu
 // =====================================================================
-await respirer(0.91);   // (voir respirer)
+await respirer(0.94);   // (voir respirer)
 let etoiles = 0, tempsCalme = 0, vuParPolice = false, tVu = 0, tRenfort = 0, tVoiturePolice = 0, tRobot = 15, tPeupler = 0, temps = 0;
 let elan = { x: 0, z: 0 }, dernierJ = null;   // où va B.J., en m/s (peupler le mesure toutes les demi-secondes)
 let saisie = null; // code de triche en cours de frappe
@@ -15484,7 +15522,7 @@ GANGS.forEach(creerGang);
 for (const g of garagistes) { const h = creerHumain(TENUES.garagiste()); h.g.position.set(g.x, g.y, g.z); animerHumain(h, 0, 0); scene.add(h.g); }
 const typeNomme = nom => nom && VOITURES.find(t => t.nom === nom);
 for (const [k, v] of voituresGarees.entries()) {
-  await respirer(0.92 + 0.05 * k / voituresGarees.length);   // (voir respirer)
+  await respirer(0.94 + 0.04 * k / voituresGarees.length);   // (voir respirer)
   creerVoiture(v.x, v.z, v.a, !!v.police, typeNomme(v.type) || undefined);
 }
 bateauxDepart.forEach(b => creerVoiture(b.x, b.z, b.a, false, typeNomme(b.type) || undefined));
@@ -20986,7 +21024,7 @@ function poserVitrine() {   // (de nouveau quand on change de héros dans le men
   const avant = vitrineBatcave;
   vitrineBatcave = statueBatman(0); vitrineBatcave.rotation.y = -Math.PI / 2;   // (tourné vers le lac)
   vitrineBatcave.position.set(POINTS.costume.x, POINTS.costume.y, POINTS.costume.z); vitrineBatcave.visible = avant ? avant.visible : !wayne.gagne; scene.add(vitrineBatcave);
-  if (avant) scene.remove(avant);
+  if (avant) { scene.remove(avant); avant.traverse(o => o.geometry?.dispose()); }   // (ses formes n'étaient qu'à elle : voir figer)
 }
 if (batcave && chezWayne) { poserVitrine(); addEventListener('heros', poserVitrine); }
 const costumeProche = () => !!vitrineBatcave && vitrineBatcave.visible && !J.voiture && !J.mort && Math.hypot(J.x - POINTS.costume.x, J.z - POINTS.costume.z) < 4 && Math.abs(J.y - POINTS.costume.y) < 2;
@@ -21312,9 +21350,9 @@ function majPoursuite(dt) {
 // une bouche d'égout, là où le Pingouin disparaît : un disque de fonte, ouvert (on la laisse jusqu'à la fin de l'étape)
 const M_FONTE = mat('#2a2a2c', { metalness: 0.6, roughness: 0.6 });
 function bouchEgout(b) {
-  const y = hauteurSol(b.x, b.z, 50), m = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.06, 16), M_FONTE);
+  const y = hauteurSol(b.x, b.z, 50), m = new THREE.Mesh(formePartagee('couvercle d\'égout', () => new THREE.CylinderGeometry(0.45, 0.45, 0.06, 16)), M_FONTE);
   m.position.set(b.x + 0.7, y + 0.03, b.z); scene.add(m);   // (son couvercle, à côté du trou)
-  const trou = new THREE.Mesh(new THREE.CircleGeometry(0.42, 16).rotateX(-Math.PI / 2), mat('#050505')); trou.position.set(b.x, y + 0.02, b.z); scene.add(trou);
+  const trou = new THREE.Mesh(formePartagee('trou d\'égout', () => new THREE.CircleGeometry(0.42, 16).rotateX(-Math.PI / 2)), mat('#050505')); trou.position.set(b.x, y + 0.02, b.z); scene.add(trou);
   return { x: b.x, z: b.z, y, objets: [m, trou] };
 }
 function finirPoursuite(suite) {
@@ -21363,19 +21401,24 @@ function finirSuivre() {
 // et son parapluie (ENNEMIS.pingouin). Une mitraillette est cachée dans son parapluie ; de temps en temps, il en tire une roquette ; quand il
 // faiblit, il appelle ses hommes. Assommé (Batman ne tue jamais), la police vient l'embarquer ---
 const M_PARAPLUIE = mat('#141418', { roughness: 0.6 });
+// (ses formes, partagées : voir formePartagee)
+const formesPingouin = () => formePartagee('Pingouin', () => ({
+  nez: new THREE.ConeGeometry(0.032, 0.13, 8).rotateX(Math.PI / 2), chapeau: new THREE.CylinderGeometry(0.15, 0.155, 0.24, 16), bord: new THREE.CylinderGeometry(0.235, 0.235, 0.02, 18),
+  ruban: new THREE.CylinderGeometry(0.152, 0.152, 0.04, 16), monocle: new THREE.TorusGeometry(0.032, 0.006, 6, 16), canne: new THREE.CylinderGeometry(0.012, 0.012, 0.95, 6).translate(0, -0.3, 0),
+  toile: new THREE.ConeGeometry(0.06, 0.62, 8).rotateX(Math.PI).translate(0, -0.42, 0), crochet: new THREE.TorusGeometry(0.05, 0.012, 6, 10, Math.PI).translate(0, 0.17, 0) }));
 function creerPingouin(t) {
   const h = creerHumain(t);
   if (h.cheveux) h.cheveux.visible = false;   // (sous son chapeau)
   h.torse.material = veste({ veste: '#141418', chemise: '#ecebe6', cravate: '#141418' });
-  piece(new THREE.ConeGeometry(0.032, 0.13, 8).rotateX(Math.PI / 2), t.peau, h.tete, 0, -0.012, 0.17);                 // son long nez pointu
-  piece(new THREE.CylinderGeometry(0.15, 0.155, 0.24, 16), '#101012', h.tete, 0, 0.22, -0.01);                         // le haut-de-forme...
-  piece(new THREE.CylinderGeometry(0.235, 0.235, 0.02, 18), '#101012', h.tete, 0, 0.105, -0.01);                       // ...son bord
-  piece(new THREE.CylinderGeometry(0.152, 0.152, 0.04, 16), '#5a1a2a', h.tete, 0, 0.13, -0.01);                        // ...son ruban
-  const monocle = piece(new THREE.TorusGeometry(0.032, 0.006, 6, 16), '#d8b060', h.tete, -0.045, 0.028, 0.118); monocle.material = M_OR;
+  const F = formesPingouin();
+  piece(F.nez, t.peau, h.tete, 0, -0.012, 0.17);               // son long nez pointu
+  piece(F.chapeau, '#101012', h.tete, 0, 0.22, -0.01);         // le haut-de-forme...
+  piece(F.bord, '#101012', h.tete, 0, 0.105, -0.01);           // ...son bord
+  piece(F.ruban, '#5a1a2a', h.tete, 0, 0.13, -0.01);           // ...son ruban
+  const monocle = piece(F.monocle, '#d8b060', h.tete, -0.045, 0.028, 0.118); monocle.material = M_OR;
   // son parapluie fermé, dans la main droite : la canne, le crochet, la toile noire roulée
   const p = new THREE.Group(); p.position.set(0, -0.3, 0.02); h.brasD.pli.add(p);
-  for (const [g, m] of [[new THREE.CylinderGeometry(0.012, 0.012, 0.95, 6).translate(0, -0.3, 0), M_METAL], [new THREE.ConeGeometry(0.06, 0.62, 8).rotateX(Math.PI).translate(0, -0.42, 0), M_PARAPLUIE],
-    [new THREE.TorusGeometry(0.05, 0.012, 6, 10, Math.PI).translate(0, 0.17, 0), M_PARAPLUIE]]) { const e = new THREE.Mesh(g, m); e.castShadow = true; p.add(e); }
+  for (const [g, m] of [[F.canne, M_METAL], [F.toile, M_PARAPLUIE], [F.crochet, M_PARAPLUIE]]) { const e = new THREE.Mesh(g, m); e.castShadow = true; p.add(e); }
   h.parapluie = p;
   return h;
 }
@@ -21445,13 +21488,15 @@ const M_LUMIERE_ROUGE = new THREE.MeshBasicMaterial({ color: '#ff2a1a', toneMapp
 const GEO_ROQUETTE_PINGOUIN = mergeGeometries([new THREE.CylinderGeometry(0.09, 0.09, 0.62, 10).translate(0, 0.55, -0.24), new THREE.ConeGeometry(0.09, 0.2, 10).translate(0, 0.96, -0.24)]);
 function creerAntenne(x, z) {
   const y = hauteurSol(x, z, 50), g = new THREE.Group(), m = (geo, matiere, px, py, pz) => { const e = new THREE.Mesh(geo, matiere); e.position.set(px, py, pz); e.castShadow = true; g.add(e); return e; };
-  // le socle et le mât, en treillis (une seule forme : moins de choses à dessiner)
-  const fer = [new THREE.BoxGeometry(1.6, 0.5, 1.6).translate(0, 0.25, 0)];
-  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) fer.push(new THREE.BoxGeometry(0.08, 9, 0.08).rotateZ(-sx * 0.03).rotateX(sz * 0.03).translate(sx * 0.3, 4.9, sz * 0.3));
-  for (let k = 1; k < 9; k++) fer.push(new THREE.BoxGeometry(0.62, 0.05, 0.62).translate(0, 0.5 + k, 0));
-  m(mergeGeometries(fer), M_METAL, 0, 0, 0);
-  const plat = m(new THREE.SphereGeometry(1.1, 14, 8, 0, 2 * Math.PI, 0, Math.PI / 2.6), mat('#d8d8d4', { side: THREE.DoubleSide }), 0, 8.6, 0.6); plat.rotation.x = 1.2;   // l'antenne parabolique
-  const lampe = m(new THREE.SphereGeometry(0.18, 10, 8), M_LUMIERE_ROUGE, 0, 9.6, 0);
+  // le socle et le mât, en treillis (une seule forme : moins de choses à dessiner ; et toutes les antennes ont les mêmes : voir formePartagee)
+  m(formePartagee('mât d\'antenne', () => {
+    const fer = [new THREE.BoxGeometry(1.6, 0.5, 1.6).translate(0, 0.25, 0)];
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) fer.push(new THREE.BoxGeometry(0.08, 9, 0.08).rotateZ(-sx * 0.03).rotateX(sz * 0.03).translate(sx * 0.3, 4.9, sz * 0.3));
+    for (let k = 1; k < 9; k++) fer.push(new THREE.BoxGeometry(0.62, 0.05, 0.62).translate(0, 0.5 + k, 0));
+    return mergeGeometries(fer);
+  }), M_METAL, 0, 0, 0);
+  const plat = m(formePartagee('plat d\'antenne', () => new THREE.SphereGeometry(1.1, 14, 8, 0, 2 * Math.PI, 0, Math.PI / 2.6)), mat('#d8d8d4', { side: THREE.DoubleSide }), 0, 8.6, 0.6); plat.rotation.x = 1.2;   // l'antenne parabolique
+  const lampe = m(formePartagee('lampe d\'antenne', () => new THREE.SphereGeometry(0.18, 10, 8)), M_LUMIERE_ROUGE, 0, 9.6, 0);
   g.position.set(x, y, z); scene.add(g);
   const boites = [ajouterCollision(x - 0.8, z - 0.8, x + 0.8, z + 0.8, y + 0.5, y - 1), ajouterCollision(x - 0.35, z - 0.35, x + 0.35, z + 0.35, y + 9.4, y + 0.5)];
   for (const e of g.children) if (e !== lampe) { e.userData.mur = true; batiments.push(e); }   // (les balles, les batarangs et le grappin s'y arrêtent)
@@ -21597,7 +21642,7 @@ function creerDoubleFace(t) {
   h.tete.material = visageDoubleFace(t.peau);
   h.arme2 = creerArme(ARMES.findIndex(a => a.modele === 'pistolet'));   // le pistolet de sa main gauche (celui de la droite : donnerArme)
   if (h.arme2) { h.arme2.position.set(0, -0.3, 0.03); h.arme2.rotation.x = Math.PI / 2; h.brasG.pli.add(h.arme2); }
-  h.piece = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.006, 16), M_PIECE); h.piece.visible = false; h.g.add(h.piece);   // (en l'air, quand il la lance)
+  h.piece = new THREE.Mesh(formePartagee('pièce de Double-Face', () => new THREE.CylinderGeometry(0.035, 0.035, 0.006, 16)), M_PIECE); h.piece.visible = false; h.g.add(h.piece);   // (en l'air, quand il la lance)
   return h;
 }
 // un mercenaire de Bane : treillis sombre, cagoule noire, un gilet plein de poches
@@ -21620,9 +21665,9 @@ function creerBane(t) {
   h.torse.scale.set(1.32, 1.06, 1.3); h.cou.scale.set(1.55, 1, 1.55);
   for (const b of [h.brasD, h.brasG]) { habiller(b.haut, t.peau); b.haut.scale.set(1.55, 1.04, 1.55); b.bas.scale.set(1.45, 1, 1.45); b.main.scale.multiplyScalar(1.3); b.position.x *= 1.3; }
   for (const j of [h.jambeD, h.jambeG]) { j.haut.scale.set(1.35, 1, 1.35); j.bas.scale.set(1.25, 1, 1.25); }
-  piece(new RoundedBoxGeometry(0.62, 0.46, 0.4, 2, 0.08), '#2a221a', h.haut, 0, 0.44, 0);   // son gilet de cuir
+  piece(formePartagee('gilet de Bane', () => new RoundedBoxGeometry(0.62, 0.46, 0.4, 2, 0.08)), '#2a221a', h.haut, 0, 0.44, 0);   // son gilet de cuir
   const m = piece(GEO_MASQUE_BANE, '#3e4146', h.tete, 0, -0.012, 0.012); m.material = M_MASQUE_BANE;
-  for (const x of [-0.024, -0.008, 0.008, 0.024]) piece(new THREE.BoxGeometry(0.008, 0.06, 0.01), '#101012', h.tete, x, -0.055, 0.14);   // la grille
+  for (const x of [-0.024, -0.008, 0.008, 0.024]) piece(formePartagee('grille de Bane', () => new THREE.BoxGeometry(0.008, 0.06, 0.01)), '#101012', h.tete, x, -0.055, 0.14);   // la grille
   for (const g of GEO_TUYAUX_BANE) piece(g, '#232428', h.tete, 0, 0, 0);
   h.g.scale.setScalar(ENNEMIS.bane.taille);
   return h;
@@ -22449,8 +22494,8 @@ const visageClown = k => cacheVisage['clown ' + k] ||= new THREE.MeshStandardMat
 function creerClown(t) {
   const h = creerHumain(t), k = Math.floor(Math.random() * 4);
   h.tete.material = visageClown(k);
-  piece(new THREE.SphereGeometry(0.032, 10, 8), '#e01818', h.tete, 0, -0.012, 0.126);   // le nez rouge
-  for (const s of [-1, 1]) piece(new THREE.SphereGeometry(0.07, 8, 6).scale(0.9, 0.8, 1.2), COULEURS_CLOWNS[(k + 2) % 4], h.tete, 0.1 * s, 0.065, -0.03);   // deux touffes de cheveux
+  piece(formePartagee('nez de clown', () => new THREE.SphereGeometry(0.032, 10, 8)), '#e01818', h.tete, 0, -0.012, 0.126);   // le nez rouge
+  for (const s of [-1, 1]) piece(formePartagee('touffe de clown', () => new THREE.SphereGeometry(0.07, 8, 6).scale(0.9, 0.8, 1.2)), COULEURS_CLOWNS[(k + 2) % 4], h.tete, 0.1 * s, 0.065, -0.03);   // deux touffes de cheveux
   return h;
 }
 // le Joker : son costume violet, sa chemise verte et sa cravate orange, son visage tout blanc, ses yeux cernés de noir, son grand sourire
@@ -22472,10 +22517,12 @@ function creerJoker(t) {
   const h = creerHumain(t);
   h.torse.material = veste({ veste: '#4a1f6e', chemise: '#3e8a36', cravate: '#e07a1a' });
   h.tete.material = visageJoker();
-  piece(new THREE.CylinderGeometry(0.112, 0.128, 0.13, 16), '#3a1656', h.tete, 0, 0.175, -0.01);   // le chapeau mou...
-  piece(new THREE.CylinderGeometry(0.2, 0.2, 0.016, 18), '#3a1656', h.tete, 0, 0.112, -0.01);       // ...son bord
-  piece(new THREE.CylinderGeometry(0.116, 0.116, 0.032, 16), '#16081e', h.tete, 0, 0.13, -0.01);    // ...son ruban
-  h.fleur = piece(new THREE.SphereGeometry(0.036, 8, 6), '#f4e6f2', h.haut, 0.12, 0.6, 0.16);        // la fleur, à la boutonnière
+  const F = formePartagee('Joker', () => ({ chapeau: new THREE.CylinderGeometry(0.112, 0.128, 0.13, 16), bord: new THREE.CylinderGeometry(0.2, 0.2, 0.016, 18),
+    ruban: new THREE.CylinderGeometry(0.116, 0.116, 0.032, 16), fleur: new THREE.SphereGeometry(0.036, 8, 6) }));   // (ses formes, partagées : voir formePartagee)
+  piece(F.chapeau, '#3a1656', h.tete, 0, 0.175, -0.01);   // le chapeau mou...
+  piece(F.bord, '#3a1656', h.tete, 0, 0.112, -0.01);      // ...son bord
+  piece(F.ruban, '#16081e', h.tete, 0, 0.13, -0.01);      // ...son ruban
+  h.fleur = piece(F.fleur, '#f4e6f2', h.haut, 0.12, 0.6, 0.16);   // la fleur, à la boutonnière
   return h;
 }
 // le Sphinx (Edward Nygma) : son costume vert couvert de points d'interrogation noirs, son chapeau melon vert, son masque violet, et sa
@@ -22494,18 +22541,20 @@ function creerSphinx(t) {
   h.torse.material = M_COSTUME_SPHINX;
   for (const m of [h.brasD, h.brasG, h.jambeD, h.jambeG]) { m.haut.material = M_COSTUME_SPHINX; m.bas.material = M_COSTUME_SPHINX; }
   h.tete.material = visageSphinx(t.peau);
-  piece(new THREE.SphereGeometry(0.135, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, 1.15, 1), '#1a5a24', h.tete, 0, 0.085, -0.01);   // le chapeau melon...
-  piece(new THREE.CylinderGeometry(0.19, 0.19, 0.016, 18), '#1a5a24', h.tete, 0, 0.085, -0.01);                                           // ...son bord
-  piece(new THREE.CylinderGeometry(0.137, 0.137, 0.03, 16), '#5a2a8a', h.tete, 0, 0.1, -0.01);                                             // ...son ruban violet
+  const F = formePartagee('Sphinx', () => ({ chapeau: new THREE.SphereGeometry(0.135, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, 1.15, 1), bord: new THREE.CylinderGeometry(0.19, 0.19, 0.016, 18),
+    ruban: new THREE.CylinderGeometry(0.137, 0.137, 0.03, 16), canne: [new THREE.CylinderGeometry(0.012, 0.012, 0.95, 6).translate(0, -0.35, 0), new THREE.TorusGeometry(0.05, 0.013, 6, 12, Math.PI * 1.4).rotateZ(-0.6).translate(0.02, 0.17, 0),
+      new THREE.SphereGeometry(0.018, 8, 6).translate(0, 0.05, 0)] }));   // (ses formes, partagées : voir formePartagee)
+  piece(F.chapeau, '#1a5a24', h.tete, 0, 0.085, -0.01);   // le chapeau melon...
+  piece(F.bord, '#1a5a24', h.tete, 0, 0.085, -0.01);      // ...son bord
+  piece(F.ruban, '#5a2a8a', h.tete, 0, 0.1, -0.01);       // ...son ruban violet
   const canne = new THREE.Group(); canne.position.set(0, -0.3, 0.02); h.brasD.pli.add(canne);   // la canne, dans la main droite
-  for (const g of [new THREE.CylinderGeometry(0.012, 0.012, 0.95, 6).translate(0, -0.35, 0), new THREE.TorusGeometry(0.05, 0.013, 6, 12, Math.PI * 1.4).rotateZ(-0.6).translate(0.02, 0.17, 0),
-    new THREE.SphereGeometry(0.018, 8, 6).translate(0, 0.05, 0)]) { const e = new THREE.Mesh(g, M_OR); e.castShadow = true; canne.add(e); }
+  for (const g of F.canne) { const e = new THREE.Mesh(g, M_OR); e.castShadow = true; canne.add(e); }
   h.canne = canne;
   return h;
 }
 // un homme du Sphinx : un pull vert, un bonnet noir, et un point d'interrogation vert sur la poitrine
 function creerAcolyte(t) {
-  const h = creerHumain(t), q = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.2), MAT.interrogation);
+  const h = creerHumain(t), q = new THREE.Mesh(formePartagee('point d\'interrogation', () => new THREE.PlaneGeometry(0.2, 0.2)), MAT.interrogation);
   q.position.set(0, 0.45, 0.17); h.haut.add(q);
   return h;
 }
@@ -22555,6 +22604,8 @@ function majCable(P, dt) {
 }
 const M_CABLE_BATPOD = new THREE.MeshBasicMaterial({ color: '#8a9098' });   // (gris acier : on le voit, dans le noir du tunnel)
 function finirCable(P) { if (!P.cable) return; for (const m of P.cable.fils) scene.remove(m); P.cable = null; }
+// le Joker quitte le toit de son camion : son bazooka ne sert plus (ses formes sont jetées, voir jeterArme)
+function enleverJokerDuToit(v) { if (v.joker) { v.corps.remove(v.joker.g); jeterArme(v.joker.arme); v.joker = null; } }
 // une voiture se retourne par-dessus son nez (le câble du Batpod) : elle part en accident, en l'air, en basculant vers l'avant. Elle ne prend
 // jamais feu (increvable) : elle reste sur le toit (le camion du Joker : il en sortira, et ses clowns aussi)
 function renverser(v) {
@@ -22562,7 +22613,7 @@ function renverser(v) {
   if (!a) return;
   v.increvable = true;
   if (v.fuyard) Object.assign(v.fuyard, { fini: true, stop: temps, toupie: 0 }); else v.faute = true;
-  if (v.joker) { v.corps.remove(v.joker.g); v.joker = null; }   // (le Joker, sur le toit du camion : il saute)
+  enleverJokerDuToit(v);   // (le Joker, sur le toit du camion : il saute)
   // elle monte de 3 m (7,5 m/s vers le haut) et fait un demi-tour par-dessus son nez pendant qu'elle est en l'air (2,1 tours en 2π s) : elle
   // retombe sur le toit, sans toucher le plafond du tunnel (plus vite, son nez taperait la route, et elle partirait bien plus haut)
   const gauche = V3(1, 0, 0).applyQuaternion(v.quat), avant = V3(0, 0, 1).applyQuaternion(v.quat);
@@ -22583,7 +22634,7 @@ function seSauver(P) {
     return;
   }
   // le Joker : il sort de sa voiture (le bus, le camion retourné), court quelques mètres... et disparaît dans un nuage de fumée violette
-  if (v.joker) { v.corps.remove(v.joker.g); v.joker = null; }   // (celui qui tirait au bazooka, sur le toit du camion)
+  enleverJokerDuToit(v);   // (celui qui tirait au bazooka, sur le toit du camion)
   const a = v.angle + Math.PI / 2, q = local(v, v.rayon + 1.6, 0), p = creerPersonne('joker', q.x, q.z, undefined, hauteurSol(q.x, q.z, v.y + 2));
   const vers = { x: q.x + Math.sin(a) * 9, z: q.z + Math.cos(a) * 9 };
   Object.assign(p, { fuit: { vers, t: 0 }, invincible: true, alerte: false, angle: a, figurant: {} });   // (figurant : pas de barre de vie)
@@ -22602,9 +22653,9 @@ function majFuiteJoker(p, dt) {
 // le Joker sur le toit de son camion, le bazooka à l'épaule, tourné vers l'arrière (il tire sur Batman : voir majPoursuite) ; et « HA HA HA »
 // en grandes lettres vertes sur les flancs du camion
 const TEX_HAHAHA = toile(256, 64, g => { g.fillStyle = '#5a2a7a'; g.fillRect(0, 0, 256, 64); g.fillStyle = '#5adf3a'; g.font = "bold 52px Impact, sans-serif"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('HA HA HA', 128, 34); });
+const M_HAHAHA = new THREE.MeshStandardMaterial({ map: TEX_HAHAHA, roughness: 0.7 });
 function deguiserCamion(v, bazooka) {
-  const m = new THREE.MeshStandardMaterial({ map: TEX_HAHAHA, roughness: 0.7 });
-  for (const s of [-1, 1]) { const e = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 1.3).rotateY(s * Math.PI / 2), m); e.position.set(s * 1.27, 2.7, -1.4); v.corps.add(e); }
+  for (const s of [-1, 1]) { const e = new THREE.Mesh(formePartagee('HA HA HA ' + s, () => new THREE.PlaneGeometry(5.2, 1.3).rotateY(s * Math.PI / 2)), M_HAHAHA); e.position.set(s * 1.27, 2.7, -1.4); v.corps.add(e); }
   if (!bazooka) return;
   const h = v.joker = creerJoker(TENUES.joker());
   donnerArme(h, ARMES.findIndex(a => a.modele === 'bazooka'));
@@ -22852,9 +22903,9 @@ function creerHelicoJoker(vers, bas) {
   M.m.position.set(x, y, z); M.m.rotation.order = 'YXZ'; scene.add(M.m);
   // l'échelle de corde : deux cordes et des barreaux, d'un mètre de long (on l'étire à sa longueur : voir majHelicoJoker)
   const ech = new THREE.Group();
-  for (const s of [-1, 1]) { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1, 4).translate(0, -0.5, 0), M_CORDE); m.position.x = 0.22 * s; ech.add(m); }
+  for (const s of [-1, 1]) { const m = new THREE.Mesh(formePartagee('corde', () => new THREE.CylinderGeometry(0.025, 0.025, 1, 4).translate(0, -0.5, 0)), M_CORDE); m.position.x = 0.22 * s; ech.add(m); }
   ech.visible = false; scene.add(ech);
-  const barreaux = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.02, 0.02, 0.48, 4).rotateZ(Math.PI / 2), M_CORDE, 40); barreaux.frustumCulled = false; barreaux.visible = false; scene.add(barreaux);
+  const barreaux = new THREE.InstancedMesh(formePartagee('barreau', () => new THREE.CylinderGeometry(0.02, 0.02, 0.48, 4).rotateZ(Math.PI / 2)), M_CORDE, 40); barreaux.frustumCulled = false; barreaux.visible = false; scene.add(barreaux);
   return { g: M.m, rotors: M.rotors, echelle: ech, barreaux, x, y, z, angle: a, etat: 'arrive', vers, bas, t: 0, vitesse: 0 };
 }
 // où s'accroche le haut de l'échelle : sous la porte de l'hélicoptère
@@ -24062,12 +24113,23 @@ function haloLampadaire(e, allume) {
 // la nuit, quelques vraies lumières (REGLAGES.lumieresNuit) éclairent le sol, les murs, les voitures et les gens : celles des lampadaires
 // les plus proches de B.J., ou, s'il est dans une maison, celles des lampes de son étage. Dans la galerie de la grotte des Dix Anneaux, où le
 // soleil n'entre pas, ses lampes éclairent vraiment, même le jour. Toutes les 0,25 s, on les pose sur les plus proches ;
-// une lumière garde sa lampe tant qu'elle reste parmi les plus proches, et s'éteint doucement quand elle s'éloigne (on ne la voit pas sauter)
+// une lumière garde sa lampe tant qu'elle reste parmi les plus proches, et s'éteint doucement quand elle s'éloigne (on ne la voit presque pas sauter : avec beaucoup de lumières, ce sont des lampes déjà loin).
+// Avec très peu de lumières (moins de PEU_DE_LUMIERES : en Basse), on prend d'abord celles de devant la caméra (une lampe dans son dos n'éclaire
+// rien de ce qu'on voit : elle compte pour jusqu'à LAMPE_DERRIERE mètres de plus, peu à peu, sur 10 m derrière elle), et seule la plus loin des
+// lampes choisies s'éteint : à mi-chemin entre deux lampes, dans le Tunnel de Gotham, toutes sont aussi loin, et les 2 lumières s'éteignaient
+// ensemble (la clarté montait et descendait). Et une lumière dont la lampe n'est plus choisie s'éteint d'abord, avant d'aller sur une autre lampe
+const PEU_DE_LUMIERES = 4, LAMPE_DERRIERE = 15, devantCamera = new THREE.Vector3();
 const lumieresNuit = Array.from({ length: clamp(Math.round(R_.lumieresNuit) || 0, 0, 16) }, () => {
   const l = new THREE.PointLight('#ffcf90', 0, 35, 1.4); scene.add(l);
   return { l, source: null, force: 0 };
 });
 let tSources = 0, sourcesNuit = [], dLoin = Infinity;   // les lampes choisies ; dLoin : la distance de la première qui n'a pas de lumière
+// la distance de la lampe q à B.J., comme on la compte pour choisir
+function distanceLampe(q) {
+  const d = Math.hypot(q.x - J.x, q.y - J.y, q.z - J.z), c = camera.position;
+  if (lumieresNuit.length >= PEU_DE_LUMIERES) return d;
+  return d + LAMPE_DERRIERE * clamp(-((q.x - c.x) * devantCamera.x + (q.y - c.y) * devantCamera.y + (q.z - c.z) * devantCamera.z) / 10, 0, 1);
+}
 const sousTerre = () => (!!galerie && J.y < galerie.toit && dansGalerie(J.x, J.z)) || !!souterrainEn(J.x, J.z, J.y);   // dans la galerie de la grotte (ou dans un souterrain de Gotham)
 let ombreGrotte = 0;   // (voir majCiel)
 function choisirSources() {
@@ -24081,19 +24143,21 @@ function choisirSources() {
       for (const e of morceaux.get(a * 100 + b)?.lampadaires || []) if (e.boite.h > -Infinity && Math.abs(e.tete.x - J.x) < 80 && Math.abs(e.tete.z - J.z) < 80) l.push(e.tete);
     for (const q of lampesDehors) if (Math.abs(q.x - J.x) < 80 && Math.abs(q.z - J.z) < 80) l.push(q);   // (les lanternes du clocher)
   }
-  for (const q of l) q.d = Math.hypot(q.x - J.x, q.y - J.y, q.z - J.z);
+  for (const q of l) q.d = distanceLampe(q);
   l.sort((p, q) => p.d - q.d);
   sourcesNuit = l.slice(0, lumieresNuit.length);
   dLoin = Math.min(l[lumieresNuit.length]?.d ?? Infinity, 80);
-  for (const n of lumieresNuit) if (!sourcesNuit.includes(n.source)) n.source = null;
-  for (const q of sourcesNuit) if (!lumieresNuit.some(n => n.source === q)) { const n = lumieresNuit.find(n => !n.source); n.source = q; n.force = 0; }
+  for (const n of lumieresNuit) if (!sourcesNuit.includes(n.source) && (lumieresNuit.length >= PEU_DE_LUMIERES || n.force < 3)) n.source = null;
+  for (const q of sourcesNuit) if (!lumieresNuit.some(n => n.source === q)) { const n = lumieresNuit.find(n => !n.source); if (n) { n.source = q; n.force = 0; } }   // (pas de lumière libre : elle attend qu'une s'éteigne)
 }
 function majLumieresNuit(dt) {
   const nuit = sousTerre() ? 1 : lumiere.nuit;   // (sous la colline, il fait toujours nuit)
+  camera.getWorldDirection(devantCamera);
   if (nuit > 0 && (tSources -= dt) <= 0) { tSources = 0.25; choisirSources(); }
   for (const n of lumieresNuit) {
-    const q = n.source, d = q ? Math.hypot(q.x - J.x, q.y - J.y, q.z - J.z) : 0;
-    const voulue = q ? nuit * (q.grotte ? 18 : q.force ?? (q.dedans ? 10 : 60)) * doux(d, dLoin, dLoin - 4) : 0;   // (force : une lampe plus forte, au plafond du hall de la tour Wayne)   // (celles de la grotte éclairent plus loin)   // (une lampe de maison éclaire moins loin et moins fort)
+    const q = n.source, d = q ? distanceLampe(q) : 0;
+    const seFane = lumieresNuit.length >= PEU_DE_LUMIERES || q === sourcesNuit.at(-1);   // (la lampe qui peut quitter les plus proches)
+    const voulue = q && sourcesNuit.includes(q) ? nuit * (q.grotte ? 18 : q.force ?? (q.dedans ? 10 : 60)) * (seFane ? doux(d, dLoin, dLoin - 4) : 1) : 0;   // (force : une lampe plus forte, au plafond du hall de la tour Wayne)   // (celles de la grotte éclairent plus loin)   // (une lampe de maison éclaire moins loin et moins fort)
     n.force += (voulue - n.force) * Math.min(1, dt * 5);
     n.l.intensity = n.force;
     if (q) { n.l.position.set(q.x, q.y - (q.dedans ? 0 : 0.15), q.z); n.l.distance = q.grotte ? 15 : q.portee ?? (q.dedans ? 10 : 35); }
@@ -24159,7 +24223,7 @@ const nuages = COUVERT ? (() => {
   const fondu = toile(128, 128, (g, l, h) => { const d = g.createRadialGradient(64, 64, 0, 64, 64, 64); d.addColorStop(0, '#fff'); d.addColorStop(0.5, '#fff'); d.addColorStop(1, '#000'); g.fillStyle = d; g.fillRect(0, 0, l, h); });
   Object.assign(fondu, { colorSpace: THREE.NoColorSpace, wrapS: THREE.ClampToEdgeWrapping, wrapT: THREE.ClampToEdgeWrapping });
   const m = new THREE.Mesh(new THREE.PlaneGeometry(3600, 3600).rotateX(Math.PI / 2),
-    new THREE.MeshBasicMaterial({ map: t, alphaMap: fondu, transparent: true, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide }));
+    new THREE.MeshBasicMaterial({ map: t, alphaMap: fondu, transparent: true, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide, forceSinglePass: true }));   // (forceSinglePass : en une seule fois, avec un seul programme ; on ne voit qu'une face)
   m.renderOrder = -1; m.frustumCulled = false; scene.add(m);
   return m;
 })() : null;
@@ -24213,7 +24277,7 @@ function couvrirCiel(h) {
 // partout, même dans le brouillard (fog: false). Il s'éteint quand l'appel est fini
 const batSignal = projecteurBat ? (() => {
   const P = projecteurBat, c = P.cible, lumineux = (map, o = {}) => new THREE.MeshBasicMaterial({ map, color: '#000', transparent: true, depthWrite: false, fog: false, toneMapped: false,
-    blending: THREE.AdditiveBlending, side: THREE.DoubleSide, ...o });
+    blending: THREE.AdditiveBlending, side: THREE.DoubleSide, forceSinglePass: true, ...o });   // (forceSinglePass : en une seule fois, avec un seul programme ; les deux faces s'ajoutent, dans n'importe quel ordre)
   // la chauve-souris sur les nuages : un ovale de lumière qui s'efface sur ses bords, et la chauve-souris noire au milieu (l'additif n'y ajoute rien)
   const tEmbleme = toile(128, 128, (g, l, h) => {   // (dessiné rond, et posé sur un ovale deux fois plus large que haut)
     const d = g.createRadialGradient(64, 64, 8, 64, 64, 64); d.addColorStop(0, '#fff'); d.addColorStop(0.78, '#fff'); d.addColorStop(1, 'rgba(255,255,255,0)');
@@ -24827,8 +24891,8 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   lumiereBoum.intensity = Math.max(0, lumiereBoum.intensity - dt * 10000);
   police(dt); peupler(dt); missions(dt);
   // ménage
-  for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); jeterArme(personnes[k].h.arme); personnes.splice(k, 1); }
-  for (let k = voitures.length - 1; k >= 0; k--) if (voitures[k].supprimer && voitures[k] !== J.voiture) { scene.remove(voitures[k].m); voitures.splice(k, 1); }
+  for (let k = personnes.length - 1; k >= 0; k--) if (personnes[k].supprimer) { scene.remove(personnes[k].h.g); jeterArme(personnes[k].h.arme); jeterArme(personnes[k].h.arme2); personnes.splice(k, 1); }
+  for (let k = voitures.length - 1; k >= 0; k--) if (voitures[k].supprimer && voitures[k] !== J.voiture) { scene.remove(voitures[k].m); jeterArme(voitures[k].joker?.arme); voitures.splice(k, 1); }
   // (un objet ramassé : ses formes sont jetées, sauf celles marquées partagées, aJeter = false, comme le sceptre ou le batarang d'une arme lâchée)
   for (let k = objets.length - 1; k >= 0; k--) if (objets[k].supprimer) { scene.remove(objets[k].m); objets[k].m.traverse(o => { if (o.geometry && o.userData.aJeter !== false) o.geometry.dispose(); }); objets.splice(k, 1); }
   for (let k = robots.length - 1; k >= 0; k--) if ((robots[k].supprimer || (!robots[k].pilote && !robots[k].armure && dist(robots[k], J) > 600)) && robots[k] !== J.robot) { scene.remove(robots[k].m.g); robots.splice(k, 1); }
@@ -25052,7 +25116,7 @@ function boucle(t) {
 // sait compiler en arrière-plan le fait sans geler la page (les autres gèlent encore, mais avant de jouer).
 // A_PREPARER : ce qu'on ne voit qu'en jouant (une explosion, un code de triche...). Une matière, et la sorte d'objet qui la porte :
 // 'forme' (un objet tout simple), 'lot' (beaucoup d'objets pareils dessinés d'un coup), 'image' (une image toujours face à la caméra),
-// 'trait' (une ligne), 'squelette' (un objet qui suit des os, comme les personnages d'un seul bloc) ; 'vm' : dans la main, à la
+// 'lot colorié' (un lot où chacun a sa couleur), 'trait' (une ligne), 'squelette' (un objet qui suit des os, comme les personnages d'un seul bloc) ; 'vm' : dans la main, à la
 // 1re personne (d'autres lumières, donc d'autres programmes). Ce qui compte, c'est la sorte de matière (à pleine lumière ou non,
 // transparente, à deux faces, découpée, avec une image...), pas sa couleur : une seule suffit pour toutes celles qui lui ressemblent,
 // et si une matière de la même sorte est déjà dans le pays, même cachée, la ligne ne coûte rien.
@@ -25084,10 +25148,29 @@ const A_PREPARER = [
   // à la 1re personne : l'éclair au bout du canon, le gant d'Iron Man (à deux faces)
   [M_FLASH, 'image', 'vm'], [M_ECLAT, 'forme', 'vm'],
 ];
+// à Gotham, ce que ses missions fabriquent : la foule du stade (un lot, chacun de sa couleur) et les trous de la pelouse (un lot transparent, avec
+// une image : pas M_TROU lui-même, qui n'est peint que quand il sert), les pingouins-missiles (des lots, percés : voir percer) et leur lampe,
+// l'écran des minuteries (une image qui passe devant tout)
+if (GOTHAM) A_PREPARER.push([M_FOULE, 'lot colorié'], [new THREE.MeshStandardMaterial({ map: IMAGE_PREPARER, transparent: true }), 'lot'], [MAT.noirMeuble, 'lot'], [M_METAL, 'lot'], [M_LAMPES_PINGOUINS, 'lot colorié'],
+  [new THREE.SpriteMaterial({ map: IMAGE_PREPARER, depthTest: false, toneMapped: false, fog: false, transparent: true }), 'image']);
+// Les programmes des ombres, eux, Three.js les fait avec ses propres matières, que compile ne voit pas. À Gotham, des témoins réduits à un point
+// (on ne les voit pas) sont dessinés avec la toute première image, ombres comprises, puis enlevés, comme celui des personnages (temoinForme) : un
+// objet découpé (le blason d'un costume), découpé à deux faces (la cape de Batman), à deux faces (le plat des antennes, le canard du Pingouin ;
+// juste après un lot : Three.js n'en refait le programme qu'en changeant de sorte d'objet, et n'y pense qu'à ce moment-là)
+const temoinsOmbres = !GOTHAM ? [] : [std(IMAGE_PREPARER, { alphaTest: 0.5 }), std(IMAGE_PREPARER, { alphaTest: 0.5, side: THREE.DoubleSide }), MAT.noirMeuble, std(null, { side: THREE.DoubleSide })].map(m => {
+  const f = new THREE.BufferGeometry(), t = m === MAT.noirMeuble ? new THREE.InstancedMesh(f, m, 1) : new THREE.Mesh(f, m);
+  f.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(9), 3)); f.setAttribute('normal', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 0], 3)); f.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(6), 2));
+  t.castShadow = true; t.frustumCulled = false; t.raycast = () => {};
+  t.onAfterRender = () => { t.visible = false; };   // (l'image est dessinée après les ombres : il a servi aux deux)
+  scene.add(t);
+  return t;
+});
 const GEO_PREPARER = new THREE.BoxGeometry(), GEO_PREPARER_TRAIT = new THREE.BufferGeometry().setFromPoints([V3(0, 0, 0), V3(0, 1, 0)]);   // (un trait n'a que des points)
 const objetAPreparer = (m, sorte) => sorte === 'image' ? new THREE.Sprite(m) : sorte === 'trait' ? new THREE.Line(GEO_PREPARER_TRAIT, m)
   : sorte === 'squelette' ? new THREE.SkinnedMesh(GEO_PREPARER, m)
-  : sorte === 'lot' ? new THREE.InstancedMesh(GEO_PREPARER, m, 1) : new THREE.Mesh(GEO_PREPARER, m);
+  : sorte === 'lot' ? new THREE.InstancedMesh(GEO_PREPARER, m, 1)
+  : sorte === 'lot colorié' ? Object.assign(new THREE.InstancedMesh(GEO_PREPARER, m, 1), { instanceColor: new THREE.InstancedBufferAttribute(new Float32Array(3), 3) })
+  : new THREE.Mesh(GEO_PREPARER, m);
 const preparation = { ms: 0, programmes: 0, rate: null };   // (pour les essais : ce qu'elle a duré, les programmes qu'il y a ensuite, et si elle a raté)
 async function preparerProgrammes() {
   const debut = performance.now(), dehors = new THREE.Group(), main = new THREE.Group();   // (jamais ajoutés au pays : on ne les voit pas)
@@ -25097,7 +25180,10 @@ async function preparerProgrammes() {
     const fin = await Promise.race([Promise.all([
       renderer.compileAsync(scene, camera), renderer.compileAsync(dehors, camera, scene),   // (avec les lumières, la brume et les reflets du pays)
       renderer.compileAsync(vmScene, vmCamera), renderer.compileAsync(main, vmCamera, vmScene), renderer.compileAsync(apercu.scene, apercu.camera),
-      ...(effetsImage ? [renderer.compileAsync(effetsImage.aPreparer, effetsImage.camera)] : [])]).then(() => 'fini'),   // (les effets d'image)
+      ...(effetsImage ? [renderer.compileAsync(effetsImage.aPreparer, effetsImage.camera)] : []),   // (les effets d'image)
+      // (la vision de détective : Three.js ne voit pas la matière que ces scènes imposent à tout ce qu'elles dessinent. Alors un objet de chaque
+      // sorte la porte ici, dans la scène, sans lumières : les gens en pièces, et ceux d'un seul bloc)
+      ...(chezWayne ? sceneDetective.map(s => { const g = new THREE.Group(); g.add(objetAPreparer(s.overrideMaterial, 'forme'), objetAPreparer(s.overrideMaterial, 'squelette')); return renderer.compileAsync(g, camera, s); }) : [])]).then(() => 'fini'),
       new Promise(ok => setTimeout(() => ok('plus de 15 s'), 15000))]);
     if (fin !== 'fini') preparation.rate = fin;
   } catch (e) { preparation.rate = String(e); }
@@ -25110,6 +25196,7 @@ majJoueur(0);
 if (CHAPITRE.heure != null) fixerHeure(CHAPITRE.heure);
 cacherDeLorean();
 { const t = tricheHeros(); if (t && !t.actif && !costumeCivil()) basculerTriche(t, false, enCivil()); }   // (Batman en civil : il le mettra avec H)
+A_PREPARER.push([joueurH.brasD.bas.material, 'forme', 'vm']);   // (sa manche, à la 1re personne : un tissu dessiné, chez Spiderman)
 await respirer(1);   // le pays est construit (la barre est pleine)
 // on n'attend plus que la carte graphique : le menu (et l'écran du chapitre) le disent
 etat('Préparation des images…');
