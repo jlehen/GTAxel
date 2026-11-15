@@ -368,12 +368,13 @@ const CHAPITRES = [
     civilFille: { veste: '#7d9cc4', chemise: '#f6efe2', jupe: '#2c3350', talons: '#5a3a26', cheveux: '#e2bf6a', lunettes: '#dfe9ef' }, touches: [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser'],
     ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
-    ['H', 'tu mets ton costume, et tu deviens {super} · H encore : tu repasses en civil (sans tes pouvoirs)'],
+    ['H', 'tu mets ton costume (trouvé à la 1re mission), et tu deviens {super} · H encore : tu repasses en civil (sans tes pouvoirs)'],
     ['J', "changer de costume (S.T.A.R. Labs en vend d'autres : ★ sur la carte)"],
     ['Maj 3 fois, vite', "en costume : t'envoler · encore 3 fois : arrêter de voler"],
     ['En volant', 'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping'],
     ['9', 'en costume : les yeux laser (garde le clic gauche enfoncé)'],
     ['G', 'en costume : soulever la voiture la plus proche (même un bus) · clic gauche : la lancer · G encore : la reposer'],
+    ['Clic gauche', 'en costume, un missile de Luthor dans les mains : le lancer vers le ciel'],
     ['X, O, R, B', 'en costume, une fois achetés à S.T.A.R. Labs : le souffle glacé, la vision à rayons X, la super-vitesse (avec Maj), le super-cri'],
     ['K', 'Krypto, le super-chien (une fois acheté) : il vient, ou il rentre à la maison'],
     ['E', 'monter / descendre (voiture, bateau), ascenseur, magasin de S.T.A.R. Labs'],
@@ -381,15 +382,15 @@ const CHAPITRES = [
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
     ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
-    'Tu es <b>{heros}</b>, en civil. <b>H</b> : tu mets ton costume, et tu deviens <b>{super}</b> ! <b>H</b> encore : tu repasses en civil.',
+    'Tu es <b>{heros}</b>, en civil. Ton costume, tu le trouveras à ta 1re mission (<b>point jaune</b>). Ensuite, <b>H</b> : tu deviens <b>{super}</b> ! <b>H</b> encore : tu repasses en civil.',
     'En costume, <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.',
     'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.',
     'En costume, <b>9</b> : les yeux laser. Et tomber de très haut ne te fait rien : tout s\'écrase autour de toi !',
     'En costume, <b>G</b> : tu soulèves la voiture la plus proche, même un bus ! Clic gauche : tu la lances. <b>G</b> encore : tu la reposes.',
-    "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte) : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.",
+    "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte), ouvert après ta 1re mission : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.",
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
-    'La DeLorean a disparu : elle est cachée dans la cour du vieux théâtre (<b>♣</b> sur la carte). Retrouve-la, puis tiens 88 miles à l\'heure pendant 3 secondes.',
+    "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par la Forteresse de Solitude. À la fin, la DeLorean est cachée dans la cour du vieux théâtre (<b>♣</b> sur la carte) : retrouve-la, puis tiens 88 miles à l'heure pendant 3 secondes.",
   ]},
   { ville: 'New York', heros: 'Peter Parker', heroine: 'Gwen Stacy', super: 'Spiderman', superFille: 'Spider-Gwen', triche: 'SPIDERMAN', logo: 'spiderman', cachette: 'a', sansReproche: true, touches: [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
@@ -2319,6 +2320,121 @@ const TRADUCTIONS = {
   "« Tout n'est pas encore prêt. Reviens après ta première mission ! »": { de: '„Noch ist nicht alles fertig. Komm nach deiner ersten Mission wieder!“', en: '"Not everything is ready yet. Come back after your first mission!"', gsw: '«Es isch no nöd alles parat. Chumm nach dinere erschte Mission wider!»' },
   "« Bonjour, {super} ! J'ai de nouvelles inventions pour toi. »": { de: '„Hallo, {super}! Ich habe neue Erfindungen für dich.“', en: '"Hello, {super}! I have new inventions for you."', gsw: '«Hoi, {super}! Ich ha neui Erfindige für dich.»' },
   '« Bonjour, {nom} ! Dites à {super} que tout est prêt. »': { de: '„Guten Tag, {nom}! Sagen Sie {super}, dass alles bereit ist.“', en: '"Hello, {nom}! Tell {super} that everything is ready."', gsw: '«Grüezi, {nom}! Säged Sie im {super}, dass alles parat isch.»' },
+  // les missions de Superman (chapitre 4, missions 1 à 4) : la Forteresse de Solitude, Lois Lane, le grand pont, les missiles de Lex Luthor
+  'Le Daily Planet t\'envoie en reportage tout au nord, où la glace brille d\'une lueur verte : monte dans l\'hélicoptère du journal, sur la place (E). Son pilote t\'emmène !': {
+    de: 'Der Daily Planet schickt dich für eine Reportage ganz in den Norden, wo das Eis grün leuchtet: Steig in den Hubschrauber der Zeitung, auf dem Platz (E). Sein Pilot fliegt dich hin!',
+    en: 'The Daily Planet is sending you on a report far to the north, where the ice glows green: get into the newspaper\'s helicopter, on the square (E). Its pilot will fly you there!',
+    gsw: 'De Daily Planet schickt dich für e Reportage ganz in Norde, wo s Iis grüen lüüchtet: Stiig in Heli vo de Ziitig, uf em Platz (E). Sin Pilot flüügt dich hi!' },
+  'La lueur verte : un cristal brille dans la glace... Approche-toi (point jaune)': { de: 'Das grüne Leuchten: Ein Kristall leuchtet im Eis... Geh hin (gelber Punkt)', en: 'The green glow: a crystal shines in the ice... Walk up to it (yellow dot)', gsw: 'S grüene Lüüchte: En Kristall lüüchtet im Iis... Gang hi (gääle Punkt)' },
+  'Ton premier vol ! Maj 3 fois, vite : tu t\'envoles. Chaque Maj de plus : encore plus vite ! Rentre à Metropolis, et pose-toi sur le toit du Daily Planet (point jaune)': {
+    de: 'Dein erster Flug! 3-mal schnell Shift: Du fliegst los. Jedes weitere Shift: noch schneller! Flieg zurück nach Metropolis und lande auf dem Dach des Daily Planet (gelber Punkt)',
+    en: 'Your first flight! Shift 3 times, fast: you take off. Each extra Shift: even faster! Fly back to Metropolis, and land on the roof of the Daily Planet (yellow dot)',
+    gsw: 'Din erschte Flug! 3 Mal schnäll Shift: Du flüügsch los. Jedes Shift meh: no schnäller! Flüüg zrugg uf Metropolis und land uf em Dach vom Daily Planet (gääle Punkt)' },
+  'LE PILOTE': { de: 'DER PILOT', en: 'THE PILOT', gsw: 'DE PILOT' },
+  '« Accroche-toi, on décolle ! »': { de: '„Halt dich fest, wir heben ab!“', en: '"Hold on, we\'re taking off!"', gsw: '«Heb di fescht, mir hebed ab!»' },
+  '« Je ne peux pas aller plus près... La lueur verte, c\'est là-bas, devant toi ! »': { de: '„Näher kann ich nicht ran... Das grüne Leuchten ist da vorne, vor dir!“', en: '"I can\'t get any closer... The green glow is over there, in front of you!"', gsw: '«Nöcher chan ich nöd... S grüene Lüüchte isch det vorne, vor dir!»' },
+  'Le pilote t\'emmène tout au nord : regarde la ville (souris)... et la lueur verte, au loin !': { de: 'Der Pilot fliegt dich ganz in den Norden: Schau dir die Stadt an (Maus)... und das grüne Leuchten in der Ferne!', en: 'The pilot is flying you far to the north: look at the city (mouse)... and the green glow, far away!', gsw: 'De Pilot flüügt dich ganz in Norde: Lueg d Stadt aa (Muus)... und s grüene Lüüchte, wiit wäg!' },
+  "Le pilote t'emmène : attends d'être arrivé !": { de: 'Der Pilot fliegt dich hin: Warte, bis ihr angekommen seid!', en: "The pilot is flying you there: wait until you've arrived!", gsw: 'De Pilot flüügt dich hi: Wart, bis er aachoo sind!' },
+  '« Mon fils... Je suis ton père, Jor-El. Tu viens de Krypton, une planète qui n\'existe plus. »': { de: '„Mein Sohn... Ich bin dein Vater, Jor-El. Du kommst von Krypton, einem Planeten, den es nicht mehr gibt.“', en: '"My son... I am your father, Jor-El. You come from Krypton, a planet that no longer exists."', gsw: '«Min Sohn... Ich bi din Vater, de Jor-El. Du chunnsch vo Krypton, emene Planet, wos nüme git.»' },
+  '« Ma fille... Je suis ton père, Zor-El. Tu viens de Krypton, une planète qui n\'existe plus. »': { de: '„Meine Tochter... Ich bin dein Vater, Zor-El. Du kommst von Krypton, einem Planeten, den es nicht mehr gibt.“', en: '"My daughter... I am your father, Zor-El. You come from Krypton, a planet that no longer exists."', gsw: '«Mini Tochter... Ich bi din Vater, de Zor-El. Du chunnsch vo Krypton, emene Planet, wos nüme git.»' },
+  '« Sous le soleil jaune de la Terre, tu peux voler, et tes yeux lancent des rayons. Protège les gens. »': { de: '„Unter der gelben Sonne der Erde kannst du fliegen, und deine Augen schießen Strahlen. Beschütze die Menschen.“', en: '"Under the Earth\'s yellow sun, you can fly, and your eyes shoot beams. Protect people."', gsw: '«Under de gääle Sunne vo de Erde chasch flüüge, und dini Auge schüüssed Strahle. Beschütz d Lüüt.»' },
+  '« Voici ton costume. Le S, c\'est le blason de notre famille : il veut dire « espoir ». Va, mon fils ! »': { de: '„Hier ist dein Anzug. Das S ist das Wappen unserer Familie: Es bedeutet „Hoffnung“. Geh, mein Sohn!“', en: '"Here is your suit. The S is our family crest: it means "hope". Go, my son!"', gsw: '«Da isch dis Kostüm. S S isch s Wappe vo üsere Familie: Es heisst «Hoffnig». Gang, min Sohn!»' },
+  '« Voici ton costume. Le S, c\'est le blason de notre famille : il veut dire « espoir ». Va, ma fille ! »': { de: '„Hier ist dein Anzug. Das S ist das Wappen unserer Familie: Es bedeutet „Hoffnung“. Geh, meine Tochter!“', en: '"Here is your suit. The S is our family crest: it means "hope". Go, my daughter!"', gsw: '«Da isch dis Kostüm. S S isch s Wappe vo üsere Familie: Es heisst «Hoffnig». Gang, mini Tochter!»' },
+  'L\'hélicoptère penche au bord du toit, son pilote dedans ! Vole tout près de lui (point jaune) : il va glisser. G : soulève-le': { de: 'Der Hubschrauber kippt am Dachrand, der Pilot ist drin! Flieg ganz nah an ihn heran (gelber Punkt): Er wird rutschen. G: Heb ihn hoch', en: 'The helicopter is tipping over the edge of the roof, with the pilot inside! Fly right up to it (yellow dot): it\'s going to slip. G: lift it', gsw: 'De Heli chippt am Dachrand, de Pilot isch drin! Flüüg ganz nöch zue em (gääle Punkt): Er rutscht glii. G: Heb en uf' },
+  'Raté... L\'hélicoptère est de nouveau au bord du toit : recommence !': { de: 'Daneben... Der Hubschrauber ist wieder am Dachrand: Versuch es nochmal!', en: 'Missed... The helicopter is back at the edge of the roof: try again!', gsw: 'Verpasst... De Heli isch wider am Dachrand: Probier s nomal!' },
+  "Trop haut : descends d'abord pour la reposer": { de: 'Zu hoch: Flieg zuerst tiefer, um es abzustellen', en: 'Too high: go lower first to put it down', gsw: 'Z höch: Flüüg zersch abe, zum s abstelle' },
+  'Vite, rattrape-le : il tombe dans 4 s !': { de: 'Schnell, fang es auf: Es fällt in 4 s!', en: 'Quick, catch it: it falls in 4 s!', gsw: 'Schnäll, fang s uf: Es gheit in 4 s!' },
+  'Remonte-les sur la route, un par un : vole tout près, G pour le soulever, G encore pour le reposer · encore {n} · le prochain tombe dans {t} s': { de: 'Hol sie zurück auf die Straße, einen nach dem anderen: Flieg ganz nah heran, G zum Hochheben, G nochmal zum Abstellen · noch {n} · der nächste fällt in {t} s', en: 'Bring them back up onto the road, one by one: fly up close, G to lift, G again to put down · {n} left · the next one falls in {t} s', gsw: 'Hol sie zrugg uf d Strass, eis nach em andere: Flüüg ganz nöch ane, G zum Ufhebe, G nomal zum Abstelle · no {n} · s nächscht gheit in {t} s' },
+  'tu mets ton costume (trouvé à la 1re mission), et tu deviens {super} · H encore : tu repasses en civil (sans tes pouvoirs)': {
+    de: 'du ziehst dein Kostüm an (gefunden in der 1. Mission) und wirst {super} · H nochmal: wieder in Zivil (ohne deine Kräfte)',
+    en: 'you put on your suit (found in the 1st mission) and become {super} · H again: back in plain clothes (without your powers)',
+    gsw: 'du leisch dis Kostüm aa (gfunde i de 1. Mission) und wirsch {super} · H nomal: wider in Zivil (ohni dini Chräft)' },
+  'en costume, un missile de Luthor dans les mains : le lancer vers le ciel': { de: 'im Kostüm, mit einer Rakete von Luthor in den Händen: sie in den Himmel werfen', en: 'in your suit, holding one of Luthor\'s missiles: throw it into the sky', gsw: 'im Kostüm, mit ere Rakete vom Luthor i de Händ: sie in Himmel ue wärfe' },
+  "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte), ouvert après ta 1re mission : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.": {
+    de: 'Der Laden von <b>S.T.A.R. Labs</b> (★ auf der Karte), offen nach deiner 1. Mission: andere Kostüme, neue Kräfte, Verbesserungen und Krypto, der Superhund! <b>J</b>: Kostüm wechseln.',
+    en: 'The <b>S.T.A.R. Labs</b> shop (★ on the map), open after your 1st mission: other suits, new powers, upgrades, and Krypto the Superdog! <b>J</b>: change suit.',
+    gsw: 'De Lade vo <b>S.T.A.R. Labs</b> (★ uf de Charte), offe nach dinere 1. Mission: anderi Kostüm, neui Chräft, Verbesserige und Krypto, de Superhund! <b>J</b>: Kostüm wächsle.' },
+  "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par la Forteresse de Solitude. À la fin, la DeLorean est cachée dans la cour du vieux théâtre (<b>♣</b> sur la carte) : retrouve-la, puis tiens 88 miles à l'heure pendant 3 secondes.": {
+    de: 'Folge dem <b>gelben Punkt</b>: Deine Missionen warten auf dich, angefangen mit der Festung der Einsamkeit. Am Ende ist der DeLorean im Hof des alten Theaters versteckt (<b>♣</b> auf der Karte): Finde ihn, und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
+    en: 'Follow the <b>yellow dot</b>: your missions are waiting, starting with the Fortress of Solitude. At the end, the DeLorean is hidden in the courtyard of the old theater (<b>♣</b> on the map): find it, then hold 88 miles per hour for 3 seconds.',
+    gsw: 'Folg em <b>gääle Punkt</b>: Dini Missione warted uf dich, aagfange mit de Feschtig vo de Einsamkeit. Am Schluss isch de DeLorean im Hof vom alte Theater versteckt (<b>♣</b> uf de Charte): Find en, und heb denn 3 Sekunde lang 88 Meile pro Stund.' },
+  'La Forteresse de Solitude': { de: 'Die Festung der Einsamkeit', en: 'The Fortress of Solitude', gsw: 'D Feschtig vo de Einsamkeit' },
+  'Lois tombe du toit': { de: 'Lois fällt vom Dach', en: 'Lois falls from the roof', gsw: 'D Lois gheit vom Dach' },
+  'Le bus sur le pont': { de: 'Der Bus auf der Brücke', en: 'The bus on the bridge', gsw: 'De Bus uf de Brugg' },
+  'Les deux missiles': { de: 'Die zwei Raketen', en: 'The two missiles', gsw: 'Di zwei Rakete' },
+  'Hélicoptère du Daily Planet': { de: 'Hubschrauber des Daily Planet', en: 'Daily Planet helicopter', gsw: 'Heli vom Daily Planet' },
+  'Bus de Metropolis': { de: 'Bus von Metropolis', en: 'Metropolis bus', gsw: 'Bus vo Metropolis' },
+  'Missile de Luthor': { de: 'Rakete von Luthor', en: "Luthor's missile", gsw: 'Rakete vom Luthor' },
+  '{ami} : « Lois Lane monte dans l\'hélicoptère du Daily Planet... et il fait un drôle de bruit ! » Mets ton costume (H), et vole jusqu\'au toit du Daily Planet (point jaune)': {
+    de: '{ami}: „Lois Lane steigt in den Hubschrauber des Daily Planet... und er macht ein komisches Geräusch!“ Zieh dein Kostüm an (H) und flieg zum Dach des Daily Planet (gelber Punkt)',
+    en: '{ami}: "Lois Lane is getting into the Daily Planet helicopter... and it\'s making a funny noise!" Put on your suit (H), and fly to the roof of the Daily Planet (yellow dot)',
+    gsw: '{ami}: «D Lois Lane stiigt in Heli vom Daily Planet... und er macht es komisches Grüüsch!» Leg dis Kostüm aa (H) und flüüg ufs Dach vom Daily Planet (gääle Punkt)' },
+  'Le grand pont de Metropolis tremble ! La police l\'a fermé, mais un bus plein de gens est encore dessus : vole jusqu\'au pont (point jaune)': {
+    de: 'Die große Brücke von Metropolis bebt! Die Polizei hat sie gesperrt, aber ein Bus voller Leute ist noch darauf: Flieg zur Brücke (gelber Punkt)',
+    en: 'The great Metropolis bridge is shaking! The police have closed it, but a bus full of people is still on it: fly to the bridge (yellow dot)',
+    gsw: 'Di grossi Brugg vo Metropolis zitteret! D Polizei hät sie gsperrt, aber en Bus voll Lüüt isch no druf: Flüüg zur Brugg (gääle Punkt)' },
+  'Lex Luthor veut te parler : il t\'attend devant sa tour, LexCorp (point jaune)': { de: 'Lex Luthor will mit dir reden: Er wartet vor seinem Turm, LexCorp, auf dich (gelber Punkt)', en: 'Lex Luthor wants to talk to you: he is waiting in front of his tower, LexCorp (yellow dot)', gsw: 'De Lex Luthor wott mit dir rede: Er wartet vor sim Turm, LexCorp, uf dich (gääle Punkt)' },
+  'Les missiles de Luthor ! Rattrape-les en volant (touche-les), puis clic gauche : lance-les vers le ciel. Ou tes yeux laser (9), loin des gens. Encore {n} · le prochain arrive dans {t} s': {
+    de: 'Luthors Raketen! Fang sie im Flug (berühre sie), dann Linksklick: Wirf sie in den Himmel. Oder deine Laseraugen (9), weit weg von den Leuten. Noch {n} · die nächste kommt in {t} s an',
+    en: 'Luthor\'s missiles! Catch them in flight (touch them), then left click: throw them into the sky. Or your laser eyes (9), away from people. {n} left · the next one arrives in {t} s',
+    gsw: 'Em Luthor sini Rakete! Fang sie im Flug (berüehr sie), denn Linksklick: Wirf sie in Himmel ue. Oder dini Laserauge (9), wiit wäg vo de Lüüt. No {n} · di nächscht chunnt in {t} s aa' },
+  'LE CRISTAL !': { de: 'DER KRISTALL!', en: 'THE CRYSTAL!', gsw: 'DE KRISTALL!' },
+  'Il brille de plus en plus fort... La glace tremble !': { de: 'Er leuchtet immer heller... Das Eis bebt!', en: 'It shines brighter and brighter... The ice is shaking!', gsw: 'Er lüüchtet immer heller... S Iis zitteret!' },
+  'LA FORTERESSE DE SOLITUDE !': { de: 'DIE FESTUNG DER EINSAMKEIT!', en: 'THE FORTRESS OF SOLITUDE!', gsw: 'D FESCHTIG VO DE EINSAMKEIT!' },
+  'Un palais de cristal, venu de Krypton...': { de: 'Ein Palast aus Kristall, von Krypton...', en: 'A crystal palace, from Krypton...', gsw: 'En Palascht us Kristall, vo Krypton...' },
+  'Ton costume ! H : le mettre ou l\'enlever, partout · Maj 3 fois, vite : tu t\'envoles': { de: 'Dein Kostüm! H: es überall an- oder ausziehen · 3-mal schnell Shift: Du fliegst los', en: 'Your suit! H: put it on or take it off, anywhere · Shift 3 times, fast: you take off', gsw: 'Dis Kostüm! H: überall aa- oder uszieh · 3 Mal schnäll Shift: Du flüügsch los' },
+  'LE MOTEUR LÂCHE !': { de: 'DER MOTOR FÄLLT AUS!', en: 'THE ENGINE FAILS!', gsw: 'DE MOTOR GIT DE GEIST UF!' },
+  'L\'hélicoptère du Daily Planet tombe en tournant...': { de: 'Der Hubschrauber des Daily Planet stürzt trudelnd ab...', en: 'The Daily Planet helicopter is spinning down...', gsw: 'De Heli vom Daily Planet gheit dräiend abe...' },
+  'LOIS TOMBE !': { de: 'LOIS FÄLLT!', en: 'LOIS IS FALLING!', gsw: 'D LOIS GHEIT!' },
+  '« Au secours ! »': { de: '„Hilfe!“', en: '"Help!"', gsw: '«Hilfe!»' },
+  '« Vous me tenez ? Mais... qui vous tient, vous ? »': { de: '„Sie halten mich? Aber... wer hält denn Sie?“', en: '"You\'ve got me? But... who\'s got you?"', gsw: '«Sie händ mich? Aber... wer hät denn Sie?»' },
+  'Les pompiers l\'ont rattrapée dans leur grand coussin. On recommence !': { de: 'Die Feuerwehr hat sie mit ihrem großen Sprungkissen aufgefangen. Noch einmal!', en: 'The firefighters caught her in their big air cushion. Let\'s try again!', gsw: 'D Füürwehr hät sie mit ihrem grosse Sprungchüssi ufgfange. Nomal!' },
+  'Tu l\'as lâchée !': { de: 'Du hast sie fallen lassen!', en: 'You dropped her!', gsw: 'Du häsch sie la gheie!' },
+  '« Merci, {super} ! L\'hélicoptère... le pilote est encore dedans ! »': { de: '„Danke, {super}! Der Hubschrauber... der Pilot ist noch drin!“', en: '"Thank you, {super}! The helicopter... the pilot is still inside!"', gsw: '«Merci, {super}! De Heli... de Pilot isch no drin!»' },
+  'IL GLISSE !': { de: 'ER RUTSCHT!', en: "IT'S SLIPPING!", gsw: 'ER RUTSCHT!' },
+  'L\'hélicoptère tombe du toit ! G, tout près : soulève-le': { de: 'Der Hubschrauber fällt vom Dach! G, ganz nah: Heb ihn hoch', en: 'The helicopter is falling off the roof! G, up close: lift it', gsw: 'De Heli gheit vom Dach! G, ganz nöch: Heb en uf' },
+  'L\'hélicoptère s\'est écrasé... son pilote a sauté à temps. On recommence !': { de: 'Der Hubschrauber ist abgestürzt... sein Pilot ist rechtzeitig abgesprungen. Noch einmal!', en: 'The helicopter crashed... its pilot jumped out in time. Let\'s try again!', gsw: 'De Heli isch abgstürzt... sin Pilot isch rächtziitig abgsprunge. Nomal!' },
+  'L\'hélicoptère est tombé sur le coussin des pompiers : son pilote est sauf. On recommence !': { de: 'Der Hubschrauber ist auf das Sprungkissen der Feuerwehr gefallen: Sein Pilot ist unverletzt. Noch einmal!', en: 'The helicopter fell onto the firefighters\' air cushion: its pilot is safe. Let\'s try again!', gsw: 'De Heli isch ufs Sprungchüssi vo de Füürwehr gheit: Sin Pilot isch gsund. Nomal!' },
+  '« Merci, {super} ! » Lois et le pilote sont sains et saufs': { de: '„Danke, {super}!“ Lois und der Pilot sind wohlauf', en: '"Thank you, {super}!" Lois and the pilot are safe and sound', gsw: '«Merci, {super}!» D Lois und de Pilot sind gsund und munter' },
+  'LE PONT S\'ÉCROULE !': { de: 'DIE BRÜCKE STÜRZT EIN!', en: 'THE BRIDGE IS COLLAPSING!', gsw: 'D BRUGG STÜRZT II!' },
+  'Le bus et les voitures pendent au bord du trou !': { de: 'Der Bus und die Autos hängen am Rand des Lochs!', en: 'The bus and the cars are hanging over the edge of the hole!', gsw: 'De Bus und d Autos hanged am Rand vom Loch!' },
+  '« Merci, {super} ! » Encore {n}': { de: '„Danke, {super}!“ Noch {n}', en: '"Thank you, {super}!" {n} left', gsw: '«Merci, {super}!» No {n}' },
+  'Tout le monde est sain et sauf !': { de: 'Alle sind wohlauf!', en: 'Everyone is safe and sound!', gsw: 'Alli sind gsund und munter!' },
+  'PLOUF...': { de: 'PLATSCH...', en: 'SPLASH...', gsw: 'PLATSCH...' },
+  'Les pompiers ont repêché tout le monde. On recommence !': { de: 'Die Feuerwehr hat alle aus dem Wasser gefischt. Noch einmal!', en: 'The firefighters fished everyone out. Let\'s try again!', gsw: 'D Füürwehr hät alli us em Wasser gfischt. Nomal!' },
+  '« Bonjour, Metropolis ! Ici Lex Luthor, sur tous vos écrans. »': { de: '„Guten Tag, Metropolis! Hier ist Lex Luthor, auf all euren Bildschirmen.“', en: '"Good day, Metropolis! This is Lex Luthor, on all your screens."', gsw: '«Grüezi, Metropolis! Da isch de Lex Luthor, uf all euche Bildschirm.»' },
+  '« Alors, {super}, tu sauves tout le monde ? Voyons si tu sais être à deux endroits à la fois ! »': { de: '„Na, {super}, du rettest also alle? Mal sehen, ob du an zwei Orten gleichzeitig sein kannst!“', en: '"So, {super}, you save everyone? Let\'s see if you can be in two places at once!"', gsw: '«So, {super}, du rettisch also alli? Mal luege, öb du a zwei Ort gliichziitig chasch sii!»' },
+  '« Regarde le toit de ma tour : mes missiles partent, un vers chaque bout de la ville. Bonne chance ! »': { de: '„Schau auf das Dach meines Turms: Meine Raketen starten, eine zu jedem Ende der Stadt. Viel Glück!“', en: '"Look at the roof of my tower: my missiles are taking off, one to each end of the city. Good luck!"', gsw: '«Lueg ufs Dach vo mim Turm: Mini Rakete started, eini zu jedem Änd vo de Stadt. Vil Glück!»' },
+  'LES MISSILES !': { de: 'DIE RAKETEN!', en: 'THE MISSILES!', gsw: 'D RAKETE!' },
+  'Ils partent du toit de LexCorp !': { de: 'Sie starten vom Dach von LexCorp!', en: 'They are taking off from the roof of LexCorp!', gsw: 'Sie started vom Dach vo LexCorp!' },
+  '« Encore un ! »': { de: '„Noch eine!“', en: '"Another one!"', gsw: '«No eini!»' },
+  'METROPOLIS EST SAUVÉE !': { de: 'METROPOLIS IST GERETTET!', en: 'METROPOLIS IS SAVED!', gsw: 'METROPOLIS ISCH GRETTET!' },
+  'Lex Luthor, sur les écrans : « Je t\'aurai la prochaine fois, {super} ! »': { de: 'Lex Luthor, auf den Bildschirmen: „Nächstes Mal kriege ich dich, {super}!“', en: 'Lex Luthor, on the screens: "I\'ll get you next time, {super}!"', gsw: 'De Lex Luthor, uf de Bildschirm: «s nächscht Mal verwütsch ich dich, {super}!»' },
+  'ATTRAPÉ !': { de: 'GEFANGEN!', en: 'CAUGHT!', gsw: 'GFANGE!' },
+  'Clic gauche : lance-le vers le ciel !': { de: 'Linksklick: Wirf sie in den Himmel!', en: 'Left click: throw it into the sky!', gsw: 'Linksklick: Wirf sie in Himmel ue!' },
+  'Un missile est arrivé... La police avait fait évacuer : personne n\'est blessé. Luthor en tire un autre !': { de: 'Eine Rakete ist eingeschlagen... Die Polizei hatte alles räumen lassen: Niemand ist verletzt. Luthor schießt eine neue ab!', en: 'A missile has hit... The police had evacuated the area: nobody is hurt. Luthor fires another one!', gsw: 'E Rakete isch iigschlage... D Polizei hät alles la rüme: Niemer isch verletzt. De Luthor schüüsst e neui ab!' },
+  'MISSILE ARRÊTÉ !': { de: 'RAKETE GESTOPPT!', en: 'MISSILE STOPPED!', gsw: 'RAKETE GSTOPPT!' },
+  'Il a explosé tout là-haut, sans faire de mal': { de: 'Sie ist ganz oben explodiert, ohne Schaden anzurichten', en: 'It exploded high up in the sky, harmlessly', gsw: 'Sie isch ganz obe explodiert, ohni Schade' },
+  'MISSILE DÉTRUIT !': { de: 'RAKETE ZERSTÖRT!', en: 'MISSILE DESTROYED!', gsw: 'RAKETE KAPUTT!' },
+  'Encore {n}': { de: 'Noch {n}', en: '{n} left', gsw: 'No {n}' },
+  'Tes mains sont prises : lance le missile vers le ciel (clic gauche)': { de: 'Deine Hände sind voll: Wirf die Rakete in den Himmel (Linksklick)', en: 'Your hands are full: throw the missile into the sky (left click)', gsw: 'Dini Händ sind voll: Wirf d Rakete in Himmel ue (Linksklick)' },
+  'La Forteresse de Solitude sort de la glace !': { de: 'Die Festung der Einsamkeit wächst aus dem Eis!', en: 'The Fortress of Solitude rises from the ice!', gsw: 'D Feschtig vo de Einsamkeit wachst us em Iis!' },
+  'Écoute l\'hologramme de ton père, au cœur de la Forteresse...': { de: 'Hör dem Hologramm deines Vaters zu, im Herzen der Festung...', en: 'Listen to your father\'s hologram, at the heart of the Fortress...', gsw: 'Los em Hologramm vo dim Vater zue, im Härz vo de Feschtig...' },
+  'H : ton costume ! Puis Maj 3 fois, vite : tu t\'envoles. Pose-toi sur le toit du Daily Planet (point jaune)': { de: 'H: dein Kostüm! Dann 3-mal schnell Shift: Du fliegst los. Lande auf dem Dach des Daily Planet (gelber Punkt)', en: 'H: your suit! Then Shift 3 times, fast: you take off. Land on the roof of the Daily Planet (yellow dot)', gsw: 'H: dis Kostüm! Denn 3 Mal schnäll Shift: Du flüügsch los. Land uf em Dach vom Daily Planet (gääle Punkt)' },
+  'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Vole jusqu\'au toit du Daily Planet (point jaune)': { de: 'Zieh dein Kostüm an (H), dann 3-mal schnell Shift: Du fliegst los. Flieg zum Dach des Daily Planet (gelber Punkt)', en: 'Put on your suit (H), then Shift 3 times, fast: you take off. Fly to the roof of the Daily Planet (yellow dot)', gsw: 'Leg dis Kostüm aa (H), denn 3 Mal schnäll Shift: Du flüügsch los. Flüüg ufs Dach vom Daily Planet (gääle Punkt)' },
+  'L\'hélicoptère tombe en tournant... il va s\'écraser sur le toit !': { de: 'Der Hubschrauber stürzt trudelnd ab... er wird auf dem Dach aufschlagen!', en: 'The helicopter is spinning down... it\'s going to crash on the roof!', gsw: 'De Heli gheit dräiend abe... er schlaht uf em Dach uf!' },
+  'LOIS TOMBE ! Rattrape-la en volant : touche-la, avant le sol !': { de: 'LOIS FÄLLT! Fang sie im Flug auf: Berühre sie, bevor sie am Boden ist!', en: 'LOIS IS FALLING! Catch her in flight: touch her, before she hits the ground!', gsw: 'D LOIS GHEIT! Fang sie im Flug uf: Berüehr sie, bevor sie am Bode isch!' },
+  'Tu la tiens ! Pose-toi (sur le toit, ou en bas) pour la déposer': { de: 'Du hast sie! Lande (auf dem Dach oder unten), um sie abzusetzen', en: 'You\'ve got her! Land (on the roof, or down below) to set her down', gsw: 'Du häsch sie! Land (uf em Dach oder unde), zum sie abstelle' },
+  'Tu le tiens ! Repose-le doucement : descends tout près du toit (ou du sol), puis G': { de: 'Du hast ihn! Stell ihn vorsichtig ab: Flieg ganz nah ans Dach (oder an den Boden), dann G', en: 'You\'ve got it! Put it down gently: get very close to the roof (or the ground), then G', gsw: 'Du häsch en! Stell en vorsichtig ab: Flüüg ganz nöch as Dach (oder an Bode), denn G' },
+  'Il tombe ! Vole tout près de lui, et G : soulève-le (le pilote est dedans)': { de: 'Er fällt! Flieg ganz nah an ihn heran, und G: Heb ihn hoch (der Pilot ist drin)', en: 'It\'s falling! Fly right up to it, and G: lift it (the pilot is inside)', gsw: 'Er gheit! Flüüg ganz nöch zue em, und G: Heb en uf (de Pilot isch drin)' },
+  'Raté... Ça recommence !': { de: 'Daneben... Noch einmal!', en: 'Missed... Try again!', gsw: 'Verpasst... Nomal!' },
+  'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Vole jusqu\'au grand pont (point jaune)': { de: 'Zieh dein Kostüm an (H), dann 3-mal schnell Shift: Du fliegst los. Flieg zur großen Brücke (gelber Punkt)', en: 'Put on your suit (H), then Shift 3 times, fast: you take off. Fly to the great bridge (yellow dot)', gsw: 'Leg dis Kostüm aa (H), denn 3 Mal schnäll Shift: Du flüügsch los. Flüüg zur grosse Brugg (gääle Punkt)' },
+  'Repose-le sur la route, loin du trou : descends tout près de la route, puis G · encore {n}': { de: 'Stell es auf der Straße ab, weit weg vom Loch: Flieg ganz nah an die Straße, dann G · noch {n}', en: 'Put it down on the road, away from the hole: get very close to the road, then G · {n} left', gsw: 'Stell s uf de Strass ab, wiit wäg vom Loch: Flüüg ganz nöch a d Strass, denn G · no {n}' },
+  'Plouf... Ça recommence !': { de: 'Platsch... Noch einmal!', en: 'Splash... Try again!', gsw: 'Platsch... Nomal!' },
+  'Lex Luthor parle sur tous les écrans de Metropolis... Regarde le toit de sa tour !': { de: 'Lex Luthor spricht auf allen Bildschirmen von Metropolis... Schau auf das Dach seines Turms!', en: 'Lex Luthor is speaking on every screen in Metropolis... Look at the roof of his tower!', gsw: 'De Lex Luthor redt uf allne Bildschirm vo Metropolis... Lueg ufs Dach vo sim Turm!' },
+  'Il monte vers le ciel... Encore {n}': { de: 'Sie steigt in den Himmel... Noch {n}', en: 'It\'s rising into the sky... {n} left', gsw: 'Sie stiigt in Himmel ue... No {n}' },
+  'Tu tiens un missile ! Clic gauche : lance-le vers le ciel · encore {n}': { de: 'Du hältst eine Rakete! Linksklick: Wirf sie in den Himmel · noch {n}', en: 'You\'re holding a missile! Left click: throw it into the sky · {n} left', gsw: 'Du häsch e Rakete! Linksklick: Wirf sie in Himmel ue · no {n}' },
+  'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Rattrape les missiles de Luthor ! Encore {n}': { de: 'Zieh dein Kostüm an (H), dann 3-mal schnell Shift: Du fliegst los. Fang Luthors Raketen! Noch {n}', en: 'Put on your suit (H), then Shift 3 times, fast: you take off. Catch Luthor\'s missiles! {n} left', gsw: 'Leg dis Kostüm aa (H), denn 3 Mal schnäll Shift: Du flüügsch los. Fang em Luthor sini Rakete! No {n}' },
 };
 
 // la langue choisie : le navigateur s'en souvient pour la prochaine fois
@@ -3074,6 +3190,12 @@ const VOITURES = [
     son: { grave: 24, aigu: 95, rapports: 8, rauque: 0.8, volume: 0.07 } },
   { nom: 'Hélicoptère du Joker', modele: 'helico', vitesse: 40, acceleration: 8, virage: 1, chance: 0, vole: 'helico', montee: 8, couleurs: ['#5a2a7a'],
     son: { grave: 14, aigu: 24, rapports: 1, rauque: 1, volume: 0.09, petarade: true } },
+  // Metropolis (missions de Superman) : l'hélicoptère blanc du Daily Planet, et un bus bleu de la ville. On ne les croise jamais : ce sont
+  // ses missions qui les amènent
+  { nom: 'Hélicoptère du Daily Planet', modele: 'helico', vitesse: 45, acceleration: 9, virage: 1, chance: 0, vole: 'helico', montee: 8, couleurs: ['#ecebe4'],
+    son: { grave: 14, aigu: 24, rapports: 1, rauque: 1, volume: 0.09, petarade: true } },
+  { nom: 'Bus de Metropolis', modele: 'bus', vitesse: 26, acceleration: 7, virage: 0.75, chance: 0, couleurs: ['#2f6fd0'],
+    son: { grave: 30, aigu: 110, rapports: 5, rauque: 0.7, volume: 0.07 } },
 ];
 
 // =====================================================================
@@ -3175,6 +3297,10 @@ const ENNEMIS = {
   acolyte:   { nom: 'Homme du Sphinx', vie: 80, arme: 2, degats: 5, precision: 0.3, vue: 45, tir: [1.2, 2.2], vitesse: 4.5 },
   sphinx:    { nom: 'Le Sphinx',     vie: 500, degats: 5, precision: 0.35, vue: 60, tir: [1.5, 2.2], vitesse: 3.6, recule: 8, explosions: 0.3, boss: true,
     bombe: [5, 8], degatsBombe: 8, renforts: 2, souffle: 0.9 },
+  // Metropolis (le chapitre de Superman) : Lois Lane, la journaliste du Daily Planet (on ne peut pas la blesser), et les missiles de Lex
+  // Luthor (vie : un seul rayon des yeux laser le fait exploser, ou deux coups de poing)
+  lois:      { nom: 'Lois Lane',     vie: 100 },
+  missile:   { nom: 'Missile de Luthor', vie: 30 },
 };
 
 // =====================================================================
@@ -3880,8 +4006,8 @@ const MISSIONS = [
 // =====================================================================
 //  LES MISSIONS DES AUTRES CHAPITRES (voir CHAPITRES, tout en haut du fichier) : une liste par chapitre, comme MISSIONS.
 //  La dernière mission de chaque chapitre : retrouver la DeLorean, cachée dans la ville (sa cachette, dans CHAPITRES), puis repartir avec.
-//  Au chapitre 2, Iron Man a ses 12 missions avant celle-là ; au chapitre 3, Batman en a 12 ; pour Superman et Spiderman, il n'y a encore
-//  que la DeLorean.
+//  Au chapitre 2, Iron Man a ses 12 missions avant celle-là ; au chapitre 3, Batman en a 12 ; au chapitre 4, Superman a ses 4 premières ;
+//  pour Spiderman, il n'y a encore que la DeLorean.
 // =====================================================================
 const RETROUVER_DELOREAN = { nom: 'La DeLorean a disparu', recompense: 1000, etapes: [
   { type: 'conduire', voiture: 'DeLorean', texte: 'La DeLorean est repartie toute seule : retrouve-la (point jaune) et monte dedans' },
@@ -4164,10 +4290,58 @@ const DELOREAN_SPHINX = { nom: 'Les devinettes du Sphinx', recompense: 20000, ev
   { type: 'conduire', voiture: 'DeLorean', texte: 'La DeLorean est dans la cour du repaire du Sphinx : monte dedans (point jaune)' },
   RETROUVER_DELOREAN.etapes[1],
 ]};
+// les missions de Superman, à Metropolis (chapitre 4) : d'abord la Forteresse de Solitude, où il trouve son costume, puis Lois Lane, le grand
+// pont, et Lex Luthor. Superman tue les méchants, comme Iron Man (pas comme Batman) : seuls les passants coûtent l'amende. Avec la fille du
+// menu (Supergirl), ce sont les mêmes : c'est Superman qui l'aide ({ami}). Les nouvelles étapes :
+//  passager (voiture : l'hélicoptère qui attend sur la place « pose » ('X' : celle du départ) ; monte dedans (E) : son pilote t'emmène tout
+//    seul, au-dessus de la ville, jusqu'à l'endroit « vers » (un endroit de POINTS), en « secondes » secondes. Rien à piloter : regarde la
+//    ville avec la souris ! Il te dépose, et repart)
+//  cristal (un cristal vert brille dans la glace, là où dort la Forteresse de Solitude : approche-toi à pied. La Forteresse sort de la glace,
+//    et l'hologramme de ton père te donne ton costume)
+//  lois (l'hélicoptère du Daily Planet tourne autour du toit, avec Lois Lane : quand tu arrives, en costume, il s'écrase au bord du toit, et
+//    Lois tombe ! Rattrape-la en volant (touche-la), pose-toi pour la déposer, puis rattrape l'hélicoptère, qui glisse du toit : G pour le
+//    soulever, G encore pour le reposer, sur le toit ou en bas. Raté : les pompiers les rattrapent dans leur grand coussin, et ça recommence)
+//  pont (le grand pont s'écroule en son milieu quand tu arrives, en costume : les « vehicules » pendent au bord du trou (le premier, c'est le
+//    bus, avec ses passagers). Remonte-les sur la route, un par un : vole tout près, G pour le soulever, G encore pour le reposer. Ils glissent
+//    l'un après l'autre : chacun tient « secondes » secondes. Un qui tombe à l'eau : les pompiers repêchent les gens, et ça recommence)
+//  missiles (Lex Luthor parle sur tous les écrans de la ville, puis tire ses missiles du toit de LexCorp : un vers chacune des « cibles »
+//    [colonne, ligne], à « vitesse » m/s. Rattrape-les en volant (touche-les), puis clic gauche : tu les lances vers le ciel, où ils explosent
+//    sans faire de mal. Ou tes yeux laser (9), loin des gens. Un missile qui arrive : la police avait fait évacuer, et Luthor en tire un autre)
+//  Pour « aller », point : un endroit de Metropolis ('glaces' : devant la Forteresse de Solitude ; 'toitPlanet' : le toit du Daily Planet, partout) ;
+//    elan : pendant cette étape, à plus de 150 m du but, Superman vole déjà comme s'il avait appuyé tant de fois sur Maj (6 : 84 m/s ; son
+//    premier vol, pour rentrer vite)
+// forteresse: true (sur la mission) : avant de l'avoir finie, pas de costume (H ne fait rien), la Forteresse de Solitude dort sous la glace, et
+// le magasin de S.T.A.R. Labs attend
+const MISSIONS_METROPOLIS = [
+  // Superman (1978) et Man of Steel (2013) : Clark Kent part tout au nord, dans la glace, où brille un cristal vert venu de Krypton. La Forteresse
+  // de Solitude en sort, et l'hologramme de son père, Jor-El (Zor-El, pour Kara), lui dit qui il est... et lui donne son costume
+  { nom: 'La Forteresse de Solitude', recompense: 10000, forteresse: true, etapes: [
+    { type: 'passager', voiture: 'Hélicoptère du Daily Planet', pose: 'X', vers: 'glaces', secondes: 22,
+      texte: 'Le Daily Planet t\'envoie en reportage tout au nord, où la glace brille d\'une lueur verte : monte dans l\'hélicoptère du journal, sur la place (E). Son pilote t\'emmène !' },
+    { type: 'cristal', texte: 'La lueur verte : un cristal brille dans la glace... Approche-toi (point jaune)' },
+    { type: 'aller', point: 'toitPlanet', elan: 6, texte: 'Ton premier vol ! Maj 3 fois, vite : tu t\'envoles. Chaque Maj de plus : encore plus vite ! Rentre à Metropolis, et pose-toi sur le toit du Daily Planet (point jaune)' },
+  ]},
+  // Superman (1978) : l'hélicoptère du Daily Planet s'écrase au bord du toit, et Lois Lane tombe dans le vide... « Je vous tiens ! » « Vous me
+  // tenez ? Mais qui vous tient, vous ? »
+  { nom: 'Lois tombe du toit', recompense: 20000, etapes: [
+    { type: 'lois', texte: '{ami} : « Lois Lane monte dans l\'hélicoptère du Daily Planet... et il fait un drôle de bruit ! » Mets ton costume (H), et vole jusqu\'au toit du Daily Planet (point jaune)' },
+  ]},
+  // un grand classique de Superman : le pont s'écroule sous la circulation, avec un bus plein de gens dessus
+  { nom: 'Le bus sur le pont', recompense: 30000, etapes: [
+    { type: 'pont', secondes: 15, vehicules: ['Bus de Metropolis', 'Classique', 'Coccinelle', 'Skoda Kodiaq'],
+      texte: 'Le grand pont de Metropolis tremble ! La police l\'a fermé, mais un bus plein de gens est encore dessus : vole jusqu\'au pont (point jaune)' },
+  ]},
+  // Superman (1978) : Lex Luthor tire deux missiles, un vers chaque bout du pays. Superman ne peut pas être à deux endroits à la fois... ou si ?
+  { nom: 'Les deux missiles', recompense: 50000, etapes: [
+    { type: 'aller', lieu: 'ł', texte: 'Lex Luthor veut te parler : il t\'attend devant sa tour, LexCorp (point jaune)' },
+    { type: 'missiles', cibles: [[57, 12], [37, 46]], vitesse: 20,
+      texte: 'Les missiles de Luthor ! Rattrape-les en volant (touche-les), puis clic gauche : lance-les vers le ciel. Ou tes yeux laser (9), loin des gens. Encore {n} · le prochain arrive dans {t} s' },
+  ]},
+];
 const MISSIONS_CHAPITRES = {
   2: [...MISSIONS_MALIBU, DELOREAN_MANDARIN],
   3: [...MISSIONS_GOTHAM, DELOREAN_SPHINX],
-  4: [RETROUVER_DELOREAN],
+  4: [...MISSIONS_METROPOLIS, RETROUVER_DELOREAN],
   5: [RETROUVER_DELOREAN],
 };
 // les missions d'un chapitre (1 = le premier), et celles du chapitre où l'on est
@@ -5535,8 +5709,14 @@ const grilleRoutes = new Map();   // case de rangement -> morceaux de route qui 
     ROUTES.push(pts);
   }
 }
+// le morceau du grand pont de Metropolis qui s'écroule (mission « Le bus sur le pont ») : { r : sa route, k0, k1 : les numéros de ses deux
+// bouts (deux piliers), a : le premier, L : sa longueur, ux, uz : le long du pont, g : son groupe, ouvert : il est tombé (il y a un trou),
+// ferme : la police a fermé le pont, noeuds : les points du réseau des routes sur le pont }. Voir plus bas, avec les routes de campagne
+let trouPont = null;
+const dansTrouPont = (x, z) => { const T = trouPont, dx = x - T.a.x, dz = z - T.a.z, s = dx * T.ux + dz * T.uz; return s > 0 && s < T.L && Math.abs(dz * T.ux - dx * T.uz) < 7; };
 // le morceau de route le plus proche de (x, z), à moins de 6 m : { d, y, pont, s : le morceau } ou null
 function routeSous(x, z) {
+  if (trouPont?.ouvert && dansTrouPont(x, z)) return null;   // (le trou du pont écroulé : plus de route, l'eau est dessous)
   let r = null;
   for (const s of grilleRoutes.get(Math.floor(x / CELL) * 1000 + Math.floor(z / CELL)) || []) {
     const dx = s.bx - s.ax, dz = s.bz - s.az, t = clamp(((x - s.ax) * dx + (z - s.az) * dz) / (dx * dx + dz * dz || 1), 0, 1);
@@ -9407,6 +9587,27 @@ for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
     for (const dx of [R / 2 + 2, R / 2 + S - 2]) { const z = new THREE.PlaneGeometry(R - 2, 3).rotateX(-Math.PI / 2).rotateY(Math.PI / 2); z.translate(n.x + dx, y + 0.025, n.z); ajouterGeo('zebra', z); }
   }
 }
+// le morceau du grand pont qui s'écroulera (PONT_SUSPENDU, à Metropolis) : au milieu, entre ses deux tours, d'un pilier au suivant (les piliers
+// sont tous les 3 points de la route, à partir du deuxième point du pont : voir plus bas). Son tablier est à part, dans son groupe (aPart)
+if (PONT_SUSPENDU) {
+  const plusPres = ([c, l]) => { // le point de route au-dessus de l'eau le plus près de cette case (comme pour les tours, plus bas)
+    const q = centre(c, l); let m = null;
+    for (const r of ROUTES) r.forEach((p, k) => { if (p.pont && k > 0 && k < r.length - 1 && (!m || dist(p, q) < dist(m.r[m.k], q))) m = { r, k }; });
+    return m;
+  };
+  const [A, B] = PONT_SUSPENDU.tours.map(plusPres);
+  if (A && B && A.r === B.r && Math.abs(A.k - B.k) > 6) {
+    const r = A.r, milieu = Math.round((A.k + B.k) / 2);
+    let d0 = milieu; while (d0 > 0 && r[d0 - 1].pont) d0--;
+    const debut = Math.max(0, d0 - 1), k0 = debut + 1 + 3 * Math.floor((milieu - debut - 1) / 3), k1 = k0 + 3, a = r[k0], b = r[k1], L = Math.hypot(b.x - a.x, b.z - a.z);
+    trouPont = { r, k0, k1, a, L, ux: (b.x - a.x) / L, uz: (b.z - a.z) / L, y: (a.y + b.y) / 2, geos: {}, boites: [], interieurs: 0, ouvert: false, ferme: false, noeuds: new Set() };
+    // les points du réseau des routes sur le pont (du bord de l'eau à l'autre) : la police les ferme pendant la mission
+    let d1 = milieu; while (d1 < r.length - 1 && r[d1 + 1].pont) d1++;
+    const surLePont = r.slice(Math.max(0, d0 - 1), d1 + 2);
+    NOEUDS.forEach((n, k) => { if (surLePont.some(p => Math.abs(p.x - n.x) < 0.01 && Math.abs(p.z - n.z) < 0.01)) trouPont.noeuds.add(k); });
+    trouPont.bouts = [r[Math.max(0, d0 - 1)], r[Math.min(r.length - 1, d1 + 1)]];   // (là où le pont commence et finit)
+  }
+}
 // les routes de campagne : un ruban de 10 m qui suit la route. Sur l'eau, c'est un pont, avec ses piliers
 {
   // un ruban horizontal (ou ses deux flancs si bas > 0), le long des points de la route, du numéro de à jusqua. Chaque point prend sa direction
@@ -9432,9 +9633,18 @@ for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
     g.computeVertexNormals();
     ajouterGeo(mat, g);
   };
+  // le même ruban, sauf sur le morceau du grand pont qui s'écroulera (trouPont) : ce bout-là va dans son groupe à part
+  const rubanTrou = (route, de, jusqua, ...reste) => {
+    jusqua = Math.min(jusqua, route.length - 1);
+    const T = trouPont;
+    if (!T || route !== T.r || jusqua <= T.k0 || de >= T.k1) { ruban(route, de, jusqua, ...reste); return; }
+    if (T.k0 > de) ruban(route, de, T.k0, ...reste);
+    aPart = T; ruban(route, Math.max(de, T.k0), Math.min(jusqua, T.k1), ...reste); aPart = null;
+    if (jusqua > T.k1) ruban(route, T.k1, jusqua, ...reste);
+  };
   for (const pts of ROUTES) {
     // la route, coupée en tronçons (pour les ranger dans les bons morceaux)
-    for (let k = 0; k < pts.length - 1; k += 12) ruban(pts, k, k + 12, 5, 0.02, 'routeCampagne');
+    for (let k = 0; k < pts.length - 1; k += 12) rubanTrou(pts, k, k + 12, 5, 0.02, 'routeCampagne');
     // les ponts : les parties au-dessus de l'eau
     let debut = -1;
     for (let k = 0; k <= pts.length; k++) {
@@ -9443,8 +9653,8 @@ for (let j = 0; j <= NBZ; j++) for (let i = 0; i <= NBX; i++) {
       if (!surPont && debut >= 0) {
         const fin = Math.min(pts.length - 1, k), p = pts.slice(debut, fin + 1);
         // le tablier : ses deux flancs, et son dessous (sans lui, vu d'un bateau, le pont était transparent : la route ne se voit que d'en haut)
-        ruban(pts, debut, fin, 5.2, 0, 'beton2', 1.2); ruban(pts, debut, fin, 5.2, -1.2, 'beton2');
-        ruban(pts, debut, fin, 5.1, 1, 'rambarde', 0.12); ruban(pts, debut, fin, 5.1, 0.6, 'rambarde', 0.1);   // (les garde-fous : voir retenuPont)
+        rubanTrou(pts, debut, fin, 5.2, 0, 'beton2', 1.2); rubanTrou(pts, debut, fin, 5.2, -1.2, 'beton2');
+        rubanTrou(pts, debut, fin, 5.1, 1, 'rambarde', 0.12); rubanTrou(pts, debut, fin, 5.1, 0.6, 'rambarde', 0.1);   // (les garde-fous : voir retenuPont)
         p.forEach((q, n) => { const t = hauteurTerrain(q.x, q.z); if (n % 3 === 1 && t < q.y - 3) {
           ajouterGeo('beton2', new THREE.CylinderGeometry(0.8, 0.9, q.y - 1.2 - t, 10).translate(q.x, (q.y - 1.2 + t) / 2, q.z));
           ajouterCollision(q.x - 0.8, q.z - 0.8, q.x + 0.8, q.z + 0.8, q.y - 1.3, t - 5); } });
@@ -10278,6 +10488,7 @@ if (villaStark) {
 }
 for (const S of SOUTERRAINS) { await respirer(0.71); S.g = new THREE.Group(); scene.add(S.g); fusionner(S.geos, S.g); S.geos = null; }   // les souterrains de Gotham, chacun dans son groupe
 if (forteresse) { forteresse.g = new THREE.Group(); scene.add(forteresse.g); fusionner(forteresse.geos, forteresse.g); forteresse.geos = null; }   // la Forteresse de Solitude, dans son groupe
+if (trouPont) { trouPont.g = new THREE.Group(); scene.add(trouPont.g); fusionner(trouPont.geos, trouPont.g); trouPont.geos = null; }   // le morceau du grand pont qui s'écroulera
 for (const [k, m] of [...morceaux.values()].entries()) {
   await respirer(0.71 + 0.19 * k / morceaux.size);   // (un morceau à la fois : voir respirer)
   // (detail : un très grand étage des ombres ne dessine pas les bâtiments fusionnés, ni les lampadaires, les bornes et les troncs : voir utileDansEtage)
@@ -11502,7 +11713,7 @@ function placeDansForme(i, m, a, k) {
 function dansLePays(g) { let vu = 2; for (let o = g; o; o = o.parent) { if (o === scene) return vu; if (!o.visible) vu = 1; } return 0; }
 // essaie de lui faire sa forme (s'il est dessiné, et pas en pièces pour un moment)
 function essayerForme(h, t) {
-  if (!h.g || h.helico || h.forme || h.enPieces > t || dansLePays(h.g) !== 2) return;
+  if (!h.g || h.helico || h.missile || h.forme || h.enPieces > t || dansLePays(h.g) !== 2) return;
   if (!faireForme(h)) h.enPieces = t + 2000;   // (rien à coller : on réessaiera dans 2 s)
 }
 // Avant chaque image du pays (renderer.render est retouché pour l'appeler : voir plus bas, après les ombres des personnages) : les formes
@@ -12252,7 +12463,7 @@ function formesBlindage(nom) {
   return cacheBlindage[nom] = { rouille: fusion(rouille), acier: fusion(acier) };
 }
 const estBlindee = v => !!(v && (v.blindee || v.type.blinde));
-const pasDeTole = v => !!(v.type.bateau || v.type.vole);   // un bateau, un avion ou un hélicoptère : il ne s'abîme pas et ne part pas en accident   // une voiture blindée : par le garagiste, ou un fourgon de la police
+const pasDeTole = v => !!(v.type.bateau || v.type.vole) && !v.tole;   // un bateau, un avion ou un hélicoptère : il ne s'abîme pas et ne part pas en accident (sauf celui d'une mission qui a « tole » : l'hélicoptère du Daily Planet, qui tombe du toit)   // une voiture blindée : par le garagiste, ou un fourgon de la police
 const faitFigures = v => !!(v?.enVol && (v.type.vole === 'avion' || (v.type.vitesseVol && v.envole)));   // ce qui fait des tonneaux et des loopings en l'air (Maj + Q, D, Espace ou C) : l'avion, la Batmobile
 const enAvion = v => !!(v?.type.vole || (v?.enVol && v.type.vitesseVol));   // ce que la souris dirige, comme un avion : un avion, un hélicoptère, la Batmobile en l'air
 function modeleVoiture(type, couleur, police, blindee = false) {
@@ -13262,8 +13473,8 @@ const TENUES = {
 // devant le magasin qu'ils braquent. Les drones et les hélicoptères attaquent aussi, mais ils volent partout (VOLANTS), comme Whiplash, qui
 // marche dans les rues. Les vigiles, les chiens et les gangs restent aussi dans leur pâté, mais n'attaquent que si on les provoque
 const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'raza', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron', 'voyou', 'homme', 'pingouin',
-  'bandit', 'doubleFace', 'mercenaire', 'bane', 'clown', 'joker', 'acolyte', 'sphinx'], VIGILES = ['garde', 'chien', 'gang'];
-const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron'], LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron', 'raza', 'pingouin', 'doubleFace', 'bane', 'joker', 'sphinx'];
+  'bandit', 'doubleFace', 'mercenaire', 'bane', 'clown', 'joker', 'acolyte', 'sphinx', 'missile'], VIGILES = ['garde', 'chien', 'gang'];
+const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron', 'missile'], LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron', 'raza', 'pingouin', 'doubleFace', 'bane', 'joker', 'sphinx', 'missile'];
 const LIBRES = ['whiplash', 'killian', 'hulk'];   // ceux-là ne gardent pas de pâté : ils vont où ils veulent
 const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
 const personnes = [];
@@ -14946,8 +15157,9 @@ function costume() {
 const tricheHeros = () => TRICHES.find(t => t.code === CHAPITRE.triche);   // le code du héros du chapitre
 const costumeCivil = () => { const t = tricheHeros(); return !!t && !t.ironman && enCivil(); };   // (Iron Man, lui, a son armure : voir mettreIronman)
 // pas encore de costume ? Il le gagne à la fin de la mission « La Batcave » (celle qui a costume: true, dans MISSIONS_GOTHAM), comme la toute
-// première armure de Tony Stark (voir sansArmure)
-const sansCostume = () => chezWayne && !wayne.gagne;   // (wayne.gagne : voir « Les missions de Batman »)
+// première armure de Tony Stark (voir sansArmure). Au chapitre de Superman, l'hologramme de son père le lui donne, dans la Forteresse de
+// Solitude (la mission qui a forteresse: true)
+const sansCostume = () => (chezWayne && !wayne.gagne) || (chezClark && !star.forteresse && !star.cristal);   // (wayne.gagne : voir « Les missions de Batman » ; star.forteresse, star.cristal : « Les missions de Superman »)
 // en civil, une touche de Batman (G, 9, B, un gadget) : « mets ton costume », ou, s'il ne l'a pas encore gagné, « pas encore de costume »
 function enCivilSans(texte) { if (sansCostume()) pasEncoreDeCostume(); else annonce('', tr(texte), 2); }
 function pasEncoreDeCostume() { annonce(tr('PAS ENCORE DE COSTUME'), tr('Ton costume, tu vas le trouver : suis le point jaune !'), 3); bip(300, 200, 0.1, 'square', 0.1); }   // (H, J, N)
@@ -16328,7 +16540,7 @@ function majWayne(dt) {
 // laser, vie, force : le niveau de chaque amélioration ; krypto : Krypto est à lui, et kryptoLa : il le suit (K) ; forteresse : la mission 1
 // est finie (le magasin est ouvert). Et pendant le jeu : voitRayonsX (la vision à rayons X est allumée), superVitesse (la super-vitesse
 // aussi), tGlace et tCri (les secondes avant de souffler ou de crier encore). Au chapitre 1, rien de tout ça : le code SUPERMAN est comme avant
-const star = { costumes: [0], costume: 0, krypto: false, kryptoLa: true, forteresse: true, voitRayonsX: false, superVitesse: false, tGlace: 0, tCri: 0 };
+const star = { costumes: [0], costume: 0, krypto: false, kryptoLa: true, forteresse: true, cristal: false, voitRayonsX: false, superVitesse: false, tGlace: 0, tCri: 0 };
 for (const c in POUVOIRS_STAR) star[c] = false;
 for (const c in AMELIORATIONS_STAR) star[c] = 1;
 if (chezClark) { // (par leur nom : on peut ajouter un costume au tableau sans tout casser)
@@ -16342,6 +16554,7 @@ if (chezClark) { // (par leur nom : on peut ajouter un costume au tableau sans t
   // Metropolis) : une partie d'avant l'a ouvert si elle a passé cette mission, ou fini le chapitre. Tant qu'aucune mission n'a forteresse:
   // true, il est toujours ouvert
   star.forteresse = !!m.forteresse || missionPassee('forteresse');
+  star.cristal = !star.forteresse && !!m.cristal;   // (il a déjà son costume : l'hologramme de la Forteresse le lui a donné)
   J.vie = vieMax();
 }
 // le magasin est-il encore fermé ? (comme sansCostume, au chapitre de Batman : c'est la mission 1 qui l'ouvre)
@@ -16579,13 +16792,14 @@ let souleve = null;   // { v, t : depuis quand il la tient, de : d'où elle part
 let camPorte = 0;     // (la caméra recule et monte, pour qu'on voie par-dessus la voiture : voir majCamera)
 function superForce() {
   if (souleve) { reposerVoiture(); return; }
+  if (missileTenu()) { annonce('', tr('Tes mains sont prises : lance le missile vers le ciel (clic gauche)'), 2); return; }
   if (sansGadgets()) { enCivilSans('Mets ton costume (H) pour soulever les voitures'); return; }
   if (J.voiture || J.robot || J.mort || J.monorail || J.telesiege) { annonce('', tr("Descends d'abord !"), 1.5); return; }
   if (J.nage) { annonce('', tr("Sors de l'eau d'abord !"), 1.5); return; }
   // la voiture la plus proche : à porteeForce mètres au plus de sa carrosserie
   let v = null, mieux = Infinity;
   for (const o of voitures) {
-    if (o.detruite || o.coule || o.supprimer || o.fantome || o.autopilote || o.arriveeBat || o.entree || o.embarque || o.type.glisse || o.rail || Math.abs(o.y - J.y) > 3) continue;
+    if (o.detruite || o.coule || o.supprimer || o.fantome || o.autopilote || o.arriveeBat || o.entree || o.embarque || o.type.glisse || o.rail || o.anime || Math.abs(o.y - J.y) > 3) continue;
     const dc = Math.min(...o.cercles.map(lz => dist(local(o, 0, lz), J))) - o.rayon;
     if (dc < mieux) { mieux = dc; v = o; }
   }
@@ -16655,7 +16869,7 @@ function reposerVoiture() {
   if (S.pose || S.t < 0.45) return;
   const l = v.forme.largeur / 2 + 1.3, ici = { x: J.x + Math.sin(J.angleCorps) * l, z: J.z + Math.cos(J.angleCorps) * l };
   let sol = hauteurSol(ici.x, ici.z, J.y + 1.5);
-  if (J.y - hauteurSol(J.x, J.z, J.y + 0.5) > 6) { annonce('', tr("Trop haut : descends d'abord pour la reposer (ou lance-la : clic gauche)"), 2.5); return; }
+  if (J.y - hauteurSol(J.x, J.z, J.y + 0.5) > 6) { annonce('', tr(S.garde ? "Trop haut : descends d'abord pour la reposer" : "Trop haut : descends d'abord pour la reposer (ou lance-la : clic gauche)"), 2.5); return; }   // (avec des gens dedans, on ne la lance pas)
   if (Math.abs(sol - J.y) > 2.5 || dansBatiment(ici.x, sol + 1, ici.z) || EAU - sol > 1) { ici.x = J.x; ici.z = J.z; sol = hauteurSol(J.x, J.z, J.y + 0.5); }   // (devant lui, un mur, un trou, l'eau : sous lui)
   S.pose = 0.001; S.depart = V3().copy(v.accident.c); S.vers = { x: ici.x, y: sol, z: ici.z };
 }
@@ -17008,6 +17222,7 @@ function validerTriche() {
   if (t.action) { t.action(n); if (t.code !== 'MISSION' && t.code !== 'CHAPITRE') annonce('', tr(t.texte), 2.5); return; }
   // dans un chapitre de super-héros, son code est toujours allumé, et ceux des autres super-héros ne marchent pas
   if (CHAPITRE.triche && CHAPITRES.some(c => c.triche === t.code)) {
+    if (chezClark && t.code === CHAPITRE.triche && sansCostume()) { pasEncoreDeCostume(); return; }   // (avant la Forteresse de Solitude : H ne le mettrait pas)
     annonce('', t.code !== CHAPITRE.triche ? tr('Pas dans ce chapitre !') : costumeCivil() && !t.actif ? tr('Appuie sur H pour mettre ton costume') : tr('Tu es déjà {super} !', { super: nomSuper() }), 2);
     return;
   }
@@ -17118,7 +17333,7 @@ let tapesMaj = [];   // quand on a tapé Maj les 3 dernières fois
 function decoller() {
   if (J.voiture || J.robot || J.mort || J.ironman?.anim) return;
   if (J.superman) { J.superman = null; return; }
-  if (chezClark && sansGadgets()) { annonce('', tr('Mets ton costume (H) pour voler'), 2); bip(300, 200, 0.1, 'square', 0.1); return; }   // (au chapitre de Superman, en civil)
+  if (chezClark && sansGadgets()) { enCivilSans('Mets ton costume (H) pour voler'); bip(300, 200, 0.1, 'square', 0.1); return; }   // (au chapitre de Superman, en civil ; avant la Forteresse de Solitude : pas encore de costume)
   if (sansReacteur()) return;   // (mission « Iron Monger » : sans son réacteur, il ne vole plus)
   if (armureGelee() && armureIronman()) { annonce('', tr('Ton armure est gelée : attends que le givre fonde !'), 1.5); bip(300, 200, 0.1, 'square', 0.1); return; }   // (mission « Le premier vol »)
   if (enSecours()) { pasDeBatterie(); return; }   // (batterie vide : ses réacteurs n'ont plus la force de le soulever)
@@ -17289,6 +17504,7 @@ function action() {
   if (siege) { J.telesiege = siege; J.danse = 0; J.accroupi = false; if (J.voiture) Object.assign(J.voiture, { tour: 0, derape: 0, pas: 0, transition: 0 }); bip(500, 750, 0.3, 'sine', 0.15); return true; }
   if (tl) return true;
   if (J.voiture && J.voiture === bombeBane?.v && bombeBane.phase === 'emporte' && bombeBane.assezLoin) { sauterDuBat(); return true; }   // avec la bombe de Bane, assez loin de la terre : il saute du Bat
+  if (J.voiture?.anime) { annonce('', tr("Le pilote t'emmène : attends d'être arrivé !"), 1.5); return true; }   // (l'hélicoptère du Daily Planet, à la mission 1)
   if (J.voiture?.enVol) { annonce('', tr("Pose-toi d'abord !"), 1.5); return true; }   // pas en plein vol
   if (J.voiture) { if (!J.voiture.rail) sortirVoiture(); return true; }   // pas en plein looping. En plein accident (tonneaux, tête-à-queue), on peut : B.J. saute, et tombe par terre
   if (boutonProche() && !camp.ouvert && (!J.robot || J.robot.armure)) { appuyerBouton(); return true; }   // le bouton rouge du camp militaire (même depuis l'armure)
@@ -17624,6 +17840,7 @@ function blesser(p, degats, parJoueur = true) {
   if (p.type === 'extremis') extremisExplose(p);
   if (p.type === 'killian') { annonce(tr('KILLIAN VAINCU !'), tr("L'Extremis s'éteint : le vrai Mandarin ne fera plus de mal à personne"), 4); exploser(V3(p.x, p.y + 1, p.z), 6, 0, 0, p, false, false, false); }
   if (p.type === 'hulk') hulkCalme(p);   // (Hulk ne meurt pas : il se calme)
+  if (p.type === 'missile') missileDetruit(p);   // (un missile de Lex Luthor : il explose)
   if (p.type === 'pieton') { if (parJoueur) crime(1); if (!CHAPITRE.sansReproche && Math.random() < 0.6) creerObjet({ type: 'argent', montant: 10 + Math.floor(Math.random() * 60), x: p.x, z: p.z , y: p.y }); }   // (un héros ne fait pas les poches)
   if (p.type === 'flic') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
   if (p.type === 'garde') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
@@ -18162,7 +18379,8 @@ function superman(dt) {
   } else {
     const dx = Math.sin(J.lacet) * ct * av - Math.cos(J.lacet) * lat, dy = Math.sin(J.tangage) * av + monte, dz = Math.cos(J.lacet) * ct * av + Math.sin(J.lacet) * lat;
     if (!av && !lat && !monte) f.crans = 0;   // il s'arrête : il repart à la vitesse normale
-    const crans = armureIronman() && !(marche('jambeG') && marche('jambeD')) ? 0 : f.crans;   // (dans l'armure d'Iron Man, une jambe hors service : il n'accélère plus)
+    const etE = MISSIONS_CH[missionIndex]?.etapes[etapeIndex], elan = etE?.elan && dist(J, lieuEtape(etE) || J) > 150 ? etE.elan : 0;   // (le premier vol de Superman, à la mission 1 de Metropolis : loin du but, il file déjà, sans appuyer sur Maj)
+    const crans = armureIronman() && !(marche('jambeG') && marche('jambeD')) ? 0 : Math.max(f.crans, chezClark ? elan : 0);   // (dans l'armure d'Iron Man, une jambe hors service : il n'accélère plus)
     const secours = enSecours(), v = Math.min(R_.vitesseVolMax, R_.vitesseVol + (secours ? 0 : crans) * R_.vitesseVolMaj) * volIronman() * volSuperman() / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
     const vy = secours ? Math.min(dy * v, -IRONMAN.batterie.descente) : dy * v;   // (batterie vide : ses réacteurs n'ont plus la force de monter, ni d'aller vite ; il redescend doucement)
     f.vx += (dx * v - f.vx) * k; J.vy += (vy - J.vy) * k; f.vz += (dz * v - f.vz) * k;
@@ -18438,6 +18656,7 @@ function grimper(dt, vers) {
   animerHumain(joueurH, J.vitesse, dt);
 }
 function conduire(v, dt) {
+  if (v.anime) { v.anime(v, dt); J.vitesse = 0; return; }   // une mission le fait bouger, avec lui dedans (l'hélicoptère du Daily Planet, passager)
   if (v.type.vole) { piloterAeronef(v, dt, true); J.x = v.x; J.z = v.z; J.y = v.y; J.vitesse = Math.abs(v.vitesse); return; }
   if (v.enVol && v.type.vitesseVol) { // la Batmobile en l'air (une fois posée, elle roule comme une voiture)
     piloterBatmobile(v, dt, true);
@@ -19146,6 +19365,8 @@ function majPersonne(p, dt) {
   const d = dist(p, J);
   p.h.g.visible = d < (p.lourd ? 450 : 220);   // (Iron Monger, si grand, se voit de plus loin)
   if (p.h.helico) { majHelico(p, dt, d); return; }   // un hélicoptère du Mandarin : il vole, il tire, il tombe (voir « Les missions d'Iron Man »)
+  if (p.type === 'missile') { majMissile(p, dt, d); return; }   // un missile de Lex Luthor (voir « Les missions de Superman »)
+  if (p.type === 'lois') { majLois(p, dt); return; }            // Lois Lane, qui tombe du toit du Daily Planet
   if (p.type === 'hulk') { majHulk(p, dt, d); return; }   // Hulk (qui ne meurt pas : il se calme)
   if (p.type === 'passager' && p.etat) { majPassager(p, dt); return; }   // un passager d'Air Force One, qui tombe ou qu'Iron Man tient
   if (p.vol) { majVol(p, dt); return; }
@@ -19518,8 +19739,13 @@ function choisirSuivant(v, a, b) {
   if (!options.length) return a;   // cul-de-sac : demi-tour
   if (v.embarque?.dist) return options.reduce((m, n) => v.embarque.dist[n] < v.embarque.dist[m] ? n : m);   // (à Gotham : la police qui vient embarquer les assommés)
   if (v.police && distPolice && !invisible()) return options.reduce((m, n) => distPolice[n] < distPolice[m] ? n : m);
-  // une voiture arrêtée sur la rue qu'on prendrait, c'est un bouchon : on passe par une autre, s'il y en a une
-  const bouchon = n => voitures.some(o => o.conducteur && o.route.a === b && o.route.b === n && Math.abs(o.vitesse) < 1);
+  // le grand pont de Metropolis, fermé par la police (mission « Le bus sur le pont ») : on n'y va pas ; s'il n'y a pas d'autre chemin, demi-tour.
+  // Arrivée à son bout, demi-tour aussi ; une voiture déjà dessus le traverse, et s'en va
+  if (trouPont?.ferme && trouPont.noeuds.has(b) && !trouPont.noeuds.has(a)) return a;
+  if (trouPont?.ferme && !trouPont.noeuds.has(b)) { const o = options.filter(n => !trouPont.noeuds.has(n)); if (!o.length) return a; options = o; }
+  // une voiture arrêtée sur la rue qu'on prendrait, c'est un bouchon : on passe par une autre, s'il y en a une (une voiture qui a quelqu'un
+  // dedans mais pas de route, comme le bus d'une mission ou un hélicoptère, n'en fait pas)
+  const bouchon = n => voitures.some(o => o.conducteur && o.route?.a === b && o.route.b === n && Math.abs(o.vitesse) < 1);
   if (options.some(n => !bouchon(n))) options = options.filter(n => !bouchon(n));
   const cap = angleVers(NOEUDS[a], NOEUDS[b]), ecart = n => Math.abs(diffAngle(cap, angleVers(NOEUDS[b], NOEUDS[n])));
   const droit = options.reduce((m, n) => ecart(n) < ecart(m) ? n : m);
@@ -19693,7 +19919,8 @@ function majVoiture(v, dt) {
   if (v.telesiege) { majSkieur(v, dt); return; }   // un autre skieur sur une remontée
   if (v.gyro) { const on = Math.sin(temps * 14) > 0; v.gyro[0].material.emissiveIntensity = on ? 4 : 0.1; v.gyro[1].material.emissiveIntensity = on ? 0.1 : 4; }
   if (v === J.voiture) v.faute = true;   // sa voiture : ce qui lui arrivera sera sa faute (voir exploserVoiture)
-  else if (v.type.vole) piloterAeronef(v, dt, false);
+  else if (v.anime) v.anime(v, dt);   // une mission la fait bouger elle-même (l'hélicoptère du Daily Planet qui s'écrase : voir « Les missions de Superman »)
+  else if (v.type.vole && !v.accident) piloterAeronef(v, dt, false);   // (un hélicoptère qui tombe du toit, que Superman soulève : en accident, comme une voiture)
   else if (v.arriveeBat) majArriveeBat(v, dt);     // le Bat qui arrive du ciel (voir « Les missions de Batman »)
   else if (v.attend) majAttenteBat(v, dt);         // le Bat qui attend en l'air, au-dessus de l'eau
   else if (v.autopilote) majAutopilote(v, dt);     // le Bat qui file tout seul, avec la bombe de Bane
@@ -19831,8 +20058,8 @@ function majVoiture(v, dt) {
       }
     }
   }
-  if ((v.conducteur === 'civil' || v.epave) && (d > 280 || (d > 120 && derriere(v)))) v.supprimer = true;
-  if (v.coule > 25 && d > 60) v.supprimer = true;
+  if ((v.conducteur === 'civil' || v.epave) && !v.mission && (d > 280 || (d > 120 && derriere(v)))) v.supprimer = true;   // (pas un véhicule qu'une mission attend : voir vehiculeMission)
+  if (v.coule > 25 && d > 60 && !v.mission) v.supprimer = true;
   if (v.police && v.renfort && !v.conducteur && v !== J.voiture && d > 150) v.supprimer = true;
   if (v.detruite) { // elle brûle 12 s, et la carcasse disparaît au bout de 40 s quand on ne la voit plus
     v.detruite += dt; v.feu.visible = v.detruite < 12; v.feu.scale.setScalar(2 + Math.random());
@@ -19868,7 +20095,7 @@ const RESEAU = new Set();
 }
 function apparaitreVoiture(police, type) {
   const proches = [];
-  NOEUDS.forEach((n, k) => { const d = Math.hypot(n.x - J.x, n.z - J.z); if (d > 40 && d < 240 && n.voisins.length && RESEAU.has(k)) proches.push(k); });
+  NOEUDS.forEach((n, k) => { const d = Math.hypot(n.x - J.x, n.z - J.z); if (d > 40 && d < 240 && n.voisins.length && RESEAU.has(k) && !(trouPont?.ferme && trouPont.noeuds.has(k))) proches.push(k); });   // (pas sur le grand pont de Metropolis, quand la police l'a fermé)
   for (let essai = 0; essai < 20 && proches.length; essai++) {
     const a = hasard(proches), r = { a, b: hasard(NOEUDS[a].voisins), t: 0 };
     r.t = entre(0, longueurRoute(r));
@@ -19974,7 +20201,8 @@ function police(dt) {
 //  Missions
 // =====================================================================
 // B.J. est-il arrivé au lieu ? À moins de 4 m. Un lieu dans un bâtiment (la planque) a son rayon à lui, plus petit : il faut être dedans, pas sur le toit
-const arrive = l => l.rayon ? dist(J, l) < l.rayon && Math.abs(J.y - l.y) < (l.haut ?? 2) : dist(J, l) < 4;   // (haut : un endroit d'une mission de Batman, comme la corniche de la Batcave)
+const arrive = l => l.boite ? J.x > l.boite[0] && J.z > l.boite[1] && J.x < l.boite[2] && J.z < l.boite[3] && Math.abs(J.y - l.y) < l.haut   // (boite : tout un toit, celui du Daily Planet)
+  : l.rayon ? dist(J, l) < l.rayon && Math.abs(J.y - l.y) < (l.haut ?? 2) : dist(J, l) < 4;   // (haut : un endroit d'une mission de Batman, comme la corniche de la Batcave)
 // combien d'ennemis de cette sorte il reste à éliminer : ceux qui sont là, et ceux qui attendent encore d'arriver (les militaires du camp,
 // dans les baraques ; ceux d'une étape « eliminer » qui a un « nombre » : voir vague)
 const vivantsType = type => personnes.filter(p => p.type === type && p.vie > 0).length;
@@ -20006,6 +20234,11 @@ function etapeFinie(et) {
     case 'bombe': return bombeBane?.phase === 'fini';              // la bombe de Bane a explosé au large
     case 'parade': return !!parade && parade.creves >= parade.et.ballons;   // les ballons du Joker sont tous crevés
     case 'devinettes': return !!devinette && devinette.k >= DEVINETTES.length;   // les devinettes du Sphinx sont toutes résolues
+    case 'passager': return star.cristal || passage?.phase === 'repart' || passage?.phase === 'fini';   // l'hélicoptère l'a déposé (ou il a déjà son costume)
+    case 'cristal': return cristal?.phase === 'fini';              // la Forteresse de Solitude a poussé, et l'hologramme lui a donné son costume
+    case 'lois': return chuteLois?.phase === 'fini';               // Lois et l'hélicoptère du Daily Planet sont sains et saufs
+    case 'pont': return ecroulement?.phase === 'fini';             // le bus et les voitures sont remontés sur la route
+    case 'missiles': return missilesLuthor?.phase === 'fini';      // les missiles de Lex Luthor sont tous arrêtés
     case 'aller': { // sansPolice : 0 étoile. Déjà là où va l'étape d'après (un « aller » vers un point de Gotham : monté au grappin en haut du
       // clocher, sans passer par le parvis) : celle-ci est faite aussi
       const ets = MISSIONS_CH[missionIndex]?.etapes, apres = ets?.[ets.indexOf(et) + 1];
@@ -20066,6 +20299,13 @@ function cibleMission() {
   // la parade : le ballon le plus près de la foule ; les devinettes : le point d'interrogation (pendant un piège : l'homme du Sphinx le plus proche)
   if (et.type === 'parade') { const c = parade?.chars.filter(o => o.ballon).reduce((m, o) => !m || o.s > m.s ? o : m, null); return c ? c.ballon.getWorldPosition(V3()) : null; }
   if (et.type === 'devinettes') return !devinette ? null : devinette.piege ? proche(piegeDebout()) : devinette.trophee ? devinette.lieu : null;
+  // les missions de Superman : le cristal vert ; l'hélicoptère du Daily Planet, Lois qui tombe ; le véhicule du pont qui va glisser ; le missile
+  // de Luthor qui arrivera le premier
+  if (et.type === 'passager') return passage?.phase === 'attente' ? passage.v : null;
+  if (et.type === 'cristal') return cristal?.phase === 'attente' ? forteresse.coeur : null;
+  if (et.type === 'lois') return !chuteLois ? null : chuteLois.phase === 'tourne' ? POINTS.toitPlanet : chuteLois.phase === 'tombe' ? chuteLois.lois : chuteLois.phase === 'helico' && souleve?.v !== chuteLois.v ? chuteLois.v : null;
+  if (et.type === 'pont') return !ecroulement?.liste ? null : ecroulement.phase === 'attente' ? { ...trouPont.a, y: trouPont.y } : ecroulement.phase === 'casse' && !souleve ? ecroulement.liste[ecroulement.k]?.v || null : null;
+  if (et.type === 'missiles') return missilesLuthor?.phase !== 'vol' ? null : (missilesLuthor.liste.filter(M => M.p?.etat === 'vole').map(M => M.p).sort((a, b) => tempsMissile(a) - tempsMissile(b))[0] || null);
   if (et.type === 'eliminer' && et.nombre) return proche(personnes.filter(p => p.type === et.cible && p.vie > 0)) || lieuEtape(et);
   if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule && !v.fantome))
     || (et.voiture === 'DeLorean' ? placeDeLorean() : null);   // (la DeLorean a explosé : sa cachette, où une neuve va revenir)
@@ -20120,7 +20360,11 @@ function sauterMission(n) {
   // la Batmobile. Sauter avant ces missions les reprend
   const passee = cle => missionIndex > MISSIONS_CH.findIndex(x => x[cle]);
   if (chezStark) stark.evade = passee('armures');
-  if (chezClark) star.forteresse = passee('forteresse');   // (le magasin de S.T.A.R. Labs : ouvert après la mission 1)
+  if (chezClark) { // (le magasin de S.T.A.R. Labs est ouvert après la mission 1, et Superman a son costume ; avant, la Forteresse dort sous la glace)
+    star.forteresse = passee('forteresse'); star.cristal = false;
+    cacherForteresse(!star.forteresse);
+    if (sansCostume() && enCostumeSuper()) basculerTriche(tricheHeros(), false, false, false);   // (pas encore de costume : il repasse en civil)
+  }
   if (chezWayne) {
     wayne.gagne = passee('costume'); wayne.donnee = passee('batmobile');
     if (!wayne.gagne && enCostume()) basculerTriche(tricheHeros(), false, false, false);   // (pas encore de costume : il repasse en civil)
@@ -20282,6 +20526,11 @@ function commencerEtape(et) {
   if (et.type === 'bombe') commencerBombe(et);
   if (et.type === 'parade') commencerParade(et);
   if (et.type === 'devinettes') commencerDevinettes(et);
+  if (et.type === 'passager') commencerPassager(et);   // (les missions de Superman : voir plus bas)
+  if (et.type === 'cristal') commencerCristal(et);
+  if (et.type === 'lois') commencerLois(et);
+  if (et.type === 'pont') commencerPont(et);
+  if (et.type === 'missiles') commencerMissiles(et);
   if (et.cible === 'joker' && et.point === 'clocher' && POINTS.clocher) { combatJoker = { et, helico: false }; gardeFouClocher(true); }   // (ailleurs, un Joker qui se bat comme les autres)
 }
 function majEtape(et, dt) {
@@ -20314,6 +20563,7 @@ function majEtape(et, dt) {
   if (devinette) majDevinettes(dt);
   if (farces.length) majFarces(dt);
   if (helicoJoker) majHelicoJoker(dt);
+  if (chezClark) majMissionsSuperman(et, dt);   // (les missions de Superman : la Forteresse de Solitude, Lois, le pont, les missiles)
   // la villa tombée dans la mer revient comme avant, quand on est loin et que la mission n'a plus besoin d'elle
   if (villaStark?.tombee && !repechage && Math.hypot(J.x - villaStark.x, J.z - villaStark.z) > 600) releverVilla();
 }
@@ -20322,6 +20572,7 @@ function finirEtape(avant, suite) {   // (avant : l'étape qui finit ; suite : c
   puits = null; finirEntree(suite); finirPoursuite(suite); finirSuivre(); finirBrouiller();   // (les missions de Batman)
   finirBombesDF(); finirStade(suite); finirCombat(); livraison = null; finirBombe();
   finirParade(suite); finirDevinettes(); finirEpave(suite); finirFarces();
+  finirPassager(); finirCristal(); finirLois(); finirPont(); finirMissiles();   // (les missions de Superman)
   if (suite?.cible !== 'joker' || suite.point !== 'clocher') { combatJoker = null; gardeFouClocher(false); if (helicoJoker?.centre && helicoJoker.etat !== 'part') finirHelicoJoker(); }
   givre = null; $('givre').style.opacity = 0;
 }
@@ -20331,7 +20582,8 @@ function finirEtape(avant, suite) {   // (avant : l'étape qui finit ; suite : c
 function texteEtape(et) {
   const reste = et.type === 'anneaux' && anneaux ? anneaux.liste.length - anneaux.k : et.type === 'sauver' && sauvetage ? sauvetage.nombre - sauvetage.sauves
     : et.type === 'course' && course ? course.portes.length - course.k : et.type === 'chute' && chute ? tombent() : et.type === 'eliminer' ? resteAEliminer(et.cible) : et.type === 'poursuite' && poursuite ? Math.max(0, (et.coups || 3) - (poursuite.v.fuyard.coups || 0)) : et.type === 'brouiller' ? antennesRestantes()
-    : et.type === 'bombes' && bombesDF ? bombesDF.liste.length : et.type === 'parade' && parade ? et.ballons - parade.creves : et.type === 'devinettes' && devinette ? piegeDebout().length : 0;
+    : et.type === 'bombes' && bombesDF ? bombesDF.liste.length : et.type === 'parade' && parade ? et.ballons - parade.creves : et.type === 'devinettes' && devinette ? piegeDebout().length
+    : et.type === 'pont' && ecroulement?.liste ? ecroulement.liste.filter(q => !q.sauve).length : et.type === 'missiles' && missilesLuthor?.liste ? missilesLuthor.liste.filter(M => !M.fini).length : 0;
   const B = bombeBane, rev = combatBane?.phase === 'revanche';
   const texte = et.type === 'givre' && givre?.gel ? (givre.fond ? 'Le givre fond : vite, F pour rallumer tes réacteurs !' : "Ton armure gèle : ses réacteurs s'éteignent, tu tombes... attends que le givre fonde !")
     : et.type === 'sauver' && porte ? 'Descends le poser en bas, près des pompiers (point jaune) : pose-toi à côté d\'eux. Encore {n} à sauver'
@@ -20367,8 +20619,29 @@ function texteEtape(et) {
     : et.type === 'devinettes' && devinette?.affiche ? 'Devinette n° {k} : réponds avec 1, 2 ou 3 (une mauvaise réponse déclenche un piège !)'
     : et.type === 'devinettes' && devinette && !devinette.signal ? 'Le Sphinx t\'attend à la devinette n° {k} (point jaune) : la réponse de la précédente disait où !'
     : et.type === 'eliminer' && et.cible === 'joker' && combatJoker?.helico && helicoJoker ? 'Le Joker s\'enfuit, pendu à l\'échelle de son hélicoptère ! Vise-le, et G (ou clic gauche, le grappin en main) : ton grappin !'
+    // les missions de Superman : ce qu'il faut faire tout de suite
+    : et.type === 'passager' && passage?.phase === 'vol' ? 'Le pilote t\'emmène tout au nord : regarde la ville (souris)... et la lueur verte, au loin !'
+    : et.type === 'cristal' && cristal?.phase === 'pousse' ? 'La Forteresse de Solitude sort de la glace !'
+    : et.type === 'cristal' && cristal?.phase === 'holo' ? 'Écoute l\'hologramme de ton père, au cœur de la Forteresse...'
+    : et.type === 'aller' && et.point === 'toitPlanet' && !enCostumeSuper() ? 'H : ton costume ! Puis Maj 3 fois, vite : tu t\'envoles. Pose-toi sur le toit du Daily Planet (point jaune)'
+    : et.type === 'lois' && chuteLois?.phase === 'tourne' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Vole jusqu\'au toit du Daily Planet (point jaune)'
+    : et.type === 'lois' && chuteLois?.phase === 'crash' ? 'L\'hélicoptère tombe en tournant... il va s\'écraser sur le toit !'
+    : et.type === 'lois' && chuteLois?.phase === 'tombe' ? 'LOIS TOMBE ! Rattrape-la en volant : touche-la, avant le sol !'
+    : et.type === 'lois' && chuteLois?.phase === 'tenue' ? 'Tu la tiens ! Pose-toi (sur le toit, ou en bas) pour la déposer'
+    : et.type === 'lois' && chuteLois?.phase === 'helico' && souleve?.v === chuteLois.v ? 'Tu le tiens ! Repose-le doucement : descends tout près du toit (ou du sol), puis G'
+    : et.type === 'lois' && chuteLois?.phase === 'helico' && !chuteLois.v.anime ? 'Il tombe ! Vole tout près de lui, et G : soulève-le (le pilote est dedans)'
+    : et.type === 'lois' && chuteLois?.phase === 'helico' ? 'L\'hélicoptère penche au bord du toit, son pilote dedans ! Vole tout près de lui (point jaune) : il va glisser. G : soulève-le'
+    : et.type === 'lois' && chuteLois?.phase === 'rate' ? (chuteLois.seulHelico ? 'Raté... L\'hélicoptère est de nouveau au bord du toit : recommence !' : 'Raté... Ça recommence !')
+    : et.type === 'pont' && ecroulement?.phase === 'attente' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Vole jusqu\'au grand pont (point jaune)'
+    : et.type === 'pont' && ecroulement?.phase === 'casse' && souleve && ecroulement.liste.some(q => q.v === souleve.v) ? 'Repose-le sur la route, loin du trou : descends tout près de la route, puis G · encore {n}'
+    : et.type === 'pont' && ecroulement?.phase === 'casse' ? 'Remonte-les sur la route, un par un : vole tout près, G pour le soulever, G encore pour le reposer · encore {n} · le prochain tombe dans {t} s'
+    : et.type === 'pont' && ecroulement?.phase === 'rate' ? 'Plouf... Ça recommence !'
+    : et.type === 'missiles' && missilesLuthor?.phase === 'discours' ? 'Lex Luthor parle sur tous les écrans de Metropolis... Regarde le toit de sa tour !'
+    : et.type === 'missiles' && missileTenu() ? 'Tu tiens un missile ! Clic gauche : lance-le vers le ciel · encore {n}'
+    : et.type === 'missiles' && missilesLuthor?.phase === 'vol' && !(tempsMissiles() < Infinity) ? 'Il monte vers le ciel... Encore {n}'
+    : et.type === 'missiles' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Rattrape les missiles de Luthor ! Encore {n}'
     : et.texte;
-  const t = explosionExpo ? explosionExpo.reste : et.type === 'parade' && parade ? tempsAvantFoule() : panne?.reste ?? brouillage?.t ?? (et.type === 'bombes' && bombesDF?.liste.length ? Math.min(...bombesDF.liste.map(b => b.reste)) : et.type === 'bombe' && B ? B.reste : 0);
+  const t = et.type === 'pont' && ecroulement ? ecroulement.reste : et.type === 'missiles' && missilesLuthor ? Math.min(999, tempsMissiles()) : explosionExpo ? explosionExpo.reste : et.type === 'parade' && parade ? tempsAvantFoule() : panne?.reste ?? brouillage?.t ?? (et.type === 'bombes' && bombesDF?.liste.length ? Math.min(...bombesDF.liste.map(b => b.reste)) : et.type === 'bombe' && B ? B.reste : 0);
   return tr(texte, { n: reste, t: Math.max(0, Math.ceil(t)), h: et.hauteur, y: Math.max(0, Math.round(J.y)), ami: nomAmi(), f: montant(facture?.montant || 0), loin: et.loin, d: et.type === 'bombe' ? Math.round(B?.terre || 0) : Math.round(loinDeLExpo()),
     k: (devinette?.k ?? 0) + 1, p: typeNomme('Batpod')?.cable?.portee ?? 30 });
 }
@@ -24664,6 +24937,597 @@ function majSphinx(p, dt, d) {
 }
 
 // =====================================================================
+//  Les missions de Superman (MISSIONS_METROPOLIS, au chapitre 4) : la Forteresse de Solitude (l'hélicoptère du Daily Planet, le cristal vert,
+//  la Forteresse qui sort de la glace, l'hologramme de son père et son premier costume), Lois Lane qui tombe du toit du Daily Planet et
+//  l'hélicoptère qui glisse, le grand pont qui s'écroule sous un bus, et les deux missiles de Lex Luthor
+// =====================================================================
+// les endroits des missions de Superman (comme ceux de Gotham, dans POINTS) : devant la Forteresse de Solitude, là où l'hélicoptère se pose
+// (22 m au sud du cristal, dans l'entrée) ; le toit du Daily Planet (boite : on y est n'importe où sur le toit ; le point jaune, devant le globe)
+if (forteresse && chezClark) POINTS.glaces = { x: forteresse.coeur.x + 3, y: forteresse.y, z: forteresse.coeur.z + 22, rayon: 40, haut: 15 };
+if (dailyPlanet && chezClark) POINTS.toitPlanet = { ...dailyPlanet.toit, rayon: 9, haut: 3, boite: [dailyPlanet.x - 13.5, dailyPlanet.z - 12.5, dailyPlanet.x + 13.5, dailyPlanet.z + 12.5] };
+
+// --- les véhicules des missions de Superman (v.mission) : ils ne disparaissent pas quand on est loin (voir majVoiture). Quand leur mission
+// est finie (ou qu'on la quitte, avec le code MISSION), ce sont des épaves, qui s'en vont quand on ne les voit plus ---
+const vehiculesMission = [];
+function vehiculeMission(nom, x, z, angle) {
+  const v = creerVoiture(x, z, angle, false, typeNomme(nom));
+  v.mission = true; v.missionK = missionIndex;
+  vehiculesMission.push(v);
+  return v;
+}
+function majVehiculesMission() {
+  for (let k = vehiculesMission.length - 1; k >= 0; k--) {
+    const v = vehiculesMission[k];
+    if (!v.supprimer && v.missionK === missionIndex) continue;
+    if (v === J.voiture || souleve?.v === v) continue;   // (il est dedans, ou il la tient : elle reste à lui, pour l'instant)
+    if (v.passage) { v.supprimer = true; vehiculesMission.splice(k, 1); continue; }   // (l'hélicoptère de la mission 1, qui repartait : il s'en va)
+    Object.assign(v, { mission: false, epave: true, anime: null, occupee: false });
+    if (!v.accident && v.conducteur && !v.type.vole) v.conducteur = null;
+    vehiculesMission.splice(k, 1);
+  }
+}
+// --- l'hélicoptère du Daily Planet (étape « passager ») : il attend sur la place du départ ; Clark monte (E), et son pilote l'emmène tout seul
+// au-dessus de la ville, jusqu'à la lueur verte (« vers ») : il monte, file à 170 m de haut, puis redescend et se pose. Rien à piloter, et il
+// ne peut pas s'écraser : la souris regarde où on veut. Il le dépose, puis repart vers la ville, et s'en va ---
+let passage = null;   // { et, v : l'hélicoptère, phase : 'attente', 'vol', 'repart' ou 'fini', t, de : d'où il part, vers : où il se pose }
+function commencerPassager(et) {
+  const l = et.pose === 'X' ? depart : lieuProche(et.pose, J), B = POINTS[et.vers];
+  if (star.cristal || !l || !B) { passage = { phase: 'fini' }; return; }   // (le costume, il l'a déjà : la partie s'en souvient)
+  const v = vehiculeMission(et.voiture, l.x + 14, l.z, Math.PI / 2);   // (à côté de lui, de travers sur la place)
+  v.anime = animerPassage;
+  v.passage = passage = { et, v, phase: 'attente', t: 0, vers: B };   // (l'hélicoptère garde son vol : il repart tout seul, même quand l'étape est finie)
+}
+// la distance faite au bout de t secondes d'un vol de « duree » secondes sur L mètres : il accélère 3 s, file, et ralentit les 3 dernières
+function trajet(t, duree, L) {
+  const a = 3, v = L / (duree - a), d = clamp(t, 0, duree);
+  return d < a ? v * d * d / (2 * a) : d > duree - a ? L - v * (duree - d) ** 2 / (2 * a) : v * a / 2 + v * (d - a);
+}
+function animerPassage(v, dt) {
+  const P = v.passage;
+  v.vitesse = 0;
+  if (P.phase === 'attente') { // posé sur la place, le rotor qui tourne doucement ; Clark monte (E) : il décolle
+    v.rotor = 0.4; v.enVol = false;
+    if (J.voiture !== v) return;
+    P.phase = 'vol'; P.t = 0; P.de = { x: v.x, y: v.y, z: v.z };
+    annonce(tr('LE PILOTE'), tr('« Accroche-toi, on décolle ! »'), 3); bruit(0.5, 300, 1);
+  }
+  if (P.phase === 'vol') {
+    P.t += dt;
+    const D = P.et.secondes || 22, A = P.de, B = P.vers, L = Math.hypot(B.x - A.x, B.z - A.z), s = trajet(P.t, D, L) / L;
+    const monte = clamp(P.t / 4, 0, 1), descend = clamp((D - P.t) / 4, 0, 1), haut = 170 * Math.min(monte * monte * (3 - 2 * monte), descend * descend * (3 - 2 * descend));
+    const sol = hauteurSol(B.x, B.z), x = lerp(A.x, B.x, s), z = lerp(A.z, B.z, s);
+    Object.assign(v, { x, z, y: lerp(A.y, sol, s) + haut, angle: Math.atan2(B.x - A.x, B.z - A.z), tangage: P.t > 3 && P.t < D - 3 ? -0.12 : 0, roulis: 0, rotor: 1, enVol: P.t < D });
+    if (J.voiture === v) { J.x = v.x; J.y = v.y; J.z = v.z; }
+    if (P.t < D) return;
+    // posé : Clark descend, et le pilote repart vers la ville
+    P.phase = 'repart'; P.t = 0; v.y = sol; v.enVol = false;
+    if (J.voiture === v) sortirVoiture();
+    annonce(tr('LE PILOTE'), tr('« Je ne peux pas aller plus près... La lueur verte, c\'est là-bas, devant toi ! »'), 4);
+    return;
+  }
+  // il repart : il monte, et file vers la ville ; loin, il s'en va
+  P.t += dt;
+  const A = P.de, cap = Math.atan2(A.x - v.x, A.z - v.z), monte = Math.min(1, P.t / 5);
+  Object.assign(v, { angle: cap, rotor: 1, enVol: true, tangage: -0.1 * monte, roulis: 0 });
+  if (P.t > 1.5) { v.y += 12 * dt; v.x += Math.sin(cap) * 40 * monte * dt; v.z += Math.cos(cap) * 40 * monte * dt; }
+  if (P.t > 25 || (dist(v, J) > 500 && horsDeVue(v))) { v.supprimer = true; P.phase = 'fini'; v.anime = null; }
+}
+function finirPassager() {
+  const P = passage; passage = null;
+  if (!P?.v || P.phase === 'repart') return;   // (il repart tout seul)
+  if (J.voiture === P.v) { sortirVoiture(); J.y = hauteurSol(J.x, J.z); J.vy = 0; }   // (on a quitté la mission en plein vol : il est posé par terre)
+  P.v.supprimer = true;
+}
+
+// --- la Forteresse de Solitude (mission « La Forteresse de Solitude ») ---
+// Tant que la mission n'est pas finie, la Forteresse dort sous la glace : on ne la voit pas, et on passe là où seront ses cristaux. Au milieu,
+// un cristal vert brille dans la glace, venu de Krypton. Clark (ou Kara) s'en approche à pied : la terre tremble, et la Forteresse sort de la
+// glace, ses cristaux de plus en plus hauts (4 s). Puis l'hologramme de son père apparaît au cœur de la Forteresse, lui dit qui il est, et lui
+// donne son costume (star.cristal : il l'a, et la partie s'en souvient, même s'il recharge la page avant la fin de la mission ; après, c'est star.forteresse)
+let cristal = null;   // { et, phase : 'attente', 'pousse', 'holo' ou 'fini', t, holo : l'hologramme, k : la phrase en cours }
+const M_CRISTAL_VERT = chezClark ? std(null, { color: '#5cff86', emissive: '#14d848', emissiveIntensity: 1.5, metalness: 0.3, roughness: 0.1 }) : null;   // (comme les cristaux de la Forteresse)
+const M_HOLOGRAMME = chezClark ? new THREE.MeshStandardMaterial({ color: '#8fd0ff', emissive: '#3f9cff', emissiveIntensity: 1.5, roughness: 0.3, metalness: 0.1, transparent: true, opacity: 0.6, depthWrite: false }) : null;   // (transparent, comme la glace du souffle glacé)
+// ce que dit l'hologramme : Jor-El, le père de Superman ; avec la fille du menu, Zor-El, celui de Supergirl
+const PAROLES_JOREL = ['« Mon fils... Je suis ton père, Jor-El. Tu viens de Krypton, une planète qui n\'existe plus. »',
+  '« Sous le soleil jaune de la Terre, tu peux voler, et tes yeux lancent des rayons. Protège les gens. »',
+  '« Voici ton costume. Le S, c\'est le blason de notre famille : il veut dire « espoir ». Va, mon fils ! »'];
+const PAROLES_ZOREL = ['« Ma fille... Je suis ton père, Zor-El. Tu viens de Krypton, une planète qui n\'existe plus. »',
+  '« Sous le soleil jaune de la Terre, tu peux voler, et tes yeux lancent des rayons. Protège les gens. »',
+  '« Voici ton costume. Le S, c\'est le blason de notre famille : il veut dire « espoir ». Va, ma fille ! »'];
+// la Forteresse dort sous la glace (ses boîtes coupées, ses cristaux ne sont plus des murs pour les balles), ou elle est là
+function cacherForteresse(cache) {
+  const F = forteresse;
+  if (!F?.g) return;
+  F.g.visible = !cache; F.g.scale.y = 1; F.g.position.y = 0;   // (même si elle était en train de pousser : le code MISSION)
+  if (!!F.cachee === cache) return;
+  F.cachee = cache;
+  for (const b of F.boites) if (cache) { b.hAvant = b.h; b.h = -Infinity; } else b.h = b.hAvant;
+  F.murs ||= F.g.children.filter(m => batiments.includes(m));
+  for (const m of F.murs) { const k = batiments.indexOf(m); if (cache && k >= 0) batiments.splice(k, 1); else if (!cache && k < 0) batiments.push(m); }
+  for (const v of voitures) reveillerVoiture(v);   // (le sol change sous elles)
+}
+if (forteresse && sansForteresse() && !star.cristal) cacherForteresse(true);   // (la mission 1 n'est pas finie : elle dort encore)
+// le cristal vert : il brille dans la glace dès le début de la mission 1 (on voit sa lueur de loin, en arrivant), jusqu'à ce qu'il réveille
+// la Forteresse. Une forme partagée, et une grande lueur verte au-dessus (une image : l'éclair des tirs, en vert)
+let cristalVert = null;
+const M_LUEUR_VERTE = chezClark ? M_FLASH.clone() : null;
+if (M_LUEUR_VERTE) M_LUEUR_VERTE.color.set('#2cff6a');
+function majCristalVert(dt) {
+  const F = forteresse, veut = !!F && !!MISSIONS_CH[missionIndex]?.forteresse && !star.cristal && !(cristal && cristal.phase !== 'attente');
+  if (!veut) { if (cristalVert) { scene.remove(cristalVert.m, cristalVert.lueur); cristalVert = null; } return; }
+  if (!cristalVert) {
+    const m = new THREE.Mesh(formePartagee('cristal vert', () => {
+      const g = mergeGeometries([new THREE.CylinderGeometry(0.36, 0.44, 1.6, 6).translate(0, 0.8, 0), new THREE.ConeGeometry(0.36, 0.9, 6).translate(0, 2.05, 0)]).toNonIndexed();
+      g.computeVertexNormals(); return g;   // (à facettes, comme les cristaux de la Forteresse)
+    }), M_CRISTAL_VERT);
+    m.position.set(F.coeur.x, F.coeur.y - 0.35, F.coeur.z); m.rotation.set(0.25, 0, 0.18); m.castShadow = true;
+    const lueur = new THREE.Sprite(M_LUEUR_VERTE); lueur.position.set(F.coeur.x, F.coeur.y + 3, F.coeur.z); lueur.raycast = () => {};
+    scene.add(m, lueur); cristalVert = { m, lueur };
+  }
+  cristalVert.m.rotation.y += dt * 0.7;
+  const bat = Math.abs(Math.sin(temps * 3));   // il brille, il bat
+  M_CRISTAL_VERT.emissiveIntensity = 1.1 + 0.9 * bat; cristalVert.lueur.scale.setScalar(9 + 5 * bat);
+}
+function commencerCristal(et) {
+  const F = forteresse;
+  if (!F) { cristal = { phase: 'fini' }; return; }
+  if (!star.cristal) cacherForteresse(true);
+  cristal = { et, phase: star.cristal ? 'fini' : 'attente', t: 0, holo: null, k: -1 };   // (le costume, il l'a déjà : la Forteresse a poussé)
+}
+function majCristal(dt) {
+  const C = cristal, F = forteresse;
+  if (!C || C.phase === 'fini' || !F) return;
+  C.t += dt;
+  if (C.phase === 'attente') { // il s'approche, à pied : la glace tremble
+    if (J.mort || J.voiture || J.superman || Math.hypot(J.x - F.coeur.x, J.z - F.coeur.z) > 3 || Math.abs(J.y - F.coeur.y) > 3) return;
+    C.phase = 'pousse'; C.t = 0;
+    annonce(tr('LE CRISTAL !'), tr('Il brille de plus en plus fort... La glace tremble !'), 4);
+    bruit(1, 110, 3.5); bip(80, 40, 3.5, 'sawtooth', 0.12);
+    // (un véhicule posé là où pousseront les cristaux : il glisse jusque devant l'entrée)
+    for (const v of voitures) if (!v.supprimer && v !== J.voiture && Math.hypot(v.x - F.x, v.z - F.z) < 34) { v.x = POINTS.glaces.x + entre(-10, 10); v.z = POINTS.glaces.z + entre(-4, 4); v.y = hauteurSol(v.x, v.z); reveillerVoiture(v); }
+    F.g.visible = true; F.g.scale.y = 0.02; F.g.position.y = F.y * 0.98;
+    return;
+  }
+  if (C.phase === 'pousse') { // la Forteresse sort de la glace, de plus en plus haut, dans un nuage de poussière de glace
+    const u = clamp(C.t / 4, 0, 1), s = Math.max(0.02, u * u * (3 - 2 * u));
+    F.g.scale.y = s; F.g.position.y = F.y * (1 - s);
+    J.secousse = Math.max(J.secousse || 0, 0.16 * (1 - u * 0.6));
+    if (Math.random() < dt * 30) {
+      const a = entre(0, 2 * Math.PI), r = entre(8, 30), f = new THREE.Sprite(M_FUMEE.clone()); f.material.color.set('#eef6ff');
+      f.position.set(F.x + Math.cos(a) * r, F.y + entre(0, 4), F.z + Math.sin(a) * r); scene.add(f); effets.push({ o: f, vie: 2.5, fumee: 2.5, taille: 6 });
+    }
+    if (u < 1) return;
+    cacherForteresse(false); C.phase = 'holo'; C.t = 0;
+    annonce(tr('LA FORTERESSE DE SOLITUDE !'), tr('Un palais de cristal, venu de Krypton...'), 4);
+    // l'hologramme : la forme de la statue de Superman (sa cape, son blason), toute bleue et transparente, à taille d'homme
+    const H = C.holo = new THREE.Mesh(statueSuper.formes.garcon, M_HOLOGRAMME);
+    H.scale.setScalar(1.15 / 9.5); H.position.set(F.coeur.x, F.coeur.y, F.coeur.z); scene.add(H);
+    bip(400, 900, 1.2, 'sine', 0.08);
+    return;
+  }
+  // l'hologramme monte un peu, se tourne vers lui, et lui parle ; à la fin, il lui donne son costume
+  const H = C.holo, paroles = fille() ? PAROLES_ZOREL : PAROLES_JOREL, nom = fille() ? 'ZOR-EL' : 'JOR-EL';
+  H.position.y = F.coeur.y + 0.4 * Math.min(1, C.t) + 0.05 * Math.sin(temps * 2);
+  H.rotation.y = Math.atan2(J.x - H.position.x, J.z - H.position.z);
+  M_HOLOGRAMME.opacity = Math.min(1, C.t) * (0.55 + 0.08 * Math.sin(temps * 23));   // (il grésille un peu)
+  const k = Math.floor((C.t - 0.8) / 3.6);
+  if (k > C.k && k < paroles.length) { C.k = k; annonce(nom, tr(paroles[k]), 3.6); }
+  if (k >= paroles.length) { // le costume : il le met tout de suite, dans son tourbillon (et la partie s'en souvient : voir sauverPartie)
+    C.phase = 'fini'; star.cristal = true; sauverPartie();
+    if (!enCostumeSuper()) changerCostume();
+    annonce(tr(nomSuper().toUpperCase() + ' !'), tr('Ton costume ! H : le mettre ou l\'enlever, partout · Maj 3 fois, vite : tu t\'envoles'), 5);
+  }
+}
+function finirCristal() {
+  const C = cristal; cristal = null;
+  if (!C) return;
+  if (C.holo) scene.remove(C.holo);   // (ses formes sont celles de la statue : rien à jeter)
+}
+
+// --- Lois Lane qui tombe du toit du Daily Planet (mission « Lois tombe du toit ») ---
+// L'hélicoptère du Daily Planet tourne autour du toit, avec Lois dedans. Quand Superman arrive (en costume, à moins de 150 m), son moteur
+// lâche : il s'écrase au bord du toit, et Lois tombe dans le vide (à 10 m/s au plus : c'est un jeu !). Superman la rattrape en la touchant,
+// elle pend à sa main ; il se pose, et la dépose. Puis l'hélicoptère glisse du toit (le pilote est encore dedans) : G tout près, il le
+// soulève ; G encore, il le repose (sur le toit, ou en bas). Raté : les pompiers les rattrapent dans leur grand coussin, au pied de la tour,
+// et ça recommence
+let chuteLois = null;   // { et, phase : 'tourne', 'crash', 'tombe', 'tenue', 'helico', 'rate' ou 'fini', t, a : où en est son tour, v : l'hélicoptère, lois, coussin, bord }
+const TENUE_LOIS = { veste: '#7a1f3d', chemise: '#f4efe6', jupe: '#2a2a35', talons: '#3a1a1a', cheveux: '#2a1810' };   // (sa veste bordeaux)
+// Lois : le corps de la fille du menu (comme {ami} : voir corpsAmi), dans sa tenue à elle
+function creerLois() {
+  const h = creerHumain(TENUE_BJ), genre = heros.genre, avant = CHAPITRE.civilFille;
+  heros.genre = Object.keys(HEROS).find(g => HEROS[g].fille) || genre; CHAPITRE.civilFille = TENUE_LOIS;
+  try { corpsHeros(h); } finally { heros.genre = genre; CHAPITRE.civilFille = avant; }
+  return h;
+}
+CORPS.lois = () => creerLois();
+function commencerLois(et) {
+  if (!dailyPlanet) { chuteLois = { phase: 'fini' }; return; }
+  const T = dailyPlanet.toit, v = vehiculeMission('Hélicoptère du Daily Planet', T.x + 38, T.z, 0);
+  Object.assign(v, { y: T.y + 22, conducteur: 'civil', occupee: true, tole: true, rotor: 1, anime: animerHeliLois });   // (son pilote reste dedans : on ne peut que le reposer)
+  chuteLois = { et, phase: 'tourne', t: 0, a: 0, v, lois: null, coussin: null, bord: { x: T.x, y: T.y, z: dailyPlanet.z + 13 } };   // (bord : au bord sud du toit, la cabine dans le vide)
+}
+// l'hélicoptère, tant qu'il ne glisse pas : il tourne autour du toit ; il s'écrase au bord, en tournant sur lui-même ; il penche dans le vide
+function animerHeliLois(v, dt) {
+  const L = chuteLois, T = dailyPlanet.toit;
+  if (!L || L.v !== v) { v.anime = null; return; }
+  if (L.phase === 'tourne') {
+    L.a += dt * 12 / 38;
+    Object.assign(v, { x: dailyPlanet.x + Math.sin(L.a) * 38, z: dailyPlanet.z + Math.cos(L.a) * 38, y: T.y + 22 + Math.sin(L.t * 0.8), angle: L.a + Math.PI / 2, tangage: -0.06, roulis: -0.14, rotor: 1 });
+  } else if (L.phase === 'crash') { // il descend en tournant sur lui-même, en fumant, jusqu'au bord du toit
+    const u = clamp(L.t / 2.6, 0, 1), e = u * u, B = L.bord;
+    v.x = lerp(L.depart.x, B.x, e); v.z = lerp(L.depart.z, B.z, e); v.y = lerp(L.depart.y, B.y, e);
+    v.angle = L.depart.angle + u * 4 * Math.PI; v.tangage = -0.2 * u; v.roulis = 0.3 * Math.sin(u * 9); v.rotor = 1 - u * 0.5;
+    if ((L.tFumee = (L.tFumee || 0) - dt) <= 0) { L.tFumee = 0.06; const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#2a2a2a'); s.position.set(v.x, v.y + 2.6, v.z); scene.add(s); effets.push({ o: s, vie: 2, fumee: 2, taille: 3 }); }
+  } else { // au bord : la cabine dans le vide, il penche, et vacille de plus en plus
+    const B = L.bord, k = L.phase === 'helico' ? 1 : 0.35;
+    Object.assign(v, { x: B.x, y: B.y + 0.1, z: B.z, angle: 0, tangage: -0.2 - 0.05 * k * Math.sin(temps * 6), roulis: 0.1 + 0.03 * k * Math.sin(temps * 4.3), rotor: Math.max(0, (v.rotor || 0) - dt * 0.3) });
+  }
+  v.vitesse = 0;
+}
+// le coussin des pompiers, gonflé au pied de la tour, juste sous le bord du toit : il rattrape Lois (ou l'hélicoptère) si Superman la rate
+const M_COUSSIN = chezClark ? [mat('#d63a2e', { roughness: 0.6 }), mat('#f2c21a', { roughness: 0.6 })] : null;
+function gonflerCoussin() {
+  const L = chuteLois, g = new THREE.Group(), x = L.bord.x, z = L.bord.z + 4;
+  const bas = new THREE.Mesh(formePartagee('coussin des pompiers', () => new THREE.BoxGeometry(11, 1.8, 11).translate(0, 0.9, 0)), M_COUSSIN[0]);
+  const bande = new THREE.Mesh(formePartagee('bande du coussin', () => new THREE.BoxGeometry(11.1, 0.4, 11.1).translate(0, 1.25, 0)), M_COUSSIN[1]);
+  for (const m of [bas, bande]) { m.castShadow = m.receiveShadow = true; g.add(m); }
+  g.position.set(x, hauteurSol(x, z), z); scene.add(g);
+  L.coussin = g;
+}
+function majLoisMission(dt) {
+  const L = chuteLois;
+  if (!L || L.phase === 'fini') return;
+  L.t += dt;
+  const v = L.v, p = L.lois;
+  if (L.phase === 'tourne') { // il attend Superman (en costume, à moins de 150 m du toit) : le moteur lâche
+    if (L.t < 12 || !enCostumeSuper() || J.mort || Math.hypot(J.x - dailyPlanet.toit.x, J.y - dailyPlanet.toit.y, J.z - dailyPlanet.toit.z) > 150) return;   // (il tourne au moins 12 s : le temps de le voir)
+    L.phase = 'crash'; L.t = 0; L.depart = { x: v.x, y: v.y, z: v.z, angle: v.angle };
+    annonce(tr('LE MOTEUR LÂCHE !'), tr('L\'hélicoptère du Daily Planet tombe en tournant...'), 3); bruit(0.8, 300, 1.5); bip(600, 120, 2.2, 'sawtooth', 0.06);
+    gonflerCoussin();
+    return;
+  }
+  if (L.phase === 'crash') { // il s'écrase au bord du toit : BOUM, et Lois tombe dans le vide
+    if (L.t < 2.6) return;
+    L.phase = 'tombe'; L.t = 0;
+    const B = L.bord, P = V3(B.x, B.y + 1, B.z + 1);
+    exploser(P, 4, 0, 0, null, false, false, false); etincelles(P, 18, 6); J.secousse = Math.max(J.secousse || 0, 0.15);
+    const q = L.lois = creerPersonne('lois', B.x + 0.6, B.z + 5.5, undefined, B.y + 0.6);
+    Object.assign(q, { invincible: true, etat: 'tombe', vy: 0, angle: Math.PI, sansTache: true });
+    annonce(tr('LOIS TOMBE !'), tr('« Au secours ! »'), 2.5);
+    return;
+  }
+  if (L.phase === 'tombe') {
+    if (p.etat === 'tenue') { L.phase = 'tenue'; L.t = 0; annonce('LOIS LANE', tr('« Vous me tenez ? Mais... qui vous tient, vous ? »'), 4); bip(700, 1300, 0.3, 'sine', 0.15); }
+    else if (p.y < hauteurSol(p.x, p.z) + 2.4) raterLois(tr('Les pompiers l\'ont rattrapée dans leur grand coussin. On recommence !'));
+    return;
+  }
+  if (L.phase === 'tenue') { // posé (sur le toit, ou en bas) : il la dépose à côté de lui
+    if (J.mort || !enCostumeSuper()) { p.etat = 'tombe'; p.vy = 0; L.phase = 'tombe'; annonce('', tr('Tu l\'as lâchée !'), 2); return; }
+    if (!J.sol || J.superman) return;
+    const a = J.angleCorps + Math.PI / 2;
+    Object.assign(p, { etat: 'pose', x: J.x + Math.sin(a) * 1.2, z: J.z + Math.cos(a) * 1.2, angle: a + Math.PI });
+    p.y = hauteurSol(p.x, p.z, J.y + 1);
+    L.phase = 'helico'; L.t = 0;
+    annonce('LOIS LANE', tr('« Merci, {super} ! L\'hélicoptère... le pilote est encore dedans ! »', { super: nomSuper() }), 4);
+    return;
+  }
+  if (L.phase === 'helico') {
+    if (v.anime && Math.hypot(J.x - L.bord.x, J.y - L.bord.y, J.z - L.bord.z) < 50) { // Superman est revenu tout près : il glisse du toit. C'est une voiture accidentée, que Superman peut soulever
+      v.anime = null;
+      const a = commencerAccident(v);
+      if (a) { a.vel.set(0, 0, 2.5); a.rot.set(0.7, 0, 0); a.conducteur = null; }
+      v.conducteur = 'civil';   // (le pilote reste dedans : voir superForce)
+      annonce(tr('IL GLISSE !'), tr('L\'hélicoptère tombe du toit ! G, tout près : soulève-le'), 3); bruit(0.5, 180, 0.6);
+    }
+    if (v.accident && !v.accident.tenue) v.accident.vel.y = Math.max(v.accident.vel.y, -9);   // (il tombe moins vite qu'en vrai : c'est un jeu !)
+    const sol = hauteurSol(v.x, v.z);
+    if (v.detruite || v.coule) { raterLois(tr('L\'hélicoptère s\'est écrasé... son pilote a sauté à temps. On recommence !'), true); return; }
+    if (!v.anime && v.accident && !v.accident.tenue && v.y < sol + 3 && v.y < L.bord.y - 20) { raterLois(tr('L\'hélicoptère est tombé sur le coussin des pompiers : son pilote est sauf. On recommence !'), true); return; }
+    if (!v.anime && !v.accident && !v.detruite) { // reposé (ou retombé tout droit sur le toit) : gagné !
+      L.phase = 'fini';
+      annonce(tr('BRAVO !'), tr('« Merci, {super} ! » Lois et le pilote sont sains et saufs', { super: nomSuper() }), 4);
+    }
+    return;
+  }
+  if (L.phase === 'rate' && (L.rate -= dt) <= 0) {
+    if (L.seulHelico) { // (Lois est sauve : seul l'hélicoptère est à refaire, de nouveau au bord du toit, son pilote dedans)
+      if (souleve?.v === v) lacherVoiture();
+      v.supprimer = true;
+      const T = dailyPlanet.toit, n = L.v = vehiculeMission('Hélicoptère du Daily Planet', L.bord.x, L.bord.z, 0);
+      Object.assign(n, { y: T.y, conducteur: 'civil', occupee: true, tole: true, rotor: 0, anime: animerHeliLois });
+      L.phase = 'helico'; L.t = 0; L.seulHelico = false;
+      return;
+    }
+    const et = L.et; finirLois(); commencerLois(et);
+  }
+}
+function raterLois(texte, seulHelico = false) {
+  const L = chuteLois;
+  L.phase = 'rate'; L.rate = 4; L.seulHelico = seulHelico;
+  if (souleve?.v === L.v) lacherVoiture();
+  annonce(tr('RATÉ...'), texte, 4); bip(400, 200, 0.5, 'square', 0.1);
+}
+// Lois : elle tombe en se débattant ; elle pend sous Superman, tenue par la main ; posée, elle reste là (elle s'en va quand on ne la voit plus)
+function majLois(p, dt) {
+  const h = p.h, L = chuteLois;
+  h.g.visible = dist(p, J) < 400;
+  if (p.etat === 'tombe') {
+    p.vy = Math.max(p.vy - R_.gravite * dt, -10);
+    p.y += p.vy * dt;
+    if (L && enCostumeSuper() && !J.mort && !J.voiture && Math.hypot(J.x - p.x, J.y - p.y, J.z - p.z) < 3.5) p.etat = 'tenue';
+    const sol = hauteurSol(p.x, p.z) + (L?.coussin ? 2.3 : 0);   // (sur le coussin des pompiers)
+    if (p.y < sol) { p.y = sol; p.vy = 0; p.etat = 'pose'; }
+    h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, (p.angle += dt * 1.5), 0);
+    animerHumain(h, 0, dt, { bascule: 1.1 + 0.3 * Math.sin(temps * 3), ecarte: 1, agite: 1 });
+    poserCorps(h, p.x, p.y + 0.95, p.z, 0.95);
+  } else if (p.etat === 'tenue') { // sous Superman, tenue par la main
+    p.x += (J.x - p.x) * Math.min(1, dt * 8); p.z += (J.z - p.z) * Math.min(1, dt * 8); p.y += (J.y - 2.3 - p.y) * Math.min(1, dt * 10);
+    p.y = Math.max(p.y, hauteurSol(p.x, p.z, p.y + 1));
+    h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, J.angleCorps, 0);
+    animerHumain(h, 0, dt, { pend: true });
+  } else { // posée : elle regarde Superman
+    h.g.position.set(p.x, p.y, p.z); p.angle = lerpAngle(p.angle, angleVers(p, J), 3 * dt); h.g.rotation.set(0, p.angle, 0);
+    animerHumain(h, 0, dt, {});
+    if (!L && horsDeVue(p)) p.supprimer = true;
+  }
+  membresMous(h, dt, { sol: p.y });
+}
+function finirLois() {
+  const L = chuteLois; chuteLois = null;
+  if (!L?.v) return;
+  if (L.coussin) scene.remove(L.coussin);   // (ses formes sont partagées : rien à jeter)
+  if (L.phase !== 'fini') { // (on recommence, ou on a quitté la mission : l'hélicoptère et Lois s'en vont)
+    if (souleve?.v === L.v) lacherVoiture();
+    L.v.supprimer = true; if (L.lois) L.lois.supprimer = true;
+  }
+}
+
+// --- le grand pont qui s'écroule (mission « Le bus sur le pont ») ---
+// La police a fermé le pont (trouPont.ferme : les voitures n'y vont plus), mais un bus et trois voitures sont encore dessus, arrêtés au
+// milieu. Quand Superman arrive (en costume, à moins de 300 m), le morceau entre deux piliers s'écroule dans la rivière : ils pendent au bord
+// du trou, le nez dans le vide, les gens dedans (occupee). L'un après l'autre, ils glissent : chacun tient « secondes » secondes. Superman les
+// soulève (G) et les repose sur la route (G encore, à moins de 6 m du sol). Un qui tombe à l'eau : les pompiers repêchent tout le monde, et ça
+// recommence. Le pont est réparé quand on est loin, une fois la mission finie
+let ecroulement = null;   // { et, phase : 'attente', 'casse', 'rate' ou 'fini', t, liste : [{ v, cote, voie, sauve }], k : celui qui glisse, reste, chute : le tablier qui tombe }
+function placesPont(et) { // où ils sont : du côté ouest du trou (cote -1 : nez vers l'est) ou est (1), sur la voie de droite ou de gauche (voie)
+  return et.vehicules.map((nom, k) => ({ nom, cote: k % 2 ? 1 : -1, voie: k < 2 ? 1 : -1 }));
+}
+function poserPont(E, penche) { // chacun à sa place : à plat (en attendant), ou penché au bord du trou
+  const T = trouPont;
+  for (const q of E.liste) {
+    const v = q.v, k = coqueAccident(v.type.modele), s = q.cote < 0 ? -1.1 : T.L + 1.1, c = q.voie * 3.1;
+    const x = T.a.x + T.ux * s - T.uz * c, z = T.a.z + T.uz * s + T.ux * c, angle = Math.atan2(-q.cote * T.ux, -q.cote * T.uz) + Math.PI;
+    q.angle = angle; q.x = x; q.z = z;
+    if (!penche) { Object.assign(v, { x, z, y: T.y, angle, vitesse: 0 }); continue; }
+    const a = commencerAccident(v);
+    if (!a) continue;
+    a.dort = true; a.conducteur = null; a.vel.set(0, 0, 0); a.rot.set(0, 0, 0);
+    v.conducteur = 'civil'; v.occupee = true;   // (les gens restent dedans : on ne peut que les reposer)
+    q.pend = true; pencherPont(q, 0.2);
+  }
+}
+function pencherPont(q, angle, avance = 0) { // le nez dans le vide, penché de « angle » (le dessous contre le bord du pont), et avancé de « avance » m vers le trou
+  const v = q.v, a = v.accident, k = coqueAccident(v.type.modele), T = trouPont, y = T.y + 0.15 + v.forme.longueur * 0.5 * Math.sin(angle) * 0.4 - avance * 0.4;
+  const x = q.x - q.cote * T.ux * avance, z = q.z - q.cote * T.uz * avance;
+  v.quat.setFromEuler(new THREE.Euler(angle, q.angle, 0.04 * q.voie, 'YXZ'));
+  a.c.copy(V3(0, k.cg, 0).applyQuaternion(v.quat).add(V3(x, y, z)));
+  v.x = x; v.y = y; v.z = z; v.angle = q.angle;
+}
+function commencerPont(et) {
+  if (!trouPont) { ecroulement = { phase: 'fini' }; return; }
+  if (trouPont.ouvert) reparerPont();   // (on recommence la mission, le pont encore écroulé : il est réparé)
+  trouPont.ferme = true;
+  const E = ecroulement = { et, phase: 'attente', t: 0, liste: [], k: 0, reste: et.secondes, chute: null };
+  for (const p of placesPont(et)) E.liste.push({ ...p, v: vehiculeMission(p.nom, 0, 0, 0), sauve: false });
+  poserPont(E, false);
+}
+// le morceau de tablier tombe dans la rivière, avec des débris et une gerbe d'écume
+function ecroulerPont() {
+  const T = trouPont, E = ecroulement, m = { x: T.a.x + T.ux * T.L / 2, z: T.a.z + T.uz * T.L / 2 };
+  T.ouvert = true; E.chute = { t: 0, vy: 0, eclabousse: false };
+  T.murs ||= T.g.children.filter(o => batiments.includes(o));
+  for (const o of T.murs) { const k = batiments.indexOf(o); if (k >= 0) batiments.splice(k, 1); }   // (le tablier qui tombe n'arrête plus les balles)
+  for (const v of voitures) if (!v.mission && !v.supprimer && v !== J.voiture && (dansTrouPont(v.x, v.z) || (v.conducteur && T.noeuds.has(v.route?.a)))) v.supprimer = true;   // (les dernières voitures sur le pont : la police les a fait partir)
+  for (const v of voitures) reveillerVoiture(v);
+  annonce(tr('LE PONT S\'ÉCROULE !'), tr('Le bus et les voitures pendent au bord du trou !'), 4);
+  bruit(1, 100, 3); bip(70, 35, 2.5, 'sawtooth', 0.15); J.secousse = Math.max(J.secousse || 0, 0.3);
+  // (des morceaux de béton : une matière toute simple, comme celle des personnages ; MAT.beton2, celle du pont, n'est dessinée qu'avec l'ombre des
+  // coins, et ses débris compilaient un programme de plus en jouant)
+  for (let k = 0; k < 14; k++) { const e = new THREE.Mesh(formePartagee('débris du pont', () => new THREE.BoxGeometry(1, 0.6, 1.2)), mat('#d2cec6')); e.position.set(m.x + entre(-12, 12), T.y - 0.5, m.z + entre(-5, 5)); e.scale.setScalar(entre(0.6, 1.8)); scene.add(e); lancerDebris(e, V3(entre(-3, 3), entre(0, 3), entre(-3, 3)), entre(2.5, 4)); }
+  E.phase = 'casse'; E.t = 0; E.k = 0; E.reste = E.et.secondes;
+  poserPont(E, true);
+}
+function majPontMission(dt) {
+  const E = ecroulement, T = trouPont;
+  if (!E || !T || E.phase === 'fini') return;
+  E.t += dt;
+  const C = E.chute;
+  if (C && !C.fini) { // le tablier tombe
+    C.vy -= R_.gravite * dt; T.g.position.y += C.vy * dt;
+    if (!C.eclabousse && T.y + T.g.position.y < EAU + 0.5) {
+      C.eclabousse = true; bruit(1, 400, 1.5);
+      for (let k = 0; k < 30; k++) { const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#f4f8fa'); s.position.set(T.a.x + T.ux * entre(0, T.L), EAU + entre(0, 6), T.a.z + T.uz * entre(0, T.L) + entre(-5, 5)); scene.add(s); effets.push({ o: s, vie: 2.5, fumee: 2.5, taille: 5 }); }
+    }
+    if (T.g.position.y < -12) { C.fini = true; T.g.visible = false; }
+  }
+  if (E.phase === 'attente') {
+    for (const v of voitures) if (!v.mission && v.conducteur && T.noeuds.has(v.route?.a) && horsDeVue(v)) v.supprimer = true;   // (le pont est fermé : celles qui y sont encore s'en vont)
+    if (enCostumeSuper() && !J.mort && dist(J, { x: T.a.x + T.ux * T.L / 2, z: T.a.z + T.uz * T.L / 2 }) < 300) ecroulerPont();
+    return;
+  }
+  if (E.phase === 'rate') { if ((E.rate -= dt) <= 0) recommencerPont(); return; }
+  // chacun : sauvé quand il est de nouveau sur ses roues, hors de l'eau (reposé sur la route, ou sur la berge) ; perdu s'il touche l'eau
+  for (const q of E.liste) {
+    const v = q.v;
+    if (q.sauve) continue;
+    if (souleve?.v === v) q.pend = false;   // (il le tient : il ne pend plus au bord)
+    if (v.coule || v.detruite || (v.accident ? v.accident.c.y < EAU + 0.8 : v.y < EAU + 0.3)) { raterPont(); return; }
+    if (!v.accident) { q.sauve = true; annonce('', tr('« Merci, {super} ! » Encore {n}', { super: nomSuper(), n: E.liste.filter(o => !o.sauve).length }), 2.5); bip(600, 1300, 0.3, 'sine', 0.15); }
+  }
+  if (E.liste.every(q => q.sauve)) { E.phase = 'fini'; annonce(tr('BRAVO !'), tr('Tout le monde est sain et sauf !'), 4); return; }
+  // celui qui glisse : il penche de plus en plus, puis tombe ; celui qu'on tient (ou déjà sauvé) : c'est au suivant
+  const pend = q => !q.sauve && q.pend && q.v.accident?.dort;
+  let q = E.liste[E.k];
+  if (!q || !pend(q)) { const k = E.liste.findIndex(pend); if (k < 0) return; E.k = k; E.reste = E.et.secondes; q = E.liste[k]; }
+  // il penche de plus en plus ; ses 4 dernières secondes, il glisse vers le trou (« IL GLISSE ! »), et tombe
+  const avant = E.reste; E.reste -= dt;
+  if (avant > 4 && E.reste <= 4) { annonce(tr('IL GLISSE !'), tr('Vite, rattrape-le : il tombe dans 4 s !'), 3); bruit(0.6, 160, 0.8); }
+  const g = clamp(1 - E.reste / 4, 0, 1);
+  pencherPont(q, 0.2 + 0.18 * (1 - Math.max(0, E.reste) / E.et.secondes) + 0.45 * g * g + 0.03 * Math.sin(temps * 9), 2.6 * g * g);
+  if (E.reste > 0) return;
+  const a = q.v.accident; q.pend = false; a.dort = false; a.calme = 0; a.vel.set(-q.cote * T.ux * 2.5, -0.5, -q.cote * T.uz * 2.5); a.rot.set(-T.uz * 1.2 * q.cote, 0, T.ux * 1.2 * q.cote);   // il glisse dans le trou
+}
+function raterPont() {
+  const E = ecroulement;
+  E.phase = 'rate'; E.rate = 4;
+  if (E.liste.some(q => q.v === souleve?.v)) lacherVoiture();
+  annonce(tr('PLOUF...'), tr('Les pompiers ont repêché tout le monde. On recommence !'), 4); bip(400, 200, 0.5, 'square', 0.1);
+}
+function recommencerPont() { // tous à leur place, au bord du trou
+  const E = ecroulement;
+  for (const q of E.liste) { if (souleve?.v === q.v) lacherVoiture(); q.v.supprimer = true; q.v = vehiculeMission(q.nom, 0, 0, 0); q.sauve = false; }
+  E.phase = 'casse'; E.k = 0; E.reste = E.et.secondes;
+  poserPont(E, true);
+}
+function reparerPont() { // les ouvriers ont réparé le pont : le tablier revient, et la police rouvre le pont
+  const T = trouPont;
+  T.ouvert = false; T.ferme = false; T.g.visible = true; T.g.position.y = 0;
+  for (const o of T.murs || []) if (!batiments.includes(o)) batiments.push(o);
+  for (const v of voitures) reveillerVoiture(v);
+}
+function finirPont() {
+  const E = ecroulement; ecroulement = null;
+  if (!E?.liste) return;
+  if (E.phase !== 'fini') for (const q of E.liste) { if (souleve?.v === q.v) lacherVoiture(); if (q.v !== J.voiture) q.v.supprimer = true; }   // (on a quitté la mission)
+  if (!trouPont.ouvert) trouPont.ferme = false;   // (sinon, il reste fermé jusqu'à ce qu'il soit réparé)
+}
+
+// --- les deux missiles de Lex Luthor (mission « Les deux missiles ») ---
+// Luthor parle sur tous les écrans de Metropolis, puis tire ses missiles du toit de LexCorp : chacun monte, file vers sa cible à 160 m de
+// haut, puis pique dessus. Superman en attrape un en le touchant : il le tient devant lui, et le clic gauche le lance vers le ciel, où il
+// explose sans faire de mal. Ses yeux laser (ou ses poings) le font exploser là où il est : loin des gens ! Un missile qui arrive : la police
+// avait fait évacuer le quartier (personne n'est blessé), et Luthor en tire un autre vers la même cible
+let missilesLuthor = null;   // { et, phase : 'discours', 'vol' ou 'fini', t, k : la phrase, liste : [{ cible, p : le missile en vol, relance, fini }] }
+const PAROLES_LUTHOR = ['« Bonjour, Metropolis ! Ici Lex Luthor, sur tous vos écrans. »',
+  '« Alors, {super}, tu sauves tout le monde ? Voyons si tu sais être à deux endroits à la fois ! »',
+  '« Regarde le toit de ma tour : mes missiles partent, un vers chaque bout de la ville. Bonne chance ! »'];
+const M_MISSILE_LUTHOR = chezClark ? [mat('#e8e8e2', { metalness: 0.5, roughness: 0.35 }), mat('#c81c1c'), mat('#202226')] : null;   // le corps, le nez, les ailerons
+function creerMissile() {
+  const g = new THREE.Group(), F = formePartagee('missile de Luthor', () => ({ corps: new THREE.CylinderGeometry(0.32, 0.32, 3.6, 12).rotateX(Math.PI / 2),
+    nez: new THREE.ConeGeometry(0.32, 1.1, 12).rotateX(Math.PI / 2).translate(0, 0, 2.35), aileron: new THREE.BoxGeometry(0.05, 0.75, 0.8).translate(0, 0.55, -1.4) }));
+  const poser = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = true; g.add(o); return o; };
+  poser(F.corps, M_MISSILE_LUTHOR[0]); poser(F.nez, M_MISSILE_LUTHOR[1]);
+  for (let k = 0; k < 4; k++) poser(F.aileron, M_MISSILE_LUTHOR[2]).rotation.z = k * Math.PI / 2;
+  const flamme = new THREE.Sprite(M_FLASH); flamme.position.z = -2.3; flamme.raycast = () => {}; g.add(flamme);   // (les tirs ne s'arrêtent pas dans sa flamme)
+  return { g, missile: true, flamme, hauteur: 0.4 };
+}
+CORPS.missile = () => creerMissile();
+function commencerMissiles(et) {
+  if (!lexcorp) { missilesLuthor = { phase: 'fini' }; return; }
+  missilesLuthor = { et, phase: 'discours', t: 0, k: -1, liste: et.cibles.map(c => ({ cible: { ...centre(...c), y: hauteurSol(centre(...c).x, centre(...c).z) }, p: null, relance: 0, fini: false })) };
+}
+function lancerMissile(M, k) {
+  const T = lexcorp.toit, p = creerPersonne('missile', T.x + (k ? 4 : -4), T.z, undefined, T.y + 2);
+  Object.assign(p, { etat: 'vole', vel: V3(0, missilesLuthor.et.vitesse, 0), but: M, depart: T.y, sansTache: true, t: 0 });
+  M.p = p;
+  bruit(0.8, 900, 1.2); flash(V3(p.x, p.y, p.z), 3);
+}
+const croisiere = p => Math.max(p.but.cible.y + 160, p.depart + 40);   // (la hauteur où il file)
+// le temps qu'il lui faut encore pour arriver (en suivant son chemin : il file à sa hauteur, puis pique sur sa cible)
+function tempsMissile(p) {
+  const T = p.but.cible, dh = Math.hypot(T.x - p.x, T.z - p.z), c = croisiere(p);
+  return (dh > 220 ? dh - 220 + Math.hypot(220, c - T.y) + Math.abs(p.y - c) : Math.hypot(dh, p.y - T.y)) / missilesLuthor.et.vitesse;
+}
+// (le plus pressé, parmi ceux qui volent vers leur cible, et ceux que Luthor va tirer de nouveau, depuis le toit de LexCorp ; aucun : Infinity)
+const tempsMissiles = () => Math.min(...(missilesLuthor?.liste || []).filter(M => !M.fini && (!M.p || M.p.etat === 'vole'))
+  .map(M => M.p ? tempsMissile(M.p) : Math.max(0, M.relance) + tempsMissile({ ...lexcorp.toit, but: M, depart: lexcorp.toit.y + 2 })), Infinity);
+const missileTenu = () => missilesLuthor && personnes.find(p => p.type === 'missile' && p.etat === 'tenu' && !p.supprimer);
+function majMissilesMission(dt) {
+  const ML = missilesLuthor;
+  if (!ML || ML.phase === 'fini') return;
+  ML.t += dt;
+  if (ML.phase === 'discours') { // Luthor parle, puis ses missiles partent
+    const k = Math.floor((ML.t - 0.5) / 4);
+    if (k > ML.k && k < PAROLES_LUTHOR.length) { ML.k = k; annonce('LEX LUTHOR', tr(PAROLES_LUTHOR[k], { super: nomSuper() }), 4); bip(300, 260, 0.15, 'square', 0.05); }
+    if (ML.t > 0.5 + 4 * PAROLES_LUTHOR.length) { ML.phase = 'vol'; ML.liste.forEach((M, k) => lancerMissile(M, k)); annonce(tr('LES MISSILES !'), tr('Ils partent du toit de LexCorp !'), 3); }
+    return;
+  }
+  for (const [k, M] of ML.liste.entries()) if (!M.fini && !M.p && (M.relance -= dt) <= 0) { lancerMissile(M, k); annonce('LEX LUTHOR', tr('« Encore un ! »'), 2.5); }
+  if (ML.liste.every(M => M.fini)) { ML.phase = 'fini'; annonce(tr('METROPOLIS EST SAUVÉE !'), tr('Lex Luthor, sur les écrans : « Je t\'aurai la prochaine fois, {super} ! »', { super: nomSuper() }), 5); }
+}
+// un missile : il vole vers sa cible ; Superman le tient ; ou, lancé vers le ciel, il monte, puis explose
+function majMissile(p, dt, d) {
+  const h = p.h, M = p.but, vitesse = missilesLuthor?.et.vitesse || 20;
+  h.g.visible = d < 3000;
+  if (p.vie <= 0 || !missilesLuthor) { p.supprimer = true; return; }   // (détruit : voir missileDetruit ; ou la mission est finie)
+  p.t += dt;
+  if (p.etat === 'vole') {
+    const T = M.cible, dh = Math.hypot(T.x - p.x, T.z - p.z), but = dh > 220 ? V3(T.x, croisiere(p), T.z) : V3(T.x, T.y, T.z);
+    const voulu = but.sub(V3(p.x, p.y, p.z)).normalize().multiplyScalar(vitesse);
+    p.vel.lerp(voulu, Math.min(1, dt * (dh > 220 ? 0.9 : 2.5))).setLength(vitesse);   // il tourne doucement vers là où il va
+    if (enCostumeSuper() && !J.mort && !J.voiture && !souleve && !missileTenu() && Math.hypot(J.x - p.x, J.y + 1 - p.y, J.z - p.z) < 3.5) { // Superman l'attrape
+      p.etat = 'tenu'; annonce(tr('ATTRAPÉ !'), tr('Clic gauche : lance-le vers le ciel !'), 3); bip(500, 900, 0.2, 'sine', 0.1);
+    }
+    if (Math.hypot(T.x - p.x, T.y - p.y, T.z - p.z) < 6 || p.y < hauteurSol(p.x, p.z, p.y + 2) + 0.3) { // arrivé : BOUM (personne n'est blessé : la police avait fait évacuer)
+      exploser(V3(p.x, p.y + 1, p.z), 14, 0, 0, null, false, false, false); etincelles(V3(p.x, p.y + 1, p.z), 20, 8);
+      annonce(tr('BOUM !'), tr('Un missile est arrivé... La police avait fait évacuer : personne n\'est blessé. Luthor en tire un autre !'), 4);
+      p.supprimer = true; M.p = null; M.relance = 4;
+      return;
+    }
+  } else if (p.etat === 'tenu') { // devant lui, à bout de bras, le nez vers là où il regarde
+    if (J.mort || !enCostumeSuper() || J.voiture) { p.etat = 'vole'; }   // (il le lâche : le missile repart vers sa cible)
+    else { const r = regard(); p.x = J.x + r.x * 1.3; p.y = J.y + 1.1 + r.y * 1.3; p.z = J.z + r.z * 1.3; p.vel.copy(r).multiplyScalar(vitesse); }
+  } else if (p.etat === 'lance') { // lancé vers le ciel : il monte, puis explose, très haut
+    if (p.t > 2.5) {
+      exploser(V3(p.x, p.y, p.z), 12, 0, 0, null, false, false, false);
+      p.vie = 0; p.supprimer = true; M.p = null; M.fini = true;
+      annonce(tr('MISSILE ARRÊTÉ !'), tr('Il a explosé tout là-haut, sans faire de mal'), 3);
+      return;
+    }
+  }
+  if (p.etat !== 'tenu') { p.x += p.vel.x * dt; p.y += p.vel.y * dt; p.z += p.vel.z * dt; }
+  if ((p.tFumee = (p.tFumee || 0) - dt) <= 0 && d < 800) { // sa traînée de fumée blanche
+    p.tFumee = 0.05; const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#e8e8e8');
+    s.position.set(p.x - p.vel.x * 0.1, p.y - p.vel.y * 0.1, p.z - p.vel.z * 0.1); scene.add(s); effets.push({ o: s, vie: 1.6, fumee: 1.6, taille: 2 });
+  }
+  h.g.position.set(p.x, p.y, p.z);
+  h.g.quaternion.setFromUnitVectors(V3(0, 0, 1), V3().copy(p.vel).normalize());
+  h.flamme.scale.setScalar(entre(1, 1.6)); h.flamme.visible = p.etat !== 'tenu';
+}
+// clic gauche, un missile dans les mains : il le lance vers le ciel
+function lancerMissileTenu() {
+  const p = missileTenu();
+  if (!p) return;
+  const r = regard();
+  p.etat = 'lance'; p.t = 0; p.vel.set(r.x * 12, 55, r.z * 12);
+  J.frappe = 1; bruit(0.6, 300, 0.4);
+}
+// touché par ses yeux laser, ses poings, Krypto... : il explose là où il est (ce qui est autour est touché : sa faute, si ce sont des passants)
+function missileDetruit(p) {
+  exploser(V3(p.x, p.y, p.z), 9, 160, 30, p, false, true);
+  p.supprimer = true;
+  if (p.but) { p.but.p = null; p.but.fini = true; }
+  annonce(tr('MISSILE DÉTRUIT !'), tr('Encore {n}', { n: missilesLuthor ? missilesLuthor.liste.filter(M => !M.fini).length : 0 }), 2.5);
+}
+function finirMissiles() {
+  const ML = missilesLuthor; missilesLuthor = null;
+  if (!ML?.liste) return;
+  for (const M of ML.liste) if (M.p) M.p.supprimer = true;   // (on a quitté la mission : ils disparaissent)
+}
+
+// chaque image, au chapitre de Superman : ce que font ses missions (voir majEtape)
+function majMissionsSuperman(et, dt) {
+  majVehiculesMission();
+  majCristalVert(dt);
+  if (cristal) majCristal(dt);
+  if (chuteLois) majLoisMission(dt);
+  if (ecroulement) majPontMission(dt);
+  if (missilesLuthor) majMissilesMission(dt);
+  // le pont écroulé est réparé quand la mission n'en a plus besoin, et qu'on est loin
+  if (trouPont?.ouvert && !ecroulement && Math.hypot(J.x - (trouPont.a.x + trouPont.ux * trouPont.L / 2), J.z - (trouPont.a.z + trouPont.uz * trouPont.L / 2)) > 350) reparerPont();
+}
+
+// =====================================================================
 //  Les chapitres : la partie sauvegardée, l'amende des héros sans reproche, la DeLorean qui voyage d'un chapitre à l'autre
 // =====================================================================
 // la DeLorean de ce chapitre attend-elle dans sa cachette (la lettre l de la CARTE) ? Oui, tant qu'on ne l'a pas retrouvée. Ensuite, elle est à
@@ -24698,6 +25562,7 @@ function sauverPartie() {
     gagne: wayne.gagne, donnee: wayne.donnee, ...Object.fromEntries([...Object.keys(GADGETS_WAYNE), ...Object.keys(AMELIORATIONS_WAYNE)].map(c => [c, wayne[c]])) } };
   if (chezClark) partie.magasin = { ...partie.magasin, [chapitre]: { costumes: star.costumes.map(k => COSTUMES_STAR[k].nom), costume: COSTUMES_STAR[star.costume].nom,   // le magasin de S.T.A.R. Labs
     krypto: star.krypto, kryptoLa: star.kryptoLa, forteresse: star.forteresse && MISSIONS_CH.some(x => x.forteresse),   // (pas tant qu'aucune mission ne l'ouvre)
+    cristal: star.cristal && !star.forteresse,   // (la Forteresse de Solitude a poussé, et il a son costume, mais la mission 1 n'est pas finie)
     ...Object.fromEntries([...Object.keys(POUVOIRS_STAR), ...Object.keys(AMELIORATIONS_STAR)].map(c => [c, star[c]])) } };
   try { localStorage.partie = JSON.stringify(partie); } catch {}
 }
@@ -24764,6 +25629,7 @@ function occupe() {
     || (puits && puits.phase !== 'attente') || entree || poursuite?.v.fuyard.parti || suivi?.v.fuyard.parti || brouillage || dansBatcave(J)
     || bombesDF || (matchStade && matchStade.phase !== 'match') || combatBane?.phase === 'revanche' || (bombeBane && bombeBane.phase !== 'attente' && bombeBane.phase !== 'fini')
     || (chute && chute.phase !== 'avion') || parade || devinette || combatJoker
+    || (cristal && cristal.phase !== 'attente' && cristal.phase !== 'fini') || (chuteLois && chuteLois.phase !== 'tourne') || ecroulement?.phase === 'casse' || missilesLuthor
     || (c && dist(c, J) < 250) || personnes.some(p => ennemi(p) && dist(p, J) < 300);
 }
 function commencerAppel() {
@@ -25764,7 +26630,7 @@ function majOmbresPersonnages() {
   const allonge = Math.min(3, dh / Math.max(1e-3, directionLumiere.y));
   for (const p of personnes) {
     const g = p.h.g, o = g.position;
-    if (!g.visible || p.h.helico) continue;   // (trop loin de B.J. : il n'est pas dessiné du tout)
+    if (!g.visible || p.h.helico || p.h.missile) continue;   // (trop loin de B.J. : il n'est pas dessiné du tout ; un missile de Luthor non plus)
     const taille = g.scale.y, d = cam.distanceTo(o);
     p.ombreLoin = !(L > 0) || d > L * Math.max(1, taille) + (p.ombreLoin ? -ECART_OMBRE : ECART_OMBRE);   // (un géant, comme Iron Monger, a sa vraie ombre de plus loin)
     if (!p.ombreLoin) continue;
@@ -26210,6 +27076,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
         if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
       }
     } else if (souleve) { if (sourisG && !dejaTire && lancerVoiture()) dejaTire = true; }   // (trop tôt, il ne la lance pas : le clic attend)   // Superman tient une voiture : le clic gauche la lance
+    else if (missileTenu()) { if (sourisG && !dejaTire) { lancerMissileTenu(); dejaTire = true; } }   // un missile de Luthor dans les mains : le clic gauche le lance vers le ciel
     else if (sourisG && !J.voiture && !J.telesiege && !J.monorail && !J.nage && !J.roule && !J.ironman?.anim && !(J.superman && (ARMES[J.arme].corps || J.superman.looping)) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(vieMax(), J.vie + R_.regeneration * dt);
   }
@@ -26313,7 +27180,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
 }
 function majRepere(dt) {
   const cible = cibleMission(), et = MISSIONS_CH[missionIndex]?.etapes[etapeIndex];
-  const surCible = et?.type === 'eliminer' || et?.type === 'voler' || (['sauver', 'emmener', 'repecher', 'chute'].includes(et?.type) && !porte && !!cible?.h) || et?.type === 'parler';   // une flèche au-dessus de la cible, du butin, ou de quelqu'un à sauver
+  const surCible = et?.type === 'eliminer' || et?.type === 'voler' || (['sauver', 'emmener', 'repecher', 'chute', 'lois', 'missiles'].includes(et?.type) && !porte && !!cible?.h) || et?.type === 'parler';   // une flèche au-dessus de la cible, du butin, ou de quelqu'un à sauver
   repere.visible = !!cible && !surCible && et?.type !== 'anneaux' && !(et?.type === 'course' && course?.portes.includes(cible));   // (un anneau, une porte de la course : ils se voient tout seuls)
   fleche.visible = !!cible && surCible;
   const v = voyousDebout().reduce((m, p) => !m || dist(p, J) < dist(m, J) ? p : m, null);   // un appel de la police : le voyou le plus proche
@@ -26544,9 +27411,10 @@ if (chezClark) A_PREPARER.push([M_TOURBILLON[0], 'image'], [M_FUMEE, 'image'], [
 // (on ne les voit pas) sont dessinés avec la toute première image, ombres comprises, puis enlevés, comme celui des personnages (temoinForme) : un
 // objet découpé (le blason d'un costume), découpé à deux faces (la cape de Batman), à deux faces (le plat des antennes, le canard du Pingouin ;
 // juste après un lot : Three.js n'en refait le programme qu'en changeant de sorte d'objet, et n'y pense qu'à ce moment-là)
-// Au chapitre de Superman, un seul : l'écusson de son costume, découpé, qui fait son ombre dès qu'il le met (H)
+// Au chapitre de Superman, deux : l'écusson de son costume, découpé, qui fait son ombre dès qu'il le met (H) ; et un objet à deux faces (la
+// jupe de Lois Lane, à la mission 2, qui fait son ombre avant que Lois soit d'un seul bloc ; avec le garçon du menu, rien d'autre n'en a)
 const temoinsOmbres = (GOTHAM ? [std(IMAGE_PREPARER, { alphaTest: 0.5 }), std(IMAGE_PREPARER, { alphaTest: 0.5, side: THREE.DoubleSide }), MAT.noirMeuble, std(null, { side: THREE.DoubleSide })]
-  : chezClark ? [std(IMAGE_PREPARER, { alphaTest: 0.5 })] : []).map(m => {
+  : chezClark ? [std(IMAGE_PREPARER, { alphaTest: 0.5 }), std(null, { side: THREE.DoubleSide })] : []).map(m => {
   const f = new THREE.BufferGeometry(), t = m === MAT.noirMeuble ? new THREE.InstancedMesh(f, m, 1) : new THREE.Mesh(f, m);
   f.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(9), 3)); f.setAttribute('normal', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 0], 3)); f.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(6), 2));
   t.castShadow = true; t.frustumCulled = false; t.raycast = () => {};
@@ -26642,6 +27510,10 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   COSTUMES_STAR, POUVOIRS_STAR, AMELIORATIONS_STAR, KRYPTO, star, standsStar, objetsStar, acheterStar, aideStar, texteStar, costumeDeStar, costumeSuperman, enCostumeSuper, sansForteresse, niveauStar,
   volSuperman, laserSuperman, vitesseSuper, soufflerGlace, basculerRayonsX, basculerSuperVitesse, superCri, souffles, basculerKrypto, appelerKrypto, renvoyerKrypto, creerKrypto, get krypto() { return krypto; },
   superForce, porterVoiture, reposerVoiture, lancerVoiture, lacherVoiture, get souleve() { return souleve; }, get savant() { return savant; }, statueSuperman, habillerSuperman, motifCollant, allumer, eteindre, majStar, dansCone, numerosParNom, missionPassee,
+  // les missions de Superman (chapitre 4)
+  MISSIONS_METROPOLIS, get cristal() { return cristal; }, get chuteLois() { return chuteLois; }, get ecroulement() { return ecroulement; }, get missilesLuthor() { return missilesLuthor; }, get trouPont() { return trouPont; },
+  vehiculesMission, get passage() { return passage; }, get cristalVert() { return cristalVert; }, cacherForteresse, commencerCristal, commencerLois, commencerPont, commencerMissiles, ecroulerPont, reparerPont, lancerMissileTenu, missileTenu, tempsMissile, tempsMissiles, dansTrouPont, creerLois, creerMissile,
+  get etapeVue() { return etapeVue; }, sansCostume, changerCostume, cibleMission, etapeFinie,
   chezWayne, wayne, COSTUMES_WAYNE, BATMOBILES_WAYNE, GADGETS_WAYNE, AMELIORATIONS_WAYNE, standsWayne, objetsWayne, acheterWayne, aideWayne, texteWayne, costumeDe, costumeBatman, costumePorte, enCostume,
   costumeSuivant, batmobileSuivante, basculerVision, lancerFumigene, gelExplosif, faireSauterGel, fumees, dansFumee, voitBJ, vieMax, protectionCostume, vitesseCostume, chuteCape, vitesseCape, vitesseGrappin,
   tailleHeros, niveauWayne, typeBatmobile, voitureTriche, allumerTurbo, sauterBatmobile, virageGrappin, trouerMur, dallesEn, dessinerDetective, sceneDetective, statueBatman, figer, majWayne, coupElectrique,
