@@ -376,7 +376,7 @@ const CHAPITRES = [
     ['En volant', 'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping'],
     ['9', 'en costume : les yeux laser (garde le clic gauche enfoncé)'],
     ['G', 'en costume : soulever la voiture la plus proche (même un bus) · clic gauche : la lancer · G encore : la reposer'],
-    ['Clic gauche', 'en costume, un missile de Luthor dans les mains : le lancer vers le ciel'],
+    ['Clic gauche', 'en costume, un missile de Luthor dans les mains : le lancer vers le ciel · la lance de kryptonite à la main : la planter dans Doomsday, de tout près'],
     ['X, O, R, B', 'en costume, une fois achetés à S.T.A.R. Labs : le souffle glacé, la vision à rayons X, la super-vitesse (avec Maj), le super-cri'],
     ['K', 'Krypto, le super-chien (une fois acheté) : il vient, ou il rentre à la maison'],
     ['E', 'monter / descendre (voiture, bateau), ascenseur, magasin de S.T.A.R. Labs'],
@@ -392,7 +392,7 @@ const CHAPITRES = [
     "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte), ouvert après ta 1re mission : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.",
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
-    "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par la Forteresse de Solitude. À la fin, la DeLorean est cachée dans la cour du vieux théâtre (<b>♣</b> sur la carte) : retrouve-la, puis tiens 88 miles à l'heure pendant 3 secondes.",
+    "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par la Forteresse de Solitude. À la fin, Mister Mxyzptlk a caché la DeLorean, au vieux théâtre (<b>♣</b> sur la carte) : attrape les lettres de son nom à l'envers, dans l'ordre, puis tiens 88 miles à l'heure pendant 3 secondes.",
   ]},
   { ville: 'New York', heros: 'Peter Parker', heroine: 'Gwen Stacy', super: 'Spiderman', superFille: 'Spider-Gwen', triche: 'SPIDERMAN', logo: 'spiderman', cachette: 'a', sansReproche: true, touches: [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
@@ -2351,15 +2351,18 @@ const TRADUCTIONS = {
     de: 'du ziehst dein Kostüm an (gefunden in der 1. Mission) und wirst {super} · H nochmal: wieder in Zivil (ohne deine Kräfte)',
     en: 'you put on your suit (found in the 1st mission) and become {super} · H again: back in plain clothes (without your powers)',
     gsw: 'du leisch dis Kostüm aa (gfunde i de 1. Mission) und wirsch {super} · H nomal: wider in Zivil (ohni dini Chräft)' },
-  'en costume, un missile de Luthor dans les mains : le lancer vers le ciel': { de: 'im Kostüm, mit einer Rakete von Luthor in den Händen: sie in den Himmel werfen', en: 'in your suit, holding one of Luthor\'s missiles: throw it into the sky', gsw: 'im Kostüm, mit ere Rakete vom Luthor i de Händ: sie in Himmel ue wärfe' },
+  'en costume, un missile de Luthor dans les mains : le lancer vers le ciel · la lance de kryptonite à la main : la planter dans Doomsday, de tout près': {
+    de: 'im Kostüm, mit einer Rakete von Luthor in den Händen: sie in den Himmel werfen · mit dem Kryptonit-Speer in der Hand: ihn ganz nah in Doomsday stoßen',
+    en: 'in your suit, holding one of Luthor\'s missiles: throw it into the sky · holding the kryptonite spear: drive it into Doomsday, up close',
+    gsw: 'im Kostüm, mit ere Rakete vom Luthor i de Händ: sie in Himmel ue wärfe · mit em Kryptonit-Speer i de Hand: en ganz nöch in Doomsday ine stosse' },
   "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte), ouvert après ta 1re mission : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.": {
     de: 'Der Laden von <b>S.T.A.R. Labs</b> (★ auf der Karte), offen nach deiner 1. Mission: andere Kostüme, neue Kräfte, Verbesserungen und Krypto, der Superhund! <b>J</b>: Kostüm wechseln.',
     en: 'The <b>S.T.A.R. Labs</b> shop (★ on the map), open after your 1st mission: other suits, new powers, upgrades, and Krypto the Superdog! <b>J</b>: change suit.',
     gsw: 'De Lade vo <b>S.T.A.R. Labs</b> (★ uf de Charte), offe nach dinere 1. Mission: anderi Kostüm, neui Chräft, Verbesserige und Krypto, de Superhund! <b>J</b>: Kostüm wächsle.' },
-  "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par la Forteresse de Solitude. À la fin, la DeLorean est cachée dans la cour du vieux théâtre (<b>♣</b> sur la carte) : retrouve-la, puis tiens 88 miles à l'heure pendant 3 secondes.": {
-    de: 'Folge dem <b>gelben Punkt</b>: Deine Missionen warten auf dich, angefangen mit der Festung der Einsamkeit. Am Ende ist der DeLorean im Hof des alten Theaters versteckt (<b>♣</b> auf der Karte): Finde ihn, und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
-    en: 'Follow the <b>yellow dot</b>: your missions are waiting, starting with the Fortress of Solitude. At the end, the DeLorean is hidden in the courtyard of the old theater (<b>♣</b> on the map): find it, then hold 88 miles per hour for 3 seconds.',
-    gsw: 'Folg em <b>gääle Punkt</b>: Dini Missione warted uf dich, aagfange mit de Feschtig vo de Einsamkeit. Am Schluss isch de DeLorean im Hof vom alte Theater versteckt (<b>♣</b> uf de Charte): Find en, und heb denn 3 Sekunde lang 88 Meile pro Stund.' },
+  "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par la Forteresse de Solitude. À la fin, Mister Mxyzptlk a caché la DeLorean, au vieux théâtre (<b>♣</b> sur la carte) : attrape les lettres de son nom à l'envers, dans l'ordre, puis tiens 88 miles à l'heure pendant 3 secondes.": {
+    de: 'Folge dem <b>gelben Punkt</b>: Deine Missionen warten auf dich, angefangen mit der Festung der Einsamkeit. Am Ende hat Mister Mxyzptlk den DeLorean beim alten Theater versteckt (<b>♣</b> auf der Karte): Fang die Buchstaben seines Namens rückwärts, der Reihe nach, und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
+    en: 'Follow the <b>yellow dot</b>: your missions are waiting, starting with the Fortress of Solitude. At the end, Mister Mxyzptlk has hidden the DeLorean at the old theater (<b>♣</b> on the map): catch the letters of his name backwards, in order, then hold 88 miles per hour for 3 seconds.',
+    gsw: 'Folg em <b>gääle Punkt</b>: Dini Missione warted uf dich, aagfange mit de Feschtig vo de Einsamkeit. Am Schluss hät de Mister Mxyzptlk de DeLorean bim alte Theater versteckt (<b>♣</b> uf de Charte): Fang d Buechstabe vo sim Name rückwärts, schön der Reihe nach, und heb denn 3 Sekunde lang 88 Meile pro Stund.' },
   'La Forteresse de Solitude': { de: 'Die Festung der Einsamkeit', en: 'The Fortress of Solitude', gsw: 'D Feschtig vo de Einsamkeit' },
   'Lois tombe du toit': { de: 'Lois fällt vom Dach', en: 'Lois falls from the roof', gsw: 'D Lois gheit vom Dach' },
   'Le bus sur le pont': { de: 'Der Bus auf der Brücke', en: 'The bus on the bridge', gsw: 'De Bus uf de Brugg' },
@@ -2557,8 +2560,319 @@ const TRADUCTIONS = {
   'Brainiac ne peut plus se réparer : à lui, maintenant !': { de: 'Brainiac kann sich nicht mehr reparieren: Jetzt ist er dran!', en: 'Brainiac can\'t repair himself anymore: now for him!', gsw: 'De Brainiac chan sich nümme flicke: Jetzt isch er dra!' },
   'BRAINIAC EST VAINCU !': { de: 'BRAINIAC IST BESIEGT!', en: 'BRAINIAC IS DEFEATED!', gsw: 'DE BRAINIAC ISCH BSIEGT!' },
   '« Impossible... Ma collection ! » Les villes en bouteille retrouvent leur place, chez elles': { de: '„Unmöglich... Meine Sammlung!“ Die Städte in den Flaschen kehren nach Hause zurück', en: '"Impossible... My collection!" The bottled cities go back home', gsw: '«Unmöglich... Mini Sammlig!» D Stedt i de Fläsche gönd hei' },
-  'Tu te réveilles au pied de LexCorp (-100 $)': { de: 'Du wachst am Fuß von LexCorp auf (-100 $)', en: 'You wake up at the foot of LexCorp (-100 $)', gsw: 'Du wachsch am Fuess vo LexCorp uf (-100 $)' },
+  'Tu te réveilles en l\'air, à côté du toit de LexCorp (-100 $)': { de: 'Du wachst in der Luft auf, neben dem Dach von LexCorp (-100 $)', en: 'You wake up in the air, next to the roof of LexCorp (-100 $)', gsw: 'Du wachsch i de Luft uf, näbem Dach vo LexCorp (-100 $)' },
   'Tu te réveilles sous le vaisseau de Brainiac (-100 $)': { de: 'Du wachst unter Brainiacs Raumschiff auf (-100 $)', en: 'You wake up under Brainiac\'s ship (-100 $)', gsw: 'Du wachsch under em Raumschiff vom Brainiac uf (-100 $)' },
+  // les missions de Superman (chapitre 4, missions 9 à 13) : la machine-monde et le duel contre Zod, Doomsday, sa lance de kryptonite et l'espace, Mister Mxyzptlk
+  'La machine-monde': { de: 'Die Weltmaschine', en: 'The World Engine', gsw: 'D Weltmaschine' },
+  'Le duel contre Zod': { de: 'Das Duell gegen Zod', en: 'The duel against Zod', gsw: 'S Duell gäge de Zod' },
+  'La lance de kryptonite': { de: 'Der Kryptonit-Speer', en: 'The kryptonite spear', gsw: 'De Kryptonit-Speer' },
+  'Dans l\'espace': { de: 'Im Weltall', en: 'In space', gsw: 'Im Weltall' },
+  'Mister Mxyzptlk': { de: 'Mister Mxyzptlk', en: 'Mister Mxyzptlk', gsw: 'Mister Mxyzptlk' },
+  'Cœur de la machine-monde': { de: 'Herz der Weltmaschine', en: 'World Engine core', gsw: 'Herz vo de Weltmaschine' },
+  'Général Zod': { de: 'General Zod', en: 'General Zod', gsw: 'General Zod' },
+  'Faora': { de: 'Faora', en: 'Faora', gsw: 'Faora' },
+  'Doomsday': { de: 'Doomsday', en: 'Doomsday', gsw: 'Doomsday' },
+  'Un immense vaisseau noir apparaît dans le ciel de Metropolis... Écoute : quelqu\'un parle sur tous les écrans de la ville !': {
+    de: 'Ein riesiges schwarzes Raumschiff erscheint am Himmel über Metropolis... Hör zu: Jemand spricht auf allen Bildschirmen der Stadt!',
+    en: 'A huge black ship appears in the sky over Metropolis... Listen: someone is speaking on every screen in the city!',
+    gsw: 'Es riesigs schwarzes Raumschiff tauchet am Himmel über Metropolis uf... Los: Öpper redet uf allne Bildschirm vo de Stadt!' },
+  'Le général Zod t\'attend dans le ciel, entre les tours de New Troy (point jaune) : bats-le ! Il vole aussi vite que toi, et ses yeux laser brûlent': {
+    de: 'General Zod wartet am Himmel zwischen den Türmen von New Troy auf dich (gelber Punkt): Besiege ihn! Er fliegt so schnell wie du, und seine Laseraugen brennen',
+    en: 'General Zod is waiting for you in the sky, between the towers of New Troy (yellow dot): beat him! He flies as fast as you, and his laser eyes burn',
+    gsw: 'De General Zod wartet am Himmel zwüsched de Türm vo New Troy uf dich (gääle Punkt): Bsieg en! Er flüügt so schnäll wie du, und sini Laserauge brönned' },
+  '{ami} : « Une météorite va tomber sur Centennial Park ! » Vole jusque-là (point jaune)': {
+    de: '{ami}: „Ein Meteorit wird auf den Centennial Park fallen!“ Flieg dorthin (gelber Punkt)',
+    en: '{ami}: "A meteorite is going to fall on Centennial Park!" Fly there (yellow dot)',
+    gsw: '{ami}: «En Meteorit gheit gli uf de Centennial Park!» Flüüg det ane (gääle Punkt)' },
+  '{ami} : « Rien ne lui fait mal... sauf la kryptonite ! L\'armée a posé une lance de kryptonite au bout du parc. » Va la chercher (point jaune), puis G pour la prendre': {
+    de: '{ami}: „Nichts tut ihm weh... außer Kryptonit! Die Armee hat einen Kryptonit-Speer am Ende des Parks hingelegt.“ Hol ihn (gelber Punkt), dann G, um ihn zu nehmen',
+    en: '{ami}: "Nothing hurts him... except kryptonite! The army has left a kryptonite spear at the end of the park." Go get it (yellow dot), then G to pick it up',
+    gsw: '{ami}: «Nüt tuet em weh... usser Kryptonit! D Armee hät en Kryptonit-Speer am Änd vom Park anegleit.» Gang en go hole (gääle Punkt), denn G zum en näh' },
+  'Doomsday est affaibli : fonce sur lui en volant pour l\'attraper, puis pousse-le tout là-haut, jusque dans l\'espace !': {
+    de: 'Doomsday ist geschwächt: Flieg auf ihn zu, um ihn zu packen, und schieb ihn dann ganz nach oben, bis ins Weltall!',
+    en: 'Doomsday is weakened: fly into him to grab him, then push him way up, all the way into space!',
+    gsw: 'De Doomsday isch gschwächt: Flüüg uf en zue zum en packe, und schieb en denn ganz ufe, bis is Weltall!' },
+  'Dans l\'espace ! Finis le combat contre Doomsday : yeux laser (9), poings tout près. Le soleil jaune te redonne vite des forces': {
+    de: 'Im Weltall! Beende den Kampf gegen Doomsday: Laseraugen (9), Fäuste ganz nah. Die gelbe Sonne gibt dir schnell neue Kraft',
+    en: 'In space! Finish the fight against Doomsday: laser eyes (9), fists up close. The yellow sun quickly gives you your strength back',
+    gsw: 'Im Weltall! Mach de Kampf gäge de Doomsday fertig: Laserauge (9), Füscht ganz nöch. D gääli Sunne git dir schnäll wider Chraft' },
+  'Doomsday est vaincu ! Redescends sur Metropolis : toute la ville t\'attend devant ta statue, à Centennial Park (point jaune)': {
+    de: 'Doomsday ist besiegt! Flieg zurück nach Metropolis: Die ganze Stadt wartet vor deiner Statue im Centennial Park auf dich (gelber Punkt)',
+    en: 'Doomsday is defeated! Fly back down to Metropolis: the whole city is waiting for you in front of your statue, in Centennial Park (yellow dot)',
+    gsw: 'De Doomsday isch bsiegt! Flüüg zrugg uf Metropolis: Di ganz Stadt wartet vor dinere Statue im Centennial Park uf dich (gääle Punkt)' },
+  'La DeLorean a disparu ! Un drôle de petit bonhomme flotte au-dessus du vieux théâtre, à Suicide Slum (point jaune) : va voir': {
+    de: 'Der DeLorean ist verschwunden! Ein komisches kleines Männchen schwebt über dem alten Theater in Suicide Slum (gelber Punkt): Sieh nach',
+    en: 'The DeLorean has vanished! A funny little man is floating above the old theater, in Suicide Slum (yellow dot): go and see',
+    gsw: 'De DeLorean isch verschwunde! Es luschtigs chliises Mannli schwebt über em alte Theater in Suicide Slum (gääle Punkt): Gang go luege' },
+  'La DeLorean est revenue dans la cour du vieux théâtre : monte dedans (point jaune)': {
+    de: 'Der DeLorean ist zurück im Hof des alten Theaters: Steig ein (gelber Punkt)',
+    en: 'The DeLorean is back in the courtyard of the old theater: get in (yellow dot)',
+    gsw: 'De DeLorean isch zrugg im Hof vom alte Theater: Stiig ii (gääle Punkt)' },
+  'La machine-monde descend vers la baie, à Hob\'s Bay : vole jusque-là (point jaune)': {
+    de: 'Die Weltmaschine sinkt auf die Bucht zu, in Hob\'s Bay: Flieg dorthin (gelber Punkt)',
+    en: 'The World Engine is coming down toward the bay, at Hob\'s Bay: fly there (yellow dot)',
+    gsw: 'D Weltmaschine chunnt uf d Bucht abe, in Hob\'s Bay: Flüüg det ane (gääle Punkt)' },
+  'Mets ton costume (H), puis Maj 3 fois : vole jusqu\'à la machine-monde !': {
+    de: 'Zieh dein Kostüm an (H), dann 3-mal Shift: Flieg zur Weltmaschine!',
+    en: 'Put on your suit (H), then Shift 3 times: fly to the World Engine!',
+    gsw: 'Leg dis Kostüm aa (H), denn 3 Mal Shift: Flüüg zur Weltmaschine!' },
+  'Dans le rayon ! Frappe le cœur de la machine (poings tout près, ou yeux laser), vite !': {
+    de: 'Im Strahl! Schlag auf das Herz der Maschine (Fäuste ganz nah, oder Laseraugen), schnell!',
+    en: 'In the beam! Hit the core of the machine (fists up close, or laser eyes), quick!',
+    gsw: 'Im Strahl! Hau ufs Herz vo de Maschine (Füscht ganz nöch, oder Laserauge), schnäll!' },
+  'Son rayon soulève tout ! Entre dans le rayon (il te repousse), et frappe son cœur, sous la machine : poings ou yeux laser': {
+    de: 'Ihr Strahl hebt alles hoch! Flieg in den Strahl (er drückt dich zurück) und schlag auf ihr Herz, unter der Maschine: Fäuste oder Laseraugen',
+    en: 'Its beam lifts everything up! Get into the beam (it pushes you back), and hit its core, under the machine: fists or laser eyes',
+    gsw: 'Ihre Strahl lüpft alles ufe! Flüüg in Strahl ine (er drückt dich zrugg), und hau uf ihres Herz, under de Maschine: Füscht oder Laserauge' },
+  'La machine-monde s\'effondre dans la baie !': { de: 'Die Weltmaschine stürzt in die Bucht!', en: 'The World Engine is collapsing into the bay!', gsw: 'D Weltmaschine gheit i d Bucht!' },
+  'Mets ton costume (H), puis Maj 3 fois : le général Zod t\'attend dans le ciel, entre les tours !': {
+    de: 'Zieh dein Kostüm an (H), dann 3-mal Shift: General Zod wartet am Himmel zwischen den Türmen auf dich!',
+    en: 'Put on your suit (H), then Shift 3 times: General Zod is waiting for you in the sky, between the towers!',
+    gsw: 'Leg dis Kostüm aa (H), denn 3 Mal Shift: De General Zod wartet am Himmel zwüsched de Türm uf dich!' },
+  'Zod et Faora ! Yeux laser (9), poings tout près : écarte-toi quand ils foncent sur toi': {
+    de: 'Zod und Faora! Laseraugen (9), Fäuste ganz nah: Weich aus, wenn sie auf dich losstürmen',
+    en: 'Zod and Faora! Laser eyes (9), fists up close: dodge when they charge at you',
+    gsw: 'De Zod und d Faora! Laserauge (9), Füscht ganz nöch: Wiich us, wenn sie uf dich los schüssed' },
+  'DOOMSDAY ! Frappe-le (yeux laser, poings)... Attention à ses coups, et aux voitures qu\'il lance !': {
+    de: 'DOOMSDAY! Greif ihn an (Laseraugen, Fäuste)... Pass auf seine Schläge auf, und auf die Autos, die er wirft!',
+    en: 'DOOMSDAY! Hit him (laser eyes, fists)... Watch out for his punches, and the cars he throws!',
+    gsw: 'DOOMSDAY! Gib em eis (Laserauge, Füscht)... Pass uf sini Schläg uf, und uf d Autos, won er rüert!' },
+  'La lance est avec toi, dans la voiture : fonce jusqu\'à Doomsday, puis descends (E), et plante-la (clic gauche)': {
+    de: 'Der Speer ist bei dir im Auto: Fahr schnell zu Doomsday, steig dann aus (E) und stoß ihn hinein (Linksklick)',
+    en: 'The spear is with you, in the car: race to Doomsday, then get out (E), and drive it in (left click)',
+    gsw: 'De Speer isch bi dir im Auto: Fahr schnäll zum Doomsday, stiig denn us (E) und stoss en ine (Linksklick)' },
+  'Tu tiens la lance : elle t\'affaiblit, tu ne voles plus ! Va jusqu\'à Doomsday (à pied, en sautant, ou en voiture), et plante-la : clic gauche, tout près': {
+    de: 'Du hältst den Speer: Er schwächt dich, du fliegst nicht mehr! Geh zu Doomsday (zu Fuß, springend oder mit dem Auto) und stoß ihn hinein: Linksklick, ganz nah',
+    en: 'You are holding the spear: it weakens you, you can\'t fly anymore! Go to Doomsday (on foot, jumping, or by car), and drive it in: left click, up close',
+    gsw: 'Du hebsch de Speer: Er schwächt dich, du flüügsch nümme! Gang zum Doomsday (z Fuess, gumpend oder mit em Auto) und stoss en ine: Linksklick, ganz nöch' },
+  'La lance de kryptonite, par terre : approche-toi, et G pour la prendre (elle va t\'affaiblir !)': {
+    de: 'Der Kryptonit-Speer, auf dem Boden: Geh hin, und G, um ihn zu nehmen (er wird dich schwächen!)',
+    en: 'The kryptonite spear, on the ground: go up to it, and G to pick it up (it will weaken you!)',
+    gsw: 'De Kryptonit-Speer, am Bode: Gang ane, und G zum en näh (er wird dich schwäche!)' },
+  'Pousse Doomsday tout là-haut : regarde vers le ciel, et vole (Maj : plus vite). Tu es à {y} m, l\'espace commence à {h} m': {
+    de: 'Schieb Doomsday ganz nach oben: Schau zum Himmel und flieg (Shift: schneller). Du bist auf {y} m, das Weltall beginnt auf {h} m',
+    en: 'Push Doomsday way up: look at the sky, and fly (Shift: faster). You are at {y} m, space starts at {h} m',
+    gsw: 'Schieb de Doomsday ganz ufe: Lueg zum Himmel und flüüg (Shift: schnäller). Du bisch uf {y} m, s Weltall faht uf {h} m aa' },
+  'Mets ton costume (H), puis Maj 3 fois : attrape Doomsday en volant !': {
+    de: 'Zieh dein Kostüm an (H), dann 3-mal Shift: Pack Doomsday im Flug!',
+    en: 'Put on your suit (H), then Shift 3 times: grab Doomsday while flying!',
+    gsw: 'Leg dis Kostüm aa (H), denn 3 Mal Shift: Pack de Doomsday im Flug!' },
+  'Metropolis t\'acclame !': { de: 'Metropolis jubelt dir zu!', en: 'Metropolis cheers for you!', gsw: 'Metropolis jublet dir zue!' },
+  'Mister Mxyzptlk ! Écoute ce qu\'il te dit...': { de: 'Mister Mxyzptlk! Hör zu, was er dir sagt...', en: 'Mister Mxyzptlk! Listen to what he tells you...', gsw: 'Mister Mxyzptlk! Los, was er dir seit...' },
+  'Attrape ses lettres dans l\'ordre (touche-les) : la prochaine, en or, c\'est le {l} · déjà : {mot} · encore {n}': {
+    de: 'Fang seine Buchstaben der Reihe nach (berühre sie): Der nächste, in Gold, ist das {l} · schon: {mot} · noch {n}',
+    en: 'Catch his letters in order (touch them): the next one, in gold, is the {l} · so far: {mot} · {n} left',
+    gsw: 'Fang sini Buechstabe der Reihe nach (berüer sie): De nächscht, in Gold, isch s {l} · scho: {mot} · no {n}' },
+  'Mister Mxyzptlk dit son nom à l\'envers...': { de: 'Mister Mxyzptlk sagt seinen Namen rückwärts...', en: 'Mister Mxyzptlk says his name backwards...', gsw: 'De Mister Mxyzptlk seit sin Name rückwärts...' },
+  'UN VAISSEAU DANS LE CIEL !': { de: 'EIN RAUMSCHIFF AM HIMMEL!', en: 'A SHIP IN THE SKY!', gsw: 'ES RAUMSCHIFF AM HIMMEL!' },
+  'Un immense vaisseau noir, au-dessus de Metropolis... Tous les écrans de la ville s\'allument !': {
+    de: 'Ein riesiges schwarzes Raumschiff über Metropolis... Alle Bildschirme der Stadt gehen an!',
+    en: 'A huge black ship, above Metropolis... Every screen in the city switches on!',
+    gsw: 'Es riesigs schwarzes Raumschiff über Metropolis... Alli Bildschirm vo de Stadt gönd aa!' },
+  'GÉNÉRAL ZOD': { de: 'GENERAL ZOD', en: 'GENERAL ZOD', gsw: 'GENERAL ZOD' },
+  '« Je suis le général Zod, de Krypton. Peuple de la Terre : vous n\'êtes pas seuls dans l\'univers. »': {
+    de: '„Ich bin General Zod, von Krypton. Volk der Erde: Ihr seid nicht allein im Universum.“',
+    en: '"I am General Zod, of Krypton. People of Earth: you are not alone in the universe."',
+    gsw: '«Ich bi de General Zod, vo Krypton. Volk vo de Ärde: Ihr sind nöd elei im Universum.»' },
+  '« {nom} ! Rends-toi... ou ta planète deviendra une nouvelle Krypton ! »': {
+    de: '„{nom}! Ergib dich... oder dein Planet wird ein neues Krypton!“',
+    en: '"{nom}! Surrender... or your planet will become a new Krypton!"',
+    gsw: '«{nom}! Gib uf... oder din Planet wird es neus Krypton!»' },
+  '« Ma machine-monde va changer la Terre. Regardez le ciel : elle arrive ! »': {
+    de: '„Meine Weltmaschine wird die Erde verändern. Schaut zum Himmel: Sie kommt!“',
+    en: '"My World Engine will change the Earth. Look at the sky: here it comes!"',
+    gsw: '«Mini Weltmaschine wird d Ärde verändere. Lueged zum Himmel: Sie chunnt!»' },
+  'LA MACHINE-MONDE !': { de: 'DIE WELTMASCHINE!', en: 'THE WORLD ENGINE!', gsw: 'D WELTMASCHINE!' },
+  'Elle descend du vaisseau de Zod... vers la baie !': { de: 'Sie sinkt aus Zods Raumschiff herab... auf die Bucht zu!', en: 'It is coming down from Zod\'s ship... toward the bay!', gsw: 'Sie chunnt us em Raumschiff vom Zod abe... uf d Bucht zue!' },
+  'LA MACHINE-MONDE SE POSE !': { de: 'DIE WELTMASCHINE LANDET!', en: 'THE WORLD ENGINE LANDS!', gsw: 'D WELTMASCHINE LANDET!' },
+  'Son rayon change la gravité : tout s\'envole autour d\'elle ! Entre dans le rayon, et frappe son cœur': {
+    de: 'Ihr Strahl verändert die Schwerkraft: Alles um sie herum fliegt davon! Flieg in den Strahl und schlag auf ihr Herz',
+    en: 'Its beam changes gravity: everything around it flies away! Get into the beam, and hit its core',
+    gsw: 'Ihre Strahl veränderet d Schwerchraft: Alles um sie ume flüügt devo! Flüüg in Strahl ine und hau uf ihres Herz' },
+  'DANS LE RAYON !': { de: 'IM STRAHL!', en: 'IN THE BEAM!', gsw: 'IM STRAHL!' },
+  'Il te repousse, et t\'écrase : fonce sur le cœur, et frappe vite !': {
+    de: 'Er drückt dich zurück und quetscht dich: Stürz dich auf das Herz und schlag schnell zu!',
+    en: 'It pushes you back, and crushes you: rush at the core, and hit it fast!',
+    gsw: 'Er drückt dich zrugg und verdrückt dich: Schüss uf s Herz und hau schnäll zue!' },
+  'LA MACHINE-MONDE EST DÉTRUITE !': { de: 'DIE WELTMASCHINE IST ZERSTÖRT!', en: 'THE WORLD ENGINE IS DESTROYED!', gsw: 'D WELTMASCHINE ISCH KAPUTT!' },
+  'Elle s\'effondre dans la baie... Tout ce qui flottait redescend, tout doucement : personne n\'a de mal !': {
+    de: 'Sie stürzt in die Bucht... Alles, was geschwebt hat, kommt ganz sanft herunter: Niemand ist verletzt!',
+    en: 'It collapses into the bay... Everything that was floating comes down, very gently: nobody is hurt!',
+    gsw: 'Sie gheit i d Bucht... Alles, wo gschwebt hät, chunnt ganz sanft abe: Niemer hät sich weh ta!' },
+  '« Tu vas me le payer, {nom} ! Je t\'attends, entre les tours de ta ville... »': {
+    de: '„Dafür wirst du bezahlen, {nom}! Ich warte auf dich, zwischen den Türmen deiner Stadt...“',
+    en: '"You will pay for this, {nom}! I\'ll be waiting for you, between the towers of your city..."',
+    gsw: '«Das zahlsch mer, {nom}! Ich warte uf dich, zwüsched de Türm vo dinere Stadt...»' },
+  'Le rayon de la machine-monde arrête tes coups : entre dedans pour frapper son cœur !': {
+    de: 'Der Strahl der Weltmaschine hält deine Angriffe auf: Flieg hinein, um ihr Herz zu treffen!',
+    en: 'The World Engine\'s beam stops your attacks: get inside it to hit its core!',
+    gsw: 'De Strahl vo de Weltmaschine hebt dini Schläg uf: Flüüg ine zum ihres Herz träffe!' },
+  'LE VAISSEAU DE ZOD S\'EN VA !': { de: 'ZODS RAUMSCHIFF FLIEGT DAVON!', en: 'ZOD\'S SHIP IS LEAVING!', gsw: 'S RAUMSCHIFF VOM ZOD HAUT AB!' },
+  'Il remonte vers l\'espace... et il ne reviendra plus': { de: 'Es steigt ins Weltall auf... und es kommt nie wieder', en: 'It rises back into space... and it will never come back', gsw: 'Es stiigt is Weltall ufe... und es chunnt nie meh zrugg' },
+  '« {nom}... Je suis né pour protéger Krypton. Toi, tu protèges ces humains ? Alors bats-toi ! »': {
+    de: '„{nom}... Ich wurde geboren, um Krypton zu beschützen. Du beschützt diese Menschen? Dann kämpfe!“',
+    en: '"{nom}... I was born to protect Krypton. You protect these humans? Then fight!"',
+    gsw: '«{nom}... Ich bi gebore, zum Krypton beschütze. Du beschützisch die Mänsche? Denn kämpf!»' },
+  '« Te revoilà, {nom} ? Ce combat n\'est pas fini ! »': { de: '„Da bist du wieder, {nom}? Dieser Kampf ist noch nicht vorbei!“', en: '"Back again, {nom}? This fight isn\'t over!"', gsw: '«Bisch wider da, {nom}? De Kampf isch nonig fertig!»' },
+  'FAORA !': { de: 'FAORA!', en: 'FAORA!', gsw: 'FAORA!' },
+  '« Général, je suis là ! » La plus rapide des guerrières de Krypton vient l\'aider': {
+    de: '„General, ich bin da!“ Die schnellste Kriegerin von Krypton kommt ihm zu Hilfe',
+    en: '"General, I\'m here!" The fastest warrior of Krypton comes to help him',
+    gsw: '«General, ich bi da!» Di schnällscht Chriegerin vo Krypton chunnt em go hälfe' },
+  'Zod fonce sur toi : écarte-toi, ou frappe-le avant (yeux laser, poings) !': {
+    de: 'Zod stürmt auf dich los: Weich aus, oder triff ihn zuerst (Laseraugen, Fäuste)!',
+    en: 'Zod is charging at you: dodge, or hit him first (laser eyes, fists)!',
+    gsw: 'De Zod schüsst uf dich los: Wiich us, oder triff en zerscht (Laserauge, Füscht)!' },
+  'Faora fonce sur toi : écarte-toi !': { de: 'Faora stürmt auf dich los: Weich aus!', en: 'Faora is charging at you: dodge!', gsw: 'D Faora schüsst uf dich los: Wiich us!' },
+  'Les yeux de Zod brillent : il va tirer ses yeux laser, écarte-toi !': {
+    de: 'Zods Augen leuchten: Er schießt gleich mit seinen Laseraugen, weich aus!',
+    en: 'Zod\'s eyes are glowing: he\'s about to fire his laser eyes, dodge!',
+    gsw: 'Em Zod sini Auge lüüchted: Er schüsst gli mit sine Laserauge, wiich us!' },
+  'FAORA EST VAINCUE !': { de: 'FAORA IST BESIEGT!', en: 'FAORA IS DEFEATED!', gsw: 'D FAORA ISCH BSIEGT!' },
+  '« Général... pardon... »': { de: '„General... verzeiht...“', en: '"General... forgive me..."', gsw: '«General... Entschuldigung...»' },
+  'LE GÉNÉRAL ZOD EST VAINCU !': { de: 'GENERAL ZOD IST BESIEGT!', en: 'GENERAL ZOD IS DEFEATED!', gsw: 'DE GENERAL ZOD ISCH BSIEGT!' },
+  'Il ne fera plus de mal à personne... Faora s\'enfuit vers son vaisseau !': {
+    de: 'Er wird niemandem mehr wehtun... Faora flieht zu seinem Raumschiff!',
+    en: 'He won\'t hurt anyone ever again... Faora flees to his ship!',
+    gsw: 'Er tuet niemerem meh weh... D Faora flüchtet zu sim Raumschiff!' },
+  'Il ne fera plus de mal à personne. Metropolis est sauvée !': { de: 'Er wird niemandem mehr wehtun. Metropolis ist gerettet!', en: 'He won\'t hurt anyone ever again. Metropolis is saved!', gsw: 'Er tuet niemerem meh weh. Metropolis isch grettet!' },
+  'UNE MÉTÉORITE !': { de: 'EIN METEORIT!', en: 'A METEORITE!', gsw: 'EN METEORIT!' },
+  'Quelque chose tombe du ciel sur Centennial Park !': { de: 'Etwas fällt vom Himmel auf den Centennial Park!', en: 'Something is falling from the sky onto Centennial Park!', gsw: 'Öppis gheit vom Himmel uf de Centennial Park!' },
+  'DOOMSDAY !': { de: 'DOOMSDAY!', en: 'DOOMSDAY!', gsw: 'DOOMSDAY!' },
+  'Un monstre de Krypton sort du cratère... et il casse tout !': {
+    de: 'Ein Monster von Krypton kommt aus dem Krater... und macht alles kaputt!',
+    en: 'A monster from Krypton climbs out of the crater... and smashes everything!',
+    gsw: 'Es Monschter vo Krypton chunnt us em Krater... und macht alles kaputt!' },
+  'Doomsday te lance une voiture !': { de: 'Doomsday wirft ein Auto nach dir!', en: 'Doomsday throws a car at you!', gsw: 'De Doomsday rüert es Auto uf dich!' },
+  'Doomsday casse tout !': { de: 'Doomsday macht alles kaputt!', en: 'Doomsday is smashing everything!', gsw: 'De Doomsday macht alles kaputt!' },
+  'Tes coups ne lui font presque rien ! Il faudrait de la kryptonite...': {
+    de: 'Deine Schläge machen ihm fast nichts! Man bräuchte Kryptonit...',
+    en: 'Your hits barely hurt him! You\'d need kryptonite...',
+    gsw: 'Dini Schläg mached em fascht nüt! Mer bruuchti Kryptonit...' },
+  'Il est trop fort ici-bas : attrape-le en volant, et pousse-le dans l\'espace !': {
+    de: 'Hier unten ist er zu stark: Pack ihn im Flug und schieb ihn ins Weltall!',
+    en: 'He\'s too strong down here: grab him while flying, and push him into space!',
+    gsw: 'Da une isch er z starch: Pack en im Flug und schieb en is Weltall!' },
+  'TU ATTRAPES DOOMSDAY !': { de: 'DU PACKST DOOMSDAY!', en: 'YOU GRAB DOOMSDAY!', gsw: 'DU PACKSCH DE DOOMSDAY!' },
+  'Pousse-le tout là-haut, jusque dans l\'espace : regarde vers le ciel, et vole (Maj : plus vite) !': {
+    de: 'Schieb ihn ganz nach oben, bis ins Weltall: Schau zum Himmel und flieg (Shift: schneller)!',
+    en: 'Push him way up, all the way into space: look at the sky, and fly (Shift: faster)!',
+    gsw: 'Schieb en ganz ufe, bis is Weltall: Lueg zum Himmel und flüüg (Shift: schnäller)!' },
+  'Tu as lâché Doomsday ! Rattrape-le en volant (fonce sur lui)': {
+    de: 'Du hast Doomsday losgelassen! Fang ihn im Flug wieder (flieg auf ihn zu)',
+    en: 'You dropped Doomsday! Catch him again while flying (fly into him)',
+    gsw: 'Du häsch de Doomsday la gheie! Fang en im Flug wider (flüüg uf en zue)' },
+  'Descends de la voiture (E) pour planter la lance dans Doomsday': {
+    de: 'Steig aus dem Auto (E), um den Speer in Doomsday zu stoßen',
+    en: 'Get out of the car (E) to drive the spear into Doomsday',
+    gsw: 'Stiig us em Auto (E) zum de Speer in Doomsday ine stosse' },
+  'Approche-toi de Doomsday : de tout près, clic gauche, tu plantes la lance dans son corps !': {
+    de: 'Geh näher an Doomsday heran: Ganz nah, Linksklick, und du stößt ihm den Speer in den Körper!',
+    en: 'Get closer to Doomsday: up close, left click, and you drive the spear into his body!',
+    gsw: 'Gang nöcher zum Doomsday: Ganz nöch, Linksklick, und du stossisch em de Speer in Körper!' },
+  'LA LANCE EST PLANTÉE !': { de: 'DER SPEER STECKT!', en: 'THE SPEAR IS IN!', gsw: 'DE SPEER STECKT!' },
+  'La kryptonite est dans Doomsday : il hurle, il est affaibli... et toi, tu retrouves tes forces !': {
+    de: 'Das Kryptonit steckt in Doomsday: Er brüllt, er ist geschwächt... und du bekommst deine Kräfte zurück!',
+    en: 'The kryptonite is inside Doomsday: he roars, he is weakened... and you get your strength back!',
+    gsw: 'S Kryptonit steckt im Doomsday: Er brüelet, er isch gschwächt... und du überchunnsch dini Chräft zrugg!' },
+  'La lance est tombée à l\'eau... L\'armée en rapporte une autre, au bout du parc !': {
+    de: 'Der Speer ist ins Wasser gefallen... Die Armee bringt einen neuen ans Ende des Parks!',
+    en: 'The spear fell into the water... The army brings another one to the end of the park!',
+    gsw: 'De Speer isch is Wasser gheit... D Armee bringt en neue as Änd vom Park!' },
+  'Tu te réveilles près de Doomsday (-100 $) : il est retourné dans son cratère. Plante-lui la lance !': {
+    de: 'Du wachst in der Nähe von Doomsday auf (-100 $): Er ist in seinen Krater zurückgegangen. Stoß ihm den Speer hinein!',
+    en: 'You wake up near Doomsday (-100 $): he went back into his crater. Drive the spear into him!',
+    gsw: 'Du wachsch nöch bim Doomsday uf (-100 $): Er isch in sin Krater zrugg. Stoss em de Speer ine!' },
+  'DANS L\'ESPACE !': { de: 'IM WELTALL!', en: 'IN SPACE!', gsw: 'IM WELTALL!' },
+  'Au-dessus de la Terre, sous le soleil jaune : il te redonne des forces. Finis Doomsday !': {
+    de: 'Über der Erde, unter der gelben Sonne: Sie gibt dir neue Kraft. Erledige Doomsday!',
+    en: 'Above the Earth, under the yellow sun: it gives you your strength back. Finish Doomsday!',
+    gsw: 'Über de Ärde, under de gääle Sunne: Sie git dir wider Chraft. Mach de Doomsday fertig!' },
+  'Reste dans l\'espace : finis Doomsday !': { de: 'Bleib im Weltall: Erledige Doomsday!', en: 'Stay in space: finish Doomsday!', gsw: 'Blib im Weltall: Mach de Doomsday fertig!' },
+  'Doomsday fonce sur toi : écarte-toi, et tire !': { de: 'Doomsday stürmt auf dich los: Weich aus, und schieß!', en: 'Doomsday is charging at you: dodge, and fire!', gsw: 'De Doomsday schüsst uf dich los: Wiich us, und schüss!' },
+  'Le soleil jaune te redonne tes forces (-100 $) : finis Doomsday !': {
+    de: 'Die gelbe Sonne gibt dir deine Kräfte zurück (-100 $): Erledige Doomsday!',
+    en: 'The yellow sun gives you your strength back (-100 $): finish Doomsday!',
+    gsw: 'D gääli Sunne git dir dini Chräft zrugg (-100 $): Mach de Doomsday fertig!' },
+  'DOOMSDAY EST VAINCU !': { de: 'DOOMSDAY IST BESIEGT!', en: 'DOOMSDAY IS DEFEATED!', gsw: 'DE DOOMSDAY ISCH BSIEGT!' },
+  '« GRRRAAAH... » Il s\'éteint, et dérive dans l\'espace, loin de la Terre. Tu as réussi !': {
+    de: '„GRRRAAAH...“ Er erlischt und treibt durchs Weltall, weit weg von der Erde. Du hast es geschafft!',
+    en: '"GRRRAAAH..." He goes still, and drifts into space, far from the Earth. You did it!',
+    gsw: '«GRRRAAAH...» Er löscht ab und tribt dur s Weltall, wiit weg vo de Ärde. Du häsch es gschafft!' },
+  'METROPOLIS T\'ACCLAME !': { de: 'METROPOLIS JUBELT DIR ZU!', en: 'METROPOLIS CHEERS FOR YOU!', gsw: 'METROPOLIS JUBLET DIR ZUE!' },
+  '« Merci, Superman ! » Toute la ville est venue te dire merci': {
+    de: '„Danke, Superman!“ Die ganze Stadt ist gekommen, um dir zu danken',
+    en: '"Thank you, Superman!" The whole city has come to thank you',
+    gsw: '«Merci, Superman!» Di ganz Stadt isch cho, zum dir danke säge' },
+  '« Merci, Supergirl ! » Toute la ville est venue te dire merci': {
+    de: '„Danke, Supergirl!“ Die ganze Stadt ist gekommen, um dir zu danken',
+    en: '"Thank you, Supergirl!" The whole city has come to thank you',
+    gsw: '«Merci, Supergirl!» Di ganz Stadt isch cho, zum dir danke säge' },
+  '« Hi hi hi ! Bonjour, {super} ! Je suis Mister Mxyzptlk, de la cinquième dimension ! »': {
+    de: '„Hi hi hi! Hallo, {super}! Ich bin Mister Mxyzptlk, aus der fünften Dimension!“',
+    en: '"Hee hee hee! Hello, {super}! I am Mister Mxyzptlk, from the fifth dimension!"',
+    gsw: '«Hi hi hi! Hoi, {super}! Ich bi de Mister Mxyzptlk, us de füfte Dimension!»' },
+  '« C\'est moi qui ai caché ta DeLorean ! Et je ne rentre chez moi que si je dis mon nom à l\'envers... »': {
+    de: '„Ich habe deinen DeLorean versteckt! Und ich gehe nur nach Hause, wenn ich meinen Namen rückwärts sage...“',
+    en: '"I\'m the one who hid your DeLorean! And I only go home if I say my name backwards..."',
+    gsw: '«Ich han din DeLorean versteckt! Und ich gang nur hei, wenn ich min Name rückwärts säge...»' },
+  '« Attrape les lettres de mon nom à l\'envers, dans l\'ordre : {lettres}. Hi hi ! Si tu y arrives ! »': {
+    de: '„Fang die Buchstaben meines Namens rückwärts, der Reihe nach: {lettres}. Hi hi! Wenn du das schaffst!“',
+    en: '"Catch the letters of my name backwards, in order: {lettres}. Hee hee! If you can!"',
+    gsw: '«Fang d Buechstabe vo mim Name rückwärts, der Reihe nach: {lettres}. Hi hi! Wenn du das schaffsch!»' },
+  'LES LETTRES DE MXYZPTLK !': { de: 'DIE BUCHSTABEN VON MXYZPTLK!', en: 'MXYZPTLK\'S LETTERS!', gsw: 'D BUECHSTABE VOM MXYZPTLK!' },
+  'Attrape-les dans l\'ordre (touche-les, à pied ou en volant) : la prochaine brille en or': {
+    de: 'Fang sie der Reihe nach (berühre sie, zu Fuß oder im Flug): Der nächste leuchtet golden',
+    en: 'Catch them in order (touch them, on foot or flying): the next one glows gold',
+    gsw: 'Fang sie der Reihe nach (berüer sie, z Fuess oder im Flug): De nächscht lüüchtet golde' },
+  'Encore {n} lettres : la prochaine, en or, c\'est le {l}': { de: 'Noch {n} Buchstaben: Der nächste, in Gold, ist das {l}', en: '{n} letters left: the next one, in gold, is the {l}', gsw: 'No {n} Buechstabe: De nächscht, in Gold, isch s {l}' },
+  'Toutes les lettres !': { de: 'Alle Buchstaben!', en: 'All the letters!', gsw: 'Alli Buechstabe!' },
+  'Pas dans le bon ordre ! Hi hi ! D\'abord le {l} (en or)': {
+    de: 'Nicht in der richtigen Reihenfolge! Hi hi! Zuerst das {l} (in Gold)',
+    en: 'Not in the right order! Hee hee! First the {l} (in gold)',
+    gsw: 'Nöd i de richtige Reihefolg! Hi hi! Zerscht s {l} (in Gold)' },
+  '« K... L... T... P... Kltpzyxm ! Oh non, je l\'ai dit ! Tu m\'as eu... »': {
+    de: '„K... L... T... P... Kltpzyxm! Oh nein, ich habe es gesagt! Du hast mich erwischt...“',
+    en: '"K... L... T... P... Kltpzyxm! Oh no, I said it! You got me..."',
+    gsw: '«K... L... T... P... Kltpzyxm! Oh nei, ich hans gseit! Du häsch mich verwütscht...»' },
+  'Mister Mxyzptlk est rentré chez lui, dans la 5e dimension... et la DeLorean est revenue, dans la cour du vieux théâtre !': {
+    de: 'Mister Mxyzptlk ist nach Hause gegangen, in die 5. Dimension... und der DeLorean ist zurück, im Hof des alten Theaters!',
+    en: 'Mister Mxyzptlk has gone home, to the 5th dimension... and the DeLorean is back, in the courtyard of the old theater!',
+    gsw: 'De Mister Mxyzptlk isch hei, i di 5. Dimension... und de DeLorean isch zrugg, im Hof vom alte Theater!' },
+  'DES GÂTEAUX ! Hi hi !': { de: 'TORTEN! Hi hi!', en: 'CAKES! Hee hee!', gsw: 'TORTE! Hi hi!' },
+  'Mister Mxyzptlk a changé les voitures en gâteaux !': { de: 'Mister Mxyzptlk hat die Autos in Torten verwandelt!', en: 'Mister Mxyzptlk has turned the cars into cakes!', gsw: 'De Mister Mxyzptlk hät d Autos in Torte verwandlet!' },
+  'Il n\'y a pas de voiture ici... alors il rit tout seul !': { de: 'Hier gibt es kein Auto... also lacht er ganz allein!', en: 'There are no cars here... so he laughs all by himself!', gsw: 'Da hätts kei Auto... drum lacht er ganz elei!' },
+  'LA GRAVITÉ À L\'ENVERS ! Hi hi !': { de: 'DIE SCHWERKRAFT VERKEHRT HERUM! Hi hi!', en: 'GRAVITY UPSIDE DOWN! Hee hee!', gsw: 'D SCHWERCHRAFT VERCHEHRT UME! Hi hi!' },
+  'Tout s\'envole autour de toi... et redescend tout doucement': {
+    de: 'Alles um dich herum fliegt davon... und kommt ganz sanft wieder herunter',
+    en: 'Everything around you floats up... and comes back down very gently',
+    gsw: 'Alles um dich ume flüügt devo... und chunnt ganz sanft wider abe' },
+  'TU RAPETISSES ! Hi hi !': { de: 'DU SCHRUMPFST! Hi hi!', en: 'YOU\'RE SHRINKING! Hee hee!', gsw: 'DU SCHRUMPFSCH! Hi hi!' },
+  'Mister Mxyzptlk t\'a rendu tout petit... pour un moment': {
+    de: 'Mister Mxyzptlk hat dich ganz klein gemacht... für einen Moment',
+    en: 'Mister Mxyzptlk has made you tiny... for a moment',
+    gsw: 'De Mister Mxyzptlk hät dich ganz chlii gmacht... für en Moment' },
+  'Tu as retrouvé ta taille !': { de: 'Du hast wieder deine Größe!', en: 'You\'re back to your normal size!', gsw: 'Du häsch wider dini Grössi!' },
+  'Hi hi ! Ça chatouille ! Rien ne me fait de mal : attrape plutôt mes lettres !': {
+    de: 'Hi hi! Das kitzelt! Nichts tut mir weh: Fang lieber meine Buchstaben!',
+    en: 'Hee hee! That tickles! Nothing can hurt me: catch my letters instead!',
+    gsw: 'Hi hi! Das chitzlet! Nüt tuet mir weh: Fang lieber mini Buechstabe!' },
+  'TU TIENS LA LANCE !': { de: 'DU HÄLTST DEN SPEER!', en: 'YOU HAVE THE SPEAR!', gsw: 'DU HEBSCH DE SPEER!' },
+  'Elle t\'affaiblit : plus de vol. Va jusqu\'à Doomsday, et de tout près, clic gauche : plante-la · G : pose-la': {
+    de: 'Er schwächt dich: kein Fliegen mehr. Geh zu Doomsday, und ganz nah, Linksklick: Stoß ihn hinein · G: leg ihn hin',
+    en: 'It weakens you: no more flying. Go to Doomsday, and up close, left click: drive it in · G: put it down',
+    gsw: 'Er schwächt dich: kei Flüüge meh. Gang zum Doomsday, und ganz nöch, Linksklick: Stoss en ine · G: leg en ane' },
+  'Mister Mxyzptlk t\'a rendue toute petite... pour un moment': { de: 'Mister Mxyzptlk hat dich ganz klein gemacht... für einen Moment', en: 'Mister Mxyzptlk has made you tiny... for a moment', gsw: 'De Mister Mxyzptlk hät dich ganz chlii gmacht... für en Moment' },
+  'Mets ton costume (H) : Mister Mxyzptlk t\'attend au-dessus du vieux théâtre, et ses lettres flottent jusque sur les toits !': {
+    de: 'Zieh dein Kostüm an (H): Mister Mxyzptlk wartet über dem alten Theater auf dich, und seine Buchstaben schweben bis über die Dächer!',
+    en: 'Put on your suit (H): Mister Mxyzptlk is waiting for you above the old theater, and his letters float all the way up to the rooftops!',
+    gsw: 'Leg dis Kostüm aa (H): De Mister Mxyzptlk wartet über em alte Theater uf dich, und sini Buechstabe schwebed bis über d Dächer!' },
+  'CLIC GAUCHE !': { de: 'LINKSKLICK!', en: 'LEFT CLICK!', gsw: 'LINKSKLICK!' },
+  'Tu es tout près de Doomsday : clic gauche, et tu plantes la lance !': { de: 'Du bist ganz nah bei Doomsday: Linksklick, und du stößt den Speer hinein!', en: 'You\'re right next to Doomsday: left click, and you drive the spear in!', gsw: 'Du bisch ganz nöch bim Doomsday: Linksklick, und du stossisch de Speer ine!' },
+  'Mister Mxyzptlk a caché ta DeLorean : attrape les lettres de son nom à l\'envers !': {
+    de: 'Mister Mxyzptlk hat deinen DeLorean versteckt: Fang die Buchstaben seines Namens rückwärts!',
+    en: 'Mister Mxyzptlk has hidden your DeLorean: catch the letters of his name backwards!',
+    gsw: 'De Mister Mxyzptlk hät din DeLorean versteckt: Fang d Buechstabe vo sim Name rückwärts!' },
 };
 
 // la langue choisie : le navigateur s'en souvient pour la prochaine fois
@@ -3450,6 +3764,22 @@ const ENNEMIS = {
   // chaque seconde, pour chaque réparateur encore debout)
   brainiac:  { nom: 'Brainiac',      vie: 6000, degats: 5, degatsCable: 8, precision: 0.3, vue: 80, tir: [1.6, 2.6], vitesse: 5, cables: [7, 10], sondes: 2,
     guerison: 60, rayons: 0.6, boss: true },
+  // le cœur de la machine-monde du général Zod : de dehors, ni tes yeux laser ni tes poings ne passent son rayon (entre dedans !) ; poings : un
+  // coup de poing lui fait tant de fois plus mal ; rayons : la part des yeux laser qu'il prend
+  coeurMonde: { nom: 'Cœur de la machine-monde', vie: 1200, poings: 6, rayons: 0.35 },
+  // le général Zod et Faora, de Krypton comme toi : ils volent (vol : leur vitesse, en m/s ; charge : quand ils foncent sur toi pour frapper),
+  // degats (un coup de poing, en passant), degatsLaser (les yeux laser de Zod : tant, toutes les 0,12 s, pendant 1,2 s ; ses yeux brillent en
+  // rouge 0,8 s avant), tir (les secondes entre deux charges), rayons (la part de tes yeux laser qu'ils prennent), renforts (Faora, à la
+  // moitié de sa vie)
+  zod:       { nom: 'Général Zod',   vie: 5000, degats: 6, degatsLaser: 1.2, precision: 0.45, vue: 200, tir: [4.5, 7], vol: 22, charge: 42, rayons: 0.5, renforts: 1, boss: true },
+  faora:     { nom: 'Faora',         vie: 1600, degats: 5, precision: 0.4, vue: 200, tir: [3.5, 5.5], vol: 26, charge: 46, rayons: 0.6 },
+  // Doomsday, le monstre de Krypton : degats (un coup de poing), degatsSaut (quand il retombe d'un saut, tout près de toi), degatsVoiture (une
+  // voiture qu'il te lance), taille (combien de fois plus grand que toi), armure (la part de tes coups qu'il prend tant qu'il n'a pas la lance de
+  // kryptonite dans le corps : 0.03, presque rien !), rayons (la part des yeux laser)
+  doomsday:  { nom: 'Doomsday',      vie: 4000, degats: 12, degatsSaut: 8, degatsVoiture: 10, precision: 0.4, vue: 150, tir: [6, 9], vitesse: 5, taille: 2.2, armure: 0.03,
+    rayons: 0.5, boss: true },
+  // Mister Mxyzptlk, le lutin farceur de la 5e dimension (la dernière mission) : rien ne lui fait de mal
+  mxyzptlk:  { nom: 'Mister Mxyzptlk', vie: 100 },
 };
 
 // =====================================================================
@@ -4155,7 +4485,7 @@ const MISSIONS = [
 // =====================================================================
 //  LES MISSIONS DES AUTRES CHAPITRES (voir CHAPITRES, tout en haut du fichier) : une liste par chapitre, comme MISSIONS.
 //  La dernière mission de chaque chapitre : retrouver la DeLorean, cachée dans la ville (sa cachette, dans CHAPITRES), puis repartir avec.
-//  Au chapitre 2, Iron Man a ses 12 missions avant celle-là ; au chapitre 3, Batman en a 12 ; au chapitre 4, Superman a ses 4 premières ;
+//  Au chapitre 2, Iron Man a ses 12 missions avant celle-là ; au chapitre 3, Batman en a 12 ; au chapitre 4, Superman en a 12 ;
 //  pour Spiderman, il n'y a encore que la DeLorean.
 // =====================================================================
 const RETROUVER_DELOREAN = { nom: 'La DeLorean a disparu', recompense: 1000, etapes: [
@@ -4440,8 +4770,10 @@ const DELOREAN_SPHINX = { nom: 'Les devinettes du Sphinx', recompense: 20000, ev
   RETROUVER_DELOREAN.etapes[1],
 ]};
 // les missions de Superman, à Metropolis (chapitre 4) : d'abord la Forteresse de Solitude, où il trouve son costume, puis Lois Lane, le grand
-// pont, Lex Luthor (ses missiles, son armure et sa kryptonite) et Brainiac (ses robots pirates, sa ville en bouteille, son vaisseau). Superman tue les méchants, comme Iron Man (pas comme Batman) : seuls les passants coûtent l'amende. Avec la fille du
-// menu (Supergirl), ce sont les mêmes : c'est Superman qui l'aide ({ami}). Les nouvelles étapes :
+// pont, Lex Luthor (ses missiles, son armure et sa kryptonite), Brainiac (ses robots pirates, sa ville en bouteille, son vaisseau), le général
+// Zod (sa machine-monde, et le duel entre les tours) et Doomsday (la lance de kryptonite, et le combat dans l'espace) ; pour finir, Mister
+// Mxyzptlk, qui a caché la DeLorean (DELOREAN_MXYZPTLK). Superman tue les méchants, comme Iron Man (pas comme Batman) : seuls les passants
+// coûtent l'amende. Avec la fille du menu (Supergirl), ce sont les mêmes : c'est Superman qui l'aide ({ami}). Les nouvelles étapes :
 //  passager (voiture : l'hélicoptère qui attend sur la place « pose » ('X' : celle du départ) ; monte dedans (E) : son pilote t'emmène tout
 //    seul, au-dessus de la ville, jusqu'à l'endroit « vers » (un endroit de POINTS), en « secondes » secondes. Rien à piloter : regarde la
 //    ville avec la souris ! Il te dépose, et repart)
@@ -4466,8 +4798,20 @@ const DELOREAN_SPHINX = { nom: 'Les devinettes du Sphinx', recompense: 20000, ev
 //  vaisseau (le vaisseau de Brainiac, un crâne géant, au-dessus de la case « case », à « hauteur » mètres : vole dans son rayon vert, dessous, et
 //    il t'aspire dans sa salle)
 //  naufrage (Brainiac est vaincu : sors du vaisseau par la trappe verte, et regarde-le tomber dans la mer)
+//  machine (le vaisseau du général Zod apparaît dans le ciel, et il parle sur tous les écrans ; puis sa machine-monde se pose dans la baie, au
+//    milieu de la case « case » : son rayon soulève tout ce qui est à « rayon » mètres. Entre dans son rayon (« largeur » : son rayon à lui, en
+//    mètres), qui te repousse (« poussee », en m/s), te ralentit et t'écrase un peu (« degats » par seconde), et frappe son cœur, sous la machine)
+//  doomsday (une météorite tombe au milieu de la case « case » : Doomsday en sort, et casse tout. Frappe-le un peu : rien ne lui fait mal !)
+//  lance (l'armée a posé la lance de kryptonite au milieu de la case « case » : prends-la (G), et plante-la dans Doomsday (clic gauche, de tout
+//    près). Elle t'affaiblit, comme toute la kryptonite : pas de vol ! À pied, en sautant, en voiture...)
+//  pousser (Doomsday est affaibli : fonce sur lui en volant, tu l'attrapes ; pousse-le tout là-haut, jusqu'à « hauteur » mètres : l'espace)
+//  acclamer (la foule t'attend devant le lieu ; pose-toi près d'elle : elle t'acclame)
+//  mxyzptlk (Mister Mxyzptlk flotte au-dessus du lieu, où il a caché la DeLorean : attrape les lettres de son nom à l'envers, dans l'ordre,
+//    pour le renvoyer chez lui. Voir le tableau MXYZPTLK, juste après les missions)
 //  Pour « eliminer », à Metropolis : 'luthor' (Lex Luthor, sur le toit de LexCorp : point 'toitLex' ; sa kryptonite te rend tout faible : voir
-//    REGLAGES, kryptonitePortee), 'brainiac' (dans son vaisseau : point 'salleBrainiac' ; reparateurs : combien de réparateurs le soignent)
+//    REGLAGES, kryptonitePortee), 'brainiac' (dans son vaisseau : point 'salleBrainiac' ; reparateurs : combien de réparateurs le soignent),
+//    'zod' (le général Zod, dans le ciel, entre les tours : point 'duelZod' ; Faora arrive à la moitié de sa vie), 'doomsday' (avec
+//    espace: true : dans l'espace, où il vole toujours, et où le soleil jaune te redonne vite des forces)
 //  Pour « aller », point : un endroit de Metropolis ('glaces' : devant la Forteresse de Solitude ; 'toitPlanet' : le toit du Daily Planet, partout ;
 //    'toitLex' : le toit de LexCorp, partout) ;
 //    elan : pendant cette étape, à plus de 150 m du but, Superman vole déjà comme s'il avait appuyé tant de fois sur Maj (6 : 84 m/s ; son
@@ -4525,11 +4869,67 @@ const MISSIONS_METROPOLIS = [
       texte: 'BRAINIAC ! Il se répare tant que ses réparateurs brillent : casse-les d\'abord. Et ses câbles, qui tombent du plafond : saute de côté !' },
     { type: 'naufrage', texte: 'Le vaisseau tombe ! Sors vite par la trappe verte, dans le sol (point jaune)' },
   ]},
+  // Man of Steel (2013) : le général Zod, un Kryptonien comme Superman, arrive avec son immense vaisseau noir. Sa machine-monde se pose dans la
+  // baie : elle change la gravité, et tout ce qui est autour s'envole ! Superman doit traverser son rayon, qui le repousse, pour frapper son cœur
+  { nom: 'La machine-monde', recompense: 55000, etapes: [
+    { type: 'machine', case: [45, 44.2], rayon: 200, largeur: 16, poussee: 3.5, degats: 3,
+      texte: 'Un immense vaisseau noir apparaît dans le ciel de Metropolis... Écoute : quelqu\'un parle sur tous les écrans de la ville !' },
+  ]},
+  // Man of Steel : le duel contre Zod, entre les tours de Metropolis, à toute vitesse. Il a les yeux laser, lui aussi... et Faora, la plus
+  // rapide des guerrières de Krypton, vient l'aider
+  { nom: 'Le duel contre Zod', recompense: 65000, etapes: [
+    { type: 'eliminer', cible: 'zod', nombre: 1, point: 'duelZod',
+      texte: 'Le général Zod t\'attend dans le ciel, entre les tours de New Troy (point jaune) : bats-le ! Il vole aussi vite que toi, et ses yeux laser brûlent' },
+  ]},
+  // La Mort de Superman (bandes dessinées, 1992) et Batman v Superman (2016) : Doomsday, un monstre de Krypton, tombe du ciel et casse tout. Rien
+  // ne lui fait mal... sauf la kryptonite : l'armée a posé une lance de kryptonite au bout du parc
+  { nom: 'La lance de kryptonite', recompense: 70000, etapes: [
+    { type: 'doomsday', case: [44.5, 38.8], texte: '{ami} : « Une météorite va tomber sur Centennial Park ! » Vole jusque-là (point jaune)' },
+    { type: 'lance', case: [42.5, 37.5],
+      texte: '{ami} : « Rien ne lui fait mal... sauf la kryptonite ! L\'armée a posé une lance de kryptonite au bout du parc. » Va la chercher (point jaune), puis G pour la prendre' },
+  ]},
+  // le grand final : Superman pousse Doomsday tout là-haut, au-dessus des nuages, jusque dans l'espace, et finit le combat là-bas. Puis il
+  // redescend sur Metropolis : la ville l'acclame
+  { nom: 'Dans l\'espace', recompense: 80000, etapes: [
+    { type: 'pousser', hauteur: 1100, texte: 'Doomsday est affaibli : fonce sur lui en volant pour l\'attraper, puis pousse-le tout là-haut, jusque dans l\'espace !' },
+    { type: 'eliminer', cible: 'doomsday', espace: true, texte: 'Dans l\'espace ! Finis le combat contre Doomsday : yeux laser (9), poings tout près. Le soleil jaune te redonne vite des forces' },
+    { type: 'acclamer', lieu: '¡', texte: 'Doomsday est vaincu ! Redescends sur Metropolis : toute la ville t\'attend devant ta statue, à Centennial Park (point jaune)' },
+  ]},
 ];
+
+// =====================================================================
+//  MISTER MXYZPTLK (la dernière mission de Metropolis : il a caché la DeLorean). Ce lutin farceur de la 5e dimension ne rentre chez lui que
+//  s'il dit son nom à l'envers : « Kltpzyxm ! ». Il sème les lettres de son nom à l'envers autour du vieux théâtre (¤), et il faut les
+//  attraper (les toucher, à pied ou en volant), dans l'ordre : la prochaine brille en or. Une lettre touchée dans le désordre s'envole plus
+//  loin, et il fait un tour de magie. Toutes attrapées : il dit son nom à l'envers... POP ! Il disparaît, et la DeLorean revient.
+//  envers : son nom à l'envers (les lettres à attraper, dans l'ordre : change-les, et il faudra attraper les tiennes !)
+//  lettres : où attend chaque lettre, [vers l'est, vers le sud, en haut] en mètres depuis la cour du théâtre (« en haut » : au-dessus du sol,
+//    ou du toit qui est là). Une lettre de plus dans « envers » ? Ajoute sa place (sinon, elle attend n'importe où, pas loin)
+//  tours : ses tours de magie, l'un après l'autre ('gateaux' : les voitures autour de toi deviennent des gâteaux ; 'gravite' : tout s'envole un
+//    moment, puis redescend ; 'rapetisser' : tu deviens tout petit) ; entreTours : les secondes entre deux tours (au hasard entre les deux) ;
+//    duree : combien de secondes dure un tour ; gateaux : combien de voitures deviennent des gâteaux, au plus
+//  paroles : ce qu'il dit en arrivant ({super} : ton nom de super-héros ; {lettres} : celles d'« envers ». Traduit dans TRADUCTIONS)
+// =====================================================================
+const MXYZPTLK = {
+  envers: 'KLTPZYXM',
+  lettres: [[0, -6, 3], [30, 18, 5], [-38, 26, 6], [55, -28, 14], [-60, -45, 5], [18, -80, 30], [-25, 60, 4], [80, 50, 45]],
+  tours: ['gateaux', 'gravite', 'rapetisser'], entreTours: [11, 15], duree: 8, gateaux: 6,
+  paroles: [
+    '« Hi hi hi ! Bonjour, {super} ! Je suis Mister Mxyzptlk, de la cinquième dimension ! »',
+    '« C\'est moi qui ai caché ta DeLorean ! Et je ne rentre chez moi que si je dis mon nom à l\'envers... »',
+    '« Attrape les lettres de mon nom à l\'envers, dans l\'ordre : {lettres}. Hi hi ! Si tu y arrives ! »',
+  ],
+};
+// au chapitre 4, c'est Mister Mxyzptlk qui l'a cachée, dans la cour du vieux théâtre (¤ dans la carte de Metropolis)
+const DELOREAN_MXYZPTLK = { nom: 'Mister Mxyzptlk', recompense: 20000, etapes: [
+  { type: 'mxyzptlk', lieu: '¤', texte: 'La DeLorean a disparu ! Un drôle de petit bonhomme flotte au-dessus du vieux théâtre, à Suicide Slum (point jaune) : va voir' },
+  { type: 'conduire', voiture: 'DeLorean', texte: 'La DeLorean est revenue dans la cour du vieux théâtre : monte dedans (point jaune)' },
+  RETROUVER_DELOREAN.etapes[1],
+]};
 const MISSIONS_CHAPITRES = {
   2: [...MISSIONS_MALIBU, DELOREAN_MANDARIN],
   3: [...MISSIONS_GOTHAM, DELOREAN_SPHINX],
-  4: [...MISSIONS_METROPOLIS, RETROUVER_DELOREAN],
+  4: [...MISSIONS_METROPOLIS, DELOREAN_MXYZPTLK],
   5: [RETROUVER_DELOREAN],
 };
 // les missions d'un chapitre (1 = le premier), et celles du chapitre où l'on est
@@ -13667,11 +14067,11 @@ const TENUES = {
 // marche dans les rues. Les vigiles, les chiens et les gangs restent aussi dans leur pâté, mais n'attaquent que si on les provoque
 const NAZIS = ['soldat', 'boss', 'hitler', 'militaire', 'engel', 'anneaux', 'raza', 'monger', 'whiplash', 'whiplashArmure', 'drone', 'helico', 'extremis', 'killian', 'hulk', 'sentinelle', 'ultron', 'voyou', 'homme', 'pingouin',
   'bandit', 'doubleFace', 'mercenaire', 'bane', 'clown', 'joker', 'acolyte', 'sphinx', 'missile', 'luthor', 'droneLex', 'antenne', 'robotPirate', 'sonde', 'porteur', 'reparateur',
-  'brainiac'], VIGILES = ['garde', 'chien', 'gang'];
-const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron', 'missile', 'droneLex', 'robotPirate', 'sonde', 'porteur'],
+  'brainiac', 'coeurMonde', 'zod', 'faora', 'doomsday', 'mxyzptlk'], VIGILES = ['garde', 'chien', 'gang'];
+const VOLANTS = ['drone', 'helico', 'sentinelle', 'ultron', 'missile', 'droneLex', 'robotPirate', 'sonde', 'porteur', 'coeurMonde', 'zod', 'faora', 'mxyzptlk'],
   LOURDS = ['monger', 'whiplash', 'whiplashArmure', 'helico', 'killian', 'hulk', 'ultron', 'raza', 'pingouin', 'doubleFace', 'bane', 'joker', 'sphinx', 'missile', 'luthor', 'antenne',
-    'porteur', 'reparateur', 'brainiac'];
-const LIBRES = ['whiplash', 'killian', 'hulk'];   // ceux-là ne gardent pas de pâté : ils vont où ils veulent
+    'porteur', 'reparateur', 'brainiac', 'coeurMonde', 'zod', 'faora', 'doomsday', 'mxyzptlk'];
+const LIBRES = ['whiplash', 'killian', 'hulk', 'doomsday'];   // ceux-là ne gardent pas de pâté : ils vont où ils veulent
 const fiche = p => ENNEMIS[p.elite ? 'elite' : p.type];   // sa ligne du tableau ENNEMIS
 const personnes = [];
 // le corps de ceux qui ne sont pas faits comme tout le monde (voir « Les missions d'Iron Man ») : une armure, des fouets, un hélicoptère...
@@ -16276,7 +16676,8 @@ function vieMax() { return R_.viesJoueur + (chezWayne ? (wayne.vie - 1) * AMELIO
 const protectionCostume = () => costumePorte()?.protection ?? 1;
 const vitesseCostume = () => costumePorte()?.vitesse ?? 1;
 const poingsCostume = () => (costumePorte()?.poings || 1) * (enCostumeSuper() ? niveauStar('force', 'poings') : 1);   // (au chapitre de Superman, en costume, la force du magasin de S.T.A.R. Labs)
-const tailleHeros = () => tailleIronman() * (costumePorte()?.taille || 1);   // (la Hulkbuster, l'armure anti-Superman le grandissent : la caméra, les murs, les plafonds)
+let tailleFarce = 1;   // (Mister Mxyzptlk l'a rapetissé : voir « Les missions de Superman »)
+const tailleHeros = () => tailleIronman() * (costumePorte()?.taille || 1) * tailleFarce;   // (la Hulkbuster, l'armure anti-Superman le grandissent : la caméra, les murs, les plafonds)
 const chuteCape = () => R_.chuteCape / ((costumePorte()?.cape ?? 1) * niveauWayne('cape', 'chute'));
 const vitesseCape = () => R_.vitesseCape * niveauWayne('cape', 'vitesse');
 const vitesseGrappin = () => R_.vitesseGrappin * niveauWayne('grappin', 'vitesse');
@@ -16994,6 +17395,7 @@ function superForce() {
   if (sansGadgets()) { enCivilSans('Mets ton costume (H) pour soulever les voitures'); return; }
   if (J.voiture || J.robot || J.mort || J.monorail || J.telesiege) { annonce('', tr("Descends d'abord !"), 1.5); return; }
   { const k = kryptoniteAPrendre(); if (k) { prendreKryptonite(k); return; } }   // (la kryptonite, tout près : il la prend, ou l'arrache de l'armure de Luthor)
+  if (attraperDoomsday()) return;   // (mission « Dans l'espace » : Doomsday, tout près)
   if (J.nage) { annonce('', tr("Sors de l'eau d'abord !"), 1.5); return; }
   // la voiture la plus proche : à porteeForce mètres au plus de sa carrosserie
   let v = null, mieux = Infinity;
@@ -17987,13 +18389,14 @@ function frapper(a) {
   if (farces.length && casserDentier({ x: J.x + Math.sin(J.lacet) * 0.9, z: J.z + Math.cos(J.lacet) * 0.9 })) { J.secousse = Math.max(J.secousse || 0, 0.04); return; }   // (le dentier du Joker, à ses pieds)
   for (const p of personnes) {
     if (p.vie <= 0) continue;
-    if (p.h.machine && Math.abs(p.y + p.h.hauteur - J.y - 1) > 3.5) continue;   // (une machine de Brainiac, sur un toit ou en l'air : à sa hauteur)
-    const d = dist(p, J);
+    if (p.h.machine && Math.abs(p.y + p.h.hauteur - J.y - 1) > 3.5 + (p.h.rayon || 0)) continue;   // (une machine de Brainiac, sur un toit ou en l'air : à sa hauteur)
+    if (POINGS_EN_VOL.includes(p.type) && Math.abs(p.y + p.h.g.scale.y - J.y - 1) > 2 + p.h.g.scale.y) continue;   // (Zod, Faora, Doomsday : à leur hauteur, quand ils volent)
+    const d = dist(p, J) - (p.h.rayon || 0);   // (rayon : une grosse boule, le cœur de la machine-monde)
     if (d < best && Math.abs(diffAngle(J.lacet, angleVers(J, p))) < 0.9) { best = d; cible = p; }
   }
   const sx = Math.sin(J.lacet), sz = Math.cos(J.lacet);
   // la kryptonite, sur la poitrine de celui qu'il frappe, ou par terre juste devant lui : elle se fêle, puis se casse
-  const kr = cible?.krypto && !cible.krypto.casse ? cible.krypto : !cible && kryptonites.find(k => k !== kryptoniteTenue && !k.sur && Math.hypot(k.x - J.x - sx, k.z - J.z - sz) < 1.6 && Math.abs(k.y - J.y) < 2);
+  const kr = cible?.krypto && !cible.krypto.casse ? cible.krypto : !cible && kryptonites.find(k => k !== kryptoniteTenue && !k.sur && !k.lance && Math.hypot(k.x - J.x - sx, k.z - J.z - sz) < 1.6 && Math.abs(k.y - J.y) < 2);   // (la lance de kryptonite, elle, ne se casse pas)
   if (kr) { frapperKryptonite(kr, a.degats * fort); J.secousse = Math.max(J.secousse || 0, 0.04); return; }
   if (cible) {
     blesser(cible, a.degats * fort * (fiche(cible)?.poings ?? 1)); bip(160, 60, 0.12, 'sine', 0.5);   // (poings : une machine de Brainiac craint les coups de poing)
@@ -18027,6 +18430,9 @@ function blesser(p, degats, parJoueur = true) {
   if (p.vie <= 0 || p.invincible) return;   // ({ami} et Trevor Slattery, dans les missions d'Iron Man : on ne peut pas les blesser)
   if (p.sonne > 0) degats *= fiche(p)?.sonneDegats || 1;   // (Bane, sonné : les coups comptent double)
   if (p.type === 'luthor' && luthorProtege(p)) return;   // (Lex Luthor, tant que sa kryptonite brille sur sa poitrine : rien ne le touche)
+  if (p.type === 'coeurMonde' && !machineMonde?.dedans) { if (parJoueur && temps - (p.tProtege ?? -9) > 2.5) { p.tProtege = temps; annonce('', tr('Le rayon de la machine-monde arrête tes coups : entre dedans pour frapper son cœur !'), 2.5); } return; }
+  if (p.type === 'mxyzptlk') { if (parJoueur) chatouilleMxy(); return; }   // (Mister Mxyzptlk : rien ne lui fait de mal)
+  if (p.type === 'doomsday') degats = degatsDoomsday(p, degats, parJoueur);   // (sans la lance de kryptonite, presque rien)
   if (p.affaibli && !parJoueur) degats = Math.min(degats, Math.max(0, p.vie - fiche(p).vie * 0.25));   // (à la revanche, ni la police ni une voiture qui explose ne l'achèvent : c'est Batman qui finit le travail)
   p.vie -= degats; alerter(p);   // un vigile ou un chien touché : l'alarme sonne ; un membre de gang : tout le gang attaque
   if (degats > 0) p.dernierCoup = temps;   // (un soldat Extremis ne guérit que quand on ne le touche plus)
@@ -18050,6 +18456,8 @@ function blesser(p, degats, parJoueur = true) {
   if (p.h.machine) machineDetruite(p);           // (une machine de Brainiac : elle explose)
   if (p.type === 'luthor') luthorVaincu(p);
   if (p.type === 'brainiac') brainiacVaincu(p);
+  if (p.type === 'zod' || p.type === 'faora') kryptonienVaincu(p);
+  if (p.type === 'doomsday') doomsdayVaincu(p);
   if (p.type === 'pieton') { if (parJoueur) crime(1); if (!CHAPITRE.sansReproche && Math.random() < 0.6) creerObjet({ type: 'argent', montant: 10 + Math.floor(Math.random() * 60), x: p.x, z: p.z , y: p.y }); }   // (un héros ne fait pas les poches)
   if (p.type === 'flic') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
   if (p.type === 'garde') { if (parJoueur) crime(1); creerObjet({ type: 'arme', arme: p.armeIdx, x: p.x, z: p.z , y: p.y }); }
@@ -18112,12 +18520,15 @@ function reapparaitre() {
   // dans la Batcave, on se réveille au bord du lac ; dans l'égout, à son entrée (sur le trottoir)
   const cellule = enEvasion(), cave = !cellule && chezWayne && dansBatcave(J), dansEgout = !revanche && !cellule && !cave && !!egout && souterrainEn(J.x, J.z, J.y)?.zone === egout.S;
   const parvis = !revanche && !cellule && !cave && !dansEgout && !!combatJoker && !!POINTS.parvis && dist(J, POINTS.clocher) < 150;   // (contre le Joker, en haut du clocher : sur le parvis de la cathédrale)
-  // à Metropolis : contre Lex Luthor, au pied de LexCorp ; dans le vaisseau de Brainiac (ou dessous), sous le vaisseau, dans Centennial Park
-  const piedLex = !parvis && !!combatLuthor && !!POINTS.piedLex && dist(J, lexcorp) < 200, sousVaisseau = !parvis && !piedLex && !!vaisseauB && !!POINTS.sousVaisseau && dist(J, vaisseauB) < 150;
-  const h = revanche ? lieuRevanche() : cellule ? grotte.reveil : cave ? POINTS.reveilBatcave : dansEgout ? POINTS.reveilEgout : parvis ? POINTS.parvis : piedLex ? POINTS.piedLex : sousVaisseau ? POINTS.sousVaisseau
-    : hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);
+  // à Metropolis : contre Lex Luthor, en l'air, à côté du toit de LexCorp ; dans le vaisseau de Brainiac (ou dessous), sous le vaisseau, dans Centennial Park
+  const piedLex = !parvis && !!combatLuthor && !!POINTS.coinLex && dist(J, lexcorp) < 200, sousVaisseau = !parvis && !piedLex && !!vaisseauB && !!POINTS.sousVaisseau && dist(J, vaisseauB) < 150;
+  // contre Doomsday : dans l'espace, il se réveille là-haut, au soleil ; la lance de kryptonite à la main (ou par terre), tout près d'elle
+  const auSoleil = !parvis && !piedLex && !sousVaisseau && chezClark ? reveilEspace() : null, pres = !parvis && !piedLex && !sousVaisseau && !auSoleil && chezClark ? reveilLance() : null;
+  const h = revanche ? lieuRevanche() : cellule ? grotte.reveil : cave ? POINTS.reveilBatcave : dansEgout ? POINTS.reveilEgout : parvis ? POINTS.parvis : piedLex ? POINTS.coinLex : sousVaisseau ? POINTS.sousVaisseau
+    : auSoleil || pres || hopitaux.reduce((m, q) => dist(q, J) < dist(m, J) ? q : m);
   const sous = cave || dansEgout || revanche;
-  J.x = h.x; J.z = h.z; J.y = sous ? hauteurSol(J.x, J.z, h.y + 1) : hauteurSol(J.x, J.z); J.vy = 0; J.lacet = cellule || sous || parvis || piedLex || sousVaisseau ? h.angle : 0; J.accroupi = false; J.nage = false; J.roule = null; J.genou = J.atterri = J.energie = 0;
+  J.x = h.x; J.z = h.z; J.y = auSoleil || piedLex ? h.y : sous ? hauteurSol(J.x, J.z, h.y + 1) : hauteurSol(J.x, J.z); J.vy = 0; J.lacet = cellule || sous || parvis || piedLex || sousVaisseau || auSoleil || pres ? h.angle : 0; J.accroupi = false; J.nage = false; J.roule = null; J.genou = J.atterri = J.energie = 0;
+  if (piedLex) { J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0, bascule: 0, tonneau: 0, sensTonneau: 0 }; J.sol = false; }   // (il vole déjà : il n'a plus qu'à redescendre sur le toit)
   if (cellule && (!markI || markI.supprimer || dist(markI, grotte.poste) > 1)) { if (markI && !markI.supprimer) markI.supprimer = true; poserMarkI(); }
   etoiles = 0;
   for (const p of personnes) { p.alerte = false; if (p.renfort) p.supprimer = true; }
@@ -18131,7 +18542,9 @@ function reapparaitre() {
   }
   if (revanche) { commencerRevanche(); return; }   // (la rue, la police de Gotham, et Bane qui revient : voir « Les missions de Batman »)
   annonce('', cellule ? tr('Les Dix Anneaux te ramènent dans ta cellule (-100 $)') : cave ? tr('Tu te réveilles au bord du lac de la Batcave (-100 $)') : dansEgout ? tr("Tu te réveilles à l'entrée de l'égout (-100 $)") : parvis ? tr('Tu te réveilles sur le parvis de la cathédrale (-100 $)')
-    : piedLex ? tr('Tu te réveilles au pied de LexCorp (-100 $)') : sousVaisseau ? tr('Tu te réveilles sous le vaisseau de Brainiac (-100 $)') : tr("Tu te réveilles à l'hôpital le plus proche (-100 $)"), 3);
+    : piedLex ? tr('Tu te réveilles en l\'air, à côté du toit de LexCorp (-100 $)') : sousVaisseau ? tr('Tu te réveilles sous le vaisseau de Brainiac (-100 $)')
+    : auSoleil ? tr('Le soleil jaune te redonne tes forces (-100 $) : finis Doomsday !') : pres ? tr('Tu te réveilles près de Doomsday (-100 $) : il est retourné dans son cratère. Plante-lui la lance !')
+    : tr("Tu te réveilles à l'hôpital le plus proche (-100 $)"), 3);
 }
 
 // =====================================================================
@@ -18594,7 +19007,7 @@ function superman(dt) {
     if (!av && !lat && !monte) f.crans = 0;   // il s'arrête : il repart à la vitesse normale
     const etE = MISSIONS_CH[missionIndex]?.etapes[etapeIndex], elan = etE?.elan && dist(J, lieuEtape(etE) || J) > 150 ? etE.elan : 0;   // (le premier vol de Superman, à la mission 1 de Metropolis : loin du but, il file déjà, sans appuyer sur Maj)
     const crans = armureIronman() && !(marche('jambeG') && marche('jambeD')) ? 0 : Math.max(f.crans, chezClark ? elan : 0);   // (dans l'armure d'Iron Man, une jambe hors service : il n'accélère plus)
-    const faible = affaibli(), secours = enSecours() || faible, v = Math.min(R_.vitesseVolMax, R_.vitesseVol + (secours ? 0 : crans) * R_.vitesseVolMaj) * volIronman() * volSuperman() * (faible ? 0.5 : 1) / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
+    const faible = affaibli(), secours = enSecours() || faible, v = Math.min(R_.vitesseVolMax, R_.vitesseVol + (secours ? 0 : crans) * R_.vitesseVolMaj) * volIronman() * volSuperman() * (faible ? 0.5 : 1) * (chezClark ? ralentiSuperman() : 1) / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
     const vy = secours ? Math.min(dy * v, -(faible ? R_.kryptoniteVol : IRONMAN.batterie.descente)) : dy * v;   // (batterie vide : ses réacteurs n'ont plus la force de monter, ni d'aller vite ; il redescend doucement. Près de la kryptonite aussi)
     f.vx += (dx * v - f.vx) * k; J.vy += (vy - J.vy) * k; f.vz += (dz * v - f.vz) * k;
   }
@@ -19584,6 +19997,8 @@ function majPersonne(p, dt) {
   if (p.type === 'hulk') { majHulk(p, dt, d); return; }   // Hulk (qui ne meurt pas : il se calme)
   if (p.type === 'passager' && p.etat) { majPassager(p, dt); return; }   // un passager d'Air Force One, qui tombe ou qu'Iron Man tient
   if (p.vol) { majVol(p, dt); return; }
+  if (p.apesanteur && p.vie > 0) { majPassantFlotte(p, dt); return; }   // un passant qui flotte (la machine-monde de Zod, Mister Mxyzptlk)
+  if (p.derive) { majDoomsdayDerive(p, dt); return; }                // Doomsday vaincu, qui dérive dans l'espace
   if (p.vie <= 0) {
     if (p.assomme) { majAssomme(p, dt); return; }   // à Gotham, Batman ne tue jamais : il est assommé (voir assommer)
     if (p.h.chien) { p.mort = Math.min(1, p.mort + dt * 3); animerChien(p.h, 0, dt, p.mort); p.h.g.position.y = p.y + p.mort * 0.15; }
@@ -19598,6 +20013,7 @@ function majPersonne(p, dt) {
   if (p.releve !== undefined) { relever(p, dt); return; }
   if (p.pris) { majPris(p, dt); return; }   // emballé dans un filet, ou paralysé
   if (p.embarque) { majFlicEmbarque(p, dt); return; }   // un policier venu embarquer les assommés (à Gotham)
+  if (p.fan) { majFan(p, dt); return; }                 // la foule qui acclame Superman (mission « Dans l'espace »)
   if (p.type === 'pingouin') { majPingouin(p, dt, d); return; }   // le Pingouin, à Gotham : son parapluie (voir « Les missions de Batman »)
   if (p.type === 'doubleFace') { majDoubleFace(p, dt, d); return; }   // Double-Face : ses deux pistolets, et sa pièce
   if (p.type === 'bane') { majBane(p, dt, d); return; }               // Bane : ses coups de poing, et ses charges
@@ -19609,6 +20025,9 @@ function majPersonne(p, dt) {
   if (p.type === 'monger') { majMonger(p, dt, d); return; }   // Iron Monger : il marche, il vole, il tire (voir « Les missions d'Iron Man »)
   if (p.type === 'luthor') { majLuthor(p, dt, d); return; }   // Lex Luthor, dans son armure, et sa kryptonite (voir « Les missions de Superman »)
   if (p.type === 'brainiac') { majBrainiac(p, dt, d); return; }   // Brainiac, dans son vaisseau
+  if (p.type === 'zod' || p.type === 'faora') { majKryptonien(p, dt, d); return; }   // le général Zod et Faora : ils volent, foncent, et Zod a les yeux laser
+  if (p.type === 'doomsday') { majDoomsday(p, dt, d); return; }   // Doomsday : il casse tout, saute, frappe, lance des voitures
+  if (p.type === 'mxyzptlk') { majMxyzptlk(p, dt, d); return; }   // Mister Mxyzptlk, qui flotte près de Superman et se moque de lui
   if (p.secours) { majSecours(p, dt); return; }               // quelqu'un à sauver (la tour en feu, {ami}) : il attend Iron Man, ou Iron Man le porte
   // Whiplash et ses fouets, les drones de Hammer, les soldats Extremis et Killian, Trevor Slattery (voir « Les missions d'Iron Man »)
   if (p.type === 'whiplash' || p.type === 'whiplashArmure') { majWhiplash(p, dt, d); return; }
@@ -20128,7 +20547,7 @@ function dortEncore(v, d) {
 function reveillerVoiture(v) { v.dort = null; v.immobile = 0; }
 function majVoiture(v, dt) {
   const d = dist(v, J);
-  v.m.visible = d < 350;
+  v.m.visible = d < 350 && !v.gateau;   // (changée en gâteau par Mister Mxyzptlk : on voit le gâteau, pas la voiture)
   if (v.dort) { if (dortEncore(v, d)) return; reveillerVoiture(v); }   // elle dort : il n'y a rien à faire (voir peutDormir)
   if (J.telesiege && v === J.voiture) return;   // sur le télésiège avec B.J. : monterTelesiege la porte
   if (v.ski && v.conducteur !== 'skieur') v.ski = v.telesiege = null;   // un autre skieur qui est tombé, ou à qui B.J. a pris ses skis
@@ -20461,6 +20880,12 @@ function etapeFinie(et) {
     case 'cloche': return cloche?.phase === 'fini';                // la cloche de verre de Brainiac a éclaté
     case 'vaisseau': return dansSalle(J);                          // il est dans la salle du vaisseau de Brainiac
     case 'naufrage': return !!naufrage?.fini || (vaisseauB?.phase === 'coule' && vaisseauB.t > 2.5);   // il est sorti, et le vaisseau est tombé dans la mer
+    case 'machine': return machineMonde?.phase === 'fini';         // la machine-monde de Zod est détruite
+    case 'doomsday': return combatDoomsday?.phase === 'combat' && ((combatDoomsday.coups >= 3 && combatDoomsday.tCombat > 6) || combatDoomsday.tCombat > 12);   // il a essayé de frapper Doomsday
+    case 'lance': return !!combatDoomsday?.plantee && temps - combatDoomsday.tPlante > 3.5;   // la lance de kryptonite est plantée dans Doomsday (on l'a vu hurler)
+    case 'pousser': return !!combatDoomsday?.tenu && J.y >= et.hauteur;   // il a poussé Doomsday jusque dans l'espace
+    case 'acclamer': return acclamation?.phase === 'fini';         // la foule l'a acclamé
+    case 'mxyzptlk': return lutin?.phase === 'fini';               // Mister Mxyzptlk a dit son nom à l'envers, et la DeLorean est revenue
     case 'aller': { // sansPolice : 0 étoile. Déjà là où va l'étape d'après (un « aller » vers un point de Gotham : monté au grappin en haut du
       // clocher, sans passer par le parvis) : celle-ci est faite aussi
       const ets = MISSIONS_CH[missionIndex]?.etapes, apres = ets?.[ets.indexOf(et) + 1];
@@ -20536,6 +20961,13 @@ function cibleMission() {
   if (et.type === 'vaisseau') return sousLeVaisseau();
   if (et.cible === 'brainiac') return !dansSalle(J) ? sousLeVaisseau() : proche(combatBrainiac?.reparateurs.filter(q => q.p.vie > 0).map(q => q.p) || []) || proche(personnes.filter(p => p.type === 'brainiac' && p.vie > 0));
   if (et.type === 'naufrage') return dansSalle(J) ? POINTS.trappeBrainiac : null;
+  // la machine-monde (puis son cœur) ; la météorite, puis Doomsday ; la lance, puis Doomsday ; Doomsday à pousser ; Mister Mxyzptlk, puis la
+  // prochaine lettre
+  if (et.type === 'machine') return !machineMonde ? null : machineMonde.phase === 'gravite' ? machineMonde.coeur : machineMonde.phase === 'vaisseau' || machineMonde.phase === 'descend' ? { ...machineMonde.c, y: machineMonde.c.y + HAUT_MACHINE } : null;
+  if (et.type === 'doomsday') return combatDoomsday?.p && combatDoomsday.p.vie > 0 ? combatDoomsday.p : combatDoomsday?.c || null;
+  if (et.type === 'lance') { const C = combatDoomsday; return !C ? null : kryptoniteTenue && kryptoniteTenue === C.lance ? C.p : C.lance && !C.lance.casse ? C.lance : C.p; }
+  if (et.type === 'pousser') return combatDoomsday?.tenu ? null : combatDoomsday?.p || null;
+  if (et.type === 'mxyzptlk') return !lutin ? null : lutin.phase === 'attente' ? lutin.l : lutin.phase === 'lettres' ? lutin.lettres[lutin.k] || null : lutin.p;
   if (et.type === 'eliminer' && et.nombre) return proche(personnes.filter(p => p.type === et.cible && p.vie > 0)) || lieuEtape(et);
   if (et.type === 'conduire') return proche(voitures.filter(v => v.type.nom === et.voiture && !v.detruite && !v.coule && !v.fantome))
     || (et.voiture === 'DeLorean' ? placeDeLorean() : null);   // (la DeLorean a explosé : sa cachette, où une neuve va revenir)
@@ -20766,6 +21198,10 @@ function commencerEtape(et) {
   if (et.type === 'cloche') commencerCloche(et);
   if (et.cible === 'brainiac') commencerCombatBrainiac(et);
   if (et.type === 'naufrage') commencerNaufrage(et);
+  if (et.type === 'machine') commencerMachine(et);
+  if (etapeDeDoomsday(et) && chezClark) commencerDoomsday(et);
+  if (et.type === 'acclamer') commencerAcclamer(et);
+  if (et.type === 'mxyzptlk') commencerLutin(et);
   if (et.cible === 'joker' && et.point === 'clocher' && POINTS.clocher) { combatJoker = { et, helico: false }; gardeFouClocher(true); }   // (ailleurs, un Joker qui se bat comme les autres)
 }
 function majEtape(et, dt) {
@@ -20810,6 +21246,8 @@ function finirEtape(avant, suite) {   // (avant : l'étape qui finit ; suite : c
   finirPassager(); finirCristal(); finirLois(); finirPont(); finirMissiles();   // (les missions de Superman)
   if (suite?.cible !== 'luthor') finirLuthor();
   finirAntennes(); finirCloche(); finirCombatBrainiac(); finirNaufrage();
+  finirMachineMonde(); finirKryptoniens(); finirAcclamer(); finirLutin();
+  if (!etapeDeDoomsday(suite)) finirDoomsday();
   if (suite?.cible !== 'joker' || suite.point !== 'clocher') { combatJoker = null; gardeFouClocher(false); if (helicoJoker?.centre && helicoJoker.etat !== 'part') finirHelicoJoker(); }
   givre = null; $('givre').style.opacity = 0;
 }
@@ -20821,7 +21259,8 @@ function texteEtape(et) {
     : et.type === 'course' && course ? course.portes.length - course.k : et.type === 'chute' && chute ? tombent() : et.type === 'eliminer' ? resteAEliminer(et.cible) : et.type === 'poursuite' && poursuite ? Math.max(0, (et.coups || 3) - (poursuite.v.fuyard.coups || 0)) : et.type === 'brouiller' ? antennesRestantes()
     : et.type === 'bombes' && bombesDF ? bombesDF.liste.length : et.type === 'parade' && parade ? et.ballons - parade.creves : et.type === 'devinettes' && devinette ? piegeDebout().length
     : et.type === 'pont' && ecroulement?.liste ? ecroulement.liste.filter(q => !q.sauve).length : et.type === 'missiles' && missilesLuthor?.liste ? missilesLuthor.liste.filter(M => !M.fini).length
-    : et.type === 'antennes' && piratage ? piratage.antennes.filter(A => A.p.vie > 0).length : et.type === 'cloche' && cloche ? cloche.porteurs.filter(q => q.p.vie > 0 && !q.p.supprimer).length : 0;
+    : et.type === 'antennes' && piratage ? piratage.antennes.filter(A => A.p.vie > 0).length : et.type === 'cloche' && cloche ? cloche.porteurs.filter(q => q.p.vie > 0 && !q.p.supprimer).length
+    : et.type === 'mxyzptlk' && lutin ? MXYZPTLK.envers.length - lutin.k : 0;
   const B = bombeBane, rev = combatBane?.phase === 'revanche';
   const texte = et.type === 'givre' && givre?.gel ? (givre.fond ? 'Le givre fond : vite, F pour rallumer tes réacteurs !' : "Ton armure gèle : ses réacteurs s'éteignent, tu tombes... attends que le givre fonde !")
     : et.type === 'sauver' && porte ? 'Descends le poser en bas, près des pompiers (point jaune) : pose-toi à côté d\'eux. Encore {n} à sauver'
@@ -20890,10 +21329,28 @@ function texteEtape(et) {
     : et.cible === 'brainiac' && !dansSalle(J) ? 'Retourne dans le vaisseau : vole dans son rayon vert, dessous (point jaune)'
     : et.cible === 'brainiac' && combatBrainiac && !combatBrainiac.reparateurs.some(q => q.p.vie > 0) ? 'Ses réparateurs sont cassés : à Brainiac, maintenant ! Yeux laser (9), poings. Et saute de côté quand les câbles tombent !'
     : et.type === 'naufrage' && !dansSalle(J) ? 'Regarde : le vaisseau de Brainiac tombe dans la baie de Metropolis !'
+    : et.type === 'machine' && machineMonde?.phase === 'descend' ? 'La machine-monde descend vers la baie, à Hob\'s Bay : vole jusque-là (point jaune)'
+    : et.type === 'machine' && machineMonde?.phase === 'gravite' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois : vole jusqu\'à la machine-monde !'
+    : et.type === 'machine' && machineMonde?.phase === 'gravite' && machineMonde.dedans ? 'Dans le rayon ! Frappe le cœur de la machine (poings tout près, ou yeux laser), vite !'
+    : et.type === 'machine' && machineMonde?.phase === 'gravite' ? 'Son rayon soulève tout ! Entre dans le rayon (il te repousse), et frappe son cœur, sous la machine : poings ou yeux laser'
+    : et.type === 'machine' && (machineMonde?.phase === 'casse' || machineMonde?.phase === 'apres') ? 'La machine-monde s\'effondre dans la baie !'
+    : et.cible === 'zod' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois : le général Zod t\'attend dans le ciel, entre les tours !'
+    : et.cible === 'zod' && personnes.some(p => p.type === 'faora' && p.vie > 0 && !p.fuit) ? 'Zod et Faora ! Yeux laser (9), poings tout près : écarte-toi quand ils foncent sur toi'
+    : et.type === 'doomsday' && combatDoomsday?.phase === 'combat' ? 'DOOMSDAY ! Frappe-le (yeux laser, poings)... Attention à ses coups, et aux voitures qu\'il lance !'
+    : et.type === 'lance' && kryptoniteTenue && kryptoniteTenue === combatDoomsday?.lance && J.voiture ? 'La lance est avec toi, dans la voiture : fonce jusqu\'à Doomsday, puis descends (E), et plante-la (clic gauche)'
+    : et.type === 'lance' && kryptoniteTenue && kryptoniteTenue === combatDoomsday?.lance ? 'Tu tiens la lance : elle t\'affaiblit, tu ne voles plus ! Va jusqu\'à Doomsday (à pied, en sautant, ou en voiture), et plante-la : clic gauche, tout près'
+    : et.type === 'lance' && combatDoomsday?.lance && dist(J, combatDoomsday.lance) < 30 ? 'La lance de kryptonite, par terre : approche-toi, et G pour la prendre (elle va t\'affaiblir !)'
+    : et.type === 'pousser' && combatDoomsday?.tenu ? 'Pousse Doomsday tout là-haut : regarde vers le ciel, et vole (Maj : plus vite). Tu es à {y} m, l\'espace commence à {h} m'
+    : et.type === 'pousser' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois : attrape Doomsday en volant !'
+    : et.type === 'acclamer' && acclamation?.phase === 'acclame' ? 'Metropolis t\'acclame !'
+    : et.type === 'mxyzptlk' && !enCostumeSuper() && lutin?.phase !== 'nom' ? 'Mets ton costume (H) : Mister Mxyzptlk t\'attend au-dessus du vieux théâtre, et ses lettres flottent jusque sur les toits !'
+    : et.type === 'mxyzptlk' && lutin?.phase === 'parle' ? 'Mister Mxyzptlk ! Écoute ce qu\'il te dit...'
+    : et.type === 'mxyzptlk' && lutin?.phase === 'lettres' ? 'Attrape ses lettres dans l\'ordre (touche-les) : la prochaine, en or, c\'est le {l} · déjà : {mot} · encore {n}'
+    : et.type === 'mxyzptlk' && lutin?.phase === 'nom' ? 'Mister Mxyzptlk dit son nom à l\'envers...'
     : et.texte;
   const t = et.type === 'cloche' && cloche ? cloche.reste : et.type === 'pont' && ecroulement ? ecroulement.reste : et.type === 'missiles' && missilesLuthor ? Math.min(999, tempsMissiles()) : explosionExpo ? explosionExpo.reste : et.type === 'parade' && parade ? tempsAvantFoule() : panne?.reste ?? brouillage?.t ?? (et.type === 'bombes' && bombesDF?.liste.length ? Math.min(...bombesDF.liste.map(b => b.reste)) : et.type === 'bombe' && B ? B.reste : 0);
   return tr(texte, { n: reste, t: Math.max(0, Math.ceil(t)), h: et.hauteur, y: Math.max(0, Math.round(J.y)), ami: nomAmi(), f: montant(facture?.montant || 0), loin: et.loin, d: et.type === 'bombe' ? Math.round(B?.terre || 0) : Math.round(loinDeLExpo()),
-    k: (devinette?.k ?? 0) + 1, p: typeNomme('Batpod')?.cable?.portee ?? 30 });
+    k: (devinette?.k ?? 0) + 1, p: typeNomme('Batpod')?.cable?.portee ?? 30, l: lutin ? MXYZPTLK.envers[lutin.k] || '' : '', mot: lutin ? MXYZPTLK.envers.slice(0, lutin.k) || '—' : '' });
 }
 
 // --- la Mark I, dans la grotte des Dix Anneaux (mission « La grotte des Dix Anneaux ») ---
@@ -21116,7 +21573,7 @@ function commencerVague(et) {
 function faireArriver() {
   const V = vague, libres = V.sorties.filter(s => !personnes.some(p => p.vie > 0 && dist(p, s) < 1.5)), s = hasard(libres.length ? libres : V.sorties);
   const x = s.x + entre(-0.6, 0.6), z = s.z + entre(-0.6, 0.6), p = creerPersonne(V.cible, x, z, undefined, s.poste ? hauteurSol(x, z, s.y + 1) : s.y ?? hauteurSol(x, z));
-  p.alerte = !['monger', 'whiplash', 'whiplashArmure', 'killian', 'doubleFace', 'bane', 'joker', 'sphinx', 'luthor', 'brainiac'].includes(V.cible); p.angle = angleVers(p, J);   // (les boss attendent, eux, qu'on vienne : voir majMonger)
+  p.alerte = !['monger', 'whiplash', 'whiplashArmure', 'killian', 'doubleFace', 'bane', 'joker', 'sphinx', 'luthor', 'brainiac', 'zod'].includes(V.cible); p.angle = angleVers(p, J);   // (les boss attendent, eux, qu'on vienne : voir majMonger)
   if (V.zone) p.zone = V.zone;
   if (V.zoneSalle) p.zone = V.zoneSalle;   // (dans la salle de l'égout : ils y restent ; en haut du clocher, sur la plateforme)
   if (V.zonePres) { p.zone = V.zonePres; p.zoneDehors = true; }   // (autour du camion renversé du Joker, de son char)
@@ -25191,7 +25648,9 @@ function majSphinx(p, dt, d) {
 //  Les missions de Superman (MISSIONS_METROPOLIS, au chapitre 4) : la Forteresse de Solitude (l'hélicoptère du Daily Planet, le cristal vert,
 //  la Forteresse qui sort de la glace, l'hologramme de son père et son premier costume), Lois Lane qui tombe du toit du Daily Planet et
 //  l'hélicoptère qui glisse, le grand pont qui s'écroule sous un bus, les deux missiles de Lex Luthor ; la kryptonite ; l'armure de Lex
-//  Luthor ; les antennes et les voitures piratées de Brainiac, sa cloche de verre, son vaisseau et Brainiac lui-même
+//  Luthor ; les antennes et les voitures piratées de Brainiac, sa cloche de verre, son vaisseau et Brainiac lui-même ; le vaisseau du général
+//  Zod, sa machine-monde et ce qui flotte, Zod et Faora ; Doomsday, sa météorite, la lance de kryptonite, l'espace ; la foule qui acclame
+//  Superman ; Mister Mxyzptlk, ses lettres et ses tours de magie
 // =====================================================================
 // les endroits des missions de Superman (comme ceux de Gotham, dans POINTS) : devant la Forteresse de Solitude, là où l'hélicoptère se pose
 // (22 m au sud du cristal, dans l'entrée) ; le toit du Daily Planet (boite : on y est n'importe où sur le toit ; le point jaune, devant le globe)
@@ -25780,14 +26239,16 @@ const kryptonites = [];   // { x, y, z, g : son dessin, lueur, vie, sur : celui 
 let kryptoniteTenue = null;   // celle qu'il tient dans sa main (voir prendreKryptonite)
 let faibleAvant = false, tFaible = -99;   // (pour ne dire « LA KRYPTONITE ! » qu'en arrivant près d'elle)
 const M_KRYPTONITE = chezClark ? std(null, { color: '#5cff86', emissive: '#14d848', emissiveIntensity: 1.6, metalness: 0.3, roughness: 0.1 }) : null;   // (comme le cristal vert)
-function poserKryptonite(x, y, z, { sur = null, vie = 60, emporter = true, de = '' } = {}) {
+function poserKryptonite(x, y, z, { sur = null, vie = 60, emporter = true, de = '', lance = false } = {}) {
   const g = new THREE.Group();
-  for (const [rx, rz, s, dx] of [[0.2, 0.1, 0.42, 0], [-0.5, 0.6, 0.3, 0.18], [0.4, -0.7, 0.28, -0.16]]) { // trois cristaux, en bouquet
+  if (lance) { const l = dessinerLance(new THREE.Group()); l.rotation.z = Math.PI / 2; l.position.set(1.1, 0.12, 0); g.add(l); g.userData.lance = l; }   // (la lance de kryptonite : couchée par terre)
+  else for (const [rx, rz, s, dx] of [[0.2, 0.1, 0.42, 0], [-0.5, 0.6, 0.3, 0.18], [0.4, -0.7, 0.28, -0.16]]) { // trois cristaux, en bouquet
     const c = new THREE.Mesh(formeCristalVert(), M_KRYPTONITE); c.rotation.set(rx, 0, rz); c.scale.setScalar(s); c.position.x = dx; c.castShadow = true; g.add(c);
   }
   const lueur = new THREE.Sprite(M_LUEUR_VERTE); lueur.position.y = 0.4; lueur.raycast = () => {}; g.add(lueur);
   g.position.set(x, y, z); scene.add(g);
-  const k = { x, y, z, g, lueur, vie, sur, vel: V3(), pose: !sur, emporter, de, t: 0 };
+  const k = { x, y, z, g, lueur, vie, sur, vel: V3(), pose: !sur, emporter, de, t: 0, lance };
+  if (lance) lueur.position.set(-1.1, 0.3, 0);   // (la lueur, sur sa pointe)
   kryptonites.push(k);
   return k;
 }
@@ -25829,6 +26290,7 @@ function kryptoniteAPrendre() {
 }
 function prendreKryptonite(k) {
   if (k.sur) { annonce(tr('TU ARRACHES LA KRYPTONITE !'), tr('Clic gauche : lance-la au loin, très loin de toi · G : pose-la'), 4); bruit(0.6, 1500, 0.3); k.sur.krypto = null; k.sur = null; }
+  else if (k.lance) annonce(tr('TU TIENS LA LANCE !'), tr('Elle t\'affaiblit : plus de vol. Va jusqu\'à Doomsday, et de tout près, clic gauche : plante-la · G : pose-la'), 4);
   else annonce('', tr('Tu tiens la kryptonite : clic gauche, lance-la au loin · G : pose-la'), 3);
   kryptoniteTenue = k; k.pose = false; k.vel.set(0, 0, 0);
   bip(300, 600, 0.2, 'sine', 0.1);
@@ -25836,6 +26298,7 @@ function prendreKryptonite(k) {
 // clic gauche : il la lance là où il regarde, un peu vers le haut (le plus loin possible)
 function lancerKryptonite() {
   const k = kryptoniteTenue; if (!k) return;
+  if (k.lance) { planterLance(k); return; }   // (la lance de kryptonite : on ne la lance pas, on la plante dans Doomsday, de tout près)
   kryptoniteTenue = null; k.pose = false; k.lancee = true;
   k.vel.copy(regard()).multiplyScalar(R_.lancerForce * 1.2); k.vel.y += 10;
   J.frappe = 1; bruit(0.6, 300, 0.4);
@@ -25849,22 +26312,29 @@ function poserKryptoniteTenue(lache = false) {
 function majKryptonites(dt) {
   // mort : la kryptonite qu'il tenait, ou qui traînait par terre, la police l'emporte (on revient, et elle n'est plus là)
   if (J.mort) for (const k of [...kryptonites]) if (!k.sur && k.emporter) enleverKryptonite(k);
-  if (kryptoniteTenue && (J.voiture || J.robot || !enCostumeSuper())) poserKryptoniteTenue(true);
+  if (kryptoniteTenue && (J.voiture || J.robot || !enCostumeSuper()) && !(kryptoniteTenue.lance && J.voiture && enCostumeSuper())) poserKryptoniteTenue(true);   // (la lance, il l'emporte en voiture)
   for (const k of [...kryptonites]) {
     k.t += dt;
     if (k.sur && (k.sur.supprimer || k.sur.vie <= 0)) { k.sur.krypto = null; k.sur = null; k.pose = false; }   // (celui qui la portait est tombé : elle tombe)
     if (k.sur) { // sur sa poitrine
       const h = k.sur.h; h.g.updateMatrixWorld(true);
       const q = h.torse.localToWorld(V3(0, 0.14, 0.24)); k.x = q.x; k.y = q.y; k.z = q.z; k.g.scale.setScalar(0.7);
+    } else if (k === kryptoniteTenue && k.lance) { // la lance : dans sa main droite, la pointe vers le haut, devant lui (en voiture, avec lui)
+      joueurH.g.updateMatrixWorld(true);
+      const q = J.voiture ? V3(J.x, J.y + 1, J.z) : joueurH.brasD.main.getWorldPosition(V3()); k.x = q.x; k.y = q.y; k.z = q.z;
+      k.g.visible = !J.voiture; k.g.scale.setScalar(0.8); k.g.rotation.set(0, J.angleCorps, 0); k.g.userData.lance.rotation.set(0.5, 0, 0); k.g.userData.lance.position.set(0, -0.8, 0); k.lueur.position.set(0, 1.2, 0.85);
     } else if (k === kryptoniteTenue) { // dans sa main droite, levée devant lui
       joueurH.g.updateMatrixWorld(true);
       const q = joueurH.brasD.main.getWorldPosition(V3()); k.x = q.x; k.y = q.y; k.z = q.z; k.g.scale.setScalar(0.8);
     } else if (!k.pose) { // elle vole (lancée), ou elle tombe
-      k.g.scale.setScalar(1);
+      k.g.scale.setScalar(1); k.g.visible = true;
+      if (k.lance) { k.g.userData.lance.rotation.set(0, 0, Math.PI / 2); k.g.userData.lance.position.set(1.1, 0.12, 0); k.lueur.position.set(-1.1, 0.3, 0); }   // (la lance, couchée)
       k.vel.y -= R_.gravite * dt; k.x += k.vel.x * dt; k.y += k.vel.y * dt; k.z += k.vel.z * dt;
       const sol = hauteurSol(k.x, k.z, k.y + 0.5);
-      if (k.y < EAU - 0.4 && sol < EAU - 0.4) { // dans l'eau : elle coule
-        annonce('', tr('La kryptonite coule au fond de l\'eau : tu retrouves tes forces !'), 3); enleverKryptonite(k); continue;
+      if (k.y < EAU - 0.4 && sol < EAU - 0.4) { // dans l'eau : elle coule (la lance : l'armée en rapporte une autre, au bout du parc)
+        annonce('', tr(k.lance ? 'La lance est tombée à l\'eau... L\'armée en rapporte une autre, au bout du parc !' : 'La kryptonite coule au fond de l\'eau : tu retrouves tes forces !'), 3); enleverKryptonite(k);
+        if (k.lance && combatDoomsday?.et?.type === 'lance') { combatDoomsday.lance = null; poserLance(combatDoomsday.et); }
+        continue;
       }
       if (k.y <= sol) { k.y = sol; if (k.vel.y < -4) { k.vel.multiplyScalar(0.3); k.vel.y *= -1; } else { k.pose = true; k.vel.set(0, 0, 0); k.tPose = 0; } }
     }
@@ -25872,7 +26342,7 @@ function majKryptonites(dt) {
     if (k.pose && k.emporter && k.lancee && Math.hypot(k.x - J.x, k.y - J.y, k.z - J.z) > R_.kryptonitePortee + 8 && (k.tPose = (k.tPose || 0) + dt) > 1.5) {
       annonce(tr('LA KRYPTONITE EST LOIN !'), tr('La police l\'emporte dans une boîte en plomb : tu retrouves tes forces !'), 4); enleverKryptonite(k); continue;
     }
-    k.g.position.set(k.x, k.y, k.z); k.g.rotation.y += dt * 1.2;
+    k.g.position.set(k.x, k.y, k.z); if (!k.lance) k.g.rotation.y += dt * 1.2;
     k.lueur.scale.setScalar(2.2 + 0.9 * Math.abs(Math.sin(temps * 4 + k.t)));
   }
   // près d'elle : il perd ses forces (le bord de l'écran verdit) ; il ne vole plus (voir superman), et on le lui dit, en arrivant
@@ -25920,7 +26390,9 @@ let combatLuthor = null;   // { et, surToit : il était sur le toit à l'image d
 if (lexcorp && chezClark) {
   const T = lexcorp.toit, l = lexcorp.cote / 2;
   POINTS.toitLex = { ...T, rayon: 9, haut: 3, boite: [T.x - l, T.z - l, T.x + l, T.z + l], sorties: [{ x: T.x, z: T.z - 4, y: T.y }], zone: [T.x - l + 1.5, T.z - l + 1.5, T.x + l - 1.5, T.z + l - 1.5] };
-  const L = lieuProche('ł', T); if (L) POINTS.piedLex = { x: L.x, y: hauteurSol(L.x, L.z), z: L.z, angle: Math.PI };   // (là où l'on se réveille, mort sur le toit)
+  // (là où l'on se réveille, mort contre Luthor : en l'air, en volant, à 35 m du milieu du toit et 8 m plus haut, loin de sa kryptonite. Au pied de
+  // la tour, en remontant par en dessous, la kryptonite l'arrêtait sous le toit, et il ne pouvait plus y revenir ; sur le toit, elle est partout)
+  POINTS.coinLex = { x: T.x + 25, y: T.y + 8, z: T.z + 25, angle: Math.atan2(-1, -1) };
 }
 // le garde-fou invisible du toit (chaque image, après qu'il a bougé) : s'il était sur le toit, à moins de 3,2 m au-dessus de l'héliport, il y
 // reste (au bord, il s'arrête) ; arrivé de dehors, il passe
@@ -26030,7 +26502,8 @@ const FORMES_MACHINE = () => formePartagee('machines de Brainiac', () => ({
   mat: new THREE.CylinderGeometry(0.12, 0.2, 5, 8).translate(0, 2.5, 0), pied: new THREE.CylinderGeometry(0.06, 0.06, 2.2, 6).translate(0, 1.1, 0),
   parabole: new THREE.SphereGeometry(1.1, 16, 8, 0, 2 * Math.PI, 0, Math.PI / 2.4), bulbe: new THREE.SphereGeometry(0.3, 12, 8),
   corps: new THREE.SphereGeometry(0.8, 16, 12), anneau: new THREE.TorusGeometry(0.86, 0.1, 6, 24).rotateX(Math.PI / 2), oeil: new THREE.SphereGeometry(0.3, 12, 8),
-  bras: new THREE.CylinderGeometry(0.07, 0.03, 1.6, 6).translate(0, -0.8, 0), boitier: new THREE.BoxGeometry(1.6, 1.4, 0.8), dome: new THREE.SphereGeometry(0.62, 14, 8, 0, 2 * Math.PI, 0, Math.PI / 2) }));
+  bras: new THREE.CylinderGeometry(0.07, 0.03, 1.6, 6).translate(0, -0.8, 0), boitier: new THREE.BoxGeometry(1.6, 1.4, 0.8), dome: new THREE.SphereGeometry(0.62, 14, 8, 0, 2 * Math.PI, 0, Math.PI / 2),
+  coeur: new THREE.SphereGeometry(3, 20, 14), cercle: new THREE.TorusGeometry(4.2, 0.35, 6, 32) }));
 function creerMachine(sorte) {
   const F = FORMES_MACHINE(), g = new THREE.Group(), h = { g, machine: sorte, hauteur: 0 }, M = M_MACHINE;
   const poser = (geo, m, x = 0, y = 0, z = 0, parent = g) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = m !== M.vert; parent.add(o); return o; };
@@ -26043,6 +26516,10 @@ function creerMachine(sorte) {
   } else if (sorte === 'reparateur') { // un boîtier accroché au mur, son dôme vert
     poser(F.boitier, M.metal); h.oeil = poser(F.dome, M.vert, 0, 0, 0.4); h.oeil.rotation.x = Math.PI / 2;
     h.lueur = new THREE.Sprite(M_LUEUR_VERTE); h.lueur.position.z = 0.8; h.lueur.raycast = () => {}; g.add(h.lueur);
+  } else if (sorte === 'coeur') { // le cœur de la machine-monde de Zod : une boule de lumière blanche et bleue, et deux anneaux qui tournent autour
+    const o = new THREE.Mesh(F.coeur, M_COEUR_MONDE); g.add(o); h.oeil = o; h.rayon = 3;
+    h.anneaux = [0, 1].map(k => { const a = new THREE.Mesh(F.cercle, M_MACHINE.metal); a.rotation.x = k * 1.3; g.add(a); return a; });
+    h.lueur = new THREE.Sprite(M_LUEUR_BLEUE); h.lueur.raycast = () => {}; g.add(h.lueur);
   } else { // un drone (sonde) ou un porteur : une boule de métal, son anneau violet, son œil vert, et trois bras qui pendent
     poser(F.corps, M.metal); poser(F.anneau, M.violet); h.oeil = poser(F.oeil, M.vert, 0, 0.05, 0.66);
     h.bras = [0, 1, 2].map(k => { const o = poser(F.bras, M.metal, Math.sin(k * 2.1) * 0.45, -0.5, Math.cos(k * 2.1) * 0.45); return o; });
@@ -26050,13 +26527,14 @@ function creerMachine(sorte) {
   }
   return h;
 }
-CORPS.antenne = () => creerMachine('antenne'); CORPS.sonde = () => creerMachine('sonde'); CORPS.porteur = () => creerMachine('porteur'); CORPS.reparateur = () => creerMachine('reparateur');
+CORPS.coeurMonde = () => creerMachine('coeur'); CORPS.antenne = () => creerMachine('antenne'); CORPS.sonde = () => creerMachine('sonde'); CORPS.porteur = () => creerMachine('porteur'); CORPS.reparateur = () => creerMachine('reparateur');
 // chaque image : ce que fait une machine (une antenne bipe, un drone vole et tire ; le porteur, c'est la cloche qui le place)
 function majMachine(p, dt, d) {
   const h = p.h;
   if (p.vie <= 0) { p.supprimer = true; return; }
   h.g.visible = d < 700;
-  if (h.lueur) h.lueur.scale.setScalar((h.machine === 'antenne' ? 4 : 2.2) + Math.sin(temps * 6 + p.x) * 0.8);
+  if (h.lueur) h.lueur.scale.setScalar((h.machine === 'antenne' ? 4 : h.machine === 'coeur' ? 14 : 2.2) + Math.sin(temps * 6 + p.x) * (h.machine === 'coeur' ? 3 : 0.8));
+  if (h.anneaux) { h.anneaux[0].rotation.y += dt * 1.6; h.anneaux[1].rotation.z += dt * 1.1; }   // (les anneaux du cœur de la machine-monde)
   if (h.machine === 'sonde') majSonde(p, dt, d);
   else if (h.machine === 'antenne' && d < 70 && (p.tBip = (p.tBip ?? 0) - dt) <= 0) { p.tBip = 0.3 + d / 50; bip(1500, 1500, 0.06, 'square', 0.05 * clamp(1 - d / 70, 0.1, 1)); }   // (elle bipe, de plus en plus vite)
   else if (h.machine === 'porteur') { p.angle = lerpAngle(p.angle, angleVers(p, J), 2 * dt); for (const [k, b] of h.bras.entries()) b.rotation.x = 0.3 * Math.sin(temps * 3 + k); }
@@ -26089,7 +26567,9 @@ function majSonde(p, dt, d) {
 }
 // en volant, on ne donne pas de coups de poing... sauf à une machine de Brainiac toute proche, devant lui (un porteur, une antenne, un drone,
 // un réparateur : voir frapper)
-const machineAPortee = () => chezClark && personnes.some(p => p.h.machine && p.vie > 0 && Math.hypot(p.x - J.x, p.y + p.h.hauteur - J.y - 1, p.z - J.z) < 3.2 && Math.abs(diffAngle(J.lacet, angleVers(J, p))) < 0.9);
+const POINGS_EN_VOL = ['zod', 'faora', 'doomsday'];   // (ceux-là aussi, on les frappe en volant : ils volent, ou on se bat dans l'espace)
+const machineAPortee = () => chezClark && personnes.some(p => (p.h.machine || POINGS_EN_VOL.includes(p.type)) && p.vie > 0
+  && Math.hypot(p.x - J.x, p.y + (p.h.hauteur ?? p.h.g.scale.y) - J.y - 1, p.z - J.z) < 3.2 + (p.h.rayon || 0) + (p.h.machine ? 0 : p.h.g.scale.y) && Math.abs(diffAngle(J.lacet, angleVers(J, p))) < 0.9);
 // une machine détruite : elle explose (sans blesser personne), et disparaît
 function machineDetruite(p) {
   const P = V3(p.x, p.y + p.h.hauteur, p.z);
@@ -26551,6 +27031,953 @@ let naufrage = null;
 function commencerNaufrage(et) { naufrage = { et }; if (vaisseauB && vaisseauB.phase === 'la') { vaisseauB.phase = 'tremble'; vaisseauB.t = 0; } else if (!vaisseauB) naufrage.fini = true; }
 function finirNaufrage() { naufrage = null; if (vaisseauB && (vaisseauB.phase === 'coule' || vaisseauB.phase === 'tremble')) jeterVaisseau(); }
 
+// --- la gravité qui flotte : la machine-monde de Zod, et un tour de Mister Mxyzptlk. Des voitures et des passants s'envolent doucement (de
+// « haut » mètres), en tournant, puis, quand ça s'arrête, redescendent tout doucement, à 3 m/s : personne n'a de mal ---
+const flottants = [];   // { o : une voiture ou un passant, voiture, y0 : sa hauteur au départ, sol : celle où il se reposera, haut, t, tourne, descend, de : qui l'a fait flotter, phase }
+function faireFlotter(o, haut, de, voiture) {
+  if (o.apesanteur || o.supprimer) return null;
+  const f = { o, voiture, y0: o.y, sol: o.y, haut, t: 0, tourne: entre(-0.5, 0.5), descend: false, de, phase: entre(0, 6.3) };
+  o.apesanteur = f; flottants.push(f);
+  if (voiture) { reveillerVoiture(o); o.anime = animerFlotte; o.enVol = true; o.vitesse = 0; }   // (elle ne roule plus : majFlottants la place)
+  else o.peur = 8;
+  return f;
+}
+function animerFlotte(v) { v.vitesse = 0; v.vy = 0; }
+// il est redescendu : il repart comme avant (un passant a eu peur : il s'enfuit)
+function reposerFlottant(f) {
+  const o = f.o, i = flottants.indexOf(f); if (i >= 0) flottants.splice(i, 1);
+  o.apesanteur = null;
+  if (f.voiture) { if (o.anime === animerFlotte) o.anime = null; o.enVol = false; o.tangage = o.roulis = 0; if (!o.supprimer) { o.y = Math.max(o.y, f.sol); reveillerVoiture(o); } }
+  else if (o.h) { o.y = Math.max(o.y, f.sol); o.h.g.rotation.set(0, o.angle, 0); }
+}
+function majFlottants(dt) {
+  for (const f of [...flottants]) {
+    const o = f.o;
+    if (o.supprimer || (f.voiture ? o.detruite || o === J.voiture || souleve?.v === o : o.vie <= 0 || o.vol)) { if (!f.voiture && o.vie <= 0) o.y = f.sol; reposerFlottant(f); continue; }
+    f.t += dt;
+    const k = f.descend ? clamp((o.y - f.sol) / Math.max(1, f.haut), 0, 1) : Math.min(1, f.t / 3);   // (il tourne de plus en plus, puis de moins en moins en redescendant)
+    if (!f.descend) o.y += (f.y0 + f.haut + Math.sin(temps * 1.3 + f.phase) * 0.6 - o.y) * Math.min(1, dt * 0.6);
+    else { o.y -= 3 * dt; if (o.y <= f.sol) { o.y = f.sol; reposerFlottant(f); continue; } }
+    if (f.voiture) { o.angle += f.tourne * dt * k; o.tangage = Math.sin(f.t * 0.7 + f.phase) * 0.35 * k; o.roulis = Math.sin(f.t * 0.53 + f.phase) * 0.3 * k; }
+  }
+}
+// un passant qui flotte : il se débat, les bras et les jambes écartés, et tourne doucement sur lui-même
+function majPassantFlotte(p, dt) {
+  const f = p.apesanteur, h = p.h, k = Math.min(1, f.t / 2);
+  p.angle += f.tourne * dt;
+  if (!h.g.visible) return;
+  h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(Math.sin(f.t * 0.8 + f.phase) * 0.35 * k, p.angle, Math.sin(f.t * 0.6) * 0.25 * k);
+  animerHumain(h, 0, dt, { agite: 1, ecarte: 0.6 * k });
+  membresMous(h, dt, { sol: p.y - 2 });
+}
+// tout ce qui flotte (à cause de « de » : la machine-monde, Mister Mxyzptlk) redescend, tout doucement
+function toutRedescend(de) { for (const f of flottants) if (!de || f.de === de) f.descend = true; }
+
+// --- le vaisseau du général Zod (missions « La machine-monde » et « Le duel contre Zod ») ---
+// Un immense vaisseau noir, long de 380 m, qui flotte au-dessus de New Troy. Il n'est construit que pendant ces deux missions (et jeté ensuite :
+// il ne pèse rien le reste du temps) ; à la fin du duel, il s'en va, tout là-haut. Il ne fait pas d'ombre : il est trop haut, et trop grand
+const M_ZOD = chezClark ? { coque: mat('#26282d', { metalness: 0.7, roughness: 0.4 }), arete: mat('#4a4e57', { metalness: 0.8, roughness: 0.3 }),
+  lumiere: new THREE.MeshBasicMaterial({ color: '#cfe6ff', toneMapped: false }) } : null;
+const HAUT_VAISSEAU_ZOD = 560;   // (à combien de mètres au-dessus de la ville il flotte)
+let vaisseauZod = null;   // { g, geos, x, y, z, phase : 'la', 'attend' ou 'part', t }
+const missionDeZod = () => !!MISSIONS_CH[missionIndex]?.etapes.some(e => e.type === 'machine' || e.cible === 'zod');
+function construireVaisseauZod() {
+  const c = centre(45, 30), y = HAUT_VAISSEAU_ZOD, g = new THREE.Group(), geos = [], M = M_ZOD;
+  const lot = (liste, m) => { const geo = mergeGeometries(liste); geos.push(geo); const o = new THREE.Mesh(geo, m); o.raycast = () => {}; g.add(o); return o; };
+  lot([new THREE.SphereGeometry(1, 32, 14).scale(190, 24, 52),                                                       // la coque : longue, aplatie
+    new THREE.BoxGeometry(260, 10, 14).translate(0, -20, 0),                                                          // la quille, dessous
+    new THREE.SphereGeometry(1, 20, 10).scale(60, 40, 30).translate(-70, 18, 0),                                      // la tour, à l'arrière
+    ...[-1, 1].map(s => new THREE.CylinderGeometry(4, 9, 120, 10).rotateZ(Math.PI / 2).translate(150, -6, s * 26)),   // ses deux pointes, à l'avant
+    ...[-1, 1].map(s => new THREE.BoxGeometry(120, 6, 50).rotateX(s * 0.35).translate(-20, -4, s * 62))], M.coque);   // ses ailes
+  lot([...[-1, 1].map(s => new THREE.BoxGeometry(300, 2.5, 2.5).translate(0, -6, s * 50)), new THREE.BoxGeometry(2, 60, 2).translate(-70, 40, 0)], M.arete);   // ses arêtes
+  lot([...Array(10)].map((_, k) => new THREE.SphereGeometry(3.2, 10, 6).translate(-150 + k * 32, -24, 0)), M.lumiere);   // ses lumières, dessous
+  g.position.set(c.x, y, c.z); g.rotation.y = 0.6; scene.add(g);
+  vaisseauZod = { g, geos, x: c.x, y, z: c.z, phase: 'la', t: 0 };
+}
+function jeterVaisseauZod() {
+  const V = vaisseauZod; vaisseauZod = null;
+  if (!V) return;
+  scene.remove(V.g); for (const g of V.geos) g.dispose();
+}
+function majVaisseauZod(dt) {
+  const veut = missionDeZod();
+  if (veut && !vaisseauZod) construireVaisseauZod();
+  const V = vaisseauZod; if (!V) return;
+  V.t += dt;
+  if (!veut && V.phase === 'la') { // le duel est fini : il s'en va, tout là-haut (on a quitté sa mission avec le code MISSION : il disparaît)
+    if (MISSIONS_CH[missionIndex - 1]?.etapes.some(e => e.cible === 'zod')) { V.phase = 'attend'; V.t = 0; V.mission = missionIndex; }
+    else { jeterVaisseauZod(); return; }
+  }
+  if (V.phase !== 'la' && V.mission !== missionIndex) { jeterVaisseauZod(); return; }   // (le code MISSION, pendant qu'il s'en va)
+  if (V.phase === 'attend' && V.t > 4.5) { V.phase = 'part'; V.t = 0; annonce(tr('LE VAISSEAU DE ZOD S\'EN VA !'), tr('Il remonte vers l\'espace... et il ne reviendra plus'), 4); bruit(0.8, 90, 3); }
+  if (V.phase === 'part') { V.g.position.y += dt * (8 + V.t * 9); if (V.t > 16) { jeterVaisseauZod(); return; } }
+  else V.g.position.y = V.y + Math.sin(V.t * 0.25) * 4;   // il flotte, tout doucement
+}
+
+// --- la machine-monde de Zod (mission « La machine-monde », étape « machine ») ---
+// Zod parle sur tous les écrans de la ville ; puis sa machine descend du vaisseau, et se pose dans la baie (case) : un grand corps de métal
+// sur trois pattes, comme une araignée, et un rayon de lumière qui monte jusqu'au ciel. Le rayon change la gravité : tout ce qui est autour
+// (à « rayon » mètres) s'envole doucement, les voitures et les passants. Son cœur brille sous la machine, au milieu du rayon : de dehors, ni
+// les yeux laser ni les poings ne passent le rayon ; il faut entrer dedans (« largeur » : son rayon à lui, en mètres)... et dedans, il repousse
+// (« poussee », en m/s), ralentit et écrase un peu (« degats », par seconde) Superman. Le cœur détruit : la machine s'effondre dans la baie,
+// et tout ce qui flottait redescend tout doucement
+const PAROLES_ZOD = ['« Je suis le général Zod, de Krypton. Peuple de la Terre : vous n\'êtes pas seuls dans l\'univers. »',
+  '« {nom} ! Rends-toi... ou ta planète deviendra une nouvelle Krypton ! »',
+  '« Ma machine-monde va changer la Terre. Regardez le ciel : elle arrive ! »'];
+const nomKryptonien = () => fille() ? 'Kara Zor-El' : 'Kal-El';   // (son nom de Krypton : celui que Zod lui donne)
+const HAUT_MACHINE = 46;   // (le dessous de son corps, au-dessus de l'eau : son cœur brille juste dessous)
+const M_RAYON_MONDE = chezClark ? M_HALO_ROUGE.clone() : null, M_COEUR_MONDE = chezClark ? M_RAYON_ROUGE.clone() : null, M_LUEUR_BLEUE = chezClark ? M_FLASH.clone() : null;
+if (chezClark) { M_RAYON_MONDE.color.set('#7ab8ff'); M_RAYON_MONDE.opacity = 0.3; M_COEUR_MONDE.color.set('#dff4ff'); M_LUEUR_BLEUE.color.set('#7ac4ff'); }
+let machineMonde = null;   // { et, phase : 'vaisseau', 'descend', 'gravite', 'casse', 'apres' ou 'fini', t, k : la phrase, c : où elle se pose, g, geos, rayon, coeur, dedans, tEcrase, tFlotte, de }
+// un cylindre de a à b (de rayon r1 en a, r2 en b) : les pattes de la machine
+function cylindreEntre(a, b, r1, r2, n = 10) {
+  const d = b.clone().sub(a), g = new THREE.CylinderGeometry(r2, r1, d.length(), n);
+  g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V3(0, 1, 0), d.normalize()));
+  return g.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+}
+function commencerMachine(et) {
+  const c0 = centre(...et.case), c = { x: c0.x, z: c0.z, y: Math.max(EAU, hauteurSol(c0.x, c0.z)) };
+  const g = new THREE.Group(), geos = [], M = M_ZOD, H = HAUT_MACHINE, fond = Math.min(c.y, hauteurSol(c.x, c.z)) - 4 - c.y;   // (ses pattes vont jusqu'au fond de l'eau)
+  const lot = (liste, m, ombre = true) => { const geo = mergeGeometries(liste); geos.push(geo); const o = new THREE.Mesh(geo, m); o.castShadow = ombre; o.receiveShadow = ombre; o.raycast = () => {}; g.add(o); return o; };
+  lot([new THREE.CylinderGeometry(22, 13, 12, 24).translate(0, H + 6, 0), new THREE.SphereGeometry(15, 20, 8, 0, 2 * Math.PI, 0, Math.PI / 2).scale(1, 0.6, 1).translate(0, H + 12, 0),
+    new THREE.ConeGeometry(7, 7, 16).rotateX(Math.PI).translate(0, H - 3.5, 0),
+    ...[0, 1, 2].flatMap(k => { const a = k * 2 * Math.PI / 3, s = Math.sin(a), co = Math.cos(a);   // ses trois pattes : le haut, puis le bas, jusqu'au fond
+      return [cylindreEntre(V3(s * 18, H + 6, co * 18), V3(s * 34, H + 26, co * 34), 3.2, 2.6), cylindreEntre(V3(s * 34, H + 26, co * 34), V3(s * 52, fond, co * 52), 2.6, 1.6)]; })], M.coque);
+  lot([new THREE.TorusGeometry(22.3, 0.7, 6, 48).rotateX(Math.PI / 2).translate(0, H + 3, 0), new THREE.TorusGeometry(5, 0.4, 6, 24).rotateX(Math.PI / 2).translate(0, H - 1, 0)], M.lumiere, false);   // ses lumières
+  g.visible = false; scene.add(g);
+  const L = et.largeur || 16, geoRayon = new THREE.CylinderGeometry(L, L, 900, 24, 1, true).translate(0, 444, 0); geos.push(geoRayon);
+  const rayon = new THREE.Mesh(geoRayon, M_RAYON_MONDE); rayon.raycast = () => {}; rayon.position.set(c.x, c.y, c.z); rayon.visible = false; scene.add(rayon);
+  machineMonde = { et, phase: 'vaisseau', t: 0, k: -1, c, g, geos, rayon, coeur: null, dedans: false, tEcrase: 0, tFlotte: 0 };
+}
+function majMachineMonde(dt) {
+  const M = machineMonde; if (!M || M.phase === 'fini') return;
+  M.t += dt;
+  const et = M.et, H = HAUT_MACHINE, L = et.largeur || 16;
+  if (M.phase === 'vaisseau') { // le vaisseau de Zod, là-haut : il parle sur tous les écrans de la ville
+    if (M.k === -1 && M.t > 0.3) { M.k = -0.5; annonce(tr('UN VAISSEAU DANS LE CIEL !'), tr('Un immense vaisseau noir, au-dessus de Metropolis... Tous les écrans de la ville s\'allument !'), 3.5); bruit(0.9, 70, 3); J.secousse = Math.max(J.secousse || 0, 0.08); }
+    const k = Math.floor((M.t - 3.5) / 3.8);
+    if (k >= 0 && k > M.k && k < PAROLES_ZOD.length) { M.k = k; annonce(tr('GÉNÉRAL ZOD'), tr(PAROLES_ZOD[k], { nom: nomKryptonien() }), 3.8); }
+    if (k < PAROLES_ZOD.length) return;
+    const V = vaisseauZod; M.de = V ? { x: V.g.position.x, y: V.g.position.y - 30, z: V.g.position.z } : { x: M.c.x, y: M.c.y + 400, z: M.c.z };
+    M.phase = 'descend'; M.t = 0; M.g.visible = true; M.g.position.set(M.de.x, M.de.y, M.de.z);
+    annonce(tr('LA MACHINE-MONDE !'), tr('Elle descend du vaisseau de Zod... vers la baie !'), 4); bruit(0.8, 120, 2);
+    return;
+  }
+  if (M.phase === 'descend') { // elle descend du vaisseau, et se pose dans la baie
+    const u = clamp(M.t / 7, 0, 1), e = u * u * (3 - 2 * u);
+    M.g.position.set(lerp(M.de.x, M.c.x, e), lerp(M.de.y, M.c.y, e), lerp(M.de.z, M.c.z, e)); M.g.rotation.y = 1.5 * (1 - e);
+    if (u < 1) return;
+    M.phase = 'gravite'; M.t = 0; M.rayon.visible = true;
+    // son cœur : une boule de lumière, sous son corps, au milieu du rayon
+    const q = M.coeur = creerPersonne('coeurMonde', M.c.x, M.c.z, undefined, M.c.y + H - 7);
+    Object.assign(q, { alerte: true, sansTache: true, zone: null });
+    for (let n = 0; n < 30; n++) { const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#f4f8fa'); s.position.set(M.c.x + entre(-50, 50), EAU + entre(0, 12), M.c.z + entre(-50, 50)); scene.add(s); effets.push({ o: s, vie: 3, fumee: 3, taille: 10 }); }
+    bruit(1, 100, 2.5); J.secousse = Math.max(J.secousse || 0, 0.25 * clamp(1 - dist(J, M.c) / 600, 0.2, 1));
+    annonce(tr('LA MACHINE-MONDE SE POSE !'), tr('Son rayon change la gravité : tout s\'envole autour d\'elle ! Entre dans le rayon, et frappe son cœur'), 5);
+    return;
+  }
+  if (M.phase === 'gravite') {
+    // le rayon bat. Dedans, il repousse Superman vers le dehors (moins au milieu), le ralentit (voir superman), et l'écrase un peu
+    M_RAYON_MONDE.opacity = 0.26 + 0.08 * Math.sin(temps * 5);
+    const dx = J.x - M.c.x, dz = J.z - M.c.z, r = Math.hypot(dx, dz);
+    M.dedans = !J.mort && !J.voiture && r < L && J.y > M.c.y - 4 && J.y < M.c.y + H + 4;
+    if (M.dedans) {
+      const k = (et.poussee ?? 4) * dt * (0.35 + 0.65 * r / L);
+      J.x += dx / (r || 1) * k; J.z += dz / (r || 1) * k;
+      if ((M.tEcrase -= dt) <= 0) { M.tEcrase = 0.5; if (et.degats && J.vie > 25) blesserJoueur(Math.min(et.degats * 0.5, (J.vie - 25) / protectionCostume()), false); }   // (il ne l'écrase jamais tout à fait : à 25 points de vie, il ne lui fait plus rien)
+      if (!M.ditDedans) { M.ditDedans = true; annonce(tr('DANS LE RAYON !'), tr('Il te repousse, et t\'écrase : fonce sur le cœur, et frappe vite !'), 3); }
+      J.secousse = Math.max(J.secousse || 0, 0.05);
+      // (on ne passe pas à travers le cœur : on bute dessus, et on le frappe)
+      const q = M.coeur; if (q && q.vie > 0) { const ex = J.x - q.x, ey = J.y + 1 - q.y, ez = J.z - q.z, e = Math.hypot(ex, ey, ez); if (e < 3.8 && e > 0.01) { J.x = q.x + ex / e * 3.8; J.y = q.y + ey / e * 3.8 - 1; J.z = q.z + ez / e * 3.8; } }
+    }
+    // ce qui est autour s'envole (pas tout d'un coup : un à la fois)
+    if ((M.tFlotte -= dt) <= 0) {
+      M.tFlotte = 0.3;
+      const R = et.rayon || 120;
+      if (flottants.filter(f => f.de === 'machine').length < 26) {
+        const v = voitures.find(o => !o.apesanteur && !o.mission && !o.pirate && !o.anime && !o.gateau && !o.detruite && !o.coule && !o.type.bateau && !o.type.vole && o !== J.voiture && souleve?.v !== o && dist(o, M.c) < R);
+        if (v) faireFlotter(v, entre(8, 35), 'machine', true);
+        const p = personnes.find(o => o.type === 'pieton' && !o.apesanteur && !o.fan && o.vie > 0 && !o.vol && !o.pris && dist(o, M.c) < R);
+        if (p) faireFlotter(p, entre(5, 22), 'machine', false);
+      }
+    }
+    // de l'écume et de la poussière montent dans le rayon
+    if (dist(J, M.c) < 700 && Math.random() < dt * 8) { const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#cfe2f4'); s.position.set(M.c.x + entre(-0.8, 0.8) * L, M.c.y + entre(0, H + 30), M.c.z + entre(-0.8, 0.8) * L); scene.add(s); effets.push({ o: s, vie: 2.2, fumee: 2.2, taille: 5 }); }
+    if (M.coeur && M.coeur.vie > 0 && !M.coeur.supprimer) return;
+    // le cœur est détruit : la machine s'effondre
+    M.phase = 'casse'; M.t = 0; M.dedans = false; M.coeur = null; toutRedescend('machine');
+    annonce(tr('LA MACHINE-MONDE EST DÉTRUITE !'), tr('Elle s\'effondre dans la baie... Tout ce qui flottait redescend, tout doucement : personne n\'a de mal !'), 5); bruit(1, 200, 2);
+    return;
+  }
+  if (M.phase === 'casse') { // elle penche, s'enfonce dans la baie, dans les explosions
+    const u = clamp(M.t / 6, 0, 1);
+    M.g.rotation.z = 0.5 * u * u; M.g.position.y = M.c.y - 75 * u * u; M.rayon.visible = M.t < 1.2 && Math.sin(temps * 40) > 0;
+    if ((M.tBoum = (M.tBoum || 0) - dt) <= 0 && u < 0.85) { M.tBoum = 0.35; const P = V3(M.c.x + entre(-25, 25), M.g.position.y + H + entre(-5, 15), M.c.z + entre(-25, 25)); flash(P, 6); bouffees(P, 4, '#3a3a3a', 6, 2, 4); bruit(0.7 * clamp(1 - dist(J, M.c) / 500, 0.1, 1), 400, 0.5); }
+    if (u < 1) return;
+    M.phase = 'apres'; M.t = 0; M.g.visible = M.rayon.visible = false;
+    for (let n = 0; n < 30; n++) { const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set('#f4f8fa'); s.position.set(M.c.x + entre(-40, 40), EAU + entre(0, 20), M.c.z + entre(-40, 40)); scene.add(s); effets.push({ o: s, vie: 3, fumee: 3, taille: 12 }); }
+    annonce(tr('GÉNÉRAL ZOD'), tr('« Tu vas me le payer, {nom} ! Je t\'attends, entre les tours de ta ville... »', { nom: nomKryptonien() }), 4.5);
+    return;
+  }
+  if (M.phase === 'apres' && M.t > 4.6) M.phase = 'fini';
+}
+function finirMachineMonde() {
+  const M = machineMonde; machineMonde = null;
+  if (!M) return;
+  scene.remove(M.g, M.rayon); for (const g of M.geos) g.dispose();
+  if (M.coeur && M.coeur.vie > 0) M.coeur.supprimer = true;
+  M_RAYON_MONDE.opacity = 0.3;
+  toutRedescend('machine');
+}
+// dans le rayon de la machine-monde, Superman vole moins vite ; il va aussi moins vite quand il pousse Doomsday (voir superman)
+function ralentiSuperman() { return (machineMonde?.dedans ? 0.6 : 1) * (combatDoomsday?.tenu ? 0.7 : 1); }
+
+// --- le général Zod et Faora (mission « Le duel contre Zod ») ---
+// Deux Kryptoniens, dans leur armure noire : ils volent aussi vite que Superman (vol), tournent autour de lui entre les tours, et foncent sur lui
+// pour frapper (charge : ils s'arrêtent 0,6 s, serrent les poings, puis foncent tout droit) ; Zod a aussi les yeux laser (ses yeux brillent
+// en rouge 0,8 s avant : le temps de s'écarter). À la moitié de sa vie, Faora vient l'aider (renforts). Zod vaincu, Faora s'enfuit vers son vaisseau
+TENUES.zod = () => ({ peau: '#d8b08e', haut: '#23262c', bas: '#23262c', chaussures: '#15171b', cheveux: '#131313', taille: 1.04, carrure: 1.06 });
+TENUES.faora = () => ({ peau: '#e8c6a6', haut: '#23262c', bas: '#23262c', chaussures: '#15171b', cheveux: '#17120e', fille: true });
+function creerKryptonien(t, zod) {
+  const h = creerHumain(t);
+  const F = formePartagee('armure de Krypton', () => ({ epauliere: new RoundedBoxGeometry(0.2, 0.09, 0.24, 2, 0.03), plastron: new RoundedBoxGeometry(0.42, 0.3, 0.06, 2, 0.02),
+    blason: new THREE.CylinderGeometry(0.07, 0.07, 0.02, 5).rotateX(Math.PI / 2), barbe: new THREE.BoxGeometry(0.15, 0.07, 0.05), col: new THREE.CylinderGeometry(0.11, 0.13, 0.08, 12) }));
+  for (const s of [-1, 1]) piece(F.epauliere, '#3b3f47', h.haut, s * 0.2, 0.7, 0);   // ses épaulières
+  piece(F.plastron, '#30333a', h.haut, 0, 0.5, 0.11);   // la plaque de sa poitrine...
+  piece(F.blason, '#8a8f98', h.haut, 0, 0.52, 0.145);   // ...le blason de sa famille...
+  piece(F.col, '#30333a', h.haut, 0, 0.7, 0);           // ...et son col
+  if (zod) piece(F.barbe, '#1a1a1a', h.tete, 0, -0.085, 0.09);   // la barbe du général
+  return h;
+}
+CORPS.zod = t => creerKryptonien(t, true); CORPS.faora = t => creerKryptonien(t, false);
+if (chezClark) { const n = noeud(45, 30); POINTS.duelZod = { x: n.x, y: baseNoeud(45, 30) + 70, z: n.z, rayon: 30, haut: 40, sorties: [{ x: n.x, z: n.z, y: baseNoeud(45, 30) + 70 }] }; }   // (au-dessus du carrefour, entre les tours de New Troy)
+// sa pose en volant, comme Superman : couché quand il file, debout quand il monte ou qu'il attend
+function poseVolante(h, p, dt, vx, vy, vz, o = {}) {
+  const vh = Math.hypot(vx, vz), e = Math.min(1, Math.hypot(vh, vy) / 8), devant = vx * Math.sin(p.angle) + vz * Math.cos(p.angle);
+  const bascule = e * Math.atan2(devant, Math.max(vy, 0) + 0.01);
+  animerHumain(h, 0, dt, { superman: e, bascule, ...o });
+  h.g.quaternion.setFromEuler(new THREE.Euler(bascule, p.angle, 0, 'YZX'));
+  poserCorps(h, p.x, p.y + 0.95 * h.g.scale.y, p.z, 0.95);
+  membresMous(h, dt, { raideur: 25, sol: p.y - 5, vx, vy, vz });
+}
+function majKryptonien(p, dt, d) {
+  const E = fiche(p), h = p.h, zod = p.type === 'zod', C = POINTS.duelZod || { x: p.x, y: p.y, z: p.z };
+  p.cooldown -= dt; p.cdCharge = (p.cdCharge ?? entre(2.5, 4)) - dt; p.cdLaser = (p.cdLaser ?? entre(3.5, 5)) - dt;
+  p.vx ??= 0; p.vy ??= 0; p.vz ??= 0;
+  const d3 = Math.hypot(J.x - p.x, J.y - p.y, J.z - p.z);
+  if ((p.vuTimer -= dt) <= 0) { p.vuTimer = 0.3; p.voitJ = !J.mort && d3 < E.vue && voitBJ({ x: p.x, y: p.y + 1.5, z: p.z }); }
+  if (p.fuit) { // Faora s'enfuit vers le vaisseau de Zod, tout là-haut
+    p.vy = Math.min(45, p.vy + 25 * dt); p.y += p.vy * dt;
+    if ((p.tFuit = (p.tFuit || 0) + dt) > 7) p.supprimer = true;
+    if (h.g.visible) poseVolante(h, p, dt, 0, p.vy, 0);
+    return;
+  }
+  if (!p.alerte) { // il attend, debout dans le ciel, entre les tours, que Superman arrive
+    if (!J.mort && d3 < 90) {
+      p.alerte = true; bruit(0.7, 300, 1);
+      if (zod) annonce(tr('GÉNÉRAL ZOD'), tr(p.parle ? '« Te revoilà, {nom} ? Ce combat n\'est pas fini ! »' : '« {nom}... Je suis né pour protéger Krypton. Toi, tu protèges ces humains ? Alors bats-toi ! »', { nom: nomKryptonien() }), 5);
+      p.parle = true;
+    }
+    p.angle = lerpAngle(p.angle, angleVers(p, J), 2 * dt);
+    if (h.g.visible) poseVolante(h, p, dt, 0, 0, 0);
+    return;
+  }
+  // à la moitié de sa vie : Faora vient l'aider
+  if (zod && !p.appel && p.vie < E.vie / 2 && E.renforts) {
+    p.appel = true; appelerRenforts(p, E.renforts, 'faora', tr('FAORA !'), tr('« Général, je suis là ! » La plus rapide des guerrières de Krypton vient l\'aider'));
+    for (const q of p.renforts || []) Object.assign(q, { alerte: true, y: p.y, cdCharge: 1.5 });
+  }
+  const vise = angleVers(p, J);
+  p.angle = lerpAngle(p.angle, vise, 5 * dt);
+  // il fonce sur lui : il s'arrête un instant, serre les poings... puis file tout droit
+  if (!p.charge && !p.laser && p.cdCharge <= 0 && p.voitJ && d3 > 5 && d3 < 70 && !J.mort) {
+    p.charge = { t: 0 };
+    if (!p.ditCharge) { p.ditCharge = true; annonce('', tr(zod ? 'Zod fonce sur toi : écarte-toi, ou frappe-le avant (yeux laser, poings) !' : 'Faora fonce sur toi : écarte-toi !'), 2.5); }
+  }
+  let tire = false;
+  if (p.charge) {
+    const K = p.charge; K.t += dt;
+    if (K.t < 0.6) { p.vx *= 0.85; p.vy *= 0.85; p.vz *= 0.85; }
+    else { const v = V3(J.x - p.x, J.y + 0.3 - p.y, J.z - p.z), l = v.length() || 1; v.multiplyScalar(E.charge / l); p.vx = v.x; p.vy = v.y; p.vz = v.z; if (!K.parti) { K.parti = true; bruit(0.5, 1500, 0.4); } }
+    if (K.parti && d3 < 2.6 && !J.mort) { // le coup de poing, en passant : il l'envoie voler
+      const u = V3(J.x - p.x, 0, J.z - p.z).normalize();
+      blesserJoueur(E.degats, true, p); J.secousse = Math.max(J.secousse || 0, 0.22); bruit(0.7, 700, 0.25); etincelles(V3(J.x, J.y + 1.2, J.z), 8, 4);
+      if (J.superman) { J.superman.vx += u.x * 22; J.superman.vz += u.z * 22; J.vy += 5; } else { J.lance = { vx: u.x * 12, vz: u.z * 12 }; J.vy = 6; J.sol = false; }
+      p.charge = null; p.cdCharge = entre(...E.tir); p.recule = 1; p.frappe = 1;
+    } else if (K.t > 1.8) { p.charge = null; p.cdCharge = entre(...E.tir); }
+  }
+  // les yeux laser de Zod : ses yeux brillent (0,8 s), puis le rayon part, 1,2 s, et suit Superman
+  if (zod && !p.laser && !p.charge && p.cdLaser <= 0 && p.voitJ && d3 > 6 && d3 < 90 && !J.mort) {
+    p.laser = { t: 0, touche: Math.random() < E.precision * clamp(1.3 - d3 / 80, 0.3, 1), tic: 0 };
+    if (!p.ditLaser) { p.ditLaser = true; annonce('', tr('Les yeux de Zod brillent : il va tirer ses yeux laser, écarte-toi !'), 2.5); }
+    bip(200, 900, 0.8, 'sawtooth', 0.05);
+  }
+  if (p.laser) {
+    const Lz = p.laser; Lz.t += dt; h.g.updateMatrixWorld(true);
+    const yeux = h.tete.localToWorld(V3(0, 0.02, 0.13));
+    if (!Lz.eclat) { Lz.eclat = new THREE.Sprite(M_HALO_ROUGE_SPRITE); Lz.eclat.raycast = () => {}; scene.add(Lz.eclat); }
+    Lz.eclat.position.copy(yeux); Lz.eclat.scale.setScalar(Lz.t < 0.8 ? 0.2 + Lz.t : 0.9);
+    p.vx *= 0.9; p.vy *= 0.9; p.vz *= 0.9;
+    if (Lz.t >= 0.8 && (Lz.tic -= dt) <= 0) {
+      Lz.tic = 0.12; tire = true;
+      const cible = V3(J.x, J.y + 1.2, J.z); if (!Lz.touche) cible.add(V3(entre(-3, 3), entre(-2, 2), entre(-3, 3)));
+      const arrive = balleArrive(p, yeux, cible, !Lz.touche);
+      rayonRouge(yeux, cible, 0.5, 0.13); bip(1200, 700, 0.1, 'sawtooth', 0.04);
+      if (Lz.touche && arrive) blesserJoueur(E.degatsLaser * parTriche('balles'), true, p);
+    }
+    if (Lz.t > 2) { scene.remove(Lz.eclat); p.laser = null; p.cdLaser = entre(5, 7.5); }
+  }
+  // il tourne autour de lui, à 12 ou 24 m, un peu plus haut ou plus bas (sans quitter les tours de New Troy)
+  if (!p.charge && !p.laser) {
+    if (p.ecart === undefined) Object.assign(p, { orbite: angleVers(J, p), ecart: entre(12, 24), haut: entre(-3, 8), sens: Math.random() < 0.5 ? 1 : -1, tChange: entre(3, 6) });
+    if ((p.tChange -= dt) <= 0) Object.assign(p, { ecart: entre(12, 24), haut: entre(-3, 8), sens: Math.random() < 0.3 ? -p.sens : p.sens, tChange: entre(3, 6) });
+    p.orbite += p.sens * dt * 0.6 * E.vol / p.ecart;
+    let bx = J.x + Math.sin(p.orbite) * p.ecart, bz = J.z + Math.cos(p.orbite) * p.ecart;
+    const loin = Math.hypot(bx - C.x, bz - C.z); if (loin > 350) { bx = C.x + (bx - C.x) * 350 / loin; bz = C.z + (bz - C.z) * 350 / loin; }
+    const by = clamp(Math.max(J.y + p.haut, hauteurSol(bx, bz, J.y + p.haut + 2) + 3, EAU + 3), C.y - 60, C.y + 160);
+    const v = V3(bx - p.x, by - p.y, bz - p.z), lh = Math.hypot(v.x, v.z), m = lh > 0.01 ? Math.min(E.vol, lh * 1.5) / lh : 0, k = Math.min(1, dt * 2.5);
+    v.x *= m; v.z *= m; v.y = clamp(v.y * 1.5, -2 * E.vol, E.vol);
+    if ((p.recule = Math.max(0, (p.recule || 0) - dt)) > 0) { const u = V3(p.x - J.x, 0, p.z - J.z).normalize(); v.x = u.x * E.vol; v.z = u.z * E.vol; v.y = E.vol * 0.3; }
+    if ((p.monte = Math.max(0, (p.monte || 0) - dt)) > 0) v.y = E.vol;
+    p.vx += (v.x - p.vx) * k; p.vy += (v.y - p.vy) * k; p.vz += (v.z - p.vz) * k;
+  }
+  const avant = { x: p.x, z: p.z };
+  p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+  if (resoudre(p, 0.5, 2, avant)) { p.vx *= 0.3; p.vz *= 0.3; p.tChange = Math.min(p.tChange ?? 0, 0.5); p.monte = 0.7; if (p.charge?.parti) { p.charge = null; p.cdCharge = entre(...E.tir); } }   // (contre une tour : il remonte)
+  const sol = hauteurSol(p.x, p.z, p.y + 0.5); if (p.y < sol + 0.5) { p.y = sol + 0.5; p.vy = Math.max(0, p.vy); }
+  p.frappe = Math.max(0, (p.frappe || 0) - dt * 2.5);
+  if (h.g.visible) poseVolante(h, p, dt, p.vx, p.vy, p.vz, { frappe: p.frappe, tend: p.charge?.parti ? 1 : 0 });
+}
+// Zod (ou Faora) vaincu : il tombe, en bas ; Zod vaincu, Faora s'enfuit vers son vaisseau
+function kryptonienVaincu(p) {
+  if (p.laser?.eclat) scene.remove(p.laser.eclat); p.laser = null; p.charge = null;
+  p.y = hauteurSol(p.x, p.z, p.y + 0.6);   // (il s'écrase en dessous : une rue, un toit)
+  flash(V3(p.x, p.y + 1, p.z), 3); bruit(0.8, 300, 0.6);
+  if (p.type === 'faora') { annonce(tr('FAORA EST VAINCUE !'), tr('« Général... pardon... »'), 3.5); return; }
+  const faora = personnes.filter(q => q.type === 'faora' && q.vie > 0 && !q.supprimer);
+  for (const q of faora) { q.fuit = true; q.charge = null; if (vague) vague.partis = vague.partis.filter(o => o !== q); }   // (elle ne s'en va pas avec l'étape : on la voit s'enfuir)
+  annonce(tr('LE GÉNÉRAL ZOD EST VAINCU !'), faora.length ? tr('Il ne fera plus de mal à personne... Faora s\'enfuit vers son vaisseau !') : tr('Il ne fera plus de mal à personne. Metropolis est sauvée !'), 5);
+}
+function finirKryptoniens() { for (const p of personnes) if ((p.type === 'zod' || p.type === 'faora') && p.laser?.eclat) { scene.remove(p.laser.eclat); p.laser = null; } }
+
+// --- Doomsday (missions « La lance de kryptonite » et « Dans l'espace ») ---
+// Un monstre de Krypton, gris, énorme, couvert de pics d'os. Il tombe du ciel dans une météorite (étape « doomsday ») et casse tout ce qui
+// est autour de son cratère ; rien ne lui fait mal (il ne prend que « armure » de tes coups : 0.03, presque rien !), sauf la kryptonite.
+// Alors l'armée apporte sa lance de kryptonite (étape « lance ») : elle affaiblit Superman qui la tient (pas de vol : à pied, en sautant, en
+// voiture...), et, de tout près, le clic gauche la plante dans Doomsday : il devient vulnérable. Puis Superman le pousse tout là-haut, jusque
+// dans l'espace (étape « pousser »), et finit le combat là-bas (« eliminer », avec espace: true)
+TENUES.doomsday = () => ({ peau: '#5d6268', haut: '#5d6268', bas: '#323a2e', chaussures: '#5d6268', cheveux: '#5e5a50', short: true, manchesCourtes: true });
+const M_YEUX_DOOMSDAY = chezClark ? M_RAYON_ROUGE.clone() : null;   // (ses yeux rouges, qui brillent)
+const M_LANCE = chezClark ? mat('#6d737c', { metalness: 0.75, roughness: 0.35 }) : null;   // (le manche de la lance)
+function creerDoomsday(t) {
+  const h = creerHumain(t || TENUES.doomsday());
+  h.torse.scale.set(1.45, 1.08, 1.35); h.cou.scale.set(1.7, 1, 1.7);
+  for (const b of [h.brasD, h.brasG]) { b.haut.scale.set(1.7, 1.05, 1.7); b.bas.scale.set(1.6, 1, 1.6); b.main.scale.multiplyScalar(1.6); b.position.x *= 1.35; }
+  for (const j of [h.jambeD, h.jambeG]) { j.haut.scale.set(1.5, 1, 1.5); j.bas.scale.set(1.4, 1, 1.4); }
+  if (h.cheveux) h.cheveux.visible = false;   // (pas de cheveux : des pics d'os)
+  const F = formePartagee('pics de Doomsday', () => ({ pic: new THREE.ConeGeometry(0.035, 0.17, 6), gros: new THREE.ConeGeometry(0.055, 0.28, 6), oeil: new THREE.SphereGeometry(0.018, 8, 6) }));
+  const os = '#ece4cf', pic = (geo, parent, x, y, z, rx, rz) => { const m = piece(geo, os, parent, x, y, z); m.rotation.set(rx, 0, rz); return m; };
+  for (const s of [-1, 1]) {
+    pic(F.gros, h.haut, s * 0.23, 0.72, 0, 0, -s * 0.5); pic(F.gros, h.haut, s * 0.27, 0.64, -0.07, -0.4, -s * 0.95); pic(F.pic, h.haut, s * 0.15, 0.76, -0.1, -0.5, -s * 0.25);   // sur les épaules
+    for (const b of [s < 0 ? h.brasD : h.brasG]) { pic(F.gros, b.pli, 0, 0.02, -0.06, -1.7, 0); pic(F.pic, b.bas, s * 0.05, -0.12, 0, 0, -s * 1.4); pic(F.pic, b.bas, s * 0.05, -0.2, 0.01, 0, -s * 1.4); }   // aux coudes, aux avant-bras
+    for (const j of [s < 0 ? h.jambeD : h.jambeG]) pic(F.gros, j.pli, 0, 0.02, 0.07, 1.6, 0);   // aux genoux
+    pic(F.pic, h.tete, s * 0.06, 0.09, 0.02, 0.2, -s * 0.5);   // sur la tête
+    piece(F.oeil, '#f00', h.tete, s * 0.042, 0.012, 0.112).material = M_YEUX_DOOMSDAY;   // ses yeux rouges
+  }
+  for (const y of [0.3, 0.45, 0.6]) pic(F.gros, h.haut, 0, y, -0.17, -1.25, 0);   // le long du dos
+  h.g.scale.setScalar(ENNEMIS.doomsday.taille);
+  return h;
+}
+CORPS.doomsday = t => creerDoomsday(t);
+// la lance de kryptonite : un long manche de métal, et sa pointe, un cristal de kryptonite (plantée dans Doomsday, elle reste dans son dos)
+const FORMES_LANCE = () => formePartagee('lance de kryptonite', () => ({ manche: new THREE.CylinderGeometry(0.035, 0.035, 2.2, 8).translate(0, 1.1, 0), garde: new THREE.CylinderGeometry(0.08, 0.08, 0.06, 10).translate(0, 2.2, 0) }));
+function dessinerLance(g, kryptonite = true) {
+  const F = FORMES_LANCE();
+  for (const geo of [F.manche, F.garde]) { const m = new THREE.Mesh(geo, M_LANCE); m.castShadow = true; g.add(m); }
+  if (kryptonite) { const c = new THREE.Mesh(formeCristalVert(), M_KRYPTONITE); c.scale.set(0.22, 0.32, 0.22); c.position.y = 2.2; c.castShadow = true; g.add(c); }
+  return g;
+}
+const LAISSE_DOOMSDAY = 50;   // (Doomsday ne s'éloigne pas de plus de tant de mètres de son cratère : là, au milieu du parc, il n'y a ni immeuble ni toit)
+const dansLaisse = q => { const C = combatDoomsday, dx = q.x - C.c.x, dz = q.z - C.c.z, l = Math.hypot(dx, dz), m = LAISSE_DOOMSDAY; return l <= m ? { x: q.x, z: q.z } : { x: C.c.x + dx / l * m, z: C.c.z + dz / l * m }; };
+let combatDoomsday = null;   // { et, p : Doomsday, phase : 'attente', 'tombe' ou 'combat', c : son cratère, t, coups, tCombat, plantee, tenu, espace, meteore, lance }
+const ETAPE_ARRIVEE_DOOMSDAY = MISSIONS_CH.flatMap(m => m.etapes).find(e => e.type === 'doomsday');
+const etapeDeDoomsday = et => !!et && (et.type === 'doomsday' || et.type === 'lance' || et.type === 'pousser' || et.cible === 'doomsday');
+const hautEspace = () => MISSIONS_CH.flatMap(m => m.etapes).find(e => e.type === 'pousser')?.hauteur ?? 1100;   // (là où commence l'espace)
+function cratereDoomsday() { const e = ETAPE_ARRIVEE_DOOMSDAY, c = e ? centre(...e.case) : { x: J.x + 30, z: J.z }; return { x: c.x, z: c.z, y: hauteurSol(c.x, c.z) }; }
+function commencerDoomsday(et) {
+  if (!combatDoomsday) combatDoomsday = { et, p: null, phase: 'attente', c: cratereDoomsday(), t: 0, coups: 0, tCombat: 0, plantee: false, tenu: false, espace: false, lance: null };
+  const C = combatDoomsday; C.et = et; C.tenu = false;
+  if (et.type !== 'lance') finirKryptonites('lance');   // (la lance ne sert qu'à sa mission)
+  if (et.type === 'pousser' || et.cible === 'doomsday') C.plantee = true;   // (la mission « Dans l'espace » : la lance est déjà dans son corps)
+  if (et.type !== 'doomsday' && (!C.p || C.p.supprimer || C.p.vie <= 0)) poserDoomsday();   // (la page rechargée, ou le code MISSION : il est déjà là)
+  if (C.plantee && C.p && !C.p.lanceDans) lanceDans(C.p);
+  if (et.type === 'lance') poserLance(et);
+  if (et.cible === 'doomsday' && et.espace) { // dans l'espace : il flotte là-haut, près de Superman
+    C.espace = true;
+    if (C.p.y < hautEspace() - 200) { const a = entre(0, 6.3); Object.assign(C.p, { x: J.x + Math.sin(a) * 25, z: J.z + Math.cos(a) * 25, y: Math.max(J.y, hautEspace()) }); }
+    annonce(tr('DANS L\'ESPACE !'), tr('Au-dessus de la Terre, sous le soleil jaune : il te redonne des forces. Finis Doomsday !'), 5);
+  }
+}
+function poserDoomsday() {
+  const C = combatDoomsday, p = creerPersonne('doomsday', C.c.x, C.c.z, undefined, C.c.y);
+  Object.assign(p, { alerte: true, angle: angleVers(p, J) });
+  C.p = p; C.phase = 'combat';
+  return p;
+}
+// la lance, plantée dans son corps : dans son dos, penchée (sa kryptonite est dedans)
+function lanceDans(p) { const g = dessinerLance(new THREE.Group(), false); g.position.set(0.06, 0.25, -0.12); g.rotation.set(-0.9, 0, 0.25); g.scale.setScalar(0.42); p.h.haut.add(g); p.lanceDans = g; }
+// la lance de kryptonite, posée au bout du parc par l'armée (là où il n'y a rien entre elle et Doomsday), (une kryptonite : elle affaiblit Superman, comme les autres)
+function poserLance(et) {
+  const C = combatDoomsday; if (C.plantee) return;
+  if (C.lance && !C.lance.casse) return;
+  const c = centre(...et.case), y = hauteurSol(c.x, c.z, 1e4);
+  C.lance = poserKryptonite(c.x, y, c.z, { vie: Infinity, emporter: false, de: 'lance', lance: true });
+}
+// la meilleure place pour se réveiller, la lance à la main : sur le chemin, à 70 m de Doomsday (il le laisse se relever : calme)
+function reveilLance() {
+  const C = combatDoomsday; if (!C?.p || C.plantee || C.et?.type !== 'lance' || !C.lance || C.lance.casse) return null;
+  const p = C.p, tenue = kryptoniteTenue === C.lance, k = tenue ? centre(...C.et.case) : C.lance;   // (la lance à la main : sur le chemin libre, entre la cachette de la lance et lui)
+  p.calme = 6; p.coup = null; if (dist(p, C.c) > 30) Object.assign(p, { x: C.c.x, z: C.c.z, y: C.c.y, vy: 0, saut: null });   // (il retourne dans son cratère)
+  C.morts = (C.morts || 0) + 1;   // (et il tape de moins en moins fort : voir majDoomsday)
+  // (la lance à la main : à 70 m de lui, du côté de la cachette de la lance ; par terre : juste à côté d'elle, un peu plus loin de Doomsday)
+  const dx = k.x - p.x, dz = k.z - p.z, l = Math.hypot(dx, dz) || 1, e = tenue ? 70 : l + 3;
+  const q = { x: p.x + dx / l * e, z: p.z + dz / l * e, y: 0 }; q.y = hauteurSol(q.x, q.z); resoudre(q, 0.4);
+  return { ...q, angle: Math.atan2(p.x - q.x, p.z - q.z) };
+}
+// dans l'espace : il se réveille au soleil, à 50 m de Doomsday
+function reveilEspace() {
+  const C = combatDoomsday; if (!C?.espace || !C.p || C.p.vie <= 0) return null;
+  const a = entre(0, 6.3), p = C.p; p.coup = null; p.calme = 3;
+  return { x: p.x + Math.sin(a) * 50, y: p.y + 5, z: p.z + Math.cos(a) * 50, angle: a + Math.PI };
+}
+// ce que lui font les coups de Superman : sans la lance, presque rien (et il ne tombe jamais) ; sur Terre, affaibli, il ne tombe pas non plus
+// (il faut l'emmener dans l'espace)
+function degatsDoomsday(p, degats, parJoueur) {
+  const C = combatDoomsday, E = ENNEMIS.doomsday, dire = texte => { if (parJoueur && temps - (p.tDit ?? -9) > 3) { p.tDit = temps; annonce('', tr(texte), 2.5); } };
+  if (!C?.plantee) {
+    if (parJoueur && C) C.coups++;
+    dire('Tes coups ne lui font presque rien ! Il faudrait de la kryptonite...');
+    return Math.min(degats * E.armure, Math.max(0, p.vie - E.vie * 0.5));
+  }
+  if (!C.espace) { const reste = Math.max(0, p.vie - E.vie * 0.3); if (degats > reste) dire('Il est trop fort ici-bas : attrape-le en volant, et pousse-le dans l\'espace !'); return Math.min(degats, reste); }
+  return degats;
+}
+// G (ou foncer dessus en volant), à l'étape « pousser » : Superman attrape Doomsday
+function attraperDoomsday() {
+  const C = combatDoomsday, et = MISSIONS_CH[missionIndex]?.etapes[etapeIndex];
+  if (!C?.p || C.tenu || et?.type !== 'pousser' || C.p.vie <= 0 || J.mort || J.voiture || !enCostumeSuper()) return false;
+  const p = C.p, T = p.h.g.scale.y;
+  if (Math.hypot(J.x - p.x, J.y + 1 - (p.y + T), J.z - p.z) > 2.4 + T) return false;
+  C.tenu = true; p.coup = null; p.saut = null;
+  if (!J.superman) decoller();
+  annonce(tr('TU ATTRAPES DOOMSDAY !'), tr('Pousse-le tout là-haut, jusque dans l\'espace : regarde vers le ciel, et vole (Maj : plus vite) !'), 4); bruit(0.7, 300, 0.4); J.secousse = Math.max(J.secousse || 0, 0.15);
+  return true;
+}
+// clic gauche, la lance à la main : de tout près, il la plante dans Doomsday
+function planterLance(k) {
+  const C = combatDoomsday, p = C?.p;
+  if (J.voiture) { annonce('', tr('Descends de la voiture (E) pour planter la lance dans Doomsday'), 2); return; }
+  if (!p || p.vie <= 0 || C.plantee || Math.hypot(p.x - J.x, p.y + 1.4 * p.h.g.scale.y - J.y - 1, p.z - J.z) > 5.5) { annonce('', tr('Approche-toi de Doomsday : de tout près, clic gauche, tu plantes la lance dans son corps !'), 2.5); return; }
+  enleverKryptonite(k); C.lance = null; C.plantee = true; C.tPlante = temps; lanceDans(p);
+  J.frappe = 1; p.rugit = 2.5; p.coup = null; p.saut = null;
+  const P = V3(p.x, p.y + 1.6 * p.h.g.scale.y, p.z); flash(P, 4, scene, M_LUEUR_VERTE); etincelles(P, 20, 6); bruit(1, 500, 0.8); bip(300, 80, 1.2, 'sawtooth', 0.15); J.secousse = Math.max(J.secousse || 0, 0.25);
+  annonce(tr('LA LANCE EST PLANTÉE !'), tr('La kryptonite est dans Doomsday : il hurle, il est affaibli... et toi, tu retrouves tes forces !'), 5);
+}
+// la météorite qui tombe sur le parc, puis le cratère : Doomsday en sort
+function majDoomsdayMission(dt) {
+  const C = combatDoomsday, et = MISSIONS_CH[missionIndex]?.etapes[etapeIndex];
+  C.t += dt;
+  if (C.phase === 'attente' && C.t > 1.5) {
+    C.phase = 'tombe'; C.t = 0;
+    const s = C.meteore = new THREE.Sprite(M_FLASH); s.scale.setScalar(16); s.raycast = () => {}; scene.add(s);
+    annonce(tr('UNE MÉTÉORITE !'), tr('Quelque chose tombe du ciel sur Centennial Park !'), 3.5); bruit(0.8, 300, 3);
+  }
+  if (C.phase === 'tombe') {
+    const u = Math.min(1, C.t / 3.2), s = C.meteore, de = { x: C.c.x + 500, y: C.c.y + 900, z: C.c.z - 300 };
+    s.position.set(lerp(de.x, C.c.x, u), lerp(de.y, C.c.y + 2, u), lerp(de.z, C.c.z, u));
+    if ((C.tFumee = (C.tFumee || 0) - dt) <= 0) { C.tFumee = 0.04; const f = new THREE.Sprite(M_FUMEE.clone()); f.material.color.set('#5a4a3a'); f.position.copy(s.position); scene.add(f); effets.push({ o: f, vie: 2.5, fumee: 2.5, taille: 9 }); }
+    if (u < 1) return;
+    scene.remove(s); C.meteore = null;
+    const P = V3(C.c.x, C.c.y + 1, C.c.z), loin = clamp(1 - dist(J, C.c) / 500, 0.1, 1);
+    flash(P, 14); bouffees(P, 25, '#8a7a66', 8, 3, 18); fissurer(C.c.x, C.c.y, C.c.z, 12); bruit(loin, 60, 3); J.secousse = Math.max(J.secousse || 0, 0.4 * loin);
+    for (const v of voitures) if (!pasDeTole(v) && dist(v, C.c) < 30 && v !== J.voiture && !v.mission) { v.faute = false; souffler(v, P, 0.7); }
+    for (const q of personnes) { const e = dist(q, C.c); if (q.vie > 0 && q.type === 'pieton' && e < 25 && e > 0) projeter(q, (q.x - C.c.x) / e * 6, 5, (q.z - C.c.z) / e * 6, -3); }   // (soufflés, mais pas blessés)
+    const p = poserDoomsday(); p.rugit = 2.5;
+    annonce(tr('DOOMSDAY !'), tr('Un monstre de Krypton sort du cratère... et il casse tout !'), 4);
+    return;
+  }
+  if (C.phase !== 'combat' || !C.p) return;
+  const p = C.p;
+  if (dist(J, p) < 60 && !J.mort) C.tCombat += dt;
+  // la lance à la main, tout près de lui, sans la planter : on le lui rappelle
+  if (C.lance && kryptoniteTenue === C.lance && !J.voiture && !J.mort && Math.hypot(p.x - J.x, p.z - J.z) < 6) { if ((C.tPres = (C.tPres || 0) + dt) > 3 && temps - (C.tRappel ?? -9) > 6) { C.tRappel = temps; annonce(tr('CLIC GAUCHE !'), tr('Tu es tout près de Doomsday : clic gauche, et tu plantes la lance !'), 2.5); } } else C.tPres = 0;
+  // il pousse Doomsday : Doomsday est devant lui, dans ses bras ; il le lâche s'il arrête de voler
+  if (C.tenu && (!J.superman || J.mort || J.voiture || p.vie <= 0 || et?.type !== 'pousser')) {
+    C.tenu = false; p.vy = 0;
+    if (et?.type === 'pousser' && p.vie > 0) annonce('', tr('Tu as lâché Doomsday ! Rattrape-le en volant (fonce sur lui)'), 2.5);
+  }
+  if (et?.type === 'pousser' && !C.tenu && J.superman) attraperDoomsday();
+  if (C.tenu) {
+    const a = J.angleCorps, T = p.h.g.scale.y;
+    Object.assign(p, { x: J.x + Math.sin(a) * 1.2, z: J.z + Math.cos(a) * 1.2, y: J.y + 1.4, angle: a + Math.PI, vy: 0 });   // (au-dessus de sa tête : il le pousse vers le ciel)
+  }
+  // dans l'espace : il ne redescend pas (garde-fou), et il vole toujours (sinon, il tomberait de 1 000 m)
+  if (C.espace && !J.mort && p.vie > 0) {
+    if (!J.superman && enCostumeSuper() && !J.voiture) decoller();
+    const bas = hautEspace() - 150;
+    if (J.y < bas) { J.y = bas; J.vy = Math.max(0, J.vy); if (temps - (C.tDit ?? -9) > 4) { C.tDit = temps; annonce('', tr('Reste dans l\'espace : finis Doomsday !'), 2); } }
+    if (J.y > bas + 900) { J.y = bas + 900; J.vy = Math.min(0, J.vy); }
+  }
+}
+function majDoomsday(p, dt, d) {
+  const E = fiche(p), h = p.h, C = combatDoomsday, T = h.g.scale.y;
+  if (!C) { if (h.g.visible) { h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, p.angle, 0); animerHumain(h, 0, dt, {}); } return; }
+  p.cooldown -= dt; p.cdSaut = (p.cdSaut ?? 4) - dt; p.cdLancer = (p.cdLancer ?? 5) - dt; p.cdCasse = (p.cdCasse ?? 2) - dt;
+  if ((p.vuTimer -= dt) <= 0) { p.vuTimer = 0.3; p.voitJ = !J.mort && voitBJ({ x: p.x, y: p.y + 1.6 * T, z: p.z }); }
+  const faible = C.plantee, vit = E.vitesse * (faible ? 0.6 : 1), fort = (faible ? 0.7 : 1) * Math.max(0.4, 0.75 ** (C.morts || 0)), d3 = Math.hypot(J.x - p.x, J.y + 1 - (p.y + T), J.z - p.z);
+  p.frappe = Math.max(0, (p.frappe || 0) - dt * 2.5);
+  if (C.tenu) { // dans les bras de Superman : il se débat
+    if (h.g.visible) { h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(-0.3, p.angle, 0.15 * Math.sin(temps * 5)); animerHumain(h, 0, dt, { agite: 1, ecarte: 0.5 }); membresMous(h, dt, { sol: p.y - 3 }); }
+    return;
+  }
+  if (C.espace) { majDoomsdayEspace(p, dt, d3); return; }
+  if (p.rugit > 0) { // il rugit, les bras levés
+    p.rugit -= dt;
+    if ((p.tRugit = (p.tRugit ?? 0) - dt) <= 0) { p.tRugit = 0.9; bruit(0.8 * clamp(1 - d / 150, 0.1, 1), 90, 0.8); bip(110, 60, 0.7, 'sawtooth', 0.12 * clamp(1 - d / 150, 0.1, 1)); }
+    if (h.g.visible) { h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, p.angle, 0); animerHumain(h, 0, dt, { souleve: 1 }); membresMous(h, dt, { sol: p.y }); }
+    return;
+  }
+  if (p.calme > 0) p.calme -= dt;   // (Superman vient de se réveiller : il le laisse se relever)
+  // la pesanteur (lâché en l'air, il retombe : la terre tremble)
+  const sol = hauteurSol(p.x, p.z, p.y + 0.6);
+  if (!p.saut) { p.vy = (p.vy || 0) - R_.gravite * dt; p.y += p.vy * dt; if (p.y <= sol) { if (p.vy < -12) chocDoomsday(p, d); p.y = sol; p.vy = 0; } }
+  const lance = !!C.lance && kryptoniteTenue === C.lance;   // (la lance à la main : Doomsday sent la kryptonite, et vient vers lui, sans quitter le parc)
+  const engage = !J.mort && !(p.calme > 0) && (d < 45 || (lance && d < 160)) && J.y - p.y < 25;
+  // (au bord de son coin, LAISSE_DOOMSDAY mètres autour du cratère, là où il n'y a ni immeuble ni toit : il attend Superman, tourné vers lui)
+  const bord = dist(p, C.c) > LAISSE_DOOMSDAY - 1.5 && Math.cos(angleVers(C.c, p) - angleVers(p, J)) > 0;
+  const vise = angleVers(p, J);
+  let vitesse = 0;
+  if (p.saut) { // un grand saut vers lui ; en retombant, il écrase tout autour
+    const ax = p.x, az = p.z;
+    p.x += p.vsx * dt; p.z += p.vsz * dt; p.vy -= R_.gravite * dt; p.y += p.vy * dt;
+    resoudre(p, 0.9, 4.5, { x: ax, z: az });
+    const s2 = hauteurSol(p.x, p.z, p.y + 0.5);
+    if (p.y <= s2 && p.vy < 0) { p.y = s2; p.saut = null; p.vy = 0; chocDoomsday(p, d); }
+  } else if (p.y <= sol + 0.05) {
+    if (engage) {
+      p.angle = lerpAngle(p.angle, vise, 4 * dt);
+      const dh = J.y - p.y, dl = Math.hypot(J.x - p.x, J.z - p.z);
+      if (!p.coup && dl > 1.3 * T && !bord) vitesse = vit;
+      if (!p.coup && !bord && p.cdSaut <= 0 && (dl > 18 || dh > 5) && dl < 45) { // il saute vers lui (sans sortir de son coin)
+        const q = dansLaisse({ x: J.x, z: J.z }), vy = Math.sqrt(2 * R_.gravite * (Math.max(dh, 4) + 4)), tv = (vy + Math.sqrt(Math.max(0, vy * vy - 2 * R_.gravite * dh))) / R_.gravite;
+        Object.assign(p, { saut: true, vy, vsx: (q.x - p.x) / tv, vsz: (q.z - p.z) / tv }); p.cdSaut = entre(5, 8);
+        bruit(0.7 * clamp(1 - d / 120, 0.1, 1), 200, 0.5);
+      } else if (!p.coup && p.cdLancer <= 0 && dl > 10 && dl < 45 && p.voitJ) { // il lui lance une voiture
+        const v = voitures.filter(o => !o.detruite && !pasDeTole(o) && o !== J.voiture && !o.mission && !o.apesanteur && !o.anime && dist(o, p) < 12).sort((a, b) => dist(a, p) - dist(b, p))[0];
+        p.cdLancer = v ? entre(...E.tir) : 1.5;
+        if (v) {
+          const tv = 1.4, dv = V3((J.x - v.x) / tv, R_.gravite * tv / 2 + (J.y - v.y) / tv, (J.z - v.z) / tv);
+          v.faute = false; v.lanceePar = p; v.tLancee = 4; p.frappe = 1;
+          heurter(v, V3(v.x, v.y + 0.6, v.z), dv); bruit(0.8, 700, 0.3);
+          annonce('', tr('Doomsday te lance une voiture !'), 1.5);
+        }
+      }
+      // tout près : il lève les deux poings (0,9 s : le temps de s'écarter), puis il frappe
+      if (!p.coup && p.cooldown <= 0 && d3 < 1.5 * T + 0.8) { p.coup = { t: 0 }; p.cooldown = 2.4; }
+    } else if (p.cdCasse <= 0) { // personne ne l'embête : il casse tout, autour de son cratère
+      const v = voitures.filter(o => !o.detruite && !pasDeTole(o) && o !== J.voiture && !o.mission && !o.apesanteur && !o.anime && dist(o, C.c) < LAISSE_DOOMSDAY && dist(o, p) < 40).sort((a, b) => dist(a, p) - dist(b, p))[0];
+      if (v && dist(v, p) < v.rayon + 1.5 * T) { p.cdCasse = entre(2.5, 4); p.frappe = 1; v.faute = false; heurter(v, V3(v.x, v.y + 0.6, v.z), V3(Math.sin(p.angle) * 12, 7, Math.cos(p.angle) * 12)); bruit(0.7 * clamp(1 - d / 150, 0.1, 1), 800, 0.3); if (d < 150 && temps - (C.tCasse ?? -9) > 8) { C.tCasse = temps; annonce('', tr('Doomsday casse tout !'), 1.5); } }
+      else if (v) { p.angle = lerpAngle(p.angle, angleVers(p, v), 3 * dt); vitesse = vit * 0.6; }
+      else if (dist(p, C.c) > 20) { p.angle = lerpAngle(p.angle, angleVers(p, C.c), 3 * dt); vitesse = vit * 0.5; }
+    }
+  }
+  if (!C.tenu && !C.espace) Object.assign(p, dansLaisse(p));   // (il ne sort jamais de son coin, même en sautant, ou projeté)
+  if (p.coup) {
+    p.coup.t += dt;
+    if (!p.coup.fait && p.coup.t > 0.9) {
+      p.coup.fait = true; p.frappe = 1; bruit(0.8, 250, 0.3);
+      if (Math.hypot(J.x - p.x, J.z - p.z) < 1.5 * T + 1.4 && Math.abs(J.y - p.y) < 2 * T && !J.mort) {
+        blesserJoueur(E.degats * fort, true, p);
+        const a = angleVers(p, J); J.superman = null; J.lance = { vx: Math.sin(a) * 13, vz: Math.cos(a) * 13 }; J.vy = 7; J.sol = false;
+        J.secousse = Math.max(J.secousse || 0, 0.25);
+      }
+    }
+    if (p.coup.t > 1.4) p.coup = null;
+  }
+  if (vitesse && !p.coup) {
+    const ax = p.x, az = p.z;
+    p.x += Math.sin(p.angle) * vitesse * dt; p.z += Math.cos(p.angle) * vitesse * dt; resoudre(p, 0.9, 4.5, { x: ax, z: az });
+    if (EAU - hauteurSol(p.x, p.z, p.y) > 1.5) { p.x = ax; p.z = az; }
+    if ((p.tPas = (p.tPas ?? 0) - dt) <= 0) { p.tPas = 0.5; bruit(0.4 * clamp(1 - d / 100, 0, 1), 140, 0.25); J.secousse = Math.max(J.secousse || 0, 0.1 * clamp(1 - d / 40, 0, 1)); }   // la terre tremble
+    for (const v of voitures) if (!v.detruite && !pasDeTole(v) && v !== J.voiture && !v.accident && !v.mission && !v.apesanteur && dist(v, p) < v.rayon + 1.2) { v.faute = false; heurter(v, V3(v.x, v.y + 0.6, v.z), V3(Math.sin(p.angle) * 9, 4, Math.cos(p.angle) * 9)); bruit(0.6, 900, 0.3); }
+  }
+  // une voiture qu'il a lancée : si elle passe sur Superman, ça fait mal
+  for (const v of voitures) if (v.lanceePar === p && (v.tLancee -= dt) > 0 && Math.hypot(v.x - J.x, v.y + 0.7 - (J.y + 1), v.z - J.z) < 3) {
+    v.lanceePar = null; blesserJoueur(E.degatsVoiture * fort, true, v); J.secousse = Math.max(J.secousse || 0, 0.2); bruit(0.8, 600, 0.3);
+  }
+  if (!h.g.visible) return;
+  h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, p.angle, 0);
+  const leve = p.coup && p.coup.t < 0.9;
+  animerHumain(h, p.saut ? 0 : vitesse, dt, leve ? { souleve: 1 } : { frappe: p.frappe, saut: p.saut ? p.vy : undefined });
+  membresMous(h, dt, { sol: p.y });
+}
+// il retombe (d'un saut, ou lâché) : la terre tremble, ce qui est à côté vole, et Superman, tout près, a mal
+function chocDoomsday(p, d) {
+  const E = fiche(p), pos = V3(p.x, p.y + 0.5, p.z), fort = combatDoomsday?.plantee ? 0.7 : 1;
+  bruit(clamp(1 - d / 150, 0.1, 1), 90, 1); J.secousse = Math.max(J.secousse || 0, 0.4 * clamp(1 - d / 60, 0, 1));
+  fissurer(p.x, p.y, p.z, 7);
+  for (const q of personnes) { const e = dist(q, p); if (q !== p && q.vie > 0 && q.type === 'pieton' && e < 8 && e > 0) projeter(q, (q.x - p.x) / e * 7, 5, (q.z - p.z) / e * 7, -4); }
+  for (const v of voitures) if (!pasDeTole(v) && dist(v, p) < 9 && v !== J.voiture && !v.mission && !v.apesanteur) { v.faute = false; souffler(v, pos, 0.6); }
+  if (d < 7 && Math.abs(J.y - p.y) < 3 && !J.mort) { blesserJoueur(E.degatsSaut * fort, true, p); if (!J.superman) { J.vy = 6; J.sol = false; } }
+}
+// dans l'espace : il « nage » vers lui, lentement, et frappe de tout près (0,8 s pour s'écarter)
+function majDoomsdayEspace(p, dt, d3) {
+  const E = fiche(p), h = p.h, T = h.g.scale.y, bas = hautEspace() - 120;
+  p.vx ??= 0; p.vy = p.vy || 0; p.vz ??= 0;
+  if (p.calme > 0) p.calme -= dt;
+  const v = V3(J.x - p.x, J.y - (p.y + T * 0.6), J.z - p.z), l = v.length() || 1;
+  if (p.coup || p.calme > 0 || J.mort || l < 3) v.set(0, 0, 0); else v.multiplyScalar(Math.min(9, l) / l);
+  // de temps en temps, il fonce sur lui (il se ramasse 0,7 s avant : le temps de s'écarter)
+  p.cdCharge = (p.cdCharge ?? 3) - dt;
+  if (!p.coup && !p.charge && p.cdCharge <= 0 && d3 > 6 && d3 < 60 && !J.mort && !(p.calme > 0)) {
+    p.charge = { t: 0 };
+    if (!p.ditCharge) { p.ditCharge = true; annonce('', tr('Doomsday fonce sur toi : écarte-toi, et tire !'), 2.5); }
+  }
+  let k = Math.min(1, dt * 1.5);
+  if (p.charge) {
+    const K = p.charge; K.t += dt;
+    if (K.t < 0.7) v.set(0, 0, 0); else { v.set(J.x - p.x, J.y - (p.y + T * 0.6), J.z - p.z).setLength(26); k = 1; if (!K.parti) { K.parti = true; bruit(0.6, 160, 0.6); } }
+    if (K.parti && d3 < 1.5 * T + 1.5 && !J.mort) { // le coup, en passant
+      blesserJoueur(E.degats * 0.7, true, p); J.secousse = Math.max(J.secousse || 0, 0.25); bruit(0.8, 250, 0.3); p.frappe = 1;
+      const u = V3(J.x - p.x, 0, J.z - p.z).normalize(); if (J.superman) { J.superman.vx += u.x * 24; J.superman.vz += u.z * 24; }
+      p.charge = null; p.cdCharge = entre(4, 6); v.set(0, 0, 0);
+    } else if (K.t > 2.2) { p.charge = null; p.cdCharge = entre(4, 6); }
+  }
+  p.vx += (v.x - p.vx) * k; p.vy += (v.y - p.vy) * k; p.vz += (v.z - p.vz) * k;
+  p.x += p.vx * dt; p.y = clamp(p.y + p.vy * dt, bas, bas + 900); p.z += p.vz * dt;
+  p.angle = lerpAngle(p.angle, angleVers(p, J), 3 * dt);
+  if (!p.coup && p.cooldown <= 0 && d3 < 1.5 * T + 1.2 && !(p.calme > 0) && !J.mort) { p.coup = { t: 0 }; p.cooldown = 2.4; }
+  if (p.coup) {
+    p.coup.t += dt;
+    if (!p.coup.fait && p.coup.t > 0.8) {
+      p.coup.fait = true; p.frappe = 1; bruit(0.7, 250, 0.3);
+      if (Math.hypot(J.x - p.x, J.y - p.y - T * 0.6, J.z - p.z) < 1.5 * T + 1.6 && !J.mort) {
+        blesserJoueur(E.degats * 0.7, true, p); J.secousse = Math.max(J.secousse || 0, 0.22);
+        const u = V3(J.x - p.x, 0, J.z - p.z).normalize(); if (J.superman) { J.superman.vx += u.x * 20; J.superman.vz += u.z * 20; }
+      }
+    }
+    if (p.coup.t > 1.3) p.coup = null;
+  }
+  if (!h.g.visible) return;
+  h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0.25 * Math.sin(temps * 0.7), p.angle, 0.15 * Math.sin(temps * 0.5));
+  animerHumain(h, 0, dt, p.coup && p.coup.t < 0.8 ? { souleve: 1 } : { frappe: p.frappe, agite: 0.25 });
+  membresMous(h, dt, { sol: p.y - 5 });
+}
+// vaincu (dans l'espace) : il s'éteint, et dérive au loin, en tournant sur lui-même
+function doomsdayVaincu(p) {
+  const P = V3(p.x, p.y + 2, p.z);
+  flash(P, 6, scene, M_FLASH_FOUDRE); etincelles(P, 25, 8); bruit(1, 120, 1.5);
+  p.derive = { t: 0, v: V3(p.x - J.x, 0.4, p.z - J.z).normalize().multiplyScalar(6) };
+  annonce(tr('DOOMSDAY EST VAINCU !'), tr('« GRRRAAAH... » Il s\'éteint, et dérive dans l\'espace, loin de la Terre. Tu as réussi !'), 5);
+}
+function majDoomsdayDerive(p, dt) {
+  const D = p.derive; D.t += dt;
+  p.x += D.v.x * dt; p.y += D.v.y * dt; p.z += D.v.z * dt;
+  const h = p.h; h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(D.t * 0.4, p.angle + D.t * 0.2, D.t * 0.3);
+  animerHumain(h, 0, dt, poseMort(1, -1));
+  if (D.t > 12) p.supprimer = true;
+}
+function finirDoomsday() {
+  const C = combatDoomsday; combatDoomsday = null;
+  if (!C) return;
+  if (C.meteore) scene.remove(C.meteore);
+  if (C.p && C.p.vie > 0) C.p.supprimer = true;
+  finirKryptonites('lance');
+}
+
+// --- l'espace (mission « Dans l'espace ») : le ciel devient noir et plein d'étoiles, le soleil brille, et la Terre est en dessous. On ne
+// charge pas tout un monde : une grande boule (la Terre, dessinée, avec ses mers, ses terres et ses nuages) passe devant la ville, et la brume,
+// noire, cache ce qui dépasse derrière. Tout n'est construit que pendant la mission (et jeté ensuite). espace.fait : de 0 (sous les nuages)
+// à 1 (dans l'espace), selon la hauteur où il est. Au-dessus des nuages (une couche de nuages, à 430 m, autour du cratère de Doomsday)
+const R_TERRE = 6000, NUAGES_COTE = 1400;   // (le rayon de la boule de la Terre : plus petit, elle paraît plus ronde)
+const M_TERRE = chezClark ? new THREE.MeshBasicMaterial({ map: TEX.flash, transparent: true, fog: false }) : null;   // (son image n'est peinte que pour la mission)
+const M_NUAGE = chezClark ? M_FUMEE.clone() : null;
+if (M_NUAGE) { M_NUAGE.color.set('#ffffff'); M_NUAGE.fog = false; M_NUAGE.toneMapped = false; }   // (bien blancs, même tout là-haut)
+const BRUME0 = { near: scene.fog.near, far: scene.fog.far }, NOIR_ESPACE = new THREE.Color(0, 0, 0);
+let espace = null;   // { terre, geo, tex, soleil, texSoleil, nuages, fait }
+const missionEspace = () => !!MISSIONS_CH[missionIndex]?.etapes.some(e => e.type === 'pousser');
+const soleilJaune = () => !!espace && espace.fait > 0.9;   // (dans l'espace, le soleil jaune lui redonne vite des forces : voir la boucle)
+// la Terre vue de l'espace : des mers bleues, des terres vertes et brunes, de la glace aux pôles et des nuages, peinte une seule fois
+function peindreTerre(g) {
+  const rnd = graine(4242), l = 1024, h = 512;
+  const mer = g.createLinearGradient(0, 0, l, h); mer.addColorStop(0, '#123a7a'); mer.addColorStop(0.5, '#1d5aa8'); mer.addColorStop(1, '#14427e');
+  g.fillStyle = mer; g.fillRect(0, 0, l, h);
+  for (let k = 0; k < 6; k++) { // les continents : des taches de taches (vertes, brunes, et le sable autour)
+    const cx = rnd() * l, cy = rnd() * h, taille = 50 + rnd() * 70;
+    const taches = [...Array(20)].map(() => [cx + (rnd() - 0.5) * taille * 2.2, cy + (rnd() - 0.5) * taille * 1.4, taille * (0.25 + 0.4 * rnd()), rnd() * 3]);
+    for (const [couleur, plus] of [['#c8b47a', 6], ['#3f7a34', 0]]) for (const [x, y, r, a] of taches) for (const dx of [-l, 0, l]) for (const dy of [-h, 0, h]) {   // (l'image se répète : ce qui dépasse revient de l'autre côté)
+      g.fillStyle = plus ? couleur : hasardR(['#3f7a34', '#4d8a3a', '#7a6a3e', '#2f6a30'], rnd); g.beginPath(); g.ellipse(x + dx, y + dy, r + plus, (r + plus) * 0.7, a, 0, 7); g.fill();
+    }
+  }
+  for (let n = 0; n < 320; n++) { // les nuages
+    const x = rnd() * l, y = rnd() * h, r = 6 + rnd() * 30;
+    g.fillStyle = `rgba(255,255,255,${0.3 + 0.45 * rnd()})`; g.beginPath(); g.ellipse(x, y, r * 2, r * 0.55, rnd() * 0.8 - 0.4, 0, 7); g.fill();
+  }
+}
+function peindreSoleil(g) {
+  const r = g.createRadialGradient(64, 64, 6, 64, 64, 64); r.addColorStop(0, 'rgba(255,255,240,1)'); r.addColorStop(0.18, 'rgba(255,245,200,1)'); r.addColorStop(0.3, 'rgba(255,220,140,.5)'); r.addColorStop(1, 'rgba(255,200,120,0)');
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+}
+function construireEspace() {
+  const tex = toile(1024, 512, peindreTerre), geo = new THREE.SphereGeometry(R_TERRE, 64, 40);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(10, 5);   // (l'image se répète : des continents d'un kilomètre ou deux, sous lui)
+  M_TERRE.map = tex;
+  const terre = new THREE.Mesh(geo, M_TERRE); terre.rotation.z = Math.PI / 2; terre.raycast = () => {}; terre.visible = false; scene.add(terre);   // (tournée : sous lui, le milieu de l'image, pas un pôle)
+  const texSoleil = toile(128, 128, peindreSoleil), ms = lune.material.clone(); ms.map = texSoleil;
+  const soleilE = new THREE.Sprite(ms); soleilE.scale.setScalar(70); soleilE.renderOrder = -1; soleilE.frustumCulled = false; soleilE.visible = false; scene.add(soleilE);
+  const nuages = [], rnd = graine(77);
+  for (let k = 0; k < 150; k++) { // la couche de nuages, à 430 m : 1,4 km de côté, autour de lui (elle le suit : voir majEspace)
+    const s = new THREE.Sprite(M_NUAGE); s.userData.o = { x: rnd() * NUAGES_COTE, z: rnd() * NUAGES_COTE };
+    s.position.y = 430 + rnd() * 80; s.scale.setScalar(150 + rnd() * 110); s.raycast = () => {}; scene.add(s); nuages.push(s);
+  }
+  espace = { terre, geo, tex, soleil: soleilE, texSoleil, nuages, fait: 0 };
+}
+function jeterEspace() {
+  const E = espace; espace = null;
+  if (!E) return;
+  scene.remove(E.terre, E.soleil, ...E.nuages); E.geo.dispose(); E.tex.dispose(); E.texSoleil.dispose(); E.soleil.material.dispose();
+  M_TERRE.map = TEX.flash; M_NUAGE.opacity = 1;
+  scene.fog.near = BRUME0.near; scene.fog.far = BRUME0.far;
+}
+function majEspace() {
+  const veut = chezClark && missionEspace();
+  if (veut && !espace) construireEspace();
+  if (!espace) return;
+  if (!veut) { jeterEspace(); return; }
+  const E = espace, f = E.fait = doux(J.y, 600, 1050), haut = Math.min(J.y - 250, 400), m = a => ((a % NUAGES_COTE) + NUAGES_COTE) % NUAGES_COTE;
+  E.terre.visible = J.y > 850; E.terre.position.set(J.x, haut - R_TERRE, J.z); M_TERRE.opacity = clamp((J.y - 850) / 200, 0, 1);   // (elle apparaît sous les nuages, qui cachent la ville)
+  for (const n of E.nuages) { const o = n.userData.o; n.position.x = J.x - NUAGES_COTE / 2 + m(o.x - J.x); n.position.z = J.z - NUAGES_COTE / 2 + m(o.z - J.z); n.visible = J.y > 200; }
+  M_NUAGE.opacity = 0.95 * clamp((J.y - 200) / 200, 0, 1);   // (on ne les voit qu'en montant vers eux : en bas, le ciel reste bleu)
+  E.soleil.visible = f > 0.01; E.soleil.material.color.setScalar(f);
+}
+// dans majCiel (le ciel de chaque image) : là-haut, le bleu s'éteint, les étoiles s'allument, la brume devient noire (elle cache la ville)
+function cielEspace() {
+  const E = espace; if (!E) return;
+  const f = E.fait;
+  scene.fog.near = lerp(BRUME0.near, 500, f); scene.fog.far = lerp(BRUME0.far, 1600, f);
+  if (f <= 0) return;
+  ciel.material.uniforms.eclat.value *= 1 - f;
+  cielEtoile.material.color.setScalar(Math.max(cielEtoile.material.color.r, f));
+  scene.fog.color.lerp(NOIR_ESPACE, f);
+  ambiance.intensity *= 1 - 0.5 * f;
+  E.soleil.position.copy(camera.position).addScaledVector(soleilDir, 380);
+}
+
+// --- la ville acclame Superman (étape « acclamer ») : devant sa statue (lieu), la foule l'attend, les bras en l'air. Il se pose près
+// d'elle (à 12 m) : « Metropolis t'acclame ! », des confettis, et ça crie de joie ---
+let acclamation = null;   // { et, phase : 'attente', 'acclame' ou 'fini', t, fans, l : le lieu }
+function commencerAcclamer(et) { acclamation = { et, phase: 'attente', t: 0, fans: [], l: lieuEtape(et) }; }
+function majAcclamer(dt) {
+  const A = acclamation; if (!A || A.phase === 'fini' || !A.l) return;
+  A.t += dt;
+  const l = A.l;
+  if (!A.fans.length && dist(J, l) < 180) { // la foule, en demi-cercle, devant la statue (au sud de l'allée)
+    for (let k = 0; k < 18; k++) {
+      const a = Math.PI * (0.1 + 0.8 * k / 17), r = 6 + (k % 3) * 2.5, x = l.x + Math.cos(a) * r, z = l.z + Math.sin(a) * r * 0.8 + 2;
+      const p = creerPersonne('pieton', x, z); resoudre(p, 0.35); p.fan = { t: entre(0, 3) }; A.fans.push(p);
+    }
+  }
+  if (A.phase === 'attente' && !J.mort && dist(J, l) < 12 && J.y - l.y < 6) {
+    A.phase = 'acclame'; A.t = 0;
+    annonce(tr('METROPOLIS T\'ACCLAME !'), tr(fille() ? '« Merci, Supergirl ! » Toute la ville est venue te dire merci' : '« Merci, Superman ! » Toute la ville est venue te dire merci'), 5);
+    bip(500, 1500, 0.6, 'triangle', 0.2);
+  }
+  if (A.phase === 'acclame') {
+    if ((A.tCri = (A.tCri || 0) - dt) <= 0) { A.tCri = 0.7; bruit(0.5, 2200, 0.6); }   // la foule crie de joie
+    if (Math.random() < dt * 6) bouffees(V3(l.x + entre(-8, 8), l.y + entre(3, 7), l.z + entre(-6, 6)), 3, hasard(['#ff4a4a', '#3a7aff', '#ffd23a', '#4aff7a']), 0.5, 1.6, 2);   // des confettis
+    if (A.t > 5) A.phase = 'fini';
+  }
+}
+function finirAcclamer() { for (const p of acclamation?.fans || []) p.fan = null; acclamation = null; }
+// quelqu'un de la foule : tourné vers Superman, les bras en l'air ; il saute de joie quand Superman est là
+function majFan(p, dt) {
+  const h = p.h; p.fan.t += dt;
+  p.angle = lerpAngle(p.angle, angleVers(p, J), 4 * dt);
+  const saute = acclamation?.phase === 'acclame' || dist(J, p) < 40 ? Math.max(0, Math.sin(p.fan.t * 7)) * 0.35 : 0;
+  if (!h.g.visible) return;
+  h.g.position.set(p.x, p.y + saute, p.z); h.g.rotation.set(0, p.angle, 0);
+  animerHumain(h, 0, dt, { souleve: 1 }); membresMous(h, dt, { sol: p.y });
+}
+
+// --- Mister Mxyzptlk et la DeLorean (la dernière mission de Metropolis : DELOREAN_MXYZPTLK, et le tableau MXYZPTLK, en haut du fichier) ---
+// Le lutin farceur de la 5e dimension flotte au-dessus de la cour du vieux théâtre, où il a caché la DeLorean. Il parle, puis sème les lettres de
+// son nom à l'envers autour du théâtre : il faut les attraper (les toucher), dans l'ordre ; la prochaine brille en or. Une lettre touchée dans
+// le désordre s'envole plus loin, et il fait un tour de magie (les voitures en gâteaux, la gravité qui flotte, Superman tout petit). Toutes
+// attrapées : il dit son nom à l'envers... POP ! il rentre chez lui, ses tours s'arrêtent, et la DeLorean revient, dans la cour
+TENUES.mxyzptlk = () => ({ peau: '#f0c8a4', haut: '#6a2a9a', bas: '#6a2a9a', chaussures: '#2a1a30', cheveux: '#f4f4f0', taille: 0.55, carrure: 1.15 });
+function creerMxyzptlk(t) {
+  const h = creerHumain(t);
+  if (h.cheveux) h.cheveux.visible = false;   // (sous son chapeau : deux touffes blanches, sur les côtés)
+  const F = formePartagee('chapeau de Mxyzptlk', () => ({ calotte: new THREE.CylinderGeometry(0.1, 0.11, 0.14, 16), bord: new THREE.CylinderGeometry(0.19, 0.19, 0.02, 20), touffe: new THREE.SphereGeometry(0.05, 8, 6), noeud: new THREE.BoxGeometry(0.12, 0.05, 0.03) }));
+  piece(F.calotte, '#5a1f86', h.tete, 0, 0.16, 0); piece(F.bord, '#5a1f86', h.tete, 0, 0.09, 0);   // son chapeau melon violet
+  for (const s of [-1, 1]) piece(F.touffe, '#f4f4f0', h.tete, s * 0.1, 0.03, -0.02);   // ses touffes de cheveux blancs
+  piece(F.noeud, '#ff8a1a', h.haut, 0, 0.68, 0.12);   // son nœud papillon orange
+  h.tete.scale.setScalar(1.35);   // (une grosse tête, comme dans les bandes dessinées)
+  return h;
+}
+CORPS.mxyzptlk = t => creerMxyzptlk(t);
+const M_LUEUR_VIOLETTE = chezClark ? M_FLASH.clone() : null;
+if (M_LUEUR_VIOLETTE) M_LUEUR_VIOLETTE.color.set('#c070ff');
+const FORMES_GATEAU = () => formePartagee('gâteau de Mxyzptlk', () => ({ bas: new THREE.CylinderGeometry(2.3, 2.3, 1.1, 20).translate(0, 0.55, 0), milieu: new THREE.CylinderGeometry(1.7, 1.7, 0.9, 20).translate(0, 1.55, 0),
+  haut: new THREE.CylinderGeometry(1.1, 1.1, 0.8, 18).translate(0, 2.4, 0), creme: new THREE.TorusGeometry(2.25, 0.16, 6, 28).rotateX(Math.PI / 2).translate(0, 1.1, 0), cerise: new THREE.SphereGeometry(0.28, 10, 8).translate(0, 3.05, 0) }));
+let lutin = null;   // { et, phase : 'attente', 'parle', 'lettres', 'nom' ou 'fini', t, k : la prochaine lettre, p : Mxyzptlk, lettres, tTour, tour, l : la cour, gateaux, petit }
+const lutinCache = () => !!lutin && lutin.phase !== 'fini';   // (il a caché la DeLorean : voir placeDeLorean, appuyerT)
+function commencerLutin(et) {
+  lutin = { et, phase: 'attente', t: 0, k: 0, p: null, lettres: [], tTour: 6, tour: 0, l: lieuEtape(et), gateaux: [], petit: 0, kParole: -1 };
+  for (const v of voitures) if (v.type.nom === 'DeLorean' && !v.supprimer) { if (J.voiture === v) sortirVoiture(); v.supprimer = true; }   // (il l'a cachée : elle n'est plus là)
+  if (arrivee?.v?.type.nom === 'DeLorean') arrivee = null;
+}
+function rireMxy() { for (let k = 0; k < 4; k++) setTimeout(() => bip(entre(900, 1100) * (1 + k * 0.08), entre(700, 900), 0.08, 'square', 0.04), k * 110); }
+function popMxy(P, n = 14) { flash(P, 2.5, scene, M_LUEUR_VIOLETTE); bouffees(P, n, '#b45aff', 1.2, 1.2, 1.5); bip(1800, 300, 0.15, 'sine', 0.15); }
+function texLettre(ch) {
+  return toile(128, 128, g => { g.font = 'bold 100px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 10; g.strokeStyle = 'rgba(50,0,80,0.9)'; g.strokeText(ch, 64, 70); g.fillStyle = '#ffffff'; g.fillText(ch, 64, 70); });
+}
+function placeLettre(q, [dx, dz, haut]) {
+  const l = lutin.l, x = l.x + dx, z = l.z + dz, y = Math.max(hauteurSol(x, z, 1e4), EAU) + haut;
+  Object.assign(q, { x, y, z });
+}
+function semerLettres() {
+  const L = lutin;
+  L.lettres = [...MXYZPTLK.envers].map((ch, i) => {
+    const m = new THREE.SpriteMaterial({ map: texLettre(ch), depthWrite: false, toneMapped: false, transparent: true });
+    const s = new THREE.Sprite(m); s.scale.setScalar(2.6); s.raycast = () => {};
+    const lueur = new THREE.Sprite(M_LUEUR_VIOLETTE); lueur.scale.setScalar(5); lueur.raycast = () => {};
+    const q = { ch, s, lueur, prise: false, x: 0, y: 0, z: 0 };
+    placeLettre(q, MXYZPTLK.lettres[i] || [entre(-60, 60), entre(-60, 60), entre(2, 30)]);
+    scene.add(s, lueur); popMxy(V3(q.x, q.y, q.z), 6);
+    return q;
+  });
+}
+function finirLettres() { for (const q of lutin?.lettres || []) { scene.remove(q.s, q.lueur); q.s.material.map.dispose(); q.s.material.dispose(); } }
+// ses tours de magie (MXYZPTLK.tours), l'un après l'autre : rien n'y fait vraiment de mal
+function tourDeMagie() {
+  const L = lutin, nom = MXYZPTLK.tours[L.tour++ % MXYZPTLK.tours.length], duree = MXYZPTLK.duree;
+  rireMxy(); if (L.p) popMxy(V3(L.p.x, L.p.y + 1, L.p.z), 6);
+  if (nom === 'gateaux') {
+    const liste = voitures.filter(v => !v.gateau && !v.apesanteur && !v.mission && !v.pirate && !v.anime && !v.detruite && !v.coule && !v.type.bateau && !v.type.vole && v !== J.voiture && souleve?.v !== v && v.m.visible && dist(v, J) < 90)
+      .sort((a, b) => dist(a, J) - dist(b, J)).slice(0, MXYZPTLK.gateaux);
+    for (const v of liste) changerEnGateau(v, duree);
+    annonce(tr('DES GÂTEAUX ! Hi hi !'), liste.length ? tr('Mister Mxyzptlk a changé les voitures en gâteaux !') : tr('Il n\'y a pas de voiture ici... alors il rit tout seul !'), 3);
+  } else if (nom === 'gravite') {
+    for (const v of voitures) if (!v.apesanteur && !v.mission && !v.pirate && !v.anime && !v.gateau && !v.detruite && !v.coule && !v.type.bateau && !v.type.vole && v !== J.voiture && souleve?.v !== v && dist(v, J) < 60) faireFlotter(v, entre(3, 7), 'mxyzptlk', true);
+    for (const p of personnes) if (p.type === 'pieton' && !p.apesanteur && p.vie > 0 && !p.vol && !p.pris && dist(p, J) < 60) faireFlotter(p, entre(2, 5), 'mxyzptlk', false);
+    L.gravite = duree;
+    annonce(tr('LA GRAVITÉ À L\'ENVERS ! Hi hi !'), tr('Tout s\'envole autour de toi... et redescend tout doucement'), 3);
+  } else if (nom === 'rapetisser') {
+    L.petit = duree;
+    annonce(tr('TU RAPETISSES ! Hi hi !'), tr(fille() ? 'Mister Mxyzptlk t\'a rendue toute petite... pour un moment' : 'Mister Mxyzptlk t\'a rendu tout petit... pour un moment'), 3);
+  }
+}
+function changerEnGateau(v, duree) {
+  const F = FORMES_GATEAU(), g = new THREE.Group();
+  for (const [geo, c] of [[F.bas, '#f2b8cc'], [F.milieu, '#fff4e6'], [F.haut, '#f2b8cc'], [F.creme, '#fffaf2'], [F.cerise, '#d81c3a']]) { const m = new THREE.Mesh(geo, mat(c, { roughness: 0.7 })); m.castShadow = m.receiveShadow = true; g.add(m); }
+  g.position.set(v.x, v.y, v.z); g.rotation.y = v.angle; g.scale.set(v.forme.largeur / 4.2, 1, v.forme.longueur / 4.6); scene.add(g);
+  v.gateau = { g, t: duree }; v.anime = animerGateau; v.vitesse = 0; reveillerVoiture(v);
+  popMxy(V3(v.x, v.y + 1.5, v.z), 8);
+  lutin.gateaux.push(v);
+}
+function animerGateau(v) { v.vitesse = 0; if (v.gateau) { v.gateau.g.position.set(v.x, v.y, v.z); v.gateau.g.rotation.y = v.angle; } }
+function redevenirVoiture(v) { // POP : le gâteau redevient une voiture, qui repart
+  const G = v.gateau; if (!G) return;
+  scene.remove(G.g); v.gateau = null; if (v.anime === animerGateau) v.anime = null; reveillerVoiture(v);
+  if (!v.supprimer) popMxy(V3(v.x, v.y + 1.5, v.z), 5);
+}
+function majLutin(dt) {
+  const L = lutin; if (!L || L.phase === 'fini' || !L.l) return;
+  L.t += dt;
+  // ses tours qui durent : les gâteaux, Superman tout petit, la gravité
+  for (const v of [...L.gateaux]) if (!v.gateau || (v.gateau.t -= dt) <= 0 || v.supprimer || v.detruite) { redevenirVoiture(v); L.gateaux.splice(L.gateaux.indexOf(v), 1); }
+  if (L.gravite > 0 && (L.gravite -= dt) <= 0) toutRedescend('mxyzptlk');
+  if (L.petit > 0) { L.petit -= dt; tailleFarce = L.petit > 0 ? 0.4 : 1; if (L.petit <= 0) { tailleFarce = 1; annonce('', tr('Tu as retrouvé ta taille !'), 1.5); } }
+  joueurH.g.scale.setScalar((costumePorte()?.taille || 1) * tailleFarce);
+  if (L.phase === 'attente') { // il attend, au-dessus de la cour du théâtre ; Superman arrive : POP, le voilà
+    if (J.mort || dist(J, L.l) > 90) return;
+    const p = L.p = creerPersonne('mxyzptlk', L.l.x, L.l.z, undefined, L.l.y + 3);
+    Object.assign(p, { alerte: true, angle: angleVers(p, J) });
+    popMxy(V3(p.x, p.y + 1, p.z), 20); rireMxy();
+    L.phase = 'parle'; L.t = 0; L.kParole = -1;
+    return;
+  }
+  if (L.phase === 'parle') {
+    const k = Math.floor(L.t / 4.2);
+    if (k > L.kParole && k < MXYZPTLK.paroles.length) { L.kParole = k; annonce('MISTER MXYZPTLK', tr(MXYZPTLK.paroles[k], { super: nomSuper(), lettres: [...MXYZPTLK.envers].join(', ') }), 4.2); if (k === 0) rireMxy(); }
+    if (k < MXYZPTLK.paroles.length) return;
+    L.phase = 'lettres'; L.t = 0; semerLettres();
+    annonce(tr('LES LETTRES DE MXYZPTLK !'), tr('Attrape-les dans l\'ordre (touche-les, à pied ou en volant) : la prochaine brille en or'), 4);
+    return;
+  }
+  if (L.phase === 'lettres') {
+    // la prochaine lettre brille en or, et grossit un peu ; les autres, violettes, attendent
+    for (const [i, q] of L.lettres.entries()) {
+      if (q.prise) continue;
+      const suivante = i === L.k, b = Math.sin(temps * 2 + i) * 0.4;
+      q.s.position.set(q.x, q.y + b, q.z); q.lueur.position.copy(q.s.position);
+      q.s.material.color.set(suivante ? '#ffd34a' : '#d6a8ff'); q.s.scale.setScalar(suivante ? 3 + 0.3 * Math.sin(temps * 6) : 2.4); q.lueur.scale.setScalar(suivante ? 6 : 4);
+      if (J.mort || Math.hypot(J.x - q.x, J.y + 1 - q.y - b, J.z - q.z) > 2.8) continue;
+      if (suivante) { // attrapée !
+        q.prise = true; scene.remove(q.s, q.lueur); L.k++;
+        popMxy(V3(q.x, q.y, q.z), 8); bip(700 + 90 * L.k, 1500 + 90 * L.k, 0.3, 'sine', 0.15);
+        const mot = MXYZPTLK.envers.slice(0, L.k), reste = MXYZPTLK.envers.length - L.k;
+        annonce([...mot].join(' · '), reste ? tr('Encore {n} lettres : la prochaine, en or, c\'est le {l}', { n: reste, l: MXYZPTLK.envers[L.k] }) : tr('Toutes les lettres !'), 2.5);
+      } else if ((q.tFuit ?? -9) < temps - 1) { // dans le désordre : elle s'envole plus loin, et il fait un tour de magie
+        q.tFuit = temps; const a = entre(0, 6.3), e = entre(25, 40);
+        placeLettre(q, [q.x - L.l.x + Math.sin(a) * e, q.z - L.l.z + Math.cos(a) * e, entre(2, 25)]);
+        popMxy(V3(q.x, q.y, q.z), 6);
+        annonce('', tr('Pas dans le bon ordre ! Hi hi ! D\'abord le {l} (en or)', { l: MXYZPTLK.envers[L.k] }), 2.5);
+        L.tTour = 0;
+      }
+    }
+    if ((L.tTour -= dt) <= 0) { L.tTour = entre(...MXYZPTLK.entreTours); tourDeMagie(); }
+    if (L.k < MXYZPTLK.envers.length) return;
+    L.phase = 'nom'; L.t = 0;
+    annonce('MISTER MXYZPTLK', tr('« K... L... T... P... Kltpzyxm ! Oh non, je l\'ai dit ! Tu m\'as eu... »'), 3.5);
+    return;
+  }
+  if (L.phase === 'nom' && L.t > 3.3) { // POP : il rentre chez lui, et ses tours s'arrêtent ; la DeLorean revient dans la cour
+    if (L.p) { popMxy(V3(L.p.x, L.p.y + 0.8, L.p.z), 30); L.p.supprimer = true; L.p = null; }
+    for (const v of [...L.gateaux]) redevenirVoiture(v); L.gateaux = []; toutRedescend('mxyzptlk'); L.petit = 0; tailleFarce = 1; joueurH.g.scale.setScalar(costumePorte()?.taille || 1);
+    bruit(0.8, 2000, 0.3);
+    L.phase = 'fini';
+    const c = placeDeLorean();
+    if (c && !deLoreanLa()) arrivee = { t: 0, v: creerVoiture(c.x, c.z, c.a || 0, false, typeNomme('DeLorean')) };   // (trois éclairs, et la voilà : voir majArrivee)
+    annonce(tr('POP !'), tr('Mister Mxyzptlk est rentré chez lui, dans la 5e dimension... et la DeLorean est revenue, dans la cour du vieux théâtre !'), 5);
+  }
+}
+// Mister Mxyzptlk : il flotte près de Superman, à hauteur de sa tête, tourné vers lui, assis en l'air, et il se moque de lui
+function majMxyzptlk(p, dt, d) {
+  const h = p.h, L = lutin;
+  if (!L) { p.supprimer = true; return; }
+  const a = temps * 0.5, bx = J.x + Math.sin(a) * 6, bz = J.z + Math.cos(a) * 6, by = Math.max(J.y + 2.5, hauteurSol(bx, bz, J.y + 4) + 1.5) + Math.sin(temps * 2.2) * 0.4;
+  const k = Math.min(1, dt * 1.5);
+  p.x += (bx - p.x) * k; p.z += (bz - p.z) * k; p.y += (by - p.y) * k;
+  p.angle = lerpAngle(p.angle, angleVers(p, J), 5 * dt);
+  if ((p.tRire = (p.tRire ?? 4) - dt) <= 0) { p.tRire = entre(5, 9); rireMxy(); }
+  if (!h.g.visible) return;
+  h.g.position.set(p.x, p.y, p.z); h.g.rotation.set(0, p.angle, 0.1 * Math.sin(temps * 3));
+  animerHumain(h, 0, dt, { assis: true, ecarte: 0.2 });
+  membresMous(h, dt, { sol: p.y - 3 });
+}
+// on ne peut pas lui faire de mal : ça le chatouille
+function chatouilleMxy() { if (temps - (lutin?.tChatouille ?? -9) > 3) { if (lutin) lutin.tChatouille = temps; rireMxy(); annonce('', tr('Hi hi ! Ça chatouille ! Rien ne me fait de mal : attrape plutôt mes lettres !'), 2.5); } }
+function finirLutin() {
+  const L = lutin; if (!L) return;
+  finirLettres();
+  for (const v of [...L.gateaux]) redevenirVoiture(v);
+  toutRedescend('mxyzptlk'); tailleFarce = 1; joueurH.g.scale.setScalar(costumePorte()?.taille || 1);
+  if (L.p) L.p.supprimer = true;
+  lutin = null;
+}
+
 // chaque image, au chapitre de Superman : ce que font ses missions (voir majEtape)
 function majMissionsSuperman(et, dt) {
   majVehiculesMission();
@@ -26564,6 +27991,13 @@ function majMissionsSuperman(et, dt) {
   if (piratage) majAntennes(dt);
   if (cloche) majCloche(dt);
   majVaisseau(dt);
+  majVaisseauZod(dt);
+  if (machineMonde) majMachineMonde(dt);
+  majFlottants(dt);
+  if (combatDoomsday) majDoomsdayMission(dt);
+  majEspace();
+  if (acclamation) majAcclamer(dt);
+  if (lutin) majLutin(dt);
   // le pont écroulé est réparé quand la mission n'en a plus besoin, et qu'on est loin
   if (trouPont?.ouvert && !ecroulement && Math.hypot(J.x - (trouPont.a.x + trouPont.ux * trouPont.L / 2), J.z - (trouPont.a.z + trouPont.uz * trouPont.L / 2)) > 350) reparerPont();
 }
@@ -26730,7 +28164,8 @@ function appuyerT() {
   if (J.voiture?.type.nom === 'DeLorean') {
     choisirDestination(true);
     if (destination) bip(900, 1300, 0.08, 'square', 0.08); else annonce('', tr("Retrouve d'abord la DeLorean de ce chapitre pour voyager"), 2);
-  } else if (!partie.trouvee[chapitre]) annonce('', tr("La DeLorean est cachée quelque part : retrouve-la d'abord !"), 2);
+  } else if (chezClark && lutinCache()) annonce('', tr('Mister Mxyzptlk a caché ta DeLorean : attrape les lettres de son nom à l\'envers !'), 2.5);
+  else if (!partie.trouvee[chapitre]) annonce('', tr("La DeLorean est cachée quelque part : retrouve-la d'abord !"), 2);
   else rappelerVoiture('DeLorean');
 }
 // À 88 miles à l'heure (39,3 m/s, 142 km/h), quand elle peut voyager, il faut tenir cette vitesse pendant 3 secondes (dureeVoyage) :
@@ -26842,7 +28277,7 @@ function cacherDeLorean() {
 }
 // où elle attend qu'on la retrouve : sa cachette (au chapitre 1, le garage du bunker secret). Rien si elle est déjà à lui
 function placeDeLorean() {
-  if (!cachetteDeLorean(CHAPITRE.cachette)) return null;
+  if (!cachetteDeLorean(CHAPITRE.cachette) || (chezClark && lutinCache())) return null;   // (Mister Mxyzptlk l'a cachée : elle ne revient qu'avec son nom à l'envers)
   return CHAPITRE.cachette === '?' ? bunkerSecret?.garage || null : lieuProche(CHAPITRE.cachette, J);
 }
 // elle a explosé ou coulé avant qu'on la retrouve : au bout de 4 s (retourDeLorean), sa carcasse s'en va, et une neuve revient dans sa cachette,
@@ -27752,6 +29187,7 @@ function majCiel(dt) {
   M_PHARE.emissiveIntensity = 1.5 + 4 * lumiere.nuit; M_FEU.emissiveIntensity = 1 + 2 * lumiere.nuit;
   majLumieresNuit(dt); majPhares();
   if (COUVERT) { couvrirCiel(h); if (ombreGrotte > 0.001) { ambiance.intensity *= 1 - 0.85 * ombreGrotte; soleil.intensity *= 1 - 0.95 * ombreGrotte; scene.fog.color.multiplyScalar(1 - 0.9 * ombreGrotte); } }   // sous la pluie, ou dans le brouillard : le ciel couvert (à Gotham) ; sous la terre, il n'éclaire presque plus
+  if (chezClark) cielEspace();   // (la mission « Dans l'espace » : le ciel noir et ses étoiles)
   majPluie(dt); majBatSignal(dt);
   majDetailsVoitures();     // (après les phares : la forme de loin prend leur matière)
   majOmbresPersonnages();   // (après le soleil, qui vient de bouger)
@@ -28120,7 +29556,8 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
     else if (missileTenu()) { if (sourisG && !dejaTire) { lancerMissileTenu(); dejaTire = true; } }   // un missile de Luthor dans les mains : le clic gauche le lance vers le ciel
     else if (kryptoniteTenue) { if (sourisG && !dejaTire) { lancerKryptonite(); dejaTire = true; } }   // la kryptonite dans sa main : le clic gauche la lance au loin
     else if (sourisG && !J.voiture && !J.telesiege && !J.monorail && !J.nage && !J.roule && !J.ironman?.anim && !(J.superman && ((ARMES[J.arme].corps && !machineAPortee()) || J.superman.looping)) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
-    if (temps - J.dernierDegat > R_.delaiRegeneration && !affaibli()) J.vie = Math.min(vieMax(), J.vie + R_.regeneration * dt);   // (près de la kryptonite, sa vie ne remonte plus)
+    const auSoleil = chezClark && soleilJaune();   // (dans l'espace, le soleil jaune lui redonne des forces : 3 fois plus vite, et plus tôt)
+    if (temps - J.dernierDegat > R_.delaiRegeneration * (auSoleil ? 0.4 : 1) && !affaibli()) J.vie = Math.min(vieMax(), J.vie + R_.regeneration * dt * (auSoleil ? 3 : 1));   // (près de la kryptonite, sa vie ne remonte plus)
   }
   tenirPrise(dt);   // la voiture que Spiderman fait tourner au bout de sa toile
   majFete(dt);      // la grande roue et les montagnes russes de la jetée (Malibu)
@@ -28450,7 +29887,9 @@ if (GOTHAM) A_PREPARER.push([M_FOULE, 'lot colorié'], [new THREE.MeshStandardMa
 // gèlent (transparent), et les ondes du super-cri
 if (chezClark) A_PREPARER.push([M_TOURBILLON[0], 'image'], [M_FUMEE, 'image'], [M_GLACE, 'forme'], [M_ONDE, 'image'],
   // (et ses missions : les rayons verts de Lex Luthor et de Brainiac, la cloche de verre, les bouteilles du vaisseau, la kryptonite)
-  [M_RAYON_VERT, 'forme'], [M_HALO_VERT, 'forme'], [M_VERRE_CLOCHE, 'forme'], [M_VAISSEAU.verre, 'forme'], [M_KRYPTONITE, 'forme'], [M_LUEUR_VERTE, 'image']);   // (et ce que fait le magasin de S.T.A.R. Labs : la glace autour de ceux qui gèlent, les ondes du super-cri)
+  [M_RAYON_VERT, 'forme'], [M_HALO_VERT, 'forme'], [M_VERRE_CLOCHE, 'forme'], [M_VAISSEAU.verre, 'forme'], [M_KRYPTONITE, 'forme'], [M_LUEUR_VERTE, 'image'],
+  // (la Terre vue de l'espace, et la couche de nuages, à la mission « Dans l'espace »)
+  [M_TERRE, 'forme'], [M_NUAGE, 'image']);   // (et ce que fait le magasin de S.T.A.R. Labs : la glace autour de ceux qui gèlent, les ondes du super-cri)
 // Les programmes des ombres, eux, Three.js les fait avec ses propres matières, que compile ne voit pas. À Gotham, des témoins réduits à un point
 // (on ne les voit pas) sont dessinés avec la toute première image, ombres comprises, puis enlevés, comme celui des personnages (temoinForme) : un
 // objet découpé (le blason d'un costume), découpé à deux faces (la cape de Batman), à deux faces (le plat des antennes, le canard du Pingouin ;
@@ -28560,7 +29999,10 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   get etapeVue() { return etapeVue; }, sansCostume, changerCostume, cibleMission, etapeFinie,
   kryptonites, get kryptoniteTenue() { return kryptoniteTenue; }, affaibli, poserKryptonite, enleverKryptonite, kryptoniteProche, prendreKryptonite, lancerKryptonite, casserKryptonite,
   get combatLuthor() { return combatLuthor; }, gardeFouActif, get piratage() { return piratage; }, pirates, lieuAntenne, get cloche() { return cloche; }, get vaisseauB() { return vaisseauB; },
-  get combatBrainiac() { return combatBrainiac; }, get naufrage() { return naufrage; }, dansSalle, dansRayon, SALLE_BRAINIAC, construireVaisseau, jeterVaisseau, creerMachine, M_VERRE_CLOCHE,
+  get combatBrainiac() { return combatBrainiac; }, get naufrage() { return naufrage; },
+  get vaisseauZod() { return vaisseauZod; }, get machineMonde() { return machineMonde; }, flottants, faireFlotter, toutRedescend, get combatDoomsday() { return combatDoomsday; }, attraperDoomsday, planterLance, poserLance, hautEspace,
+  get espace() { return espace; }, soleilJaune, get acclamation() { return acclamation; }, get lutin() { return lutin; }, MXYZPTLK, DELOREAN_MXYZPTLK, tourDeMagie, changerEnGateau, lutinCache, M_TERRE, M_NUAGE,
+  get tailleFarce() { return tailleFarce; }, tailleHeros, ralentiSuperman, kryptonienVaincu, dansSalle, dansRayon, SALLE_BRAINIAC, construireVaisseau, jeterVaisseau, creerMachine, M_VERRE_CLOCHE,
   chezWayne, wayne, COSTUMES_WAYNE, BATMOBILES_WAYNE, GADGETS_WAYNE, AMELIORATIONS_WAYNE, standsWayne, objetsWayne, acheterWayne, aideWayne, texteWayne, costumeDe, costumeBatman, costumePorte, enCostume,
   costumeSuivant, batmobileSuivante, basculerVision, lancerFumigene, gelExplosif, faireSauterGel, fumees, dansFumee, voitBJ, vieMax, protectionCostume, vitesseCostume, chuteCape, vitesseCape, vitesseGrappin,
   tailleHeros, niveauWayne, typeBatmobile, voitureTriche, allumerTurbo, sauterBatmobile, virageGrappin, trouerMur, dallesEn, dessinerDetective, sceneDetective, statueBatman, figer, majWayne, coupElectrique,
