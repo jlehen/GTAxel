@@ -267,7 +267,7 @@ for (const k in heros) {
 //  LES CHAPITRES : le jeu se joue en chapitres, un par héros. À la fin d'un chapitre, la DeLorean emmène au suivant : il faut tenir
 //  88 miles à l'heure (142 km/h) pendant 3 secondes. Elle ramène aussi aux chapitres d'avant (dedans, la touche T choisit où aller).
 //  Les missions sont dans MISSIONS (le chapitre 1) et MISSIONS_CHAPITRES (les autres), plus bas.
-//  ville : où ça se passe. Sa carte est dans VILLES (plus bas), sinon c'est le pays de la CARTE (Los Santos). Metropolis et New York arrivent bientôt
+//  ville : où ça se passe. Sa carte est dans VILLES (plus bas), sinon c'est le pays de la CARTE (Los Santos). New York arrive bientôt
 //  heros, heroine : ton nom, avec le garçon ou la fille du menu (sans : celui de HEROS) ; super, superFille : le nom de super-héros ;
 //    ami, amiFille : qui t'aide dans les missions ({ami} dans leurs textes : avec le garçon, ami ; avec la fille, amiFille)
 //  civil, civilFille : ta tenue de tous les jours (le héros, l'héroïne), avant de mettre ton costume (touche H) : veste, chemise, cravate, pantalon
@@ -361,24 +361,28 @@ const CHAPITRES = [
     'Quand des voyous braquent un magasin, le <b>Bat-signal</b> s\'allume dans le ciel : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par le Pingouin. À la fin, le Sphinx a caché la DeLorean : résous ses devinettes (<b>1</b>, <b>2</b> ou <b>3</b>) jusqu'à son repaire (<b>?</b> vert sur la carte), puis tiens 88 miles à l'heure pendant 3 secondes.",
   ]},
-  { ville: 'Metropolis', heros: 'Clark Kent', heroine: 'Kara Danvers', super: 'Superman', superFille: 'Supergirl', triche: 'SUPERMAN', logo: 'superman', heure: 12, cachette: 'd', sansReproche: true, touches: [
-    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
+  { ville: 'Metropolis', heros: 'Clark Kent', heroine: 'Kara Danvers', super: 'Superman', superFille: 'Supergirl', ami: 'Supergirl', amiFille: 'Superman', triche: 'SUPERMAN', logo: 'superman', heure: 12,
+    cachette: '¤', sansReproche: true,
+    civil: { veste: '#3b4a66', chemise: '#f2f2ee', cravate: '#a3191c', pantalon: '#3b4a66', chaussures: '#2a1c12', cheveux: '#121216', lunettes: '#dfe9ef' },
+    civilFille: { veste: '#7d9cc4', chemise: '#f6efe2', jupe: '#2c3350', talons: '#5a3a26', cheveux: '#e2bf6a', lunettes: '#dfe9ef' }, touches: [
+    ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser'],
     ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
-    ['Maj 3 fois, vite', "t'envoler · encore 3 fois : arrêter de voler"],
+    ['H', 'tu mets ton costume, et tu deviens {super} · H encore : tu repasses en civil (sans tes pouvoirs)'],
+    ['Maj 3 fois, vite', "en costume : t'envoler · encore 3 fois : arrêter de voler"],
     ['En volant', 'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping'],
-    ['9', 'les yeux laser (garde le clic gauche enfoncé)'],
-    ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
+    ['9', 'en costume : les yeux laser (garde le clic gauche enfoncé)'],
+    ['E', 'monter / descendre (voiture, bateau), ascenseur'],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
     ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
   ], bulles: [
-    'Tu es <b>{super}</b> ! <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.',
+    'Tu es <b>{heros}</b>, en civil. <b>H</b> : tu mets ton costume, et tu deviens <b>{super}</b> ! <b>H</b> encore : tu repasses en civil.',
+    'En costume, <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.',
     'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.',
-    '<b>9</b> : les yeux laser.',
-    'Tomber de très haut ne te fait rien : tout s\'écrase autour de toi !',
+    'En costume, <b>9</b> : les yeux laser. Et tomber de très haut ne te fait rien : tout s\'écrase autour de toi !',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
-    'La DeLorean a disparu : retrouve-la (point jaune), puis tiens 88 miles à l\'heure pendant 3 secondes.',
+    'La DeLorean a disparu : elle est cachée dans la cour du vieux théâtre (<b>♣</b> sur la carte). Retrouve-la, puis tiens 88 miles à l\'heure pendant 3 secondes.',
   ]},
   { ville: 'New York', heros: 'Peter Parker', heroine: 'Gwen Stacy', super: 'Spiderman', superFille: 'Spider-Gwen', triche: 'SPIDERMAN', logo: 'spiderman', cachette: 'a', sansReproche: true, touches: [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser (lunette du sniper)'],
@@ -772,6 +776,16 @@ const TRADUCTIONS = {
     gsw: 'In Zivil kein Umhang: <b>H</b>, dis Kostüm, und du gleitisch!' },
   'BATMAN !':         { de: 'BATMAN!', en: 'BATMAN!', gsw: 'BATMAN!' },
   'BATGIRL !':        { de: 'BATGIRL!', en: 'BATGIRL!', gsw: 'BATGIRL!' },
+  'SUPERMAN !':       { de: 'SUPERMAN!', en: 'SUPERMAN!', gsw: 'SUPERMAN!' },
+  'SUPERGIRL !':      { de: 'SUPERGIRL!', en: 'SUPERGIRL!', gsw: 'SUPERGIRL!' },
+  'Supergirl !':      { de: 'Supergirl!', en: 'Supergirl!', gsw: 'Supergirl!' },
+  'En civil : ni vol, ni yeux laser. H : ton costume': { de: 'In Zivil: kein Fliegen, keine Laseraugen. H: dein Kostüm', en: 'In plain clothes: no flying, no laser eyes. H: your suit',
+    gsw: 'In Zivil: kei Flüüge, kei Laserauge. H: dis Kostüm' },
+  'Mets ton costume (H) pour voler': { de: 'Zieh dein Kostüm an (H), um zu fliegen', en: 'Put on your suit (H) to fly', gsw: 'Leg dis Kostüm aa (H), zum flüüge' },
+  'Mets ton costume (H) pour avoir tes yeux laser': { de: 'Zieh dein Kostüm an (H), um deine Laseraugen zu haben', en: 'Put on your suit (H) to get your laser eyes',
+    gsw: 'Leg dis Kostüm aa (H), zum dini Laserauge ha' },
+  'En civil, tu ne voles pas : <b>H</b>, ton costume, puis <b>Maj</b> 3 fois !': { de: 'In Zivil fliegst du nicht: <b>H</b>, dein Kostüm, dann 3-mal <b>Shift</b>!',
+    en: "In plain clothes you can't fly: <b>H</b>, your suit, then <b>Shift</b> 3 times!", gsw: 'In Zivil flüügsch nöd: <b>H</b>, dis Kostüm, dänn 3 Mal <b>Shift</b>!' },
   'Mets ton costume (H) pour appeler ta Batmobile': { de: 'Zieh dein Kostüm an (H), um dein Batmobil zu rufen', en: 'Put on your suit (H) to call your Batmobile',
     gsw: 'Leg dis Kostüm aa (H), zum dis Batmobil rüefe' },
   'Gare : {gare}':    { de: 'Station: {gare}', en: 'Station: {gare}', gsw: 'Station: {gare}' },
@@ -1074,6 +1088,35 @@ const TRADUCTIONS = {
   'ZOO DE GOTHAM':    { de: 'ZOO VON GOTHAM', en: 'GOTHAM ZOO', gsw: 'ZOO VO GOTHAM' },
   'STADE DE GOTHAM':  { de: 'STADION VON GOTHAM', en: 'GOTHAM STADIUM', gsw: 'STADION VO GOTHAM' },
   'MONORAIL':         { de: 'EINSCHIENENBAHN', en: 'MONORAIL', gsw: 'EINSCHIINEBAHN' },
+  // les noms de Metropolis (sur les cartes)
+  'METROPOLIS':       { de: 'METROPOLIS', en: 'METROPOLIS', gsw: 'METROPOLIS' },
+  'New Troy':         { de: 'New Troy', en: 'New Troy', gsw: 'New Troy' },
+  'Park Ridge':       { de: 'Park Ridge', en: 'Park Ridge', gsw: 'Park Ridge' },
+  'Centennial Park':  { de: 'Centennial Park', en: 'Centennial Park', gsw: 'Centennial Park' },
+  "Hob's Bay":        { de: "Hob's Bay", en: "Hob's Bay", gsw: "Hob's Bay" },
+  'Suicide Slum':     { de: 'Suicide Slum', en: 'Suicide Slum', gsw: 'Suicide Slum' },
+  'Queensland Park':  { de: 'Queensland Park', en: 'Queensland Park', gsw: 'Queensland Park' },
+  'Rivière Hob':      { de: 'Hob River', en: 'Hob River', gsw: 'Hob River' },
+  'Baie de Metropolis': { de: 'Bucht von Metropolis', en: 'Metropolis Bay', gsw: 'Bucht vo Metropolis' },
+  'SMALLVILLE':       { de: 'SMALLVILLE', en: 'SMALLVILLE', gsw: 'SMALLVILLE' },
+  'Glaces du Nord':   { de: 'Eis des Nordens', en: 'Northern ice', gsw: 'Iis vom Norde' },
+  'Collines du Nord': { de: 'Nördliche Hügel', en: 'Northern hills', gsw: 'Nördlichi Hügel' },
+  'Pont de Metropolis': { de: 'Metropolis-Brücke', en: 'Metropolis Bridge', gsw: 'Metropolis-Brugg' },
+  'Daily Planet':     { de: 'Daily Planet', en: 'Daily Planet', gsw: 'Daily Planet' },
+  'Tour LexCorp':     { de: 'LexCorp Tower', en: 'LexCorp Tower', gsw: 'LexCorp Tower' },
+  'S.T.A.R. Labs':    { de: 'S.T.A.R. Labs', en: 'S.T.A.R. Labs', gsw: 'S.T.A.R. Labs' },
+  'Forteresse de Solitude': { de: 'Festung der Einsamkeit', en: 'Fortress of Solitude', gsw: 'Feschtig vo de Einsamkeit' },
+  'Ferme Kent':       { de: 'Kent-Farm', en: 'Kent Farm', gsw: 'Kent-Hof' },
+  'Statue de Superman': { de: 'Superman-Statue', en: 'Superman statue', gsw: 'Superman-Statue' },
+  'Statue de Supergirl': { de: 'Supergirl-Statue', en: 'Supergirl statue', gsw: 'Supergirl-Statue' },
+  'Base militaire':   { de: 'Militärstützpunkt', en: 'Army base', gsw: 'Militärbasis' },
+  'Vieux théâtre':    { de: 'Altes Theater', en: 'Old theater', gsw: 'Alts Theater' },
+  // les enseignes de Metropolis
+  'DAILY PLANET':     { de: 'DAILY PLANET', en: 'DAILY PLANET', gsw: 'DAILY PLANET' },
+  'LEXCORP':          { de: 'LEXCORP', en: 'LEXCORP', gsw: 'LEXCORP' },
+  'S.T.A.R. LABS':    { de: 'S.T.A.R. LABS', en: 'S.T.A.R. LABS', gsw: 'S.T.A.R. LABS' },
+  'THÉÂTRE':          { de: 'THEATER', en: 'THEATER', gsw: 'THEATER' },
+  'KENT':             { de: 'KENT', en: 'KENT', gsw: 'KENT' },
   'Désert de Grand Senora': { de: 'Grand-Senora-Wüste', en: 'Grand Senora Desert', gsw: 'Grand-Senora-Wüeschti' },
   'Mont Josiah':      { de: 'Mount Josiah', en: 'Mount Josiah', gsw: 'Mount Josiah' },
   'Mont Chiliad':     { de: 'Mount Chiliad', en: 'Mount Chiliad', gsw: 'Mount Chiliad' },
@@ -1167,6 +1210,15 @@ const TRADUCTIONS = {
   'Maj 3 fois, vite': { de: 'Shift 3-mal, schnell', en: 'Shift 3 times, fast', gsw: 'Shift 3 Mal, schnäll' },
   "t'envoler · encore 3 fois : arrêter de voler": { de: 'losfliegen · noch 3-mal: aufhören zu fliegen', en: 'take off · 3 more times: stop flying', gsw: 'losflüüge · nomal 3 Mal: ufhöre flüüge' },
   'les yeux laser (garde le clic gauche enfoncé)': { de: 'die Laseraugen (Linksklick gedrückt halten)', en: 'laser eyes (hold left click)', gsw: 'd Laserauge (Linksklick druckt hebe)' },
+  'tu mets ton costume, et tu deviens {super} · H encore : tu repasses en civil (sans tes pouvoirs)': {
+    de: 'du ziehst dein Kostüm an und wirst {super} · H noch einmal: wieder in Zivil (ohne deine Kräfte)',
+    en: 'you put on your suit, and you become {super} · H again: back in plain clothes (without your powers)',
+    gsw: 'du leisch dis Kostüm aa und wirsch {super} · H nomal: wieder in Zivil (ohni dini Chräft)' },
+  "en costume : t'envoler · encore 3 fois : arrêter de voler": { de: 'im Kostüm: losfliegen · noch 3-mal: aufhören zu fliegen', en: 'in your suit: take off · 3 more times: stop flying',
+    gsw: 'im Kostüm: losflüüge · nomal 3 Mal: ufhöre flüüge' },
+  'en costume : les yeux laser (garde le clic gauche enfoncé)': { de: 'im Kostüm: die Laseraugen (Linksklick gedrückt halten)', en: 'in your suit: laser eyes (hold left click)',
+    gsw: 'im Kostüm: d Laserauge (Linksklick druckt hebe)' },
+  'monter / descendre (voiture, bateau), ascenseur': { de: 'einsteigen / aussteigen (Auto, Boot), Aufzug', en: 'get in / out (car, boat), elevator', gsw: 'iistiige / uusstiige (Auto, Boot), Lift' },
   "une toile, pour te balancer d'immeuble en immeuble : garde la touche enfoncée, lâche-la pour t'envoler (ou clic gauche, la toile en main)": {
     de: 'ein Netz, um dich von Haus zu Haus zu schwingen: Taste gedrückt halten, loslassen, um davonzufliegen (oder Linksklick, mit dem Netz in der Hand)',
     en: 'a web, to swing from building to building: hold the key, let go to fly off (or left click, with the web in your hand)',
@@ -1236,6 +1288,20 @@ const TRADUCTIONS = {
   'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.': { de: 'Im Flug macht dich jedes Drücken auf <b>Shift</b> schneller. <b>Shift</b> + A oder D: eine Fassrolle.',
     en: 'While flying, each press of <b>Shift</b> makes you faster. <b>Shift</b> + A or D: a barrel roll.', gsw: 'Im Flug macht di jede Druck uf <b>Shift</b> schnäller. <b>Shift</b> + A oder D: e Fassrolle.' },
   '<b>9</b> : les yeux laser.': { de: '<b>9</b>: die Laseraugen.', en: '<b>9</b>: laser eyes.', gsw: '<b>9</b>: d Laserauge.' },
+  'Tu es <b>{heros}</b>, en civil. <b>H</b> : tu mets ton costume, et tu deviens <b>{super}</b> ! <b>H</b> encore : tu repasses en civil.': {
+    de: 'Du bist <b>{heros}</b>, in Zivil. <b>H</b>: Du ziehst dein Kostüm an und wirst <b>{super}</b>! <b>H</b> noch einmal: wieder in Zivil.',
+    en: 'You are <b>{heros}</b>, in plain clothes. <b>H</b>: you put on your suit, and you become <b>{super}</b>! <b>H</b> again: back in plain clothes.',
+    gsw: 'Du bisch <b>{heros}</b>, in Zivil. <b>H</b>: Du leisch dis Kostüm aa und wirsch <b>{super}</b>! <b>H</b> nomal: wieder in Zivil.' },
+  'En costume, <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.': { de: 'Im Kostüm, 3-mal schnell <b>Shift</b>: Du fliegst los. Noch 3-mal: Du hörst auf zu fliegen.',
+    en: 'In your suit, <b>Shift</b> 3 times, fast: you take off. 3 more times: you stop flying.', gsw: 'Im Kostüm, 3 Mal schnäll <b>Shift</b>: Du flüügsch los. Nomal 3 Mal: Du hörsch uf flüüge.' },
+  'En costume, <b>9</b> : les yeux laser. Et tomber de très haut ne te fait rien : tout s\'écrase autour de toi !': {
+    de: 'Im Kostüm, <b>9</b>: die Laseraugen. Und ein Sturz aus großer Höhe tut dir nichts: Alles um dich herum wird zerquetscht!',
+    en: 'In your suit, <b>9</b>: laser eyes. And falling from very high does nothing to you: everything around you gets crushed!',
+    gsw: 'Im Kostüm, <b>9</b>: d Laserauge. Und vo ganz höch abegheie macht dir nüüt: Alles um di ume wird verdrückt!' },
+  'La DeLorean a disparu : elle est cachée dans la cour du vieux théâtre (<b>♣</b> sur la carte). Retrouve-la, puis tiens 88 miles à l\'heure pendant 3 secondes.': {
+    de: 'Der DeLorean ist verschwunden: Er ist im Hof des alten Theaters versteckt (<b>♣</b> auf der Karte). Finde ihn und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
+    en: 'The DeLorean has vanished: it is hidden in the yard of the old theater (<b>♣</b> on the map). Find it, then hold 88 miles per hour for 3 seconds.',
+    gsw: 'De DeLorean isch verschwunde: Er isch im Hof vom alte Theater versteckt (<b>♣</b> uf de Charte). Find en und heb dänn 3 Sekunde lang 88 Meile pro Stund.' },
   'Tomber de très haut ne te fait rien : tout s\'écrase autour de toi !': { de: 'Ein Sturz aus großer Höhe tut dir nichts: Alles um dich herum wird zerquetscht!',
     en: 'Falling from very high does nothing to you: everything around you gets crushed!', gsw: 'Vo ganz höch abegheie macht dir nüüt: Alles um di ume wird verdrückt!' },
   'Tu es <b>{super}</b> ! <b>G</b> (ou clic gauche) : une toile, pour te balancer d\'immeuble en immeuble.': { de: 'Du bist <b>{super}</b>! <b>G</b> (oder Linksklick): ein Netz, um dich von Haus zu Haus zu schwingen.',
@@ -2670,6 +2736,7 @@ const REGLAGES = {
   vitesseVolMaj: 12,         // ...et chaque appui sur Maj en volant ajoute ça (1 fois : 24 m/s, 2 fois : 36 m/s...)
   vitesseVolMax: 100,        // ...jusqu'à ça (360 km/h, plus vite que l'avion !)
   tripleMaj: 0.6,            // secondes pour taper Maj 3 fois
+  traitsTourbillon: 34,      // au chapitre de Superman : les traits bleus, rouges et jaunes du tourbillon, quand il met son costume (touche H) ou l'enlève
   vitesseTonneau: 7.5,       // en volant (Superman, la Batmobile), Maj + Q ou D : un tonneau, il tourne sur lui-même. En radians par seconde (7.5 = un tour en 0,8 s)
   vitesseLooping: 3,         // en volant (Superman, la Batmobile), Maj + Espace (ou C) : un looping, en radians par seconde (3 = un looping en 2 s). Plus il vole vite, plus la boucle est grande. L'avion a ses nombres à lui, dans VOITURES
   roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36°, 1.5 = jusqu'à 60°
@@ -3296,6 +3363,12 @@ let VISITABLES = null;   // (à Los Santos : REGLAGES.immeublesVisitables)
 let BATCAVE = null, EGOUT = null;
 // le bas de la ville : l'autoroute qui passe sous les quais, dans un long tunnel (voir VILLES : à Gotham) ; ailleurs, il n'y en a pas
 let TUNNEL = null;
+// le nord gelé, les tours art déco et le grand pont suspendu (voir VILLES : à Metropolis) ; à Los Santos, il n'y en a pas
+let GLACE = null, ARTDECO = 0, PONT_SUSPENDU = null;
+// les arbres d'un parc (P : jusqu'à ARBRES_PARC, au hasard, pas sur les allées) et les lampadaires de chaque côté d'un pâté
+let ARBRES_PARC = 14, LAMPADAIRES = 3;
+// la sorte des arbres des pâtés (les parcs, les maisons, les places...), et l'ombre des lampadaires (voir VILLES : à Metropolis)
+let ARBRES_VILLE = 'rond', OMBRE_LAMPADAIRES = true;
 
 // =====================================================================
 //  LES GANGS : ils traînent dans leur quartier, et te laissent tranquille... sauf si tu en frappes un,
@@ -3316,7 +3389,7 @@ let GANGS = [
 //  Ce qu'elle n'a pas, elle ne l'a pas : sans SOMMETS, pas de neige ; sans GANGS, pas de gangs... Pour inventer une ville : copie Malibu !
 //  PANNEAUX : les grandes lettres blanches posées sur une colline : texte, col, ligne (le milieu du mot), angle (vers où elles regardent :
 //    0 = le sud, 90 = l'est, 180 = le nord, 270 = l'ouest). Écris ton nom sur la colline !
-//  PALMIERS : les palmiers poussent sur les plages à partir de cette ligne de la carte (0 : sur toutes les plages)
+//  PALMIERS : les palmiers poussent sur les plages à partir de cette ligne de la carte (0 : sur toutes les plages ; null : aucun palmier)
 //  GALERIE : la galerie de la grotte ()), qui part du bord sud de son pâté et s'enfonce dans la colline, en tournant. chemin : les coins
 //    de son chemin, en mètres, depuis le milieu du bord sud du pâté ([vers l'est, vers le sud] : le premier, c'est l'entrée, [0, 0], et le
 //    deuxième doit être juste au sud). D'un coin à l'autre, elle va tout droit, sans biais (soit vers l'est ou l'ouest, soit vers le nord ou
@@ -3335,6 +3408,18 @@ let GANGS = [
 //    du premier point (elle reste à cette hauteur tout du long : fais-la passer dans une ville plate ; vers une colline, elle s'y enterre) ;
 //    wagons : combien ; vitesse : en m/s ; arret : les secondes qu'il attend dans chaque gare. Monte dedans avec E, dans une gare (un ascenseur
 //    monte de la rue au quai)
+//  GLACE : un coin gelé (à Metropolis, autour de la Forteresse de Solitude). À moins de « rayon » cases de la case col, ligne, tout est
+//    blanc : la neige couvre la terre, les collines et les sapins ; un peu plus loin, elle s'en va par plaques. On y glisse, comme sur les pistes
+//  ARTDECO : la part des tours (pâtés T) qui sont de vieux gratte-ciel art déco, en pierre claire, en gradins, avec leur couronne de métal
+//    et leur flèche (0.4 = 4 sur 10 ; sans : aucune). Les autres sont de verre et de béton, comme à Los Santos
+//  PONT_SUSPENDU : un grand pont suspendu, sur une route qui passe sur l'eau (#). tours : les deux cases [colonne, ligne] où se dressent ses
+//    deux grandes tours ; hauteur : leur hauteur au-dessus de la route, en mètres ; ecart : à combien de mètres du milieu de la route se
+//    dressent leurs piliers (et pendent les câbles). Les câbles pendent d'une tour à l'autre, et retombent jusqu'à leurs massifs, au bout du pont
+//  ARBRES_PARC : les arbres d'un parc (P), au plus (sans : 14, comme à Los Santos). Moins d'arbres, moins de travail pour la carte graphique
+//  LAMPADAIRES : les lampadaires de chaque côté d'un pâté (sans : 3, comme à Los Santos ; 2 : un tous les 27 m au lieu de 18).
+//    OMBRE_LAMPADAIRES: false : ils ne font pas d'ombre (à midi, elle est toute petite ; dans une grande ville, il y en a des milliers)
+//  ARBRES_VILLE : la sorte des arbres des pâtés (sans : 'rond', comme à Los Santos ; 'feuillu' : le même arbre en moins de facettes,
+//    celui de la campagne : 5 fois moins de triangles à dessiner, et à peine moins joli)
 // =====================================================================
 const VILLES = {
   // Malibu, au chapitre 2 (Iron Man). Dans sa CARTE, les signes de Los Santos, et ceux de Malibu (* = avec un étage ou un toit où monter) :
@@ -3512,7 +3597,7 @@ const VILLES = {
       ['Rivière de Gotham', 19, 32], ['Baie de Gotham', 34, 47], ['Port', 37, 42], ['Domaine Wayne', 9, 14], ['Bristol', 10, 33],
       ['Île d\'Arkham', 52, 2], ['Autoroute', 22, 11], ['Bas de la ville', 20.6, 32],
     ],
-    PALMIERS: 70,   // (la carte n'a que 70 lignes : aucun palmier à Gotham)
+    PALMIERS: null,   // (aucun palmier à Gotham)
     GOTHIQUE: { col: 36, ligne: 30, rayon: 6 },
     BATSIGNAL: true,
     VISITABLES: 0.1,   // (deux fois plus d'immeubles qu'à Los Santos : on n'entre que dans 1 sur 10, sinon le jeu prend 80 Mo de plus)
@@ -3531,6 +3616,102 @@ const VILLES = {
     // piliers et ses lampes (le camion du Joker y passe). route : la colonne de l'autoroute ; de, a : les lignes où il commence et finit ;
     // largeur : en mètres ; hauteur : son plafond, au-dessus de la route (sur son toit, le parc des quais)
     TUNNEL: { route: 22, de: 25.3, a: 39.4, largeur: 18, hauteur: 9 },
+  },
+  // Metropolis, au chapitre 4 (Superman). En plein jour, sous un ciel bleu : il y est toujours midi (CHAPITRES : heure). Dans sa CARTE, les signes
+  // de Los Santos, et ceux de Metropolis (* = avec un toit où monter) :
+  //    ø Daily Planet*, le journal de Clark Kent : une tour art déco, et sur son toit, le globe doré qui tourne (un ascenseur monte du hall au toit)
+  //    ł tour LexCorp*, la plus haute de la ville : l'héliport de Lex Luthor sur son toit        µ S.T.A.R. Labs : le laboratoire, son dôme, son hall
+  //    ¡ la statue de Superman (de Supergirl, avec la fille du menu), au milieu de Centennial Park, sur un grand socle
+  //    ê Forteresse de Solitude : ses cristaux de glace géants, dans le nord gelé (GLACE), sans rues autour
+  //    ç ferme Kent, à Smallville : la maison, la grange rouge, le silo et le champ de maïs, au bout de sa route de campagne
+  //    ß base militaire : ses tanks et ses avions de chasse, sa tour de contrôle et son hangar ; sa piste est juste à côté (!)
+  //    ¤ vieux théâtre, à Suicide Slum : la DeLorean y est cachée, dans la cour
+  'Metropolis': {
+    CARTE: [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 0
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 1
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 2
+      "~~~~~~__~~__~___~~~__~~~~~~~~~~~~~~~~~~~___~~____~~~~~~~~~~~~~~~~~~~~~~~~~",  // 3
+      "~~~~_~~~____________~~~~____________~~~~____________~~~~___________~~~~~~~",  // 4
+      "~~~~_1122333221,,,,122332_~~~~_1223344332211,,,,,,,,******,,1122,,_~~~~~~~",  // 5
+      "~~~~_12345443,,,,,,,23443_~~~~_12345554432;;;;;;;;;,******,******,_~~~~~~~",  // 6
+      "~~~~_1234543,,,,,,,,,2343_~~~~_12345655432;;;;;;;;;,******,******,_~~~~~~~",  // 7
+      "~~~~_123443,,,ê,,,,,,2232_~~~~_12345544321;;;;;;;;;,******,******,_~~~~~~~",  // 8
+      "~~~~_12333,,,,,,,,,,,1221_~~~~_12234432211;;;;;;;;;,,,,,,,,******,_~~~~~~~",  // 9
+      "~~~~_1222,,,,,,,,,,,,1111*,,,,,1122332211,,,,,,,,,,,,,,,,,,,,,,,,,_~~~~~~~",  // 10
+      "~~~~_111,,,,,,,,,,,,,,1*********112221,,,,,,,,,,,,,,!!!!!!!!!!,,,,_~~~~~~~",  // 11
+      "~~~~_**,,,,,,*,,,,,,,,*********,,,,,,,,,,,,,,,,,,,,,,,,,,ß,,,,,,,,_~~~~~~~",  // 12
+      "~~~~_***,,***,,,****,,,********,,******,,,,,,,,,,,,,,,,,,=,,,,,,,,_~~~~~~~",  // 13
+      "~~~~_,,,,,,,,,,,,,,,,,,,,,*****,,******,,,,,,,,,,,,,,,,,,=,,,;12;;_~~~~~~~",  // 14
+      "~~~~_*****,,,,*******1111,*****~~~~****,,,,,,,,122***,,,,=,,,;;;;;_~~~~~~~",  // 15
+      "~~~~_*****,,,,*******1221,*****~~~~****,,,,,,,1233***,,,,=,,,;;;;;_~~~~~~~",  // 16
+      "~~~~_*****,,,,*******1111,*****~~~~****,,,,,,,12221,,,,,,=,,,;;;;;_~~~~~~~",  // 17
+      "~~~~_*****,,,,*******,,,,,*****~~,,,,,*****,,,,,,,,,,,,,,=,,,;;;;;_~~~~~~~",  // 18
+      "~~~~_*****,,,,*******,,,,,,,,,,~~,,,,,*****,=============,,,,;;;;;_~~~~~~~",  // 19
+      "~~~~_*****,,,,*******,,,,,,,,,,~~,,,,,*****,=,,,,,,,,,,,,,,,,;;;;;_~~~~~~~",  // 20
+      "~~~~_*****,,,,,,,,,,,,,,,,,,,,,~~,,,,,*****,=;;;;;;;;,,,,,,,,,,,,,_~~~~~~~",  // 21
+      "~~~~_*****,====================##,,,,,,,,,,,=;;;;;;;;,,,,,,_~~~~~~~~~~~~~~",  // 22
+      "~~~~_*****,=,,,,,,,,,,12211,,,,~~=,,,,,,,,,,=,,,,,,,,,,,,,,_~~~~~~~~~~~~~~",  // 23
+      "~~~~_*****,=,,,,,,,,,,11111,,,,~~MMMMMMMMMMMMMMMMMM,1111,,,_~~~~~~~~~~~~~~",  // 24
+      "~~~~_,,,,,,=,,,,,,,,,,11111,,,,~~MMMMMSMMMMMMMMMMMM,1111,,,_~~~~~~~~~~~~~~",  // 25
+      "~~~~_,;;;;;=;,,;;;;;;;;,,,,,,,,~~IIITIIIIIIIIITIIII***E,,,,_~~~~~~~~~~~~~~",  // 26
+      "~~~~_,;;;;;=;,,;;;;;;;;,,,,,,,,~~IIIIIIIIIIIIIIIIIIIIIIMM,,_~~~~~~~~~~~~~~",  // 27
+      "~~~~_,;;;;;=;,,;;;;;;;;,,,,,,,,~~IIISIITTTTTTTTTTTTIITIMM,,_~~~~~~~~~~~~~~",  // 28
+      "~~~~_,;;;;;=;,,;;;;;;;;,,,,,,,,~~IIIIIITTTTTTTTTTTTIIIIMM,,_~~~~~~~~~~~~~~",  // 29
+      "~~~~_,;;;;;=;,,;;;;;;;;,,,,,_~~~~IITIIITTTTTTTTTłTTIIIIMM,,_~~~~~~~~~~~~~~",  // 30
+      "~~~~_,;;;;;=;,,;;;;;;;;,,,,,_~~~~IIIIIITTøTTTTTTTTTIIIIMM,,_~~~~~~~~~~~~~~",  // 31
+      "~~~~_,;;;;;=;,,;;;;;;;;,,,,,_~~~~IIIIIITTXTTTTTTTTTIITIMM,,_~~~~~~~~~~~~~~",  // 32
+      "~~~~_,;;;;;=;,,;;;;;;;;,,,,,_~~~~IHIITITTTTT.TTTTTTIIIIMM,,_~~~~~~~~~~~~~~",  // 33
+      "~~~~_,,,,,,=,,,,,,,,,,,,,,,,_~~~~IIIIIITTTTTTTTTTTTIIIIII,,_~~~~~~~~~~~~~~",  // 34
+      "~~~~_,,,,MSMM,,,,,*******,,,_~~~~IIIIIIIIIIIIIIIIIIIIIIII,,_~~~~~~~~~~~~~~",  // 35
+      "~~~~_,,,,M.PM,,,,,*******,_~~~~~_IIIIIIIIIPPPPPIIIIIIIIµI,,_~~~~~~~~~~~~~~",  // 36
+      "~~~~_,,,,EMHM,,,,,*******,_~~~~~_IIITIIIIIPP¡PPICIIIIIIII,,_~~~~~~~~~~~~~~",  // 37
+      "~~~~_,,,,=,,,=============######=IIIIIIIIIPPPPPIIIIITIIII,,_~~~~~~~~~~~~~~",  // 38
+      "~~~~_,,,=,,,,,,,,,,,,,,,,,_~~~~~_EIIIIIIIIPPPPPIIIIIIISII,,_~~~~~~~~~~~~~~",  // 39
+      "~~~~;;;;=;,,,,,,,,,,,,,,,,_~~~~~_IIIIIIITIIIIIIIIIIIHIIII,,_~~~~~~~~~~~~~~",  // 40
+      "~~~~;;;=;;,,,,,;;;;;;;;;,,,,_~~~~IIII.IIIIIIISIIITIIIIIII,,_~~~~~~~~~~~~~~",  // 41
+      "~~~~;;;=;;,,,,,;;;;;;;;;,,,,_~~~~IIIIIIIIIIIIIIIIIIIIIMMM,,_~~~~~~~~~~~~~~",  // 42
+      "~~~~;;=;;;,,,,,;;;;;;;;;,,,,_~~~~IIIIIIDDDDDDDDDDDIIIIMMM,,_~~~~~~~~~~~~~~",  // 43
+      "~~~~;;ç;;;,,,,,;;;;;;;;;,,,~~~~~~IIIIIIDD~~~~~~~DDI.IIMMM,,_~~~~~~~~~~~~~~",  // 44
+      "~~~~;;;;;;,,,,,;;;;;;;;;,,,~~~~~~II¤IIIDD~~~~~~~DDIIIIMMM,,_~~~~~~~~~~~~~~",  // 45
+      "~~~~;;;;;;;;;;;;;;;;;;;;,,,~~~~~~IIIIIIDD~~~~~~~DDISIIMMM,,_~~~~~~~~~~~~~~",  // 46
+      "~~~~;;;;;;;;;;;;;;;;;;;;,,,~~~~~~IIIIIIDD~~~~~~~DDEIIIMMM,,_~~~~~~~~~~~~~~",  // 47
+      "~~~~;;;;;;;;;;;;;;;;;;;;,,,~~~~~~________~~~~~~~_________,,_~~~~~~~~~~~~~~",  // 48
+      "~~~~_,,,,;;;;;;;;;;;;;;;,,,~~~~~~~~~~~~~~~~~~~~~~~~~&~~~~~~~~~~~~~~~~~~~~~",  // 49
+      "~~~~_,,,,;;;;;;;;;;;;;;;,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 50
+      "~~~~_,,,,;;;;;;,,,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 51
+      "~~~~_,*******;;,,,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 52
+      "~~~~_,*******,,111111,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 53
+      "~~~~_,*******,,111111,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 54
+      "~~~~_,*******,,111111,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 55
+      "~~~~_,*******,,111111~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 56
+      "~~~~_,*******,,111111~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 57
+      "~~~~_,,,,,,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 58
+      "~~~~_,,,,,,,,,,,,,,,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 59
+      "~~~~________________~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 60
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 61
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 62
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 63
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 64
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 65
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 66
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 67
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 68
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",  // 69
+    ],
+    NOMS_LIEUX: [
+      ['METROPOLIS', 44.5, 22.6], ['New Troy', 45, 27], ['Park Ridge', 39, 23.3], ['Centennial Park', 44, 40.4], ["Hob's Bay", 44, 43.4], ['Suicide Slum', 35.5, 42.6],
+      ['Queensland Park', 53.5, 23.3], ['Rivière Hob', 31.5, 26], ['Baie de Metropolis', 45, 55], ['SMALLVILLE', 10.5, 34], ['Glaces du Nord', 14, 12],
+      ['Collines du Nord', 38, 9.5], ['Pont de Metropolis', 29.5, 37.3],
+    ],
+    PALMIERS: null,   // (aucun palmier à Metropolis)
+    VISITABLES: 0.1,   // (presque autant d'immeubles qu'à Gotham : on n'entre que dans 1 sur 10)
+    GLACE: { col: 14, ligne: 8, rayon: 8 },
+    ARTDECO: 0.4,
+    PONT_SUSPENDU: { tours: [[27, 38], [30, 38]], hauteur: 46, ecart: 6.2 },
+    // (une ville très serrée, sans brouillard, et Centennial Park à côté du départ : avec les arbres, les lampadaires et les ombres de Los
+    // Santos, le départ demandait deux fois plus de travail à la carte graphique qu'à Los Santos)
+    ARBRES_PARC: 8, ARBRES_VILLE: 'feuillu', LAMPADAIRES: 2, OMBRE_LAMPADAIRES: false,
   },
 };
 
@@ -4210,6 +4391,39 @@ const FETE_DES_ARMURES = [
 const COSTUME_BATMAN =  { nom: 'Batman',  costume: '#5c6068', slip: '#131318', noir: '#131318', jaune: '#f0c41a', ovale: true };
 const COSTUME_BATGIRL = { nom: 'Batgirl', costume: '#3b3448', slip: '#3b3448', noir: '#131318', jaune: '#f0c41a', ovale: false, cheveux: true };
 const batgirl = () => fille() && CHAPITRE.triche === 'BATMAN';
+// LES COSTUMES DE SUPERMAN ET DE SUPERGIRL (le code SUPERMAN ; au chapitre de Superman, la touche H les met et les enlève) : bleu (le collant),
+// rouge (le slip, les bottes et la cape), jaune (la ceinture, et l'écusson et son « S »). jupe: true = une jupe rouge et les jambes nues, et
+// ses longs cheveux qui tombent dans son dos (ceux de l'héroïne, Kara Danvers : blonds). Supergirl, c'est Kara Danvers, au chapitre de
+// Superman, avec la fille du menu. Ailleurs (le code SUPERMAN au chapitre 1), c'est toujours Superman
+const COSTUME_SUPERMAN =  { nom: 'Superman',  bleu: '#1c50c8', rouge: '#c8141c', jaune: '#f2cc1e' };
+const COSTUME_SUPERGIRL = { nom: 'Supergirl', bleu: '#1c50c8', rouge: '#c8141c', jaune: '#f2cc1e', jupe: true };
+const supergirl = () => fille() && CHAPITRE.triche === 'SUPERMAN';
+// Habille b (B.J.) en Superman, avec le costume C (COSTUME_SUPERMAN ou COSTUME_SUPERGIRL) : le collant bleu, le slip et les bottes rouges,
+// la ceinture jaune, le « S » sur la poitrine, la cape rouge ; les cheveux noirs et l'accroche-cœur (Superman), ou la jupe et les longs
+// cheveux (Supergirl)
+function habillerSuperman(b, C) {
+  const { bleu, rouge, jaune } = C, noir = '#16161c';
+  habiller(b.torse, bleu); habiller(b.bassin, rouge); habiller(b.ceinture, jaune);
+  for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, C.jupe && m.chaussure ? PEAU_BJ : bleu);   // (Supergirl : les jambes nues)
+  for (const j of [b.jambeD, b.jambeG]) { // les bottes montent sur le mollet
+    habiller(j.chaussure, rouge);
+    accessoire(GEO.tigeSantiag, rouge, j.pli, 0, 0, 0).material = mat(rouge, { side: THREE.DoubleSide });
+  }
+  // l'écusson : cinq côtés, la pointe en bas, jaune bordé de rouge, avec le « S » (là où rien n'est dessiné, on voit le collant à travers)
+  accessoire(GEO.blason, jaune, b.torse, 0, 0, 0).material = TISSUS['blason' + C.nom] ||= std(toile(128, 128, g => {
+    g.translate(64, 0);
+    g.beginPath(); for (const [x, y] of [[-38, 14], [38, 14], [58, 44], [0, 120], [-58, 44]]) g.lineTo(x, y); g.closePath();
+    g.fillStyle = jaune; g.fill(); g.lineWidth = 9; g.lineJoin = 'round'; g.strokeStyle = rouge; g.stroke();
+    g.fillStyle = rouge; g.font = 'bold 82px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('S', 0, 57);
+  }), { alphaTest: 0.5, bumpScale: 0.01 });
+  mettreCape(b, rouge);   // la cape, qui flotte au vent
+  if (b.lunettes) b.lunettes.visible = false;   // (les lunettes de Clark Kent, ou de Kara Danvers : en costume, il les enlève ; rhabillerBJ les lui rend)
+  if (C.jupe) { // Supergirl : la jupe rouge (sur le bassin et sur chaque cuisse), et ses longs cheveux, dans son dos
+    accessoire(GEO.jupe, rouge, b.bassin, 0, 0, 0).material = mat(rouge, { side: THREE.DoubleSide });
+    for (const j of [b.jambeD, b.jambeG]) accessoire(GEO.jupeCuisse, rouge, j, 0, 0, 0).material = mat(rouge, { side: THREE.DoubleSide });
+    accessoire(GEO.criniere, tenueCivile().cheveux || CHEVEUX[heros.cheveux], b.tete, 0, -0.02, -0.075).rotation.x = 0.22;
+  } else { habiller(b.cheveux, noir); accessoire(GEO.boucle, noir, b.tete, 0.012, 0.086, 0.104).rotation.z = 2.4; }   // l'accroche-cœur, sur le front
+}
 const cacheBatman = {};   // (les dessins de l'écusson et de la cagoule, faits une fois pour toutes)
 // LE MAGASIN DE LUCIUS FOX, au chapitre de Batman : dans le grand hall de Wayne Enterprises, au pied de la tour Wayne (⚙ sur la carte de
 // Gotham). Il n'ouvre que quand tu as ton premier costume. E devant un stand : l'acheter, ou choisir ce que tu as déjà. Ce que tu achètes
@@ -4384,25 +4598,9 @@ const TRICHES = [
       accessoire(GEO.moustache, blanc, b.tete, 0, -0.045, 0.118).scale.set(1.9, 0.8, 1);
     } },
   // le costume de Superman : collant bleu, slip et bottes rouges, ceinture jaune, le « S » sur la poitrine, la cape rouge, les cheveux noirs
-  // et l'accroche-cœur. Il n'est pas invincible (les balles lui font mal), mais il a les yeux laser, et tomber de haut ne lui fait rien
-  { code: 'SUPERMAN', texte: 'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout', laser: true, ecrase: true, effet: b => {
-      const bleu = '#1c50c8', rouge = '#c8141c', jaune = '#f2cc1e', noir = '#16161c';
-      habiller(b.torse, bleu); habiller(b.bassin, rouge); habiller(b.ceinture, jaune);
-      for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, bleu);
-      for (const j of [b.jambeD, b.jambeG]) { // les bottes montent sur le mollet
-        habiller(j.chaussure, rouge);
-        accessoire(GEO.tigeSantiag, rouge, j.pli, 0, 0, 0).material = mat(rouge, { side: THREE.DoubleSide });
-      }
-      // l'écusson : cinq côtés, la pointe en bas, jaune bordé de rouge, avec le « S » (là où rien n'est dessiné, on voit le collant à travers)
-      accessoire(GEO.blason, jaune, b.torse, 0, 0, 0).material = TISSUS.blasonSuperman ||= std(toile(128, 128, g => {
-        g.translate(64, 0);
-        g.beginPath(); for (const [x, y] of [[-38, 14], [38, 14], [58, 44], [0, 120], [-58, 44]]) g.lineTo(x, y); g.closePath();
-        g.fillStyle = jaune; g.fill(); g.lineWidth = 9; g.lineJoin = 'round'; g.strokeStyle = rouge; g.stroke();
-        g.fillStyle = rouge; g.font = 'bold 82px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('S', 0, 57);
-      }), { alphaTest: 0.5, bumpScale: 0.01 });
-      mettreCape(b, rouge);   // la cape, qui flotte au vent
-      habiller(b.cheveux, noir); accessoire(GEO.boucle, noir, b.tete, 0.012, 0.086, 0.104).rotation.z = 2.4;   // l'accroche-cœur, sur le front
-    } },
+  // et l'accroche-cœur (voir habillerSuperman ; au chapitre de Superman, avec la fille du menu : Supergirl). Il n'est pas invincible (les
+  // balles lui font mal), mais il a les yeux laser, et tomber de haut ne lui fait rien
+  { code: 'SUPERMAN', texte: 'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout', laser: true, ecrase: true, effet: b => habillerSuperman(b, supergirl() ? COSTUME_SUPERGIRL : COSTUME_SUPERMAN) },
   // Batman : le costume gris, le slip, les gants, les bottes et la cagoule noirs (avec ses deux oreilles pointues), la ceinture jaune,
   // la chauve-souris sur la poitrine et la grande cape noire. Il a le grappin (qu'il prend en main), les batarangs et les filets (touche 9),
   // la cape pour planer (Maj en l'air), et sa Batmobile, qui vole (touche R), apparaît à côté de lui (la touche B la rappelle). Il n'est pas
@@ -4686,9 +4884,11 @@ const S = 60, R = 14, PAS = S + R, VOIE = 3.2;
 const EAU = -1;                // la hauteur de l'eau : mer, lacs et rivières
 const PASMAX = 0.6;            // la plus haute marche qu'on monte sans sauter
 // le pays du chapitre : Los Santos (la CARTE et ses tableaux), ou la ville du chapitre (VILLES), dont les tableaux les remplacent
-if (VILLES[CHAPITRE.ville]) ({ CARTE, SOMMETS, REMONTEES, PISTES_SKI, NAVETTE, NOMS_LIEUX, GANGS, CASCADES, PANNEAUX, PALMIERS, GALERIE, GOTHIQUE, BATSIGNAL, MONORAIL, VISITABLES, BATCAVE, EGOUT, TUNNEL } =
+if (VILLES[CHAPITRE.ville]) ({ CARTE, SOMMETS, REMONTEES, PISTES_SKI, NAVETTE, NOMS_LIEUX, GANGS, CASCADES, PANNEAUX, PALMIERS, GALERIE, GOTHIQUE, BATSIGNAL, MONORAIL, VISITABLES, BATCAVE, EGOUT, TUNNEL,
+  GLACE, ARTDECO, PONT_SUSPENDU, ARBRES_PARC, LAMPADAIRES, ARBRES_VILLE, OMBRE_LAMPADAIRES } =
   { SOMMETS: [], REMONTEES: [], PISTES_SKI: [], NAVETTE: [], NOMS_LIEUX: [], GANGS: [], CASCADES: [], PANNEAUX: [], PALMIERS: 0, GALERIE: null, GOTHIQUE: null, BATSIGNAL: false, MONORAIL: null,
-    VISITABLES: null, BATCAVE: null, EGOUT: null, TUNNEL: null, ...VILLES[CHAPITRE.ville] });
+    VISITABLES: null, BATCAVE: null, EGOUT: null, TUNNEL: null, GLACE: null, ARTDECO: 0, PONT_SUSPENDU: null, ARBRES_PARC: 14, LAMPADAIRES: 3,
+    ARBRES_VILLE: 'rond', OMBRE_LAMPADAIRES: true, ...VILLES[CHAPITRE.ville] });
 const NBX = CARTE[0].length, NBZ = CARTE.length;
 const TAILLE_X = NBX * PAS + R, TAILLE_Z = NBZ * PAS + R;
 CARTE.forEach((l, i) => { if (l.length !== NBX) alert(`Carte : la ligne ${i} n'a pas la bonne longueur !`); });
@@ -4697,7 +4897,11 @@ const centre = (i, j) => ({ x: i * PAS + R + S / 2, z: j * PAS + R + S / 2 });
 const noeud = (i, j) => ({ x: i * PAS + R / 2, z: j * PAS + R / 2 });        // carrefour
 const blocEn = (x, z) => [clamp(Math.floor((x - R / 2) / PAS), 0, NBX - 1), clamp(Math.floor((z - R / 2) / PAS), 0, NBZ - 1)];
 const car = (i, j) => (i >= 0 && j >= 0 && i < NBX && j < NBZ) ? CARTE[j][i] : '~';
-const estBloc = c => /[A-Za-z.%?<>|$()[\]{}\/é£°§]/.test(c);   // un pâté, avec des rues autour
+const estBloc = c => /[A-Za-z.%?<>|$()[\]{}\/é£°§øłµ¡êçß¤]/.test(c);   // un pâté, avec des rues autour
+// les pâtés sans rues autour, ni trottoir, ni lampadaires : le camp de la grotte des Dix Anneaux (Malibu), au pied de sa colline, la
+// Forteresse de Solitude (Metropolis), dans la glace, et la ferme Kent, au milieu des champs (sa route de campagne arrive dans sa cour).
+// Le terrain n'y est plat que sur le pâté lui-même
+const sansRues = c => c === ')' || c === 'ê' || c === 'ç';
 const estPiste = c => '!^@'.includes(c);          // une piste d'aéroport (avec un avion ou un hélicoptère, ou rien)
 const estPlat = c => estBloc(c) || estPiste(c);    // le terrain y est aplani
 const estRoute = c => c === '=' || c === '#';
@@ -4799,6 +5003,12 @@ function neigeEn(x, z) {
   const t = (sommetEn(x, z).h - R_.neigeBas) / (R_.neigeHaut - R_.neigeBas);
   let n = clamp((t - clamp(0.5 - 0.8 * bosses(x * 3, z * 3), 0.08, 0.92)) / 0.08, 0, 1);   // (des plaques de plus en plus rares en descendant)
   if (n < 1) { const q = pisteSkiEn(x, z, 12); if (q) n = Math.max(n, clamp((q.p.large + 12 - q.d) / 12, 0, 1)); }
+  // le coin gelé d'une ville (GLACE, à Metropolis : le nord, autour de la Forteresse de Solitude) : tout blanc jusqu'à « rayon » cases, puis
+  // la neige s'en va par plaques, sur un tiers de plus
+  if (GLACE && n < 1) {
+    const c = centre(GLACE.col, GLACE.ligne), t = 1 - (Math.hypot(x - c.x, z - c.z) / (GLACE.rayon * PAS) - 1) / 0.33;
+    n = Math.max(n, clamp((t - clamp(0.5 - 0.8 * bosses(x * 3, z * 3), 0.08, 0.92)) / 0.08, 0, 1));
+  }
   return n;
 }
 // une route prend la hauteur moyenne des cases autour d'elle
@@ -4847,13 +5057,13 @@ function terrainNaturel(x, z) {
   const sm = sommetEn(x, z), sh = sm.lisse;
   h += bosses(x, z) * (1.2 + 0.1 * clamp(h - sh, 0, 270)) + bruitDoux(x / 260, z / 260) * 0.06 * sh + sm.h - sh;
   // autour d'une ville (ou d'une piste), le terrain est à plat sur « plat » mètres, à la hauteur de la ville, puis il rejoint doucement le
-  // reste en « fondu » mètres. La grotte des Dix Anneaux, au pied de sa colline, n'a pas de rues autour : la colline monte tout de suite
+  // reste en « fondu » mètres. La grotte des Dix Anneaux, au pied de sa colline, n'a pas de rues autour : la colline monte tout de suite (sansRues)
   let dmin = Infinity, base = 0, plat = 4, fondu = 40;
   const ci = Math.floor((x - R / 2) / PAS), cj = Math.floor((z - R / 2) / PAS);
   for (let j = cj - 1; j <= cj + 1; j++) for (let i = ci - 1; i <= ci + 1; i++) {
     const c = car(i, j);
     if (!estPlat(c)) continue;
-    const pied = c === ')', m = estPiste(c) ? R / 2 : pied ? R : 0, n = estPiste(c) ? R / 2 : pied ? 0 : R;   // un pâté compte avec ses rues
+    const pied = sansRues(c), m = estPiste(c) ? R / 2 : pied ? R : 0, n = estPiste(c) ? R / 2 : pied ? 0 : R;   // un pâté compte avec ses rues
     const d = Math.hypot(Math.max(i * PAS + m - x, 0, x - (i + 1) * PAS - n), Math.max(j * PAS + m - z, 0, z - (j + 1) * PAS - n));
     if (d < dmin) { dmin = d; base = baseCase[j][i]; [plat, fondu] = pied ? [0, 24] : [4, 40]; }
   }
@@ -4926,8 +5136,8 @@ if (MISSIONS_CH.some(m => m.etapes.some(e => e.type === 'devinettes'))) DEVINETT
 });
 
 // les rues des villes suivent les lignes entre les cases : rueH(i, j) va du carrefour (i, j) à (i + 1, j), rueV(i, j) de (i, j) à (i, j + 1).
-// (Pas de rues autour de la grotte des Dix Anneaux : son camp est dans la montagne)
-const bordeRue = c => (estBloc(c) && c !== ')') || c === '+';
+// (Pas de rues autour de la grotte des Dix Anneaux : son camp est dans la montagne ; ni autour de la Forteresse de Solitude : voir sansRues)
+const bordeRue = c => (estBloc(c) && !sansRues(c)) || c === '+';
 const rueH = (i, j) => bordeRue(car(i, j - 1)) || bordeRue(car(i, j));
 const rueV = (i, j) => bordeRue(car(i - 1, j)) || bordeRue(car(i, j));
 const estCarrefour = (i, j) => rueH(i, j) || rueH(i - 1, j) || rueV(i, j) || rueV(i, j - 1);
@@ -6192,6 +6402,22 @@ const TEX_GOTHAM = {
   }),
 };
 if (GOTHAM) for (const [k, nom] of Object.keys(TEX_GOTHAM).entries()) { await respirer(0.15 + 0.01 * k / 12); TEX[nom] = TEX_GOTHAM[nom](); }   // (un dessin à la fois : voir respirer)
+// --- Metropolis (chapitre 4) : ses façades, dessinées seulement si la carte a ses signes, des tours art déco, ou un coin gelé (METROPOLIS) ---
+const METROPOLIS = ARTDECO > 0 || !!GLACE || !!PONT_SUSPENDU || CARTE.some(l => /[øłµ¡êçß¤]/.test(l));
+const TEX_METROPOLIS = {
+  // les gratte-ciel art déco (et le Daily Planet) : de la pierre claire, un grand pilier entre chaque colonne de fenêtres, et sous chaque
+  // fenêtre, un panneau de métal doré
+  artDeco: () => facade('#d9cfb8', 4, 4, (g, x, y, w, h) => {
+    vitre(g, x + w * .3, y + h * .08, w * .42, h * .7, [44, 62, 84]);
+    g.fillStyle = '#b4934c'; g.fillRect(x + w * .3, y + h * .8, w * .42, h * .1);
+    g.fillStyle = '#ebe3cf'; g.fillRect(x, y, w * .14, h);
+  }, null, 256, 0.45),
+  // la tour LexCorp : du verre vert sombre, entre de fines lames d'acier
+  lexcorp: () => facade('#18211f', 6, 5, (g, x, y, w, h) => { vitre(g, x + 2, y + 1, w - 4, h - 2, [26, 52, 44]); g.fillStyle = '#5a6a66'; g.fillRect(x, y, 2, h); }, null, 256, 0.35),
+  // S.T.A.R. Labs : un mur blanc, et de longues bandes de vitres bleues
+  starLabs: () => facade('#e6eaec', 2, 4, (g, x, y, w, h) => vitre(g, x + 1, y + h * .28, w - 2, h * .46, [40, 86, 140]), null, 256, 0.5),
+};
+if (METROPOLIS) for (const [k, nom] of Object.keys(TEX_METROPOLIS).entries()) { await respirer(0.16 + 0.003 * k); TEX[nom] = TEX_METROPOLIS[nom](); }
 
 // le dessin sert aussi de relief (clair = bosse, foncé = creux). Une façade a des fenêtres qui s'allument la nuit : MATS_FENETRES les garde
 // toutes, pour les allumer (voir « Le jour et la nuit »)
@@ -6279,6 +6505,20 @@ if (GOTHAM) Object.assign(MAT, {
   stadeEnseigne: enseigne('STADE DE GOTHAM', '#fff', '#1a2a5a'), monorailEnseigne: enseigne('MONORAIL', '#fff', '#5a1a1a'),
 });
 if (MAT.rosace) MATS_FENETRES.push(MAT.rosace);
+// Metropolis : ses façades (voir TEX), le bronze de la statue, l'or du globe du Daily Planet, les cristaux de la Forteresse de Solitude, le
+// kaki des tanks, le gris des avions de chasse, le maïs de la ferme Kent, ses enseignes...
+if (METROPOLIS) Object.assign(MAT, {
+  artDeco: std(TEX.artDeco), lexcorp: std(TEX.lexcorp), starLabs: std(TEX.starLabs),
+  bronze: std(null, { color: '#a8844e', metalness: 0.7, roughness: 0.38 }), pierreBlanche: std(null, { color: '#e4e0d6', roughness: 0.7 }),
+  orGlobe: std(null, { color: '#e0b64a', emissive: '#8a6418', emissiveIntensity: 0.25, metalness: 0.85, roughness: 0.28 }),   // le globe du Daily Planet : il brille, doré
+  cristal: std(null, { color: '#9fd6f2', emissive: '#3a9ad8', emissiveIntensity: 0.3, metalness: 0.35, roughness: 0.06, userData: { facettes: true } }),   // les cristaux de la Forteresse : ils luisent, bleu glacier (facettes : voir fusionner)
+  kaki: std(null, { color: '#56603e', roughness: 0.85 }), avionGris: std(null, { color: '#8d959b', metalness: 0.45, roughness: 0.4 }),
+  mais: std(null, { color: '#6f9a34', roughness: 1 }),
+  dailyPlanet: enseigne('DAILY PLANET', '#f6dc8a', '#2a2418'), anneauPlanet: enseigne('DAILY PLANET', '#2a1e08', '#e8c25a'),
+  lexcorpEnseigne: enseigne('LEXCORP', '#8cf08a', '#0c1210'), starLabsEnseigne: enseigne('S.T.A.R. LABS', '#fff', '#1a4a8a'),
+  theatreEnseigne: enseigne('THÉÂTRE', '#ffd23a', '#5a1a6a'), kentEnseigne: enseigne('KENT', '#222', '#e8e4d8'),
+});
+if (MAT.anneauPlanet) MAT.anneauPlanet.map.repeat.set(2, 1);   // (l'anneau du globe : DAILY PLANET deux fois, tout autour)
 // sous un ciel couvert (à Gotham), les fenêtres des tours et des immeubles modernes brillent moins : la ville reste sombre (eclat : 1 = comme d'habitude)
 if (COUVERT) for (const k of ['verre', 'verre2', 'moderne', 'beton', 'brique', 'hopital', 'magasin', 'stark']) MAT[k].userData.eclat = 0.45;
 // sous la pluie (CHAPITRES : pluie, à Gotham), les rues, les trottoirs et les pavés sont mouillés : ils brillent sous les lampadaires et les phares
@@ -6289,7 +6529,8 @@ const DIM_TEX = { brique: [12, 12], beton: [12, 12], moderne: [12, 12], verre: [
   herbe: [6, 6], paves: [4, 4], chateau: [4, 4], carrelage: [2, 2], parquet: [3, 3], planches: [3, 3], grange: [6, 6], tole: [6, 6],
   conteneur1: [6, 2.6], conteneur2: [6, 2.6], conteneur3: [6, 2.6], conteneur4: [6, 2.6], produits: [4, 2],
   marbre: [4, 4], musee: [12, 12], banqueQ: [12, 12], luxe: [8, 4], coffres: [1.2, 1.2], stark: [12, 12], villaStark: [8, 10.8], vueMer: [16, 3.2],
-  gothique: [12, 12], gothiqueTour: [12, 12], manoir: [9, 9], cathedrale: [12, 12], arkham: [9, 9], wayne: [12, 12], pelouse: [8, 8], gradins: [3, 3], pierreNoire: [4, 4], briqueEgout: [3, 3] };
+  gothique: [12, 12], gothiqueTour: [12, 12], manoir: [9, 9], cathedrale: [12, 12], arkham: [9, 9], wayne: [12, 12], pelouse: [8, 8], gradins: [3, 3], pierreNoire: [4, 4], briqueEgout: [3, 3],
+  artDeco: [12, 12], lexcorp: [12, 12], starLabs: [12, 12] };
 // De très loin, une façade n'a plus qu'une couleur : celle de son dessin, fenêtres comprises, tout mélangé (sa moyenne), qu'on voit dans la
 // silhouette des villes (voir construireSilhouette). Mesurées une fois pour toutes sur les textures du jeu, à Los Santos, à Malibu et à Gotham (les
 // lire à chaque chargement le ralentissait de près de 2 secondes sur un ordinateur sans carte graphique). [couleur de loin, vitres, nuit] :
@@ -6301,6 +6542,7 @@ const DE_LOIN = {
   hopital: ['#c0c3c6', 0.45, 1.45], magasin: ['#494041', 0.45, 1.55], musee: ['#b8b09a', 0.27, 1.05], banqueQ: ['#b0a284', 0.27, 1.05], luxe: ['#50442e', 0.58, 3.1],
   maison1: ['#cec7b3', 0.18, 0.55], maison2: ['#a7afb3', 0.18, 0.55], maison3: ['#ce9c7b', 0.18, 0.55], villa: ['#b0b2b0', 0.45, 2.7], stark: ['#55677a', 0.88, 2.9],
   gothique: ['#2e2f35', 0.3, 1.3], gothiqueTour: ['#393b41', 0.36, 1.25], manoir: ['#6f6c67', 0.33, 1.65], cathedrale: ['#4a4547', 0, 1], arkham: ['#3a3833', 0.2, 0.5], wayne: ['#565351', 0.82, 1.7],   // (à Gotham : on ne les voit que sans son brouillard, voir noterSilhouette)
+  artDeco: ['#c1b9a8', 0.3, 1], lexcorp: ['#4d5952', 0.87, 2], starLabs: ['#b6bdc4', 0.45, 1.4],   // (à Metropolis)
   tole: ['#b4b9bc'], bunker: ['#6d6d65'], chateau: ['#736d68'], grange: ['#852b20'],   // (sans fenêtres)
   toit: ['#6f6f6d'], tuiles: ['#7c2f1e'], ardoise: ['#2d0c08'], ardoiseNoire: ['#180503'],   // (les toits)
 };
@@ -6572,8 +6814,8 @@ function maison(mat, toitMat, x, z) {
   toitPente(toitMat, x, 0.2 + h, z, l, p);
   boite('porte', x, 0.2, z + p / 2, 1.2, 2.2, 0.1);
 }
-// un arbre : sorte = 'rond', 'sapin', 'palmier' ou 'cactus' ; y = la hauteur du sol à son pied
-function arbre(x, z, s = 1, y = Y0 + 0.2, sorte = 'rond') { morceauEn(x, z).arbres.push({ x, y, z, s, sorte }); ajouterCollision(x - 0.3, z - 0.3, x + 0.3, z + 0.3, y + 3, y); }
+// un arbre : sorte = 'rond', 'feuillu', 'sapin', 'palmier' ou 'cactus' (sans : celle des villes, ARBRES_VILLE) ; y = la hauteur du sol à son pied
+function arbre(x, z, s = 1, y = Y0 + 0.2, sorte = ARBRES_VILLE) { morceauEn(x, z).arbres.push({ x, y, z, s, sorte }); ajouterCollision(x - 0.3, z - 0.3, x + 0.3, z + 0.3, y + 3, y); }
 
 // Un bâtiment où l'on peut entrer. (x, z) : son centre ; l : sa largeur (le long de la porte) ; p : sa profondeur ; mat : sa façade.
 // etages : les étages qu'on visite (hEtage mètres chacun), reliés par un escalier au fond à gauche ;
@@ -7487,16 +7729,292 @@ function construireSphinx(X, Z, rnd) {
   sphinx = { x: X(30), z: Z(16), y: Y0 + 0.2 };
   Object.assign(lieux['§'].find(q => q.x === X(30) && q.z === Z(30)), { x: X(30), z: Z(42), a: 0 });   // la DeLorean, dans la cour, le nez vers le portail
 }
+// --- Metropolis (chapitre 4) : ses gratte-ciel art déco, et ses monuments (voir VILLES) ---
+// Un gratte-ciel art déco (dans un pâté T, à Metropolis : ARTDECO) : de la pierre claire, en trois gradins de plus en plus étroits, une
+// corniche blanche sur chacun, et tout en haut, soit sa couronne de métal qui brille, en marches, et sa flèche (comme le Chrysler Building),
+// soit son mât (comme l'Empire State Building). l : la largeur du bas ; etages : sa hauteur ; toits : la liste où noter le dessus de son
+// dernier gradin (toursT)
+function tourArtDeco(x, z, l, etages, rnd, toits) {
+  const e1 = Math.round(etages * 0.55), e2 = Math.round(etages * 0.28), e3 = Math.max(3, etages - e1 - e2);
+  let y = 0.2, L = l;
+  [e1, e2, e3].forEach((e, k) => {
+    boitePleine('artDeco', x, y, z, L, e * 3, L, 'toit', 0, 0.5); y += e * 3;
+    boite('pierreBlanche', x, y, z, L + 0.8, 0.5, L + 0.8, true); y += 0.5;   // la corniche (on se pose dessus)
+    if (k < 2) L = Math.round(L * (k ? 0.72 : 0.78));
+  });
+  toits.push({ x, z, l: L, p: L, y: Y0 + y });
+  if (rnd() < 0.5) { // la couronne : quatre marches de métal, de plus en plus petites, puis la flèche
+    let c = L * 0.7, yc = y;
+    for (let k = 0; k < 4; k++) { boite('metal', x, yc, z, c, 2.6, c, true); yc += 2.6; c *= 0.75; }
+    geoBloc('metal', new THREE.ConeGeometry(c * 0.6, L * 0.9, 8).translate(x, yc + L * 0.45, z));
+  } else { // le mât : une petite tour de pierre, puis une longue antenne
+    boite('pierreBlanche', x, y, z, L * 0.45, 6, L * 0.45, true);
+    geoBloc('metal', new THREE.CylinderGeometry(0.25, 0.5, 18, 8).translate(x, y + 6 + 9, z));
+  }
+}
+// Le Daily Planet (ø), le journal où travaille Clark Kent : une tour art déco de pierre claire, en trois gradins, et sur son toit, le
+// grand globe doré qui tourne, entouré de son anneau où l'on lit DAILY PLANET (majGlobe). En bas, le hall, où l'on entre ; un ascenseur
+// monte du fond du hall jusqu'au toit. On se pose sur le toit, autour du globe (une mission y fera s'écraser un hélicoptère : dailyPlanet.toit)
+let dailyPlanet = null;
+function construireDailyPlanet(X, Z, rnd) {
+  sol('paves', X(30), 0.21, Z(51), 56, 14);
+  const b = batiment({ x: X(30), z: Z(26), l: 40, p: 30, mat: 'artDeco', hEtage: 8, largeurPorte: 6, hauteurPorte: 4.5, sol: 'marbre' });
+  b.meuble('bois', 0, 0, 7, 10, 1.1, 1.4);                                           // l'accueil
+  for (const u of [-3, 3]) b.meuble('metal', u, 0, -b.iw + 0.08, 2, 3, 0.1);         // les portes de l'ascenseur, au fond
+  for (const [u, w] of [[-12, -6], [12, -6], [-12, 6], [12, 6]]) b.meuble('pierreBlanche', u, 0, w, 1.4, 8, 1.4);   // de grandes colonnes
+  panneau('dailyPlanet', X(30), 6.3, Z(41.07), 18, 2.2);                            // DAILY PLANET, au-dessus de la porte
+  let y = b.niveau(1) + 0.4, dernier = null;
+  for (const [l, p, h] of [[34, 26, 54], [29, 24, 24], [26, 24, 14]]) { // les trois gradins, et leur corniche
+    boitePleine('artDeco', X(30), y, Z(26), l, h, p, 'toit', 0, 0.6); y += h;
+    boite('pierreBlanche', X(30), y, Z(26), l + 0.8, 0.6, p + 0.8, true); y += 0.6;
+    dernier = [l, p];
+  }
+  const [l, p] = dernier;
+  for (const [x, z, ll, pp] of [[0, -p / 2, l, 0.4], [0, p / 2, l, 0.4], [-l / 2, 0, 0.4, p], [l / 2, 0, 0.4, p]]) boite('pierreBlanche', X(30 + x), y, Z(26 + z), ll, 1.1, pp, true);   // le garde-fou du toit
+  boite('metal', X(30 + l / 2 - 3), y, Z(26 - p / 2 + 3), 3.4, 3, 3, true);            // la cabine de l'ascenseur, en haut
+  ascenseurs.push({ bas: b.point(0, 0, -b.iw + 1.2), haut: { x: X(30 + l / 2 - 3), z: Z(26 - p / 2 + 5.5), y: Y0 + y } });
+  // le globe : son socle, la boule dorée (ses méridiens et ses parallèles en relief), et l'anneau de DAILY PLANET, un peu penché. Ils
+  // tournent ensemble (majGlobe) : ils sont à part, hors des formes fusionnées du pays
+  geoBloc('pierreBlanche', new THREE.CylinderGeometry(2.4, 3, 3, 16).translate(X(30), y + 1.5, Z(26)));
+  const r = 6, boule = [new THREE.SphereGeometry(r, 28, 18)];
+  for (let k = 0; k < 8; k++) boule.push(new THREE.TorusGeometry(r, 0.09, 4, 40).rotateY(k * Math.PI / 8));
+  for (const a of [-50, -25, 25, 50]) { const t = a * Math.PI / 180; boule.push(new THREE.TorusGeometry(r * Math.cos(t), 0.09, 4, 36).rotateX(Math.PI / 2).translate(0, r * Math.sin(t), 0)); }
+  const globe = new THREE.Group(), anneau = new THREE.Mesh(mergeGeometries([new THREE.CylinderGeometry(r + 1.6, r + 1.6, 1.5, 48, 1, true), (() => { const g = new THREE.CylinderGeometry(r + 1.55, r + 1.55, 1.5, 48, 1, true); g.index.array.reverse(); g.computeVertexNormals(); return g; })()]), MAT.anneauPlanet);
+  anneau.rotation.z = 0.28;
+  globe.add(new THREE.Mesh(mergeGeometries(boule), MAT.orGlobe), anneau);
+  globe.position.set(X(30), Y0 + y + 3 + r, Z(26));
+  globe.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } });
+  scene.add(globe);
+  collisionRonde(X(30), Z(26), 2.6, Y0 + y, Y0 + y + 3);   // (le socle...
+  collisionRonde(X(30), Z(26), r * 0.85, Y0 + y + 3 + r * 0.3, Y0 + y + 3 + 2 * r);   // ...puis la boule, au-dessus)
+  dailyPlanet = { x: X(30), z: Z(26), y: Y0 + y, toit: { x: X(30), z: Z(26 + p / 2 - 2.5), y: Y0 + y }, globe, hall: b, porte: b.point(0, 0, b.iw - 1) };   // (toit : au bord du toit, au sud, devant le globe)
+  Object.assign(lieux['ø'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(50) });   // le lieu des missions : sur la place, devant la porte
+}
+// le globe du Daily Planet tourne doucement, à chaque image (un tour en 40 s)
+function majGlobe(dt) { if (dailyPlanet) dailyPlanet.globe.rotation.y += dt * 2 * Math.PI / 40; }
+// La tour LexCorp (ł), celle de Lex Luthor : la plus haute de la ville (228 m). Un socle de verre vert sombre, puis la tour, en trois gradins,
+// LEXCORP en lettres vertes sur les quatre côtés du dernier, et sur le toit, l'héliport de Lex Luthor et son garde-fou (lexcorp.toit :
+// une mission s'y battra). On n'y entre pas : Superman y monte en volant
+let lexcorp = null;
+function construireLexCorp(X, Z, rnd) {
+  sol('paves', X(30), 0.21, Z(52), 56, 12);
+  boitePleine('lexcorp', X(30), 0.2, Z(28), 42, 14, 34, 'toit', 0, 0.6); boite('metal', X(30), 14.2, Z(28), 42.6, 0.6, 34.6, true);
+  boite('porte', X(30), 0.2, Z(45.06), 8, 5, 0.12);
+  panneau('lexcorpEnseigne', X(30), 9.5, Z(45.08), 22, 3.2);
+  let y = 14.8, L = 0;
+  for (const l of [[32, 140], [27, 46], [23, 26]]) { // les trois gradins, et une fine ligne d'acier en haut de chacun
+    L = l[0];
+    boitePleine('lexcorp', X(30), y, Z(28), L, l[1], L, 'toit', 0, 0.6); y += l[1];
+    boite('metal', X(30), y, Z(28), L + 0.6, 0.6, L + 0.6, true); y += 0.6;
+  }
+  for (let a = 0; a < 4; a++) geoBloc('lexcorpEnseigne', new THREE.PlaneGeometry(17, 3.8).translate(0, 0, L / 2 + 0.06).rotateY(a * Math.PI / 2).translate(X(30), y - 6.5, Z(28)));   // LEXCORP, en haut
+  sol('helipad', X(30), y + 0.01, Z(28), 15, 15);   // l'héliport
+  for (const [x, z, ll, pp] of [[0, -L / 2, L, 0.4], [0, L / 2, L, 0.4], [-L / 2, 0, 0.4, L], [L / 2, 0, 0.4, L]]) boite('metal', X(30 + x), y, Z(28 + z), ll, 1.2, pp, true);   // le garde-fou
+  boite('metal', X(30 + L / 2 - 2), y, Z(28 - L / 2 + 2), 0.5, 16, 0.5, true);        // l'antenne
+  boite('lampe', X(30 + L / 2 - 2), y + 16, Z(28 - L / 2 + 2), 0.5, 0.3, 0.5);
+  lexcorp = { x: X(30), z: Z(28), y: Y0 + y, toit: { x: X(30), z: Z(28), y: Y0 + y } };
+  Object.assign(lieux['ł'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(52) });   // le lieu des missions : sur la place, devant la porte
+}
+// S.T.A.R. Labs (µ), le laboratoire : un bâtiment blanc et ses longues vitres bleues, et sur son toit, le grand dôme de l'observatoire.
+// En bas, le grand hall où l'on entre (le magasin de Superman y sera : starLabs.hall), ses paillasses et ses écrans, et une grande machine
+let starLabs = null;
+function construireStarLabs(X, Z, rnd) {
+  sol('paves', X(30), 0.21, Z(50), 56, 16);
+  const b = batiment({ x: X(30), z: Z(24), l: 44, p: 30, mat: 'starLabs', hEtage: 8, largeurPorte: 6, hauteurPorte: 4, sol: 'carrelage' });
+  panneau('starLabsEnseigne', X(30), 6, Z(39.07), 18, 2.2);                         // S.T.A.R. LABS, au-dessus de la porte
+  b.meuble('blanc', 0, 0, 8, 10, 1.1, 1.2);                                          // l'accueil
+  for (const u of [-15, -9, 9, 15]) { b.meuble('blanc', u, 0, -5, 4, 1, 1.6); b.meuble('ecran', u, 0, -5.4, 1.6, 0.6, 0.08, 1); }   // les paillasses et leurs écrans
+  b.meuble('metal', 0, 0, -11, 8, 5, 2.4); b.meuble('ecran', 0, 0, -9.75, 5, 2, 0.1, 1.5);   // la grande machine, au fond
+  const yt = b.niveau(1) + 0.4;
+  geoBloc('metal', new THREE.SphereGeometry(12, 28, 12, 0, 2 * Math.PI, 0, Math.PI / 2).translate(X(30), yt, Z(22)));   // le dôme
+  for (const [r, h] of [[12, 4], [10.4, 7.5], [7, 10.5], [3.5, 11.8]]) collisionRonde(X(30), Z(22), r, Y0 + yt, Y0 + yt + h);   // (le dôme : en marches)
+  starLabs = { x: X(30), z: Z(24), y: Y0 + 0.2, hall: b, porte: b.point(0, 0, b.iw - 1), dome: { x: X(30), z: Z(22), y: Y0 + yt + 12 } };
+  Object.assign(lieux['µ'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(49) });   // le lieu des missions : sur la place, devant la porte
+}
+// La statue de Superman (¡), au milieu de Centennial Park : un géant de bronze de 18 m, les poings sur les hanches, la cape au vent, sur un
+// grand socle de pierre blanche. Avec la fille du menu, c'est Supergirl (sa jupe, ses longs cheveux). Ses deux formes sont faites au
+// chargement : on passe de l'une à l'autre quand on change de héros dans le menu (voir majHeros)
+let statueSuper = null;
+function formeStatue(fille) {
+  const V = (x, y, z) => new THREE.Vector3(x, y, z), haut = V(0, 1, 0), formes = [];
+  const membre = (a, b, r, r2 = r) => { // un cylindre de a à b (de rayon r en a, r2 en b)
+    const d = b.clone().sub(a), g = new THREE.CylinderGeometry(r2, r, d.length(), 10);
+    g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(haut, d.normalize()));
+    formes.push(g.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2));
+  };
+  const boule = (x, y, z, r, sx = 1, sy = 1, sz = 1) => formes.push(new THREE.SphereGeometry(r, 14, 10).scale(sx, sy, sz).translate(x, y, z));
+  const envers = g => { const e = g.clone(); e.index.array.reverse(); e.computeVertexNormals(); return e; };   // (une pièce mince : on voit aussi son dedans)
+  const e = fille ? 0.84 : 1;   // (Supergirl : des épaules plus fines)
+  for (const s of [-1, 1]) { membre(V(s * 0.1, 0.95, 0), V(s * 0.15, 0.1, 0.02), 0.085, 0.07); boule(s * 0.15, 0.07, 0.06, 0.08, 1, 0.7, 1.7); }   // les jambes, un peu écartées, et les bottes
+  formes.push(new THREE.CylinderGeometry(0.16 * e, 0.15, 0.24, 12).scale(1, 1, 0.65).translate(0, 1.0, 0));        // le bassin
+  formes.push(new THREE.CylinderGeometry(0.24 * e, 0.16 * e, 0.52, 12).scale(1, 1, 0.62).translate(0, 1.36, 0.01)); // le torse, la poitrine en avant
+  membre(V(0, 1.6, 0), V(0, 1.72, 0.01), 0.05);                                                                    // le cou
+  boule(0, 1.81, 0.02, 0.105, 0.9, 1.12, 1); boule(0, 1.85, -0.01, 0.106, 0.95, 0.9, 1);                          // la tête, et les cheveux
+  for (const s of [-1, 1]) { // les bras : les poings sur les hanches, les coudes en dehors
+    const epaule = V(s * 0.25 * e, 1.56, 0), coude = V(s * 0.4 * e, 1.26, -0.05), poing = V(s * 0.18, 1.06, 0.02);
+    boule(epaule.x, epaule.y, epaule.z, 0.078); membre(epaule, coude, 0.065, 0.055); membre(coude, poing, 0.052, 0.045); boule(poing.x, poing.y, poing.z, 0.058);
+  }
+  formes.push(new THREE.CylinderGeometry(0.11, 0.11, 0.03, 5).rotateX(Math.PI / 2).scale(1.2 * e, 0.95, 1).translate(0, 1.44, 0.165));   // l'écusson : un pentagone, la pointe en bas
+  const cape = new THREE.CylinderGeometry(0.22 * e, 0.44, 1.3, 14, 1, true, Math.PI * 0.6, Math.PI * 0.8).scale(1.15, 1, 0.8).rotateX(-0.14).translate(0, 0.94, -0.08);
+  formes.push(cape, envers(cape));   // la cape, qui s'évase et flotte un peu au vent
+  if (fille) { // Supergirl : sa jupe, et ses longs cheveux dans le dos
+    const jupe = new THREE.CylinderGeometry(0.16, 0.26, 0.24, 14, 1, true).translate(0, 0.9, 0);
+    formes.push(jupe, envers(jupe), new THREE.BoxGeometry(0.21, 0.46, 0.06).translate(0, 1.6, -0.095));
+  }
+  return mergeGeometries(formes).scale(9.5, 9.5, 9.5);
+}
+function construireStatue(X, Z, rnd) {
+  sol('herbe', X(30), 0.21, Z(30), S - 4, S - 4);
+  sol('paves', X(30), 0.215, Z(30), 24, 24);
+  for (const [x, z, l, p] of [[30, 51, 5, 18], [30, 9, 5, 18], [9, 30, 18, 5], [51, 30, 18, 5]]) sol('paves', X(x), 0.217, Z(z), l, p);   // les allées, vers les quatre côtés
+  boite('pierreBlanche', X(30), 0.2, Z(30), 13, 0.7, 13, true);                     // les marches du socle...
+  boite('pierreBlanche', X(30), 0.9, Z(30), 9, 5.5, 9, true);                       // ...et le socle
+  for (const [a, b] of [[8, 8], [52, 8], [8, 52], [52, 52], [18, 4], [42, 56]]) arbre(X(a), Z(b), 1 + rnd() * 0.3);
+  for (const [x, z, a] of [[19, 30, Math.PI / 2], [41, 30, Math.PI / 2], [30, 19, 0], [30, 41, 0]]) geoBloc('bois', new THREE.BoxGeometry(2.4, 0.45, 0.6).rotateY(a).translate(X(x), 0.65, Z(z)));   // des bancs
+  const y = Y0 + 6.4, formes = { garcon: formeStatue(false), fille: formeStatue(true) }, m = new THREE.Mesh(formes[fille() ? 'fille' : 'garcon'], MAT.bronze);
+  m.position.set(X(30), y, Z(30)); m.castShadow = m.receiveShadow = true; scene.add(m);
+  ajouterCollision(X(30) - 2, Z(30) - 1.6, X(30) + 2, Z(30) + 1.6, y + 17.6, y);
+  statueSuper = { mesh: m, x: X(30), z: Z(30), y, formes };
+  Object.assign(lieux['¡'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(48) });   // le lieu des missions : dans l'allée, au sud de la statue
+}
+// on change de héros dans le menu : la statue devient Supergirl (ou Superman)
+function majStatue() { if (statueSuper) statueSuper.mesh.geometry = statueSuper.formes[fille() ? 'fille' : 'garcon']; }
+// La Forteresse de Solitude (ê), dans le nord gelé (GLACE) : un cercle de cristaux de glace géants (jusqu'à 58 m), qui penchent vers le
+// dehors, autour d'une cour ronde ouverte au sud ; au milieu, le cœur de la forteresse, un petit cercle de cristaux (une mission y
+// fera parler l'hologramme du père de Superman : forteresse.coeur). Tout autour, d'autres cristaux, plus petits, sortent de la glace.
+// Elle est dans son groupe à part (comme la villa de Tony Stark : aPart), pour qu'une mission puisse la faire pousser
+let forteresse = null;
+function construireForteresse(X, Z, rnd) {
+  const F = aPart = forteresse = { geos: {}, boites: [], interieurs: interieurs.length, x: X(30), z: Z(28), y: Y0, coeur: { x: X(30), z: Z(28), y: Y0 }, entree: { x: X(30), z: Z(46), y: Y0 } };
+  const haut = new THREE.Vector3(0, 1, 0);
+  // un cristal : un prisme à six faces, et sa pointe, penché de « a » vers (dx, dz) ; ses boîtes de collision suivent sa pente, en trois morceaux
+  const cristal = (x, z, r, h, a, dx = 0, dz = 0) => {
+    const g = mergeGeometries([new THREE.CylinderGeometry(r * 0.92, r, h, 6).translate(0, h / 2, 0), new THREE.ConeGeometry(r * 0.92, r * 2.6, 6).translate(0, h + r * 1.3, 0)]);
+    const dir = new THREE.Vector3(dx * Math.sin(a), Math.cos(a), dz * Math.sin(a)).normalize();
+    geoBloc('cristal', g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(haut, dir)).translate(x, -0.5, z));
+    for (let k = 0; k < 3; k++) {
+      const t = (k + 0.5) / 3 * h, cx = x + dir.x * t, cz = z + dir.z * t, c = r * 0.85;
+      ajouterCollision(cx - c, cz - c, cx + c, cz + c, Y0 - 0.5 + dir.y * h * (k + 1) / 3 + (k === 2 ? r * 1.6 : 0), Y0 - 0.5 + dir.y * h * k / 3);
+    }
+  };
+  for (let k = 0; k < 15; k++) { // le grand cercle, ouvert au sud (là où l'on entre : vers +z, l'angle d'un quart de tour)
+    const ang = Math.PI / 2 + 0.6 + (k + 0.5) * (2 * Math.PI - 1.2) / 15, d = 15 + rnd() * 4, dx = Math.cos(ang), dz = Math.sin(ang);
+    cristal(X(30) + dx * d, Z(28) + dz * d, 2.8 + rnd() * 2, 24 + rnd() * 34 * (1 - 0.4 * Math.max(0, dz)), 0.08 + rnd() * 0.16, dx, dz);
+  }
+  for (let k = 0; k < 20; k++) { // les petits, autour
+    const ang = rnd() * 2 * Math.PI, d = 22 + rnd() * 8;
+    if (Math.abs(ang - Math.PI / 2) < 0.4) continue;   // (le chemin de l'entrée reste libre)
+    cristal(X(30) + Math.cos(ang) * d, Z(28) + Math.sin(ang) * d, 0.8 + rnd() * 1.1, 4 + rnd() * 12, rnd() * 0.5, Math.cos(ang), Math.sin(ang));
+  }
+  for (let k = 0; k < 6; k++) { const ang = k * Math.PI / 3; cristal(X(30) + Math.cos(ang) * 2.6, Z(28) + Math.sin(ang) * 2.6, 0.35, 1.4 + (k % 2) * 0.8, 0.15, Math.cos(ang), Math.sin(ang)); }   // le cœur
+  aPart = null; F.interieurs = interieurs.slice(F.interieurs);
+  Object.assign(lieux['ê'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(48) });   // le lieu des missions : devant l'entrée, au sud
+}
+// La ferme Kent (ç), à Smallville : la maison blanche des Kent, sa véranda et son toit d'ardoise ; la grange rouge (on y entre : du foin
+// en bas et au grenier), le silo, et au sud, un grand champ de maïs (on y passe à travers). La boîte aux lettres KENT, au bord de la rue,
+// et le pick-up de Jonathan Kent
+let fermeKent = null;
+function construireFermeKent(X, Z, rnd) {
+  sol('herbe', X(30), 0.21, Z(30), S - 2, S - 2);
+  sol('terre', X(30), 0.215, Z(45), 54, 22);                                          // la terre du champ
+  // le chemin de terre, du bout de la route de campagne (au nord, à 44 m du pâté : la ferme n'a pas de rues autour, voir sansRues) jusqu'à
+  // la cour : des bouts de 2 m, posés sur le terrain
+  for (let z = -44; z < 14; z += 2) {
+    const y = z < 0 ? Math.max(hauteurTerrain(X(30), Z(z + 1)), hauteurTerrain(X(28), Z(z + 1)), hauteurTerrain(X(32), Z(z + 1))) + 0.06 - Y0 : 0.215;
+    geoBloc('terre', new THREE.PlaneGeometry(5, 2.05).rotateX(-Math.PI / 2).translate(X(30), y, Z(z + 1)));
+  }
+  boitePleine('maison1', X(16), 0.2, Z(16), 14, 7, 10, 'ardoise', 0.866 * 11 * 0.55); toitPente('ardoise', X(16), 7.2, Z(16), 14, 10);   // la maison
+  boite('porte', X(16), 0.5, Z(21.06), 1.3, 2.2, 0.1);
+  boite('planches', X(16), 0.2, Z(22.4), 14, 0.3, 2.6, true);                          // la véranda : son plancher, ses poteaux, son toit
+  for (const x of [9.3, 16, 22.7]) boite('blanc', X(x), 0.5, Z(23.5), 0.2, 2.5, 0.2, true);
+  boite('blanc', X(16), 3, Z(22.4), 14.4, 0.2, 2.9);
+  const b = batiment({ x: X(42), z: Z(18), l: 16, p: 20, mat: 'grange', etages: 2, hEtage: 3.5, largeurPorte: 5, hauteurPorte: 3.2, sol: 'planches', mur: 'grange' });
+  toitPente('ardoise', X(42), 0.2 + 7.05, Z(18), 16, 20, 0.4);
+  for (let k = 0; k < 5; k++) b.meuble('paille', -4 + (k % 3) * 2.3, 0, 4 - Math.floor(k / 3) * 1.4, 2, 1, 1.2);
+  for (let k = 0; k < 4; k++) b.meuble('paille', 1 + k * 1.6, 1, 5, 1.4, 1, 1.2);
+  geoBloc('metal', new THREE.CylinderGeometry(3, 3, 13, 16).translate(X(54), 6.7, Z(10)));   // le silo
+  geoBloc('metal', new THREE.SphereGeometry(3.05, 16, 8, 0, 2 * Math.PI, 0, Math.PI / 2).translate(X(54), 13.2, Z(10)));
+  collisionRonde(X(54), Z(10), 3, Y0, Y0 + 16);
+  const tiges = [];   // le maïs : des rangées de tiges vertes (une seule forme), avec une allée au milieu
+  for (let x = 5; x < 56; x += 1.6) for (let z = 36; z < 56; z += 1.3) if (Math.abs(x - 30) > 2.5) tiges.push(new THREE.ConeGeometry(0.22, 2.2 + rnd() * 0.5, 5).translate(X(x + rnd() * 0.5), 1.3, Z(z + rnd() * 0.4)));
+  geoBloc('mais', mergeGeometries(tiges));
+  boite('bois', X(34), 0.2, Z(1.5), 0.15, 1.1, 0.15); boite('metal', X(34), 1.3, Z(1.5), 0.5, 0.35, 0.7);   // la boîte aux lettres, au bord du chemin...
+  panneau('kentEnseigne', X(34), 1.75, Z(1.14), 0.8, 0.3, Math.PI);                   // ...et son nom, vers la route
+  for (const [a, c] of [[4, 4], [28, 6], [6, 28], [56, 28]]) arbre(X(a), Z(c), 1.1 + rnd() * 0.3);
+  voituresGarees.push({ x: X(29), z: Z(24), a: Math.PI / 2, type: '4x4 du désert' });   // le pick-up de Jonathan Kent
+  fermeKent = { x: X(30), z: Z(30), y: Y0 + 0.2, maison: { x: X(16), z: Z(24.4), y: Y0 + 0.5 }, grange: b, champ: { x: X(30), z: Z(46), y: Y0 + 0.2 } };
+  Object.assign(lieux['ç'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(28) });   // le lieu des missions : dans la cour, entre la maison et la grange
+}
+// La base militaire (ß) : le béton, une clôture (la grande porte au sud, et au nord, l'ouverture vers sa piste), un hangar à toit rond, la
+// tour de contrôle, une caserne, une antenne radar, un mât et son drapeau ; et garés, quatre tanks et deux avions de chasse, prêts à
+// partir (pour l'instant, du décor : baseMilitaire.tanks, baseMilitaire.avions)
+let baseMilitaire = null;
+const GEO_TANK = METROPOLIS ? { // un tank, tourné vers le sud (+z) : la caisse, la tourelle et son canon, kaki ; les chenilles, noires
+  kaki: mergeGeometries([new THREE.BoxGeometry(3.4, 1.1, 6.4).translate(0, 0.95, 0), new THREE.BoxGeometry(2.4, 0.85, 2.8).translate(0, 1.92, -0.3),
+    new THREE.CylinderGeometry(0.1, 0.14, 4.4, 8).rotateX(Math.PI / 2).translate(0, 1.95, 3.1), new THREE.CylinderGeometry(0.4, 0.4, 0.22, 10).translate(0.55, 2.45, -0.7)]),
+  noirMeuble: mergeGeometries([-1, 1].map(s => new THREE.BoxGeometry(0.8, 1, 6.8).translate(s * 1.75, 0.5, 0))),
+} : null;
+const GEO_AVION_CHASSE = METROPOLIS ? { // un avion de chasse, le nez vers le sud (+z) : le fuselage, ses ailes en flèche, ses dérives ; le cockpit
+  avionGris: mergeGeometries([new THREE.CylinderGeometry(0.75, 0.6, 12, 12).rotateX(Math.PI / 2).translate(0, 1.9, 0), new THREE.ConeGeometry(0.75, 3, 12).rotateX(Math.PI / 2).translate(0, 1.9, 7.5),
+    ...[-1, 1].flatMap(s => [new THREE.BoxGeometry(4.6, 0.14, 2.6).translate(s * 2.6, 0, 0).rotateY(s * 0.35).translate(0, 1.7, -1),
+      new THREE.BoxGeometry(0.14, 2.2, 2).rotateZ(s * 0.25).translate(s * 0.7, 2.9, -5), new THREE.BoxGeometry(2, 0.12, 1.4).translate(s * 1.6, 1.8, -5.3)])]),
+  noirMeuble: mergeGeometries([new THREE.SphereGeometry(0.6, 10, 8).scale(1, 0.8, 2.2).translate(0, 2.55, 3.2),
+    ...[[0, 5], [-1.3, -1.2], [1.3, -1.2]].map(([x, z]) => new THREE.CylinderGeometry(0.25, 0.25, 0.25, 8).rotateZ(Math.PI / 2).translate(x, 0.35, z))]),
+} : null;
+function construireBase(X, Z, rnd) {
+  sol('beton2', X(30), 0.21, Z(30), S - 2, S - 2);
+  for (const [x, z, l, p] of [[1.5, 30, 0.12, 57], [58.5, 30, 0.12, 57], [12.5, 58.5, 22, 0.12], [47.5, 58.5, 22, 0.12], [8.5, 1.5, 14, 0.12], [51.5, 1.5, 14, 0.12]])
+    boite('rambarde', X(x), 0.2, Z(z), l, 2.6, p, true);   // la clôture (la porte au sud : 13 m ; au nord, 29 m, vers la piste)
+  boitePleine('tole', X(14), 0.2, Z(22), 20, 7, 22, 'toit'); toitLong('tole', X(14), 7.2, Z(22), 22, 20, 0.5, true);   // le hangar
+  boite('porte', X(14), 0.2, Z(33.06), 14, 6, 0.12);
+  boite('beton', X(53), 0.2, Z(24), 4, 14, 4, true); boite('verre', X(53), 14.2, Z(24), 6.4, 3, 6.4, true); boite('toit', X(53), 17.2, Z(24), 7, 0.4, 7, true);   // la tour de contrôle
+  boitePleine('beton', X(12), 0.2, Z(48), 18, 4, 9, 'toit'); boite('toit', X(12), 4.2, Z(48), 18.5, 0.4, 9.5, true);   // la caserne
+  boite('metal', X(52), 0.2, Z(52), 0.4, 7, 0.4, true);                                // l'antenne radar
+  geoBloc('metal', new THREE.CylinderGeometry(2.4, 0.4, 0.9, 16).rotateX(-0.9).translate(X(52), 7.6, Z(52)));   // (sa parabole)
+  boite('metal', X(21), 0.2, Z(55), 0.18, 10, 0.18); boite('bleu', X(22.2), 8.4, Z(55), 2.2, 1.4, 0.05); boite('rouge', X(22.2), 8.9, Z(55), 2.2, 0.3, 0.06);   // le mât et son drapeau
+  const tanks = [], avions = [];
+  for (const x of [30, 37, 44, 51]) { // les tanks, en rang, tournés vers la porte
+    for (const m in GEO_TANK) geoBloc(m, GEO_TANK[m].clone().translate(X(x), 0.2, Z(40)));
+    ajouterCollision(X(x) - 2.15, Z(40) - 3.5, X(x) + 2.15, Z(40) + 3.5, Y0 + 2.6, Y0); ajouterCollision(X(x) - 0.2, Z(40) + 3.5, X(x) + 0.2, Z(40) + 5.4, Y0 + 2.3, Y0 + 1.8);   // (et son canon)
+    tanks.push({ x: X(x), z: Z(40), y: Y0 + 0.2, a: 0 });
+  }
+  for (const x of [31, 42]) { // les avions de chasse, le nez vers la piste, au nord
+    for (const m in GEO_AVION_CHASSE) geoBloc(m, GEO_AVION_CHASSE[m].clone().rotateY(Math.PI).translate(X(x), 0.2, Z(14)));
+    ajouterCollision(X(x) - 1, Z(14) - 9, X(x) + 1, Z(14) + 6.5, Y0 + 3, Y0); ajouterCollision(X(x) - 5.2, Z(14) - 1, X(x) + 5.2, Z(14) + 3.4, Y0 + 2.05, Y0 + 1.6);
+    avions.push({ x: X(x), z: Z(14), y: Y0 + 0.2, a: Math.PI });
+  }
+  baseMilitaire = { x: X(30), z: Z(30), y: Y0 + 0.2, tanks, avions };
+  Object.assign(lieux['ß'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(56) });   // le lieu des missions : juste derrière la porte
+}
+// Le vieux théâtre (¤), à Suicide Slum : une vieille salle de brique, sa marquise et ses ampoules, et THÉÂTRE, en lettres jaunes sur fond
+// violet (les couleurs de Mister Mxyzptlk). Devant, une cour fermée par un mur, son portail au sud. La DeLorean y attend, le nez vers le
+// portail (la cachette du chapitre 4 : CHAPITRES, cachette)
+let theatre = null;
+function construireTheatre(X, Z, rnd) {
+  sol('paves', X(30), 0.215, Z(43), 50, 26);
+  boitePleine('brique', X(30), 0.2, Z(16), 46, 14, 22, 'toit', 0, 0.5); boite('toit', X(30), 14.2, Z(16), 46.5, 0.5, 22.5, true);
+  boite('porte', X(30), 0.2, Z(27.06), 5, 4, 0.12);
+  boite('rouge', X(30), 4.6, Z(28.6), 18, 0.7, 3.2);                                   // la marquise, et ses ampoules
+  for (let k = 0; k < 12; k++) boite('lampe', X(21.8 + k * 1.5), 4.35, Z(30.1), 0.25, 0.25, 0.25);
+  panneau('theatreEnseigne', X(30), 8.4, Z(27.08), 16, 3);
+  const mur = (a, b, l, p) => { boite('chateau', X(a), 0.2, Z(b), l, 3.6, p, true); boite('pierre', X(a), 3.8, Z(b), l + 0.3, 0.25, p + 0.3); };   // (un vrai mur de cour : des pierres, sans fenêtres, et son chaperon)
+  mur(4, 42, 0.8, 30); mur(56, 42, 0.8, 30); mur(14, 56.6, 20, 0.8); mur(46, 56.6, 20, 0.8);   // (le portail, au sud : 12 m)
+  for (const a of [24, 36]) { boite('chateau', X(a), 0.2, Z(56.6), 1.6, 4.4, 1.6, true); boite('jaune', X(a), 4.6, Z(56.6), 1, 1, 1); }
+  theatre = { x: X(30), z: Z(16), y: Y0 + 0.2, porte: { x: X(30), z: Z(28), y: Y0 + 0.2 } };
+  Object.assign(lieux['¤'].find(q => q.x === X(30) && q.z === Z(30)), { x: X(30), z: Z(42), a: 0 });   // la DeLorean, dans la cour, le nez vers le portail
+}
+
 function genererBloc(i, j) {
   const c = CARTE[j][i], o = origine(i, j), rnd = graine(i * 7919 + j * 104729);
   const X = v => o.x + v, Z = v => o.z + v;
   Y0 = baseCase[j][i];
-  if (c !== ')') { // (le camp de la grotte des Dix Anneaux est dans la montagne : ni trottoir, ni lampadaires)
+  if (!sansRues(c)) { // (le camp de la grotte des Dix Anneaux est dans la montagne, la Forteresse de Solitude dans la glace : ni trottoir, ni lampadaires)
     if (c !== '{' || !BATCAVE) boite('trottoir', X(S / 2), 0, Z(S / 2), S, 0.2, S);
     else for (const [a, b, d, e] of [[0, 0, S, 49.2], [0, 50.8, S, S], [0, 49.2, 11.2, 50.8], [12.8, 49.2, S, 50.8]]) boite('trottoir', X((a + d) / 2), 0, Z((b + e) / 2), d - a, 0.2, e - b);   // (le manoir Wayne : le trou du vieux puits, au-dessus de la Batcave)
-    for (const k of [12, 30, 48]) { // lampadaires sur les 4 côtés
+    for (let n = 0; n < LAMPADAIRES; n++) { // lampadaires sur les 4 côtés (LAMPADAIRES de chaque côté : 3, à 12, 30 et 48 m du coin)
+      const k = 30 + (n - (LAMPADAIRES - 1) / 2) * 54 / LAMPADAIRES;
       for (const l of [{ x: X(k), z: Z(0.8), a: Math.PI }, { x: X(k), z: Z(S - 0.8), a: 0 }, { x: X(0.8), z: Z(k), a: -Math.PI / 2 }, { x: X(S - 0.8), z: Z(k), a: Math.PI / 2 }])
-        morceauEn(l.x, l.z).lampadaires.push({ ...l, y: Y0 + 0.2 });
+        if (!(l.a === 0 && Math.abs(k - 30) < 8 && 'ø¤µłß'.includes(c))) morceauEn(l.x, l.z).lampadaires.push({ ...l, y: Y0 + 0.2 });   // (pas devant la porte d'un monument de Metropolis, au sud)
     }
   }
   const herbe = () => sol('herbe', X(S / 2), 0.21, Z(S / 2), S - 4, S - 4);
@@ -7515,6 +8033,9 @@ function genererBloc(i, j) {
     if (estGothique(i, j, rnd)) { // à Gotham, dans le vieux quartier : de vieux gratte-ciel gothiques, pointus
       if (rnd() < 0.5) tourGothique(X(30), Z(30), 34, 20 + Math.floor(rnd() * 18), rnd, toits);
       else for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) tourGothique(X(a), Z(b), 22, 12 + Math.floor(rnd() * 16), rnd, toits);
+    } else if (ARTDECO && rnd() < ARTDECO) { // à Metropolis : de vieux gratte-ciel art déco, en gradins
+      if (rnd() < 0.5) tourArtDeco(X(30), Z(30), 34, 24 + Math.floor(rnd() * 20), rnd, toits);
+      else for (const [a, b] of [[17, 17], [43, 17], [17, 43], [43, 43]]) tourArtDeco(X(a), Z(b), 22, 14 + Math.floor(rnd() * 16), rnd, toits);
     } else if (rnd() < 0.5) {
       const e = 20 + Math.floor(rnd() * 20), m = hasardR(mats, rnd);
       tour(m, X(30), Z(30), 33, 33, e);
@@ -7536,7 +8057,7 @@ function genererBloc(i, j) {
     herbe();
     sol('paves', X(S / 2), 0.22, Z(S / 2), 4, S - 8); sol('paves', X(S / 2), 0.225, Z(S / 2), S - 8, 4);
     boite('pierre', X(30), 0.2, Z(30), 8, 0.7, 8, true); boite('eau', X(30), 0.2, Z(30), 7, 0.75, 7);
-    for (let k = 0; k < 14; k++) { const a = 8 + rnd() * 44, b = 8 + rnd() * 44; if (Math.abs(a - 30) > 5 && Math.abs(b - 30) > 5) arbre(X(a), Z(b), 0.8 + rnd() * 0.7); }
+    for (let k = 0; k < ARBRES_PARC; k++) { const a = 8 + rnd() * 44, b = 8 + rnd() * 44; if (Math.abs(a - 30) > 5 && Math.abs(b - 30) > 5) arbre(X(a), Z(b), 0.8 + rnd() * 0.7); }
     soins.push({ x: X(34), z: Z(26) });
   } else if (c === 'H') { // l'hôpital : on entre dans le hall
     hopitaux.push({ x: X(30), z: Z(S - 2) });
@@ -8138,6 +8659,14 @@ function genererBloc(i, j) {
   else if (c === '}') construireZoo(X, Z, rnd);
   else if (c === '°') construireStade(X, Z, rnd);
   else if (c === '§') construireSphinx(X, Z, rnd);
+  else if (c === 'ø') construireDailyPlanet(X, Z, rnd);   // les monuments de Metropolis (voir plus haut, et VILLES)
+  else if (c === 'ł') construireLexCorp(X, Z, rnd);
+  else if (c === 'µ') construireStarLabs(X, Z, rnd);
+  else if (c === '¡') construireStatue(X, Z, rnd);
+  else if (c === 'ê') construireForteresse(X, Z, rnd);
+  else if (c === 'ç') construireFermeKent(X, Z, rnd);
+  else if (c === 'ß') construireBase(X, Z, rnd);
+  else if (c === '¤') construireTheatre(X, Z, rnd);
   else if (c === 'Y') { // une station de ski : une place enneigée et un chalet, derrière la gare du télésiège (construite avec le télésiège)
     sol('neige', X(30), 0.21, Z(30), S, S);
     const l = TELESIEGES.find(q => q.bas.x === X(30) && q.bas.z === Z(30));
@@ -8952,6 +9481,71 @@ for (let j = 0; j < NBZ; j++) for (let i = 0; i < NBX; i++) {
   }
 }
 
+// Le grand pont suspendu de Metropolis (PONT_SUSPENDU, dans VILLES) : sur la route qui passe sur l'eau, deux grandes tours de pierre
+// blanche, chacune faite de deux piliers (un de chaque côté de la route) reliés par deux poutres ; les deux câbles qui pendent, tout
+// droit, de l'une à l'autre, et retombent de chaque tour jusqu'à un massif de pierre, au bout du pont ; et leurs suspentes, qui tiennent le
+// tablier. grandPont : ses tours, sa route, et les numéros de ses points sur l'eau (de, a) : une mission le fera s'écrouler, avec un bus dessus
+let grandPont = null;
+if (PONT_SUSPENDU) {
+  const plusPres = ([c, l]) => { // le point de route au-dessus de l'eau le plus près de cette case
+    const q = centre(c, l); let m = null;
+    for (const r of ROUTES) r.forEach((p, k) => { if (p.pont && k > 0 && k < r.length - 1 && (!m || dist(p, q) < dist(m.r[m.k], q))) m = { r, k }; });
+    return m;
+  };
+  const [A, B] = PONT_SUSPENDU.tours.map(plusPres);
+  if (!A || !B || A.r !== B.r || A.k === B.k) alert("PONT_SUSPENDU : ses deux tours doivent être sur une même route qui passe sur l'eau (#), à deux cases différentes !");
+  else {
+    const r = A.r, [ka, kb] = A.k < B.k ? [A.k, B.k] : [B.k, A.k], H = PONT_SUSPENDU.hauteur, cote = PONT_SUSPENDU.ecart;
+    let d0 = ka, d1 = kb;   // les deux bouts du pont, au bord de l'eau
+    while (d0 > 0 && r[d0 - 1].pont) d0--;
+    while (d1 < r.length - 1 && r[d1 + 1].pont) d1++;
+    const poutre = (mat, a, b, e) => { // une poutre (ou un câble) toute droite, de a à b, de e mètres d'épaisseur
+      const d = new THREE.Vector3(b.x - a.x, b.y - a.y, b.z - a.z), g = new THREE.BoxGeometry(e, e, d.length());
+      g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), d.normalize()));
+      ajouterGeo(mat, g.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2));
+    };
+    // tout le pont suit la droite d'une tour à l'autre (u : le long du pont ; n : en travers), même si la route tourne un peu à ses bouts
+    const L = Math.hypot(r[kb].x - r[ka].x, r[kb].z - r[ka].z), u = { x: (r[kb].x - r[ka].x) / L, z: (r[kb].z - r[ka].z) / L }, n = { x: -u.z, z: u.x };
+    const sur = (s, c, y) => ({ x: r[ka].x + u.x * s + n.x * c * cote, y, z: r[ka].z + u.z * s + n.z * c * cote });   // (s : mètres depuis la 1re tour)
+    const tours = [ka, kb].map(k => ({ x: r[k].x, z: r[k].z, y: r[k].y, s: u, n }));
+    for (const t of tours) {
+      for (const c of [-1, 1]) { // ses deux piliers, du fond de l'eau jusqu'en haut
+        const px = t.x + n.x * c * cote, pz = t.z + n.z * c * cote;
+        ajouterGeo('pierreBlanche', new THREE.BoxGeometry(1.6, t.y + H - EAU + 3, 1.6).rotateY(Math.atan2(u.x, u.z)).translate(px, (EAU - 3 + t.y + H) / 2, pz));
+        ajouterCollision(px - 0.9, pz - 0.9, px + 0.9, pz + 0.9, t.y + H, EAU - 3);
+      }
+      for (const h of [H - 1, H * 0.55]) poutre('pierreBlanche', { x: t.x - n.x * cote, y: t.y + h, z: t.z - n.z * cote }, { x: t.x + n.x * cote, y: t.y + h, z: t.z + n.z * cote }, 1.6);
+    }
+    // les massifs, au bout du pont : là où la route s'écarte de plus de 30 cm de la droite des tours (sinon, au bord de l'eau), un peu en dehors
+    const ecart = k => Math.abs((r[k].x - r[ka].x) * n.x + (r[k].z - r[ka].z) * n.z), le = k => (r[k].x - r[ka].x) * u.x + (r[k].z - r[ka].z) * u.z;
+    let m0 = ka, m1 = kb;
+    while (m0 > d0 && ecart(m0 - 1) < 0.3) m0--;
+    while (m1 < d1 && ecart(m1 + 1) < 0.3) m1++;
+    const haut = (r[ka].y + r[kb].y) / 2 + H - 0.5, ancres = [[le(m0), r[m0].y], [le(m1), r[m1].y]];   // [à combien de la 1re tour, la route à cet endroit]
+    for (const [s, y] of ancres) for (const c of [-1, 1]) {
+      const p = sur(s, c * (cote + 0.6) / cote, 0), bas = Math.min(EAU - 3, hauteurTerrain(p.x, p.z) - 0.5);
+      ajouterGeo('pierreBlanche', new THREE.BoxGeometry(1.8, y + 2 - bas, 3).rotateY(Math.atan2(u.x, u.z)).translate(p.x, (y + 2 + bas) / 2, p.z));
+      ajouterCollision(p.x - 1.2, p.z - 1.2, p.x + 1.2, p.z + 1.2, y + 2, bas);
+    }
+    // les câbles, à s mètres de la 1re tour : de massif en tour, tout droit ; de tour en tour, en pendant jusqu'à 4 m au-dessus de la route,
+    // au milieu (une parabole) ; puis de tour en massif. Une suspente tous les 9 m environ, jusqu'au tablier
+    const cable = s => {
+      if (s < 0) { const t = s / ancres[0][0]; return { y: lerp(haut, ancres[0][1] + 2, t), route: lerp(r[ka].y, ancres[0][1], t) }; }
+      if (s > L) { const t = (s - L) / (ancres[1][0] - L); return { y: lerp(haut, ancres[1][1] + 2, t), route: lerp(r[kb].y, ancres[1][1], t) }; }
+      const t = s / L; return { y: haut - (H - 4.5) * 4 * t * (1 - t), route: lerp(r[ka].y, r[kb].y, t) };
+    };
+    for (const c of [-1, 1]) for (const [s0, s1] of [[ancres[0][0], 0], [0, L], [L, ancres[1][0]]]) {   // (au massif, le câble arrive 60 cm plus au-dehors : à peine)
+      const morceaux = Math.max(1, Math.round(Math.abs(s1 - s0) / 9));
+      for (let k = 0; k < morceaux; k++) {
+        const sa = lerp(s0, s1, k / morceaux), sb = lerp(s0, s1, (k + 1) / morceaux), a = cable(sa), b = cable(sb);
+        poutre('metal', sur(sa, c, a.y), sur(sb, c, b.y), 0.45);
+        if (k > 0 && a.y - a.route > 1.6) poutre('metal', sur(sa, c, a.route + 0.6), sur(sa, c, a.y), 0.1);
+      }
+    }
+    grandPont = { tours, route: r, de: d0, a: d1, ancres };
+  }
+}
+
 // le terrain : un morceau de grille par morceau du pays, colorié selon le sol (herbe, sable, désert, roche...)
 await respirer(0.37);   // (voir respirer)
 const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du ciel, pour les cartes
@@ -9007,7 +9601,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
       const ombre = clamp(0.85 - (n.x + n.z) * 1.5, 0.45, 1.3), srgb = v => 255 * Math.min(1, v * ombre) ** (1 / 2.2);
       imageTerrain.set(y < EAU ? [63, 121, 163, 255] : [srgb(coul.r), srgb(coul.g), srgb(coul.b), 255], (iz * NXT + ix) * 4);
       // sous une ville, le terrain est gris : de près, les rues et les trottoirs le cachent ; de très loin, c'est tout ce qu'on voit de la ville
-      if (estBloc(CARTE[j][i]) && !'PM){}['.includes(CARTE[j][i])) coul.copy(COUL.ville);   // (pas sous le camp de la grotte : il est en terre ; ni sous le parc du manoir Wayne, le zoo ou Arkham : de l'herbe)
+      if (estBloc(CARTE[j][i]) && !'PM){}[ê¡ç'.includes(CARTE[j][i])) coul.copy(COUL.ville);   // (pas sous le camp de la grotte : il est en terre ; ni sous le parc du manoir Wayne, le zoo, Arkham, la statue de Superman ou la ferme Kent : de l'herbe ; ni sous la Forteresse de Solitude : de la glace)
       col.set([coul.r, coul.g, coul.b], k * 3);
       if (a < nx - 1 && b < nz - 1 && !trousTerrain.has(iz * NXT + ix)) idx.push(k, k + nx, k + 1, k + nx, k + nx + 1, k + 1);   // (sauf les carrés percés, à l'entrée de la grotte)
     }
@@ -9051,7 +9645,7 @@ const imageTerrain = new Uint8ClampedArray(NXT * NZT * 4);   // le même, vu du 
       if (s === '*') { n = 12; sorte = 'sapin'; }
       else if (s === ':') { n = 1; sorte = 'cactus'; }
       else if (s === ',') { n = chiffre ? (chiffre >= 7 ? 2 : 5) : 2; sorte = chiffre || rnd() < 0.3 ? 'sapin' : 'feuillu'; }
-      else if (s === '_' && j >= PALMIERS) { n = 2; sorte = 'palmier'; }   // les plages du sud (PALMIERS)
+      else if (s === '_' && PALMIERS !== null && j >= PALMIERS) { n = 2; sorte = 'palmier'; }   // les plages du sud (PALMIERS)
       if (chiffre && s === '*') n = chiffre >= 7 ? 3 : 8;
       for (let k = 0; k < n; k++) {
         const x = i * PAS + R / 2 + rnd() * PAS, z = j * PAS + R / 2 + rnd() * PAS, y = hauteurTerrain(x, z);
@@ -9512,6 +10106,7 @@ if (villaStark) {
   V.pivot.add(V.g); scene.add(V.pivot); fusionner(V.geos, V.g); V.geos = null;
 }
 for (const S of SOUTERRAINS) { await respirer(0.71); S.g = new THREE.Group(); scene.add(S.g); fusionner(S.geos, S.g); S.geos = null; }   // les souterrains de Gotham, chacun dans son groupe
+if (forteresse) { forteresse.g = new THREE.Group(); scene.add(forteresse.g); fusionner(forteresse.geos, forteresse.g); forteresse.geos = null; }   // la Forteresse de Solitude, dans son groupe
 for (const [k, m] of [...morceaux.values()].entries()) {
   await respirer(0.71 + 0.19 * k / morceaux.size);   // (un morceau à la fois : voir respirer)
   // (detail : un très grand étage des ombres ne dessine pas les bâtiments fusionnés, ni les lampadaires, les bornes et les troncs : voir utileDansEtage)
@@ -9526,6 +10121,7 @@ for (const [k, m] of [...morceaux.values()].entries()) {
   }
   const placer = (o, e) => { o.position.set(e.x, e.y, e.z); o.rotation.y = e.a; };
   const dessins = [instances(m.g, GEO_POTEAU, MAT_POTEAU, m.lampadaires, placer), instances(m.g, GEO_LAMPE, MAT_LAMPE, m.lampadaires, placer)].map(detail);
+  if (!OMBRE_LAMPADAIRES) for (const d of dessins) if (d) d.castShadow = false;   // (OMBRE_LAMPADAIRES, dans VILLES : à Metropolis)
   m.lampadaires.forEach((e, k) => { Object.assign(e, { k, dessins, boite: ajouterCollision(e.x - 0.15, e.z - 0.15, e.x + 0.15, e.z + 0.15, e.y + 7, e.y) }); e.boite.lampadaire = e; });
   // une borne n'est pas un mur (on passe par-dessus, en s'abîmant) ni un sol : c'est bornesSous qui la trouve
   detail(instances(m.g, GEO_BORNE, MAT_BORNE, m.bornes, (o, e) => o.position.set(e.x, e.y, e.z)));
@@ -9876,7 +10472,7 @@ function hauteurSol(x, z, y = -Infinity) {
   }
   let h = hauteurTerrain(x, z, y);
   const i = Math.floor((x - R) / PAS), j = Math.floor((z - R) / PAS);
-  if (estBloc(car(i, j)) && car(i, j) !== ')' && x - R - i * PAS <= S && z - R - j * PAS <= S) h = Math.max(h, baseCase[j][i] + 0.2);   // le trottoir d'un pâté (pas au camp de la grotte : de la terre)
+  if (estBloc(car(i, j)) && !sansRues(car(i, j)) && x - R - i * PAS <= S && z - R - j * PAS <= S) h = Math.max(h, baseCase[j][i] + 0.2);   // le trottoir d'un pâté (pas au camp de la grotte : de la terre ; ni à la Forteresse de Solitude : de la glace)
   const jl = Math.round((z - R / 2) / PAS), il = Math.round((x - R / 2) / PAS), p = pontEn(x, z);
   if (p) { if (y === -Infinity || p.y <= y + PASMAX) h = Math.max(h, p.y); }   // un pont bombé : on est dessus... ou dessous (le sol est alors l'eau, ou la berge)
   else {
@@ -9895,7 +10491,7 @@ const profondeur = (x, z, y) => EAU - hauteurTerrain(x, z, y);   // plus de 0 : 
 // 'rue' ; 'route' : une route de campagne ou un pont ; 'terre' : le terrain (herbe, sable, rocher, neige)
 function sorteDeSol(x, z) {
   const i = Math.floor((x - R) / PAS), j = Math.floor((z - R) / PAS), c = car(i, j);
-  if (estBloc(c) && c !== ')' && x - R - i * PAS <= S && z - R - j * PAS <= S) return c === 'P' || c === 'M' ? 'herbe' : 'pave';
+  if (estBloc(c) && !sansRues(c) && x - R - i * PAS <= S && z - R - j * PAS <= S) return c === 'P' || c === 'M' ? 'herbe' : 'pave';
   const jl = Math.round((z - R / 2) / PAS), il = Math.round((x - R / 2) / PAS);
   if (Math.abs(z - jl * PAS - R / 2) <= R / 2 && rueH(Math.floor((x - R / 2) / PAS), jl)) return 'rue';
   if (Math.abs(x - il * PAS - R / 2) <= R / 2 && rueV(il, Math.floor((z - R / 2) / PAS))) return 'rue';
@@ -12380,6 +12976,7 @@ function majHeros() {
   apercu.h.g.traverse(o => o.frustumCulled = false);   // (sinon il n'est pas dessiné : le jeu saute ce qui est loin de la caméra du jeu)
   giletBJ.scale.set(H.epaules, 1, 1 + 7 * (H.poitrine || 0));
   rhabillerBJ();
+  majStatue();   // (à Metropolis : la statue de Superman, ou de Supergirl)
 }
 addEventListener('heros', majHeros);   // on a cliqué sur un bouton du menu
 majHeros();
@@ -14179,15 +14776,30 @@ function enCivilSans(texte) { if (sansCostume()) pasEncoreDeCostume(); else anno
 function pasEncoreDeCostume() { annonce(tr('PAS ENCORE DE COSTUME'), tr('Ton costume, tu vas le trouver : suis le point jaune !'), 3); bip(300, 200, 0.1, 'square', 0.1); }   // (H, J, N)
 // en civil, au chapitre de Batman : ni grappin, ni batarangs, ni filets, ni cape, ni Batmobile (G, 9, B et Maj le disent ; H : son costume)
 const sansGadgets = () => costumeCivil() && !tricheHeros().actif;
+// au chapitre de Superman, Clark Kent (ou Kara Danvers) commence aussi en civil : ni vol, ni yeux laser, et tomber de haut fait mal, comme
+// à tout le monde. H : le costume, dans un tourbillon bleu et rouge (voir tourbillon)
+const chezClark = CHAPITRE.triche === 'SUPERMAN';
 function changerCostume() {
   const t = tricheHeros();
   if (sansCostume()) { pasEncoreDeCostume(); return; }
   if (J.mort || J.voiture || J.robot || J.telesiege || J.monorail) { annonce('', tr('Sois à pied, debout par terre !'), 2); return; }
   if (t.actif && (!J.sol || accroche() || J.echelle || J.superman)) { annonce('', tr("Pose-toi d'abord !"), 2); return; }   // (en civil, sans sa cape, il tomberait)
   basculerTriche(t, false, false, false);   // (sans faire venir la Batmobile : B la rappelle)
-  voleeDeChauvesSouris(J, 26);
-  annonce(t.actif ? tr(nomSuper().toUpperCase() + ' !') : nomHeros(),   // (« BATMAN ! », « BATGIRL ! » : dans TRADUCTIONS)
-          t.actif ? '' : tr('En civil : ni gadgets, ni cape. H : ton costume'), 2);
+  if (chezClark) tourbillon(J); else voleeDeChauvesSouris(J, 26);
+  annonce(t.actif ? tr(nomSuper().toUpperCase() + ' !') : nomHeros(),   // (« BATMAN ! », « BATGIRL ! », « SUPERMAN ! », « SUPERGIRL ! » : dans TRADUCTIONS)
+          t.actif ? '' : tr(chezClark ? 'En civil : ni vol, ni yeux laser. H : ton costume' : 'En civil : ni gadgets, ni cape. H : ton costume'), 2);
+}
+// Superman (ou Supergirl) qui met son costume, ou qui le quitte : il tourne si vite sur lui-même qu'on ne voit plus qu'un tourbillon de
+// traits bleus, rouges et jaunes, qui montent en tournant autour de lui, dans un grand souffle (ils bougent comme les chauves-souris de
+// Batman : voir majChauvesSouris)
+const M_TOURBILLON = chezClark ? ['#2a60e0', '#e01c24', '#f2cc1e'].map(c => new THREE.SpriteMaterial({ color: c })) : null;   // (seulement au chapitre de Superman)
+function tourbillon(o, n = R_.traitsTourbillon) {
+  for (let k = 0; k < n; k++) {
+    const s = new THREE.Sprite(M_TOURBILLON[k % 3]);
+    s.scale.set(0.06, entre(0.35, 0.7), 1); scene.add(s);
+    chauvesSouris.push({ s, trait: true, c: { x: o.x, z: o.z }, a: entre(0, 2 * Math.PI), r: entre(0.3, 0.55), y: o.y + entre(0, 1.6), vy: entre(1, 3), vr: entre(0.6, 1.6), va: entre(9, 14), vie: entre(0.5, 0.9), phase: 0 });
+  }
+  bruit(0.45, 2200, 0.5);
 }
 // Une nuée de chauves-souris : Batman qui met son costume, ou qui le quitte. Des chauves-souris noires (la forme du batarang) qui battent des
 // ailes et s'envolent en tournant autour de lui, avec un grand souffle et leurs petits cris
@@ -14207,7 +14819,7 @@ function majChauvesSouris(dt) {
   for (const b of chauvesSouris) {
     b.vie -= dt; b.a += b.va * dt; b.r += b.vr * dt; b.y += b.vy * dt;
     b.s.position.set(b.c.x + Math.cos(b.a) * b.r, b.y, b.c.z + Math.sin(b.a) * b.r);
-    b.s.scale.x = 0.5 * (0.25 + 0.75 * Math.abs(Math.sin(temps * 22 + b.phase)));   // elle bat des ailes
+    if (!b.trait) b.s.scale.x = 0.5 * (0.25 + 0.75 * Math.abs(Math.sin(temps * 22 + b.phase)));   // elle bat des ailes (pas les traits du tourbillon de Superman)
     if (b.vie <= 0) scene.remove(b.s);
   }
   for (let k = chauvesSouris.length - 1; k >= 0; k--) if (chauvesSouris[k].vie <= 0) chauvesSouris.splice(k, 1);
@@ -15582,14 +16194,14 @@ addEventListener('keydown', e => {
   else if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
   if (e.code === 'KeyL' && im) leverMasque();   // Iron Man : L lève ou baisse le masque
   if (e.code === 'KeyG' && im && chezStark) tirerMissiles();   // Iron Man, au chapitre d'Iron Man : les mini-missiles
-  else if (e.code === 'KeyG' && sansGadgets() && !J.voiture && !J.monorail) enCivilSans('Mets ton costume (H) pour lancer ton grappin');   // en civil
+  else if (e.code === 'KeyG' && sansGadgets() && chezWayne && !J.voiture && !J.monorail) enCivilSans('Mets ton costume (H) pour lancer ton grappin');   // en civil
   else if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
   if (e.code === 'KeyX' && im && chezStark) lancerLaser();   // Iron Man, au chapitre d'Iron Man : le laser des bras
   else if (e.code === 'KeyX' && chezWayne) gelExplosif();   // Batman, au chapitre de Batman : le gel explosif (X encore : il explose)
-  if (e.code === 'KeyB') { if (sansBatmobile() && !entree && !J.voiture) pasEncoreDeBatmobile(); else if (sansGadgets()) enCivilSans('Mets ton costume (H) pour appeler ta Batmobile'); else rappelerVoiture(); }   // Batman rappelle sa Batmobile (pas en civil, ni avant la mission 2)
+  if (e.code === 'KeyB') { if (sansBatmobile() && !entree && !J.voiture) pasEncoreDeBatmobile(); else if (sansGadgets() && chezWayne) enCivilSans('Mets ton costume (H) pour appeler ta Batmobile'); else rappelerVoiture(); }   // Batman rappelle sa Batmobile (pas en civil, ni avant la mission 2)
   if (e.code === 'KeyT' && !voyage) appuyerT();   // la DeLorean : choisir le chapitre où aller (dedans), ou la faire venir
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
-  if (e.code === 'Digit9' && sansGadgets() && !J.robot) enCivilSans('Mets ton costume (H) pour avoir tes batarangs et tes filets');   // en civil
+  if (e.code === 'Digit9' && sansGadgets() && !J.robot) enCivilSans(chezClark ? 'Mets ton costume (H) pour avoir tes yeux laser' : 'Mets ton costume (H) pour avoir tes batarangs et tes filets');   // en civil
   else if (e.code.startsWith('Digit') && !J.robot) choisirArme((+e.code.slice(5) + 9) % 10);
 });
 // les touches 1 à 9 (et 0 pour une 10e arme) : une arme chacune. Les armes des codes de triche (les yeux laser, le sceptre de foudre)
@@ -15757,6 +16369,7 @@ let tapesMaj = [];   // quand on a tapé Maj les 3 dernières fois
 function decoller() {
   if (J.voiture || J.robot || J.mort || J.ironman?.anim) return;
   if (J.superman) { J.superman = null; return; }
+  if (chezClark && sansGadgets()) { annonce('', tr('Mets ton costume (H) pour voler'), 2); bip(300, 200, 0.1, 'square', 0.1); return; }   // (au chapitre de Superman, en civil)
   if (sansReacteur()) return;   // (mission « Iron Monger » : sans son réacteur, il ne vole plus)
   if (armureGelee() && armureIronman()) { annonce('', tr('Ton armure est gelée : attends que le givre fonde !'), 1.5); bip(300, 200, 0.1, 'square', 0.1); return; }   // (mission « Le premier vol »)
   if (enSecours()) { pasDeBatterie(); return; }   // (batterie vide : ses réacteurs n'ont plus la force de le soulever)
@@ -15764,7 +16377,7 @@ function decoller() {
   // bascule : debout (0) ou couché ; tonneau, sensTonneau : le tonneau en cours (voir figuresVol, qui y ajoute « looping », le looping en cours)
   J.superman = { vx: 0, vz: 0, crans: 0, roulis: 0, bascule: 0, tonneau: 0, sensTonneau: 0 }; J.vy = 8;
   J.sol = J.nage = J.saute = J.accroupi = false; J.roule = J.echelle = J.grappin = J.balance = J.mur = J.plane = J.lance = null; J.danse = J.genou = J.atterri = 0;
-  annonce('', tr(!armureIronman() ? 'Superman !' : rescue() ? 'Rescue !' : 'Iron Man !'), 2);   // (dans l'armure d'Iron Man : la touche F)
+  annonce('', tr(!armureIronman() ? (supergirl() ? 'Supergirl !' : 'Superman !') : rescue() ? 'Rescue !' : 'Iron Man !'), 2);   // (dans l'armure d'Iron Man : la touche F)
 }
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
@@ -23632,8 +24245,11 @@ const ICONES = { A: ['#d86a10', 'A', 'Armurerie'], H: ['#c02020', '+', 'Hôpital
   '(': ['#1a8aa8', '◉', 'Stark Expo'], '>': ['#b8860b', '◎', 'Repaire du Mandarin'], ')': ['#6a4a2a', '∩', 'Grotte des Dix Anneaux'],
   '{': ['#6a5a3a', '⌂', 'Manoir Wayne'], '/': ['#1a2e5a', '⚙', 'Tour Wayne (magasin de Lucius Fox)'], '£': ['#1a7a3a', '$', 'Banque de Gotham'], 'é': ['#4a3a62', '†', 'Cathédrale'],
   '[': ['#6a2a6a', 'A', "Asile d'Arkham"], ']': ['#2a8a2a', '⚗', 'Ace Chemicals'], '}': ['#3a7a2a', 'Z', 'Zoo de Gotham'], '°': ['#2a5a8a', '◯', 'Stade'],
-  '§': ['#1f9a3a', '?', 'Repaire du Sphinx'] };
+  '§': ['#1f9a3a', '?', 'Repaire du Sphinx'],
+  'ø': ['#c8a030', 'ø', 'Daily Planet'], 'ł': ['#1f7a4a', 'L', 'Tour LexCorp'], 'µ': ['#1a5aa8', '★', 'S.T.A.R. Labs'], '¡': ['#a8844e', '♦', 'Statue de Superman'],
+  'ê': ['#5ab0d8', '❄', 'Forteresse de Solitude'], 'ç': ['#a8341c', 'K', 'Ferme Kent'], 'ß': ['#56603e', '✈', 'Base militaire'], '¤': ['#7a2a9a', '♣', 'Vieux théâtre'] };
 if (BATSIGNAL) ICONES.C = ['#1a3a9a', 'P', 'Commissariat (Bat-signal)'];   // à Gotham, le Bat-signal est sur son toit
+if (fille() && ICONES['¡']) ICONES['¡'][2] = 'Statue de Supergirl';   // à Metropolis, avec la fille du menu
 // les ronds de la légende de la grande carte : seulement ce qu'il y a dans la ville du chapitre
 const LEGENDE = [...Object.entries(ICONES).filter(([c]) => lieux[c]).map(([, v]) => v),
   ...CASCADES.length ? [['#d8501a', 'C', 'Piste de cascades']] : [], ...arrets.length ? [['#0a9a9a', 'N', 'Navette des pistes']] : [],
@@ -23670,7 +24286,8 @@ function dessinerPlan(g) {
   for (const l of TELESIEGES) { g.moveTo(l.bas.x, l.bas.z); g.lineTo(l.haut.x, l.haut.z); }
   g.stroke(); g.setLineDash([]);
   const couleurs = { P: '#3f6b3a', M: '#4d6b44', B: '#6a4040', H: '#556070', W: '#5a4038', O: '#4d6b44', L: '#4d6b44', v: '#4d6b44', F: '#5a7040', R: '#8a7a5a', '%': '#5a5a44', '?': '#4a4a52',
-    '<': '#4d6b44', '(': '#3f6b3a', '>': '#4d6b44', ')': '#7a6a52', '{': '#4d6b44', '}': '#3f6b3a', '°': '#3a6a3a', '[': '#4a4a52', ']': '#4a5244' };
+    '<': '#4d6b44', '(': '#3f6b3a', '>': '#4d6b44', ')': '#7a6a52', '{': '#4d6b44', '}': '#3f6b3a', '°': '#3a6a3a', '[': '#4a4a52', ']': '#4a5244',
+    '¡': '#3f6b3a', 'ç': '#5a7040', 'ê': '#d8e6ee', 'ß': '#5a5a44' };
   for (const [c, o] of PLAN.pates) { g.fillStyle = couleurs[c] || '#44484d'; g.fillRect(o.x, o.z, S, S); }
   g.globalAlpha = 0.65; for (const gang of GANGS) { const o = origine(gang.col, gang.ligne); g.fillStyle = gang.couleur; g.fillRect(o.x - R / 2, o.z - R / 2, S + R, S + R); } g.globalAlpha = 1;   // le quartier des gangs
   g.fillStyle = '#2c2f33'; for (const [x, z, l, p] of empreintes) g.fillRect(x, z, l, p);
@@ -23990,7 +24607,7 @@ function majHUD(dt) {
     : J.balance ? tr(J.balance.souris ? "Lâche le bouton pour lâcher la toile · Z Q S D : prendre de l'élan" : "Lâche <b>G</b> pour lâcher la toile · Z Q S D : prendre de l'élan")
     : J.prise ? tr(J.prise.souris ? 'Lâche le bouton pour lancer la voiture là où tu regardes' : 'Lâche <b>G</b> pour lancer la voiture là où tu regardes') : J.grappin ? tr('<b>Espace</b> : lâcher le grappin')
     : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape')
-    : !J.sol && !J.nage && !J.superman && !J.voiture && J.vy < -6 && sansGadgets() && !sansCostume() ? tr('Pas de cape en civil : <b>H</b>, ton costume, et tu planes !')
+    : !J.sol && !J.nage && !J.superman && !J.voiture && J.vy < -6 && sansGadgets() && !sansCostume() ? tr(chezClark ? 'En civil, tu ne voles pas : <b>H</b>, ton costume, puis <b>Maj</b> 3 fois !' : 'Pas de cape en civil : <b>H</b>, ton costume, et tu planes !')
     : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping')   // en volant : les figures
     : ironmanLibre() ? aideIronman() : '';   // dans l'armure d'Iron Man
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
@@ -24834,6 +25451,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   }
   tenirPrise(dt);   // la voiture que Spiderman fait tourner au bout de sa toile
   majFete(dt);      // la grande roue et les montagnes russes de la jetée (Malibu)
+  majGlobe(dt);     // le globe du Daily Planet (Metropolis)
   majMonorail(dt);  // le monorail de Gotham (et B.J., s'il est dedans)
   majIronman(dt);   // l'armure d'Iron Man : son masque, ses répulseurs, son plastron, ses réacteurs
   majChauvesSouris(dt);   // Batman qui met son costume (ou qui l'enlève) : la nuée de chauves-souris
@@ -25153,6 +25771,9 @@ const A_PREPARER = [
 // l'écran des minuteries (une image qui passe devant tout)
 if (GOTHAM) A_PREPARER.push([M_FOULE, 'lot colorié'], [new THREE.MeshStandardMaterial({ map: IMAGE_PREPARER, transparent: true }), 'lot'], [MAT.noirMeuble, 'lot'], [M_METAL, 'lot'], [M_LAMPES_PINGOUINS, 'lot colorié'],
   [new THREE.SpriteMaterial({ map: IMAGE_PREPARER, depthTest: false, toneMapped: false, fog: false, transparent: true }), 'image']);
+// au chapitre de Superman, qui commence en civil (sans les yeux laser) : le tourbillon du costume (des images sans dessin), et la poussière
+// qui vole là où touchent les yeux laser (une image, éclairée comme le reste : pas comme l'éclair, M_FLASH)
+if (chezClark) A_PREPARER.push([M_TOURBILLON[0], 'image'], [M_FUMEE, 'image']);
 // Les programmes des ombres, eux, Three.js les fait avec ses propres matières, que compile ne voit pas. À Gotham, des témoins réduits à un point
 // (on ne les voit pas) sont dessinés avec la toute première image, ombres comprises, puis enlevés, comme celui des personnages (temoinForme) : un
 // objet découpé (le blason d'un costume), découpé à deux faces (la cape de Batman), à deux faces (le plat des antennes, le canard du Pingouin ;
@@ -25247,6 +25868,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   // Gotham (chapitre 3)
   costume, changerCostume, costumeCivil, tricheHeros, sansCostume, chauvesSouris, monorail, monorailProche, monterMonorail, descendreMonorail, majMonorail, batSignal, majBatSignal, projecteurBat,
   pluie, nuages, majPluie, COUVERT, BROUILLARD, PLUIE, vueDetails, estGothique, manoir, tourWayne, cathedrale, arkham, aceChemicals, zoo, stade, sphinx, GOTHAM,
+  METROPOLIS, dailyPlanet, lexcorp, starLabs, statueSuper, forteresse, fermeKent, baseMilitaire, theatre, grandPont, majGlobe, majStatue, chezClark, supergirl, tourbillon, neigeEn, sansRues,
   // le magasin de Lucius Fox (chapitre 3)
   chezWayne, wayne, COSTUMES_WAYNE, BATMOBILES_WAYNE, GADGETS_WAYNE, AMELIORATIONS_WAYNE, standsWayne, objetsWayne, acheterWayne, aideWayne, texteWayne, costumeDe, costumeBatman, costumePorte, enCostume,
   costumeSuivant, batmobileSuivante, basculerVision, lancerFumigene, gelExplosif, faireSauterGel, fumees, dansFumee, voitBJ, vieMax, protectionCostume, vitesseCostume, chuteCape, vitesseCape, vitesseGrappin,

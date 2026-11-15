@@ -25,7 +25,7 @@ Dans GTAxel, tu peux :
 - [Vie, armes et police](#vie-armes-et-police)
 - [Voitures](#voitures) : dégâts, accidents, cascades
 - [Les missions du chapitre 1](#les-missions-du-chapitre-1) : braquages, camp militaire
-- [Les chapitres de super-héros](#les-chapitres-de-super-héros) : la DeLorean, Malibu, Gotham
+- [Les chapitres de super-héros](#les-chapitres-de-super-héros) : la DeLorean, Malibu, Gotham, Metropolis
 - [Les codes de triche](#les-codes-de-triche)
 - [Modifier le jeu](#modifier-le-jeu)
 
@@ -124,6 +124,7 @@ Elles changent selon ce que tu pilotes et le héros que tu es :
 | **A**, **Z**, **E** (vite) | [Iron Man](#iron-man), avec le code `IRONMAN` | L'armure arrive en volant, pièce par pièce, ou tu en sors |
 | **H** | [Iron Man](#iron-man) | Appeler ton armure, ou en sortir |
 | **H** | [Gotham](#gotham-chapitre-3) | Mettre ton costume (tu deviens Batman, ou Batgirl), même en l'air, ou repasser en civil (les pieds par terre). Ton premier costume, tu le trouves à la 1re mission |
+| **H** | [Metropolis](#metropolis-chapitre-4) | Mettre ton costume (tu deviens Superman, ou Supergirl), même en l'air, ou repasser en civil (les pieds par terre). En civil, tu ne voles pas et tu n'as pas tes yeux laser |
 | **J** | [Iron Man](#iron-man) | Choisir une autre de tes armures |
 | **J** | [Gotham](#le-magasin-de-lucius-fox) | Changer de costume (en costume, tout de suite, dans une nuée de chauves-souris) |
 | **X** | [Iron Man](#iron-man) | Le laser des bras (si tu l'as acheté) |
@@ -214,7 +215,7 @@ Tu deviens un super-héros avec son [code de triche](#les-codes-de-triche), ou p
 
 ### Superman
 
-Le code `SUPERMAN` t'habille en Superman, avec une cape qui flotte au vent. Sans le code, appuie vite 3 fois sur **Maj** pour voler.
+Le code `SUPERMAN` t'habille en Superman, avec une cape qui flotte au vent. Sans le code, appuie vite 3 fois sur **Maj** pour voler (sauf à Metropolis, en civil : d'abord **H**, ton costume ; voir [Metropolis](#metropolis-chapitre-4)).
 
 - **Z Q S D** : voler là où tu regardes ; **Espace** : monter ; **C** ou **Ctrl** : descendre.
 - **Maj** : chaque appui te fait aller plus vite, jusqu'à 360 km/h. Espace bien les appuis : 3 fois trop vite et tu arrêtes de voler !
@@ -431,6 +432,7 @@ Les touches sont dans [Ski, snowboard et luge](#ski-snowboard-et-luge).
 - La nuit est sombre et bleue, au clair de lune. À la campagne, on distingue juste les formes, les étoiles et la lune, et les phares de ta voiture s'allument tout seuls. En ville, les lampadaires et les fenêtres sont allumés.
 - La nuit, il y a moins de passants et de voitures, mais les gangs sont deux fois plus nombreux, et certains de leurs membres se promènent par deux dans les rues : ne t'approche pas d'eux une arme à la main !
 - À [Gotham](#gotham-chapitre-3), il fait toujours nuit, il pleut et il y a du brouillard. Mais la ville ne dort jamais : ses rues restent pleines de monde.
+- À [Metropolis](#metropolis-chapitre-4), il fait toujours jour : il est toujours midi.
 
 ### Tes villas
 
@@ -467,6 +469,8 @@ Quelques signes de la mini-carte :
 | ⌂ $ † A ⚗ Z ◯ | À Gotham : le manoir Wayne, la banque de Gotham, la cathédrale, l'asile d'Arkham, Ace Chemicals, le zoo, le stade |
 | ? vert | Le repaire du Sphinx (à Gotham) : la DeLorean y est cachée |
 | M rouge | Une gare du monorail (à Gotham) |
+| ø L ★ ♦ ❄ K ✈ | À Metropolis : le Daily Planet, la tour LexCorp, S.T.A.R. Labs, la statue de Superman, la Forteresse de Solitude, la ferme Kent, la base militaire |
+| ♣ violet | Le vieux théâtre (à Metropolis) : la DeLorean y est cachée |
 
 ## Vie, armes et police
 
@@ -629,13 +633,13 @@ Le jeu se joue en chapitres, un par héros :
 | 1 | Los Santos | B.J. (les 11 missions) | Jess |
 | 2 | Malibu | **Tony Stark**, alias **Iron Man** | Pepper Potts |
 | 3 | Gotham, où il fait toujours nuit, sous la pluie | **Bruce Wayne**, alias **Batman** | **Barbara Gordon**, alias **Batgirl** |
-| 4 | Metropolis | **Clark Kent**, alias **Superman** | Kara Danvers |
+| 4 | Metropolis, en plein jour | **Clark Kent**, alias **Superman** | **Kara Danvers**, alias **Supergirl** |
 | 5 | New York | **Peter Parker**, alias **Spiderman** | Gwen Stacy |
 
 - Malibu a ses 12 missions d'Iron Man, avant celle de la DeLorean ; Gotham, ses 12 missions de Batman, contre le Pingouin, Double-Face, Bane et le Joker, avant celle du Sphinx et de la DeLorean. Metropolis et New York n'ont pour l'instant qu'une mission (retrouver la DeLorean) : les vraies arrivent bientôt !
-- Metropolis et New York se passent encore à Los Santos ; Malibu et Gotham ont déjà leur ville.
+- New York se passe encore à Los Santos ; Malibu, Gotham et Metropolis ont déjà leur ville.
 - Chaque chapitre commence par le logo de son héros (« CHAPITRE 2 »), qui s'en va à sa façon, et par des bulles d'aide qui t'apprennent ses pouvoirs.
-- Dans les chapitres 2 à 5, le code de triche de ton super-héros est toujours allumé (à Gotham, quand tu es en costume), et ceux des autres super-héros ne marchent pas.
+- Dans les chapitres 2 à 5, le code de triche de ton super-héros est toujours allumé (à Gotham et à Metropolis, quand tu es en costume), et ceux des autres super-héros ne marchent pas.
 - Tu gardes ton argent d'un chapitre à l'autre, mais pas tes armes : chaque chapitre garde les siennes, et tu les retrouves en y revenant (ses missions recommencent).
 
 ### La DeLorean
@@ -721,6 +725,27 @@ La ville de Batman. Il y fait **toujours nuit**, il **pleut** et il y a du **bro
 11. **La parade au gaz** : Gotham fête ses 200 ans, et le Joker a sa parade : des chars tirent des **ballons géants** à sa tête, pleins de gaz qui fait rire. Crève-les (batarangs, filets, grappin, ou fonce dedans en volant) avant qu'ils arrivent au-dessus de la foule ! Trop tard, et les gens rient... puis tombent (personne n'en meurt), et le Joker en lâche un autre. Puis ses clowns sautent de son char, et il s'enfuit en hélicoptère.
 12. **La cathédrale** : le grand final ! Monte au grappin en haut du clocher, à 57 m, où t'attend le **Joker** : son revolver (sa première balle sort un drapeau « BANG ! »), ses dentiers à remontoir qui explosent (un coup de poing les casse), sa fleur qui crache de l'acide et son gaz qui fait rire. Pendant le combat, un garde-fou invisible t'empêche de tomber du clocher. Quand son hélicoptère vient le chercher, et qu'il s'enfuit pendu à l'échelle : ton **grappin** (**G**), sur lui !
 13. **Les devinettes du Sphinx** : le Sphinx a volé la DeLorean, et détourné le Bat-signal (un point d'interrogation !). Ses devinettes t'attendent sous de grands ? verts, dans Gotham : réponds avec **1**, **2** ou **3**, et la réponse te dit où est la suivante. Une mauvaise réponse ? Un piège : ses hommes arrivent ! Au bout, assomme le Sphinx dans son repaire, et pars avec la DeLorean.
+
+### Metropolis (chapitre 4)
+
+La ville de Superman : une grande ville moderne et lumineuse, au bord de la mer, en **plein jour** sous un ciel bleu (il y est toujours midi). Tu commences devant le **Daily Planet**, le journal où travaille Clark Kent.
+
+**À voir** :
+
+- le **Daily Planet** et son grand **globe doré** qui tourne sur le toit : un ascenseur, au fond du hall, monte jusqu'au toit (à 102 m) ;
+- la **tour LexCorp**, la plus haute de la ville (228 m), en verre vert sombre, avec l'héliport de Lex Luthor sur son toit ;
+- les tours de **New Troy**, le centre, dont de vieux gratte-ciel **art déco** en pierre claire, avec leur couronne de métal et leur flèche ;
+- **Centennial Park**, et au milieu, la **statue géante de Superman** (de **Supergirl** si tu joues la fille) ;
+- **S.T.A.R. Labs**, le laboratoire, son dôme et son grand hall (son magasin arrive bientôt) ;
+- le port de **Hob's Bay**, et à **Suicide Slum**, le **vieux théâtre** : la DeLorean est cachée dans sa cour ;
+- la **rivière Hob** et le **pont de Metropolis**, un grand pont suspendu entre deux tours ;
+- **Smallville**, un petit village au milieu des champs, et au bout de sa route de campagne et de son chemin de terre, la **ferme Kent** : la maison, la grange rouge, le silo et le champ de maïs ;
+- la **base militaire**, au nord-est, avec ses tanks et ses avions de chasse ;
+- tout au nord, les **glaces** : la neige, les sapins givrés, et la **Forteresse de Solitude**, des cristaux de glace géants (aucune route n'y va : vas-y en volant !).
+
+**En civil, puis en costume** : tu es **Clark Kent**, en costume, cravate rouge et lunettes (ou **Kara Danvers**, gilet bleu, lunettes et cheveux blonds). Appuie sur **H** : tu tournes si vite que tu disparais dans un tourbillon bleu et rouge, et tu deviens **Superman** (ou **Supergirl**, sa jupe rouge et ses longs cheveux blonds) ! Tu peux le mettre n'importe où, même en tombant d'un toit (puis **Maj** 3 fois, et tu voles) ; **H** encore : tu repasses en civil, mais seulement les pieds par terre. En civil, pas de pouvoirs : tu ne voles pas, tu n'as pas tes yeux laser, et tomber de haut fait mal.
+
+**Pour l'instant**, Metropolis n'a qu'une mission : retrouver la DeLorean, dans la cour du vieux théâtre (♣ sur la carte). Les missions de Superman arrivent bientôt !
 
 ### Un héros sans reproche
 
