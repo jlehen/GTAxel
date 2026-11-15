@@ -37,6 +37,7 @@
                          radial-gradient(circle, transparent 38vh, #000 38.5vh); }
   #fumee { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(165,180,135,.6), rgba(110,125,85,.95)); opacity: 0; }
   #detective { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(40,120,255,.05) 35%, rgba(20,70,210,.42)); display: none; }
+  #detective.rayonsX { background: radial-gradient(ellipse at center, rgba(255,90,40,.04) 35%, rgba(200,40,20,.36)); }   /* au chapitre de Superman : la vision à rayons X */
   #rouge { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 45%, rgba(190,0,0,.75)); opacity: 0; }
   #sommeil { position: absolute; inset: 0; background: #000; opacity: 0; display: flex; align-items: center; justify-content: center;   /* B.J. dort : l'écran devient noir */
              font: 72px 'Anton', Impact, sans-serif; color: #b8c4ff; letter-spacing: 8px; }
@@ -368,10 +369,14 @@ const CHAPITRES = [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser'],
     ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
     ['H', 'tu mets ton costume, et tu deviens {super} · H encore : tu repasses en civil (sans tes pouvoirs)'],
+    ['J', "changer de costume (S.T.A.R. Labs en vend d'autres : ★ sur la carte)"],
     ['Maj 3 fois, vite', "en costume : t'envoler · encore 3 fois : arrêter de voler"],
     ['En volant', 'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping'],
     ['9', 'en costume : les yeux laser (garde le clic gauche enfoncé)'],
-    ['E', 'monter / descendre (voiture, bateau), ascenseur'],
+    ['G', 'en costume : soulever la voiture la plus proche (même un bus) · clic gauche : la lancer · G encore : la reposer'],
+    ['X, O, R, B', 'en costume, une fois achetés à S.T.A.R. Labs : le souffle glacé, la vision à rayons X, la super-vitesse (avec Maj), le super-cri'],
+    ['K', 'Krypto, le super-chien (une fois acheté) : il vient, ou il rentre à la maison'],
+    ['E', 'monter / descendre (voiture, bateau), ascenseur, magasin de S.T.A.R. Labs'],
     ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
     ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
     ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
@@ -380,6 +385,8 @@ const CHAPITRES = [
     'En costume, <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.',
     'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.',
     'En costume, <b>9</b> : les yeux laser. Et tomber de très haut ne te fait rien : tout s\'écrase autour de toi !',
+    'En costume, <b>G</b> : tu soulèves la voiture la plus proche, même un bus ! Clic gauche : tu la lances. <b>G</b> encore : tu la reposes.',
+    "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte) : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.",
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     'La DeLorean a disparu : elle est cachée dans la cour du vieux théâtre (<b>♣</b> sur la carte). Retrouve-la, puis tiens 88 miles à l\'heure pendant 3 secondes.',
@@ -2247,6 +2254,71 @@ const TRADUCTIONS = {
   "Le point d'exclamation": { de: 'Das Ausrufezeichen', en: 'The exclamation mark', gsw: 'S Usrüefezeiche' },
   "Le point d'interrogation": { de: 'Das Fragezeichen', en: 'The question mark', gsw: 'S Fragezeiche' },
   'La virgule': { de: 'Das Komma', en: 'The comma', gsw: 'S Komma' },
+  // le magasin de S.T.A.R. Labs, les pouvoirs de Superman, Krypto et la super-force (chapitre 4)
+  "changer de costume (S.T.A.R. Labs en vend d'autres : ★ sur la carte)": { de: 'Kostüm wechseln (S.T.A.R. Labs verkauft andere: ★ auf der Karte)', en: 'change suit (S.T.A.R. Labs sells others: ★ on the map)', gsw: 'Kostüm wächsle (S.T.A.R. Labs verchauft anderi: ★ uf de Charte)' },
+  'en costume : soulever la voiture la plus proche (même un bus) · clic gauche : la lancer · G encore : la reposer': { de: 'im Kostüm: das nächste Auto hochheben (sogar einen Bus) · Linksklick: es werfen · G noch einmal: es abstellen', en: 'in your suit: lift the nearest car (even a bus) · left click: throw it · G again: put it down', gsw: 'im Kostüm: s nächschte Auto ufhebe (sogar en Bus) · Linksklick: s wärfe · G nomal: s abstelle' },
+  'X, O, R, B': { de: 'X, O, R, B', en: 'X, O, R, B', gsw: 'X, O, R, B' },
+  'en costume, une fois achetés à S.T.A.R. Labs : le souffle glacé, la vision à rayons X, la super-vitesse (avec Maj), le super-cri': { de: 'im Kostüm, einmal bei S.T.A.R. Labs gekauft: der Eisatem, der Röntgenblick, die Supergeschwindigkeit (mit Umschalt), der Superschrei', en: 'in your suit, once bought at S.T.A.R. Labs: freeze breath, X-ray vision, super speed (with Shift), super shout', gsw: 'im Kostüm, wänn bi S.T.A.R. Labs kauft: de Iisatem, de Röntgeblick, d Supergschwindigkeit (mit Umschalt), de Superschrei' },
+  'Krypto, le super-chien (une fois acheté) : il vient, ou il rentre à la maison': { de: 'Krypto, der Superhund (einmal gekauft): Er kommt, oder er geht nach Hause', en: 'Krypto the Superdog (once bought): he comes, or he goes home', gsw: 'Krypto, de Superhund (wänn kauft): Er chunnt, oder er gaht hei' },
+  'monter / descendre (voiture, bateau), ascenseur, magasin de S.T.A.R. Labs': { de: 'einsteigen / aussteigen (Auto, Boot), Aufzug, Laden von S.T.A.R. Labs', en: 'get in / out (car, boat), elevator, S.T.A.R. Labs shop', gsw: 'iistiige / uusstiige (Auto, Boot), Lift, Lade vo S.T.A.R. Labs' },
+  'En costume, <b>G</b> : tu soulèves la voiture la plus proche, même un bus ! Clic gauche : tu la lances. <b>G</b> encore : tu la reposes.': { de: 'Im Kostüm, <b>G</b>: Du hebst das nächste Auto hoch, sogar einen Bus! Linksklick: Du wirfst es. <b>G</b> noch einmal: Du stellst es ab.', en: 'In your suit, <b>G</b>: you lift the nearest car, even a bus! Left click: you throw it. <b>G</b> again: you put it down.', gsw: 'Im Kostüm, <b>G</b>: Du hebsch s nächschte Auto uf, sogar en Bus! Linksklick: Du wirfsch es. <b>G</b> nomal: Du stellsch es ab.' },
+  "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte) : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.": { de: 'Der Laden von <b>S.T.A.R. Labs</b> (★ auf der Karte): andere Kostüme, neue Kräfte, Verbesserungen und Krypto, der Superhund! <b>J</b>: Kostüm wechseln.', en: 'The <b>S.T.A.R. Labs</b> shop (★ on the map): other suits, new powers, upgrades, and Krypto the Superdog! <b>J</b>: change suit.', gsw: 'De Lade vo <b>S.T.A.R. Labs</b> (★ uf de Charte): anderi Kostüm, neui Chräft, Verbesserige und Krypto, de Superhund! <b>J</b>: Kostüm wächsle.' },
+  'Le magasin de <b>S.T.A.R. Labs</b> est ouvert (★ sur la carte) : des costumes, des pouvoirs, des améliorations... et Krypto !': { de: 'Der Laden von <b>S.T.A.R. Labs</b> ist offen (★ auf der Karte): Kostüme, Kräfte, Verbesserungen... und Krypto!', en: 'The <b>S.T.A.R. Labs</b> shop is open (★ on the map): suits, powers, upgrades... and Krypto!', gsw: 'De Lade vo <b>S.T.A.R. Labs</b> isch offe (★ uf de Charte): Kostüm, Chräft, Verbesserige... und Krypto!' },
+  'Man of Steel':     { de: 'Man of Steel', en: 'Man of Steel', gsw: 'Man of Steel' },
+  'Costume noir':     { de: 'Schwarzes Kostüm', en: 'Black suit', gsw: 'Schwarzes Kostüm' },
+  'Superman électrique': { de: 'Elektrischer Superman', en: 'Electric Superman', gsw: 'Elektrische Superman' },
+  'Supergirl électrique': { de: 'Elektrisches Supergirl', en: 'Electric Supergirl', gsw: 'Elektrischs Supergirl' },
+  'Armure de Krypton': { de: 'Rüstung von Krypton', en: 'Kryptonian armor', gsw: 'Rüschtig vo Krypton' },
+  'Souffle glacé':    { de: 'Eisatem', en: 'Freeze breath', gsw: 'Iisatem' },
+  'Vision à rayons X': { de: 'Röntgenblick', en: 'X-ray vision', gsw: 'Röntgeblick' },
+  'Super-vitesse':    { de: 'Supergeschwindigkeit', en: 'Super speed', gsw: 'Supergschwindigkeit' },
+  'Super-cri':        { de: 'Superschrei', en: 'Super shout', gsw: 'Superschrei' },
+  'Vol':              { de: 'Fliegen', en: 'Flight', gsw: 'Flüüge' },
+  'Force':            { de: 'Kraft', en: 'Strength', gsw: 'Chraft' },
+  'tu voles plus vite': { de: 'du fliegst schneller', en: 'you fly faster', gsw: 'du flüügsch schnäller' },
+  'tu voles moins vite': { de: 'du fliegst langsamer', en: 'you fly slower', gsw: 'du flüügsch langsamer' },
+  'yeux laser plus forts': { de: 'stärkere Laseraugen', en: 'stronger laser eyes', gsw: 'stärcheri Laserauge' },
+  "Tu n'as que ce costume : les autres s'achètent à S.T.A.R. Labs (★ sur la carte)": { de: 'Du hast nur dieses Kostüm: Die anderen kaufst du bei S.T.A.R. Labs (★ auf der Karte)', en: 'You only have this suit: the others are sold at S.T.A.R. Labs (★ on the map)', gsw: 'Du häsch nur das Kostüm: Di andere chaufsch bi S.T.A.R. Labs (★ uf de Charte)' },
+  'Mets ton costume (H) pour tes pouvoirs': { de: 'Zieh dein Kostüm an (H) für deine Kräfte', en: 'Put on your suit (H) for your powers', gsw: 'Leg dis Kostüm aa (H) für dini Chräft' },
+  "{gadget} : ça s'achète à S.T.A.R. Labs (★ sur la carte)": { de: '{gadget}: Das kaufst du bei S.T.A.R. Labs (★ auf der Karte)', en: '{gadget}: sold at S.T.A.R. Labs (★ on the map)', gsw: '{gadget}: Das chaufsch bi S.T.A.R. Labs (★ uf de Charte)' },
+  'Souffle glacé : encore {n} s': { de: 'Eisatem: noch {n} s', en: 'Freeze breath: {n} s left', gsw: 'Iisatem: na {n} s' },
+  'VISION À RAYONS X': { de: 'RÖNTGENBLICK', en: 'X-RAY VISION', gsw: 'RÖNTGEBLICK' },
+  'Les méchants en rouge, les autres en bleu, à travers les murs · O : éteindre': { de: 'Die Bösewichte in Rot, die anderen in Blau, durch die Wände hindurch · O: ausschalten', en: 'Villains in red, everyone else in blue, through the walls · O: switch off', gsw: 'D Bösewicht in Rot, di andere in Blau, dur d Wänd dure · O: abschalte' },
+  'Vision à rayons X éteinte': { de: 'Röntgenblick aus', en: 'X-ray vision off', gsw: 'Röntgeblick us' },
+  'SUPER-VITESSE !':  { de: 'SUPERGESCHWINDIGKEIT!', en: 'SUPER SPEED!', gsw: 'SUPERGSCHWINDIGKEIT!' },
+  "<b>Maj</b> : tu cours à toute vitesse · <b>R</b> : l'arrêter": { de: '<b>Umschalt</b>: Du rennst mit voller Geschwindigkeit · <b>R</b>: aufhören', en: '<b>Shift</b>: you run at full speed · <b>R</b>: stop it', gsw: '<b>Umschalt</b>: Du seckelsch mit vollem Tämpo · <b>R</b>: ufhöre' },
+  'Super-vitesse arrêtée': { de: 'Supergeschwindigkeit aus', en: 'Super speed off', gsw: 'Supergschwindigkeit us' },
+  'Super-cri : encore {n} s': { de: 'Superschrei: noch {n} s', en: 'Super shout: {n} s left', gsw: 'Superschrei: na {n} s' },
+  "Krypto t'attend à S.T.A.R. Labs (★ sur la carte) : il s'achète au magasin": { de: 'Krypto wartet bei S.T.A.R. Labs auf dich (★ auf der Karte): Du kannst ihn im Laden kaufen', en: 'Krypto is waiting for you at S.T.A.R. Labs (★ on the map): you can buy him at the shop', gsw: 'De Krypto wartet bi S.T.A.R. Labs uf dich (★ uf de Charte): Du chasch en im Lade chaufe' },
+  'Il arrive en volant · <b>K</b> : le renvoyer': { de: 'Er kommt angeflogen · <b>K</b>: ihn nach Hause schicken', en: 'He comes flying in · <b>K</b>: send him home', gsw: 'Er chunnt cho flüüge · <b>K</b>: en hei schicke' },
+  'Il rentre à la maison · <b>K</b> : le rappeler': { de: 'Er fliegt nach Hause · <b>K</b>: ihn zurückrufen', en: 'He goes home · <b>K</b>: call him back', gsw: 'Er gaht hei · <b>K</b>: en zrugg rüefe' },
+  'Mets ton costume (H) pour soulever les voitures': { de: 'Zieh dein Kostüm an (H), um Autos hochzuheben', en: 'Put on your suit (H) to lift cars', gsw: 'Leg dis Kostüm aa (H), zum Autos ufhebe' },
+  "Sors de l'eau d'abord !": { de: 'Komm zuerst aus dem Wasser!', en: 'Get out of the water first!', gsw: 'Chumm zersch us em Wasser!' },
+  "Approche-toi d'une voiture pour la soulever (<b>G</b>)": { de: 'Geh näher an ein Auto heran, um es hochzuheben (<b>G</b>)', en: 'Get closer to a car to lift it (<b>G</b>)', gsw: 'Gang nöcher anes Auto, zum s ufhebe (<b>G</b>)' },
+  'Celle-là, tu ne peux pas la soulever': { de: 'Das kannst du nicht hochheben', en: "You can't lift that one", gsw: 'Das chasch nöd ufhebe' },
+  'Clic gauche : la lancer là où tu regardes · <b>G</b> : la reposer': { de: 'Linksklick: es dorthin werfen, wo du hinschaust · <b>G</b>: es abstellen', en: "Left click: throw it where you're looking · <b>G</b>: put it down", gsw: 'Linksklick: s det häre wärfe, wo du häluegsch · <b>G</b>: s abstelle' },
+  "Trop haut : descends d'abord pour la reposer (ou lance-la : clic gauche)": { de: 'Zu hoch: Flieg zuerst tiefer, um es abzustellen (oder wirf es: Linksklick)', en: 'Too high: go lower first to put it down (or throw it: left click)', gsw: 'Z höch: Flüüg zersch abe, zum s abstelle (oder wirf es: Linksklick)' },
+  'Il y a des gens dedans : repose-la doucement (<b>G</b>)': { de: 'Da sind Leute drin: Stell es vorsichtig ab (<b>G</b>)', en: 'There are people inside: put it down gently (<b>G</b>)', gsw: 'Da sind Lüüt drin: Stell s vorsichtig ab (<b>G</b>)' },
+  'Tes mains sont prises : lance la voiture (clic gauche), ou repose-la (<b>G</b>)': { de: 'Deine Hände sind voll: Wirf das Auto (Linksklick) oder stell es ab (<b>G</b>)', en: 'Your hands are full: throw the car (left click), or put it down (<b>G</b>)', gsw: 'Dini Händ sind voll: Wirf s Auto (Linksklick) oder stell s ab (<b>G</b>)' },
+  'Le magasin de S.T.A.R. Labs ouvre après ta première mission (suis le point jaune)': { de: 'Der Laden von S.T.A.R. Labs öffnet nach deiner ersten Mission (folge dem gelben Punkt)', en: 'The S.T.A.R. Labs shop opens after your first mission (follow the yellow dot)', gsw: 'De Lade vo S.T.A.R. Labs gaht nach dinere erschte Mission uf (folg em gääle Punkt)' },
+  'Il ouvre après ta première mission : suis le point jaune !': { de: 'Er öffnet nach deiner ersten Mission: Folge dem gelben Punkt!', en: 'It opens after your first mission: follow the yellow dot!', gsw: 'Er gaht nach dinere erschte Mission uf: Folg em gääle Punkt!' },
+  'Krypto : déjà à toi (<b>K</b> : il vient, ou il rentre à la maison)': { de: 'Krypto: gehört schon dir (<b>K</b>: Er kommt, oder er geht nach Hause)', en: 'Krypto: already yours (<b>K</b>: he comes, or he goes home)', gsw: 'Krypto: ghört scho dir (<b>K</b>: Er chunnt, oder er gaht hei)' },
+  'En costume, X : ton souffle glacé gèle tout devant toi': { de: 'Im Kostüm, X: Dein Eisatem friert alles vor dir ein', en: 'In your suit, X: your freeze breath freezes everything in front of you', gsw: 'Im Kostüm, X: Din Iisatem friert alles vor dir ii' },
+  'En costume, O : tu vois les méchants à travers les murs': { de: 'Im Kostüm, O: Du siehst die Bösewichte durch die Wände', en: 'In your suit, O: you see villains through walls', gsw: 'Im Kostüm, O: Du gsehsch d Bösewicht dur d Wänd' },
+  'En costume, R : la super-vitesse (avec Maj, tu cours à toute vitesse)': { de: 'Im Kostüm, R: die Supergeschwindigkeit (mit Umschalt rennst du mit voller Geschwindigkeit)', en: 'In your suit, R: super speed (with Shift, you run at full speed)', gsw: 'Im Kostüm, R: d Supergschwindigkeit (mit Umschalt seckelsch mit vollem Tämpo)' },
+  'En costume, B : ton super-cri renverse tout devant toi': { de: 'Im Kostüm, B: Dein Superschrei wirft alles vor dir um', en: 'In your suit, B: your super shout knocks over everything in front of you', gsw: 'Im Kostüm, B: Din Superschrei rüehrt alles vor dir um' },
+  'Appuie sur <b>E</b> pour monter : {vehicule} · <b>G</b> : la soulever': { de: 'Drücke <b>E</b> zum Einsteigen: {vehicule} · <b>G</b>: hochheben', en: 'Press <b>E</b> to get in: {vehicule} · <b>G</b>: lift it', gsw: 'Drück <b>E</b> zum Iistiige: {vehicule} · <b>G</b>: ufhebe' },
+  'Krypto : à toi !': { de: 'Krypto: gehört dir!', en: 'Krypto: yours!', gsw: 'Krypto: ghört dir!' },
+  'Il te suit partout, à pied et en volant, et mord les méchants · K : le renvoyer, ou le rappeler': { de: 'Er folgt dir überallhin, zu Fuß und im Flug, und beißt die Bösewichte · K: ihn nach Hause schicken oder zurückrufen', en: 'He follows you everywhere, on foot and in flight, and bites villains · K: send him home, or call him back', gsw: 'Er folgt dir überall hi, z Fuess und im Flug, und biisst d Bösewicht · K: en hei schicke oder zrugg rüefe' },
+  'Tu voles plus vite': { de: 'Du fliegst schneller', en: 'You fly faster', gsw: 'Du flüügsch schnäller' },
+  'Tes yeux laser font plus mal': { de: 'Deine Laseraugen tun mehr weh', en: 'Your laser eyes hurt more', gsw: 'Dini Laserauge tüend meh weh' },
+  'Tes coups de poing font plus mal, et envoient tout valser': { de: 'Deine Faustschläge tun mehr weh und schleudern alles weg', en: 'Your punches hurt more, and send everything flying', gsw: 'Dini Fuustschläg tüend meh weh und schlänggered alles wäg' },
+  'monsieur Kent':    { de: 'Mister Kent', en: 'Mr. Kent', gsw: 'Mister Kent' },
+  'mademoiselle Danvers': { de: 'Miss Danvers', en: 'Miss Danvers', gsw: 'Miss Danvers' },
+  'PROFESSEUR HAMILTON': { de: 'PROFESSOR HAMILTON', en: 'PROFESSOR HAMILTON', gsw: 'PROFESSER HAMILTON' },
+  "« Tout n'est pas encore prêt. Reviens après ta première mission ! »": { de: '„Noch ist nicht alles fertig. Komm nach deiner ersten Mission wieder!“', en: '"Not everything is ready yet. Come back after your first mission!"', gsw: '«Es isch no nöd alles parat. Chumm nach dinere erschte Mission wider!»' },
+  "« Bonjour, {super} ! J'ai de nouvelles inventions pour toi. »": { de: '„Hallo, {super}! Ich habe neue Erfindungen für dich.“', en: '"Hello, {super}! I have new inventions for you."', gsw: '«Hoi, {super}! Ich ha neui Erfindige für dich.»' },
+  '« Bonjour, {nom} ! Dites à {super} que tout est prêt. »': { de: '„Guten Tag, {nom}! Sagen Sie {super}, dass alles bereit ist.“', en: '"Hello, {nom}! Tell {super} that everything is ready."', gsw: '«Grüezi, {nom}! Säged Sie im {super}, dass alles parat isch.»' },
 };
 
 // la langue choisie : le navigateur s'en souvient pour la prochaine fois
@@ -2737,6 +2809,8 @@ const REGLAGES = {
   vitesseVolMax: 100,        // ...jusqu'à ça (360 km/h, plus vite que l'avion !)
   tripleMaj: 0.6,            // secondes pour taper Maj 3 fois
   traitsTourbillon: 34,      // au chapitre de Superman : les traits bleus, rouges et jaunes du tourbillon, quand il met son costume (touche H) ou l'enlève
+  porteeForce: 4,            // au chapitre de Superman, en costume, la super-force : G soulève la voiture la plus proche (même un camion ou un bus), à autant de mètres au plus de sa carrosserie...
+  lancerForce: 32,           // ...et le clic gauche la lance là où tu regardes, à cette vitesse (m/s : 32 = 115 km/h). G encore : il la repose doucement par terre
   vitesseTonneau: 7.5,       // en volant (Superman, la Batmobile), Maj + Q ou D : un tonneau, il tourne sur lui-même. En radians par seconde (7.5 = un tour en 0,8 s)
   vitesseLooping: 3,         // en volant (Superman, la Batmobile), Maj + Espace (ou C) : un looping, en radians par seconde (3 = un looping en 2 s). Plus il vole vite, plus la boucle est grande. L'avion a ses nombres à lui, dans VOITURES
   roulisVirage: 0.9,         // ce qui vole (avion, hélicoptère, Superman) penche dans ses virages : 0 = jamais, 0.9 = jusqu'à 36°, 1.5 = jusqu'à 60°
@@ -4394,36 +4468,118 @@ const batgirl = () => fille() && CHAPITRE.triche === 'BATMAN';
 // LES COSTUMES DE SUPERMAN ET DE SUPERGIRL (le code SUPERMAN ; au chapitre de Superman, la touche H les met et les enlève) : bleu (le collant),
 // rouge (le slip, les bottes et la cape), jaune (la ceinture, et l'écusson et son « S »). jupe: true = une jupe rouge et les jambes nues, et
 // ses longs cheveux qui tombent dans son dos (ceux de l'héroïne, Kara Danvers : blonds). Supergirl, c'est Kara Danvers, au chapitre de
-// Superman, avec la fille du menu. Ailleurs (le code SUPERMAN au chapitre 1), c'est toujours Superman
+// Superman, avec la fille du menu. Ailleurs (le code SUPERMAN au chapitre 1), c'est toujours Superman. Les autres costumes, ceux du magasin
+// de S.T.A.R. Labs, sont dans COSTUMES_STAR, juste en dessous
 const COSTUME_SUPERMAN =  { nom: 'Superman',  bleu: '#1c50c8', rouge: '#c8141c', jaune: '#f2cc1e' };
 const COSTUME_SUPERGIRL = { nom: 'Supergirl', bleu: '#1c50c8', rouge: '#c8141c', jaune: '#f2cc1e', jupe: true };
 const supergirl = () => fille() && CHAPITRE.triche === 'SUPERMAN';
-// Habille b (B.J.) en Superman, avec le costume C (COSTUME_SUPERMAN ou COSTUME_SUPERGIRL) : le collant bleu, le slip et les bottes rouges,
-// la ceinture jaune, le « S » sur la poitrine, la cape rouge ; les cheveux noirs et l'accroche-cœur (Superman), ou la jupe et les longs
-// cheveux (Supergirl)
-function habillerSuperman(b, C) {
-  const { bleu, rouge, jaune } = C, noir = '#16161c';
-  habiller(b.torse, bleu); habiller(b.bassin, rouge); habiller(b.ceinture, jaune);
-  for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) habillerMembre(m, C.jupe && m.chaussure ? PEAU_BJ : bleu);   // (Supergirl : les jambes nues)
+// Habille b (B.J., ou un mannequin du magasin de S.T.A.R. Labs) en Superman, avec le costume C (COSTUME_SUPERMAN, COSTUME_SUPERGIRL, ou une
+// ligne de COSTUMES_STAR) : le collant bleu, le slip et les bottes rouges, la ceinture jaune, le « S » sur la poitrine, la cape rouge ; les
+// cheveux noirs et l'accroche-cœur (Superman), ou la jupe et les longs cheveux (Supergirl). cape : la cape à lui mettre (celle de B.J., sinon)
+function habillerSuperman(b, C, cape = capeBJ) {
+  const { bleu, rouge, jaune } = C, noir = '#16161c', slip = C.slip || rouge, bottes = C.bottes || rouge, brille = C.brille ? { emissive: C.brille, emissiveIntensity: 0.5 } : {};
+  const collant = mat(bleu, brille);   // (Superman électrique : son collant brille)
+  b.torse.material = !C.motif ? collant : TISSUS['collant' + C.nom] ||= std(toile(128, 128, (g, l, h) => motifCollant(g, l, h, C)), { bumpScale: 0.02, ...brille });
+  habiller(b.bassin, slip); habiller(b.ceinture, C.ceinture || jaune);
+  for (const m of [b.brasD, b.brasG, b.jambeD, b.jambeG]) m.haut.material = m.bas.material = C.jupe && m.chaussure ? mat(PEAU_BJ) : collant;   // (Supergirl : les jambes nues)
   for (const j of [b.jambeD, b.jambeG]) { // les bottes montent sur le mollet
-    habiller(j.chaussure, rouge);
-    accessoire(GEO.tigeSantiag, rouge, j.pli, 0, 0, 0).material = mat(rouge, { side: THREE.DoubleSide });
+    habiller(j.chaussure, bottes);
+    accessoire(GEO.tigeSantiag, bottes, j.pli, 0, 0, 0).material = mat(bottes, { side: THREE.DoubleSide });
   }
   // l'écusson : cinq côtés, la pointe en bas, jaune bordé de rouge, avec le « S » (là où rien n'est dessiné, on voit le collant à travers)
-  accessoire(GEO.blason, jaune, b.torse, 0, 0, 0).material = TISSUS['blason' + C.nom] ||= std(toile(128, 128, g => {
+  const fond = C.ecusson || jaune, lettre = C.lettre || rouge;
+  accessoire(GEO.blason, fond, b.torse, 0, 0, 0).material = TISSUS['blason' + C.nom] ||= std(toile(128, 128, g => {
     g.translate(64, 0);
     g.beginPath(); for (const [x, y] of [[-38, 14], [38, 14], [58, 44], [0, 120], [-58, 44]]) g.lineTo(x, y); g.closePath();
-    g.fillStyle = jaune; g.fill(); g.lineWidth = 9; g.lineJoin = 'round'; g.strokeStyle = rouge; g.stroke();
-    g.fillStyle = rouge; g.font = 'bold 82px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('S', 0, 57);
+    g.fillStyle = fond; g.fill(); g.lineWidth = 9; g.lineJoin = 'round'; g.strokeStyle = lettre; g.stroke();
+    g.fillStyle = lettre; g.font = 'bold 82px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('S', 0, 57);
   }), { alphaTest: 0.5, bumpScale: 0.01 });
-  mettreCape(b, rouge);   // la cape, qui flotte au vent
+  if (!C.sansCape) mettreCape(b, C.couleurCape || rouge, false, cape);   // la cape, qui flotte au vent (sansCape: true : pas de cape)
   if (b.lunettes) b.lunettes.visible = false;   // (les lunettes de Clark Kent, ou de Kara Danvers : en costume, il les enlève ; rhabillerBJ les lui rend)
-  if (C.jupe) { // Supergirl : la jupe rouge (sur le bassin et sur chaque cuisse), et ses longs cheveux, dans son dos
-    accessoire(GEO.jupe, rouge, b.bassin, 0, 0, 0).material = mat(rouge, { side: THREE.DoubleSide });
-    for (const j of [b.jambeD, b.jambeG]) accessoire(GEO.jupeCuisse, rouge, j, 0, 0, 0).material = mat(rouge, { side: THREE.DoubleSide });
-    accessoire(GEO.criniere, tenueCivile().cheveux || CHEVEUX[heros.cheveux], b.tete, 0, -0.02, -0.075).rotation.x = 0.22;
-  } else { habiller(b.cheveux, noir); accessoire(GEO.boucle, noir, b.tete, 0.012, 0.086, 0.104).rotation.z = 2.4; }   // l'accroche-cœur, sur le front
+  if (C.jupe) { // Supergirl : la jupe rouge (sur le bassin et sur chaque cuisse)
+    accessoire(GEO.jupe, slip, b.bassin, 0, 0, 0).material = mat(slip, { side: THREE.DoubleSide });
+    for (const j of [b.jambeD, b.jambeG]) accessoire(GEO.jupeCuisse, slip, j, 0, 0, 0).material = mat(slip, { side: THREE.DoubleSide });
+  }
+  if (C.jupe || C.cheveux) accessoire(GEO.criniere, tenueCivile().cheveux || CHEVEUX[heros.cheveux], b.tete, 0, -0.02, -0.075).rotation.x = 0.22;   // ses longs cheveux, dans son dos
+  else { habiller(b.cheveux, noir); accessoire(GEO.boucle, noir, b.tete, 0.012, 0.086, 0.104).rotation.z = 2.4; }   // l'accroche-cœur, sur le front
 }
+// le dessin du collant (motif, dans COSTUMES_STAR), sur le torse : 'mailles' (de fines écailles, comme dans Man of Steel), 'eclairs' (des
+// éclairs blancs : Superman électrique), 'armure' (des plaques bordées d'argent : l'armure de Krypton). Le devant est au bord de l'image
+function motifCollant(g, l, h, C) {
+  g.fillStyle = C.bleu; g.fillRect(0, 0, l, h);
+  if (C.motif === 'mailles') { // de petites écailles, en quinconce : un trait plus sombre en bas, plus clair en haut
+    g.lineWidth = 1;
+    for (let y = 0; y <= h; y += 6) for (let x = (y / 6) % 2 * 4; x <= l; x += 8) {
+      g.strokeStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.arc(x, y, 4, 0.2, Math.PI - 0.2); g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.arc(x, y + 2, 4, Math.PI + 0.4, -0.4); g.stroke();
+    }
+  } else if (C.motif === 'eclairs') { // des éclairs blancs qui zigzaguent du haut en bas du collant
+    g.strokeStyle = '#ffffff'; g.lineWidth = 2.5; g.lineJoin = 'round';
+    for (const x0 of [10, 42, 74, 106]) { g.beginPath(); let x = x0; for (let y = 0; y <= h; y += 16) { g.lineTo(x, y); x += (y / 16) % 2 ? -9 : 9; } g.stroke(); }
+  } else if (C.motif === 'armure') { // des plaques : des bandes sur le ventre, une grande plaque sur la poitrine, bordées d'argent
+    g.strokeStyle = '#8a909a'; g.lineWidth = 1.5;
+    for (let y = 76; y < h - 6; y += 9) { g.beginPath(); g.moveTo(0, y); g.lineTo(l, y); g.stroke(); }
+    for (const x of [0, l]) { g.fillStyle = 'rgba(255,255,255,.07)'; g.beginPath(); g.ellipse(x, 34, 28, 28, 0, 0, 7); g.fill(); g.lineWidth = 2.5; g.stroke(); }   // (la poitrine : au bord de l'image, devant)
+    g.beginPath(); g.moveTo(l / 2, 0); g.lineTo(l / 2, h); g.stroke();   // (la couture du dos)
+  }
+}
+// LE MAGASIN DE S.T.A.R. LABS, au chapitre de Superman : dans le grand hall du laboratoire (★ sur la carte de Metropolis), où le professeur
+// Hamilton t'attend. Il n'ouvre qu'après ta première mission. E devant un stand : l'acheter, ou choisir ce que tu as déjà. Ce que tu achètes
+// reste à toi, même si tu changes de chapitre et que tu reviens. Tout va dans ces 4 tableaux : change les prix, ou invente les tiens !
+// LES COSTUMES : le premier, tu l'as (le classique, au slip rouge ; avec la fille du menu, celui de Supergirl) ; les autres s'achètent.
+// J : passer au costume suivant (en costume, tu te changes tout de suite, dans ton tourbillon ; en civil, H le mettra)
+//  nom, prix (0 : le premier) ; fille : ce qui change avec la fille du menu (ses longs cheveux sortent toujours ; jupe: true : une jupe)
+//  bleu (le collant), rouge (le slip, les bottes et la cape), jaune (la ceinture et l'écusson), comme COSTUME_SUPERMAN ; slip, bottes,
+//    couleurCape, ceinture : leur couleur à eux (sansCape: true = pas de cape) ; ecusson, lettre : le fond de l'écusson, et son bord et son « S » ;
+//    motif : un dessin sur le collant ('mailles', 'eclairs' ou 'armure') ; brille : le collant brille de cette couleur
+//  protection : la part des dégâts que tu prends (0.5 = la moitié ; sans : tout) ; vol : ta vitesse en volant (1.2 = 20 % plus vite) ;
+//    vitesse : à pied (1 = normal) ; laser : tes yeux laser font tant de fois plus mal ; poings : tes coups de poing aussi, et ils envoient
+//    valser les gens et les voitures
+//  (les mannequins sont en rang au milieu du hall : plus il y a de costumes, plus ils sont serrés ; une dizaine au plus)
+const COSTUMES_STAR = [
+  { ...COSTUME_SUPERMAN, prix: 0, fille: COSTUME_SUPERGIRL },
+  { nom: 'Man of Steel', prix: 20000, bleu: '#1e2f66', rouge: '#7e1519', jaune: '#c39a2c', slip: '#1e2f66', ceinture: '#24356e', motif: 'mailles', vol: 1.2 },
+  { nom: 'Costume noir', prix: 40000, bleu: '#17181d', rouge: '#17181d', jaune: '#b9bfc9', ecusson: '#17181d', lettre: '#b9bfc9', protection: 0.6 },
+  { nom: 'Superman électrique', prix: 60000, bleu: '#9fd2ff', rouge: '#2a78e8', jaune: '#ffffff', ecusson: '#2a78e8', lettre: '#ffffff', slip: '#9fd2ff', sansCape: true, motif: 'eclairs', brille: '#3a9cff',
+    vitesse: 1.25, laser: 1.5, fille: { nom: 'Supergirl électrique' } },
+  { nom: 'Armure de Krypton', prix: 90000, bleu: '#2b2d33', rouge: '#5a1418', jaune: '#9aa0aa', slip: '#2b2d33', bottes: '#202226', ecusson: '#9aa0aa', lettre: '#202226', motif: 'armure',
+    protection: 0.35, vol: 0.85, poings: 1.5 },
+];
+// LES NOUVEAUX POUVOIRS : une fois achetés, ils marchent quand tu es en costume
+//  glace (touche X) : le souffle glacé. Tu souffles devant toi, jusqu'à « portee » mètres, dans un cône de « angle » degrés : ceux qui y sont
+//    gèlent « gel » secondes (ils ne bougent plus, ne tirent plus ; les méchants perdent « degats » points), les voitures s'arrêtent et
+//    s'éteignent si elles brûlent. Puis il faut « recharge » secondes
+//  rayonsX (touche O) : la vision à rayons X. O l'allume ou l'éteint : tu vois les méchants à travers les murs (en rouge, jusqu'à « portee »
+//    mètres) et les autres gens (en bleu, jusqu'à « porteeGens »)
+//  vitesse (touche R) : la super-vitesse. R l'allume ou l'éteint : à pied, avec Maj, tu cours à « course » m/s (30 = 108 km/h !)
+//  cri (touche B) : le super-cri. Tout ce qui est devant toi, jusqu'à « portee » mètres, dans un cône de « angle » degrés, est renversé : les
+//    gens volent (les méchants perdent « degats » points), les voitures sont soufflées (« force » : 1 comme une explosion). Puis « recharge » s
+//  (change leurs nombres et leurs prix ; un pouvoir de plus aurait son présentoir, mais il ne ferait rien : ce qu'il fait, et sa touche, sont
+//  dans le code. Les présentoirs vont vers le mur : 5 au plus)
+const POUVOIRS_STAR = {
+  glace:   { nom: 'Souffle glacé', prix: 25000, portee: 20, angle: 25, gel: 6, degats: 25, recharge: 3 },
+  rayonsX: { nom: 'Vision à rayons X', prix: 15000, portee: 150, porteeGens: 60 },
+  vitesse: { nom: 'Super-vitesse', prix: 30000, course: 30 },
+  cri:     { nom: 'Super-cri', prix: 40000, portee: 30, angle: 30, degats: 150, force: 1, recharge: 5 },
+};
+// LES AMÉLIORATIONS, niveau par niveau (prix : celui de chaque niveau, à partir du 2e : ajoute un prix, tu as un niveau de plus !)
+//  vol : à chaque niveau, tu voles « vitesse » fois plus vite (et ta vitesse la plus haute aussi)
+//  laser : à chaque niveau, tes yeux laser font « degats » fois plus mal
+//  vie : à chaque niveau, « vie » points de vie en plus (au 1er niveau : REGLAGES.viesJoueur)
+//  force : à chaque niveau, en costume, tes coups de poing font « poings » fois plus mal (et envoient valser les gens et les voitures).
+//    Attention : au-delà de 50 points, un seul coup de poing tue un passant (au niveau 4, dans l'armure de Krypton : 44 points)
+//  (une amélioration de plus aurait son socle, mais ne changerait rien sans code : ajoute plutôt des niveaux. 5 socles au plus)
+const AMELIORATIONS_STAR = {
+  vol:   { nom: 'Vol', prix: [10000, 20000, 40000], vitesse: 1.2 },
+  laser: { nom: 'Yeux laser', prix: [10000, 20000, 40000], degats: 1.5 },
+  vie:   { nom: 'Vie', prix: [10000, 20000, 40000], vie: 25 },
+  force: { nom: 'Force', prix: [8000, 15000, 30000], poings: 1.25 },
+};
+// KRYPTO, LE SUPER-CHIEN : un chien blanc à cape rouge, qui attend au fond du hall. Une fois acheté, il te suit partout, à pied et en volant,
+// et il mord les méchants (jamais les passants). K : il s'en va, ou il revient
+//  prix ; degats : une morsure ; morsure : les secondes entre deux morsures ; portee : il attaque les méchants à moins de ça de toi (en
+//  mètres) ; vitesse : il court à ça (m/s) ; vol : en volant, il va jusqu'à ça (m/s), et toujours au moins aussi vite que toi
+const KRYPTO = { prix: 50000, degats: 45, morsure: 0.7, portee: 40, vitesse: 13, vol: 40 };
 const cacheBatman = {};   // (les dessins de l'écusson et de la cagoule, faits une fois pour toutes)
 // LE MAGASIN DE LUCIUS FOX, au chapitre de Batman : dans le grand hall de Wayne Enterprises, au pied de la tour Wayne (⚙ sur la carte de
 // Gotham). Il n'ouvre que quand tu as ton premier costume. E devant un stand : l'acheter, ou choisir ce que tu as déjà. Ce que tu achètes
@@ -4598,9 +4754,9 @@ const TRICHES = [
       accessoire(GEO.moustache, blanc, b.tete, 0, -0.045, 0.118).scale.set(1.9, 0.8, 1);
     } },
   // le costume de Superman : collant bleu, slip et bottes rouges, ceinture jaune, le « S » sur la poitrine, la cape rouge, les cheveux noirs
-  // et l'accroche-cœur (voir habillerSuperman ; au chapitre de Superman, avec la fille du menu : Supergirl). Il n'est pas invincible (les
-  // balles lui font mal), mais il a les yeux laser, et tomber de haut ne lui fait rien
-  { code: 'SUPERMAN', texte: 'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout', laser: true, ecrase: true, effet: b => habillerSuperman(b, supergirl() ? COSTUME_SUPERGIRL : COSTUME_SUPERMAN) },
+  // et l'accroche-cœur (voir habillerSuperman ; au chapitre de Superman, c'est le costume qu'il a choisi, COSTUMES_STAR : avec la fille du
+  // menu, celui de Supergirl). Il n'est pas invincible (les balles lui font mal), mais il a les yeux laser, et tomber de haut ne lui fait rien
+  { code: 'SUPERMAN', texte: 'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout', laser: true, ecrase: true, effet: b => habillerSuperman(b, costumeSuperman()) },
   // Batman : le costume gris, le slip, les gants, les bottes et la cagoule noirs (avec ses deux oreilles pointues), la ceinture jaune,
   // la chauve-souris sur la poitrine et la grande cape noire. Il a le grappin (qu'il prend en main), les batarangs et les filets (touche 9),
   // la cape pour planer (Maj en l'air), et sa Batmobile, qui vole (touche R), apparaît à côté de lui (la touche B la rappelle). Il n'est pas
@@ -7104,6 +7260,7 @@ const garagistes = [], braquages = [], butinsDepart = [];
 const presentoirs = [];   // les vitrines de l'atelier de Tony Stark : une armure debout dans chacune (voir exposerArmures)
 const standsStark = [];   // le magasin de Stark Industries : une armure (k) ou une amélioration sur chaque stand (voir ouvrirMagasin)
 const standsWayne = [];   // le magasin de Lucius Fox : un costume, une Batmobile, un gadget ou une amélioration sur chaque stand (voir ouvrirMagasinWayne)
+const standsStar = [];    // le magasin de S.T.A.R. Labs : un costume, un pouvoir, une amélioration ou Krypto sur chaque stand (voir ouvrirMagasinStar)
 const lits = [];   // les lits où B.J. dort (voir « Le jour et la nuit ») : ceux de ses villas (v dans la CARTE), de la villa de Michael et de la maison de Franklin
 const autresLits = [];   // les autres (appartements, caravane de Trevor, hôpital) : l'aide dit d'aller dormir dans une de ses villas
 let chateau = null, bunker = null;
@@ -7828,7 +7985,21 @@ function construireStarLabs(X, Z, rnd) {
   const yt = b.niveau(1) + 0.4;
   geoBloc('metal', new THREE.SphereGeometry(12, 28, 12, 0, 2 * Math.PI, 0, Math.PI / 2).translate(X(30), yt, Z(22)));   // le dôme
   for (const [r, h] of [[12, 4], [10.4, 7.5], [7, 10.5], [3.5, 11.8]]) collisionRonde(X(30), Z(22), r, Y0 + yt, Y0 + yt + h);   // (le dôme : en marches)
-  starLabs = { x: X(30), z: Z(24), y: Y0 + 0.2, hall: b, porte: b.point(0, 0, b.iw - 1), dome: { x: X(30), z: Z(22), y: Y0 + yt + 12 } };
+  // le magasin de S.T.A.R. Labs (voir COSTUMES_STAR, POUVOIRS_STAR, AMELIORATIONS_STAR et KRYPTO) : les costumes sur des mannequins, en rang
+  // au milieu du hall, face à la porte ; près de la porte, les pouvoirs (à gauche en entrant) et les améliorations (à droite) sur des socles ;
+  // Krypto au fond, devant la grande machine. Le professeur Hamilton attend derrière l'accueil (ouvrirMagasinStar). On ne passe pas à travers
+  // un mannequin ni Krypto
+  const nc = COSTUMES_STAR.length;
+  COSTUMES_STAR.forEach((C, k) => {
+    const q = b.point(nc > 1 ? -10 + 20 * k / (nc - 1) : 0, 0, 1.5);
+    standsStar.push({ sorte: 'costume', k, ...q }); ajouterCollision(q.x - 0.6, q.z - 0.6, q.x + 0.6, q.z + 0.6, q.y + 2.4, Y0);
+  });
+  Object.keys(POUVOIRS_STAR).forEach((c, i) => standsStar.push({ sorte: 'pouvoir', cle: c, ...b.point(-6.5 - 3.2 * i, 0, 11.5) }));
+  Object.keys(AMELIORATIONS_STAR).forEach((c, i) => standsStar.push({ sorte: 'amelioration', cle: c, ...b.point(6.5 + 3.2 * i, 0, 11.5) }));
+  { const q = b.point(0, 0, -6.5); standsStar.push({ sorte: 'krypto', ...q }); ajouterCollision(q.x - 0.9, q.z - 0.9, q.x + 0.9, q.z + 0.9, q.y + 1.4, Y0); }
+  const c1 = b.point(-b.iu, 0, -b.iw), c2 = b.point(b.iu, 0, b.iw);   // (les coins du hall)
+  starLabs = { x: X(30), z: Z(24), y: Y0 + 0.2, hall: b, porte: b.point(0, 0, b.iw - 1), dome: { x: X(30), z: Z(22), y: Y0 + yt + 12 }, savant: b.point(0, 0, 6.6),
+    zone: { x1: Math.min(c1.x, c2.x), x2: Math.max(c1.x, c2.x), z1: Math.min(c1.z, c2.z), z2: Math.max(c1.z, c2.z) } };   // (savant : là où le professeur Hamilton attend, derrière l'accueil)
   Object.assign(lieux['µ'].find(q => q.x === X(30) && q.z === Z(30)), { z: Z(49) });   // le lieu des missions : sur la place, devant la porte
 }
 // La statue de Superman (¡), au milieu de Centennial Park : un géant de bronze de 18 m, les poings sur les hanches, la cape au vent, sur un
@@ -10798,10 +10969,11 @@ function batons(h, poser = piece) {
 //   tend : de 0 à 1, il tend le bras droit devant lui (il lance sa toile ou son filet) ; grimpe : Spiderman sur un mur ;
 //   pend : pendu par la main droite au bout d'un grappin ou d'une toile ; plane : Batman qui plane, les bras écartés
 //   ironman : Iron Man qui vole (avec superman) ; attend : de 0 à 1, il attend son armure, les bras écartés ; croix : de 0 à 1, les bras en croix,
-//   pour sortir de son armure ; plastron : de 0 à 1, il tire le rayon de sa poitrine, les bras en arrière
+//   pour sortir de son armure ; plastron : de 0 à 1, il tire le rayon de sa poitrine, les bras en arrière ; souleve : de 0 à 1, les deux bras
+//   levés au-dessus de la tête (Superman qui tient une voiture)
 function animerHumain(h, vitesse, dt, o = {}) {
   h.phase += dt * (vitesse > 0.2 ? 2.5 + vitesse * 1.3 : 0); h.t += dt;
-  h.brasPris = !!o.arme || o.frappe > 0 || !!(o.tend || o.grimpe || o.pend || o.plane || o.attend || o.croix || o.plastron || o.dos);   // ses bras tiennent une arme, frappent, s'accrochent ou prennent une pose : ils ne deviennent pas mous (membresMous)
+  h.brasPris = !!o.arme || o.frappe > 0 || !!(o.tend || o.grimpe || o.pend || o.plane || o.attend || o.croix || o.plastron || o.dos || o.souleve);   // ses bras tiennent une arme, frappent, s'accrochent ou prennent une pose : ils ne deviennent pas mous (membresMous)
   // un robot bouge par à-coups : sa pose ne change que 8 fois par pas, et il fait de petits pas
   const phase = o.robot ? Math.round(h.phase / (Math.PI / 4)) * Math.PI / 4 : h.phase;
   const amp = vitesse > 0.2 ? Math.min(o.robot ? 0.28 : 0.95, 0.35 + vitesse * 0.08) : 0, s = Math.sin(phase) * amp, c = Math.cos(phase) * amp;
@@ -10925,6 +11097,7 @@ function animerHumain(h, vitesse, dt, o = {}) {
   const poseBras = (b, x, z, coude, e) => { b.rotation.set(lerp(b.rotation.x, x, e), 0, lerp(b.rotation.z, z, e)); b.pli.rotation.x = lerp(b.pli.rotation.x, coude, e); };
   if (o.attend) { const e = o.attend; poseBras(h.brasD, -0.1, -0.6, -0.25, e); poseBras(h.brasG, -0.1, 0.6, -0.25, e); h.jambeD.rotation.z = -0.12 * e; h.jambeG.rotation.z = 0.12 * e; }
   if (o.croix) { const e = o.croix; poseBras(h.brasD, 0, -1.5, 0, e); poseBras(h.brasG, 0, 1.5, 0, e); }
+  if (o.souleve) { const e = o.souleve; poseBras(h.brasD, -2.9, -0.45, -0.3, e); poseBras(h.brasG, -2.9, 0.45, -0.3, e); }   // Superman soulève une voiture au-dessus de sa tête
   if (o.plastron) { const e = o.plastron; poseBras(h.brasD, 0.6, -0.4, -0.5, e); poseBras(h.brasG, 0.6, 0.4, -0.5, e); penche = lerp(penche, -0.15, e); h.tete.rotation.x = -0.1 * e; }
   // les pieds écartés sur la planche, la tête tournée vers l'avant (quand il pousse, il se tourne vers l'avant, le pied arrière à côté de la planche)
   // (envers : de 0 à 1, il glisse à l'envers, en « switch » : il regarde par-dessus son épaule, ou de l'autre côté sur un snowboard)
@@ -11351,6 +11524,7 @@ function majFormes() {
   }
   if (!oui) return;
   for (const p of personnes) essayerForme(p.h, t);
+  if (savant) essayerForme(savant.h, t);   // (le professeur Hamilton, au magasin de S.T.A.R. Labs ; pas Lucius Fox)
   for (const v of voitures) {
     if (v.pilote) essayerForme(v.pilote, t);   // (ceux des motos, des tricycles, des Segway, les autres skieurs)
     if (v.joker) essayerForme(v.joker, t);     // (le Joker, sur le toit de son camion)
@@ -12590,6 +12764,7 @@ function souffler(v, pos, force) {
 // chaque image : la voiture accidentée tombe et tourne, touche le sol, les murs et les autres voitures, et finit par s'arrêter
 function majAccident(v, dt) {
   const a = v.accident, k = coqueAccident(v.type.modele), q = v.quat;
+  if (a.tenue) { porterVoiture(v, dt); return; }   // (Superman la tient au-dessus de sa tête : voir « La super-force »)
   if (a.dort) return;
   a.duree += dt;
   const depart = { x: a.c.x, z: a.c.z };   // (où était son milieu : voir les garde-fous des ponts, plus bas)
@@ -13146,9 +13321,10 @@ function apparaitreRodeurs() {
   }
   ami.suit = chef;
 }
-// un chien de garde (un berger allemand) : il regarde vers +Z, comme les personnages
-function creerChien() {
-  const g = new THREE.Group(), corps = new THREE.Group(), fauve = '#8a5a2a', noir = '#1e1a16';
+// un chien de garde (un berger allemand) : il regarde vers +Z, comme les personnages. fauve, noir : les couleurs de son poil (Krypto, le
+// chien de Superman, est tout blanc : voir creerKrypto)
+function creerChien(fauve = '#8a5a2a', noir = '#1e1a16') {
+  const g = new THREE.Group(), corps = new THREE.Group();
   corps.position.y = 0.55; g.add(corps);
   piece(new THREE.CapsuleGeometry(0.16, 0.55, 4, 10).rotateX(Math.PI / 2), fauve, corps, 0, 0, 0);
   piece(new THREE.CapsuleGeometry(0.14, 0.4, 4, 10).rotateX(Math.PI / 2), noir, corps, 0, 0.06, -0.02).scale.set(1.05, 0.8, 1);   // le dos noir
@@ -13206,6 +13382,7 @@ function creerObjet(o) {
   if (o.type === 'argent') for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.15), M_BILLET); b.position.y = k * 0.05; b.rotation.y = k; g.add(b); }
   if (o.stark) g.add(vitrineStark(o));   // un stand du magasin de Stark Industries
   else if (o.wayne) g.add(vitrineWayne(o));   // un stand du magasin de Lucius Fox
+  else if (o.star) g.add(vitrineStar(o));     // un stand du magasin de S.T.A.R. Labs
   else if (o.type === 'arme' || o.type === 'stand') { const a = o.masque ? creerMasque() : creerArme(o.arme); a.scale.setScalar(2.2); g.add(a); }
   if (o.type === 'tresor') g.add(formeTresor(TRESORS[o.tresor].forme));
   if (o.type === 'munitions') { // une caisse kaki, des cartouches dessus
@@ -13229,11 +13406,11 @@ function creerObjet(o) {
   g.add(anneau);
   if (o.type === 'stand') {
     // une armure du magasin de Stark Industries, un costume ou une Batmobile de celui de Lucius Fox : sur son plateau, pas sur un socle
-    const armure = (o.stark && o.k !== undefined) || (o.wayne && o.fixe);
-    if (!armure) { const piedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal); piedestal.position.y = -0.6; piedestal.castShadow = true; g.add(piedestal); }
-    anneau.position.y = armure ? -0.82 : -1.08; anneau.visible = !(o.wayne && o.fixe);   // (un mannequin, une Batmobile : leur plateau a déjà son anneau bleu)
+    const armure = (o.stark && o.k !== undefined) || ((o.wayne || o.star) && o.fixe);
+    if (!armure && !o.star) { const piedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal); piedestal.position.y = -0.6; piedestal.castShadow = true; g.add(piedestal); }
+    anneau.position.y = armure ? -0.82 : -1.08; anneau.visible = !(o.wayne && o.fixe) && !o.star;   // (un mannequin, une Batmobile : leur plateau a déjà son anneau bleu ; à S.T.A.R. Labs, pas d'anneau : le socle est dans le décor du magasin, voir construireDecorStar)
     o.etiquette = new THREE.Sprite(new THREE.SpriteMaterial()); etiqueter(o);
-    o.etiquette.scale.set(2.4, 0.6, 1); o.etiquette.position.y = o.wayne && o.fixe ? hauteurEtiquette(o) : armure ? 1.2 + 2.1 * ((armureDe(o.k).taille || 1) - 1) : 1; g.add(o.etiquette);
+    o.etiquette.scale.set(2.4, 0.6, 1); o.etiquette.position.y = (o.wayne || o.star) && o.fixe ? hauteurEtiquette(o) : armure ? 1.2 + 2.1 * ((armureDe(o.k).taille || 1) - 1) : 1; g.add(o.etiquette);
     if (o.sorte === 'batmobile') o.etiquette.scale.set(3.4, 0.85, 1);
   }
   o.m = g; o.base = (o.type === 'stand' ? 1.1 : 0.85) + (o.y ?? hauteurSol(o.x, o.z));
@@ -13269,7 +13446,7 @@ function majCachettes() {
 // Celle qu'aucun stand ne montre plus (une autre langue, un prix qui a changé) est jetée
 const ETIQUETTES = {};
 function etiqueter(o) {
-  const texte = o.stark ? texteStark(o) : o.wayne ? texteWayne(o) : o.masque ? `${tr('Masque à gaz')} ${R_.prixMasque} $` : `${tr(ARMES[o.arme].nom)} ${ARMES[o.arme].prix} $`;
+  const texte = o.stark ? texteStark(o) : o.wayne ? texteWayne(o) : o.star ? texteStar(o) : o.masque ? `${tr('Masque à gaz')} ${R_.prixMasque} $` : `${tr(ARMES[o.arme].nom)} ${ARMES[o.arme].prix} $`;
   const avant = o.etiquette.material.map; o.langue = langue;
   o.etiquette.material.map = ETIQUETTES[texte] ||= Object.assign(toile(256, 64, (c) => { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#7fcf6f'; c.font = 'bold 30px Arial'; c.textAlign = 'center'; c.fillText(texte, 128, 42, 248); }), { name: texte });
   if (avant && avant !== o.etiquette.material.map && !objets.some(p => p.etiquette?.material.map === avant)) { delete ETIQUETTES[avant.name]; avant.dispose(); }
@@ -15651,20 +15828,23 @@ const chezWayne = CHAPITRE.triche === 'BATMAN';
 const wayne = { costumes: [0], costume: 0, batmobiles: [0], batmobile: 0, detective: false, tFumigene: 0, tGel: 0, gelPose: null };
 for (const c in GADGETS_WAYNE) wayne[c] = false;
 for (const c in AMELIORATIONS_WAYNE) wayne[c] = 1;
+// la partie se souvient de ce qu'on a acheté par son nom (voir sauverPartie) : leurs numéros dans le tableau l (toujours le premier), triés
+const numerosParNom = (l, noms, nom) => [...new Set([0, ...(noms || []).map(n => l.findIndex(x => nom(x) === n)).filter(k => k > 0)])].sort((a, b) => a - b);
+// une partie d'avant a-t-elle passé la mission qui a « cle » (costume: true...) ? Oui aussi si elle a fini le chapitre ; et s'il n'y a pas de
+// telle mission. cle : le nom de ce qu'elle a, ou une question sur la mission (x => x.donne === 'Bat')
+const missionPassee = cle => (partie.missions[chapitre] || 0) > MISSIONS_CH.findIndex(typeof cle === 'function' ? cle : x => x[cle]) || partie.ouvert > chapitre || !!partie.trouvee[chapitre];
 if (chezWayne) { // (par leur nom : on peut ajouter un costume ou une Batmobile aux tableaux sans tout casser)
   const m = partie.magasin?.[chapitre] || {};
-  const liste = (l, noms, nom) => [...new Set([0, ...(noms || []).map(n => l.findIndex(x => nom(x) === n)).filter(k => k > 0)])].sort((a, b) => a - b);
-  wayne.costumes = liste(COSTUMES_WAYNE, m.costumes, C => C.nom); wayne.batmobiles = liste(BATMOBILES_WAYNE, m.batmobiles, V => V.voiture);
+  wayne.costumes = numerosParNom(COSTUMES_WAYNE, m.costumes, C => C.nom); wayne.batmobiles = numerosParNom(BATMOBILES_WAYNE, m.batmobiles, V => V.voiture);
   wayne.costume = wayne.costumes.find(k => COSTUMES_WAYNE[k].nom === m.costume) ?? 0;
   wayne.batmobile = wayne.batmobiles.find(k => BATMOBILES_WAYNE[k].voiture === m.batmobile) ?? 0;
   for (const c in GADGETS_WAYNE) wayne[c] = !!m[c];
   for (const c in AMELIORATIONS_WAYNE) wayne[c] = clamp(Math.round(m[c]) || 1, 1, AMELIORATIONS_WAYNE[c].prix.length + 1);
   // le premier costume (la mission « La Batcave ») et la première Batmobile (« Poursuite sous la pluie ») : une partie d'avant les a déjà, si
   // elle a passé ces missions, ou fini le chapitre
-  const passe = cle => (partie.missions[chapitre] || 0) > MISSIONS_CH.findIndex(typeof cle === 'function' ? cle : x => x[cle]) || partie.ouvert > chapitre || !!partie.trouvee[chapitre];
-  wayne.gagne = !!m.gagne || passe('costume'); wayne.donnee = !!m.donnee || passe('batmobile');
+  wayne.gagne = !!m.gagne || missionPassee('costume'); wayne.donnee = !!m.donnee || missionPassee('batmobile');
   // le Bat (BATMOBILES_WAYNE : mission: true), que donne une mission (donne: 'Bat') : une partie d'avant qui l'a passée l'a déjà
-  BATMOBILES_WAYNE.forEach((V, k) => { if (V.mission && MISSIONS_CH.some(x => x.donne === V.voiture) && passe(x => x.donne === V.voiture) && !wayne.batmobiles.includes(k)) wayne.batmobiles = [...wayne.batmobiles, k].sort((a, b) => a - b); });
+  BATMOBILES_WAYNE.forEach((V, k) => { if (V.mission && MISSIONS_CH.some(x => x.donne === V.voiture) && missionPassee(x => x.donne === V.voiture) && !wayne.batmobiles.includes(k)) wayne.batmobiles = [...wayne.batmobiles, k].sort((a, b) => a - b); });
   J.vie = vieMax();
 }
 // un costume (son numéro dans COSTUMES_WAYNE), tel qu'il le porte : avec la fille du menu, ce que « fille » y change (Batgirl), et ses
@@ -15674,13 +15854,19 @@ const costumeDe = k => { const C = COSTUMES_WAYNE[k] || COSTUMES_WAYNE[0]; retur
 const costumeBatman = () => chezWayne ? costumeDe(wayne.costume) : COSTUME_BATMAN;
 const avecGants = () => chezWayne && wayne.gants;   // les gants électriques
 const enCostume = () => chezWayne && !!tricheHeros()?.actif;   // au chapitre de Batman, en costume
-const costumePorte = () => enCostume() ? costumeDe(wayne.costume) : null;   // le costume qu'il porte (null : en civil, ou ailleurs)
+// au chapitre de Superman (voir « Le magasin de S.T.A.R. Labs », plus bas) : un costume (son numéro dans COSTUMES_STAR), tel qu'il le porte
+// (avec la fille du menu : Supergirl, et ses longs cheveux) ; celui que dessine le code SUPERMAN (au chapitre 1 : celui de Superman) ; en costume ?
+const costumeDeStar = k => { const C = COSTUMES_STAR[k] || COSTUMES_STAR[0]; return fille() ? { ...C, cheveux: true, ...C.fille } : C; };
+const costumeSuperman = () => chezClark ? costumeDeStar(star.costume) : COSTUME_SUPERMAN;
+const enCostumeSuper = () => chezClark && !!tricheHeros()?.actif;
+// le costume qu'il porte (null : en civil, ou ailleurs) : celui de Batman qu'il a choisi, ou celui de Superman
+const costumePorte = () => enCostume() ? costumeDe(wayne.costume) : enCostumeSuper() ? costumeDeStar(star.costume) : null;
 // ce que changent son costume et ses améliorations (1 : rien ne change ; hors du chapitre de Batman, rien ne change jamais)
 const niveauWayne = (c, cle) => chezWayne ? AMELIORATIONS_WAYNE[c][cle] ** (wayne[c] - 1) : 1;
-function vieMax() { return R_.viesJoueur + (chezWayne ? (wayne.vie - 1) * AMELIORATIONS_WAYNE.vie.vie : 0); }
+function vieMax() { return R_.viesJoueur + (chezWayne ? (wayne.vie - 1) * AMELIORATIONS_WAYNE.vie.vie : 0) + (chezClark ? (star.vie - 1) * AMELIORATIONS_STAR.vie.vie : 0); }
 const protectionCostume = () => costumePorte()?.protection ?? 1;
 const vitesseCostume = () => costumePorte()?.vitesse ?? 1;
-const poingsCostume = () => costumePorte()?.poings || 1;
+const poingsCostume = () => (costumePorte()?.poings || 1) * (enCostumeSuper() ? niveauStar('force', 'poings') : 1);   // (au chapitre de Superman, en costume, la force du magasin de S.T.A.R. Labs)
 const tailleHeros = () => tailleIronman() * (costumePorte()?.taille || 1);   // (la Hulkbuster, l'armure anti-Superman le grandissent : la caméra, les murs, les plafonds)
 const chuteCape = () => R_.chuteCape / ((costumePorte()?.cape ?? 1) * niveauWayne('cape', 'chute'));
 const vitesseCape = () => R_.vitesseCape * niveauWayne('cape', 'vitesse');
@@ -15688,28 +15874,30 @@ const vitesseGrappin = () => R_.vitesseGrappin * niveauWayne('grappin', 'vitesse
 const typeBatmobile = k => VOITURES.find(t => t.nom === BATMOBILES_WAYNE[k]?.voiture) || VOITURES.find(t => t.nom === 'Batmobile');
 // la Batmobile que B fait venir : au chapitre de Batman, celle qu'il a choisie (N) ; ailleurs, la Batmobile du code BATMAN
 const voitureTriche = nom => nom === 'Batmobile' && chezWayne ? typeBatmobile(wayne.batmobile).nom : nom;
-// ce que change un costume, en quelques mots (« dégâts : 60 % · plus lent »)
+// ce que change un costume (de Batman, ou de Superman), en quelques mots (« dégâts : 60 % · plus lent »)
 function effetsCostume(C) {
   return [C.protection < 1 && tr('dégâts : {n} %', { n: Math.round(C.protection * 100) }), C.cape > 1 && tr('tu planes plus loin'), C.cape < 1 && tr('tu planes moins loin'),
-    C.vitesse > 1 && tr('plus rapide'), C.vitesse < 1 && tr('plus lent'), C.poings > 1 && tr('coups de poing très forts')].filter(Boolean).join(' · ');
+    C.vol > 1 && tr('tu voles plus vite'), C.vol < 1 && tr('tu voles moins vite'), C.vitesse > 1 && tr('plus rapide'), C.vitesse < 1 && tr('plus lent'),
+    C.laser > 1 && tr('yeux laser plus forts'), C.poings > 1 && tr('coups de poing très forts')].filter(Boolean).join(' · ');
 }
 // ce que sait faire une Batmobile, avec la touche R
 const pouvoirBatmobile = t => t.cable ? tr('R : le câble') : t.vitesseVol ? tr('R : voler') : t.turbo ? tr('R : le turbo') : t.saut ? tr('R : sauter') : t.grappin ? tr('R + Q ou D : le virage au grappin') : '';
 
-// J, au chapitre de Batman : le costume suivant, parmi ceux qu'il a. En costume, il se change tout de suite, dans sa nuée de chauves-souris
+// J, au chapitre de Batman (ou de Superman) : le costume suivant, parmi ceux qu'il a. En costume, il se change tout de suite, dans sa nuée de
+// chauves-souris (ou son tourbillon)
 function costumeSuivant() {
-  if (!chezWayne) return;
+  if (!chezWayne && !chezClark) return;
   if (sansCostume()) { pasEncoreDeCostume(); return; }
-  const l = wayne.costumes;
-  if (l.length < 2) { annonce('', tr("Tu n'as que ce costume : les autres s'achètent chez Lucius Fox, à Wayne Enterprises (⚙ sur la carte)"), 3); bip(300, 200, 0.1, 'square', 0.1); return; }
-  wayne.costume = l[(l.indexOf(wayne.costume) + 1) % l.length];
+  const S = chezClark ? star : wayne, l = S.costumes;
+  if (l.length < 2) { annonce('', tr(chezClark ? "Tu n'as que ce costume : les autres s'achètent à S.T.A.R. Labs (★ sur la carte)" : "Tu n'as que ce costume : les autres s'achètent chez Lucius Fox, à Wayne Enterprises (⚙ sur la carte)"), 3); bip(300, 200, 0.1, 'square', 0.1); return; }
+  S.costume = l[(l.indexOf(S.costume) + 1) % l.length];
   mettreCostumeChoisi();
 }
 // le costume qu'il vient de choisir (ou d'acheter) : en costume, il se change tout de suite ; en civil, H le mettra
 function mettreCostumeChoisi(titre) {
-  const C = costumeDe(wayne.costume);
-  if (enCostume()) { rhabillerBJ(); voleeDeChauvesSouris(J, 26); }
-  annonce(titre || tr(C.nom).toUpperCase(), [enCostume() ? '' : tr('H : tu le mets'), effetsCostume(C)].filter(Boolean).join(' · '), 3);
+  const C = chezClark ? costumeDeStar(star.costume) : costumeDe(wayne.costume), porte = enCostume() || enCostumeSuper();
+  if (porte) { rhabillerBJ(); if (chezClark) tourbillon(J); else voleeDeChauvesSouris(J, 26); }
+  annonce(titre || tr(C.nom).toUpperCase(), [porte ? '' : tr('H : tu le mets'), effetsCostume(C)].filter(Boolean).join(' · '), 3);
   bip(600, 900, 0.12, 'sine', 0.06);
   sauverPartie();
 }
@@ -15726,11 +15914,14 @@ function batmobileSuivante() {
   bip(600, 900, 0.12, 'sine', 0.06);
   sauverPartie();
 }
-// un gadget, avec sa touche : en costume, et une fois acheté. Renvoie true s'il peut s'en servir
+// un gadget (au chapitre de Superman : un pouvoir, POUVOIRS_STAR), avec sa touche : en costume, et une fois acheté. Renvoie true s'il peut s'en servir
 function gadgetPret(c) {
-  if (!chezWayne) return false;
-  if (sansGadgets()) { enCivilSans('Mets ton costume (H) pour tes gadgets'); return false; }
-  if (!wayne[c]) { annonce('', tr("{gadget} : ça s'achète chez Lucius Fox, à Wayne Enterprises (⚙ sur la carte)", { gadget: tr(GADGETS_WAYNE[c].nom) }), 3); bip(300, 200, 0.1, 'square', 0.1); return false; }
+  if (!chezWayne && !chezClark) return false;
+  if (sansGadgets()) { enCivilSans(chezClark ? 'Mets ton costume (H) pour tes pouvoirs' : 'Mets ton costume (H) pour tes gadgets'); return false; }
+  if (!(chezClark ? star : wayne)[c]) {
+    annonce('', chezClark ? tr("{gadget} : ça s'achète à S.T.A.R. Labs (★ sur la carte)", { gadget: tr(POUVOIRS_STAR[c].nom) }) : tr("{gadget} : ça s'achète chez Lucius Fox, à Wayne Enterprises (⚙ sur la carte)", { gadget: tr(GADGETS_WAYNE[c].nom) }), 3);
+    bip(300, 200, 0.1, 'square', 0.1); return false;
+  }
   return !J.mort;
 }
 
@@ -15745,8 +15936,9 @@ function basculerVision() {
 const sceneDetective = ['#ff4a1a', '#3aa6ff'].map((c, k) => { const s = new THREE.Scene();   // [les ennemis, les autres]
   s.overrideMaterial = new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: k ? 0.32 : 0.55, depthTest: false, depthWrite: false, toneMapped: false, fog: false });
   return s; });
+// (au chapitre de Superman, la vision à rayons X fait pareil : POUVOIRS_STAR.rayonsX)
 function dessinerDetective() {
-  const G = GADGETS_WAYNE.vision, vus = [];
+  const G = chezClark ? POUVOIRS_STAR.rayonsX : GADGETS_WAYNE.vision, vus = [];
   for (const p of personnes) {
     if (p.vie <= 0 || !p.h.g.visible || p.h.g.parent !== scene) continue;
     const k = ennemi(p) ? 0 : 1;
@@ -15966,8 +16158,7 @@ function vitrineWayne(o) {
     m(GEO.avantBras, gant).rotation.z = Math.PI / 2; m(GEO.main, gant, -0.29, 0, 0).scale.set(1, 0.8, 1.3);
     for (const x of [-0.09, -0.15, -0.21]) m(GEO.aileronGant, gant, x, 0.05, 0).rotation.z = 0.4;
   } else if (c === 'vie') { // un cœur rouge
-    const s = new THREE.Shape(); s.moveTo(0, -0.1); s.bezierCurveTo(-0.14, 0, -0.1, 0.12, 0, 0.06); s.bezierCurveTo(0.1, 0.12, 0.14, 0, 0, -0.1);
-    m(new THREE.ExtrudeGeometry(s, { depth: 0.05, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.012, bevelSegments: 2 }).translate(0, 0, -0.025), mat('#d0182a', { emissive: '#600', roughness: 0.4 }));
+    m(formeCoeur(), mat('#d0182a', { emissive: '#600', roughness: 0.4 }));
   } else if (c === 'grappin') { // le pistolet à grappin
     const a = creerArme(ARMES.findIndex(x => x.grappin)); if (a) { a.scale.setScalar(1.2); g.add(a); }
   } else { // la cape (ou une amélioration qu'on a inventée) : un petit bout de cape, découpé en aile de chauve-souris
@@ -15976,28 +16167,37 @@ function vitrineWayne(o) {
   g.scale.setScalar(2);   // (deux fois plus grand que nature, comme au magasin de Stark Industries)
   return g;
 }
-// la hauteur de l'étiquette d'un mannequin ou d'une Batmobile (au-dessus de sa tête, ou de son toit)
-const hauteurEtiquette = o => o.sorte === 'costume' ? 1.55 + 1.9 * ((COSTUMES_WAYNE[o.k].taille || 1) - 1) : MODELES[typeBatmobile(o.k).modele].hauteur + 0.5;
-// ce qu'on lit au-dessus d'un stand : le nom et le prix, ou « à toi », ou le niveau suivant d'une amélioration
+// le cœur rouge des améliorations de la vie (aux magasins de Lucius Fox et de S.T.A.R. Labs)
+function formeCoeur() {
+  const s = new THREE.Shape(); s.moveTo(0, -0.1); s.bezierCurveTo(-0.14, 0, -0.1, 0.12, 0, 0.06); s.bezierCurveTo(0.1, 0.12, 0.14, 0, 0, -0.1);
+  return new THREE.ExtrudeGeometry(s, { depth: 0.05, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.012, bevelSegments: 2 }).translate(0, 0, -0.025);
+}
+// la hauteur de l'étiquette d'un mannequin, d'une Batmobile ou de Krypto (au-dessus de sa tête, ou de son toit)
+const hauteurEtiquette = o => o.sorte === 'costume' ? 1.55 + 1.9 * (((o.star ? COSTUMES_STAR : COSTUMES_WAYNE)[o.k].taille || 1) - 1) : o.sorte === 'krypto' ? 0.75 : MODELES[typeBatmobile(o.k).modele].hauteur + 0.5;
+// ce qu'on lit au-dessus d'un stand (des magasins de Lucius Fox et de S.T.A.R. Labs) : le nom et le prix, ou « à toi » ; pour une amélioration
+// U, dont on a le niveau n : le niveau suivant et son prix, ou « niveau maximum »
+const etiquetteAchat = (nom, prix, aToi) => aToi ? tr('{nom} : à toi', { nom }) : `${nom} ${enDollars(prix)}`;
+const etiquetteNiveau = (U, n) => U.prix[n - 1] === undefined ? tr('{nom} : niveau maximum', { nom: tr(U.nom) }) : `${tr('{nom} niveau {n}', { nom: tr(U.nom), n: n + 1 })} ${enDollars(U.prix[n - 1])}`;
 function texteWayne(o) {
-  const n = enDollars, a = (nom, prix, aToi) => aToi ? tr('{nom} : à toi', { nom }) : `${nom} ${n(prix)}`;
-  if (o.sorte === 'costume') return a(tr(costumeDe(o.k).nom), COSTUMES_WAYNE[o.k].prix, wayne.costumes.includes(o.k));
-  if (o.sorte === 'batmobile') return a(tr(BATMOBILES_WAYNE[o.k].voiture), BATMOBILES_WAYNE[o.k].prix, wayne.batmobiles.includes(o.k));
-  if (o.sorte === 'gadget') return a(tr(GADGETS_WAYNE[o.cle].nom), GADGETS_WAYNE[o.cle].prix, wayne[o.cle]);
-  const U = AMELIORATIONS_WAYNE[o.cle], prix = U.prix[wayne[o.cle] - 1];
-  return prix === undefined ? tr('{nom} : niveau maximum', { nom: tr(U.nom) }) : `${tr('{nom} niveau {n}', { nom: tr(U.nom), n: wayne[o.cle] + 1 })} ${n(prix)}`;
+  if (o.sorte === 'costume') return etiquetteAchat(tr(costumeDe(o.k).nom), COSTUMES_WAYNE[o.k].prix, wayne.costumes.includes(o.k));
+  if (o.sorte === 'batmobile') return etiquetteAchat(tr(BATMOBILES_WAYNE[o.k].voiture), BATMOBILES_WAYNE[o.k].prix, wayne.batmobiles.includes(o.k));
+  if (o.sorte === 'gadget') return etiquetteAchat(tr(GADGETS_WAYNE[o.cle].nom), GADGETS_WAYNE[o.cle].prix, wayne[o.cle]);
+  return etiquetteNiveau(AMELIORATIONS_WAYNE[o.cle], wayne[o.cle]);
 }
 const TOUCHES_GADGETS = { vision: 'O', fumigene: 'K', gel: 'X' };
-// l'aide, près d'un stand (« Appuie sur E pour acheter... »)
+// l'aide, près d'un stand (des magasins de Lucius Fox et de S.T.A.R. Labs) : « Appuie sur E pour acheter... » ; une amélioration U, dont
+// on a le niveau n ; un costume, à acheter, à choisir, ou celui qu'il a déjà choisi (porte : il le porte)
+const aideAcheter = (arme, prix) => tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme, prix: enChiffres(prix) });
+const aideNiveau = (U, n) => U.prix[n - 1] === undefined ? tr('{nom} : niveau maximum', { nom: tr(U.nom) }) : aideAcheter(tr('{nom} niveau {n}', { nom: tr(U.nom), n: n + 1 }), U.prix[n - 1]);
+function aideCostume(nom, prix, aLui, choisi, porte) {
+  if (!aLui) return aideAcheter(nom, prix);
+  return !choisi ? tr('Appuie sur <b>E</b> pour choisir : {armure}', { armure: nom })
+    : porte ? tr("{costume} : c'est le costume que tu portes", { costume: nom }) : tr("{costume} : c'est le costume que tu as choisi (<b>H</b> pour le mettre)", { costume: nom });
+}
 function aideWayne(s) {
   if (sansCostume()) return tr('Le magasin de Lucius Fox ouvre quand tu as ton premier costume (suis le point jaune)');
-  const acheter = (arme, prix) => tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme, prix: enChiffres(prix) });
-  if (s.sorte === 'costume') {
-    const nom = tr(costumeDe(s.k).nom);
-    if (!wayne.costumes.includes(s.k)) return acheter(nom, COSTUMES_WAYNE[s.k].prix);
-    return wayne.costume !== s.k ? tr('Appuie sur <b>E</b> pour choisir : {armure}', { armure: nom })
-      : enCostume() ? tr("{costume} : c'est le costume que tu portes", { costume: nom }) : tr("{costume} : c'est le costume que tu as choisi (<b>H</b> pour le mettre)", { costume: nom });
-  }
+  const acheter = aideAcheter;
+  if (s.sorte === 'costume') return aideCostume(tr(costumeDe(s.k).nom), COSTUMES_WAYNE[s.k].prix, wayne.costumes.includes(s.k), wayne.costume === s.k, enCostume());
   if (s.sorte === 'batmobile') {
     if (sansBatmobile()) return tr('Ta première Batmobile arrive à la mission 2 : les autres attendent');
     const nom = tr(BATMOBILES_WAYNE[s.k].voiture);
@@ -16009,8 +16209,7 @@ function aideWayne(s) {
     if (!wayne[s.cle]) return acheter(nom, G.prix);
     return s.cle === 'gants' ? tr('{nom} : déjà à toi (en costume, les poings en main : touche 1)', { nom }) : tr('{nom} : déjà à toi (en costume, <b>{touche}</b>)', { nom, touche: TOUCHES_GADGETS[s.cle] });
   }
-  const U = AMELIORATIONS_WAYNE[s.cle], prix = U.prix[wayne[s.cle] - 1];
-  return prix === undefined ? tr('{nom} : niveau maximum', { nom: tr(U.nom) }) : acheter(tr('{nom} niveau {n}', { nom: tr(U.nom), n: wayne[s.cle] + 1 }), prix);
+  return aideNiveau(AMELIORATIONS_WAYNE[s.cle], wayne[s.cle]);
 }
 // E près d'un stand : il achète, ou il choisit ce qu'il a déjà. Les étiquettes changent, et la partie s'en souvient tout de suite
 function acheterWayne(s) {
@@ -16065,19 +16264,24 @@ function creerLucius() {
   lucius = { h, x: p.x, y: p.y, z: p.z, angle: 0, parle: false };
 }
 function majLucius(dt, pres) {
-  const L = lucius, d = dist(L, J), nom = fille() ? tr('mademoiselle Gordon') : tr('monsieur Wayne');
+  const nom = fille() ? tr('mademoiselle Gordon') : tr('monsieur Wayne');
+  majVendeur(lucius, dt, pres, () => annonce('LUCIUS FOX', sansCostume() ? tr('« Revenez quand vous aurez votre costume, {nom}. »', { nom }) : tr('« Bonsoir, {nom}. J\'ai quelques nouveaux jouets pour vous. »', { nom }), 4));
+}
+// un vendeur derrière son accueil (Lucius Fox, le professeur Hamilton de S.T.A.R. Labs) : il regarde B.J. (sans tourner le dos à la porte),
+// les mains posées sur l'accueil, et lui parle (parler) quand il arrive près de l'accueil ; il le redit quand B.J. revient, après s'être
+// éloigné de 20 m. Renvoie true quand il vient de lui parler
+function majVendeur(L, dt, pres, parler) {
+  const d = dist(L, J);
   L.h.g.visible = pres;
-  if (!pres) return;
-  // il regarde B.J. (sans tourner le dos à la porte)
+  if (!pres) return false;
   L.angle = lerpAngle(L.angle, d < 18 && Math.abs(J.y - L.y) < 4 ? clamp(diffAngle(0, angleVers(L, J)), -1.3, 1.3) : 0, 3 * dt);
   L.h.g.rotation.y = L.angle;
   animerHumain(L.h, 0, dt);
   for (const [b, c] of [[L.h.brasD, -1], [L.h.brasG, 1]]) { b.rotation.set(-0.5, 0, 0.06 * c); b.pli.rotation.x = -0.55; }   // les mains posées sur l'accueil
-  if (d < 5.5 && Math.abs(J.y - L.y) < 2 && !L.parle) {
-    L.parle = true; bip(500, 380, 0.15, 'sine', 0.06);
-    annonce('LUCIUS FOX', sansCostume() ? tr('« Revenez quand vous aurez votre costume, {nom}. »', { nom }) : tr('« Bonsoir, {nom}. J\'ai quelques nouveaux jouets pour vous. »', { nom }), 4);
-  }
+  let parle = false;
+  if (d < 5.5 && Math.abs(J.y - L.y) < 2 && !L.parle) { L.parle = parle = true; bip(500, 380, 0.15, 'sine', 0.06); parler(); }
   if (d > 20) L.parle = false;
+  return parle;
 }
 
 // au chapitre de Batman, le magasin ouvre ses stands, et Lucius Fox prend sa place
@@ -16111,6 +16315,547 @@ function majWayne(dt) {
     const main = hasard([joueurH.brasD.main, joueurH.brasG.main]).getWorldPosition(V3());
     foudre(main, main.clone().add(V3(entre(-0.15, 0.15), entre(-0.1, 0.15), entre(-0.15, 0.15))), 0.12, 0.08, 0);
   }
+}
+
+// =====================================================================
+//  Le magasin de S.T.A.R. Labs (le hall du laboratoire, au chapitre de Superman) : ce qu'il y a acheté, ce que changent les costumes et les
+//  améliorations, les nouveaux pouvoirs (le souffle glacé, la vision à rayons X, la super-vitesse, le super-cri), Krypto le super-chien,
+//  la super-force (G : soulever une voiture, la lancer, la reposer), les stands et le professeur Hamilton. Les 4 tableaux du magasin sont
+//  en haut du fichier, juste après COSTUME_SUPERGIRL ; la touche J et les costumes eux-mêmes sont avec ceux de Lucius Fox, juste au-dessus
+// =====================================================================
+// Ce que Clark Kent (ou Kara Danvers) y a acheté, que la partie retient par leur nom (voir sauverPartie) : costumes, les numéros (dans
+// COSTUMES_STAR) de ceux qu'il a, et costume, celui qu'il a choisi (J) ; glace, rayonsX, vitesse, cri : les POUVOIRS_STAR qu'il a ; vol,
+// laser, vie, force : le niveau de chaque amélioration ; krypto : Krypto est à lui, et kryptoLa : il le suit (K) ; forteresse : la mission 1
+// est finie (le magasin est ouvert). Et pendant le jeu : voitRayonsX (la vision à rayons X est allumée), superVitesse (la super-vitesse
+// aussi), tGlace et tCri (les secondes avant de souffler ou de crier encore). Au chapitre 1, rien de tout ça : le code SUPERMAN est comme avant
+const star = { costumes: [0], costume: 0, krypto: false, kryptoLa: true, forteresse: true, voitRayonsX: false, superVitesse: false, tGlace: 0, tCri: 0 };
+for (const c in POUVOIRS_STAR) star[c] = false;
+for (const c in AMELIORATIONS_STAR) star[c] = 1;
+if (chezClark) { // (par leur nom : on peut ajouter un costume au tableau sans tout casser)
+  const m = partie.magasin?.[chapitre] || {};
+  star.costumes = numerosParNom(COSTUMES_STAR, m.costumes, C => C.nom);
+  star.costume = star.costumes.find(k => COSTUMES_STAR[k].nom === m.costume) ?? 0;
+  for (const c in POUVOIRS_STAR) star[c] = !!m[c];
+  for (const c in AMELIORATIONS_STAR) star[c] = clamp(Math.round(m[c]) || 1, 1, AMELIORATIONS_STAR[c].prix.length + 1);
+  star.krypto = !!m.krypto; star.kryptoLa = m.kryptoLa !== false;
+  // le magasin ouvre à la fin de la mission 1, la Forteresse de Solitude (la mission qui aura « forteresse: true », dans les missions de
+  // Metropolis) : une partie d'avant l'a ouvert si elle a passé cette mission, ou fini le chapitre. Tant qu'aucune mission n'a forteresse:
+  // true, il est toujours ouvert
+  star.forteresse = !!m.forteresse || missionPassee('forteresse');
+  J.vie = vieMax();
+}
+// le magasin est-il encore fermé ? (comme sansCostume, au chapitre de Batman : c'est la mission 1 qui l'ouvre)
+const sansForteresse = () => chezClark && !star.forteresse;
+// ce que changent ses améliorations (1 : rien ne change ; hors du chapitre de Superman, rien ne change jamais)
+const niveauStar = (c, cle) => chezClark ? AMELIORATIONS_STAR[c][cle] ** (star[c] - 1) : 1;
+// sa vitesse en volant (1 : celle de Superman) et la force de ses yeux laser : son costume et ses améliorations
+const volSuperman = () => chezClark ? (costumePorte()?.vol ?? 1) * niveauStar('vol', 'vitesse') : 1;
+const laserSuperman = () => chezClark ? (costumePorte()?.laser ?? 1) * niveauStar('laser', 'degats') : 1;
+// vers où il regarde (la caméra) : une direction de longueur 1
+const regard = () => V3(Math.sin(J.lacet) * Math.cos(J.tangage), Math.sin(J.tangage), Math.cos(J.lacet) * Math.cos(J.tangage));
+// le point q (x, y, z) est-il dans le cône qui part de o vers d (une direction de longueur 1), à moins de « portee » mètres et de « angle »
+// degrés, sans mur entre les deux ? Renvoie de 1 (tout près) à 0 (au bout), ou -1 (dehors)
+function dansCone(o, d, q, portee, angle) {
+  const dx = q.x - o.x, dy = q.y - o.y, dz = q.z - o.z, l = Math.hypot(dx, dy, dz);
+  if (l > portee) return -1;
+  if (l > 0.5 && (dx * d.x + dy * d.y + dz * d.z) / l < Math.cos(angle * Math.PI / 180)) return -1;
+  if (l > 0.5 && butee(o, q) < 0.97) return -1;   // (un mur entre les deux : ça ne passe pas)
+  return 1 - l / portee;
+}
+// d'où il souffle et crie : de sa bouche, et il se tourne vers où il regarde
+function bouche() { J.angleCorps = J.lacet; return V3(J.x + Math.sin(J.lacet) * 0.3, J.y + 1.6 * tailleHeros(), J.z + Math.cos(J.lacet) * 0.3); }
+
+// --- Le souffle glacé (X) : il souffle devant lui un vent glacé. Ceux qui sont dedans gèlent (un bloc de glace autour d'eux : voir prendre),
+// les voitures s'arrêtent, et un feu s'éteint ---
+const M_GLACE = chezClark ? new THREE.MeshStandardMaterial({ color: '#d4f0ff', emissive: '#4aa8ff', emissiveIntensity: 0.25, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.55, depthWrite: false }) : null;
+const GEO_GLACE = chezClark ? new THREE.CylinderGeometry(0.5, 0.56, 2.05, 6).translate(0, 1, 0) : null;   // (le bloc de glace : six faces, comme un cristal)
+const souffles = [];   // ce qui vole devant lui : les bouffées de givre du souffle glacé, les ondes du super-cri { s, v : leur vitesse, vie, duree, grandit }
+function soufflerGlace() {
+  if (!gadgetPret('glace')) return;
+  const P = POUVOIRS_STAR.glace;
+  if (star.tGlace > 0) { annonce('', tr('Souffle glacé : encore {n} s', { n: Math.ceil(star.tGlace) }), 1.5); return; }
+  if (J.voiture || J.robot) { annonce('', tr("Descends d'abord !"), 1.5); return; }
+  star.tGlace = P.recharge;
+  const o = bouche(), d = regard();
+  // les gens : ils gèlent (un passant moins longtemps, et sans mal) ; les méchants perdent des points
+  for (const p of personnes) {
+    if (p.vie <= 0 || p.vol || p.secours || p.invincible) continue;
+    if (dansCone(o, d, V3(p.x, p.y + 1, p.z), P.portee, P.angle) < 0) continue;
+    if (ennemi(p)) blesser(p, P.degats); else p.peur = 8;
+    if (p.vie > 0) prendre(p, 'glace', ennemi(p) ? P.gel : P.gel / 2);
+  }
+  // les voitures : elles s'arrêtent net, couvertes de givre, le temps que ça dégèle ; une voiture en feu s'éteint
+  for (const v of voitures) {
+    if (v.detruite || v.coule || pasDeTole(v) || v === souleve?.v) continue;
+    if (dansCone(o, d, V3(v.x, v.y + 0.8, v.z), P.portee + v.forme.longueur / 2, P.angle) < 0) continue;
+    if (v.brule > 0) eteindre(v);
+    if (!v.accident) { v.vitesse *= 0.1; v.panne = Math.max(v.panne || 0, P.gel); v.givree = true; }
+  }
+  // les bouffées de givre : blanches et bleues, elles filent devant lui, grossissent et s'effacent
+  for (let k = 0; k < 22; k++) {
+    const s = new THREE.Sprite(M_FUMEE.clone()); s.material.color.set(hasard(['#e8f8ff', '#cfeeff', '#ffffff'])); s.material.opacity = 0.8;
+    s.position.copy(o); s.scale.setScalar(0.3); scene.add(s);
+    const v = d.clone().add(V3(entre(-0.2, 0.2), entre(-0.15, 0.15), entre(-0.2, 0.2))).normalize().multiplyScalar(entre(14, 24));
+    souffles.push({ s, v, vie: entre(0.7, 1), duree: 1, grandit: 4 });
+  }
+  bruit(0.5, 5000, 0.9); bip(1800, 600, 0.8, 'sine', 0.04);   // fffffff...
+}
+
+// --- La vision à rayons X (O) : comme la vision de détective de Batman (voir dessinerDetective) : les méchants en rouge, les autres gens
+// en bleu, à travers les murs ; les bords de l'écran rougissent ---
+function basculerRayonsX() {
+  if (!star.voitRayonsX && !gadgetPret('rayonsX')) return;
+  star.voitRayonsX = !star.voitRayonsX;
+  annonce(star.voitRayonsX ? tr('VISION À RAYONS X') : '', star.voitRayonsX ? tr('Les méchants en rouge, les autres en bleu, à travers les murs · O : éteindre') : tr('Vision à rayons X éteinte'), 2);
+  bip(star.voitRayonsX ? 500 : 900, star.voitRayonsX ? 1300 : 400, 0.25, 'sine', 0.08);
+}
+
+// --- La super-vitesse (R) : à pied, avec Maj, il court à toute vitesse (voir majJoueur), et laisse derrière lui des traits bleus et rouges ---
+function basculerSuperVitesse() {
+  if (!star.superVitesse && !gadgetPret('vitesse')) return;
+  star.superVitesse = !star.superVitesse;
+  annonce(star.superVitesse ? tr('SUPER-VITESSE !') : '', star.superVitesse ? tr('<b>Maj</b> : tu cours à toute vitesse · <b>R</b> : l\'arrêter') : tr('Super-vitesse arrêtée'), 2);
+  bip(star.superVitesse ? 300 : 900, star.superVitesse ? 1500 : 300, 0.3, 'sawtooth', 0.05);
+}
+// ce que la super-vitesse change à sa course (1 : rien)
+const vitesseSuper = court => star.superVitesse && court && !J.nage && enCostumeSuper() ? POUVOIRS_STAR.vitesse.course / R_.vitesseCourse : 1;
+
+// --- Le super-cri (B) : tout ce qui est devant lui vole (les gens, les voitures), et les méchants y laissent des points ---
+const M_ONDE = chezClark ? new THREE.SpriteMaterial({ transparent: true, depthWrite: false, map: toile(64, 64, g => {
+  g.strokeStyle = '#ffffff'; for (const [r, a] of [[28, 0.9], [24, 0.45]]) { g.globalAlpha = a; g.lineWidth = 4; g.beginPath(); g.arc(32, 32, r, 0, 7); g.stroke(); }
+}) }) : null;
+function superCri() {
+  if (!gadgetPret('cri')) return;
+  const P = POUVOIRS_STAR.cri;
+  if (star.tCri > 0) { annonce('', tr('Super-cri : encore {n} s', { n: Math.ceil(star.tCri) }), 1.5); return; }
+  if (J.voiture || J.robot) { annonce('', tr("Descends d'abord !"), 1.5); return; }
+  star.tCri = P.recharge;
+  const o = bouche(), d = regard();
+  for (const p of personnes) {
+    if (p.vie <= 0 || p.secours || p.invincible) continue;
+    const k = dansCone(o, d, V3(p.x, p.y + 1, p.z), P.portee, P.angle);
+    if (k < 0) continue;
+    if (ennemi(p)) blesser(p, P.degats * (0.5 + 0.5 * k)); else p.peur = 8;   // (un passant vole, sans mal)
+    projeter(p, d.x * (8 + 12 * k), 3 + 5 * k, d.z * (8 + 12 * k), -5 - 6 * k);
+  }
+  for (const v of voitures) {
+    if (v.detruite || v.coule || pasDeTole(v) || v.type.glisse || v === souleve?.v) continue;
+    const k = dansCone(o, d, V3(v.x, v.y + 0.8, v.z), P.portee + v.forme.longueur / 2, P.angle);
+    if (k < 0) continue;
+    v.faute = true; souffler(v, o, P.force * (0.4 + 0.8 * k));   // (ce qu'elle renverse, c'est sa faute)
+  }
+  for (const r of robots) if (dansCone(o, d, V3(r.x, r.y + 3, r.z), P.portee, P.angle) >= 0) toucherRobot(r, P.degats);   // le heavy robot : sa vitre casse
+  // les ondes : des cercles blancs qui filent devant lui en grandissant
+  for (let k = 0; k < 6; k++) {
+    const s = new THREE.Sprite(M_ONDE.clone()); s.position.copy(o).addScaledVector(d, 1 + k * 0.6); s.scale.setScalar(1); scene.add(s);
+    souffles.push({ s, v: d.clone().multiplyScalar(26 + k * 3), vie: 0.6 + k * 0.04, duree: 0.6 + k * 0.04, grandit: 9 });
+  }
+  J.secousse = Math.max(J.secousse || 0, 0.12);
+  bruit(1, 500, 0.9); bip(420, 110, 0.9, 'sawtooth', 0.12);   // AAAAAH !
+}
+// chaque image : les bouffées et les ondes avancent, grossissent et s'effacent
+function majSouffles(dt) {
+  for (const f of souffles) {
+    f.vie -= dt; f.s.position.addScaledVector(f.v, dt); f.v.multiplyScalar(Math.pow(0.3, dt));
+    const t = 1 - f.vie / f.duree; f.s.scale.setScalar(0.3 + t * f.grandit); f.s.material.opacity = 0.8 * (1 - t);
+    if (f.vie <= 0) { scene.remove(f.s); f.s.material.dispose(); }
+  }
+  for (let k = souffles.length - 1; k >= 0; k--) if (souffles[k].vie <= 0) souffles.splice(k, 1);
+}
+
+// --- Krypto, le super-chien (KRYPTO) : un chien blanc à cape rouge (un chien de garde, tout blanc : voir creerChien). Il suit Superman,
+// à côté de lui, un peu en arrière ; il court à pied et vole quand Superman vole, quand il est loin, ou bloqué contre un mur, ou au-dessus
+// de l'eau. Il fonce sur le méchant le plus proche (à moins de KRYPTO.portee de Superman) et le mord. Personne ne le vise, et il ne mord
+// jamais un passant ---
+const GEO_CAPE_KRYPTO = chezClark ? new THREE.PlaneGeometry(0.38, 0.58).rotateX(-Math.PI / 2).translate(0, 0, -0.29) : null;
+function creerKrypto() {
+  const h = creerChien('#f2efe8', '#dcd6ca');
+  const cape = new THREE.Group(); cape.position.set(0, 0.165, 0.3); h.corps.add(cape);   // (accrochée à son cou, elle couvre son dos)
+  const m = new THREE.Mesh(GEO_CAPE_KRYPTO, mat('#c8141c', { side: THREE.DoubleSide, roughness: 0.9 })); m.castShadow = true; cape.add(m);   // (la matière de la cape de Superman)
+  h.cape = cape;
+  return h;
+}
+let krypto = null;   // { h, x, y, z, angle, vole, vx, vy, vz, cible, tCible, cd, coince, envol, mord, part }
+// il arrive : en volant, du ciel (ici : tout de suite à côté de lui, au chargement de la page ou au magasin ; sous un toit aussi)
+function appelerKrypto(ici = false) {
+  const h = creerKrypto(), a = J.angleCorps - 2.3, x = J.x + Math.sin(a) * 2.2, z = J.z + Math.cos(a) * 2.2;
+  const libre = !dansBatiment(x, J.y + 0.5, z), ciel = !ici && plafondAu(J.x, J.z, J.y) > J.y + 20;
+  krypto = { h, x: libre ? x : J.x, z: libre ? z : J.z, y: ciel ? J.y + 18 : J.y, angle: J.angleCorps, vole: ciel, vx: 0, vy: 0, vz: 0, cible: null, tCible: 0, cd: 0, coince: 0, envol: ciel ? 1 : 0, mord: 0, part: 0, loin: 0 };
+  h.g.position.set(krypto.x, krypto.y, krypto.z); scene.add(h.g);
+}
+// il s'en va : il s'envole tout droit, et disparaît dans le ciel
+function renvoyerKrypto() { if (krypto) { krypto.part = 3; krypto.vole = true; krypto.cible = null; } }
+// K : il s'en va, ou il revient
+function basculerKrypto() {
+  if (!chezClark) return;
+  if (!star.krypto) { annonce('', tr("Krypto t'attend à S.T.A.R. Labs (★ sur la carte) : il s'achète au magasin"), 3); bip(300, 200, 0.1, 'square', 0.1); return; }
+  star.kryptoLa = !star.kryptoLa;
+  if (star.kryptoLa) { if (!krypto || krypto.part) { if (krypto) scene.remove(krypto.h.g); appelerKrypto(); } aboyer(krypto); annonce('KRYPTO !', tr('Il arrive en volant · <b>K</b> : le renvoyer'), 2.5); }
+  else { renvoyerKrypto(); annonce('KRYPTO', tr('Il rentre à la maison · <b>K</b> : le rappeler'), 2.5); }
+  sauverPartie();
+}
+function majKrypto(dt) {
+  const K = krypto;
+  if (!K) return;
+  const h = K.h, d = dist(K, J);
+  h.g.visible = d < 300;
+  if (K.part) { // il s'en va : tout droit vers le ciel
+    K.vy = Math.min(40, K.vy + 30 * dt); K.y += K.vy * dt;
+    if ((K.part -= dt) <= 0) { scene.remove(h.g); krypto = null; return; }
+  } else {
+    // sa cible : le méchant le plus proche de lui, à moins de KRYPTO.portee de Superman (jamais un passant)
+    if ((K.tCible -= dt) <= 0) {
+      K.tCible = 0.4; K.cible = null;
+      let mieux = Infinity;
+      for (const p of personnes) { if (!ennemi(p) || p.vol || dist(p, J) > KRYPTO.portee || Math.abs(p.y - J.y) > 40) continue; const dp = Math.hypot(p.x - K.x, p.y - K.y, p.z - K.z); if (dp < mieux) { mieux = dp; K.cible = p; } }
+    }
+    if (K.cible && (K.cible.vie <= 0 || K.cible.supprimer)) K.cible = null;
+    const c = K.cible, a = J.angleCorps - 2.3;
+    // là où il va : sur le méchant ; sinon, à côté de Superman (à sa droite, un peu en arrière), à pied ou en l'air comme lui
+    const but = c ? { x: c.x, y: c.y, z: c.z } : { x: J.x + Math.sin(a) * 2.2, y: J.y, z: J.z + Math.cos(a) * 2.2 };
+    const dh = Math.hypot(but.x - K.x, but.z - K.z), solBut = hauteurSol(but.x, but.z, but.y + 1), sol = hauteurSol(K.x, K.z, K.y + 0.6);
+    const enLair = !c && (J.superman || J.voiture || J.y - hauteurSol(J.x, J.z, J.y + 0.5) > 2.5);   // (Superman vole, ou il est en voiture : il le suit en l'air)
+    const eau = EAU - sol > 0.6 || EAU - solBut > 0.6;
+    K.envol = Math.max(0, K.envol - dt);
+    K.vole = enLair || eau || K.envol > 0 || dh > 30 || but.y - solBut > 1.5 || but.y - K.y > 2.5 || (K.vole && K.y - sol > 0.6);   // (but.y : sur un toit, plus haut que lui)
+    const avant = { x: K.x, z: K.z };
+    if (K.vole) { // en l'air : il file vers là où il va (à côté de Superman : un peu plus haut que lui), au moins aussi vite que Superman
+      const cible = V3(but.x - K.x, (c ? but.y + 0.5 : enLair ? but.y + 0.8 : Math.max(solBut, EAU) + 0.1) - K.y, but.z - K.z), l = cible.length();
+      const vmax = Math.max(KRYPTO.vol, J.vitesse + 8, J.voiture ? Math.abs(J.voiture.vitesse) + 8 : 0);
+      cible.multiplyScalar(l > 0.01 ? Math.min(vmax, l * 2.5) / l : 0);
+      if ((K.monte = Math.max(0, (K.monte || 0) - dt)) > 0) cible.y = Math.max(cible.y, 10);   // (bloqué contre un mur : il monte par-dessus)
+      const k = Math.min(1, dt * 4);
+      K.vx += (cible.x - K.vx) * k; K.vy += (cible.y - K.vy) * k; K.vz += (cible.z - K.vz) * k;
+      K.x += K.vx * dt; K.y += K.vy * dt; K.z += K.vz * dt;
+      if (resoudre(K, 0.3, 0.8, avant)) { K.vx *= 0.3; K.vz *= 0.3; K.monte = 0.6; }
+      const s = hauteurSol(K.x, K.z, K.y + 0.6);
+      if (K.y < s) { K.y = s; K.vy = Math.max(0, K.vy); }
+      if (Math.hypot(K.vx, K.vz) > 1) K.angle = lerpAngle(K.angle, Math.atan2(K.vx, K.vz), 8 * dt);
+      else K.angle = lerpAngle(K.angle, c ? angleVers(K, c) : J.angleCorps, 4 * dt);
+    } else { // à pied : il court vers là où il va (près de Superman : il marche, puis s'arrête)
+      const vitesse = dh > (c ? 1.1 : 4) ? KRYPTO.vitesse : !c && dh > 1.2 ? 3.5 : 0;
+      K.vx = K.vy = K.vz = 0;
+      if (dh > 0.3) K.angle = lerpAngle(K.angle, Math.atan2(but.x - K.x, but.z - K.z), 10 * dt); else K.angle = lerpAngle(K.angle, J.angleCorps, 4 * dt);
+      if (vitesse) {
+        K.x += Math.sin(K.angle) * vitesse * dt; K.z += Math.cos(K.angle) * vitesse * dt;
+        resoudre(K, 0.3, 0.8, avant);
+        K.y = hauteurSol(K.x, K.z, K.y + 0.6);
+        // contre un mur, il n'avance presque plus : au bout de 0,6 s, il s'envole par-dessus
+        K.coince = Math.hypot(K.x - avant.x, K.z - avant.z) < vitesse * dt * 0.3 ? K.coince + dt : 0;
+        if (K.coince > 0.6) { K.envol = 1.5; K.coince = 0; K.monte = 0.8; }
+      } else K.coince = 0;
+      K.vitesseSol = vitesse;
+    }
+    // trop loin de Superman (il est parti très vite, ou Krypto est resté bloqué, sur un toit, de l'autre côté d'un mur) : il le rejoint d'un
+    // coup, à côté de lui
+    K.loin = d > 60 || (!c && !enLair && (d > 12 || Math.abs(K.y - J.y) > 4)) ? K.loin + dt : 0;
+    if (d > 250 || K.loin > 4) { const x = J.x + Math.sin(a) * 2.2, z = J.z + Math.cos(a) * 2.2, libre = !dansBatiment(x, J.y + 0.5, z); Object.assign(K, { x: libre ? x : J.x, z: libre ? z : J.z, y: J.y + 1, vx: 0, vy: 0, vz: 0, loin: 0, envol: 0.5 }); }
+    // il mord le méchant qu'il a rattrapé
+    K.cd -= dt; K.mord = Math.max(0, K.mord - dt);
+    if (c && Math.hypot(c.x - K.x, c.z - K.z) < 1.4 && Math.abs(c.y + 0.4 - K.y) < 1.6 && K.cd <= 0) {
+      K.cd = KRYPTO.morsure; K.mord = 0.25; blesser(c, KRYPTO.degats, false); aboyer(K);
+    }
+    if (c && (K.tAboie = (K.tAboie ?? 1) - dt) <= 0) { K.tAboie = entre(0.8, 1.6); aboyer(K); }
+  }
+  if (!h.g.visible) return;
+  // sa pose : il court comme un chien ; en l'air, les pattes avant tendues devant lui, celles de derrière en arrière, la cape au vent
+  h.g.position.set(K.x, K.y, K.z); h.g.rotation.y = K.angle;
+  animerChien(h, K.vole ? 0 : K.vitesseSol || 0, dt);
+  h.tete.position.z = 0.42 + 0.12 * Math.sin(K.mord / 0.25 * Math.PI);   // (il mord : sa tête part en avant)
+  const vh = Math.hypot(K.vx, K.vz);
+  if (K.vole) {
+    for (const [k, p] of h.pattes.entries()) p.rotation.x = k < 2 ? -1.25 : 1.2;
+    h.corps.rotation.x = -clamp(Math.atan2(K.vy, Math.max(2, vh)), -0.6, 0.6);
+    h.cape.rotation.x = 0.08 + Math.min(0.25, vh / 120) + Math.sin(temps * 16) * 0.08;   // (elle claque au vent, sur son dos)
+  } else { h.corps.rotation.x = 0; h.cape.rotation.x = 0.05 + Math.min(0.3, (K.vitesseSol || 0) / 40) + Math.sin(temps * 9) * 0.04; }
+}
+
+// --- La super-force (G) : en costume, il soulève la voiture la plus proche (même un camion ou un bus) au-dessus de sa tête, en travers.
+// Il peut marcher et voler avec. Clic gauche : il la lance là où il regarde (elle tombe, s'écrase, et peut exploser, comme une voiture
+// accidentée : voir majAccident) ; G encore : il la repose doucement par terre, devant lui. Celui qui la conduisait descend avant, et la lui
+// prête (pas d'amende). Pour une mission : une voiture qui a « occupee » (le bus du pont) garde ses passagers ; on ne peut que la reposer,
+// et elle a alors « reposee » (le moment où elle est posée) ---
+let souleve = null;   // { v, t : depuis quand il la tient, de : d'où elle part, q0 : comment elle était tournée, vel : sa vitesse, garde : son conducteur (s'il reste dedans), pose : de 0 à 1, quand il la repose }
+let camPorte = 0;     // (la caméra recule et monte, pour qu'on voie par-dessus la voiture : voir majCamera)
+function superForce() {
+  if (souleve) { reposerVoiture(); return; }
+  if (sansGadgets()) { enCivilSans('Mets ton costume (H) pour soulever les voitures'); return; }
+  if (J.voiture || J.robot || J.mort || J.monorail || J.telesiege) { annonce('', tr("Descends d'abord !"), 1.5); return; }
+  if (J.nage) { annonce('', tr("Sors de l'eau d'abord !"), 1.5); return; }
+  // la voiture la plus proche : à porteeForce mètres au plus de sa carrosserie
+  let v = null, mieux = Infinity;
+  for (const o of voitures) {
+    if (o.detruite || o.coule || o.supprimer || o.fantome || o.autopilote || o.arriveeBat || o.entree || o.embarque || o.type.glisse || o.rail || Math.abs(o.y - J.y) > 3) continue;
+    const dc = Math.min(...o.cercles.map(lz => dist(local(o, 0, lz), J))) - o.rayon;
+    if (dc < mieux) { mieux = dc; v = o; }
+  }
+  if (!v || mieux > R_.porteeForce) { annonce('', tr("Approche-toi d'une voiture pour la soulever (<b>G</b>)"), 2); bip(300, 200, 0.1, 'square', 0.1); return; }
+  if (pasDeTole(v) || v.type.stable || v.fuyard || v.type.modele === 'delorean') { annonce('', tr('Celle-là, tu ne peux pas la soulever'), 2); return; }   // (un bateau, un avion, un hélicoptère, le Batpod, une voiture qu'une mission fait fuir, la DeLorean)
+  if (v.dort) reveillerVoiture(v);
+  // celui qui conduit : il descend tranquillement, et lui prête sa voiture (sauf si une mission veut qu'il reste dedans : occupee)
+  const garde = v.occupee && v.conducteur && !v.forme.ouvert ? v.conducteur : null;   // (sur une moto, un tricycle : rien ne le retient, il descend)
+  if (v.conducteur && !garde) {
+    const p = local(v, v.rayon + 0.8, 0.3), c = creerPersonne(v.police ? 'flic' : 'pieton', p.x, p.z, v.pilote?.tenue);
+    resoudre(c, 0.35); v.conducteur = null; v.volee = true;
+    annonce(tr(v.type.nom).toUpperCase(), tr('« Tiens, {super} : je te la prête ! »', { super: nomSuper() }), 2.5);
+  } else annonce('', tr(garde ? 'Il y a des gens dedans : repose-la doucement (<b>G</b>)' : 'Clic gauche : la lancer là où tu regardes · <b>G</b> : la reposer'), 3);
+  if (v.filet) oterFilet(v);
+  v.vitesse = 0; v.panne = 0;
+  const a = commencerAccident(v);
+  if (!a) return;
+  a.tenue = true; a.dort = false; v.faute = true;   // (ce qu'elle fera en tombant, c'est sa faute)
+  souleve = { v, t: 0, de: V3().copy(a.c), q0: v.quat.clone(), vel: V3(), avant: V3(J.x, J.y, J.z), garde, pose: 0 };
+  bruit(0.5, 180, 0.4); bip(110, 70, 0.35, 'sawtooth', 0.08);   // la tôle grince
+}
+// chaque image, pendant qu'il la tient (majAccident, à la place de la chute) : au-dessus de sa tête, en travers ; ou elle descend
+// doucement, quand il la repose
+function porterVoiture(v, dt) {
+  const S = souleve, a = v.accident, k = coqueAccident(v.type.modele);
+  if (!S || S.v !== v) { a.tenue = false; return; }
+  if (J.mort || J.voiture || J.robot || J.nage || v.detruite || v.coule || v.supprimer || !enCostumeSuper()) { lacherVoiture(); return; }
+  S.t += dt;
+  if (dt > 0) S.vel.set((J.x - S.avant.x) / dt, (J.y - S.avant.y) / dt, (J.z - S.avant.z) / dt); S.avant.set(J.x, J.y, J.z);
+  const q = Q_.setFromEuler(new THREE.Euler(0, J.angleCorps + Math.PI / 2, 0));   // en travers, au-dessus de sa tête
+  const garde = v.forme.garde || 0, haut = V3(J.x, J.y + 2.1 * tailleHeros() - garde + k.cg, J.z);   // (le dessous de la voiture contre ses mains)
+  let c;
+  if (S.pose) { // il la repose : elle descend devant lui, jusqu'au sol
+    S.pose = Math.min(1, S.pose + dt / 0.6);
+    const e = S.pose * S.pose * (3 - 2 * S.pose);
+    c = S.depart.clone().lerp(V3(S.vers.x, S.vers.y + k.cg, S.vers.z), e);
+  } else { // il la soulève (en 0,45 s), puis la tient
+    const e = Math.min(1, S.t / 0.45), l = e * e * (3 - 2 * e);
+    c = S.de.clone().lerp(haut, l); q.copy(S.q0.clone().slerp(q, l));
+    // elle ne passe pas à travers les murs : contre un mur, elle le pousse en arrière, et lui avec
+    if (l >= 1) {
+      let px = 0, pz = 0;
+      const ang = J.angleCorps + Math.PI / 2;
+      for (const lz of v.cercles) {
+        const o = { x: c.x + Math.sin(ang) * lz, z: c.z + Math.cos(ang) * lz, y: c.y - k.cg + garde }, x0 = o.x, z0 = o.z;
+        resoudre(o, v.rayon, Math.max(0.5, v.forme.hauteur - garde));
+        if (Math.abs(o.x - x0) > Math.abs(px)) px = o.x - x0; if (Math.abs(o.z - z0) > Math.abs(pz)) pz = o.z - z0;
+      }
+      if (px || pz) { c.x += px; c.z += pz; J.x += px; J.z += pz; S.avant.x += px; S.avant.z += pz; }
+    }
+  }
+  a.c.copy(c); v.quat.copy(q); a.vel.copy(S.vel); a.rot.set(0, 0, 0); a.duree = a.calme = 0;
+  const f = V3(0, 0, 1).applyQuaternion(v.quat); v.angle = Math.atan2(f.x, f.z);
+  const bas = V3(0, -k.cg, 0).applyQuaternion(v.quat).add(a.c);
+  v.x = bas.x; v.y = bas.y; v.z = bas.z; v.vitesse = 0;
+  if (S.pose >= 1) { // posée : elle redevient une voiture comme les autres (avec son conducteur, s'il était resté dedans)
+    souleve = null; a.tenue = false;
+    finirAccident(v);
+    Object.assign(v, { x: S.vers.x, y: S.vers.y, z: S.vers.z, vitesse: 0, vy: 0, reposee: temps });
+    if (S.garde) v.conducteur = S.garde;
+    bruit(0.35, 160, 0.25);
+  }
+}
+// G encore : il la repose, devant lui (ou sous lui, s'il n'y a pas la place). Pas de trop haut : il doit être à moins de 6 m du sol
+function reposerVoiture() {
+  const S = souleve, v = S.v;
+  if (S.pose || S.t < 0.45) return;
+  const l = v.forme.largeur / 2 + 1.3, ici = { x: J.x + Math.sin(J.angleCorps) * l, z: J.z + Math.cos(J.angleCorps) * l };
+  let sol = hauteurSol(ici.x, ici.z, J.y + 1.5);
+  if (J.y - hauteurSol(J.x, J.z, J.y + 0.5) > 6) { annonce('', tr("Trop haut : descends d'abord pour la reposer (ou lance-la : clic gauche)"), 2.5); return; }
+  if (Math.abs(sol - J.y) > 2.5 || dansBatiment(ici.x, sol + 1, ici.z) || EAU - sol > 1) { ici.x = J.x; ici.z = J.z; sol = hauteurSol(J.x, J.z, J.y + 0.5); }   // (devant lui, un mur, un trou, l'eau : sous lui)
+  S.pose = 0.001; S.depart = V3().copy(v.accident.c); S.vers = { x: ici.x, y: sol, z: ici.z };
+}
+// clic gauche : il la lance là où il regarde (pas avec des gens dedans)
+// (renvoie false si c'est trop tôt : elle n'est pas encore au-dessus de sa tête, ou il la repose)
+function lancerVoiture() {
+  const S = souleve, v = S.v, a = v.accident;
+  if (S.pose || S.t < 0.45) return false;
+  if (S.garde) { annonce('', tr('Il y a des gens dedans : repose-la doucement (<b>G</b>)'), 2.5); return true; }
+  a.vel.copy(regard().multiplyScalar(R_.lancerForce)).add(S.vel); a.vel.y += 3;
+  a.rot.set(entre(-1.5, 1.5), entre(-1, 1), entre(-1.5, 1.5));
+  a.tenue = false; a.duree = 0; v.faute = true; v.lancee = temps; souleve = null;
+  J.frappe = 1; J.secousse = Math.max(J.secousse || 0, 0.05);
+  bruit(0.7, 300, 0.4); bip(200, 90, 0.3, 'sawtooth', 0.08);
+  return true;
+}
+// il la lâche (il est mort, il est entré dans une voiture, il est tombé à l'eau, il a enlevé son costume) : elle tombe
+function lacherVoiture() {
+  const S = souleve; souleve = null;
+  if (!S?.v.accident) return;
+  S.v.accident.tenue = false; S.v.accident.vel.copy(S.vel);
+}
+// ses bras, de 0 à 1 : il les lève en la soulevant, et les baisse en la reposant (voir animerHumain : souleve)
+const brasSouleve = () => !souleve ? 0 : souleve.pose ? 1 - souleve.pose : Math.min(1, souleve.t / 0.3);
+
+// --- Les stands (standsStar, voir construireStarLabs) : un costume sur un mannequin, Krypto sur son plateau, un pouvoir ou une
+// amélioration qui flotte au-dessus de son socle ; leur nom et leur prix au-dessus ---
+// un mannequin habillé du costume k (avec la fille du menu : celui de Supergirl, ou avec ses cheveux), les poings sur les hanches
+function statueSuperman(k) {
+  const h = creerHumain({ peau: PEAU_BJ, haut: '#333', bas: '#333', chaussures: '#111', cheveux: '#111' }), cape = capeBJ.clone();
+  h.g.traverse(o => o.userData.habit = o.material);
+  habillerSuperman(h, costumeDeStar(k), cape);
+  animerHumain(h, 0, 0);
+  for (const [b, c] of [[h.brasD, -1], [h.brasG, 1]]) { b.rotation.set(0.1, 0, 0.75 * c); b.pli.rotation.set(0, 0, -1.7 * c); }   // (les coudes écartés, les mains sur les hanches)
+  cape.rotation.x = 0.12;
+  return figer(h.g);
+}
+// Le décor du magasin, qui ne bouge pas, d'un seul bloc par matière (figer) : les plateaux bordés de bleu (ceux du magasin de Lucius Fox), les
+// mannequins et Krypto dessus, les socles des pouvoirs et des améliorations. Une quinzaine de dessins au lieu d'une centaine. Refait quand on
+// change de héros dans le menu (les mannequins de Supergirl)
+let decorStar = null;
+function construireDecorStar() {
+  if (decorStar) { decorStar.removeFromParent(); decorStar.traverse(x => x.geometry?.dispose()); }
+  const g = new THREE.Group(), m = (geo, matiere, x, y, z) => { const e = new THREE.Mesh(geo, matiere); e.position.set(x, y, z); g.add(e); return e; };
+  for (const s of standsStar) {
+    if (s.sorte === 'costume' || s.sorte === 'krypto') {
+      const r = s.sorte === 'krypto' ? 0.85 : 0.65;
+      m(new THREE.CylinderGeometry(r - 0.03, r + 0.03, 0.22, 28), M_PLATEAU_WAYNE, s.x, s.y + 0.11, s.z); m(new THREE.TorusGeometry(r, 0.018, 6, 40).rotateX(Math.PI / 2), M_BORD_WAYNE, s.x, s.y + 0.22, s.z);
+      const f = s.sorte === 'krypto' ? figer(creerKrypto().g) : statueSuperman(s.k); f.position.set(s.x, s.y + 0.22, s.z); g.add(f);
+    } else m(new THREE.CylinderGeometry(0.5, 0.6, 1, 16), MAT.metal, s.x, s.y + 0.5, s.z);   // le socle
+  }
+  decorStar = figer(g); decorStar.traverse(x => x.castShadow = false); scene.add(decorStar);
+}
+function vitrineStar(o) {
+  const g = new THREE.Group();
+  const m = (geo, matiere, x = 0, y = 0, z = 0) => { const e = new THREE.Mesh(geo, matiere); e.position.set(x, y, z); e.castShadow = true; g.add(e); return e; };
+  if (o.sorte === 'costume' || o.sorte === 'krypto') return g;   // (le mannequin, ou Krypto, et son plateau : dans le décor du magasin, voir construireDecorStar)
+  const c = o.cle, rouge = mat('#ff3a2a', { emissive: '#ff2a1a', emissiveIntensity: 1.2 });
+  if (c === 'glace') { // trois cristaux de glace
+    for (const [x, z, t, r] of [[0, 0, 1, 0], [0.09, 0.03, 0.6, 0.5], [-0.08, -0.02, 0.55, -0.6]]) m(new THREE.OctahedronGeometry(0.1 * t).scale(0.7, 1.8, 0.7), M_GLACE, x, 0, z).rotation.z = r;
+  } else if (c === 'rayonsX') { // un œil, qui brille en rouge
+    m(new THREE.SphereGeometry(0.1, 16, 12), mat('#f4f4f0', { roughness: 0.3 })); m(new THREE.CircleGeometry(0.05, 18), rouge, 0, 0, 0.101); m(new THREE.CircleGeometry(0.022, 12), mat('#111'), 0, 0, 0.103);
+  } else if (c === 'vitesse') { // un éclair jaune
+    const s = new THREE.Shape(); for (const [x, y] of [[0.02, 0.16], [-0.07, -0.01], [0, -0.01], [-0.04, -0.16], [0.08, 0.03], [0.01, 0.03]]) s.lineTo(x, y);
+    m(new THREE.ExtrudeGeometry(s, { depth: 0.05, bevelEnabled: false }).translate(0, 0, -0.025).scale(1.3, 1.3, 1), mat('#ffc81a', { emissive: '#ff9a00', emissiveIntensity: 1 }));
+  } else if (c === 'cri') { // des ondes qui partent d'une bouche
+    m(new THREE.SphereGeometry(0.035, 10, 8), mat('#d84a5a'), -0.1, 0, 0);
+    for (const r of [0.06, 0.11, 0.16]) m(new THREE.TorusGeometry(r, 0.008, 6, 20, Math.PI * 0.7).rotateZ(-Math.PI * 0.35), M_BORD_WAYNE, -0.1, 0, 0);
+  } else if (c === 'vol') { // un petit bout de cape rouge
+    const k = capeBJ.clone(); mettreCape({ torse: g }, '#c8141c', false, k); k.scale.setScalar(0.3); k.position.set(0, 0.16, 0); k.rotation.x = 0.5;
+  } else if (c === 'laser') { // deux yeux, et leurs rayons rouges
+    for (const x of [-0.04, 0.04]) { m(new THREE.SphereGeometry(0.03, 10, 8), rouge, x, 0, 0); m(new THREE.CylinderGeometry(0.008, 0.008, 0.3, 6).rotateX(Math.PI / 2), M_LASER, x * 1.6, 0, 0.16); }
+  } else if (c === 'vie') { // un cœur rouge
+    m(formeCoeur(), mat('#d0182a', { emissive: '#600', roughness: 0.4 }));
+  } else { // la force (ou une amélioration qu'on a inventée) : un gros haltère
+    m(new THREE.CylinderGeometry(0.015, 0.015, 0.3, 8).rotateZ(Math.PI / 2), MAT.metal);
+    for (const x of [-0.12, 0.12]) m(new THREE.CylinderGeometry(0.07, 0.07, 0.04, 16).rotateZ(Math.PI / 2), mat('#2a2c32', { metalness: 0.6, roughness: 0.35 }), x, 0, 0);
+  }
+  g.scale.setScalar(2.5);   // (plus grand que nature, comme au magasin de Lucius Fox)
+  return g;
+}
+// ce qu'on lit au-dessus d'un stand : le nom et le prix, ou « à toi », ou le niveau suivant d'une amélioration
+function texteStar(o) {
+  if (o.sorte === 'costume') return etiquetteAchat(tr(costumeDeStar(o.k).nom), COSTUMES_STAR[o.k].prix, star.costumes.includes(o.k));
+  if (o.sorte === 'pouvoir') return etiquetteAchat(tr(POUVOIRS_STAR[o.cle].nom), POUVOIRS_STAR[o.cle].prix, star[o.cle]);
+  if (o.sorte === 'krypto') return etiquetteAchat('Krypto', KRYPTO.prix, star.krypto);
+  return etiquetteNiveau(AMELIORATIONS_STAR[o.cle], star[o.cle]);
+}
+const TOUCHES_POUVOIRS = { glace: 'X', rayonsX: 'O', vitesse: 'R', cri: 'B' };
+// l'aide, près d'un stand (« Appuie sur E pour acheter... »)
+function aideStar(s) {
+  if (sansForteresse()) return tr('Le magasin de S.T.A.R. Labs ouvre après ta première mission (suis le point jaune)');
+  if (s.sorte === 'costume') return aideCostume(tr(costumeDeStar(s.k).nom), COSTUMES_STAR[s.k].prix, star.costumes.includes(s.k), star.costume === s.k, enCostumeSuper());
+  if (s.sorte === 'pouvoir') {
+    const P = POUVOIRS_STAR[s.cle], nom = tr(P.nom);
+    return !star[s.cle] ? aideAcheter(nom, P.prix) : tr('{nom} : déjà à toi (en costume, <b>{touche}</b>)', { nom, touche: TOUCHES_POUVOIRS[s.cle] });
+  }
+  if (s.sorte === 'krypto') return !star.krypto ? aideAcheter('Krypto', KRYPTO.prix) : tr('Krypto : déjà à toi (<b>K</b> : il vient, ou il rentre à la maison)');
+  return aideNiveau(AMELIORATIONS_STAR[s.cle], star[s.cle]);
+}
+// E près d'un stand : il achète, ou il choisit ce qu'il a déjà. Les étiquettes changent, et la partie s'en souvient tout de suite
+function acheterStar(s) {
+  if (sansForteresse()) { annonce(tr('MAGASIN FERMÉ'), tr('Il ouvre après ta première mission : suis le point jaune !'), 3); bip(300, 200, 0.2, 'square', 0.2); return; }
+  if (s.sorte === 'costume') {
+    const neuf = !star.costumes.includes(s.k);
+    if (neuf && !payer(COSTUMES_STAR[s.k].prix)) return;
+    if (neuf) star.costumes = [...star.costumes, s.k].sort((a, b) => a - b);
+    if (!neuf && star.costume === s.k) { annonce('', aideStar(s), 2); return; }
+    star.costume = s.k;
+    mettreCostumeChoisi(neuf ? tr('{nom} : à toi !', { nom: tr(costumeDeStar(s.k).nom) }) : '');
+  } else if (s.sorte === 'pouvoir') {
+    const c = s.cle, P = POUVOIRS_STAR[c];
+    if (star[c]) { annonce('', aideStar(s), 2); return; }
+    if (!payer(P.prix)) return;
+    star[c] = true;
+    annonce(tr('{nom} : à toi !', { nom: tr(P.nom) }), { glace: tr('En costume, X : ton souffle glacé gèle tout devant toi'), rayonsX: tr('En costume, O : tu vois les méchants à travers les murs'),
+      vitesse: tr('En costume, R : la super-vitesse (avec Maj, tu cours à toute vitesse)'), cri: tr('En costume, B : ton super-cri renverse tout devant toi') }[c] || '', 4);
+  } else if (s.sorte === 'krypto') {
+    if (star.krypto) { annonce('', aideStar(s), 2); return; }
+    if (!payer(KRYPTO.prix)) return;
+    star.krypto = star.kryptoLa = true;
+    if (krypto) scene.remove(krypto.h.g);
+    appelerKrypto(true); aboyer(krypto);
+    annonce(tr('Krypto : à toi !'), tr('Il te suit partout, à pied et en volant, et mord les méchants · K : le renvoyer, ou le rappeler'), 4);
+  } else {
+    const c = s.cle, U = AMELIORATIONS_STAR[c], prix = U.prix[star[c] - 1];
+    if (prix === undefined) { annonce('', tr('{nom} : niveau maximum', { nom: tr(U.nom) }), 2); return; }
+    if (!payer(prix)) return;
+    star[c]++;
+    if (c === 'vie') J.vie = vieMax();   // (et il est soigné)
+    annonce(tr('{nom} niveau {n} !', { nom: tr(U.nom), n: star[c] }), { vol: tr('Tu voles plus vite'), laser: tr('Tes yeux laser font plus mal'), vie: tr('Tu as {n} points de vie', { n: vieMax() }),
+      force: tr('Tes coups de poing font plus mal, et envoient tout valser') }[c] || '', 3.5);
+  }
+  for (const o of objetsStar) etiqueter(o);
+  sauverPartie();
+}
+
+// --- Le professeur Hamilton, derrière l'accueil : sa blouse blanche, sa cravate, ses lunettes, ses cheveux gris. Il se tourne vers lui quand
+// il approche, et lui fait signe de la main en lui parlant (comme Lucius Fox : voir majVendeur ; on ne peut pas le blesser) ---
+let savant = null;
+function creerSavant() {
+  const p = starLabs.savant, h = creerHumain({ peau: '#e3b894', haut: '#f4f4f0', bas: '#3c4048', chaussures: '#1a1410', cheveux: '#8f8a80' });
+  h.torse.material = veste({ veste: '#f4f4f0', chemise: '#a8c8e8', cravate: '#24355e' });                                // sa blouse blanche, ouverte sur sa chemise bleue
+  piece(GEO.lunettes, '#000', h.tete, 0, 0.026, 0.124).material = mat('#d8e6ee', { metalness: 0.6, roughness: 0.15 });  // ses lunettes
+  h.g.position.set(p.x, p.y, p.z); scene.add(h.g);
+  ajouterCollision(p.x - 0.35, p.z - 0.35, p.x + 0.35, p.z + 0.35, p.y + 1.8, p.y);
+  savant = { h, x: p.x, y: p.y, z: p.z, angle: 0, parle: false, salue: 0 };
+}
+function majSavant(dt, pres) {
+  const S = savant, nom = fille() ? tr('mademoiselle Danvers') : tr('monsieur Kent');
+  const salue = majVendeur(S, dt, pres, () => annonce(tr('PROFESSEUR HAMILTON'), sansForteresse() ? tr("« Tout n'est pas encore prêt. Reviens après ta première mission ! »")
+    : enCostumeSuper() ? tr("« Bonjour, {super} ! J'ai de nouvelles inventions pour toi. »", { super: nomSuper() }) : tr('« Bonjour, {nom} ! Dites à {super} que tout est prêt. »', { nom, super: nomSuper() }), 4));
+  if (salue) S.salue = 2;
+  if (!pres || (S.salue = Math.max(0, S.salue - dt)) <= 0) return;
+  const e = Math.min(1, S.salue * 3, (2 - S.salue) * 6);   // il lève la main droite, et l'agite
+  S.h.brasD.rotation.set(lerp(-0.5, -2.7, e), 0, lerp(0.06, -0.3 + 0.35 * Math.sin(temps * 10), e)); S.h.brasD.pli.rotation.x = lerp(-0.55, -0.7, e);
+}
+
+// au chapitre de Superman, le magasin ouvre ses stands, et le professeur Hamilton prend sa place
+if (chezClark) document.getElementById('detective').classList.add('rayonsX');   // (la vision à rayons X : les bords de l'écran rougissent)
+const objetsStar = [];
+function ouvrirMagasinStar() {
+  if (!chezClark || !starLabs) return;
+  for (const s of standsStar) objetsStar.push(creerObjet({ type: 'stand', star: true, sorte: s.sorte, k: s.k, cle: s.cle, x: s.x, y: s.y, z: s.z, fixe: s.sorte === 'costume' || s.sorte === 'krypto', tourne: 0 }));
+  construireDecorStar(); creerSavant();
+  // dans le hall, les stands ne font pas d'ombre : le toit cache déjà le soleil (sinon, il faudrait tout dessiner une 2e fois, pour les
+  // ombres). Le professeur, si : comme un passant, il est dessiné d'un seul bloc (voir majFormes), et c'est le cas des pièces qui font de l'ombre
+  for (const o of objetsStar) o.m.traverse(x => x.castShadow = false);
+}
+ouvrirMagasinStar();
+// on a changé de héros dans le menu : les mannequins se changent aussi (Supergirl), et leurs étiquettes
+addEventListener('heros', () => {
+  if (!decorStar) return;
+  const vu = decorStar.visible; construireDecorStar(); decorStar.visible = vu;
+  for (const o of objetsStar) if (o.sorte === 'costume') etiqueter(o);
+});
+// à chaque image, au chapitre de Superman : le magasin (qu'on ne dessine que de près), le professeur Hamilton, la vision à rayons X, la
+// super-vitesse et ses traits, le souffle glacé et le super-cri, Krypto
+let tTraits = 0;
+const dansHall = p => { const H = starLabs.zone; return p.x > H.x1 && p.x < H.x2 && p.z > H.z1 && p.z < H.z2 && p.y < starLabs.y + 9; };   // (le hall : voir construireStarLabs)
+function majStar(dt) {
+  star.tGlace = Math.max(0, star.tGlace - dt); star.tCri = Math.max(0, star.tCri - dt);
+  // le magasin n'est dessiné que dans le hall, ou devant sa porte (à moins de 25 m) : de plus loin, on ne le voit pas, les murs le cachent
+  const pres = !!starLabs && (Math.hypot(J.x - starLabs.porte.x, J.z - starLabs.porte.z) < 25 || dansHall(J));
+  for (const o of objetsStar) o.m.visible = pres;
+  if (decorStar) decorStar.visible = pres;
+  if (savant) majSavant(dt, pres);
+  if (star.voitRayonsX && (!enCostumeSuper() || J.mort)) { star.voitRayonsX = false; annonce('', tr('Vision à rayons X éteinte'), 1.5); }
+  if (star.superVitesse && (!enCostumeSuper() || J.mort)) star.superVitesse = false;
+  $('detective').style.display = star.voitRayonsX ? 'block' : 'none';
+  // la super-vitesse : des traits bleus, rouges et jaunes restent derrière lui (ceux du tourbillon)
+  if (vitesseSuper(true) > 1 && J.sol && J.vitesse > 12 && (tTraits -= dt) <= 0) {
+    tTraits = 0.02;
+    const s = new THREE.Sprite(hasard(M_TOURBILLON)); s.scale.set(0.05, entre(0.4, 0.8), 1);
+    s.position.set(J.x + entre(-0.3, 0.3), J.y + entre(0.2, 1.7), J.z + entre(-0.3, 0.3)); scene.add(s); effets.push({ o: s, vie: 0.25 });
+  }
+  if (star.krypto && star.kryptoLa && !krypto) appelerKrypto(true);   // (au chargement : il est là, à côté de lui)
+  majKrypto(dt);
+  majSouffles(dt);
+  camPorte += ((souleve ? 1 : 0) - camPorte) * Math.min(1, dt * 4);
 }
 
 // =====================================================================
@@ -16177,10 +16922,10 @@ addEventListener('keydown', e => {
   if (J.ironman && suiteIronman(e.code)) return;   // A Z E (Q W E sur un clavier anglais) : l'armure d'Iron Man arrive, ou il en sort
   if ((J.ironman?.anim || J.ironman?.tour) && e.code !== 'KeyV') return;   // pendant ce temps (et pendant le tour du laser des bras), il ne fait rien d'autre
   if (e.code === 'KeyH') costume();   // H : l'armure d'Iron Man arrive, ou il en sort
-  if (e.code === 'KeyJ') { if (chezWayne) costumeSuivant(); else changerArmure(); }   // J : il choisit une autre armure d'Iron Man (celles du magasin de Stark Industries), ou un autre costume de Batman (celui de Lucius Fox)
+  if (e.code === 'KeyJ') { if (chezWayne || chezClark) costumeSuivant(); else changerArmure(); }   // J : il choisit une autre armure d'Iron Man (celles du magasin de Stark Industries), ou un autre costume de Batman (celui de Lucius Fox) ou de Superman (celui de S.T.A.R. Labs)
   if (e.code === 'KeyN') batmobileSuivante();   // N : au chapitre de Batman, une autre Batmobile (B la fera venir)
-  if (e.code === 'KeyO') basculerVision();      // O : au chapitre de Batman, la vision de détective
-  if (e.code === 'KeyK') lancerFumigene();      // K : au chapitre de Batman, un fumigène
+  if (e.code === 'KeyO') { if (chezClark) basculerRayonsX(); else basculerVision(); }   // O : au chapitre de Batman, la vision de détective ; de Superman, la vision à rayons X
+  if (e.code === 'KeyK') { if (chezClark) basculerKrypto(); else lancerFumigene(); }     // K : au chapitre de Batman, un fumigène ; de Superman, Krypto vient (ou s'en va)
   suite = (suite + e.code + ' ').slice(-SUITE_DANSE.length);
   if (suite === SUITE_DANSE) { suite = ''; danser(); }
   if (e.key === 'Shift') { tapesMaj = [...tapesMaj, temps].slice(-3); if (tapesMaj[2] - tapesMaj[0] < R_.tripleMaj) { tapesMaj = []; decoller(); } else if (J.superman) J.superman.appui = true; }   // en volant : cet appui le fera aller plus vite quand on relâchera Maj, sauf s'il a servi à une figure
@@ -16191,14 +16936,18 @@ addEventListener('keydown', e => {
   else if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
   if (e.code === 'KeyR' && im) tirerPlastron();   // Iron Man : le rayon du plastron
+  else if (e.code === 'KeyR' && chezClark && !J.voiture) basculerSuperVitesse();   // au chapitre de Superman, à pied : la super-vitesse
   else if (e.code === 'KeyR') changerMode();   // en skis de rando : coller ou enlever les peaux
   if (e.code === 'KeyL' && im) leverMasque();   // Iron Man : L lève ou baisse le masque
   if (e.code === 'KeyG' && im && chezStark) tirerMissiles();   // Iron Man, au chapitre d'Iron Man : les mini-missiles
   else if (e.code === 'KeyG' && sansGadgets() && chezWayne && !J.voiture && !J.monorail) enCivilSans('Mets ton costume (H) pour lancer ton grappin');   // en civil
+  else if (e.code === 'KeyG' && chezClark) superForce();   // au chapitre de Superman : la super-force (soulever une voiture, la reposer)
   else if (e.code === 'KeyG') accrocher();     // le grappin de Batman, la toile de Spiderman
   if (e.code === 'KeyX' && im && chezStark) lancerLaser();   // Iron Man, au chapitre d'Iron Man : le laser des bras
   else if (e.code === 'KeyX' && chezWayne) gelExplosif();   // Batman, au chapitre de Batman : le gel explosif (X encore : il explose)
-  if (e.code === 'KeyB') { if (sansBatmobile() && !entree && !J.voiture) pasEncoreDeBatmobile(); else if (sansGadgets() && chezWayne) enCivilSans('Mets ton costume (H) pour appeler ta Batmobile'); else rappelerVoiture(); }   // Batman rappelle sa Batmobile (pas en civil, ni avant la mission 2)
+  else if (e.code === 'KeyX' && chezClark) soufflerGlace();   // Superman, au chapitre de Superman : le souffle glacé
+  if (e.code === 'KeyB' && chezClark) superCri();   // au chapitre de Superman : le super-cri
+  else if (e.code === 'KeyB') { if (sansBatmobile() && !entree && !J.voiture) pasEncoreDeBatmobile(); else if (sansGadgets() && chezWayne) enCivilSans('Mets ton costume (H) pour appeler ta Batmobile'); else rappelerVoiture(); }   // Batman rappelle sa Batmobile (pas en civil, ni avant la mission 2)
   if (e.code === 'KeyT' && !voyage) appuyerT();   // la DeLorean : choisir le chapitre où aller (dedans), ou la faire venir
   if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !J.voiture && !J.robot && !J.superman) J.accroupi = !J.accroupi;
   if (e.code === 'Digit9' && sansGadgets() && !J.robot) enCivilSans(chezClark ? 'Mets ton costume (H) pour avoir tes yeux laser' : 'Mets ton costume (H) pour avoir tes batarangs et tes filets');   // en civil
@@ -16526,6 +17275,7 @@ function majBoardercross() {
 // E (ou F) : ce qu'il y a à faire là. Renvoie false s'il n'y avait rien à faire (dans l'armure d'Iron Man, E tire alors de la main droite)
 function action() {
   if (J.mort || J.roule || sommeil) return true;
+  if (souleve) { annonce('', tr('Tes mains sont prises : lance la voiture (clic gauche), ou repose-la (<b>G</b>)'), 2); return true; }   // (Superman tient une voiture)
   if (J.telesiege) { // en plein trajet : il saute du siège... et retombe de haut !
     const v = J.voiture;
     J.telesiege = null; J.vy = 0; J.sol = false;
@@ -16593,6 +17343,7 @@ function payerBlindage(g) {
 function acheter(s) {
   if (s.stark) { acheterStark(s); return; }   // le magasin de Stark Industries
   if (s.wayne) { acheterWayne(s); return; }   // le magasin de Lucius Fox
+  if (s.star) { acheterStar(s); return; }     // le magasin de S.T.A.R. Labs
   if (s.masque) { // le masque à gaz : on n'en a besoin que d'un
     if (J.masque) { annonce('', tr('Tu as déjà un masque à gaz'), 2); return; }
     if (J.argent < R_.prixMasque) { annonce(tr("Pas assez d'argent"), tr('Il te faut {prix} $', { prix: R_.prixMasque }), 2); bip(300, 200, 0.2, 'square', 0.2); return; }
@@ -16778,22 +17529,22 @@ function tirer(a = ARMES[J.arme], depart0 = null) {
     }
     if (jet) { lancer(depart, point, a); continue; }   // un batarang, un filet : il vole vers le viseur (voir lancer)
     if (hit || sol) {
-      const u = hit?.object.userData || {}, p = u.personne;
+      const u = hit?.object.userData || {}, p = u.personne, degats = a.degats * (a.laser ? laserSuperman() : 1);   // (les yeux laser de Superman : son costume et ses améliorations)
       const vc = !p && u.voiture, roue = vc && vc.roues.find(r => r.tourne === hit.object.parent);
       if (vc) vc.faute = true;   // B.J. lui tire dessus : si elle explose, c'est sa faute
       // la foudre : tout ce qui est à moins de a.eclair mètres prend le choc, comme dans une explosion (les gens volent, les voitures sautent)
       if (a.eclair) { exploser(point, a.eclair, a.degats, R_.degatsExplosion, null, true); etincelles(point, 10, 6); }
-      else if (p) blesser(p, a.degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
+      else if (p) blesser(p, degats * (hit.object === p.h.tete || hit.object.parent === p.h.tete ? 2.5 : 1)); // tir à la tête : x2.5
       else if (roue) crever(vc, roue);   // un pneu : il éclate
       else if (vc) { // une voiture : un petit trou dans la tôle, et la vitre touchée se fêle (puis se brise)
         const q = vc.m.quaternion.clone().invert();
-        abimer(vc, vc.m.worldToLocal(hit.point.clone()), raycaster.ray.direction.clone().applyQuaternion(q), a.degats / 400, true);
-        if (!estBlindee(vc)) blesserConducteur(vc, a.degats);   // et celui qui conduit est touché
+        abimer(vc, vc.m.worldToLocal(hit.point.clone()), raycaster.ray.direction.clone().applyQuaternion(q), degats / 400, true);
+        if (!estBlindee(vc)) blesserConducteur(vc, degats);   // et celui qui conduit est touché
         impactVoiture(vc, raycaster);   // le trou de la balle (sur un blindage : juste des étincelles)
       }
-      else if (u.robot) toucherRobot(u.robot, a.degats, hit.object);   // le heavy robot : la vitre, puis le pilote
-      else if (u.porte) toucherPorte(u.porte, a.degats);   // une porte de la grotte des Dix Anneaux
-      if (!p && !vc && u.tourelle && (u.tourelle.vie -= a.degats) <= 0) { // une mitrailleuse de la banque, détruite
+      else if (u.robot) toucherRobot(u.robot, degats, hit.object);   // le heavy robot : la vitre, puis le pilote
+      else if (u.porte) toucherPorte(u.porte, degats);   // une porte de la grotte des Dix Anneaux
+      if (!p && !vc && u.tourelle && (u.tourelle.vie -= degats) <= 0) { // une mitrailleuse de la banque, détruite
         u.tourelle.canon.rotation.x = 0.9; etincelles(point, 12, 4); bruit(0.5, 2000, 0.4);
       }
       const brule = a.laser || a.eclair, taille = a.eclair ? 3 : 1;   // les yeux laser et la foudre laissent une marque noire (la foudre : trois fois plus grosse)
@@ -16973,7 +17724,7 @@ function majJoueur(dt) {
   if (J.biceps && (av || lat || touches.Space || J.accroupi || sourisG || visee || J.nage || J.danse || ironmanVise())) finirBiceps();   // ...et la pose du culturiste aussi
   const moonwalk = J.danse > 0 && J.danse < R_.moonwalk[0];
   const v = (moonwalk ? R_.vitesseMoonwalk : J.nage ? (court ? R_.vitesseNageRapide : R_.vitesseNage) : J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche)
-    * parTriche('vitesse') * (J.energie > 0 ? R_.vitesseEnergie : 1) * (sansReacteur() ? 0.5 : 1) * vitesseCostume();   // la boisson énergisante fait aller plus vite ; sans son réacteur (mission « Iron Monger »), il avance à peine ; au chapitre de Batman, son costume
+    * parTriche('vitesse') * (J.energie > 0 ? R_.vitesseEnergie : 1) * (sansReacteur() ? 0.5 : 1) * vitesseCostume() * vitesseSuper(court);   // la boisson énergisante fait aller plus vite ; sans son réacteur (mission « Iron Monger »), il avance à peine ; au chapitre de Batman (ou de Superman), son costume ; la super-vitesse
   const robot = TRICHES.some(t => t.actif && t.robot);
   let mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat;
   if (moonwalk) { mx = -Math.sin(J.angleCorps); mz = -Math.cos(J.angleCorps); }   // le moonwalk : il recule
@@ -16999,7 +17750,7 @@ function majJoueur(dt) {
   // on ne traverse pas les voitures, ni le robot, ni l'armure vide d'Iron Man : ils le poussent. Les murs passent après (une voiture garée
   // contre un mur ne le pousse pas à travers), et le sol après les murs (le sol d'où les murs l'ont laissé, pas d'où il voulait aller)
   for (const o of voitures) for (const lz of o.cercles) {
-    if (Math.abs(o.y - J.y) > 1.5) continue;
+    if (Math.abs(o.y - J.y) > 1.5 || o === souleve?.v) continue;   // (pas celle qu'il soulève)
     const c = local(o, 0, lz), d = dist(c, J), r = o.rayon + 0.35;
     if (d < r && d > 0) { J.x = c.x + (J.x - c.x) / d * r; J.z = c.z + (J.z - c.z) / d * r; }
   }
@@ -17040,7 +17791,7 @@ function majJoueur(dt) {
   else joueurH.g.position.set(J.x, J.y, J.z);
   joueurH.g.rotation.y = robot ? Math.round(J.angleCorps / 0.2) * 0.2 : J.angleCorps;   // un robot se tourne par crans
   // il range son arme pour nager, pour danser, ou pour montrer son biceps (pas le sceptre : il est dans l'autre main)
-  const sceptre = !!joueurH.arme?.userData.sceptre, range = J.nage || !!danse || (!!J.biceps && !sceptre);
+  const sceptre = !!joueurH.arme?.userData.sceptre, range = J.nage || !!danse || (!!J.biceps && !sceptre) || !!souleve;   // (et pour soulever une voiture)
   if (joueurH.arme) joueurH.arme.visible = !range && !(joueurH.arme.userData.jet && J.cooldown > 0.15);   // (le batarang qu'il vient de lancer n'est plus dans sa main)
   // il tend le bras pour lancer sa toile ou son filet, et tant qu'il tient une voiture au bout de sa toile
   const A = ARMES[J.arme], tend = J.prise ? 1 : A.toile || A.filet ? clamp(J.cooldown / A.cadence * 3, 0, 1) : 0;
@@ -17049,7 +17800,7 @@ function majJoueur(dt) {
   if (J.sol || J.nage) J.saute = false;
   const enLair = !J.sol && !J.nage && (J.saute || J.vy < -4);
   animerHumain(joueurH, J.vitesse, dt, { arme: armeEnMain() && !range, accroupi: J.accroupi, frappe: J.frappe, nage: J.nage, danse, robot,
-    saut: enLair ? J.vy : undefined, atterri: J.atterri, genou, pointe: 0.4 * J.recul, biceps, tend, plastron: posePlastron() });   // (le sceptre part en avant à chaque éclair)
+    saut: enLair ? J.vy : undefined, atterri: J.atterri, genou, pointe: 0.4 * J.recul, biceps, tend, plastron: posePlastron(), souleve: brasSouleve() });   // (le sceptre part en avant à chaque éclair)
   viserMains(joueurH);   // Iron Man : la main qui tire se tend vers le viseur
   // en l'air, ses membres ont du poids ; à l'atterrissage, le haut du corps continue sur sa lancée, les pieds restent posés (pas un robot)
   membresMous(joueurH, dt, !robot && (enLair || J.atterri > 0 || genou > 0) ? { raideur: 25, sol: J.sol ? J.y : -Infinity, jambes: enLair, vx, vy: J.vy, vz } : { sol: J.y });
@@ -17412,7 +18163,7 @@ function superman(dt) {
     const dx = Math.sin(J.lacet) * ct * av - Math.cos(J.lacet) * lat, dy = Math.sin(J.tangage) * av + monte, dz = Math.cos(J.lacet) * ct * av + Math.sin(J.lacet) * lat;
     if (!av && !lat && !monte) f.crans = 0;   // il s'arrête : il repart à la vitesse normale
     const crans = armureIronman() && !(marche('jambeG') && marche('jambeD')) ? 0 : f.crans;   // (dans l'armure d'Iron Man, une jambe hors service : il n'accélère plus)
-    const secours = enSecours(), v = Math.min(R_.vitesseVolMax, R_.vitesseVol + (secours ? 0 : crans) * R_.vitesseVolMaj) * volIronman() / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
+    const secours = enSecours(), v = Math.min(R_.vitesseVolMax, R_.vitesseVol + (secours ? 0 : crans) * R_.vitesseVolMaj) * volIronman() * volSuperman() / (Math.hypot(dx, dy, dz) || 1), k = Math.min(1, 2 * dt);   // il prend sa vitesse en une demi-seconde environ (dans une armure d'Iron Man : plus ou moins vite, voir ARMURES_STARK)
     const vy = secours ? Math.min(dy * v, -IRONMAN.batterie.descente) : dy * v;   // (batterie vide : ses réacteurs n'ont plus la force de monter, ni d'aller vite ; il redescend doucement)
     f.vx += (dx * v - f.vx) * k; J.vy += (vy - J.vy) * k; f.vz += (dz * v - f.vz) * k;
   }
@@ -17430,20 +18181,20 @@ function superman(dt) {
     }
   }
   const vh = Math.hypot(f.vx, f.vz), e = Math.min(1, Math.hypot(vh, J.vy) / 6);   // e : de 0 (il flotte sur place) à 1 (il est lancé)
-  const tir = !L && !ARMES[J.arme].corps && (sourisG || visee || J.cooldown > -0.5);   // il tire, vise, ou vient de tirer (pas en plein looping)
+  const tir = !L && !souleve && !ARMES[J.arme].corps && (sourisG || visee || J.cooldown > -0.5);   // il tire, vise, ou vient de tirer (pas en plein looping)
   const vise = !L && ironmanVise();   // Iron Man tire de ses mains, ou de son plastron
   const angleAvant = J.angleCorps;
   if (L) J.angleCorps = lerpAngle(J.angleCorps, L.cap, 8 * dt);   // en looping, il garde son cap, même quand il revient sur le dos
   else if (tir || vise) J.angleCorps = lerpAngle(J.angleCorps, J.lacet, 15 * dt);
   else if (vh > 1) J.angleCorps = lerpAngle(J.angleCorps, Math.atan2(f.vx, f.vz), 8 * dt);
   const devant = f.vx * Math.sin(J.angleCorps) + f.vz * Math.cos(J.angleCorps);   // sa vitesse vers l'avant (négative s'il recule en tirant)
-  if (!L) f.bascule = e * Math.atan2(devant, Math.max(J.vy, 0));
+  if (!L) f.bascule = e * Math.atan2(devant, Math.max(J.vy, 0)) * (souleve ? 0.25 : 1);   // (avec une voiture au-dessus de la tête : presque debout)
   const bascule = f.bascule - (L ? L.sens * L.a : 0);   // en looping, il bascule en arrière (ou en avant) d'un tour entier, depuis la pose qu'il avait
   J.vitesse = Math.hypot(vh, J.vy);   // vite, il est plus dur à toucher
   joueurH.g.rotation.y = J.angleCorps;
   if (joueurH.arme) joueurH.arme.visible = tir;   // il range son arme pour voler, sauf pour tirer
   // à l'horizontale, il est couché ; tout droit vers le haut, debout, le bras levé ; en descendant tout droit, debout, les pieds en bas
-  animerHumain(joueurH, 0, dt, { superman: e, bascule, arme: tir && armeEnMain(), leve: bascule + J.tangage, pointe: 1, ironman: armureIronman(), plastron: posePlastron() });   // couché, il lève les bras pour viser devant lui (pas pour les yeux laser) ; il pointe son sceptre
+  animerHumain(joueurH, 0, dt, { superman: e, bascule, arme: tir && armeEnMain(), leve: bascule + J.tangage, pointe: 1, ironman: armureIronman(), plastron: posePlastron(), souleve: brasSouleve() });   // couché, il lève les bras pour viser devant lui (pas pour les yeux laser) ; il pointe son sceptre
   // lancé, il penche dans ses virages (pas quand il tire : il vise). Il roule autour de la direction où il vole, même couché : d'où l'ordre 'YZX'
   if (dt) f.roulis += ((tir || vise ? 0 : roulisVirage(diffAngle(angleAvant, J.angleCorps) / dt) * e) - f.roulis) * Math.min(1, dt * 3);
   joueurH.g.quaternion.setFromEuler(new THREE.Euler(bascule, J.angleCorps, f.roulis, 'YZX'));
@@ -18667,6 +19418,7 @@ function prendre(p, sorte, duree, electrique = 0) {
   duree = Math.min(duree, fiche(p)?.pris ?? duree);   // (Bane arrache le filet, et se remet d'une décharge, en 1 s : ENNEMIS, pris)
   liberer(p);
   p.pris = { sorte, reste: duree, t: 0, electrique }; p.voitJ = false;
+  if (sorte === 'glace') { const c = p.pris.m = new THREE.Mesh(GEO_GLACE, M_GLACE); c.userData.personne = p; if (p.h.chien) c.scale.set(1.1, 0.45, 1.1); p.h.g.add(c); return; }   // gelé : dans un bloc de glace (le souffle glacé de Superman)
   if (sorte !== 'filet') return;
   const c = p.pris.m = new THREE.Mesh(GEO.cocon, electrique ? M_FILET_COCON_ELEC : M_FILET_COCON); c.userData.personne = p;
   if (p.h.chien) { c.rotation.x = Math.PI / 2; c.scale.setScalar(0.7); c.position.y = 0.5; } else c.position.y = 0.78;   // (un chien : couché dans son cocon)
@@ -18683,7 +19435,7 @@ function majPris(p, dt) {
     if (p.h.g.visible) foudre(V3(p.x + entre(-0.3, 0.3), p.y + entre(0.2, 0.7), p.z + entre(-0.3, 0.3)), V3(p.x + entre(-0.3, 0.3), p.y + entre(1, 1.6), p.z + entre(-0.3, 0.3)), 0.25, 0.1, 0);
     const d = dist(p, J); if (d < 40) bip(entre(900, 1600), 200, 0.08, 'sawtooth', 0.04 * (1 - d / 40));   // ça grésille
   }
-  if (!p.h.g.visible) return;
+  if (!p.h.g.visible || q.sorte === 'glace') { if (q.sorte === 'glace') p.h.g.position.set(p.x, p.y, p.z); return; }   // (gelé : il ne bouge plus du tout)
   const tremble = choc ? Math.sin(temps * 60) * 0.12 : q.sorte === 'filet' ? Math.sin(temps * 9) * 0.06 : 0;
   p.h.g.position.set(p.x, p.y, p.z); p.h.g.rotation.y = p.angle + tremble;
   if (choc && (q.t -= dt) <= 0) { q.t = 0.15; etincelles(V3(p.x, p.y + entre(0.5, 1.6), p.z), 1, 1.5); }
@@ -18955,7 +19707,8 @@ function majVoiture(v, dt) {
   else if (Math.abs(v.vitesse) > 0.05) { v.vitesse *= Math.pow(v.filet ? 0.001 : 0.3, dt); bougerVoiture(v, dt, false); }   // (prise dans un filet : elle s'arrête net)
   if (v.panne > 0) { // en panne (un batarang électrique) : elle s'arrête en roue libre, et des étincelles sautent sur le capot
     v.panne -= dt;
-    if (d < 150 && Math.random() < dt * 6) { const c = local(v, entre(-0.6, 0.6), v.forme.longueur * 0.3); etincelles(V3(c.x, v.y + v.forme.hauteur * 0.6, c.z), 2, 2); }
+    if (v.panne <= 0) v.givree = false;   // (gelée par le souffle glacé de Superman : elle a dégelé)
+    if (d < 150 && !v.givree && Math.random() < dt * 6) { const c = local(v, entre(-0.6, 0.6), v.forme.longueur * 0.3); etincelles(V3(c.x, v.y + v.forme.hauteur * 0.6, c.z), 2, 2); }
   }
   if (v.filet) { // prise dans un filet : elle ne repart pas avant la fin. Le filet électrique électrocute son conducteur (pas à travers un blindage)
     const f = v.filet;
@@ -19338,6 +20091,10 @@ function missions(dt) {
     stark.evade = true;
     bulles = { liste: ['Évasion réussie ! Maintenant, tu as ton armure : <b>H</b>, elle arrive en volant, et tu deviens <b>{super}</b>.'], k: 0, t: 4.5, montree: false };
   }
+  if (m.forteresse && chezClark && !star.forteresse) { // la Forteresse de Solitude : le magasin de S.T.A.R. Labs ouvre (une bulle d'aide le dit)
+    star.forteresse = true;
+    bulles = { liste: ['Le magasin de <b>S.T.A.R. Labs</b> est ouvert (★ sur la carte) : des costumes, des pouvoirs, des améliorations... et Krypto !'], k: 0, t: 4.5, montree: false };
+  }
   if (m.costume && chezWayne) bulles = { liste: ['Ton costume est à toi : <b>H</b> pour le mettre ou l\'enlever, partout. Le magasin de <b>Lucius Fox</b> est ouvert (⚙ sur la carte) !'], k: 0, t: 4.5, montree: false };
   if (m.batmobile && chezWayne) bulles = { liste: ['Ta Batmobile est à toi : en costume, <b>B</b> la fait venir, n\'importe où. Dedans, <b>R</b> : elle vole !'], k: 0, t: 4.5, montree: false };
   if (m.donne && chezWayne) donnerVehicule(m.donne);   // (le Bat : à lui, à la fin de la mission)
@@ -19363,6 +20120,7 @@ function sauterMission(n) {
   // la Batmobile. Sauter avant ces missions les reprend
   const passee = cle => missionIndex > MISSIONS_CH.findIndex(x => x[cle]);
   if (chezStark) stark.evade = passee('armures');
+  if (chezClark) star.forteresse = passee('forteresse');   // (le magasin de S.T.A.R. Labs : ouvert après la mission 1)
   if (chezWayne) {
     wayne.gagne = passee('costume'); wayne.donnee = passee('batmobile');
     if (!wayne.gagne && enCostume()) basculerTriche(tricheHeros(), false, false, false);   // (pas encore de costume : il repasse en civil)
@@ -19474,7 +20232,8 @@ function majCamera(dt) {
   } else if (J.vue === 1) camera.position.set(J.x, J.y + (J.accroupi ? 1.05 : 1.65) * tailleHeros(), J.z);
   else {
     const t = tailleHeros(), pivot = new THREE.Vector3(J.x, J.y + (J.accroupi ? 1.15 : 1.6) * t, J.z);   // (t : dans la Hulkbuster, ou l'armure anti-Superman, plus haut et plus loin)
-    placerCamera(pivot, dir, (visee ? 1.8 : 3.8) * t, (visee ? 0.6 : 0.5) * t);
+    pivot.y += 1.3 * camPorte;   // (une voiture au-dessus de sa tête : la caméra monte et recule, pour qu'on voie par-dessous)
+    placerCamera(pivot, dir, (visee ? 1.8 : 3.8) * t + 3 * camPorte, (visee ? 0.6 : 0.5) * t);
     // dans une petite pièce, dos au mur ou dans un coin, la caméra n'a pas la place de reculer : elle arrive dans la tête de B.J., et on ne
     // voit plus que son cou. Alors, à moins de 60 cm de sa tête, on ne le dessine plus : on voit la pièce et son arme, comme à la 1re personne.
     // (Il ne revient qu'à 80 cm : sinon, il clignoterait en longeant un mur)
@@ -23937,6 +24696,9 @@ function sauverPartie() {
   if (chezWayne) partie.magasin = { ...partie.magasin, [chapitre]: { costumes: wayne.costumes.map(k => COSTUMES_WAYNE[k].nom), costume: COSTUMES_WAYNE[wayne.costume].nom,   // le magasin de Lucius Fox
     batmobiles: wayne.batmobiles.map(k => BATMOBILES_WAYNE[k].voiture), batmobile: BATMOBILES_WAYNE[wayne.batmobile].voiture,
     gagne: wayne.gagne, donnee: wayne.donnee, ...Object.fromEntries([...Object.keys(GADGETS_WAYNE), ...Object.keys(AMELIORATIONS_WAYNE)].map(c => [c, wayne[c]])) } };
+  if (chezClark) partie.magasin = { ...partie.magasin, [chapitre]: { costumes: star.costumes.map(k => COSTUMES_STAR[k].nom), costume: COSTUMES_STAR[star.costume].nom,   // le magasin de S.T.A.R. Labs
+    krypto: star.krypto, kryptoLa: star.kryptoLa, forteresse: star.forteresse && MISSIONS_CH.some(x => x.forteresse),   // (pas tant qu'aucune mission ne l'ouvre)
+    ...Object.fromEntries([...Object.keys(POUVOIRS_STAR), ...Object.keys(AMELIORATIONS_STAR)].map(c => [c, star[c]])) } };
   try { localStorage.partie = JSON.stringify(partie); } catch {}
 }
 // on change de chapitre : on sauve celui-ci, puis la page se recharge dans l'autre (chaque chapitre construit sa ville).
@@ -24591,7 +25353,7 @@ function majHUD(dt) {
     : !aPied ? (faitFigures(J.voiture) ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping') : J.voiture?.type.cable ? tr('<b>R</b> : le câble (la voiture juste devant toi se retourne)') : '')
     : lit ? (sommeil ? '' : etoiles > 0 ? tr("Sème d'abord la police, puis reviens dormir") : tr(MOMENTS[journee.moment].dormir))   // dans sa villa, près du lit
     : autreLit ? tr("Ce lit n'est pas à toi : dors dans une de tes villas (⌂ sur la carte), chez Michael ou chez Franklin")
-    : s ? (s.stark ? aideStark(s) : s.wayne ? aideWayne(s) : s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
+    : s ? (s.stark ? aideStark(s) : s.wayne ? aideWayne(s) : s.star ? aideStar(s) : s.masque ? tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr('Masque à gaz'), prix: R_.prixMasque })
       : J.possede[s.arme] ? tr('Appuie sur <b>E</b> pour acheter : {arme} (munitions {prix} $)', { arme: tr(ARMES[s.arme].nom), prix: Math.round(ARMES[s.arme].prix / 2) })
       : tr('Appuie sur <b>E</b> pour acheter : {arme} ({prix} $)', { arme: tr(ARMES[s.arme].nom), prix: ARMES[s.arme].prix }))
     : g ? tr('Appuie sur <b>E</b> pour parler au garagiste : blindage façon Mad Max ({prix})', { prix: montant(R_.prixBlindage) })
@@ -24599,13 +25361,14 @@ function majHUD(dt) {
     : r && r.pilote === 'police' && r.vieVitre <= 0 ? tr('Appuie sur <b>E</b> pour éjecter le pilote du robot')
     : r && !r.pilote ? tr(r.armure ? "Appuie sur <b>E</b> pour monter dans l'armure" : 'Appuie sur <b>E</b> pour monter dans le heavy robot')
     : asc ? tr(asc.monte ? "Appuie sur <b>E</b> pour prendre l'ascenseur (monter sur le toit)" : "Appuie sur <b>E</b> pour prendre l'ascenseur (redescendre)")
-    : nav ? tr('Appuie sur <b>E</b> pour prendre la navette : {arret}', { arret: tr(nav.vers.nom) }) : v ? tr('Appuie sur <b>E</b> pour monter : {vehicule}', { vehicule: tr(v.type.nom) })
+    : nav ? tr('Appuie sur <b>E</b> pour prendre la navette : {arret}', { arret: tr(nav.vers.nom) }) : v && !souleve ? tr(enCostumeSuper() && !pasDeTole(v) ? 'Appuie sur <b>E</b> pour monter : {vehicule} · <b>G</b> : la soulever' : 'Appuie sur <b>E</b> pour monter : {vehicule}', { vehicule: tr(v.type.nom) })
     : perce ? tr('Perceuse thermique : {n} %. Tiens bon !', { n: Math.floor(perce.perceuse / R_.dureePerceuse * 100) })
     : ech ? tr("Avance contre l'échelle pour grimper")
     // les codes BATMAN et SPIDERMAN : ce qu'on peut faire, là, tout de suite
     : J.mur ? tr('Z S : monter ou descendre · Q D : de côté · Espace : sauter du mur')
     : J.balance ? tr(J.balance.souris ? "Lâche le bouton pour lâcher la toile · Z Q S D : prendre de l'élan" : "Lâche <b>G</b> pour lâcher la toile · Z Q S D : prendre de l'élan")
     : J.prise ? tr(J.prise.souris ? 'Lâche le bouton pour lancer la voiture là où tu regardes' : 'Lâche <b>G</b> pour lancer la voiture là où tu regardes') : J.grappin ? tr('<b>Espace</b> : lâcher le grappin')
+    : souleve ? tr(souleve.garde ? 'Il y a des gens dedans : repose-la doucement (<b>G</b>)' : 'Clic gauche : la lancer là où tu regardes · <b>G</b> : la reposer')   // (Superman tient une voiture : voir « La super-force »)
     : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape')
     : !J.sol && !J.nage && !J.superman && !J.voiture && J.vy < -6 && sansGadgets() && !sansCostume() ? tr(chezClark ? 'En civil, tu ne voles pas : <b>H</b>, ton costume, puis <b>Maj</b> 3 fois !' : 'Pas de cape en civil : <b>H</b>, ton costume, et tu planes !')
     : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping')   // en volant : les figures
@@ -25446,7 +26209,8 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
         if (sourisG && r.cdJ.lourde <= 0) tirer(ARMES_ROBOT.lourde);
         if (visee && r.cdJ.roquettes <= 0) tirer(ARMES_ROBOT.roquettes);
       }
-    } else if (sourisG && !J.voiture && !J.telesiege && !J.monorail && !J.nage && !J.roule && !J.ironman?.anim && !(J.superman && (ARMES[J.arme].corps || J.superman.looping)) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
+    } else if (souleve) { if (sourisG && !dejaTire && lancerVoiture()) dejaTire = true; }   // (trop tôt, il ne la lance pas : le clic attend)   // Superman tient une voiture : le clic gauche la lance
+    else if (sourisG && !J.voiture && !J.telesiege && !J.monorail && !J.nage && !J.roule && !J.ironman?.anim && !(J.superman && (ARMES[J.arme].corps || J.superman.looping)) && J.cooldown <= 0 && (ARMES[J.arme].auto || !dejaTire)) { tirer(); dejaTire = true; }
     if (temps - J.dernierDegat > R_.delaiRegeneration) J.vie = Math.min(vieMax(), J.vie + R_.regeneration * dt);
   }
   tenirPrise(dt);   // la voiture que Spiderman fait tourner au bout de sa toile
@@ -25456,6 +26220,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   majIronman(dt);   // l'armure d'Iron Man : son masque, ses répulseurs, son plastron, ses réacteurs
   majChauvesSouris(dt);   // Batman qui met son costume (ou qui l'enlève) : la nuée de chauves-souris
   if (chezWayne) majWayne(dt);   // le magasin de Lucius Fox, la vision de détective, les fumigènes, le gel explosif
+  if (chezClark) majStar(dt);    // le magasin de S.T.A.R. Labs, la vision à rayons X, la super-vitesse, le souffle glacé, le super-cri, Krypto
   chapeauBJ.visible = J.danse > 0;   // il ne porte son chapeau que pour danser
   auraBJ.material.map.offset.y -= dt * 1.5; auraBJ.material.opacity = (0.45 + Math.random() * 0.25) * (auraBJ.userData.avantInvisible ? 0.15 : 1);   // l'aura monte et tremble (on la voit à peine quand il est invisible)
   if (capeBJ.parent) majCape(dt);   // la cape de Superman flotte au vent
@@ -25467,7 +26232,7 @@ function mettreAJour(dt, horloge = R_.vitesseJeu > 0 ? dt / R_.vitesseJeu : 0) {
   majBraquages(dt); majTelesieges(); majBoardercross(); majCamp(dt);
   for (const o of objets) {
     if (o.cache) { o.cache -= dt; if (o.cache <= 0) { o.cache = 0; o.m.visible = true; } continue; }
-    if (o.fixe) { o.m.rotation.y += dt * (o.tourne || 0.5); continue; }   // une armure du magasin de Stark Industries (un costume, une Batmobile de celui de Lucius Fox) : elle tourne doucement sur son plateau
+    if (o.fixe) { o.m.rotation.y += dt * (o.tourne ?? 0.5); continue; }   // une armure du magasin de Stark Industries (un costume, une Batmobile de celui de Lucius Fox) : elle tourne doucement sur son plateau
     o.m.rotation.y += dt * 1.5; o.m.position.y = o.base + Math.sin(temps * 2 + o.x) * 0.1;
     if (o.type === 'stand' || J.mort || dist(o, J) > 1.6 || Math.abs(o.base - 0.85 - J.y) > 1.6) continue;
     if (o.type === 'soin') { if (J.vie >= vieMax()) continue; J.vie = Math.min(vieMax(), J.vie + 50); annonce('', tr('+50 vie'), 1.5); }
@@ -25719,7 +26484,7 @@ function boucle(t) {
   finesse.image = enJeu && !ecranChapitre.visible && !J.mort ? avantDessin - debutImage : -1;   // (pour la finesse automatique : une image normale du jeu, et son temps de calcul)
   renderer.clear();
   renderer.render(scene, camera);
-  if (wayne.detective) dessinerDetective();   // la vision de détective : les gens, par-dessus tout le reste (à travers les murs)
+  if (wayne.detective || star.voitRayonsX) dessinerDetective();   // la vision de détective (ou à rayons X) : les gens, par-dessus tout le reste (à travers les murs)
   // (pas en voiture, ni dans le heavy robot ou une armure : c'est leur arme à eux qui tire)
   if ((J.vue === 1 || tropPres) && !J.voiture && !J.mort && !dansLunette() && !J.robot) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
   compter(debutImage, avantDessin);   // le compteur de performances (touche P)
@@ -25772,13 +26537,16 @@ const A_PREPARER = [
 if (GOTHAM) A_PREPARER.push([M_FOULE, 'lot colorié'], [new THREE.MeshStandardMaterial({ map: IMAGE_PREPARER, transparent: true }), 'lot'], [MAT.noirMeuble, 'lot'], [M_METAL, 'lot'], [M_LAMPES_PINGOUINS, 'lot colorié'],
   [new THREE.SpriteMaterial({ map: IMAGE_PREPARER, depthTest: false, toneMapped: false, fog: false, transparent: true }), 'image']);
 // au chapitre de Superman, qui commence en civil (sans les yeux laser) : le tourbillon du costume (des images sans dessin), et la poussière
-// qui vole là où touchent les yeux laser (une image, éclairée comme le reste : pas comme l'éclair, M_FLASH)
-if (chezClark) A_PREPARER.push([M_TOURBILLON[0], 'image'], [M_FUMEE, 'image']);
+// qui vole là où touchent les yeux laser (une image, éclairée comme le reste : pas comme l'éclair, M_FLASH) ; le bloc de glace de ceux qui
+// gèlent (transparent), et les ondes du super-cri
+if (chezClark) A_PREPARER.push([M_TOURBILLON[0], 'image'], [M_FUMEE, 'image'], [M_GLACE, 'forme'], [M_ONDE, 'image']);   // (et ce que fait le magasin de S.T.A.R. Labs : la glace autour de ceux qui gèlent, les ondes du super-cri)
 // Les programmes des ombres, eux, Three.js les fait avec ses propres matières, que compile ne voit pas. À Gotham, des témoins réduits à un point
 // (on ne les voit pas) sont dessinés avec la toute première image, ombres comprises, puis enlevés, comme celui des personnages (temoinForme) : un
 // objet découpé (le blason d'un costume), découpé à deux faces (la cape de Batman), à deux faces (le plat des antennes, le canard du Pingouin ;
 // juste après un lot : Three.js n'en refait le programme qu'en changeant de sorte d'objet, et n'y pense qu'à ce moment-là)
-const temoinsOmbres = !GOTHAM ? [] : [std(IMAGE_PREPARER, { alphaTest: 0.5 }), std(IMAGE_PREPARER, { alphaTest: 0.5, side: THREE.DoubleSide }), MAT.noirMeuble, std(null, { side: THREE.DoubleSide })].map(m => {
+// Au chapitre de Superman, un seul : l'écusson de son costume, découpé, qui fait son ombre dès qu'il le met (H)
+const temoinsOmbres = (GOTHAM ? [std(IMAGE_PREPARER, { alphaTest: 0.5 }), std(IMAGE_PREPARER, { alphaTest: 0.5, side: THREE.DoubleSide }), MAT.noirMeuble, std(null, { side: THREE.DoubleSide })]
+  : chezClark ? [std(IMAGE_PREPARER, { alphaTest: 0.5 })] : []).map(m => {
   const f = new THREE.BufferGeometry(), t = m === MAT.noirMeuble ? new THREE.InstancedMesh(f, m, 1) : new THREE.Mesh(f, m);
   f.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(9), 3)); f.setAttribute('normal', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 0], 3)); f.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(6), 2));
   t.castShadow = true; t.frustumCulled = false; t.raycast = () => {};
@@ -25804,7 +26572,7 @@ async function preparerProgrammes() {
       ...(effetsImage ? [renderer.compileAsync(effetsImage.aPreparer, effetsImage.camera)] : []),   // (les effets d'image)
       // (la vision de détective : Three.js ne voit pas la matière que ces scènes imposent à tout ce qu'elles dessinent. Alors un objet de chaque
       // sorte la porte ici, dans la scène, sans lumières : les gens en pièces, et ceux d'un seul bloc)
-      ...(chezWayne ? sceneDetective.map(s => { const g = new THREE.Group(); g.add(objetAPreparer(s.overrideMaterial, 'forme'), objetAPreparer(s.overrideMaterial, 'squelette')); return renderer.compileAsync(g, camera, s); }) : [])]).then(() => 'fini'),
+      ...(chezWayne || chezClark ? sceneDetective.map(s => { const g = new THREE.Group(); g.add(objetAPreparer(s.overrideMaterial, 'forme'), objetAPreparer(s.overrideMaterial, 'squelette')); return renderer.compileAsync(g, camera, s); }) : [])]).then(() => 'fini'),
       new Promise(ok => setTimeout(() => ok('plus de 15 s'), 15000))]);
     if (fin !== 'fini') preparation.rate = fin;
   } catch (e) { preparation.rate = String(e); }
@@ -25870,6 +26638,10 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   pluie, nuages, majPluie, COUVERT, BROUILLARD, PLUIE, vueDetails, estGothique, manoir, tourWayne, cathedrale, arkham, aceChemicals, zoo, stade, sphinx, GOTHAM,
   METROPOLIS, dailyPlanet, lexcorp, starLabs, statueSuper, forteresse, fermeKent, baseMilitaire, theatre, grandPont, majGlobe, majStatue, chezClark, supergirl, tourbillon, neigeEn, sansRues,
   // le magasin de Lucius Fox (chapitre 3)
+  // le magasin de S.T.A.R. Labs, les pouvoirs de Superman, Krypto et la super-force (chapitre 4)
+  COSTUMES_STAR, POUVOIRS_STAR, AMELIORATIONS_STAR, KRYPTO, star, standsStar, objetsStar, acheterStar, aideStar, texteStar, costumeDeStar, costumeSuperman, enCostumeSuper, sansForteresse, niveauStar,
+  volSuperman, laserSuperman, vitesseSuper, soufflerGlace, basculerRayonsX, basculerSuperVitesse, superCri, souffles, basculerKrypto, appelerKrypto, renvoyerKrypto, creerKrypto, get krypto() { return krypto; },
+  superForce, porterVoiture, reposerVoiture, lancerVoiture, lacherVoiture, get souleve() { return souleve; }, get savant() { return savant; }, statueSuperman, habillerSuperman, motifCollant, allumer, eteindre, majStar, dansCone, numerosParNom, missionPassee,
   chezWayne, wayne, COSTUMES_WAYNE, BATMOBILES_WAYNE, GADGETS_WAYNE, AMELIORATIONS_WAYNE, standsWayne, objetsWayne, acheterWayne, aideWayne, texteWayne, costumeDe, costumeBatman, costumePorte, enCostume,
   costumeSuivant, batmobileSuivante, basculerVision, lancerFumigene, gelExplosif, faireSauterGel, fumees, dansFumee, voitBJ, vieMax, protectionCostume, vitesseCostume, chuteCape, vitesseCape, vitesseGrappin,
   tailleHeros, niveauWayne, typeBatmobile, voitureTriche, allumerTurbo, sauterBatmobile, virageGrappin, trouerMur, dallesEn, dessinerDetective, sceneDetective, statueBatman, figer, majWayne, coupElectrique,

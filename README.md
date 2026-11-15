@@ -88,7 +88,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 - **monter** dans une voiture, un bateau, un avion, un hélicoptère, le heavy robot, une armure, des skis, un snowboard, une luge ou des skis de rando, et **en descendre** (en marche, ou en plein accident, tu sautes et tu tombes par terre) ;
 - prendre l'**ascenseur**, le bus « SKI SHUTTLE », un **télésiège** ou la **télécabine** (et en sauter en route !) ;
 - à Gotham, monter dans le **monorail**, dans une gare, quand il attend (et en descendre à une autre gare) ; dans les missions de Batman, prendre ton **premier costume** (dans la Batcave), **brouiller les antennes** du Pingouin, **désamorcer les bombes** de Double-Face, **sauter du Bat** et **monter sur le Batpod** ;
-- **acheter** à l'armurerie (et dans les magasins des super-héros : Stark Industries à Malibu, Lucius Fox à Gotham), parler au **garagiste** ;
+- **acheter** à l'armurerie (et dans les magasins des super-héros : Stark Industries à Malibu, Lucius Fox à Gotham, S.T.A.R. Labs à Metropolis), parler au **garagiste** ;
 - **voler le butin**, poser la **perceuse** ou l'**explosif** ;
 - **éjecter le pilote** du heavy robot ;
 - appuyer sur le **bouton rouge** du camp militaire ;
@@ -111,14 +111,19 @@ Elles changent selon ce que tu pilotes et le héros que tu es :
 | **R** | [Le Batpod](#le-batpod) | Le câble : il renverse la voiture juste devant toi |
 | **R** | [Les autres Batmobiles](#le-magasin-de-lucius-fox) | Leur pouvoir : le turbo (celle de *The Batman*), le saut (le Tumbler), et avec Q ou D, le virage au grappin (celle de 1989) |
 | **R** | [Iron Man](#iron-man) | Le rayon du plastron (dans **War Machine** : la mitrailleuse d'épaule, tant que tu gardes R enfoncé) |
+| **R** | [Metropolis](#le-magasin-de-star-labs), en costume, à pied | La super-vitesse (si tu l'as achetée) : avec **Maj**, tu cours à 108 km/h ; R encore : tu l'arrêtes |
 | **G** | [Batman](#batman) | Lancer le grappin sur le bâtiment que tu vises, même avec une autre arme en main |
 | **G** | [Spiderman](#spiderman) | Y lancer une toile (garde G enfoncé pour te balancer) |
 | **G** | [Iron Man](#iron-man) | Les mini-missiles (si tu les as achetés) |
+| **G** | [Metropolis](#la-super-force), en costume | La super-force : tu soulèves la voiture la plus proche, même un bus ! **Clic gauche** : tu la lances ; **G** encore : tu la reposes |
 | **B** | [Batman](#batman), à pied | Rappeler la Batmobile (à Gotham : celle que tu as choisie, dès la 2e mission, ou le [Bat](#le-bat), dès la 8e, même quand tu nages, ou le [Batpod](#le-batpod), dès la 10e) |
+| **B** | [Metropolis](#le-magasin-de-star-labs), en costume | Le super-cri (si tu l'as acheté) : tout ce qui est devant toi vole |
 | **N** | [Gotham](#le-magasin-de-lucius-fox) | Choisir une autre de tes Batmobiles, le Bat ou le Batpod (B le fait venir) |
 | **1**, **2**, **3** | [Gotham](#gotham-chapitre-3) | Devant une devinette du Sphinx : ta réponse (ça ne change pas ton arme) |
 | **O** | [Gotham](#le-magasin-de-lucius-fox), en costume | La vision de détective : tu vois les ennemis à travers les murs (si tu l'as achetée) |
+| **O** | [Metropolis](#le-magasin-de-star-labs), en costume | La vision à rayons X : tu vois les méchants à travers les murs (si tu l'as achetée) |
 | **K** | [Gotham](#le-magasin-de-lucius-fox), en costume | Un fumigène à tes pieds (si tu en as acheté) |
+| **K** | [Metropolis](#le-magasin-de-star-labs) | Krypto, le super-chien (si tu l'as acheté) : il vient, ou il rentre à la maison |
 | **T** | [DeLorean](#la-delorean) | Choisir le chapitre où aller ; à pied, dans un chapitre fini : faire venir la DeLorean |
 | **A** et **E** | [Iron Man](#iron-man) | Tirer de la main gauche (A) ou de la main droite (E) ; dans la **Mark 50** : A, le bouclier ; E, le canon |
 | **A**, **Z**, **E** (vite) | [Iron Man](#iron-man), avec le code `IRONMAN` | L'armure arrive en volant, pièce par pièce, ou tu en sors |
@@ -127,8 +132,10 @@ Elles changent selon ce que tu pilotes et le héros que tu es :
 | **H** | [Metropolis](#metropolis-chapitre-4) | Mettre ton costume (tu deviens Superman, ou Supergirl), même en l'air, ou repasser en civil (les pieds par terre). En civil, tu ne voles pas et tu n'as pas tes yeux laser |
 | **J** | [Iron Man](#iron-man) | Choisir une autre de tes armures |
 | **J** | [Gotham](#le-magasin-de-lucius-fox) | Changer de costume (en costume, tout de suite, dans une nuée de chauves-souris) |
+| **J** | [Metropolis](#le-magasin-de-star-labs) | Changer de costume (en costume, tout de suite, dans un tourbillon) |
 | **X** | [Iron Man](#iron-man) | Le laser des bras (si tu l'as acheté) |
 | **X** | [Gotham](#le-magasin-de-lucius-fox), en costume | Le gel explosif (si tu l'as acheté) : X, tu en projettes là où tu vises ; X encore, boum ! (ça, même en civil ou en voiture) |
+| **X** | [Metropolis](#le-magasin-de-star-labs), en costume | Le souffle glacé (si tu l'as acheté) : tout ce qui est devant toi gèle |
 | **L** | [Iron Man](#iron-man) | Lever ou baisser ton masque |
 
 ### La danse
@@ -230,6 +237,8 @@ Le code te donne aussi deux super-pouvoirs :
 - **La chute qui écrase** : tombe de haut, ou arrête de voler en plein ciel. Tu ne te fais pas mal, tu te reçois sur un genou comme un super-héros, les gens et les voitures autour de toi sont écrasés, et le sol se fissure. De très haut, tu passes à travers le toit et les planchers des immeubles où l'on entre. Attention : si tu fonces vers le sol après avoir appuyé sur Maj, tu écrases tout ce qu'il y a dessous !
 
 Superman n'est pas invincible : les balles lui font mal.
+
+À Metropolis, en costume, tu as en plus la [super-force](#la-super-force), et les pouvoirs du [magasin de S.T.A.R. Labs](#le-magasin-de-star-labs).
 
 ### Batman
 
@@ -469,7 +478,7 @@ Quelques signes de la mini-carte :
 | ⌂ $ † A ⚗ Z ◯ | À Gotham : le manoir Wayne, la banque de Gotham, la cathédrale, l'asile d'Arkham, Ace Chemicals, le zoo, le stade |
 | ? vert | Le repaire du Sphinx (à Gotham) : la DeLorean y est cachée |
 | M rouge | Une gare du monorail (à Gotham) |
-| ø L ★ ♦ ❄ K ✈ | À Metropolis : le Daily Planet, la tour LexCorp, S.T.A.R. Labs, la statue de Superman, la Forteresse de Solitude, la ferme Kent, la base militaire |
+| ø L ★ ♦ ❄ K ✈ | À Metropolis : le Daily Planet, la tour LexCorp, S.T.A.R. Labs (et son magasin), la statue de Superman, la Forteresse de Solitude, la ferme Kent, la base militaire |
 | ♣ violet | Le vieux théâtre (à Metropolis) : la DeLorean y est cachée |
 
 ## Vie, armes et police
@@ -736,7 +745,7 @@ La ville de Superman : une grande ville moderne et lumineuse, au bord de la mer,
 - la **tour LexCorp**, la plus haute de la ville (228 m), en verre vert sombre, avec l'héliport de Lex Luthor sur son toit ;
 - les tours de **New Troy**, le centre, dont de vieux gratte-ciel **art déco** en pierre claire, avec leur couronne de métal et leur flèche ;
 - **Centennial Park**, et au milieu, la **statue géante de Superman** (de **Supergirl** si tu joues la fille) ;
-- **S.T.A.R. Labs**, le laboratoire, son dôme et son grand hall (son magasin arrive bientôt) ;
+- **S.T.A.R. Labs**, le laboratoire, son dôme et son grand hall, où est son magasin (voir plus bas) ;
 - le port de **Hob's Bay**, et à **Suicide Slum**, le **vieux théâtre** : la DeLorean est cachée dans sa cour ;
 - la **rivière Hob** et le **pont de Metropolis**, un grand pont suspendu entre deux tours ;
 - **Smallville**, un petit village au milieu des champs, et au bout de sa route de campagne et de son chemin de terre, la **ferme Kent** : la maison, la grange rouge, le silo et le champ de maïs ;
@@ -745,11 +754,52 @@ La ville de Superman : une grande ville moderne et lumineuse, au bord de la mer,
 
 **En civil, puis en costume** : tu es **Clark Kent**, en costume, cravate rouge et lunettes (ou **Kara Danvers**, gilet bleu, lunettes et cheveux blonds). Appuie sur **H** : tu tournes si vite que tu disparais dans un tourbillon bleu et rouge, et tu deviens **Superman** (ou **Supergirl**, sa jupe rouge et ses longs cheveux blonds) ! Tu peux le mettre n'importe où, même en tombant d'un toit (puis **Maj** 3 fois, et tu voles) ; **H** encore : tu repasses en civil, mais seulement les pieds par terre. En civil, pas de pouvoirs : tu ne voles pas, tu n'as pas tes yeux laser, et tomber de haut fait mal.
 
+#### La super-force
+
+En costume, appuie sur **G** près d'une voiture : tu la soulèves au-dessus de ta tête, même un camion ou un bus ! Celui qui la conduisait descend avant, et te la prête. Tu peux marcher et voler avec.
+
+- **Clic gauche** : tu la lances là où tu regardes. Elle s'écrase... et peut exploser. Attention aux passants : ceux qu'elle écrase comptent comme des victimes (l'amende !).
+- **G** encore : tu la reposes doucement par terre, devant toi (pas de trop haut : descends d'abord).
+
+#### Le magasin de S.T.A.R. Labs
+
+À Metropolis, va voir le **professeur Hamilton** à **S.T.A.R. Labs** (★ sur la carte), sur la côte est : il t'attend derrière l'accueil du grand hall, et te fait signe de la main. Les costumes sont sur des mannequins, **Krypto** attend au fond, et les nouveaux pouvoirs et les améliorations sont près de la porte, avec leur prix au-dessus.
+
+- **E** devant un stand : tu l'achètes, ou tu le choisis si tu l'as déjà.
+- **J**, n'importe où : tu changes de costume (en costume, tout de suite ; en civil, H le met).
+
+| Costume | Prix | Ce qu'il change |
+|---|---|---|
+| **Man of Steel** | 20 000 $ | Bleu sombre, sans slip rouge, comme dans le film : tu voles 20 % plus vite |
+| **Costume noir** | 40 000 $ | Tout noir, le « S » argenté : tu ne prends que 60 % des dégâts |
+| **Superman électrique** | 60 000 $ | Bleu clair, des éclairs, et il brille (sans cape) : tu cours plus vite, et tes yeux laser font plus mal |
+| **Armure de Krypton** | 90 000 $ | Une armure gris sombre : tu ne prends que 35 % des dégâts, et tes coups de poing envoient tout valser, mais tu voles moins vite |
+
+Les nouveaux pouvoirs, quand tu es en costume :
+
+| Pouvoir | Prix | Touche | Ce qu'il fait |
+|---|---|---|---|
+| **Souffle glacé** | 25 000 $ | **X** | Tout ce qui est devant toi gèle, dans un bloc de glace : les méchants ne bougent plus et ne tirent plus. Les voitures s'arrêtent, et un feu s'éteint |
+| **Vision à rayons X** | 15 000 $ | **O** | Tu vois les gens à travers les murs : les méchants en rouge, les autres en bleu |
+| **Super-vitesse** | 30 000 $ | **R** | Avec **Maj**, tu cours à 108 km/h (135 km/h en Superman électrique) ! **R** encore : tu l'arrêtes |
+| **Super-cri** | 40 000 $ | **B** | Tout ce qui est devant toi vole : les méchants, les passants (sans mal) et les voitures |
+
+Et des **améliorations**, niveau par niveau :
+
+- **voler** plus vite ;
+- des **yeux laser** plus forts ;
+- plus de **vie** (de 100 à 175 points) ;
+- plus de **force** (en costume) : tes coups de poing font plus mal, et envoient valser les gens et les voitures.
+
+**Krypto, le super-chien** (50 000 $) : un chien blanc à cape rouge. Il te suit partout, à pied et en volant, et il mord les méchants (jamais les passants). **K** : il rentre à la maison, ou il revient.
+
+Avec **Supergirl**, les costumes gardent tes longs cheveux blonds. Le jeu se souvient de tout ce que tu as acheté.
+
 **Pour l'instant**, Metropolis n'a qu'une mission : retrouver la DeLorean, dans la cour du vieux théâtre (♣ sur la carte). Les missions de Superman arrivent bientôt !
 
 ### Un héros sans reproche
 
-- Dans les chapitres de super-héros, la police est de ton côté (jamais d'étoiles), et les conducteurs te prêtent leur voiture.
+- Dans les chapitres de super-héros, la police est de ton côté (jamais d'étoiles), et les conducteurs te prêtent leur voiture (même quand Superman la soulève).
 - Mais attention aux passants : dès la 3e victime, tu paies une **amende** de 200 $, puis 400, 800... jusqu'à 100 000.
 - Une voiture qui a un accident toute seule, ce n'est pas ta faute : les passants qu'elle renverse, ou qu'elle tue en explosant, ne comptent pas (seulement si tu l'as conduite, touchée ou poussée).
 - Ton argent peut devenir négatif, mais jamais plus bas que -10 millions de dollars.
