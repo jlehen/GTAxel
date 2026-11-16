@@ -25,7 +25,7 @@ Dans GTAxel, tu peux :
 - [Vie, armes et police](#vie-armes-et-police)
 - [Voitures](#voitures) : dégâts, accidents, cascades
 - [Les missions du chapitre 1](#les-missions-du-chapitre-1) : braquages, camp militaire
-- [Les chapitres de super-héros](#les-chapitres-de-super-héros) : la DeLorean, Malibu, Gotham
+- [Les chapitres de super-héros](#les-chapitres-de-super-héros) : la DeLorean, Malibu, Gotham, Metropolis
 - [Les codes de triche](#les-codes-de-triche)
 - [Modifier le jeu](#modifier-le-jeu)
 
@@ -88,7 +88,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 - **monter** dans une voiture, un bateau, un avion, un hélicoptère, le heavy robot, une armure, des skis, un snowboard, une luge ou des skis de rando, et **en descendre** (en marche, ou en plein accident, tu sautes et tu tombes par terre) ;
 - prendre l'**ascenseur**, le bus « SKI SHUTTLE », un **télésiège** ou la **télécabine** (et en sauter en route !) ;
 - à Gotham, monter dans le **monorail**, dans une gare, quand il attend (et en descendre à une autre gare) ; dans les missions de Batman, prendre ton **premier costume** (dans la Batcave), **brouiller les antennes** du Pingouin, **désamorcer les bombes** de Double-Face, **sauter du Bat** et **monter sur le Batpod** ;
-- **acheter** à l'armurerie (et dans les magasins des super-héros : Stark Industries à Malibu, Lucius Fox à Gotham), parler au **garagiste** ;
+- **acheter** à l'armurerie (et dans les magasins des super-héros : Stark Industries à Malibu, Lucius Fox à Gotham, S.T.A.R. Labs à Metropolis), parler au **garagiste** ;
 - **voler le butin**, poser la **perceuse** ou l'**explosif** ;
 - **éjecter le pilote** du heavy robot ;
 - appuyer sur le **bouton rouge** du camp militaire ;
@@ -111,23 +111,32 @@ Elles changent selon ce que tu pilotes et le héros que tu es :
 | **R** | [Le Batpod](#le-batpod) | Le câble : il renverse la voiture juste devant toi |
 | **R** | [Les autres Batmobiles](#le-magasin-de-lucius-fox) | Leur pouvoir : le turbo (celle de *The Batman*), le saut (le Tumbler), et avec Q ou D, le virage au grappin (celle de 1989) |
 | **R** | [Iron Man](#iron-man) | Le rayon du plastron (dans **War Machine** : la mitrailleuse d'épaule, tant que tu gardes R enfoncé) |
+| **R** | [Metropolis](#le-magasin-de-star-labs), en costume, à pied | La super-vitesse (si tu l'as achetée) : avec **Maj**, tu cours à 108 km/h ; R encore : tu l'arrêtes |
 | **G** | [Batman](#batman) | Lancer le grappin sur le bâtiment que tu vises, même avec une autre arme en main |
 | **G** | [Spiderman](#spiderman) | Y lancer une toile (garde G enfoncé pour te balancer) |
 | **G** | [Iron Man](#iron-man) | Les mini-missiles (si tu les as achetés) |
+| **G** | [Metropolis](#la-super-force), en costume | La super-force : tu soulèves la voiture la plus proche, même un bus ! **Clic gauche** : tu la lances ; **G** encore : tu la reposes. Tout près de la [kryptonite](#la-kryptonite) : tu la prends (ou tu l'arraches de l'armure de Lex Luthor) |
+| **Clic gauche** | [Metropolis](#metropolis-chapitre-4), en costume | Un missile de Lex Luthor dans les mains (4e mission) : tu le lances vers le ciel. La [kryptonite](#la-kryptonite) dans ta main : tu la lances au loin. La lance de kryptonite à la main (11e mission) : tu la plantes dans Doomsday, de tout près |
 | **B** | [Batman](#batman), à pied | Rappeler la Batmobile (à Gotham : celle que tu as choisie, dès la 2e mission, ou le [Bat](#le-bat), dès la 8e, même quand tu nages, ou le [Batpod](#le-batpod), dès la 10e) |
+| **B** | [Metropolis](#le-magasin-de-star-labs), en costume | Le super-cri (si tu l'as acheté) : tout ce qui est devant toi vole |
 | **N** | [Gotham](#le-magasin-de-lucius-fox) | Choisir une autre de tes Batmobiles, le Bat ou le Batpod (B le fait venir) |
 | **1**, **2**, **3** | [Gotham](#gotham-chapitre-3) | Devant une devinette du Sphinx : ta réponse (ça ne change pas ton arme) |
 | **O** | [Gotham](#le-magasin-de-lucius-fox), en costume | La vision de détective : tu vois les ennemis à travers les murs (si tu l'as achetée) |
+| **O** | [Metropolis](#le-magasin-de-star-labs), en costume | La vision à rayons X : tu vois les méchants à travers les murs (si tu l'as achetée) |
 | **K** | [Gotham](#le-magasin-de-lucius-fox), en costume | Un fumigène à tes pieds (si tu en as acheté) |
+| **K** | [Metropolis](#le-magasin-de-star-labs) | Krypto, le super-chien (si tu l'as acheté) : il vient, ou il rentre à la maison |
 | **T** | [DeLorean](#la-delorean) | Choisir le chapitre où aller ; à pied, dans un chapitre fini : faire venir la DeLorean |
 | **A** et **E** | [Iron Man](#iron-man) | Tirer de la main gauche (A) ou de la main droite (E) ; dans la **Mark 50** : A, le bouclier ; E, le canon |
 | **A**, **Z**, **E** (vite) | [Iron Man](#iron-man), avec le code `IRONMAN` | L'armure arrive en volant, pièce par pièce, ou tu en sors |
 | **H** | [Iron Man](#iron-man) | Appeler ton armure, ou en sortir |
 | **H** | [Gotham](#gotham-chapitre-3) | Mettre ton costume (tu deviens Batman, ou Batgirl), même en l'air, ou repasser en civil (les pieds par terre). Ton premier costume, tu le trouves à la 1re mission |
+| **H** | [Metropolis](#metropolis-chapitre-4) | Mettre ton costume (tu deviens Superman, ou Supergirl), même en l'air, ou repasser en civil (les pieds par terre). Ton premier costume, tu le trouves à la 1re mission, dans la Forteresse de Solitude. En civil, tu ne voles pas et tu n'as pas tes yeux laser |
 | **J** | [Iron Man](#iron-man) | Choisir une autre de tes armures |
 | **J** | [Gotham](#le-magasin-de-lucius-fox) | Changer de costume (en costume, tout de suite, dans une nuée de chauves-souris) |
+| **J** | [Metropolis](#le-magasin-de-star-labs) | Changer de costume (en costume, tout de suite, dans un tourbillon) |
 | **X** | [Iron Man](#iron-man) | Le laser des bras (si tu l'as acheté) |
 | **X** | [Gotham](#le-magasin-de-lucius-fox), en costume | Le gel explosif (si tu l'as acheté) : X, tu en projettes là où tu vises ; X encore, boum ! (ça, même en civil ou en voiture) |
+| **X** | [Metropolis](#le-magasin-de-star-labs), en costume | Le souffle glacé (si tu l'as acheté) : tout ce qui est devant toi gèle |
 | **L** | [Iron Man](#iron-man) | Lever ou baisser ton masque |
 
 ### La danse
@@ -214,7 +223,7 @@ Tu deviens un super-héros avec son [code de triche](#les-codes-de-triche), ou p
 
 ### Superman
 
-Le code `SUPERMAN` t'habille en Superman, avec une cape qui flotte au vent. Sans le code, appuie vite 3 fois sur **Maj** pour voler.
+Le code `SUPERMAN` t'habille en Superman, avec une cape qui flotte au vent. Sans le code, appuie vite 3 fois sur **Maj** pour voler (sauf à Metropolis, en civil : d'abord **H**, ton costume ; voir [Metropolis](#metropolis-chapitre-4)).
 
 - **Z Q S D** : voler là où tu regardes ; **Espace** : monter ; **C** ou **Ctrl** : descendre.
 - **Maj** : chaque appui te fait aller plus vite, jusqu'à 360 km/h. Espace bien les appuis : 3 fois trop vite et tu arrêtes de voler !
@@ -229,6 +238,8 @@ Le code te donne aussi deux super-pouvoirs :
 - **La chute qui écrase** : tombe de haut, ou arrête de voler en plein ciel. Tu ne te fais pas mal, tu te reçois sur un genou comme un super-héros, les gens et les voitures autour de toi sont écrasés, et le sol se fissure. De très haut, tu passes à travers le toit et les planchers des immeubles où l'on entre. Attention : si tu fonces vers le sol après avoir appuyé sur Maj, tu écrases tout ce qu'il y a dessous !
 
 Superman n'est pas invincible : les balles lui font mal.
+
+À Metropolis, en costume, tu as en plus la [super-force](#la-super-force), et les pouvoirs du [magasin de S.T.A.R. Labs](#le-magasin-de-star-labs). Mais attention à la [kryptonite](#la-kryptonite) !
 
 ### Batman
 
@@ -431,6 +442,7 @@ Les touches sont dans [Ski, snowboard et luge](#ski-snowboard-et-luge).
 - La nuit est sombre et bleue, au clair de lune. À la campagne, on distingue juste les formes, les étoiles et la lune, et les phares de ta voiture s'allument tout seuls. En ville, les lampadaires et les fenêtres sont allumés.
 - La nuit, il y a moins de passants et de voitures, mais les gangs sont deux fois plus nombreux, et certains de leurs membres se promènent par deux dans les rues : ne t'approche pas d'eux une arme à la main !
 - À [Gotham](#gotham-chapitre-3), il fait toujours nuit, il pleut et il y a du brouillard. Mais la ville ne dort jamais : ses rues restent pleines de monde.
+- À [Metropolis](#metropolis-chapitre-4), il fait toujours jour : il est toujours midi.
 
 ### Tes villas
 
@@ -467,6 +479,8 @@ Quelques signes de la mini-carte :
 | ⌂ $ † A ⚗ Z ◯ | À Gotham : le manoir Wayne, la banque de Gotham, la cathédrale, l'asile d'Arkham, Ace Chemicals, le zoo, le stade |
 | ? vert | Le repaire du Sphinx (à Gotham) : la DeLorean y est cachée |
 | M rouge | Une gare du monorail (à Gotham) |
+| ø L ★ ♦ ❄ K ✈ | À Metropolis : le Daily Planet, la tour LexCorp, S.T.A.R. Labs (et son magasin), la statue de Superman, la Forteresse de Solitude, la ferme Kent, la base militaire |
+| ♣ violet | Le vieux théâtre (à Metropolis) : la DeLorean y est cachée |
 
 ## Vie, armes et police
 
@@ -629,13 +643,13 @@ Le jeu se joue en chapitres, un par héros :
 | 1 | Los Santos | B.J. (les 11 missions) | Jess |
 | 2 | Malibu | **Tony Stark**, alias **Iron Man** | Pepper Potts |
 | 3 | Gotham, où il fait toujours nuit, sous la pluie | **Bruce Wayne**, alias **Batman** | **Barbara Gordon**, alias **Batgirl** |
-| 4 | Metropolis | **Clark Kent**, alias **Superman** | Kara Danvers |
+| 4 | Metropolis, en plein jour | **Clark Kent**, alias **Superman** | **Kara Danvers**, alias **Supergirl** |
 | 5 | New York | **Peter Parker**, alias **Spiderman** | Gwen Stacy |
 
-- Malibu a ses 12 missions d'Iron Man, avant celle de la DeLorean ; Gotham, ses 12 missions de Batman, contre le Pingouin, Double-Face, Bane et le Joker, avant celle du Sphinx et de la DeLorean. Metropolis et New York n'ont pour l'instant qu'une mission (retrouver la DeLorean) : les vraies arrivent bientôt !
-- Metropolis et New York se passent encore à Los Santos ; Malibu et Gotham ont déjà leur ville.
+- Malibu a ses 12 missions d'Iron Man, avant celle de la DeLorean ; Gotham, ses 12 missions de Batman, contre le Pingouin, Double-Face, Bane et le Joker, avant celle du Sphinx et de la DeLorean ; Metropolis, ses 12 missions de Superman, contre Lex Luthor, Brainiac, le général Zod et Doomsday, avant celle de Mister Mxyzptlk et de la DeLorean. New York n'a pour l'instant qu'une mission (retrouver la DeLorean) : les vraies arrivent bientôt !
+- New York se passe encore à Los Santos ; Malibu, Gotham et Metropolis ont déjà leur ville.
 - Chaque chapitre commence par le logo de son héros (« CHAPITRE 2 »), qui s'en va à sa façon, et par des bulles d'aide qui t'apprennent ses pouvoirs.
-- Dans les chapitres 2 à 5, le code de triche de ton super-héros est toujours allumé (à Gotham, quand tu es en costume), et ceux des autres super-héros ne marchent pas.
+- Dans les chapitres 2 à 5, le code de triche de ton super-héros est toujours allumé (à Gotham et à Metropolis, quand tu es en costume), et ceux des autres super-héros ne marchent pas.
 - Tu gardes ton argent d'un chapitre à l'autre, mais pas tes armes : chaque chapitre garde les siennes, et tu les retrouves en y revenant (ses missions recommencent).
 
 ### La DeLorean
@@ -722,9 +736,92 @@ La ville de Batman. Il y fait **toujours nuit**, il **pleut** et il y a du **bro
 12. **La cathédrale** : le grand final ! Monte au grappin en haut du clocher, à 57 m, où t'attend le **Joker** : son revolver (sa première balle sort un drapeau « BANG ! »), ses dentiers à remontoir qui explosent (un coup de poing les casse), sa fleur qui crache de l'acide et son gaz qui fait rire. Pendant le combat, un garde-fou invisible t'empêche de tomber du clocher. Quand son hélicoptère vient le chercher, et qu'il s'enfuit pendu à l'échelle : ton **grappin** (**G**), sur lui !
 13. **Les devinettes du Sphinx** : le Sphinx a volé la DeLorean, et détourné le Bat-signal (un point d'interrogation !). Ses devinettes t'attendent sous de grands ? verts, dans Gotham : réponds avec **1**, **2** ou **3**, et la réponse te dit où est la suivante. Une mauvaise réponse ? Un piège : ses hommes arrivent ! Au bout, assomme le Sphinx dans son repaire, et pars avec la DeLorean.
 
+### Metropolis (chapitre 4)
+
+La ville de Superman : une grande ville moderne et lumineuse, au bord de la mer, en **plein jour** sous un ciel bleu (il y est toujours midi). Tu commences devant le **Daily Planet**, le journal où travaille Clark Kent.
+
+**À voir** :
+
+- le **Daily Planet** et son grand **globe doré** qui tourne sur le toit : un ascenseur, au fond du hall, monte jusqu'au toit (à 102 m) ;
+- la **tour LexCorp**, la plus haute de la ville (228 m), en verre vert sombre, avec l'héliport de Lex Luthor sur son toit ;
+- les tours de **New Troy**, le centre, dont de vieux gratte-ciel **art déco** en pierre claire, avec leur couronne de métal et leur flèche ;
+- **Centennial Park**, et au milieu, la **statue géante de Superman** (de **Supergirl** si tu joues la fille) ;
+- **S.T.A.R. Labs**, le laboratoire, son dôme et son grand hall, où est son magasin (voir plus bas) ;
+- le port de **Hob's Bay**, et à **Suicide Slum**, le **vieux théâtre** : la DeLorean est cachée dans sa cour (et à la fin, c'est Mister Mxyzptlk qui la cache) ;
+- la **rivière Hob** et le **pont de Metropolis**, un grand pont suspendu entre deux tours ;
+- **Smallville**, un petit village au milieu des champs, et au bout de sa route de campagne et de son chemin de terre, la **ferme Kent** : la maison, la grange rouge, le silo et le champ de maïs ;
+- la **base militaire**, au nord-est, avec ses tanks et ses avions de chasse ;
+- tout au nord, les **glaces** : la neige, les sapins givrés, et la **Forteresse de Solitude**, des cristaux de glace géants (aucune route n'y va). Elle dort sous la glace jusqu'à ta 1re mission !
+
+**En civil, puis en costume** : tu es **Clark Kent**, en costume, cravate rouge et lunettes (ou **Kara Danvers**, gilet bleu, lunettes et cheveux blonds). Ton costume, tu le trouves à ta 1re mission. Ensuite, appuie sur **H** : tu tournes si vite que tu disparais dans un tourbillon bleu et rouge, et tu deviens **Superman** (ou **Supergirl**, sa jupe rouge et ses longs cheveux blonds) ! Tu peux le mettre n'importe où, même en tombant d'un toit (puis **Maj** 3 fois, et tu voles) ; **H** encore : tu repasses en civil, mais seulement les pieds par terre. En civil, pas de pouvoirs : tu ne voles pas, tu n'as pas tes yeux laser, et tomber de haut fait mal.
+
+#### La super-force
+
+En costume, appuie sur **G** près d'une voiture : tu la soulèves au-dessus de ta tête, même un camion ou un bus ! Celui qui la conduisait descend avant, et te la prête. Tu peux marcher et voler avec.
+
+- **Clic gauche** : tu la lances là où tu regardes. Elle s'écrase... et peut exploser. Attention aux passants : ceux qu'elle écrase comptent comme des victimes (l'amende !).
+- **G** encore : tu la reposes doucement par terre, devant toi (pas de trop haut : descends d'abord).
+
+#### La kryptonite
+
+Un caillou vert qui brille, venu de Krypton, la planète de Superman : c'est la seule chose qui le rend tout faible ! Tout près d'elle (à moins de 16 m), le bord de l'écran devient vert : tu ne voles plus (en l'air, tu redescends doucement), tes yeux laser ne marchent plus, les coups te font une fois et demie plus mal, et ta vie ne remonte plus. Toute seule, elle ne te fait aucun mal.
+
+- **Casse-la** à coups de poing (même sur l'armure de Lex Luthor), ou **prends-la** (**G**, tout près), puis **clic gauche** : tu la lances au loin. Loin de toi, la police l'emporte dans une boîte en plomb ; dans l'eau, elle coule ; si tu meurs, la police l'emporte aussi. **G** encore : tu la poses à tes pieds.
+- Tu la trouveras dans l'armure de Lex Luthor (5e mission), et au bout de la **lance de kryptonite**, contre Doomsday (11e mission) : celle-là ne se casse pas, tu l'emportes même en voiture, et le **clic gauche** la plante dans Doomsday, de tout près. Ses réglages sont dans `REGLAGES` : `kryptonitePortee` (jusqu'où elle t'affaiblit), `kryptoniteDegats` (combien de fois plus de dégâts), `kryptoniteVol` (à quelle vitesse tu redescends).
+
+#### Le magasin de S.T.A.R. Labs
+
+À Metropolis, après ta 1re mission, va voir le **professeur Hamilton** à **S.T.A.R. Labs** (★ sur la carte), sur la côte est : il t'attend derrière l'accueil du grand hall, et te fait signe de la main. Les costumes sont sur des mannequins, **Krypto** attend au fond, et les nouveaux pouvoirs et les améliorations sont près de la porte, avec leur prix au-dessus.
+
+- **E** devant un stand : tu l'achètes, ou tu le choisis si tu l'as déjà.
+- **J**, n'importe où : tu changes de costume (en costume, tout de suite ; en civil, H le met).
+
+| Costume | Prix | Ce qu'il change |
+|---|---|---|
+| **Man of Steel** | 20 000 $ | Bleu sombre, sans slip rouge, comme dans le film : tu voles 20 % plus vite |
+| **Costume noir** | 40 000 $ | Tout noir, le « S » argenté : tu ne prends que 60 % des dégâts |
+| **Superman électrique** | 60 000 $ | Bleu clair, des éclairs, et il brille (sans cape) : tu cours plus vite, et tes yeux laser font plus mal |
+| **Armure de Krypton** | 90 000 $ | Une armure gris sombre : tu ne prends que 35 % des dégâts, et tes coups de poing envoient tout valser, mais tu voles moins vite |
+
+Les nouveaux pouvoirs, quand tu es en costume :
+
+| Pouvoir | Prix | Touche | Ce qu'il fait |
+|---|---|---|---|
+| **Souffle glacé** | 25 000 $ | **X** | Tout ce qui est devant toi gèle, dans un bloc de glace : les méchants ne bougent plus et ne tirent plus. Les voitures s'arrêtent, et un feu s'éteint |
+| **Vision à rayons X** | 15 000 $ | **O** | Tu vois les gens à travers les murs : les méchants en rouge, les autres en bleu |
+| **Super-vitesse** | 30 000 $ | **R** | Avec **Maj**, tu cours à 108 km/h (135 km/h en Superman électrique) ! **R** encore : tu l'arrêtes |
+| **Super-cri** | 40 000 $ | **B** | Tout ce qui est devant toi vole : les méchants, les passants (sans mal) et les voitures |
+
+Et des **améliorations**, niveau par niveau :
+
+- **voler** plus vite ;
+- des **yeux laser** plus forts ;
+- plus de **vie** (de 100 à 175 points) ;
+- plus de **force** (en costume) : tes coups de poing font plus mal, et envoient valser les gens et les voitures.
+
+**Krypto, le super-chien** (50 000 $) : un chien blanc à cape rouge. Il te suit partout, à pied et en volant, et il mord les méchants (jamais les passants). **K** : il rentre à la maison, ou il revient.
+
+Avec **Supergirl**, les costumes gardent tes longs cheveux blonds. Le jeu se souvient de tout ce que tu as acheté.
+
+**Les missions de Superman** (avec Supergirl, ce sont les mêmes, et c'est Superman qui t'aide) :
+
+1. **La Forteresse de Solitude** : le Daily Planet t'envoie tout au nord, où la glace brille d'une lueur verte. Tu ne voles pas encore : monte dans l'**hélicoptère** du journal, sur la place du départ (**E**). Son pilote t'emmène au-dessus de la ville (rien à piloter : regarde avec la souris !) et te dépose dans la glace. Approche-toi du **cristal vert** : la terre tremble, et la **Forteresse de Solitude** sort de la glace ! L'hologramme de ton père te dit qui tu es... et te donne ton **costume** (le jeu s'en souvient). Puis ton premier vol (**Maj** 3 fois, vite : tu files tout de suite à 300 km/h) : rentre à Metropolis, et pose-toi n'importe où sur le toit du Daily Planet. Le magasin de S.T.A.R. Labs ouvre.
+2. **Lois tombe du toit** : vole jusqu'au toit du Daily Planet : l'hélicoptère du journal tombe en panne, et s'écrase au bord du toit... **Lois Lane** tombe dans le vide ! Rattrape-la en volant (touche-la), et pose-toi pour la déposer. L'hélicoptère penche au bord du toit, avec son pilote dedans : vole tout près, il glisse... **G** pour le soulever, **G** encore pour le reposer. Si tu rates Lois, les pompiers la rattrapent dans leur grand coussin, et ça recommence ; si tu rates l'hélicoptère, lui seul est de nouveau au bord du toit.
+3. **Le bus sur le pont** : le grand pont de Metropolis s'écroule en son milieu ! Un bus plein de gens et trois voitures pendent au bord du trou, le nez dans le vide. Remonte-les sur la route, un par un (**G**, puis **G**) : chacun tient 15 secondes, et quand il glisse, tu as encore 4 secondes pour le rattraper. Un qui tombe à l'eau ? Les pompiers repêchent tout le monde, et ça recommence.
+4. **Les deux missiles** : Lex Luthor parle sur tous les écrans de la ville, puis tire deux missiles du toit de sa tour, un vers chaque bout de Metropolis ! Rattrape-les en volant (touche-les), puis **clic gauche** : tu les lances vers le ciel, où ils explosent sans faire de mal. Ou détruis-les avec tes yeux laser (**9**)... mais loin des gens ! Un missile qui arrive ? Personne n'est blessé, et Luthor en tire un autre.
+5. **L'armure de Luthor** : Lex Luthor t'attend sur le toit de sa tour, LexCorp, dans son armure de guerre verte et violette... avec un morceau de **kryptonite** sur la poitrine ! Tout près, tu perds tes forces : plus de vol, plus de yeux laser. Tant qu'elle brille, rien ne le touche : casse-la à coups de poing, ou arrache-la (**G**) et lance-la au loin (**clic gauche**). Alors, il s'envole : vole, et finis-le ! À la moitié de sa vie, ses drones arrivent. Un mur invisible fait le tour du toit pendant le combat : tu ne tombes pas (et tu peux toujours y revenir, de n'importe quel côté).
+6. **Les robots pirates** : Brainiac, un ordinateur venu de l'espace, pirate la ville ! Des voitures roulent toutes seules, une lueur verte au-dessus d'elles, et foncent sur toi ; des robots de S.T.A.R. Labs attaquent. Trouve ses trois antennes cachées (sur un toit, sous un pont, dans le hall d'un immeuble : la flèche te guide, et la vision à rayons X, **O**, les montre à travers les murs) et casse-les : les voitures redeviennent normales.
+7. **La ville en bouteille** : les machines de Brainiac descendent sur Park Ridge avec une immense cloche de verre, pour mettre le quartier dans une bouteille ! Détruis ses six porteurs avant qu'elle se referme (90 secondes) : yeux laser, ou coups de poing tout près (même en volant, contre les machines de Brainiac). Fermée ? Tu la soulèves, elle remonte, et tu recommences.
+8. **Brainiac** : son vaisseau, un crâne géant, flotte au-dessus de Centennial Park. Vole dans son rayon vert, dessous : il t'aspire ! Dans la salle, sa collection de villes en bouteille... et Brainiac. Il se répare tant que ses réparateurs brillent, aux murs : casse-les d'abord. Saute de côté quand ses câbles tombent du plafond ! Vaincu, il rend les villes en bouteille, et son vaisseau tombe : sors par la trappe verte, dans le sol, et regarde-le plonger dans la baie.
+9. **La machine-monde** : un immense vaisseau noir apparaît dans le ciel, et le **général Zod**, venu de Krypton comme toi, parle sur tous les écrans de la ville. Sa **machine-monde**, une grande araignée de métal, descend se poser dans la baie : son rayon de lumière change la gravité, et tout ce qui est autour s'envole, les voitures et les passants ! Entre dans le rayon (il te repousse, te ralentit et t'écrase un peu) et frappe son **cœur**, la boule de lumière sous la machine : de dehors, ni tes yeux laser ni tes poings ne passent. Détruite, elle s'effondre dans la baie, et tout redescend, tout doucement.
+10. **Le duel contre Zod** : Zod t'attend dans le ciel, entre les tours de New Troy. Il vole aussi vite que toi, fonce sur toi pour te frapper (il s'arrête une demi-seconde avant : écarte-toi !), et il a les yeux laser, lui aussi (ses yeux brillent en rouge juste avant). À la moitié de sa vie, **Faora**, la plus rapide des guerrières de Krypton, vient l'aider. Zod vaincu, elle s'enfuit, et leur vaisseau s'en va.
+11. **La lance de kryptonite** : une météorite tombe sur Centennial Park... et **Doomsday** en sort, un monstre gris couvert de pics d'os, énorme, qui casse tout. Tes coups ne lui font presque rien ! L'armée a posé une **lance de kryptonite** au bout du parc : prends-la (**G**). Elle t'affaiblit, toi aussi : plus de vol ! Va jusqu'à Doomsday à pied (ou en voiture : elle vient avec toi), et de tout près, **clic gauche** : tu la plantes dans son corps. S'il te bat, tu te réveilles la lance à la main, pas loin, et il est retourné dans son cratère.
+12. **Dans l'espace** : Doomsday est affaibli. Fonce sur lui en volant pour l'attraper, et pousse-le tout là-haut : au-dessus des nuages, le ciel devient noir, plein d'étoiles, et la Terre est en dessous ! Finis le combat là-haut : le soleil jaune te redonne vite des forces (et si tu tombes, tu te réveilles là-haut). Puis redescends à Centennial Park : toute la ville t'acclame, devant ta statue.
+13. **Mister Mxyzptlk** : la DeLorean a disparu ! Un drôle de petit bonhomme au chapeau melon violet flotte au-dessus du vieux théâtre (♣ sur la carte) : c'est **Mister Mxyzptlk**, le lutin farceur de la 5e dimension. Il a caché la DeLorean, et ne rentrera chez lui que s'il dit son nom à l'envers : « Kltpzyxm » ! Attrape les lettres de son nom à l'envers, dans l'ordre (K, L, T, P, Z, Y, X, M : touche-les, à pied ou en volant ; la prochaine brille en or). Une lettre dans le désordre s'envole plus loin... et il fait un tour de magie : les voitures deviennent des gâteaux, tout s'envole, ou tu deviens tout petit ! Toutes attrapées : POP, il rentre chez lui, et la DeLorean revient. Pars avec !
+
 ### Un héros sans reproche
 
-- Dans les chapitres de super-héros, la police est de ton côté (jamais d'étoiles), et les conducteurs te prêtent leur voiture.
+- Dans les chapitres de super-héros, la police est de ton côté (jamais d'étoiles), et les conducteurs te prêtent leur voiture (même quand Superman la soulève).
 - Mais attention aux passants : dès la 3e victime, tu paies une **amende** de 200 $, puis 400, 800... jusqu'à 100 000.
 - Une voiture qui a un accident toute seule, ce n'est pas ta faute : les passants qu'elle renverse, ou qu'elle tue en explosant, ne comptent pas (seulement si tu l'as conduite, touchée ou poussée).
 - Ton argent peut devenir négatif, mais jamais plus bas que -10 millions de dollars.
@@ -764,7 +861,7 @@ Appuie sur **Entrée**, tape le code, puis **Entrée**. Retape un code pour l'an
 | `IDKFA` (ou `ARMES`, `WAFFEN`, `WEAPONS`) | Toutes les armes et plein de munitions, comme dans *Doom* |
 | `RICHE` | 100 000 $ |
 | `MILLIARDAIRE` | Un milliard de dollars |
-| `MISSION` suivi d'un numéro | Saute directement à cette mission du chapitre où tu es (`MISSION8` : le musée ; `MISSION11` : le camp militaire, qui repart de zéro), avec une voiture blindée à côté s'il en faut une, et ce que les missions d'avant t'auraient donné (l'armure de Tony Stark ; le costume, la Batmobile, le Bat et le Batpod de Batman) ; ce qu'elles ne t'ont pas encore donné, il te le reprend |
+| `MISSION` suivi d'un numéro | Saute directement à cette mission du chapitre où tu es (`MISSION8` : le musée ; `MISSION11` : le camp militaire, qui repart de zéro), avec une voiture blindée à côté s'il en faut une, et ce que les missions d'avant t'auraient donné (l'armure de Tony Stark ; le costume, la Batmobile, le Bat et le Batpod de Batman ; le costume de Superman et le magasin de S.T.A.R. Labs) ; ce qu'elles ne t'ont pas encore donné, il te le reprend |
 | `CHAPITRE` suivi d'un numéro | Va dans ce chapitre (`CHAPITRE2` : Iron Man, à Malibu) |
 
 ### La touche 9
@@ -885,7 +982,8 @@ Vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de v
 - La Batmobile a aussi sa vitesse en l'air (`vitesseVol`) : donne-la à une autre voiture, et elle volera avec R... mais sans ailes ! Et `descente`, la vitesse à laquelle elle descend pour se poser (25 = 90 km/h ; mets 6 pour un atterrissage tout doux, 60 pour tomber comme une pierre : elle freine toujours avant le sol).
 - Pour l'avion : la vitesse pour décoller, et celles de ses figures (`tonneau` et `looping`). Pour l'hélicoptère : la vitesse à laquelle il monte.
 - Les autres Batmobiles (celles du magasin de Lucius Fox) ont chacune leur pouvoir, sur la touche R : `grappin: true` (le virage au grappin), `turbo` (sa `vitesse`, sa `duree`, sa `recharge`), `saut` (à quelle vitesse elle saute vers le haut). Et `roquettes` (combien elle en encaisse), `belier: true` (elle pousse les voitures sans s'arrêter).
-- À Gotham, les véhicules du Pingouin : sa voiture (une vieille limousine violet sombre), son canard géant à moteur (un bateau) et les camions de la poursuite ; et ceux du Joker : son bus scolaire, son gros camion violet et son hélicoptère. Ils ont `chance: 0` : on ne les croise que dans leurs missions.
+- À Gotham, les véhicules du Pingouin : sa voiture (une vieille limousine violet sombre), son canard géant à moteur (un bateau) et les camions de la poursuite ; et ceux du Joker : son bus scolaire, son gros camion violet et son hélicoptère.
+- À Metropolis, l'hélicoptère blanc du Daily Planet et le bus bleu de la ville. Ils ont tous `chance: 0` : on ne les croise que dans leurs missions.
 - Le **Batpod** : `stable: true` (il ne part jamais en accident) et son `cable` (`portee` : jusqu'où il attrape la voiture devant lui ; `tenir` : combien de secondes il faut rester derrière le camion du Joker ; `recharge` : les secondes avant de pouvoir recommencer).
 - Le **Bat** : `vitesseVol` (sa vitesse en l'air : 80 = 288 km/h), `descente`, `roquettes` (celles qu'il encaisse) et `vitesse` (au sol, tout doucement).
 - Tu peux en inventer : une « Ferrari » avec le modèle `porsche`, par exemple.
@@ -897,6 +995,7 @@ Vitesse, accélération, virage, couleurs et bruit de moteur de chaque type de v
 - policiers, policiers d'élite, soldats nazis, Kommandant, Hitler, vigiles, membres de gang, chiens de garde, militaires du camp et leur commandante Irene Engel ;
 - à Malibu : les combattants des Dix Anneaux et leur chef Raza (au bazooka : `arme: 6` ; `explosions` : la part des dégâts des explosions qu'il prend ; `recule` : il recule quand tu t'approches à moins de tant de mètres), Iron Monger, Whiplash et ses fouets (`portee` : leur longueur), les drones de Hammer, les hélicoptères du Mandarin, les soldats Extremis et Aldrich Killian (`guerison` : ce qu'ils guérissent par seconde ; `boss: true` : sa barre de vie en haut de l'écran), les passagers d'Air Force One, Hulk (`degatsVoiture` : quand il te lance une voiture ; `degatsSaut` : quand il retombe à côté de toi), les sentinelles d'Ultron et Ultron (`degatsGrandRayon`) ;
 - à Gotham : les hommes du Pingouin, et le Pingouin lui-même (`degatsRoquette` : les roquettes de son parapluie ; `recule` : il garde ses distances) ; les hommes de Double-Face, et Double-Face (`piece` : les secondes entre deux lancers de sa pièce ; `rafale` : les secondes où il tire des deux mains, quand elle tombe sur pile ; `hesite` : celles où il hésite, sur face ; `renforts` : ses hommes qui arrivent à la moitié de sa vie) ; les mercenaires de Bane, et Bane (`elan` : les secondes où il lève le poing avant de frapper ; `charge`, `degatsCharge`, `vitesseCharge` : sa charge ; `sonne` : les secondes où il est sonné ; `sonneDegats` : tes coups comptent tant de fois ; `pris` : les secondes où un filet le tient ; `taille` : sa taille) ; les clowns du Joker, et le Joker (`dentier` : les secondes entre deux dentiers à remontoir, `degatsDentier`, `rayonDentier` ; `degatsFleur` : sa fleur à l'acide ; `degatsGaz` : son gaz qui fait rire, par seconde ; `degatsRoquette` : son bazooka ; `helico` : à cette part de sa vie, son hélicoptère vient le chercher) ; les hommes du Sphinx, et le Sphinx (`degats` : sa canne électrique ; `souffle` : les secondes où il reste planté là après un coup de canne, le moment de le frapper ; `bombe` : les secondes entre deux points d'interrogation qui explosent, `degatsBombe` ; `renforts`) ;
+- à Metropolis : Lois Lane (on ne peut pas la blesser), et les missiles de Lex Luthor (leur `vie` : un seul rayon de tes yeux laser suffit) ;
 - les voyous des appels de la police ;
 - la vitre, les dégâts et la vitesse du heavy robot.
 
@@ -1078,9 +1177,29 @@ Et pour Batman :
 
 Pour `poursuite`, `qui: 'joker'` : c'est le Joker qui s'enfuit (le bus, le camion), et à la fin, il disparaît dans un nuage de fumée ; `camions` et `feux` : combien de camions roulent devant lui, combien de feux brûlent au bord de la route ; `batpod: true` : quand tu arrives, le Joker tire sur ta voiture, et le Batpod en sort ; `cable: true` : il faut le renverser avec le câble du Batpod (R) ; `bazooka` : les secondes entre deux roquettes du Joker.
 
+Et pour Superman :
+
+| Étape | Ce qu'il faut faire |
+|---|---|
+| `passager` | Monter (E) dans le véhicule qui attend sur une place (`pose: 'X'` : celle du départ) : son pilote t'emmène tout seul jusqu'à un endroit (`vers`), en `secondes` secondes |
+| `cristal` | S'approcher à pied du cristal vert, dans la glace : la Forteresse de Solitude pousse, et l'hologramme de ton père te donne ton costume |
+| `lois` | Rattraper Lois Lane, qui tombe du toit du Daily Planet, puis l'hélicoptère qui glisse du toit, et le reposer |
+| `pont` | Le grand pont s'écroule : remonter sur la route, un par un, les `vehicules` qui pendent au bord du trou (chacun tient `secondes` secondes) |
+| `missiles` | Arrêter les missiles de Lex Luthor, un vers chacune des `cibles` (des cases), à `vitesse` m/s : les rattraper et les lancer vers le ciel, ou les détruire au laser |
+| `antennes` | Casser les `antennes` de Brainiac (chacune : `case` ou `lieu`, et `ou` : `'toit'`, `'pont'` ou `'dedans'`) ; jamais plus de `voitures` voitures piratées à la fois, et `robots` robots gardent chaque antenne |
+| `cloche` | Détruire les `porteurs` de la cloche de verre de Brainiac, au-dessus d'un quartier (`case`, `rayon` en mètres), avant qu'elle se referme (`secondes`) ; `drones` drones t'attaquent |
+| `vaisseau` | Entrer dans le vaisseau de Brainiac (au-dessus de la `case`, à `hauteur` mètres) : voler dans son rayon vert |
+| `naufrage` | Sortir du vaisseau par la trappe verte, et le regarder tomber dans la mer |
+| `machine` | Détruire le cœur de la machine-monde du général Zod, posée dans la baie (`case`) : son rayon soulève tout à `rayon` mètres ; dedans (`largeur` mètres), il te repousse (`poussee`) et t'écrase un peu (`degats`) |
+| `doomsday` | Une météorite tombe au milieu de la `case` : Doomsday en sort ; essayer de le frapper |
+| `lance` | Prendre la lance de kryptonite (posée au milieu de la `case`) et la planter dans Doomsday (clic gauche, tout près) |
+| `pousser` | Attraper Doomsday en volant, et le pousser jusqu'à `hauteur` mètres : l'espace |
+| `acclamer` | Se poser devant un lieu, où la foule t'acclame |
+| `mxyzptlk` | Attraper les lettres du nom de Mister Mxyzptlk à l'envers, dans l'ordre, autour d'un lieu (voir **`MXYZPTLK`**, plus bas) |
+
 Pour l'étape `eliminer` :
 
-- les ennemis : `soldat`, `boss`, `hitler`, `militaire`, `engel`, ou à Malibu `anneaux`, `raza`, `monger`, `whiplash`, `drone`, `helico`, `extremis`, `killian`, `hulk`, `sentinelle`, `ultron`, ou à Gotham `homme` (un homme du Pingouin), `pingouin` (le Pingouin), `bandit` (un homme de Double-Face), `doubleFace`, `mercenaire` (un mercenaire de Bane), `bane`, `clown` (un clown du Joker), `joker`, `acolyte` (un homme du Sphinx), `sphinx`... ;
+- les ennemis : `soldat`, `boss`, `hitler`, `militaire`, `engel`, ou à Malibu `anneaux`, `raza`, `monger`, `whiplash`, `drone`, `helico`, `extremis`, `killian`, `hulk`, `sentinelle`, `ultron`, ou à Gotham `homme` (un homme du Pingouin), `pingouin` (le Pingouin), `bandit` (un homme de Double-Face), `doubleFace`, `mercenaire` (un mercenaire de Bane), `bane`, `clown` (un clown du Joker), `joker`, `acolyte` (un homme du Sphinx), `sphinx`, ou à Metropolis `luthor` (Lex Luthor, dans son armure, et sa kryptonite), `brainiac` (dans son vaisseau ; `reparateurs` : combien de réparateurs le soignent), `zod` (le général Zod, dans le ciel ; Faora vient l'aider), `doomsday` (avec `espace: true` : dans l'espace)... ;
 - avec `pres: 'camion'`, ils sortent du camion renversé du Joker ; avec `pres: 'char'`, ils sautent de son char, à la parade ;
 - avec `revanche` (contre Bane) : s'il te bat, tu te réveilles dans la rue (`noeud`), avec `policiers` policiers et `voitures` voitures de police, et Bane revient avec ses `mercenaires` ;
 - avec `nombre`, ils arrivent au début de l'étape ;
@@ -1093,12 +1212,15 @@ Les lieux :
 - Ou un carrefour : `noeud: [colonne, ligne]`, ou le milieu d'une case : `case: [colonne, ligne]`.
 - À la grotte des Dix Anneaux, `depuis` dit d'où arrivent les ennemis (`'galerie'`, `'tentes'` ou `'chef'`).
 - À Gotham, `point` : un endroit de la Batcave (`'corniche'`, `'ile'`, `'manoir'`), de l'égout (`'salle'`), du canal (`'ponton'`) ou la plateforme en haut du clocher de la cathédrale (`'clocher'`).
+- À Metropolis, `point` : devant la Forteresse de Solitude (`'glaces'`), le toit du Daily Planet (`'toitPlanet'`, n'importe où dessus), le toit de LexCorp (`'toitLex'`, pareil), la salle du vaisseau de Brainiac (`'salleBrainiac'`) ou le ciel entre les tours de New Troy (`'duelZod'`). Avec `elan: 6`, Superman file tout de suite, comme s'il avait appuyé 6 fois sur Maj (loin du but).
 
-Une étape `aller` avec `signal: true` allume le Bat-signal ; une mission avec `donne: 'Bat'` te donne le Bat (`donne: 'Batpod'` : le Batpod) ; avec `evacuer: true`, la police fait évacuer la ville pendant toute la mission (4 fois moins de passants et de voitures).
+Une étape `aller` avec `signal: true` allume le Bat-signal ; une mission avec `donne: 'Bat'` te donne le Bat (`donne: 'Batpod'` : le Batpod) ; avec `evacuer: true`, la police fait évacuer la ville pendant toute la mission (4 fois moins de passants et de voitures). À Metropolis, une mission avec `forteresse: true` te donne ton costume (avant de l'avoir finie, pas de costume, et le magasin de S.T.A.R. Labs est fermé).
 
 **`DEVINETTES`**, juste après `MISSIONS_GOTHAM` : les devinettes du Sphinx, dans l'ordre. Pour chacune : `lieu` (où t'attend son point d'interrogation : une lettre de la carte de Gotham, ou une case [colonne, ligne]), `question`, ses 3 `reponses` (dans l'ordre des touches 1, 2, 3) et `bonne` (le numéro de la bonne). Fais en sorte que la réponse dise où est la suivante ! Invente les tiennes (et ajoute leur traduction dans `TRADUCTIONS`, pour qu'elles marchent aussi en allemand et en anglais).
 
-Les missions des autres chapitres sont dans **`MISSIONS_CHAPITRES`**, juste après (celles d'Iron Man dans **`MISSIONS_MALIBU`**, celles de Batman dans **`MISSIONS_GOTHAM`**, et la dernière de Gotham, celle du Sphinx, dans **`DELOREAN_SPHINX`**). Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
+**`MXYZPTLK`**, juste après `MISSIONS_METROPOLIS` : Mister Mxyzptlk, à la dernière mission de Metropolis. `envers` : les lettres à attraper, dans l'ordre (son nom à l'envers) ; `lettres` : où attend chacune ([vers l'est, vers le sud, en haut], en mètres depuis la cour du vieux théâtre) ; `tours` : ses tours de magie (`'gateaux'`, `'gravite'`, `'rapetisser'`), toutes les `entreTours` secondes, chacun pendant `duree` secondes, et `gateaux` : combien de voitures deviennent des gâteaux ; `paroles` : ce qu'il dit en arrivant. Change ses lettres (un autre nom à l'envers !), leurs places ou ses tours.
+
+Les missions des autres chapitres sont dans **`MISSIONS_CHAPITRES`**, juste après (celles d'Iron Man dans **`MISSIONS_MALIBU`**, celles de Batman dans **`MISSIONS_GOTHAM`**, et la dernière de Gotham, celle du Sphinx, dans **`DELOREAN_SPHINX`** ; celles de Superman dans **`MISSIONS_METROPOLIS`**, et la dernière de Metropolis, celle de Mister Mxyzptlk, dans **`DELOREAN_MXYZPTLK`**). Tape le code `MISSION` suivi d'un numéro pour essayer ta mission tout de suite.
 
 #### `CASCADES`
 
