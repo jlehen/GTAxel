@@ -95,6 +95,25 @@
   #reglages input[type=checkbox].change { outline: 2px solid #f0c850; outline-offset: 1px; }   /* (une case à cocher garde son fond : un cadre jaune autour) */
   #reglages input.faux { border-color: #e04040; }   /* ce n'est pas un nombre : pas pris en compte */
   #menu .partie button.nouvelle { border-style: dashed; }   /* « Nouvelle partie » : efface tout */
+  /* sur un téléphone ou une tablette (voir tactile), « Touche ici pour jouer » est un vrai bouton : toucher ailleurs ne lance pas le jeu */
+  .tactile #etat.jouer { background: #f0c850; color: #000; border-radius: 24px; padding: 6px 28px; font-weight: 700; }
+  /* un petit écran (un téléphone, tenu en long ou en large) : le menu plus serré, pour voir la qualité sans faire défiler */
+  @media (max-width: 600px), (max-height: 500px) {
+    #menu h1 { font-size: 56px; letter-spacing: 2px; filter: drop-shadow(3px 3px 0 #000); }
+    #version { font-size: 12px; min-height: 14px; margin-bottom: 2px; }
+    #langues { margin: 0 0 4px; }
+    #menu button { font-size: 15px; padding: 2px 12px; margin: 2px; }
+    #menu .heros button.pastille { width: 24px; height: 24px; }
+    #reglages, #triches { margin: 2px 0 3px; }
+    #reglages > summary, #triches > summary { font-size: 15px; padding: 2px 12px; }
+    .foule, .heros, .qualite { font-size: 15px; margin-bottom: 2px; }
+    .foule span, .heros span, .qualite span { min-width: 80px; }
+    #apercu { width: 70px; height: 118px; }
+    #histoire { font-size: 16px; }
+    #etat { font-size: 22px; margin: 6px 0 16px; }
+    #barre { margin: -10px 0 16px; }
+    #menu table { font-size: 14px; }
+  }
   /* les chapitres de super-héros : les victimes, à la place des étoiles (dès la 3e, une amende) */
   #victimes { font: 22px 'Anton', Impact, sans-serif; color: #ff8a6a; }
   /* un appel de la police : des voyous braquent un magasin (le point rouge) */
@@ -483,6 +502,19 @@ const QUALITES = {
 let qualite = 'Haute';
 try { qualite = localStorage.qualite ?? qualite; } catch {}
 let qualiteDemandee = null, notesQualite = [];   // un niveau cliqué avant que le jeu soit chargé (il le prendra en démarrant) ; ce qu'on écrit à côté
+// SUR UN TÉLÉPHONE OU UNE TABLETTE (un écran qu'on touche du doigt) : Haute, c'est pour un ordinateur. La première fois, le jeu s'y met
+// tout seul dans ce niveau-là (s'il était en Haute). Tu peux en choisir un autre dans le menu : il ne le refait plus (le navigateur s'en
+// souvient : localStorage.qualiteTactile). Mets 'Moyenne' pour essayer, ou 'Haute' pour ne rien changer
+const QUALITE_TACTILE = 'Basse';
+const tactile = matchMedia('(pointer: coarse)').matches;   // vrai sur un téléphone ou une tablette (pas sur un ordinateur, même à écran tactile)
+let dejaTactile = false; try { dejaTactile = !!localStorage.qualiteTactile; } catch {}
+if (tactile && !dejaTactile && qualite === 'Haute' && QUALITES[QUALITE_TACTILE]) {
+  qualiteDemandee = qualite = QUALITE_TACTILE;   // comme un bouton touché pendant le chargement : le jeu le prend en démarrant
+  try { localStorage.qualiteTactile = QUALITE_TACTILE; } catch {}
+}
+// ce que dit le menu quand le jeu est prêt : sur un écran tactile, c'est un vrai bouton (toucher ailleurs fait seulement défiler le menu)
+const texteJouer = tactile ? 'Touche ici pour jouer' : 'Clique pour jouer';
+if (tactile) document.documentElement.classList.add('tactile');
 
 // =====================================================================
 //  LES LANGUES : le jeu est écrit en français, et TRADUCTIONS donne chaque phrase dans les autres langues.
@@ -502,6 +534,8 @@ const TRADUCTIONS = {
   'Construction du pays…':         { de: 'Das Land wird gebaut…', en: 'Building the world…', gsw: 'S Land wird baut…' },
   'Préparation des images…':       { de: 'Bilder werden vorbereitet…', en: 'Preparing the graphics…', gsw: 'Bilder wärdet vorbereitet…' },
   'Clique pour jouer':             { de: 'Klicke zum Spielen', en: 'Click to play', gsw: 'Klick zum Spile' },
+  'Touche ici pour jouer':         { de: 'Tipp hier zum Spielen', en: 'Tap here to play', gsw: 'Tipp da zum Spile' },   // (sur un téléphone ou une tablette)
+  "Touche l'écran pour jouer":     { de: 'Tipp auf den Bildschirm zum Spielen', en: 'Tap the screen to play', gsw: 'Tipp uf de Bildschirm zum Spile' },
   'Personnage :':     { de: 'Figur:', en: 'Character:', gsw: 'Figur:' },
   'Garçon':           { de: 'Junge', en: 'Boy', gsw: 'Bueb' },
   'Fille':            { de: 'Mädchen', en: 'Girl', gsw: 'Meitli' },
@@ -2896,7 +2930,7 @@ function traduireMenu() {
   for (const b of document.querySelectorAll('.heros button')) b.classList.toggle('on', heros[b.parentNode.dataset.heros] === b.dataset.fr);
   document.documentElement.lang = langue;
 }
-function etat(texte) { document.getElementById('etat').dataset.fr = texte; traduireMenu(); }   // la ligne jaune du menu
+function etat(texte) { const e = document.getElementById('etat'); e.dataset.fr = texte; e.classList.toggle('jouer', texte === texteJouer); traduireMenu(); }   // la ligne jaune du menu
 // la barre de progression, sous la ligne jaune du menu et en bas de l'écran du chapitre, pendant que le pays se construit
 // (fait : où en est la construction, de 0 à 1 ; null : plus de barre). C'est le jeu qui la fait avancer (voir respirer)
 function progression(fait) {
@@ -29945,9 +29979,9 @@ if (ecranChapitre.visible) ecranChapitre.texte = 'Préparation des images…';
 preparerProgrammes().then(() => {
   requestAnimationFrame(boucle);
   ecranChapitre.parLeJeu = true;   // l'écran du chapitre n'a plus sa propre boucle : c'est boucle qui l'anime, au plafond d'images par seconde
-  etat('Clique pour jouer'); progression(null);   // (plus de barre)
-  $('menu').addEventListener('click', lancerJeu);
-  if (ecranChapitre.visible) { ecranChapitre.texte = 'Clique pour jouer'; ecranChapitre.clic = lancerJeu; }
+  etat(texteJouer); progression(null);   // (plus de barre)
+  $('menu').addEventListener('click', e => { if (!tactile || $('etat').contains(e.target)) lancerJeu(); });   // (sur un écran tactile, seulement le bouton : le doigt fait défiler le menu)
+  if (ecranChapitre.visible) { ecranChapitre.texte = tactile ? "Touche l'écran pour jouer" : 'Clique pour jouer'; ecranChapitre.clic = lancerJeu; }
 });
 // pour les tests automatiques
 window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMous, carte, VOITURES, MODELES, ouvrirCarte, centreCarte, creerPersonne, creerVoiture, personnes, voitures, objets, lieux, stands, mettreAJour, majCamera, tirer, action, changerArme, blesser, camera, renderer, scene,
