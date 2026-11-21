@@ -266,7 +266,7 @@
     .tactile #barre-gilet { left: var(--g); top: calc(var(--h) + 194px); bottom: auto; width: 124px; height: 4px; }
     .tactile #batterie { left: var(--g); top: calc(var(--h) + 204px); height: min(84px, 100% - 270px); }
     /* l'affichage du casque, trop petit pour ses lignes de texte : seulement le haut, le nom de l'armure et sa silhouette (chaque partie de sa couleur) */
-    .tactile #casque { left: calc(var(--g) + 70px); right: auto; top: calc(var(--h) + 204px); height: 72px; width: 84px; object-fit: cover; object-position: 50% 0; }
+    .tactile #casque { left: calc(var(--g) + 68px); right: auto; top: calc(var(--h) + 204px); height: 72px; width: 80px; object-fit: cover; object-position: 50% 0; }
     .tactile #haut-droite { right: var(--d); top: var(--h); max-width: 230px; }
     .tactile #heure { font-size: 15px; }
     .tactile #argent { font-size: 24px; line-height: 1.15; }
@@ -3634,6 +3634,7 @@ const REGLAGES = {
   sensibiliteTactile: 0.005, // le doigt qui glisse à droite de l'écran fait tourner la vue d'autant (en radians par point : 100 points = un demi-radian, 29°). La souris : sensibiliteSouris
   rayonJoystick: 60,         // points : le joystick (là où le pouce gauche se pose) est poussé à fond quand le pouce s'est éloigné d'autant
   zoneMorteJoystick: 0.15,   // poussé de moins que ça (0.15 = 15 % du rayon), le joystick ne fait rien : le pouce peut trembler un peu
+  zoneMorteAxe: 0.25,        // poussé presque tout droit (moins de 0.25 de côté, environ 14°), il va tout droit : ni de côté en marchant, ni de volant, ni de vrille
   joystickLent: 0.35,        // à pied, B.J. va aussi vite que le joystick est poussé (à moitié : la moitié de sa vitesse), mais jamais moins que ça (0.35 = 35 %)
   seuilCourse: 0.9,          // à pied, le joystick poussé à plus de ça (0.9 = 90 %) : il court, comme avec Maj (en volant, en voiture, à ski : c'est le bouton Maj)
   tailleBoutons: 56,         // points : la taille des boutons (Tirer est plus gros : voir gros, dans BOUTONS_TACTILES)
@@ -3798,7 +3799,7 @@ const BOUTONS_TACTILES = [
   { nom: 'G', dit: 'Missiles', touche: 'KeyG', zone: 'milieu', si: () => ironmanLibre() && chezStark && achete('missiles') },
   { nom: 'G', dit: 'Grappin', touche: 'KeyG', zone: 'milieu', si: () => pouvoir('grappin') && libreAPied() && !(ironmanLibre() && chezStark) },
   { nom: 'G', dit: 'Toile', touche: 'KeyG', zone: 'milieu', si: () => pouvoir('toile') && !pouvoir('grappin') && libreAPied() },
-  { nom: 'G', dit: 'Soulever', touche: 'KeyG', zone: 'milieu', si: () => chezClark && enCostumeHeros() && libreAPied() && !souleve && !kryptoniteTenue },
+  { nom: 'G', dit: 'Soulever', touche: 'KeyG', zone: 'milieu', si: () => chezClark && enCostumeHeros() && libreAPied() && !souleve && !kryptoniteTenue && !missileTenu() },
   { nom: 'G', dit: 'Reposer', touche: 'KeyG', zone: 'milieu', si: () => chezClark && !!(souleve || kryptoniteTenue) },
   // X : le laser des bras d'Iron Man (par terre), le gel explosif de Batman (X encore : boum !), le souffle glacé de Superman
   { nom: 'X', dit: 'Laser', touche: 'KeyX', zone: 'milieu', si: () => ironmanLibre() && chezStark && achete('laser') && J.sol && !J.superman },
@@ -3817,7 +3818,7 @@ const BOUTONS_TACTILES = [
   { nom: 'R', dit: 'Virage', touche: 'KeyR', zone: 'milieu', si: () => !!J.voiture?.type.grappin },
   { nom: 'R', dit: 'Peaux', touche: 'KeyR', zone: 'milieu', si: () => !!J.voiture?.forme.rando && !J.telesiege, allume: () => !!J.voiture?.montee },
   // B : la Batmobile arrive à côté de toi (Batman en costume, dès qu'il en a une ; ou le code BATMAN) ; le super-cri de Superman
-  { nom: 'B', dit: 'Batmobile', touche: 'KeyB', zone: 'milieu', si: () => !chezClark && TRICHES.some(t => t.actif && t.voiture) && !sansBatmobile() && libreAPied() },
+  { nom: 'B', dit: 'Batmobile', touche: 'KeyB', zone: 'milieu', si: () => !chezClark && TRICHES.some(t => t.actif && t.voiture) && (!sansBatmobile() || (!!entree && !entree.v)) && libreAPied() },   // (entree : la mission du mur de feu, où B la fait arriver la première fois)
   { nom: 'B', dit: 'Cri', touche: 'KeyB', zone: 'milieu', si: () => chezClark && enCostumeHeros() && achete('cri') && !J.voiture && !J.robot },
   // K : un fumigène (Batman) ; Krypto, le super-chien (Superman : il vient, ou il rentre)
   { nom: 'K', dit: 'Fumigène', touche: 'KeyK', zone: 'milieu', si: () => chezWayne && enCostumeHeros() && achete('fumigene') && libreAPied() },
@@ -17343,7 +17344,7 @@ function virageGrappin(v) {
   if (v.virage || v.accident || v.detruite || v.coule) return;
   if (Math.abs(v.vitesse) < 8) { annonce('', tr('Roule plus vite pour le virage au grappin'), 1.5); return; }
   if (v.enAir || v.vol || v.rail) return;
-  const cote = Math.sign(touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft')), sens = cote || 1, tour = cote ? Math.PI / 2 : Math.PI, duree = cote ? 0.45 : 0.7;   // (le joystick à moitié : le même virage)
+  const cote = franc(touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft')), sens = cote || 1, tour = cote ? Math.PI / 2 : Math.PI, duree = cote ? 0.45 : 0.7;   // (le joystick à moitié : le même virage)
   const w = tour / duree, r = Math.abs(v.vitesse) / w;   // (elle tourne autour du crochet : il est à r mètres, sur le côté)
   v.virage = { sens: sens * Math.sign(v.vitesse), w, reste: tour, vitesse: v.vitesse, ancre: { ...local(v, -sens * r, 0), y: v.y + 0.8 } };   // (reste : l'angle qu'il lui reste à tourner)
   bruit(0.4, 4000, 0.15); bip(700, 1500, 0.2, 'square', 0.06);   // le crochet part
@@ -18250,6 +18251,8 @@ function envoyerTouche(type, code) {
 // la touche (ou l'une des touches) est-elle enfoncée ? 1 : oui, 0 : non. Le joystick d'un téléphone, lui, l'enfonce à moitié (0.5) : un
 // nombre entre 0 et 1 (voir majJoystick). Au clavier, c'est toujours 0 ou 1
 const touche = (...codes) => { let m = 0; for (const c of codes) { const v = touches[c]; if (v === true) return 1; if (v > m) m = v; } return m; };
+// pour ce qui se fait d'un coup (un tonneau, une vrille, un virage au grappin) : -1, 0 ou 1, seulement poussé franchement (plus qu'à moitié)
+const franc = x => x > 0.5 ? 1 : x < -0.5 ? -1 : 0;
 const dansLunette = () => visee && !J.voiture && !J.robot && !J.mort && !!ARMES[J.arme].zoom; // on regarde dans la lunette du sniper
 // (sur un écran tactile, le navigateur imite aussi la souris juste après un doigt : on ne l'écoute pas, sinon un toucher tirerait deux fois)
 const doigtRecent = () => tactile && performance.now() - T.dernierDoigt < 1000;
@@ -18485,9 +18488,9 @@ const enCostumeHeros = () => (chezWayne || chezClark) && !sansGadgets();   // au
 const achete = c => !!(chezStark ? stark : chezWayne ? wayne : chezClark ? star : {})[c];   // acheté au magasin du chapitre (stark, wayne, star)
 const armureIron = () => armureDe(J.ironman?.armure);   // la fiche de l'armure d'Iron Man qu'il porte (ARMURES_STARK)
 // H fera-t-il quelque chose ? Au chapitre de Batman ou de Superman, une fois le costume gagné : le mettre (même en l'air), ou l'enlever (posé
-// par terre) ; à pied, pas sur une remontée. Iron Man : son armure vient, ou il en sort (à pied, debout, ou en volant)
+// par terre) ; à pied, pas sur une remontée. Iron Man : son armure vient, ou il en sort (à pied, debout, par terre : en volant, H ne fait rien)
 const peutCostume = () => costumeCivil() && !sansCostume() && libreAPied() && (!tricheHeros().actif || (J.sol && !accroche() && !J.echelle && !J.superman));
-const peutArmure = () => !!J.ironman && !costumeCivil() && !J.ironman.anim && !J.ironman.tour && !sansArmure() && !sansReacteur() && (surPlace() || !!J.superman);
+const peutArmure = () => !!J.ironman && !costumeCivil() && !J.ironman.anim && !J.ironman.tour && !sansArmure() && !sansReacteur() && surPlace();
 // sur un écran tactile : l'objectif, l'aide, la barre du boss... passent dans la colonne du haut, au milieu, qui les empile sur un téléphone
 // en largeur (et s'efface ailleurs : voir #colonne, dans le style)
 function rangerEcran() { for (const id of ['boss', 'tableau', 'objectif', 'aide', 'devinette', 'compteur']) $('colonne').append($(id)); }
@@ -18529,7 +18532,12 @@ function lacherDoigts() { for (const id of [...T.doigts.keys()]) lacherDoigt(id)
 // le joystick : de combien le pouce s'est éloigné de là où il s'est posé, en fractions de REGLAGES.rayonJoystick (0 dans la zone morte)
 function majJoystick(d) {
   const ox = d.x - d.x0, oy = d.y - d.y0, l = Math.hypot(ox, oy), R = R_.rayonJoystick, m = Math.min(1, l / R);
-  const f = T.force = m < R_.zoneMorteJoystick ? 0 : m, fx = l ? ox / l * f : 0, fy = l ? -oy / l * f : 0;   // (vers le haut de l'écran : avancer)
+  const f = T.force = m < R_.zoneMorteJoystick ? 0 : m;
+  // une zone morte par axe (REGLAGES.zoneMorteAxe), en part de la poussée : un pouce poussé tout droit, un peu de travers (moins de 0.25 de
+  // côté, environ 14°), ne va pas du tout de côté ; au-delà, le côté repart de 0, sans saut. La force, elle, ne change pas
+  const z = R_.zoneMorteAxe, axe = c => { const p = Math.abs(c); return p < z ? 0 : Math.sign(c) * (p - z) / (1 - z); };
+  let fx = l ? axe(ox / l) : 0, fy = l ? axe(-oy / l) : 0;   // (vers le haut de l'écran : avancer)
+  const n = Math.hypot(fx, fy); if (n) { fx *= f / n; fy *= f / n; }
   touches.KeyW = Math.max(0, fy); touches.KeyS = Math.max(0, -fy); touches.KeyD = Math.max(0, fx); touches.KeyA = Math.max(0, -fx);
   joystick.firstChild.style.transform = `translate(${l ? ox / l * Math.min(l, R) : 0}px, ${l ? oy / l * Math.min(l, R) : 0}px)`;
   // poussé à fond (REGLAGES.seuilCourse) : il court. Ce n'est pas Maj : seuls la marche (court, dans majJoueur) et le heavy robot le lisent.
@@ -19632,7 +19640,7 @@ function rouler(dt) {
 const figureVol = nom => annonce(tr('{figure} !', { figure: tr(nom).toUpperCase() }), '', 1.5);   // une figure réussie : son nom s'affiche
 function figuresVol(f, dt, roule, boucle, vt = R_.vitesseTonneau, vl = R_.vitesseLooping) {
   const tour = 2 * Math.PI;
-  roule = Math.sign(roule); boucle = Math.sign(boucle);   // (le joystick d'un téléphone poussé à moitié fait le même tonneau)
+  roule = franc(roule); boucle = franc(boucle);   // (le joystick d'un téléphone : poussé franchement, le même tonneau ; un pouce un peu de travers, pas de tonneau)
   if (roule && roule !== f.sensTonneau) { f.sensTonneau = roule; if (f.tonneau) f.tonneau = tour - f.tonneau; }   // dans l'autre sens : le même angle, compté à l'envers
   if (roule && !f.tonneau) bruit(0.25, 1200, 0.5);   // l'air siffle
   if (roule || f.tonneau) {
@@ -20076,7 +20084,7 @@ function redresser(v, dt) {
 // Quand on lâche les touches, il finit son demi-tour (son tour entier, pour un salto) et s'arrête là : il n'y a plus qu'à se recevoir.
 // v.figure : ce qu'il a fait depuis qu'il a décollé (recevoirFigure compte les points)
 function figures(v, dt, gaz, volant) {
-  gaz = Math.sign(gaz); volant = Math.sign(volant);   // (le joystick d'un téléphone poussé à moitié fait la même figure)
+  gaz = franc(gaz); volant = franc(volant);   // (le joystick d'un téléphone : poussé franchement, la même figure ; un peu de travers, rien de plus)
   const f = v.figure ||= { tour: v.tour || 0, cork: 0, grabs: [0, 0, 0], sensTour: 1, sensSalto: 1, envers: Math.cos(v.tour || 0) < 0 };
   const cork = gaz && volant ? gaz : 0;
   // l'angle rond où finir (un multiple de « pas ») : le suivant s'il a déjà fait le quart du chemin, sinon il revient
