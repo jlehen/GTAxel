@@ -219,9 +219,15 @@
   #tactile .signe.pause::after { right: 3px; }
   #tactile .signe.lignes::before { content: ''; left: 1px; right: 1px; top: 2px; height: 3px; background: currentColor; box-shadow: 0 5px 0 currentColor, 0 10px 0 currentColor; }
   /* les boutons qui n'apparaissent que par moments (si, dans BOUTONS_TACTILES) : en bas au milieu, côte à côte */
-  #tactile #boutons-milieu { position: absolute; left: 30%; right: calc(var(--d) + var(--large-boutons, 240px) + 12px); bottom: var(--b);
+  #tactile #boutons-milieu { position: absolute; left: 25%; right: calc(var(--d) + var(--large-boutons, 240px) + 12px); bottom: var(--b);
                              display: flex; flex-wrap: wrap-reverse; justify-content: center; gap: 10px; pointer-events: none; }
   #tactile #boutons-milieu .bouton { position: relative; pointer-events: auto; }
+  /* un bouton de héros : la lettre de sa touche en grand, et dessous, en petit, ce qu'il fait là (« Grappin », « Voler »...) */
+  #tactile .bouton.de-heros { font-size: 20px; line-height: 1; }
+  #tactile .bouton.de-heros small { display: block; margin-top: 1px; font-size: 8.5px; letter-spacing: -0.2px; white-space: nowrap; }
+  /* la devinette du Sphinx (ses réponses) et le tableau de bord de la DeLorean se touchent : par-dessus la couche tactile */
+  .tactile #devinette, .tactile #tableau { z-index: 3; }
+  .tactile #devinette li, .tactile #tableau { pointer-events: auto; cursor: pointer; }
   /* le joystick : un anneau, et un rond qui suit le pouce (--r : REGLAGES.rayonJoystick) */
   #joystick { position: absolute; width: calc(2 * var(--r)); height: calc(2 * var(--r)); margin: calc(-1 * var(--r)) 0 0 calc(-1 * var(--r)); box-sizing: border-box;
               border-radius: 50%; border: 2px solid rgba(255,255,255,.5); background: rgba(0,0,0,.18); display: none; pointer-events: none; }
@@ -252,14 +258,15 @@
      les six boutons à droite */
   #colonne { display: contents; }   /* (ailleurs, ses éléments restent où ils sont) */
   /* (dans la colonne, la barre du boss, la devinette, le tableau de bord et le compteur restent par-dessus les voiles : rouge, fumée, givre...) */
-  .tactile #boss, .tactile #devinette, .tactile #tableau, .tactile #compteur { z-index: 1; }
+  .tactile #boss, .tactile #compteur { z-index: 1; }   /* (la devinette et le tableau de bord, eux, se touchent : par-dessus la couche tactile, plus haut) */
   @media (max-height: 500px) {
     .tactile #minicarte { left: var(--g); top: calc(var(--h) + 52px); bottom: auto; width: 120px; height: 120px; border-width: 2px; }
     .tactile #barre-armure { left: var(--g); top: calc(var(--h) + 178px); bottom: auto; width: 124px; height: 5px; }
     .tactile #barre-vie { left: var(--g); top: calc(var(--h) + 185px); bottom: auto; width: 124px; height: 7px; }
     .tactile #barre-gilet { left: var(--g); top: calc(var(--h) + 194px); bottom: auto; width: 124px; height: 4px; }
-    .tactile #batterie { left: var(--g); top: calc(var(--h) + 204px); height: min(70px, 100% - 300px); }
-    .tactile #casque { left: calc(var(--g) + 62px); right: auto; top: calc(var(--h) + 204px); height: min(70px, 100% - 300px); }
+    .tactile #batterie { left: var(--g); top: calc(var(--h) + 204px); height: min(84px, 100% - 270px); }
+    /* l'affichage du casque, trop petit pour ses lignes de texte : seulement le haut, le nom de l'armure et sa silhouette (chaque partie de sa couleur) */
+    .tactile #casque { left: calc(var(--g) + 70px); right: auto; top: calc(var(--h) + 204px); height: 72px; width: 84px; object-fit: cover; object-position: 50% 0; }
     .tactile #haut-droite { right: var(--d); top: var(--h); max-width: 230px; }
     .tactile #heure { font-size: 15px; }
     .tactile #argent { font-size: 24px; line-height: 1.15; }
@@ -291,7 +298,7 @@
     .tactile #compteur { font-size: 10px; }
     .tactile #annonce { top: 40%; left: calc(var(--g) + 150px); right: calc(var(--d) + 240px); font-size: 30px; }
     .tactile #annonce small, .tactile #hud.casque #annonce small { font-size: 15px; padding: 0; }
-    .tactile #bulle { left: calc(var(--g) + 150px); right: calc(var(--d) + 240px); top: 58%; width: fit-content; max-width: none; margin: 0 auto;
+    .tactile #bulle { left: calc(var(--g) + 150px); right: calc(var(--d) + 240px); top: auto; bottom: calc(var(--b) + var(--haut-milieu, 0px) + 10px); width: fit-content; max-width: none; margin: 0 auto;
                       font-size: 14px; padding: 6px 12px 8px; border-width: 2px; }
     .tactile #bulle h3 { font-size: 18px; }
     .tactile #wasted { top: 30%; font-size: 56px; letter-spacing: 4px; }
@@ -723,6 +730,44 @@ const TRADUCTIONS = {
   'Touche une ligne pour la choisir · le bouton {touche}, en haut à gauche, ferme le menu': { de: 'Tipp eine Zeile an, um sie zu wählen · der Knopf {touche} oben links schließt das Menü',
     en: 'Tap a line to choose it · the {touche} button, top left, closes the menu', gsw: 'Tipp e Ziile aa, zum si uuswähle · de Chnopf {touche} obe links macht s Menü zue' },
   'Tourne ton téléphone':     { de: 'Dreh dein Handy quer', en: 'Turn your phone sideways', gsw: 'Dräi dis Händy quer' },
+  // les boutons des héros (BOUTONS_TACTILES, zone 'milieu') : ce qui est écrit en petit sous la lettre ; A, la main gauche d'Iron Man, est la
+  // touche Q d'un clavier allemand ou anglais (comme dans « A Z E », qui y devient « Q W E »)
+  'A':                        { de: 'Q', en: 'Q', gsw: 'Q' },
+  'Costume':                  { de: 'Kostüm', en: 'Suit', gsw: 'Kostüm' },
+  'Voler':                    { de: 'Fliegen', en: 'Fly', gsw: 'Flüüge' },
+  'Fusées':                   { de: 'Raketen', en: 'Rockets', gsw: 'Rakete' },
+  'Bouclier':                 { de: 'Schild', en: 'Shield', gsw: 'Schild' },
+  'Répulseur':                { de: 'Repulsor', en: 'Repulsor', gsw: 'Repulsor' },
+  'Toile':                    { de: 'Netz', en: 'Web', gsw: 'Netz' },
+  'Soulever':                 { de: 'Heben', en: 'Lift', gsw: 'Lupfe' },
+  'Reposer':                  { de: 'Absetzen', en: 'Put down', gsw: 'Abstelle' },
+  'Gel':                      { de: 'Gel', en: 'Gel', gsw: 'Gel' },
+  'Souffle':                  { de: 'Eisatem', en: 'Breath', gsw: 'Iisatem' },
+  'Rafale':                   { de: 'Salve', en: 'Burst', gsw: 'Salve' },
+  'Vitesse':                  { de: 'Tempo', en: 'Speed', gsw: 'Tempo' },
+  'Câble':                    { de: 'Seil', en: 'Cable', gsw: 'Seil' },
+  'Turbo':                    { de: 'Turbo', en: 'Turbo', gsw: 'Turbo' },
+  'Saut':                     { de: 'Sprung', en: 'Jump', gsw: 'Gump' },
+  'Virage':                   { de: 'Kurve', en: 'Turn', gsw: 'Kurve' },
+  'Peaux':                    { de: 'Felle', en: 'Skins', gsw: 'Fäll' },
+  'Batmobile':                { de: 'Batmobil', en: 'Batmobile', gsw: 'Batmobil' },
+  'Cri':                      { de: 'Schrei', en: 'Shout', gsw: 'Schrei' },
+  'Fumigène':                 { de: 'Rauch', en: 'Smoke', gsw: 'Rauch' },
+  'Krypto':                   { de: 'Krypto', en: 'Krypto', gsw: 'Krypto' },
+  'Détective':                { de: 'Detektiv', en: 'Detective', gsw: 'Detektiv' },
+  'Rayons X':                 { de: 'Röntgen', en: 'X-ray', gsw: 'Röntge' },
+  'Masque':                   { de: 'Maske', en: 'Mask', gsw: 'Maske' },
+  'Armes':                    { de: 'Waffen', en: 'Weapons', gsw: 'Waffe' },
+  'Boutons des héros':        { de: 'Heldenknöpfe', en: 'Hero buttons', gsw: 'Heldechnöpf' },
+  "en bas au milieu, seulement quand ils servent : la lettre de leur touche (H, F, G...), et dessous ce qu'ils font": {
+    de: 'unten in der Mitte, nur wenn man sie braucht: der Buchstabe ihrer Taste (H, F, G...), und darunter, was sie tun',
+    en: "at the bottom in the middle, only when they are useful: the letter of their key (H, F, G...), and below it what they do",
+    gsw: 'unde i de Mitti, nume wänn mer si bruucht: de Buechstabe vo ihrere Taschte (H, F, G...), und drunder, was si mached' },
+  'Touche ta réponse. Attention : une mauvaise réponse déclenche un piège !': { de: 'Tipp deine Antwort an. Achtung: Eine falsche Antwort löst eine Falle aus!',
+    en: 'Tap your answer. Careful: a wrong answer springs a trap!', gsw: 'Tipp dini Antwort aa. Pass uf: E falschi Antwort löst e Falle us!' },
+  'Touche ta réponse dans la devinette': { de: 'Tipp deine Antwort im Rätsel an', en: 'Tap your answer in the riddle', gsw: 'Tipp dini Antwort im Rätsel aa' },
+  'Touche ce tableau pour changer de destination · 88 MPH pendant {n} s : partir': { de: 'Tipp diese Anzeige an, um das Ziel zu wechseln · {n} s lang 88 MPH: losfahren',
+    en: 'Tap this panel to change destination · 88 MPH for {n} s: go', gsw: 'Tipp die Aazeig aa, zum s Ziil wächsle · {n} s lang 88 MPH: abfahre' },
   // les boutons (BOUTONS_TACTILES), et la liste des commandes tactiles du menu (COMMANDES_TACTILES)
   'Pause':                    { de: 'Pause', en: 'Pause', gsw: 'Pause' },
   'Joystick':                 { de: 'Joystick', en: 'Joystick', gsw: 'Joystick' },
@@ -3592,6 +3637,7 @@ const REGLAGES = {
   joystickLent: 0.35,        // à pied, B.J. va aussi vite que le joystick est poussé (à moitié : la moitié de sa vitesse), mais jamais moins que ça (0.35 = 35 %)
   seuilCourse: 0.9,          // à pied, le joystick poussé à plus de ça (0.9 = 90 %) : il court, comme avec Maj (en volant, en voiture, à ski : c'est le bouton Maj)
   tailleBoutons: 56,         // points : la taille des boutons (Tirer est plus gros : voir gros, dans BOUTONS_TACTILES)
+  tailleHeros: 0.8,          // les boutons des héros (en bas au milieu, seulement quand ils servent) : autant de fois la taille des autres (0.8 = 45 points)
   moonwalk: [3, 1, 2],       // la danse, en secondes : le moonwalk, la toupie, puis la pose « Who's bad ? »
   vitesseMoonwalk: 1.5,      // m/s, à reculons
   vitesseVol: 12,            // Superman (touche F ; ou l'astuce cachée, Maj 3 fois de suite, partout) : m/s en volant...
@@ -3713,6 +3759,16 @@ const MENU_JEU = [
 //  surCarte: true : il reste là quand la grande carte est ouverte
 //  si : il n'apparaît que quand cette fonction dit oui (par exemple { nom: 'H', touche: 'KeyH', zone: 'milieu', si: () => !J.voiture } :
 //    seulement à pied). Pour en ajouter un : une ligne de plus !
+//  dit : pour les boutons des héros, ce qui est écrit en petit sous la lettre de la touche (« Grappin », « Voler »...) ; allume : il est jaune
+//    quand cette fonction dit oui (une vision allumée, la super-vitesse...)
+//  LES BOUTONS DES HÉROS ('milieu') n'apparaissent que quand ils servent. Une même touche qui fait autre chose selon le héros : une ligne par
+//  cas, chacune avec son « si ». Pour écrire un « si », ces petites questions servent souvent (voir « Les commandes tactiles », dans le code) :
+//    libreAPied() : il est à pied (ni en voiture, ni dans un robot, ni sur une remontée, ni dans le monorail, ni mort)
+//    enCostumeHeros() : au chapitre de Batman ou de Superman, il a mis son costume (H)
+//    achete('gel') : c'est acheté au magasin de son chapitre (Stark Industries, Lucius Fox, S.T.A.R. Labs : voir leurs tableaux)
+//    ironmanLibre() : dans l'armure d'Iron Man, à pied ou en volant ; armureIron() : la fiche de l'armure qu'il porte (ARMURES_STARK)
+//    supermanLibre() : il peut voler comme Superman ; pouvoir('grappin') : un code allumé (ou son costume) lui donne ce pouvoir
+//    chezStark, chezWayne, chezClark : au chapitre d'Iron Man, de Batman, de Superman ; J.voiture : la voiture où il est
 // =====================================================================
 const BOUTONS_TACTILES = [
   // sous le pouce droit : Tirer (le plus gros), viser, sauter, courir, s'accroupir, et E
@@ -3728,6 +3784,50 @@ const BOUTONS_TACTILES = [
   { nom: 'Pause', touche: 'Pause', signe: '.pause', zone: 'haut', place: [0, 0], gros: 0.8, surCarte: true, fait: 'pause (le menu)' },
   { nom: 'M', touche: 'KeyM', zone: 'haut', place: [0.9, 0], gros: 0.8, surCarte: true, fait: 'la carte du pays : un doigt la déplace, deux doigts zooment, M la ferme' },
   { nom: 'Tab', touche: REGLAGES.toucheMenu, signe: '.lignes', zone: 'haut', place: [1.8, 0], gros: 0.8, fait: 'le petit menu (changer de vue, DeLorean, code de triche…) : touche une ligne' },
+  // les boutons des héros, en bas au milieu, dans cet ordre (la rangée du bas d'abord), seulement quand ils servent
+  // H : mettre ou enlever son costume (Batman, Superman), appeler son armure ou en sortir (Iron Man)
+  { nom: 'H', dit: 'Costume', touche: 'KeyH', zone: 'milieu', si: () => peutCostume() },
+  { nom: 'H', dit: 'Armure', touche: 'KeyH', zone: 'milieu', si: () => peutArmure() },
+  // F : voler, ou arrêter de voler (Iron Man, Superman) ; dans l'armure du camp militaire : les fusées
+  { nom: 'F', dit: 'Voler', touche: 'KeyF', zone: 'milieu', si: () => ironmanLibre() || (supermanLibre() && !sansGadgets()) },
+  { nom: 'F', dit: 'Fusées', touche: 'KeyF', zone: 'milieu', si: () => !!J.robot?.armure },
+  // A : la main gauche d'Iron Man (garde le doigt dessus) : le bouclier de la Mark 50, ou le répulseur. (La main droite, c'est E)
+  { nom: 'A', dit: 'Bouclier', touche: 'KeyQ', zone: 'milieu', si: () => ironmanLibre() && !!armureIron().bouclier },
+  { nom: 'A', dit: 'Répulseur', touche: 'KeyQ', zone: 'milieu', si: () => ironmanLibre() && !armureIron().bouclier },
+  // G : les mini-missiles d'Iron Man, le grappin de Batman, la toile de Spiderman (garde le doigt dessus), la super-force de Superman
+  { nom: 'G', dit: 'Missiles', touche: 'KeyG', zone: 'milieu', si: () => ironmanLibre() && chezStark && achete('missiles') },
+  { nom: 'G', dit: 'Grappin', touche: 'KeyG', zone: 'milieu', si: () => pouvoir('grappin') && libreAPied() && !(ironmanLibre() && chezStark) },
+  { nom: 'G', dit: 'Toile', touche: 'KeyG', zone: 'milieu', si: () => pouvoir('toile') && !pouvoir('grappin') && libreAPied() },
+  { nom: 'G', dit: 'Soulever', touche: 'KeyG', zone: 'milieu', si: () => chezClark && enCostumeHeros() && libreAPied() && !souleve && !kryptoniteTenue },
+  { nom: 'G', dit: 'Reposer', touche: 'KeyG', zone: 'milieu', si: () => chezClark && !!(souleve || kryptoniteTenue) },
+  // X : le laser des bras d'Iron Man (par terre), le gel explosif de Batman (X encore : boum !), le souffle glacé de Superman
+  { nom: 'X', dit: 'Laser', touche: 'KeyX', zone: 'milieu', si: () => ironmanLibre() && chezStark && achete('laser') && J.sol && !J.superman },
+  { nom: 'X', dit: 'Gel', touche: 'KeyX', zone: 'milieu', si: () => chezWayne && enCostumeHeros() && achete('gel') && !wayne.gelPose && libreAPied() },
+  { nom: 'X', dit: 'BOUM !', touche: 'KeyX', zone: 'milieu', si: () => chezWayne && !!wayne.gelPose },
+  { nom: 'X', dit: 'Souffle', touche: 'KeyX', zone: 'milieu', si: () => chezClark && enCostumeHeros() && achete('glace') && !J.voiture && !J.robot },
+  // R : le plastron d'Iron Man (ou la mitrailleuse d'épaule de War Machine, garde le doigt dessus), la super-vitesse de Superman, et dans
+  // les véhicules : les ailes de la Batmobile (et du Bat), le câble du Batpod, le turbo, le saut, le virage au grappin, les peaux des skis de rando
+  { nom: 'R', dit: 'Plastron', touche: 'KeyR', zone: 'milieu', si: () => ironmanLibre() && !armureIron().mitrailleuse },
+  { nom: 'R', dit: 'Rafale', touche: 'KeyR', zone: 'milieu', si: () => ironmanLibre() && !!armureIron().mitrailleuse },
+  { nom: 'R', dit: 'Vitesse', touche: 'KeyR', zone: 'milieu', si: () => chezClark && enCostumeHeros() && achete('vitesse') && !J.voiture, allume: () => star.superVitesse },
+  { nom: 'R', dit: 'Voler', touche: 'KeyR', zone: 'milieu', si: () => !!J.voiture?.type.vitesseVol, allume: () => !!J.voiture?.envole },
+  { nom: 'R', dit: 'Câble', touche: 'KeyR', zone: 'milieu', si: () => !!J.voiture?.type.cable },
+  { nom: 'R', dit: 'Turbo', touche: 'KeyR', zone: 'milieu', si: () => !!J.voiture?.type.turbo },
+  { nom: 'R', dit: 'Saut', touche: 'KeyR', zone: 'milieu', si: () => !!J.voiture?.type.saut },
+  { nom: 'R', dit: 'Virage', touche: 'KeyR', zone: 'milieu', si: () => !!J.voiture?.type.grappin },
+  { nom: 'R', dit: 'Peaux', touche: 'KeyR', zone: 'milieu', si: () => !!J.voiture?.forme.rando && !J.telesiege, allume: () => !!J.voiture?.montee },
+  // B : la Batmobile arrive à côté de toi (Batman en costume, dès qu'il en a une ; ou le code BATMAN) ; le super-cri de Superman
+  { nom: 'B', dit: 'Batmobile', touche: 'KeyB', zone: 'milieu', si: () => !chezClark && TRICHES.some(t => t.actif && t.voiture) && !sansBatmobile() && libreAPied() },
+  { nom: 'B', dit: 'Cri', touche: 'KeyB', zone: 'milieu', si: () => chezClark && enCostumeHeros() && achete('cri') && !J.voiture && !J.robot },
+  // K : un fumigène (Batman) ; Krypto, le super-chien (Superman : il vient, ou il rentre)
+  { nom: 'K', dit: 'Fumigène', touche: 'KeyK', zone: 'milieu', si: () => chezWayne && enCostumeHeros() && achete('fumigene') && libreAPied() },
+  { nom: 'K', dit: 'Krypto', touche: 'KeyK', zone: 'milieu', si: () => chezClark && achete('krypto'), allume: () => star.kryptoLa },
+  // O : la vision de détective (Batman), la vision à rayons X (Superman)
+  { nom: 'O', dit: 'Détective', touche: 'KeyO', zone: 'milieu', si: () => chezWayne && (wayne.detective || (enCostumeHeros() && achete('vision'))), allume: () => wayne.detective },
+  { nom: 'O', dit: 'Rayons X', touche: 'KeyO', zone: 'milieu', si: () => chezClark && (star.voitRayonsX || (enCostumeHeros() && achete('rayonsX'))), allume: () => star.voitRayonsX },
+  // L : le masque d'Iron Man (au chapitre d'Iron Man, il est dans le petit menu) ; 9 : les armes des héros (yeux laser, batarangs, filets, toile...)
+  { nom: 'L', dit: 'Masque', touche: 'KeyL', zone: 'milieu', si: () => ironmanLibre() && !chezStark },
+  { nom: '9', dit: 'Armes', touche: 'Digit9', zone: 'milieu', si: () => !J.voiture && !J.robot && ARMES.some((a, i) => pouvoirArme(a) && J.possede[i]) },
 ];
 // la liste des commandes du menu de pause, sur un écran tactile (à la place de celle des touches du clavier) : ces lignes (ce qu'on touche,
 // ce que ça fait), puis une ligne par bouton de BOUTONS_TACTILES qui a un « fait »
@@ -3735,6 +3835,7 @@ const COMMANDES_TACTILES = [
   ['Joystick', "pose le pouce gauche n'importe où à gauche : c'est Z Q S D (se déplacer / conduire) ; poussé à fond, tu cours"],
   ['Doigt qui glisse', "ailleurs sur l'écran : c'est la souris (regarder)"],
   ['Nom de ton arme', "en haut à droite : touche-le pour changer d'arme (comme la molette)"],
+  ['Boutons des héros', "en bas au milieu, seulement quand ils servent : la lettre de leur touche (H, F, G...), et dessous ce qu'ils font"],
 ];
 
 // =====================================================================
@@ -5966,6 +6067,7 @@ if (tactile) boiteTriches.querySelector('table').addEventListener('click', e => 
   let code = t.code;
   if (t.action?.length) {   // une action qui attend un nombre (MISSION8, CHAPITRE2)
     const n = prompt(tr('Quel numéro ? ({texte})', { texte: tr(t.texte) }))?.trim();
+    T.horsPleinEcran = performance.now() + 2000;   // (la petite fenêtre fait quitter le plein écran, et le navigateur le dit un peu plus tard : pas une raison de remettre en pause)
     if (!/^\d+$/.test(n || '')) return;
     code += n;
   }
@@ -18346,16 +18448,17 @@ function mettreEnPause() {
 // T.mode : '' (pas en jeu), 'jeu', 'carte' (la grande carte ouverte), 'tourne' (le téléphone est debout) ;
 // T.doigts : chaque doigt posé, { role: 'joystick', 'regard', 'carte' ou 'bouton', x, y (où il est), x0, y0 (où il s'est posé), b (son bouton) } ;
 // T.joystick : le doigt du joystick (ou null) ; T.force : de combien il est poussé (0 à 1) ; T.court : poussé à fond, il fait courir ; T.viseeTenue : le doigt tient le bouton Viser (en voiture, il ne bascule pas) ;
-// T.dernierDoigt : quand un doigt a touché l'écran (voir doigtRecent) ; T.pleinEcran : le jeu a obtenu le plein écran
+// T.dernierDoigt : quand un doigt a touché l'écran (voir doigtRecent) ; T.pleinEcran : le jeu a obtenu le plein écran ;
+// T.prochainSi : quand regarder de nouveau quels boutons des héros servent (voir majTactile) ; T.horsPleinEcran : jusqu'à quand une sortie du plein écran ne met pas en pause
 // ---------------------------------------------------------------------
-const T = { mode: '', doigts: new Map(), joystick: null, force: 0, court: false, viseeTenue: false, dernierDoigt: -1e9, pleinEcran: false, boutons: [], allume: false };
+const T = { mode: '', doigts: new Map(), joystick: null, force: 0, court: false, viseeTenue: false, dernierDoigt: -1e9, pleinEcran: false, boutons: [], allume: false, prochainSi: 0, horsPleinEcran: 0 };
 const couche = $('tactile'), joystick = $('joystick'), enPortrait = matchMedia('(orientation: portrait) and (max-width: 600px)');   // (un téléphone tenu debout ; une tablette debout, elle, se joue)
 // les boutons, d'après BOUTONS_TACTILES : un div chacun (ceux du milieu, dans leur rangée)
 for (const def of BOUTONS_TACTILES) {
   const el = document.createElement('div');
   el.className = `bouton zone-${def.zone || 'droite'}` + (def.surCarte ? ' sur-carte' : '');
   (def.zone === 'milieu' ? $('boutons-milieu') : couche).append(el);
-  T.boutons.push({ def, el, vu: !def.si });
+  T.boutons.push({ def, el, vu: !def.si, allume: false });
   if (def.si) el.style.display = 'none';
 }
 // leur nom (dans la langue choisie), leur taille et leur place (REGLAGES.tailleBoutons) : en entrant dans le jeu (on a peut-être changé de
@@ -18364,16 +18467,27 @@ function placerBoutons() {
   const u = R_.tailleBoutons;
   let haut = 0, large = 0;
   for (const { def, el } of T.boutons) {
-    const t = u * (def.gros || 1), [x, y] = def.place || [0, 0], s = el.style, nom = tr(def.nom), signe = def.signe || '';
-    el.innerHTML = (!signe ? '' : signe[0] === '.' ? `<i class="signe ${signe.slice(1)}"></i>` : `<i class="signe">${signe}</i>`) + `<span>${nom}</span>`;
-    el.classList.toggle('court', nom.length <= 3 && !signe);
+    const t = u * (def.gros || (def.zone === 'milieu' ? R_.tailleHeros : 1)), [x, y] = def.place || [0, 0], s = el.style, nom = tr(def.nom), signe = def.signe || '';
+    el.innerHTML = (!signe ? '' : signe[0] === '.' ? `<i class="signe ${signe.slice(1)}"></i>` : `<i class="signe">${signe}</i>`) + `<span>${nom}</span>`
+      + (def.dit ? `<small>${tr(def.dit)}</small>` : '');   // (un bouton de héros : la lettre de sa touche, et dessous ce qu'il fait là)
+    el.classList.toggle('court', nom.length <= 3 && !signe); el.classList.toggle('de-heros', !!def.dit);
     s.setProperty('--t', t + 'px');
     if (def.zone === 'haut') { s.left = `calc(var(--g) + ${x * u}px)`; s.top = `calc(var(--h) + ${y * u}px)`; }
     else if (def.zone !== 'milieu') { s.right = `calc(var(--d) + ${x * u}px)`; s.bottom = `calc(var(--b) + ${y * u}px)`; haut = Math.max(haut, y * u + t); large = Math.max(large, x * u + t); }
   }
   couche.style.setProperty('--r', R_.rayonJoystick + 'px');
   $('hud').style.setProperty('--haut-boutons', haut + 'px'); $('hud').style.setProperty('--large-boutons', large + 'px');
+  T.prochainSi = 0;
 }
+// Les petites questions des « si » de BOUTONS_TACTILES (les boutons des héros), pour qu'ils restent courts
+const libreAPied = () => !J.voiture && !J.robot && !J.telesiege && !J.monorail && !J.mort;   // à pied (ou en l'air, ou dans l'eau)
+const enCostumeHeros = () => (chezWayne || chezClark) && !sansGadgets();   // au chapitre de Batman ou de Superman, en costume
+const achete = c => !!(chezStark ? stark : chezWayne ? wayne : chezClark ? star : {})[c];   // acheté au magasin du chapitre (stark, wayne, star)
+const armureIron = () => armureDe(J.ironman?.armure);   // la fiche de l'armure d'Iron Man qu'il porte (ARMURES_STARK)
+// H fera-t-il quelque chose ? Au chapitre de Batman ou de Superman, une fois le costume gagné : le mettre (même en l'air), ou l'enlever (posé
+// par terre) ; à pied, pas sur une remontée. Iron Man : son armure vient, ou il en sort (à pied, debout, ou en volant)
+const peutCostume = () => costumeCivil() && !sansCostume() && libreAPied() && (!tricheHeros().actif || (J.sol && !accroche() && !J.echelle && !J.superman));
+const peutArmure = () => !!J.ironman && !costumeCivil() && !J.ironman.anim && !J.ironman.tour && !sansArmure() && !sansReacteur() && (surPlace() || !!J.superman);
 // sur un écran tactile : l'objectif, l'aide, la barre du boss... passent dans la colonne du haut, au milieu, qui les empile sur un téléphone
 // en largeur (et s'efface ailleurs : voir #colonne, dans le style)
 function rangerEcran() { for (const id of ['boss', 'tableau', 'objectif', 'aide', 'devinette', 'compteur']) $('colonne').append($(id)); }
@@ -18426,7 +18540,7 @@ function majJoystick(d) {
 // et dans le heavy robot ou l'armure (où le clic droit tire, crache les flammes ou fait un grab), seulement tant qu'on tient le doigt dessus
 function enfoncer(b) {
   const t = b.def.touche;
-  b.el.classList.add('appuye');
+  b.el.classList.add('appuye'); T.prochainSi = 0;   // (les boutons des héros changent peut-être : un costume, un vol...)
   if (t === 'ClicGauche') sourisG = true;
   else if (t === 'ClicDroit') { if (J.voiture || J.robot) { visee = T.viseeTenue = true; } else visee = !visee; }
   else if (t === 'Pause') mettreEnPause();
@@ -18434,7 +18548,7 @@ function enfoncer(b) {
 }
 function relacherBouton(b) {
   const t = b.def.touche;
-  b.el.classList.remove('appuye');
+  b.el.classList.remove('appuye'); T.prochainSi = 0;
   if (t === 'ClicGauche') { sourisG = false; dejaTire = false; }   // (comme mouseup : une arme au coup par coup retirera au prochain appui)
   else if (t === 'ClicDroit') { if (T.viseeTenue) visee = T.viseeTenue = false; }
   else if (t !== 'Pause') relacherTouche(t);
@@ -18455,6 +18569,9 @@ function bougerCarte(d, x, y) {
 $('arme').addEventListener('pointerdown', e => { if (!tactile || !enJeu || carte.ouverte) return; e.preventDefault(); T.dernierDoigt = performance.now(); armeSuivante(1); });
 // les lignes du petit menu (Tab) se touchent
 $('menu-jeu').addEventListener('click', e => { const l = e.target.closest('[data-n]'); if (tactile && l) choisirMenuJeu(+l.dataset.n); });
+// une réponse à la devinette du Sphinx se touche : comme sa touche (1, 2 ou 3) ; le tableau de bord de la DeLorean aussi : comme T
+$('devinette').addEventListener('click', e => { const li = e.target.closest('li'); if (tactile && enJeu && li) taper('Digit' + ([...li.parentNode.children].indexOf(li) + 1)); });
+$('tableau').addEventListener('click', () => { if (tactile && enJeu) taper('KeyT'); });
 // à chaque image : la couche tactile suit le jeu (cachée dans le menu, réduite au bouton de la carte sur la grande carte, le voile quand le
 // téléphone est debout), les boutons qui n'apparaissent que par moments (si), Viser qui s'éteint tout seul. On ne touche à la page que
 // quand quelque chose change : presque rien à chaque image
@@ -18472,7 +18589,17 @@ function majTactile() {
   if (mode !== 'jeu') return;
   if (visee && !T.viseeTenue && (J.voiture || J.robot || J.mort)) visee = false;   // Viser allumé à pied : il s'éteint en montant en voiture, ou en mourant
   if (visee !== T.allume) { T.allume = visee; T.boutons.find(b => b.def.touche === 'ClicDroit')?.el.classList.toggle('allume', visee); }
-  for (const b of T.boutons) if (b.def.si) { const vu = !!b.def.si(); if (vu !== b.vu) { b.vu = vu; b.el.style.display = vu ? '' : 'none'; if (!vu) for (const [id, d] of T.doigts) if (d.b === b) lacherDoigt(id); } }
+  // les boutons des héros : cinq fois par seconde (et juste après un bouton enfoncé), pas à chaque image. Un bouton qui disparaît sous un
+  // doigt est relâché ; quand la rangée du milieu change, sa hauteur (--haut-milieu) remonte la bulle d'aide au-dessus d'elle
+  const t = performance.now();
+  if (t < T.prochainSi) return;
+  T.prochainSi = t + 200;
+  let change = false;
+  for (const b of T.boutons) {
+    if (b.def.si) { const vu = !!b.def.si(); if (vu !== b.vu) { b.vu = vu; change = true; b.el.style.display = vu ? '' : 'none'; if (!vu) for (const [id, d] of T.doigts) if (d.b === b) lacherDoigt(id); } }
+    if (b.def.allume && b.vu) { const a = !!b.def.allume(); if (a !== b.allume) { b.allume = a; b.el.classList.toggle('allume', a); } }
+  }
+  if (change) $('hud').style.setProperty('--haut-milieu', $('boutons-milieu').offsetHeight + 'px');
 }
 // le plein écran, puis le paysage (sur un téléphone, au premier toucher du jeu) : refusés ou impossibles (un iPhone n'a ni l'un ni l'autre), on joue quand même
 function pleinEcran() {
@@ -18486,7 +18613,7 @@ function pleinEcran() {
 document.addEventListener('visibilitychange', () => { if (tactile && document.hidden && enJeu) mettreEnPause(); });
 document.addEventListener('fullscreenchange', () => {
   if (!tactile || document.fullscreenElement) return;
-  if (T.pleinEcran && enJeu) mettreEnPause();
+  if (T.pleinEcran && enJeu && performance.now() > T.horsPleinEcran) mettreEnPause();   // (horsPleinEcran : voir la liste des codes, où MISSION demande son numéro)
   T.pleinEcran = false;
 });
 // « Taper un code de triche », sans clavier : la pause, et la liste des codes du menu, ouverte, à l'écran (on y touche un code : voir boiteTriches)
@@ -26147,7 +26274,7 @@ function dessinerDevinette() {
     el.querySelector('h3').textContent = tr('LE SPHINX · DEVINETTE N° {k} SUR {n}', { k: D.k + 1, n: DEVINETTES.length });
     el.querySelector('p').textContent = tr(Q.question);
     el.querySelectorAll('li').forEach((li, k) => { li.innerHTML = `<b>${k + 1}</b>${tr(Q.reponses[k] || '')}`; li.className = D.barrees.includes(k + 1) ? 'barree' : ''; li.style.display = Q.reponses[k] ? '' : 'none'; });
-    el.querySelector('small').textContent = tr('Appuie sur 1, 2 ou 3 pour répondre. Attention : une mauvaise réponse déclenche un piège !');
+    el.querySelector('small').textContent = tr(tactile ? 'Touche ta réponse. Attention : une mauvaise réponse déclenche un piège !' : 'Appuie sur 1, 2 ou 3 pour répondre. Attention : une mauvaise réponse déclenche un piège !');   // (sur un écran tactile, les réponses se touchent)
   }
   el.style.display = 'block';
 }
@@ -28872,7 +28999,7 @@ function majTableau() {
   }
   el.querySelector('.mph span').textContent = `${Math.round(Math.abs(v.vitesse) * 2.237)} MPH`;   // (1 m/s = 2,237 miles à l'heure)
   el.querySelector('.barre div').style.width = `${Math.min(1, (v.charge || 0) / R_.dureeVoyage) * 100}%`;
-  el.querySelector('.aide').innerHTML = destination ? tr('<b>T</b> : changer de destination · 88 MPH pendant {n} s : partir', { n: R_.dureeVoyage }) : tr("Retrouve d'abord la DeLorean de ce chapitre pour voyager");
+  el.querySelector('.aide').innerHTML = destination ? tr(tactile ? 'Touche ce tableau pour changer de destination · 88 MPH pendant {n} s : partir' : '<b>T</b> : changer de destination · 88 MPH pendant {n} s : partir', { n: R_.dureeVoyage }) : tr("Retrouve d'abord la DeLorean de ce chapitre pour voyager");
 }
 
 // =====================================================================
@@ -29260,7 +29387,7 @@ function majHUD(dt) {
     : aPied && antenneProche() ? tr("Appuie sur <b>E</b> pour brouiller l'antenne")          // (mission « Les pingouins-missiles »)
     : aPied && bombeProche() ? tr('Appuie sur <b>E</b> pour désamorcer la bombe')              // (mission « Pile ou face »)
     : J.voiture && J.voiture === bombeBane?.v && bombeBane.phase === 'emporte' && bombeBane.assezLoin ? tr('Appuie sur <b>E</b> pour sauter du Bat')   // (mission « La bombe de Bane »)
-    : devinette?.affiche ? tr('Appuie sur <b>1</b>, <b>2</b> ou <b>3</b> pour répondre à la devinette')   // (mission « Les devinettes du Sphinx »)
+    : devinette?.affiche ? tr(tactile ? 'Touche ta réponse dans la devinette' : 'Appuie sur <b>1</b>, <b>2</b> ou <b>3</b> pour répondre à la devinette')   // (mission « Les devinettes du Sphinx »)
     : ar ? tr('Clic gauche : mitrailleuse · clic droit : lance-flammes · <b>F</b> : fusées · <b>E</b> : sortir')
     : !aPied ? (faitFigures(J.voiture) ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping') : J.voiture?.type.cable ? tr('<b>R</b> : le câble (la voiture juste devant toi se retourne)') : '')
     : lit ? (sommeil ? '' : etoiles > 0 ? tr("Sème d'abord la police, puis reviens dormir") : tr(MOMENTS[journee.moment].dormir))   // dans sa villa, près du lit
@@ -29284,7 +29411,7 @@ function majHUD(dt) {
     : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape')
     : !J.sol && !J.nage && !J.superman && !J.voiture && J.vy < -6 && sansGadgets() && !sansCostume() ? tr(chezClark ? 'En civil, tu ne voles pas : <b>H</b>, ton costume, puis <b>F</b> !' : 'Pas de cape en civil : <b>H</b>, ton costume, et tu planes !')
     : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping')   // en volant : les figures
-    : ironmanLibre() ? aideIronman() : '';   // dans l'armure d'Iron Man
+    : ironmanLibre() && !tactile ? aideIronman() : '';   // dans l'armure d'Iron Man (sur un écran tactile, ses boutons le disent déjà)
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
   majBarreBoss();   // Iron Monger : sa barre de vie, en haut de l'écran
   dessinerCasque(dt);   // dans l'armure d'Iron Man : sa batterie et ses parties

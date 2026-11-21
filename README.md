@@ -67,12 +67,14 @@ Ouvre la même adresse dans le navigateur du téléphone. Le jeu se met tout seu
 | | **Espace**, **Maj**, **C**, **E** | Les mêmes touches |
 | En haut à gauche | **Pause** ; **M**, la carte (un doigt la déplace, deux doigts zooment, touche « Légende + » pour la légende, **M** la ferme) ; **Tab**, le petit menu (touche une ligne) | Échap, M, Tab |
 | En haut à droite | Le nom de ton arme : l'arme suivante | La molette |
+| En bas au milieu | Les **boutons des héros**, seulement quand ils servent : la lettre de la touche, et dessous ce qu'elle fait (**G** Grappin, **F** Voler, **H** Costume…) | H, F, A, G, X, R, B, K, O, L, 9 |
 
 - Chaque bouton porte le nom de la touche qu'il remplace : quand le jeu dit « Appuie sur **E** », touche le bouton **E**. Le joystick, le regard et un bouton marchent en même temps (deux pouces, et un doigt de plus).
 - Les codes de triche : dans le petit menu (**Tab**), « Codes de triche » ouvre la liste des codes. Touche un code pour l'allumer (il devient jaune), retouche-le pour l'éteindre ; ce qu'il fait s'écrit juste en dessous. **MISSION** et **CHAPITRE** te demandent leur numéro.
 - La pause : le bouton pause, ou tout seul quand tu quittes le jeu (un appel, une autre appli). Touche le bouton jaune pour continuer. Le menu de pause liste tous les boutons.
 - Le jeu prend tout l'écran (sur Android). Sur un **iPhone**, ce n'est pas possible depuis Safari : touche le bouton de partage, puis **Sur l'écran d'accueil** ; ouvert depuis l'écran d'accueil, le jeu prend tout l'écran.
-- Les touches des super-héros (**H**, **F**, **G**, **R**...) n'ont pas encore de bouton : elles arrivent bientôt. Les réponses aux devinettes du Sphinx non plus.
+- Les boutons des héros apparaissent quand tu peux t'en servir : **H** quand tu as gagné ton costume ou ton armure, **G** Grappin quand tu es Batman, **X** Gel quand tu l'as acheté chez Lucius Fox, **R** Voler dans la Batmobile… Garde le doigt sur **G** Toile pour te balancer, sur **A** et **E** pour les répulseurs d'Iron Man. Un bouton jaune, c'est que c'est allumé (la vision de détective, la super-vitesse).
+- Devant une devinette du Sphinx, touche ta réponse. Dans la DeLorean, touche son tableau de bord pour changer de destination.
 
 ## Les touches
 
@@ -989,7 +991,7 @@ Les nombres de tout le jeu :
 - **Les super-héros** : ce qu'écrase la chute de Superman (à combien de mètres à la ronde, les dégâts, et de quelle hauteur on passe à travers un toit), vitesse de vol de Superman, vitesse du grappin de Batman, vitesse de sa cape (et de combien elle descend), vitesse de Spiderman sur un mur et au bout de sa toile, vitesse de la voiture qu'il lance, vitesse des batarangs.
 - **Le jour et la nuit** : la durée du jour, du coucher du soleil, de la nuit et du lever du soleil (`dureeJour`, `dureeCrepuscule`, `dureeNuit`, `dureeLever`, en secondes : mets `dureeNuit: 30` pour une nuit toute courte), la lumière de la lune (`clairDeLune`), combien de lampadaires éclairent vraiment la nuit (`lumieresNuit`), combien de piétons et de voitures il reste la nuit, combien de gangs en plus.
 - **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), ce que les batarangs explosifs font à Batman lui-même (`explosifsBatman`, et `explosifsPres` : à moins de combien de mètres de sa main leur explosion ne lui fait rien), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
-- **Sur un téléphone ou une tablette** : `sensibiliteTactile` (de combien le doigt qui glisse fait tourner la vue : 0.005), `rayonJoystick` (60 points : le joystick est à fond quand le pouce s'est éloigné d'autant), `zoneMorteJoystick` (0.15 : en dessous, il ne fait rien), `joystickLent` (0.35 : à peine poussé, B.J. marche quand même à 35 % de sa vitesse), `seuilCourse` (0.9 : au-delà, il court), `tailleBoutons` (56 points ; voir [`BOUTONS_TACTILES`](#boutons_tactiles)).
+- **Sur un téléphone ou une tablette** : `sensibiliteTactile` (de combien le doigt qui glisse fait tourner la vue : 0.005), `rayonJoystick` (60 points : le joystick est à fond quand le pouce s'est éloigné d'autant), `zoneMorteJoystick` (0.15 : en dessous, il ne fait rien), `joystickLent` (0.35 : à peine poussé, B.J. marche quand même à 35 % de sa vitesse), `seuilCourse` (0.9 : au-delà, il court), `tailleBoutons` (56 points ; `tailleHeros`, 0.8 : ceux des héros sont un peu plus petits ; voir [`BOUTONS_TACTILES`](#boutons_tactiles)).
 - **Jusqu'où on voit** : `distanceRelief`, les montagnes et la mer (10 km) ; `distanceVue`, les bâtiments et les arbres (900 m).
 - **Les ombres des gens** : `ombresPersonnages` : les passants plus près que ça de la caméra (30 m) ont une vraie ombre, les autres une tache sombre sous les pieds (0 = une tache pour tous).
 - **Les voitures garées** : `sommeilVoitures` : les voitures garées à plus de 60 m de toi, qui ne bougent plus, « dorment » : le jeu ne les recalcule plus à chaque image, et elles se réveillent dès que tu t'approches ou qu'on les touche (0 = aucune ne dort).
@@ -1021,13 +1023,15 @@ Juste après `MENU_JEU` : les boutons d'un [téléphone ou d'une tablette](#sur-
 - `nom` : ce qui est écrit dessus, le nom de la touche qu'il remplace (`'Espace'`, `'E'`) ; `touche` : cette touche, écrite comme `touchesDanse` (`'KeyE'` pour E, `'Space'` pour Espace, `'ShiftLeft'` pour Maj), ou `'ClicGauche'`, `'ClicDroit'`, `'Pause'`. Tant que le doigt est dessus, la touche est enfoncée ;
 - `signe` : ce qui est dessiné au-dessus du nom (un caractère, `'»'`, ou un dessin du jeu : `'.tir'`, `'.viseur'`, `'.monte'`, `'.descend'`, `'.pause'`, `'.lignes'`) ;
 - `zone` : `'droite'` (en bas à droite), `'haut'` (en haut à gauche) ou `'milieu'` (en bas au milieu, côte à côte) ; `place` : où il est, en tailles de bouton depuis le coin (`[0, 0]` : dans le coin) ; `gros: 1.5` : une fois et demie plus gros ;
-- `surCarte: true` : il reste sur la grande carte ; `si` : il n'apparaît que quand cette fonction dit oui ; `fait` : ce qu'il fait, pour la liste du menu de pause (juste après, `COMMANDES_TACTILES` : les autres lignes de cette liste).
+- `surCarte: true` : il reste sur la grande carte ; `si` : il n'apparaît que quand cette fonction dit oui ; `dit` : pour un bouton de héros, le mot écrit en petit sous la lettre ; `allume` : il est jaune quand cette fonction dit oui ; `fait` : ce qu'il fait, pour la liste du menu de pause (juste après, `COMMANDES_TACTILES` : les autres lignes de cette liste).
+
+Un bouton qui n'apparaît que par moments, en bas au milieu avec ceux des héros : une `zone: 'milieu'`, un `dit` et un `si`. Par exemple, le grappin de Batman, seulement quand il l'a et qu'il est à pied :
 
 ```js
-{ nom: 'H', touche: 'KeyH', zone: 'milieu', si: () => !J.voiture },
+{ nom: 'G', dit: 'Grappin', touche: 'KeyG', zone: 'milieu', si: () => pouvoir('grappin') && libreAPied() },
 ```
 
-Pense à la traduction de son `nom` et de son `fait` dans `TRADUCTIONS`. Le joystick, la sensibilité du doigt et la taille des boutons sont dans [`REGLAGES`](#reglages).
+Pour écrire un `si`, des petites questions sont prêtes (le commentaire au-dessus du tableau les explique) : `libreAPied()` (à pied, pas en voiture), `enCostumeHeros()` (en costume, à Gotham ou à Metropolis), `achete('gel')` (acheté au magasin du chapitre), `ironmanLibre()` (dans l'armure d'Iron Man), `pouvoir('toile')`… Une touche qui fait autre chose selon le héros a une ligne par cas. Pense à la traduction de son `nom`, de son `dit` et de son `fait` dans `TRADUCTIONS`. Le joystick, la sensibilité du doigt et la taille des boutons (`tailleBoutons`, et `tailleHeros` pour ceux des héros) sont dans [`REGLAGES`](#reglages).
 
 #### `ARMES`, `TRESORS` et `ARMES_ROBOT`
 
