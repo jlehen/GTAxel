@@ -2,7 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<!-- sur un téléphone, ajouté à l'écran d'accueil : le jeu s'ouvre en plein écran, sans la barre du navigateur -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>GTAxel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -177,6 +180,128 @@
   /* l'écran du chapitre : le logo du héros, « Chapitre 2 », puis il s'en va */
   #ecran-chapitre { position: fixed; inset: 0; display: none; cursor: pointer; }
   #ecran-chapitre canvas { width: 100%; height: 100%; }
+  /* SUR UN TÉLÉPHONE OU UNE TABLETTE (voir tactile, et BOUTONS_TACTILES dans le code du jeu) : les commandes tactiles, par-dessus le jeu.
+     Le joystick apparaît là où le pouce gauche se pose ; un doigt qui glisse à droite fait regarder ; chaque bouton porte le nom de la touche
+     qu'il remplace. Sur un ordinateur, rien de tout ça ne s'affiche */
+  #tactile, #tourner { display: none; }
+  .tactile, .tactile body { overscroll-behavior: none; }   /* pas de « tirer pour rafraîchir » */
+  .tactile #menu { overscroll-behavior: contain; }         /* (le menu, lui, défile toujours au doigt) */
+  /* --g, --d, --h, --b : les marges à gauche, à droite, en haut et en bas (plus grandes sur un écran à encoche) */
+  .tactile #hud { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;   /* en jeu : pas de texte sélectionné, pas de menu au toucher long */
+                  --g: calc(10px + env(safe-area-inset-left, 0px)); --d: calc(12px + env(safe-area-inset-right, 0px));
+                  --h: calc(8px + env(safe-area-inset-top, 0px)); --b: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .tactile #tactile { position: absolute; inset: 0; z-index: 2; pointer-events: auto; touch-action: none; -webkit-tap-highlight-color: transparent; }
+  .tactile #tactile.jeu, .tactile #tactile.carte { display: block; }
+  .tactile #tactile.carte { z-index: 5; }   /* la grande carte ouverte : la couche passe par-dessus (un doigt la déplace, deux doigts zooment) */
+  .tactile #tactile.carte .bouton:not(.sur-carte), .tactile #tactile.carte #joystick { display: none; }
+  #tactile .bouton { position: absolute; box-sizing: border-box; width: var(--t); height: var(--t); border-radius: 50%; border: 2px solid rgba(255,255,255,.6);
+                     background: rgba(15,15,20,.38); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                     text-align: center; font: 700 12px/1.05 'Roboto Condensed', Arial, sans-serif; text-shadow: 0 0 3px #000; opacity: .75; }
+  #tactile .bouton.court { font-size: 22px; }                                                     /* un nom tout court : E, C, M */
+  #tactile .bouton.zone-haut { border-radius: 10px; font-size: 10px; }                            /* les petits boutons du haut */
+  #tactile .bouton.zone-haut.court { font-size: 19px; }
+  #tactile .bouton.appuye { background: rgba(255,255,255,.4); border-color: #fff; opacity: 1; }    /* le doigt est dessus */
+  #tactile .bouton.allume { background: rgba(240,200,80,.4); border-color: #f0c850; opacity: 1; } /* viser : allumé */
+  #tactile.carte .bouton.sur-carte { opacity: 1; border-color: #f0c850; }                         /* (le bouton qui ferme la carte se voit bien) */
+  /* le signe au-dessus du nom : un caractère, ou un dessin (.tir : un viseur rond, .viseur, .monte, .descend, .pause, .lignes) */
+  #tactile .signe { position: relative; display: block; width: 22px; height: 22px; margin-bottom: 1px; font: 22px/22px 'Roboto Condensed', Arial, sans-serif; font-style: normal; }
+  #tactile .zone-haut .signe { width: 18px; height: 18px; font-size: 18px; line-height: 18px; }
+  #tactile .signe::before, #tactile .signe::after { position: absolute; box-sizing: border-box; }
+  #tactile .signe.tir::before { content: ''; inset: 1px; border: 2px solid currentColor; border-radius: 50%; }
+  #tactile .signe.tir::after { content: ''; left: 8px; top: 8px; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  #tactile .signe.viseur::before { content: ''; inset: 4px; border: 2px solid currentColor; border-radius: 50%; }
+  #tactile .signe.viseur::after { content: ''; inset: 0; background: linear-gradient(currentColor, currentColor) center / 2px 100% no-repeat, linear-gradient(currentColor, currentColor) center / 100% 2px no-repeat; }
+  #tactile .signe.monte::before, #tactile .signe.descend::before { content: ''; left: 5px; width: 12px; height: 12px; border-left: 3px solid currentColor; border-top: 3px solid currentColor; }
+  #tactile .signe.monte::before { top: 8px; transform: rotate(45deg); }
+  #tactile .signe.descend::before { top: 1px; transform: rotate(225deg); }
+  #tactile .signe.pause::before, #tactile .signe.pause::after { content: ''; top: 2px; width: 5px; height: 14px; background: currentColor; }
+  #tactile .signe.pause::before { left: 3px; }
+  #tactile .signe.pause::after { right: 3px; }
+  #tactile .signe.lignes::before { content: ''; left: 1px; right: 1px; top: 2px; height: 3px; background: currentColor; box-shadow: 0 5px 0 currentColor, 0 10px 0 currentColor; }
+  /* les boutons qui n'apparaissent que par moments (si, dans BOUTONS_TACTILES) : en bas au milieu, côte à côte */
+  #tactile #boutons-milieu { position: absolute; left: 30%; right: calc(var(--d) + var(--large-boutons, 240px) + 12px); bottom: var(--b);
+                             display: flex; flex-wrap: wrap-reverse; justify-content: center; gap: 10px; pointer-events: none; }
+  #tactile #boutons-milieu .bouton { position: relative; pointer-events: auto; }
+  /* le joystick : un anneau, et un rond qui suit le pouce (--r : REGLAGES.rayonJoystick) */
+  #joystick { position: absolute; width: calc(2 * var(--r)); height: calc(2 * var(--r)); margin: calc(-1 * var(--r)) 0 0 calc(-1 * var(--r)); box-sizing: border-box;
+              border-radius: 50%; border: 2px solid rgba(255,255,255,.5); background: rgba(0,0,0,.18); display: none; pointer-events: none; }
+  #joystick div { position: absolute; left: 27%; top: 27%; width: 46%; height: 46%; border-radius: 50%; background: rgba(255,255,255,.55); }
+  /* le téléphone tenu debout : le jeu attend qu'on le tourne */
+  .tactile #tourner.vu { position: absolute; inset: 0; z-index: 7; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+                         background: #000; color: #f0c850; font: 30px 'Anton', Impact, sans-serif; letter-spacing: 1px; text-align: center; pointer-events: auto; touch-action: none; }
+  .tactile #tourner.vu::before { content: ''; width: 46px; height: 76px; border: 4px solid #fff; border-radius: 10px; animation: tourner 1.8s ease-in-out infinite; }
+  @keyframes tourner { 0%, 30% { transform: rotate(0); } 65%, 100% { transform: rotate(-90deg); } }
+  /* ce qui se touche aussi : le nom de l'arme (arme suivante), les lignes du petit menu, les codes de la liste du menu */
+  .tactile #haut-droite { z-index: 3; }
+  .tactile #arme { pointer-events: auto; }
+  .tactile #grande-carte { z-index: 4; }
+  .tactile #menu-jeu, .tactile #triche { z-index: 6; }
+  .tactile #menu-jeu { pointer-events: auto; }
+  .tactile #menu-jeu div { padding: 6px 4px; }
+  .tactile #triches tr { cursor: pointer; }
+  .tactile #triches tr.on th, .tactile #triches tr.on td { background: rgba(240,200,80,.28); }   /* un code allumé */
+  .tactile #triches tr.on th { color: #8aff7a; }
+  /* sur tous les écrans tactiles : l'aide passe sous les trois boutons du haut, la vitesse au-dessus des boutons du bas (--haut-boutons) */
+  .tactile #aide { left: var(--g); top: calc(var(--h) + 54px); }
+  .tactile #vitesse { right: var(--d); bottom: calc(var(--b) + var(--haut-boutons, 180px) + 8px); }
+  /* un téléphone en paysage (moins de 500 points de haut) : l'écran rangé autour des pouces. En haut à gauche, les trois boutons, puis la
+     mini-carte et les barres (dessous : la batterie et le casque d'Iron Man, ou la pièce de Double-Face) ; en haut au milieu (#colonne),
+     l'un sous l'autre : la barre du boss, le tableau de bord de la DeLorean, l'objectif, l'aide, la devinette, le compteur ; plus bas,
+     les annonces, puis les bulles ; en haut à droite, l'argent et l'arme. En bas : le joystick à gauche, les boutons des héros au milieu,
+     les six boutons à droite */
+  #colonne { display: contents; }   /* (ailleurs, ses éléments restent où ils sont) */
+  @media (max-height: 500px) {
+    .tactile #minicarte { left: var(--g); top: calc(var(--h) + 52px); bottom: auto; width: 120px; height: 120px; border-width: 2px; }
+    .tactile #barre-armure { left: var(--g); top: calc(var(--h) + 178px); bottom: auto; width: 124px; height: 5px; }
+    .tactile #barre-vie { left: var(--g); top: calc(var(--h) + 185px); bottom: auto; width: 124px; height: 7px; }
+    .tactile #barre-gilet { left: var(--g); top: calc(var(--h) + 194px); bottom: auto; width: 124px; height: 4px; }
+    .tactile #batterie { left: var(--g); top: calc(var(--h) + 204px); height: min(70px, 100% - 300px); }
+    .tactile #casque { left: calc(var(--g) + 62px); right: auto; top: calc(var(--h) + 204px); height: min(70px, 100% - 300px); }
+    .tactile #haut-droite { right: var(--d); top: var(--h); max-width: 230px; }
+    .tactile #heure { font-size: 15px; }
+    .tactile #argent { font-size: 24px; line-height: 1.15; }
+    .tactile #etoiles { font-size: 18px; letter-spacing: 2px; }
+    .tactile #victimes { font-size: 15px; }
+    .tactile #appel { font-size: 14px; }
+    .tactile #arme { font-size: 17px; margin-top: 2px; }
+    .tactile #munitions { font-size: 13px; }
+    .tactile #colonne { display: flex; flex-direction: column; align-items: center; gap: 4px; position: absolute; top: var(--h);
+                        left: calc(var(--g) + 150px); right: calc(var(--d) + 240px); }
+    .tactile #colonne > * { position: static; transform: none; margin: 0; max-width: 100%; box-sizing: border-box; }
+    .tactile #objectif { font-size: 14px; line-height: 1.2; padding: 0; text-align: center; }
+    .tactile #aide { font-size: 14px; padding: 5px 10px; }
+    .tactile #boss { width: 100%; font-size: 15px; letter-spacing: 1px; }
+    .tactile #boss > div { height: 7px; }
+    .tactile #tableau { padding: 2px 8px; }
+    .tactile #tableau .ligne { margin: 0; gap: 6px; }
+    .tactile #tableau .nom { width: 72px; font-size: 9px; letter-spacing: 0; }
+    .tactile #tableau .val { min-width: 110px; font-size: 13px; letter-spacing: 1px; }
+    .tactile #tableau .mph { font-size: 14px; margin-top: 1px; }
+    .tactile #tableau .aide { font-size: 11px; margin-top: 1px; }
+    .tactile #piece { left: var(--g); top: calc(var(--h) + 204px); transform: none; width: 63px; height: 70px; }   /* (sous la mini-carte : la place de la batterie d'Iron Man, qui n'est pas à Gotham) */
+    .tactile #devinette { width: 100%; padding: 6px 12px 8px; }
+    .tactile #devinette h3 { font-size: 16px; margin-bottom: 3px; }
+    .tactile #devinette p, .tactile #devinette ol { font-size: 14px; margin-bottom: 4px; }
+    .tactile #devinette li { margin: 1px 0; }
+    .tactile #devinette li b { font-size: 15px; min-width: 22px; }
+    .tactile #devinette small { font-size: 12px; margin-top: 4px; }
+    .tactile #compteur { font-size: 10px; }
+    .tactile #annonce { top: 40%; left: calc(var(--g) + 150px); right: calc(var(--d) + 240px); font-size: 30px; }
+    .tactile #annonce small, .tactile #hud.casque #annonce small { font-size: 15px; padding: 0; }
+    .tactile #bulle { left: calc(var(--g) + 150px); right: calc(var(--d) + 240px); top: 58%; width: fit-content; max-width: none; margin: 0 auto;
+                      font-size: 14px; padding: 6px 12px 8px; border-width: 2px; }
+    .tactile #bulle h3 { font-size: 18px; }
+    .tactile #wasted { top: 30%; font-size: 56px; letter-spacing: 4px; }
+    .tactile #vitesse { font-size: 24px; }
+    .tactile #sommeil { font-size: 44px; }
+    .tactile #triche { font-size: 18px; }
+    .tactile #menu-jeu { left: calc(var(--g) + 150px); right: calc(var(--d) + var(--large-boutons, 240px) + 8px); top: 50%; transform: translateY(-50%);
+                         width: fit-content; min-width: 0; max-width: none; margin: 0 auto; max-height: calc(100% - 16px); overflow-y: auto; font-size: 15px; padding: 6px 14px; }
+    .tactile #menu-jeu h3 { font-size: 20px; margin-bottom: 2px; }
+    .tactile #menu-jeu div { padding: 5px 2px; }
+    .tactile #menu-jeu b { width: 22px; line-height: 22px; margin-right: 8px; }
+    .tactile #menu-jeu small { font-size: 12px; margin-top: 3px; }
+  }
 </style>
 </head>
 <body>
@@ -198,6 +323,7 @@
     <div id="arme"></div>
     <div id="munitions"></div>
   </div>
+  <div id="colonne"></div>   <!-- sur un téléphone : en haut au milieu, l'objectif, l'aide... l'un sous l'autre (voir rangerEcran) -->
   <div id="aide"></div>
   <div id="objectif"></div>
   <div id="annonce"></div>
@@ -224,6 +350,8 @@
   <div id="voile"></div>
   <div id="compteur"></div>
   <canvas id="grande-carte"></canvas>
+  <div id="tactile"><div id="joystick"><div></div></div><div id="boutons-milieu"></div></div>   <!-- sur un téléphone : le joystick et les boutons (voir BOUTONS_TACTILES) -->
+  <div id="tourner"></div>   <!-- sur un téléphone tenu debout : « Tourne ton téléphone » -->
   <div id="triche"></div>
   <div id="menu-jeu"></div>   <!-- le petit menu du jeu (touche Tab, voir MENU_JEU) -->
 </div>
@@ -514,7 +642,10 @@ if (tactile && !dejaTactile && qualite === 'Haute' && QUALITES[QUALITE_TACTILE])
 }
 // ce que dit le menu quand le jeu est prêt : sur un écran tactile, c'est un vrai bouton (toucher ailleurs fait seulement défiler le menu)
 const texteJouer = tactile ? 'Touche ici pour jouer' : 'Clique pour jouer';
+const textePause = tactile ? 'Pause — touche ici pour continuer' : 'Pause — clique pour continuer';   // (le même bouton jaune)
 if (tactile) document.documentElement.classList.add('tactile');
+// sans clavier, on ne tape pas les codes de triche : on les touche dans la liste du menu (voir boiteTriches)
+if (tactile) document.querySelector('#triches p').textContent = "Touche un code pour l'allumer, et retouche-le pour l'éteindre : les codes allumés sont en jaune. MISSION et CHAPITRE demandent leur numéro.";
 
 // =====================================================================
 //  LES LANGUES : le jeu est écrit en français, et TRADUCTIONS donne chaque phrase dans les autres langues.
@@ -579,6 +710,50 @@ const TRADUCTIONS = {
   "Pendant le jeu, appuie sur Entrée, tape un code, puis Entrée. Pour annuler un code, retape-le.": { de: 'Drück im Spiel Enter, tipp einen Code ein, dann Enter. Um einen Code aufzuheben, tipp ihn nochmal ein.',
     en: 'While playing, press Enter, type a code, then Enter. To cancel a code, type it again.', gsw: 'Druck im Spiil Enter, tipp en Code ii, dänn Enter. Zum en Code abstelle, tipp en nomal ii.' },
   'Pause — clique pour continuer': { de: 'Pause — klicke zum Weiterspielen', en: 'Paused — click to continue', gsw: 'Pause — klick zum Wiiterspile' },
+  // sur un téléphone ou une tablette : la pause, les codes de triche au doigt, le petit menu, le téléphone tenu debout
+  'Pause — touche ici pour continuer': { de: 'Pause — tipp hier zum Weiterspielen', en: 'Paused — tap here to continue', gsw: 'Pause — tipp da zum Wiiterspile' },
+  "Touche un code pour l'allumer, et retouche-le pour l'éteindre : les codes allumés sont en jaune. MISSION et CHAPITRE demandent leur numéro.": {
+    de: 'Tipp einen Code an, um ihn einzuschalten, und tipp ihn nochmal an, um ihn auszuschalten: Eingeschaltete Codes sind gelb. MISSION und CHAPITRE fragen nach ihrer Nummer.',
+    en: 'Tap a code to switch it on, and tap it again to switch it off: codes that are on are yellow. MISSION and CHAPITRE ask for their number.',
+    gsw: 'Tipp en Code aa, zum en aaschalte, und tipp en nomal aa, zum en abstelle: Di aagschaltete Codes sind gääl. MISSION und CHAPITRE fröged nach ihrere Nummere.' },
+  'Quel numéro ? ({texte})': { de: 'Welche Nummer? ({texte})', en: 'Which number? ({texte})', gsw: 'Weli Nummere? ({texte})' },
+  'Touche une ligne pour la choisir · le bouton {touche}, en haut à gauche, ferme le menu': { de: 'Tipp eine Zeile an, um sie zu wählen · der Knopf {touche} oben links schließt das Menü',
+    en: 'Tap a line to choose it · the {touche} button, top left, closes the menu', gsw: 'Tipp e Ziile aa, zum si uuswähle · de Chnopf {touche} obe links macht s Menü zue' },
+  'Tourne ton téléphone':     { de: 'Dreh dein Handy quer', en: 'Turn your phone sideways', gsw: 'Dräi dis Händy quer' },
+  // les boutons (BOUTONS_TACTILES), et la liste des commandes tactiles du menu (COMMANDES_TACTILES)
+  'Pause':                    { de: 'Pause', en: 'Pause', gsw: 'Pause' },
+  'Joystick':                 { de: 'Joystick', en: 'Joystick', gsw: 'Joystick' },
+  'Doigt qui glisse':         { de: 'Finger wischen', en: 'Swipe a finger', gsw: 'Finger wische' },
+  'Nom de ton arme':          { de: 'Name deiner Waffe', en: 'Your weapon name', gsw: 'Name vo dinere Waffe' },
+  "pose le pouce gauche n'importe où à gauche : c'est Z Q S D (se déplacer / conduire) ; poussé à fond, tu cours": {
+    de: 'leg den linken Daumen irgendwo links hin: das ist W A S D (laufen / fahren); ganz gedrückt, rennst du',
+    en: 'put your left thumb anywhere on the left: it is W A S D (move / drive); pushed all the way, you run',
+    gsw: 'leg de linggi Duume irgendwo uf di linggi Siite: das isch W A S D (laufe / fahre); ganz usegschobe, seckelsch du' },
+  "ailleurs sur l'écran : c'est la souris (regarder)": { de: 'sonst überall auf dem Bildschirm: das ist die Maus (umschauen)', en: 'anywhere else on the screen: it is the mouse (look around)',
+    gsw: 'süscht überall uf em Bildschirm: das isch d Muus (umeluege)' },
+  "en haut à droite : touche-le pour changer d'arme (comme la molette)": { de: 'oben rechts: tipp ihn an, um die Waffe zu wechseln (wie das Mausrad)', en: 'top right: tap it to switch weapon (like the mouse wheel)',
+    gsw: 'obe rächts: tipp en aa, zum d Waffe wächsle (wie s Muusrad)' },
+  'tirer / frapper (garde le doigt dessus : il tire en continu ; fais-le glisser : tu vises en même temps)': {
+    de: 'schießen / schlagen (Finger draufhalten: Dauerfeuer; Finger ziehen: gleichzeitig zielen)',
+    en: 'shoot / punch (keep your finger on it: keeps firing; slide it: aim at the same time)',
+    gsw: 'schüüsse / haue (Finger druf lah: schüüsst immer wiiter; Finger zie: grad gliich ziele)' },
+  'viser : touche pour viser, touche encore pour arrêter (en voiture, à ski ou dans le heavy robot : garde le doigt dessus)': {
+    de: 'zielen: antippen zum Zielen, nochmal antippen zum Aufhören (im Auto, auf Ski oder im Heavy Robot: Finger draufhalten)',
+    en: 'aim: tap to aim, tap again to stop (in a car, on skis or in the heavy robot: keep your finger on it)',
+    gsw: 'ziele: aatippe zum Ziele, nomal aatippe zum Ufhöre (im Auto, uf de Ski oder im Heavy Robot: Finger druf lah)' },
+  'sauter (frein à main en voiture ; en volant : monter)': { de: 'springen (im Auto: Handbremse; beim Fliegen: steigen)', en: 'jump (in a car: handbrake; flying: go up)', gsw: 'gumpe (im Auto: Handbremse; bim Flüüge: ufe)' },
+  'courir (ou le joystick poussé à fond) ; en volant : plus vite': { de: 'rennen (oder den Joystick ganz drücken); beim Fliegen: schneller', en: 'run (or push the joystick all the way); flying: faster',
+    gsw: 'seckle (oder de Joystick ganz usestosse); bim Flüüge: schneller' },
+  "s'accroupir (en volant : descendre)": { de: 'ducken (beim Fliegen: sinken)', en: 'crouch (flying: go down)', gsw: 'sich ducke (bim Flüüge: abe)' },
+  'monter / descendre (voiture, bateau, avion), acheter, ascenseur… tout ce que dit « Appuie sur E »': {
+    de: 'einsteigen / aussteigen (Auto, Boot, Flugzeug), kaufen, Aufzug… alles, wo „Drücke E“ steht',
+    en: 'get in / out (car, boat, plane), buy, elevator… everything that says "Press E"',
+    gsw: 'iistiige / uusstiige (Auto, Boot, Flüüger), chaufe, Lift… alles, wo «Drück E» staht' },
+  'pause (le menu)':          { de: 'Pause (das Menü)', en: 'pause (the menu)', gsw: 'Pause (s Menü)' },
+  'la carte du pays : un doigt la déplace, deux doigts zooment, M la ferme': { de: 'die Landkarte: ein Finger verschiebt sie, zwei Finger zoomen, M schließt sie',
+    en: 'the map: one finger moves it, two fingers zoom, M closes it', gsw: 'd Charte: en Finger verschiebt si, zwei Finger zoomed, M macht si zue' },
+  'le petit menu (changer de vue, DeLorean, code de triche…) : touche une ligne': { de: 'das kleine Menü (Ansicht wechseln, DeLorean, Cheatcode…): tipp eine Zeile an',
+    en: 'the little menu (change view, DeLorean, cheat code…): tap a line', gsw: 's chliine Menü (Aasicht wächsle, DeLorean, Cheatcode…): tipp e Ziile aa' },
   'Z Q S D':                  { de: 'W A S D', en: 'W A S D', gsw: 'W A S D' },   // les mêmes touches, sur un clavier allemand ou anglais
   'se déplacer / conduire':   { de: 'laufen / fahren', en: 'move / drive', gsw: 'laufe / fahre' },
   'Souris':                   { de: 'Maus', en: 'Mouse', gsw: 'Muus' },
@@ -1106,6 +1281,8 @@ const TRADUCTIONS = {
   'Tu es dans la colonne {col}, ligne {ligne} de la CARTE': { de: 'Du bist in Spalte {col}, Zeile {ligne} der CARTE', en: 'You are in column {col}, row {ligne} of the CARTE', gsw: 'Du bisch i de Spalte {col}, Ziile {ligne} vo de CARTE' },
   'Molette : zoom   ·   Souris ou flèches : se déplacer   ·   M : fermer': { de: 'Mausrad: Zoom   ·   Maus oder Pfeiltasten: bewegen   ·   M: schließen',
     en: 'Wheel: zoom   ·   Mouse or arrows: move   ·   M: close', gsw: 'Muusrad: Zoom   ·   Muus oder Pfiiltaschte: verschiebe   ·   M: zuemache' },
+  'Deux doigts : zoom   ·   Un doigt : se déplacer   ·   M : fermer': { de: 'Zwei Finger: Zoom   ·   Ein Finger: bewegen   ·   M: schließen',   // (sur un écran tactile)
+    en: 'Two fingers: zoom   ·   One finger: move   ·   M: close', gsw: 'Zwei Finger: Zoom   ·   En Finger: verschiebe   ·   M: zuemache' },
   'Aéroport':         { de: 'Flughafen', en: 'Airport', gsw: 'Flughafe' },
   'Port':             { de: 'Hafen', en: 'Port', gsw: 'Hafe' },
   'Collines de Vinewood': { de: 'Vinewood Hills', en: 'Vinewood Hills', gsw: 'Vinewood Hills' },
@@ -2942,7 +3119,7 @@ function traduireMenu() {
   for (const b of document.querySelectorAll('.heros button')) b.classList.toggle('on', heros[b.parentNode.dataset.heros] === b.dataset.fr);
   document.documentElement.lang = langue;
 }
-function etat(texte) { const e = document.getElementById('etat'); e.dataset.fr = texte; e.classList.toggle('jouer', texte === texteJouer); traduireMenu(); }   // la ligne jaune du menu
+function etat(texte) { const e = document.getElementById('etat'); e.dataset.fr = texte; e.classList.toggle('jouer', texte === texteJouer || texte === textePause); traduireMenu(); }   // la ligne jaune du menu
 // la barre de progression, sous la ligne jaune du menu et en bas de l'écran du chapitre, pendant que le pays se construit
 // (fait : où en est la construction, de 0 à 1 ; null : plus de barre). C'est le jeu qui la fait avancer (voir respirer)
 function progression(fait) {
@@ -3014,8 +3191,9 @@ function afficherQualite(nom, notes) {
 }
 // l'histoire du menu : celle du chapitre où l'on est
 if (partie.chapitre > 1) document.getElementById('histoire').dataset.fr = 'Bienvenue à {ville}, {nom} ! Tu es {super} : la police est de ton côté. Retrouve la DeLorean pour aller plus loin !';
-// la liste des touches du menu : celle du chapitre où l'on est (touches, dans CHAPITRES), une ligne par touche
-for (const [touche, quoi] of CHAPITRE.touches || CHAPITRES[0].touches || []) {
+// la liste des touches du menu : celle du chapitre où l'on est (touches, dans CHAPITRES), une ligne par touche.
+// (Sur un écran tactile, c'est la liste des commandes tactiles : le jeu l'écrit en se chargeant, voir COMMANDES_TACTILES)
+if (!tactile) for (const [touche, quoi] of CHAPITRE.touches || CHAPITRES[0].touches || []) {
   const ligne = document.getElementById('touches').insertRow();
   ligne.insertCell().dataset.fr = touche; ligne.insertCell().dataset.fr = quoi;   // (traduireMenu les écrit dans la langue choisie)
 }
@@ -3404,6 +3582,13 @@ const REGLAGES = {
   touchesDanse: ['KeyA', 'KeyS', 'KeyD'], // à taper 3 fois de suite pour danser : gauche, arrière, droite (Q S D sur un clavier français)
   toucheMenu: 'Tab',         // la touche du petit menu du jeu (ce qu'on fait rarement : voir MENU_JEU, juste après REGLAGES), écrite comme dans touchesDanse ('KeyU' : la touche U)
   dureeMenu: 8,              // secondes : sans chiffre tapé, le petit menu se referme tout seul
+  // sur un téléphone ou une tablette : les commandes tactiles (les boutons sont dans BOUTONS_TACTILES, juste après MENU_JEU)
+  sensibiliteTactile: 0.005, // le doigt qui glisse à droite de l'écran fait tourner la vue d'autant (en radians par point : 100 points = un demi-radian, 29°). La souris : sensibiliteSouris
+  rayonJoystick: 60,         // points : le joystick (là où le pouce gauche se pose) est poussé à fond quand le pouce s'est éloigné d'autant
+  zoneMorteJoystick: 0.15,   // poussé de moins que ça (0.15 = 15 % du rayon), le joystick ne fait rien : le pouce peut trembler un peu
+  joystickLent: 0.35,        // à pied, B.J. va aussi vite que le joystick est poussé (à moitié : la moitié de sa vitesse), mais jamais moins que ça (0.35 = 35 %)
+  seuilCourse: 0.9,          // à pied, le joystick poussé à plus de ça (0.9 = 90 %) : il court, comme avec Maj (en volant, en voiture, à ski : c'est le bouton Maj)
+  tailleBoutons: 56,         // points : la taille des boutons (Tirer est plus gros : voir gros, dans BOUTONS_TACTILES)
   moonwalk: [3, 1, 2],       // la danse, en secondes : le moonwalk, la toupie, puis la pose « Who's bad ? »
   vitesseMoonwalk: 1.5,      // m/s, à reculons
   vitesseVol: 12,            // Superman (touche F ; ou l'astuce cachée, Maj 3 fois de suite, partout) : m/s en volant...
@@ -3506,6 +3691,45 @@ const MENU_JEU = [
   { nom: 'Changer de costume', touche: 'KeyJ', chapitres: [3, 4], reste: true },
   { nom: 'Changer de Batmobile', touche: 'KeyN', chapitres: [3], reste: true },
   { nom: 'Lever ou baisser le masque', touche: 'KeyL', chapitres: [2] },
+];
+
+// =====================================================================
+//  LES BOUTONS D'UN TÉLÉPHONE OU D'UNE TABLETTE (un écran qu'on touche du doigt ; sur un ordinateur, ils ne s'affichent pas).
+//  Le pouce gauche, posé n'importe où dans la moitié gauche de l'écran, fait apparaître le joystick : c'est Z Q S D (poussé à fond, à pied,
+//  tu cours). Un doigt qui glisse ailleurs, c'est la souris : tu regardes. Et chaque bouton fait exactement comme sa touche : il porte le
+//  nom de la touche, comme les aides du jeu (« Appuie sur E… »), qui restent justes. Tant que le doigt est dessus, la touche est enfoncée.
+//  nom : ce qui est écrit dessus (traduit dans TRADUCTIONS) ; touche : la touche qu'il remplace, écrite comme dans touchesDanse ('KeyE' : la
+//    touche E, 'Space' : Espace, 'ShiftLeft' : Maj), ou 'ClicGauche', 'ClicDroit' (les boutons de la souris), 'Pause'
+//  signe : ce qui est dessiné au-dessus du nom : un caractère ('»'), ou un dessin du jeu ('.tir' : un viseur rond, '.viseur', '.monte' : une
+//    flèche vers le haut, '.descend' : vers le bas, '.pause', '.lignes' : trois traits) ; fait : ce qu'il fait, pour la liste du menu de pause
+//  zone : 'droite' (en bas à droite, sous le pouce droit), 'haut' (en haut à gauche) ou 'milieu' (en bas au milieu, côte à côte, dans l'ordre)
+//  place : où il est, en tailles de bouton : [depuis le bord (droit, ou gauche pour 'haut'), depuis le bas (ou le haut)] ; [0, 0] : dans le coin.
+//    (Pas pour 'milieu' : ils se rangent tout seuls.) La taille d'un bouton : tailleBoutons, dans REGLAGES ; gros : 1.5 = une fois et demie plus gros
+//  surCarte: true : il reste là quand la grande carte est ouverte
+//  si : il n'apparaît que quand cette fonction dit oui (par exemple { nom: 'H', touche: 'KeyH', zone: 'milieu', si: () => !J.voiture } :
+//    seulement à pied). Pour en ajouter un : une ligne de plus !
+// =====================================================================
+const BOUTONS_TACTILES = [
+  // sous le pouce droit : Tirer (le plus gros), viser, sauter, courir, s'accroupir, et E
+  { nom: 'Clic gauche', touche: 'ClicGauche', signe: '.tir', zone: 'droite', place: [0.15, 0.15], gros: 1.5,
+    fait: 'tirer / frapper (garde le doigt dessus : il tire en continu ; fais-le glisser : tu vises en même temps)' },
+  { nom: 'Clic droit', touche: 'ClicDroit', signe: '.viseur', zone: 'droite', place: [0.05, 1.95],
+    fait: 'viser : touche pour viser, touche encore pour arrêter (en voiture, à ski ou dans le heavy robot : garde le doigt dessus)' },
+  { nom: 'Espace', touche: 'Space', signe: '.monte', zone: 'droite', place: [1.9, 0], fait: 'sauter (frein à main en voiture ; en volant : monter)' },
+  { nom: 'Maj', touche: 'ShiftLeft', signe: '»', zone: 'droite', place: [1.7, 1.3], fait: 'courir (ou le joystick poussé à fond) ; en volant : plus vite' },
+  { nom: 'C', touche: 'KeyC', signe: '.descend', zone: 'droite', place: [3.05, 0], fait: "s'accroupir (en volant : descendre)" },
+  { nom: 'E', touche: 'KeyE', zone: 'droite', place: [2.95, 1.25], fait: 'monter / descendre (voiture, bateau, avion), acheter, ascenseur… tout ce que dit « Appuie sur E »' },
+  // en haut à gauche, plus petits : la pause, la carte (comme M), le petit menu (comme Tab : si tu changes toucheMenu, change aussi son nom)
+  { nom: 'Pause', touche: 'Pause', signe: '.pause', zone: 'haut', place: [0, 0], gros: 0.8, surCarte: true, fait: 'pause (le menu)' },
+  { nom: 'M', touche: 'KeyM', zone: 'haut', place: [0.9, 0], gros: 0.8, surCarte: true, fait: 'la carte du pays : un doigt la déplace, deux doigts zooment, M la ferme' },
+  { nom: 'Tab', touche: REGLAGES.toucheMenu, signe: '.lignes', zone: 'haut', place: [1.8, 0], gros: 0.8, fait: 'le petit menu (changer de vue, DeLorean, code de triche…) : touche une ligne' },
+];
+// la liste des commandes du menu de pause, sur un écran tactile (à la place de celle des touches du clavier) : ces lignes (ce qu'on touche,
+// ce que ça fait), puis une ligne par bouton de BOUTONS_TACTILES qui a un « fait »
+const COMMANDES_TACTILES = [
+  ['Joystick', "pose le pouce gauche n'importe où à gauche : c'est Z Q S D (se déplacer / conduire) ; poussé à fond, tu cours"],
+  ['Doigt qui glisse', "ailleurs sur l'écran : c'est la souris (regarder)"],
+  ['Nom de ton arme', "en haut à droite : touche-le pour changer d'arme (comme la molette)"],
 ];
 
 // =====================================================================
@@ -5723,6 +5947,25 @@ for (const t of TRICHES) {
   const ligne = boiteTriches.querySelector('table').insertRow(), nom = document.createElement('th');   // th : le code ne se traduit pas
   nom.textContent = [t.code, t.alias].flat().filter(c => c).join(', ');
   ligne.append(nom); ligne.insertCell().textContent = t.texte;
+}
+// Sur un écran tactile, sans clavier pour taper un code : on touche sa ligne, et il s'allume ou s'éteint, comme si on l'avait tapé (MISSION
+// et CHAPITRE demandent d'abord leur numéro). Les codes allumés sont en jaune (majCodes)
+const majCodes = () => boiteTriches.querySelectorAll('tr').forEach((l, i) => l.classList.toggle('on', !!TRICHES[i]?.actif));
+if (tactile) boiteTriches.querySelector('table').addEventListener('click', e => {
+  const t = TRICHES[e.target.closest('tr')?.rowIndex];
+  if (!t || !paysConstruit) return;   // (le jeu n'est pas encore prêt)
+  let code = t.code;
+  if (t.action?.length) {   // une action qui attend un nombre (MISSION8, CHAPITRE2)
+    const n = prompt(tr('Quel numéro ? ({texte})', { texte: tr(t.texte) }))?.trim();
+    if (!/^\d+$/.test(n || '')) return;
+    code += n;
+  }
+  saisie = code; validerTriche(); majCodes();
+});
+// et la liste du menu (sous « Touche ici pour jouer ») : les commandes tactiles, à la place des touches du clavier (voir COMMANDES_TACTILES)
+if (tactile) for (const [quoi, fait] of [...COMMANDES_TACTILES, ...BOUTONS_TACTILES.filter(b => b.fait).map(b => [b.nom, b.fait])]) {
+  const ligne = document.getElementById('touches').insertRow();
+  ligne.insertCell().dataset.fr = quoi; ligne.insertCell().dataset.fr = fait;   // (traduireMenu les écrit dans la langue choisie)
 }
 
 // =====================================================================
@@ -16984,7 +17227,7 @@ function virageGrappin(v) {
   if (v.virage || v.accident || v.detruite || v.coule) return;
   if (Math.abs(v.vitesse) < 8) { annonce('', tr('Roule plus vite pour le virage au grappin'), 1.5); return; }
   if (v.enAir || v.vol || v.rail) return;
-  const cote = touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft'), sens = cote || 1, tour = cote ? Math.PI / 2 : Math.PI, duree = cote ? 0.45 : 0.7;
+  const cote = Math.sign(touche('KeyD', 'ArrowRight') - touche('KeyA', 'ArrowLeft')), sens = cote || 1, tour = cote ? Math.PI / 2 : Math.PI, duree = cote ? 0.45 : 0.7;   // (le joystick à moitié : le même virage)
   const w = tour / duree, r = Math.abs(v.vitesse) / w;   // (elle tourne autour du crochet : il est à r mètres, sur le côté)
   v.virage = { sens: sens * Math.sign(v.vitesse), w, reste: tour, vitesse: v.vitesse, ancre: { ...local(v, -sens * r, 0), y: v.y + 0.8 } };   // (reste : l'angle qu'il lui reste à tourner)
   bruit(0.4, 4000, 0.15); bip(700, 1500, 0.2, 'square', 0.06);   // le crochet part
@@ -17864,8 +18107,9 @@ function ouvrirMenuJeu(ouvrir) {
   if (!ouvrir) return;
   menuJeu.lignes = MENU_JEU.filter(l => !l.chapitres || l.chapitres.includes(chapitre)).slice(0, 9);   // (9 chiffres : 9 lignes au plus)
   menuJeu.reste = R_.dureeMenu;
-  $('menu-jeu').innerHTML = `<h3>${tr('MENU')}</h3>` + menuJeu.lignes.map((l, i) => `<div><b>${i + 1}</b>${tr(l.nom)}</div>`).join('')
-    + `<small>${tr('Un chiffre : choisir · {touche} : fermer', { touche: nomTouche(R_.toucheMenu) })}</small>`;
+  $('menu-jeu').innerHTML = `<h3>${tr('MENU')}</h3>` + menuJeu.lignes.map((l, i) => `<div data-n="${i + 1}"><b>${i + 1}</b>${tr(l.nom)}</div>`).join('')   // (data-n : sur un écran tactile, la ligne se touche)
+    + `<small>${tactile ? tr('Touche une ligne pour la choisir · le bouton {touche}, en haut à gauche, ferme le menu', { touche: nomTouche(R_.toucheMenu) })
+      : tr('Un chiffre : choisir · {touche} : fermer', { touche: nomTouche(R_.toucheMenu) })}</small>`;
 }
 // la ligne n du menu (1 = la première) : c'est comme si on appuyait sur sa touche
 function choisirMenuJeu(n) {
@@ -17875,45 +18119,61 @@ function choisirMenuJeu(n) {
   taper(l.touche);
 }
 // fait comme si on appuyait sur une touche du clavier (code : sa place, 'KeyV', 'Enter'...), puis qu'on la relâchait : le jeu fait
-// exactement ce qu'il fait pour la vraie touche. Le petit menu s'en sert ; les boutons d'un téléphone (qui n'a pas de clavier) s'en serviront aussi
-function taper(code) {
-  const key = /^Key[A-Z]$/.test(code) ? code.slice(3).toLowerCase() : '';   // (la lettre : M ouvre la carte d'après sa lettre, pas sa place)
+// exactement ce qu'il fait pour la vraie touche. Le petit menu s'en sert ; les boutons d'un téléphone (qui n'a pas de clavier) aussi :
+// appuyerTouche quand le doigt se pose, relacherTouche quand il se lève (voir BOUTONS_TACTILES)
+function taper(code) { appuyerTouche(code); relacherTouche(code); }
+const appuyerTouche = code => envoyerTouche('keydown', code), relacherTouche = code => envoyerTouche('keyup', code);
+function envoyerTouche(type, code) {
+  // la lettre (M ouvre la carte d'après sa lettre, pas sa place), ou 'Shift' pour Maj (voler plus vite, et Maj 3 fois, le regardent)
+  const key = /^Key[A-Z]$/.test(code) ? code.slice(3).toLowerCase() : /^Shift(Left|Right)$/.test(code) ? 'Shift' : '';
+  const avant = menuJeu.envoi;
   menuJeu.envoi = true;
-  try {
-    dispatchEvent(new KeyboardEvent('keydown', { code, key }));
-    dispatchEvent(new KeyboardEvent('keyup', { code, key }));
-  } finally { menuJeu.envoi = false; }
+  try { dispatchEvent(new KeyboardEvent(type, { code, key })); } finally { menuJeu.envoi = avant; }
 }
-const touche = (...codes) => codes.some(c => touches[c]) ? 1 : 0;
+// la touche (ou l'une des touches) est-elle enfoncée ? 1 : oui, 0 : non. Le joystick d'un téléphone, lui, l'enfonce à moitié (0.5) : un
+// nombre entre 0 et 1 (voir majJoystick). Au clavier, c'est toujours 0 ou 1
+const touche = (...codes) => { let m = 0; for (const c of codes) { const v = touches[c]; if (v === true) return 1; if (v > m) m = v; } return m; };
 const dansLunette = () => visee && !J.voiture && !J.robot && !J.mort && !!ARMES[J.arme].zoom; // on regarde dans la lunette du sniper
-addEventListener('mousedown', e => { if (!enJeu || carte.ouverte) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
-addEventListener('mouseup', e => { if (e.button === 0) { sourisG = false; dejaTire = false; } if (e.button === 2) visee = false; });
+// (sur un écran tactile, le navigateur imite aussi la souris juste après un doigt : on ne l'écoute pas, sinon un toucher tirerait deux fois)
+const doigtRecent = () => tactile && performance.now() - T.dernierDoigt < 1000;
+addEventListener('mousedown', e => { if (!enJeu || carte.ouverte || doigtRecent()) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
+addEventListener('mouseup', e => { if (doigtRecent()) return; if (e.button === 0) { sourisG = false; dejaTire = false; } if (e.button === 2) visee = false; });
 addEventListener('contextmenu', e => e.preventDefault());
 addEventListener('wheel', e => {
   if (!enJeu) return;
   if (carte.ouverte) { zoomerCarte(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 33 : 1) * 0.0015)); return; }
-  if (J.voiture || J.robot) return;
-  for (let k = 1; k <= ARMES.length; k++) { const i = (J.arme + (e.deltaY > 0 ? k : -k) + ARMES.length * 2) % ARMES.length; if (J.possede[i]) { changerArme(i); break; } }
+  armeSuivante(e.deltaY > 0 ? 1 : -1);
 });
+// la molette, ou le nom de l'arme touché du doigt : l'arme suivante qu'on a (sens = -1 : la précédente)
+function armeSuivante(sens) {
+  if (J.voiture || J.robot) return;
+  for (let k = 1; k <= ARMES.length; k++) { const i = (J.arme + sens * k + ARMES.length * 2) % ARMES.length; if (J.possede[i]) { changerArme(i); break; } }
+}
 addEventListener('mousemove', e => {
   if (!enJeu || document.pointerLockElement !== renderer.domElement) return;
   if (carte.ouverte) { deplacerCarte(e.movementX, e.movementY); return; }
-  const s = R_.sensibiliteSouris / (dansLunette() ? ARMES[J.arme].zoom : 1); // dans la lunette, la souris est plus douce
-  if (J.voiture && !enAvion(J.voiture)) J.decalage -= e.movementX * s; else J.lacet -= e.movementX * s;   // en avion, en hélicoptère ou dans la Batmobile en l'air, la souris dirige
-  J.tangage = clamp(J.tangage - e.movementY * s, -1.3, 1.2);
-  J.dernierMouvement = temps;
+  regarder(e.movementX, e.movementY, R_.sensibiliteSouris);
 });
+// regarder : la souris (ou le doigt) a bougé de dx, dy points ; s : de combien ça tourne la vue par point (REGLAGES.sensibiliteSouris, ou sensibiliteTactile)
+function regarder(dx, dy, s) {
+  s /= dansLunette() ? ARMES[J.arme].zoom : 1;   // dans la lunette, la souris est plus douce
+  if (J.voiture && !enAvion(J.voiture)) J.decalage -= dx * s; else J.lacet -= dx * s;   // en avion, en hélicoptère ou dans la Batmobile en l'air, la souris dirige
+  J.tangage = clamp(J.tangage - dy * s, -1.3, 1.2);
+  J.dernierMouvement = temps;
+}
 // on clique pour jouer : dans le menu, ou sur l'écran du chapitre
 function lancerJeu() {
   enJeu = true; $('menu').style.display = 'none';
   for (const o of objets) if (o.etiquette && o.langue !== langue) etiqueter(o);   // on a peut-être changé de langue dans le menu
   majEnseignes();
   initAudio(); audio.resume();
-  renderer.domElement.requestPointerLock?.();
+  if (tactile) pleinEcran();   // un téléphone : pas de souris à capturer, mais tout l'écran, en paysage
+  else renderer.domElement.requestPointerLock?.();
   debutChapitre();   // la première fois : l'écran du chapitre s'en va, la DeLorean arrive, les bulles d'aide
 }
 // (le clic sur le menu lance le jeu dès que ses programmes sont compilés : voir preparerProgrammes, tout à la fin)
 function validerTriche() {
+  if (saisie === null && tactile) { montrerCodes(); return; }   // sans clavier : la pause, et la liste des codes du menu, à toucher
   if (saisie === null) { // on ouvre la saisie
     saisie = ''; for (const k in touches) touches[k] = false; ouvrirMenuJeu(false);   // (les chiffres du code ne sont pas pour le petit menu)
     $('triche').textContent = tr('Code : {code}_', { code: '' }); $('triche').style.display = 'block';
@@ -18051,14 +18311,172 @@ function decoller() {
   J.sol = J.nage = J.saute = J.accroupi = false; J.roule = J.echelle = J.grappin = J.balance = J.mur = J.plane = J.lance = null; J.danse = J.genou = J.atterri = 0;
   annonce('', tr(!armureIronman() ? (supergirl() ? 'Supergirl !' : 'Superman !') : rescue() ? 'Rescue !' : 'Iron Man !'), 2);   // (dans l'armure d'Iron Man : la touche F)
 }
-document.addEventListener('pointerlockchange', () => {
-  if (document.pointerLockElement) return;
+// la pause : la souris n'est plus capturée (Échap), ou, sur un téléphone, le bouton pause, la page cachée, le plein écran quitté
+document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) mettreEnPause(); });
+function mettreEnPause() {
   saisie = null; $('triche').style.display = 'none'; ouvrirMenuJeu(false);
-  enJeu = false; $('menu').style.display = 'flex'; etat('Pause — clique pour continuer');
+  enJeu = false; $('menu').style.display = 'flex'; etat(textePause);
   ouvrirCarte(false); audio?.suspend();
   for (const k in touches) touches[k] = false;
   sourisG = visee = false;
+  if (tactile) { majTactile(); majCodes(); $('etat').scrollIntoView({ block: 'center' }); }   // (la couche tactile se cache, les doigts sont lâchés ; le bouton jaune « touche ici pour continuer », à l'écran)
+}
+
+// ---------------------------------------------------------------------
+// Les commandes tactiles (sur un téléphone ou une tablette : voir tactile, et BOUTONS_TACTILES). Elles ne refont aucune règle du jeu :
+// elles remplissent ce que remplissent le clavier et la souris. Le joystick écrit dans touches (KeyW, KeyS, KeyA, KeyD : de 0 à 1, sans
+// keydown : la danse et les autres suites de touches ne le voient pas) ; un doigt qui glisse appelle regarder, comme la souris ; un
+// bouton enfoncé envoie un vrai keydown, puis un keyup quand le doigt se lève (appuyerTouche, relacherTouche), ou tient sourisG et visee.
+// Chaque doigt a son numéro (pointerId) : deux pouces, et un doigt sur un bouton, marchent en même temps.
+// T.mode : '' (pas en jeu), 'jeu', 'carte' (la grande carte ouverte), 'tourne' (le téléphone est debout) ;
+// T.doigts : chaque doigt posé, { role: 'joystick', 'regard', 'carte' ou 'bouton', x, y (où il est), x0, y0 (où il s'est posé), b (son bouton) } ;
+// T.joystick : le doigt du joystick (ou null) ; T.force : de combien il est poussé (0 à 1) ; T.viseeTenue : le doigt tient le bouton Viser (en voiture, il ne bascule pas) ;
+// T.dernierDoigt : quand un doigt a touché l'écran (voir doigtRecent) ; T.pleinEcran : le jeu a obtenu le plein écran
+// ---------------------------------------------------------------------
+const T = { mode: '', doigts: new Map(), joystick: null, force: 0, viseeTenue: false, dernierDoigt: -1e9, pleinEcran: false, boutons: [], allume: false };
+const couche = $('tactile'), joystick = $('joystick'), enPortrait = matchMedia('(orientation: portrait)');
+// les boutons, d'après BOUTONS_TACTILES : un div chacun (ceux du milieu, dans leur rangée)
+for (const def of BOUTONS_TACTILES) {
+  const el = document.createElement('div');
+  el.className = `bouton zone-${def.zone || 'droite'}` + (def.surCarte ? ' sur-carte' : '');
+  (def.zone === 'milieu' ? $('boutons-milieu') : couche).append(el);
+  T.boutons.push({ def, el, vu: !def.si });
+  if (def.si) el.style.display = 'none';
+}
+// leur nom (dans la langue choisie), leur taille et leur place (REGLAGES.tailleBoutons) : en entrant dans le jeu (on a peut-être changé de
+// langue, ou un réglage, dans le menu). --haut-boutons, --large-boutons : la place que prennent ceux d'en bas à droite (la vitesse s'affiche au-dessus)
+function placerBoutons() {
+  const u = R_.tailleBoutons;
+  let haut = 0, large = 0;
+  for (const { def, el } of T.boutons) {
+    const t = u * (def.gros || 1), [x, y] = def.place || [0, 0], s = el.style, nom = tr(def.nom), signe = def.signe || '';
+    el.innerHTML = (!signe ? '' : signe[0] === '.' ? `<i class="signe ${signe.slice(1)}"></i>` : `<i class="signe">${signe}</i>`) + `<span>${nom}</span>`;
+    el.classList.toggle('court', nom.length <= 3 && !signe);
+    s.setProperty('--t', t + 'px');
+    if (def.zone === 'haut') { s.left = `calc(var(--g) + ${x * u}px)`; s.top = `calc(var(--h) + ${y * u}px)`; }
+    else if (def.zone !== 'milieu') { s.right = `calc(var(--d) + ${x * u}px)`; s.bottom = `calc(var(--b) + ${y * u}px)`; haut = Math.max(haut, y * u + t); large = Math.max(large, x * u + t); }
+  }
+  couche.style.setProperty('--r', R_.rayonJoystick + 'px');
+  $('hud').style.setProperty('--haut-boutons', haut + 'px'); $('hud').style.setProperty('--large-boutons', large + 'px');
+}
+// sur un écran tactile : l'objectif, l'aide, la barre du boss... passent dans la colonne du haut, au milieu, qui les empile sur un téléphone
+// en largeur (et s'efface ailleurs : voir #colonne, dans le style)
+function rangerEcran() { for (const id of ['boss', 'tableau', 'objectif', 'aide', 'devinette', 'compteur']) $('colonne').append($(id)); }
+if (tactile) rangerEcran();
+// un doigt se pose : sur un bouton, il l'enfonce ; dans la moitié gauche, c'est le joystick (s'il n'y en a pas déjà un) ; ailleurs, il fait regarder.
+// La grande carte ouverte : il la déplace (deux doigts : ils zooment)
+couche.addEventListener('pointerdown', e => {
+  e.preventDefault(); T.dernierDoigt = performance.now();
+  if (!enJeu || T.doigts.has(e.pointerId)) return;
+  try { couche.setPointerCapture(e.pointerId); } catch {}   // (le doigt reste à nous, même s'il glisse sur un autre bouton)
+  const el = e.target.closest('.bouton'), b = el && T.boutons.find(b => b.el === el), d = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, b };
+  if (b) { d.role = 'bouton'; T.doigts.set(e.pointerId, d); enfoncer(b); return; }
+  d.role = T.mode === 'carte' ? 'carte' : e.clientX < innerWidth / 2 && !T.joystick ? 'joystick' : 'regard';
+  T.doigts.set(e.pointerId, d);
+  if (d.role === 'joystick') { T.joystick = d; joystick.style.display = 'block'; joystick.style.left = d.x + 'px'; joystick.style.top = d.y + 'px'; majJoystick(d); }
 });
+couche.addEventListener('pointermove', e => {
+  const d = T.doigts.get(e.pointerId);
+  if (!d) return;
+  const dx = e.clientX - d.x, dy = e.clientY - d.y;
+  if (d.role === 'carte') { bougerCarte(d, e.clientX, e.clientY); return; }
+  d.x = e.clientX; d.y = e.clientY;
+  if (d.role === 'joystick') majJoystick(d);
+  else if (d.role === 'regard' || d.b?.def.touche === 'ClicGauche') regarder(dx, dy, R_.sensibiliteTactile);   // (le doigt sur Tirer vise aussi)
+});
+for (const type of ['pointerup', 'pointercancel']) couche.addEventListener(type, e => { T.dernierDoigt = performance.now(); lacherDoigt(e.pointerId); });
+// un doigt, où qu'il touche (une ligne du petit menu, le nom de l'arme...) : la souris que le navigateur imite ensuite ne compte pas (doigtRecent)
+for (const type of ['pointerdown', 'pointerup']) addEventListener(type, e => { if (tactile && e.pointerType === 'touch') T.dernierDoigt = performance.now(); }, true);
+// le doigt se lève (ou le navigateur le reprend) : son bouton est relâché, le joystick revient au milieu
+function lacherDoigt(id) {
+  const d = T.doigts.get(id);
+  if (!d) return;
+  T.doigts.delete(id);
+  if (d.role === 'bouton') relacherBouton(d.b);
+  if (d.role === 'joystick') { T.joystick = null; joystick.style.display = 'none'; T.force = 0; touches.KeyW = touches.KeyS = touches.KeyA = touches.KeyD = 0; touches.ShiftRight = false; }
+}
+function lacherDoigts() { for (const id of [...T.doigts.keys()]) lacherDoigt(id); }   // (la pause, la carte, le téléphone tourné)
+// le joystick : de combien le pouce s'est éloigné de là où il s'est posé, en fractions de REGLAGES.rayonJoystick (0 dans la zone morte)
+function majJoystick(d) {
+  const ox = d.x - d.x0, oy = d.y - d.y0, l = Math.hypot(ox, oy), R = R_.rayonJoystick, m = Math.min(1, l / R);
+  const f = T.force = m < R_.zoneMorteJoystick ? 0 : m, fx = l ? ox / l * f : 0, fy = l ? -oy / l * f : 0;   // (vers le haut de l'écran : avancer)
+  touches.KeyW = Math.max(0, fy); touches.KeyS = Math.max(0, -fy); touches.KeyD = Math.max(0, fx); touches.KeyA = Math.max(0, -fx);
+  joystick.firstChild.style.transform = `translate(${l ? ox / l * Math.min(l, R) : 0}px, ${l ? oy / l * Math.min(l, R) : 0}px)`;
+  courirAuJoystick();
+}
+// poussé à fond (REGLAGES.seuilCourse), à pied, il court : comme Maj (ShiftRight : le bouton Maj, lui, tient ShiftLeft). Pas en volant, ni en
+// voiture, ni à ski : là, Maj fait des figures ou des dérapages, c'est le bouton Maj qui s'en charge. Pas en l'air avec la cape de Batman (elle s'ouvrirait)
+const aPiedTactile = () => !J.voiture && !J.robot && !J.superman && !J.plane && !J.balance && !J.grappin && !J.mur && !J.echelle && !J.telesiege && !J.monorail
+  && (J.sol || J.nage || !pouvoir('cape'));
+function courirAuJoystick() { if (T.joystick) touches.ShiftRight = T.force > R_.seuilCourse && aPiedTactile(); }
+// un bouton enfoncé : comme sa touche (ou le bouton de la souris). Viser : à pied, un toucher l'allume, un autre l'éteint ; en voiture, à ski
+// et dans le heavy robot ou l'armure (où le clic droit tire, crache les flammes ou fait un grab), seulement tant qu'on tient le doigt dessus
+function enfoncer(b) {
+  const t = b.def.touche;
+  b.el.classList.add('appuye');
+  if (t === 'ClicGauche') sourisG = true;
+  else if (t === 'ClicDroit') { if (J.voiture || J.robot) { visee = T.viseeTenue = true; } else visee = !visee; }
+  else if (t === 'Pause') mettreEnPause();
+  else appuyerTouche(t);
+}
+function relacherBouton(b) {
+  const t = b.def.touche;
+  b.el.classList.remove('appuye');
+  if (t === 'ClicGauche') { sourisG = false; dejaTire = false; }   // (comme mouseup : une arme au coup par coup retirera au prochain appui)
+  else if (t === 'ClicDroit') { if (T.viseeTenue) visee = T.viseeTenue = false; }
+  else if (t !== 'Pause') relacherTouche(t);
+}
+// la grande carte au doigt : un doigt la fait suivre ; deux doigts zooment (le rapport de leurs écarts), et la déplacent de la moitié du chemin
+function bougerCarte(d, x, y) {
+  const autre = [...T.doigts.values()].find(o => o !== d && o.role === 'carte');
+  if (autre) {
+    const avant = Math.hypot(d.x - autre.x, d.y - autre.y), apres = Math.hypot(x - autre.x, y - autre.y);
+    if (avant > 10 && apres > 10) zoomerCarte(apres / avant);
+    deplacerCarte(-(x - d.x) / 2, -(y - d.y) / 2);
+  } else deplacerCarte(-(x - d.x), -(y - d.y));
+  d.x = x; d.y = y;
+}
+// le nom de l'arme, en haut à droite : l'arme suivante (comme la molette)
+$('arme').addEventListener('pointerdown', e => { if (!tactile || !enJeu || carte.ouverte) return; e.preventDefault(); T.dernierDoigt = performance.now(); armeSuivante(1); });
+// les lignes du petit menu (Tab) se touchent
+$('menu-jeu').addEventListener('click', e => { const l = e.target.closest('[data-n]'); if (tactile && l) choisirMenuJeu(+l.dataset.n); });
+// à chaque image : la couche tactile suit le jeu (cachée dans le menu, réduite au bouton de la carte sur la grande carte, le voile quand le
+// téléphone est debout), les boutons qui n'apparaissent que par moments (si), Viser qui s'éteint tout seul. On ne touche à la page que
+// quand quelque chose change : presque rien à chaque image
+function majTactile() {
+  if (!tactile) return;
+  const mode = !enJeu ? '' : enPortrait.matches ? 'tourne' : carte.ouverte ? 'carte' : 'jeu';
+  if (mode !== T.mode) {
+    if (T.mode === '' && mode) placerBoutons();
+    if (mode !== 'jeu' || T.mode === 'tourne') lacherDoigts();   // (en ouvrant la carte, en tournant le téléphone : les doigts posés ne comptent plus)
+    T.mode = mode;
+    couche.className = mode === 'jeu' || mode === 'carte' ? mode : '';
+    $('tourner').classList.toggle('vu', mode === 'tourne');
+    if (mode === 'tourne') $('tourner').textContent = tr('Tourne ton téléphone');
+  }
+  if (mode !== 'jeu') return;
+  courirAuJoystick();
+  if (visee && !T.viseeTenue && (J.voiture || J.robot || J.mort)) visee = false;   // Viser allumé à pied : il s'éteint en montant en voiture, ou en mourant
+  if (visee !== T.allume) { T.allume = visee; T.boutons.find(b => b.def.touche === 'ClicDroit')?.el.classList.toggle('allume', visee); }
+  for (const b of T.boutons) if (b.def.si) { const vu = !!b.def.si(); if (vu !== b.vu) { b.vu = vu; b.el.style.display = vu ? '' : 'none'; if (!vu) for (const [id, d] of T.doigts) if (d.b === b) lacherDoigt(id); } }
+}
+// le plein écran, puis le paysage (sur un téléphone, au premier toucher du jeu) : refusés ou impossibles (un iPhone n'a ni l'un ni l'autre), on joue quand même
+function pleinEcran() {
+  try {
+    Promise.resolve(document.documentElement.requestFullscreen?.({ navigationUI: 'hide' }))
+      .then(() => { if (document.fullscreenElement) T.pleinEcran = true; return screen.orientation?.lock?.('landscape'); })
+      .catch(() => {});
+  } catch {}
+}
+// la pause, toute seule : la page est cachée (on reçoit un appel, on change d'appli), ou on sort du plein écran qu'on avait obtenu
+document.addEventListener('visibilitychange', () => { if (tactile && document.hidden && enJeu) mettreEnPause(); });
+document.addEventListener('fullscreenchange', () => {
+  if (!tactile || document.fullscreenElement) return;
+  if (T.pleinEcran && enJeu) mettreEnPause();
+  T.pleinEcran = false;
+});
+// « Taper un code de triche », sans clavier : la pause, et la liste des codes du menu, ouverte, à l'écran (on y touche un code : voir boiteTriches)
+function montrerCodes() { mettreEnPause(); boiteTriches.open = true; majCodes(); boiteTriches.scrollIntoView({ block: 'start' }); }
 
 // =====================================================================
 //  Actions du joueur
@@ -18673,7 +19091,8 @@ function majJoueur(dt) {
   if (J.biceps && (av || lat || touches.Space || J.accroupi || sourisG || visee || J.nage || J.danse || ironmanVise())) finirBiceps();   // ...et la pose du culturiste aussi
   const moonwalk = J.danse > 0 && J.danse < R_.moonwalk[0];
   const v = (moonwalk ? R_.vitesseMoonwalk : J.nage ? (court ? R_.vitesseNageRapide : R_.vitesseNage) : J.accroupi ? R_.vitesseAccroupi : court ? R_.vitesseCourse : visee ? R_.vitesseMarche * 0.6 : R_.vitesseMarche)
-    * parTriche('vitesse') * (J.energie > 0 ? R_.vitesseEnergie : 1) * (sansReacteur() ? 0.5 : 1) * vitesseCostume() * vitesseSuper(court);   // la boisson énergisante fait aller plus vite ; sans son réacteur (mission « Iron Monger »), il avance à peine ; au chapitre de Batman (ou de Superman), son costume ; la super-vitesse
+    * parTriche('vitesse') * (J.energie > 0 ? R_.vitesseEnergie : 1) * (sansReacteur() ? 0.5 : 1) * vitesseCostume() * vitesseSuper(court)   // la boisson énergisante fait aller plus vite ; sans son réacteur (mission « Iron Monger »), il avance à peine ; au chapitre de Batman (ou de Superman), son costume ; la super-vitesse
+    * (moonwalk ? 1 : clamp(Math.hypot(av, lat), R_.joystickLent, 1));   // le joystick d'un téléphone poussé à moitié : il va moitié moins vite (jamais moins que joystickLent). Au clavier : 1, même en diagonale
   const robot = TRICHES.some(t => t.actif && t.robot);
   let mx = Math.sin(J.lacet) * av - Math.cos(J.lacet) * lat, mz = Math.cos(J.lacet) * av + Math.sin(J.lacet) * lat;
   if (moonwalk) { mx = -Math.sin(J.angleCorps); mz = -Math.cos(J.angleCorps); }   // le moonwalk : il recule
@@ -19072,6 +19491,7 @@ function rouler(dt) {
 const figureVol = nom => annonce(tr('{figure} !', { figure: tr(nom).toUpperCase() }), '', 1.5);   // une figure réussie : son nom s'affiche
 function figuresVol(f, dt, roule, boucle, vt = R_.vitesseTonneau, vl = R_.vitesseLooping) {
   const tour = 2 * Math.PI;
+  roule = Math.sign(roule); boucle = Math.sign(boucle);   // (le joystick d'un téléphone poussé à moitié fait le même tonneau)
   if (roule && roule !== f.sensTonneau) { f.sensTonneau = roule; if (f.tonneau) f.tonneau = tour - f.tonneau; }   // dans l'autre sens : le même angle, compté à l'envers
   if (roule && !f.tonneau) bruit(0.25, 1200, 0.5);   // l'air siffle
   if (roule || f.tonneau) {
@@ -19399,8 +19819,8 @@ function conduire(v, dt) {
   const lourd = v.blindee ? R_.lourdeurBlindage : 1, turbo = v.turboReste > 0 ? t.turbo.vitesse : 1, acc = t.acceleration * lourd * (turbo > 1 ? 2.5 : 1);   // le blindage Mad Max pèse lourd ; le turbo pousse fort
   if (t.glisse) { if (auSol) glisser(v, dt, gaz, volant); else if (v.vol && !v.accident) figures(v, dt, gaz, volant); }   // à ski : sur la neige, ou en l'air (les figures)
   else if (auSol) {
-    if (gaz > 0) v.vitesse += acc * dt * (v.vitesse < 0 ? 2.5 : 1);
-    else if (gaz < 0) v.vitesse -= acc * dt * (v.vitesse > 0 ? 2.5 : 0.6);
+    if (gaz > 0) v.vitesse += acc * dt * gaz * (v.vitesse < 0 ? 2.5 : 1);   // (gaz : 1 au clavier ; avec le joystick d'un téléphone, de 0 à 1)
+    else if (gaz < 0) v.vitesse -= acc * dt * -gaz * (v.vitesse > 0 ? 2.5 : 0.6);
     else v.vitesse *= Math.pow(0.6, dt);
     if (touches.Space) v.vitesse *= Math.pow(0.05, dt); // frein à main
     if (!t.bateau) v.vitesse -= R_.graviteVoiture * Math.sin(v.tangage) * dt;   // la pente freine en montée et pousse en descente
@@ -19515,6 +19935,7 @@ function redresser(v, dt) {
 // Quand on lâche les touches, il finit son demi-tour (son tour entier, pour un salto) et s'arrête là : il n'y a plus qu'à se recevoir.
 // v.figure : ce qu'il a fait depuis qu'il a décollé (recevoirFigure compte les points)
 function figures(v, dt, gaz, volant) {
+  gaz = Math.sign(gaz); volant = Math.sign(volant);   // (le joystick d'un téléphone poussé à moitié fait la même figure)
   const f = v.figure ||= { tour: v.tour || 0, cork: 0, grabs: [0, 0, 0], sensTour: 1, sensSalto: 1, envers: Math.cos(v.tour || 0) < 0 };
   const cork = gaz && volant ? gaz : 0;
   // l'angle rond où finir (un multiple de « pas ») : le suivant s'il a déjà fait le quart du chemin, sinon il revient
@@ -28630,11 +29051,12 @@ function dessinerGrandeCarte(dt) {
   flecheJoueur(g, ...ecran(J.x, J.z), Math.PI - (J.voiture ? J.voiture.angle : J.lacet), 2);
   g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(0, 0, l, 64); g.fillRect(0, h - 52, l, 52); // bandeaux pour lire les textes
   legendeCarte(g, h);
-  if (cible) { g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(36, 32, 8, 0, 7); g.fill(); g.stroke(); }
-  texteCarte(g, $('objectif').textContent, cible ? 54 : 28, 40, 22, 'left');
+  const x0 = tactile ? 112 : 0;   // (sur un écran tactile, les boutons Pause et M sont en haut à gauche, par-dessus la carte : l'objectif commence après eux)
+  if (cible) { g.fillStyle = '#ffd23a'; g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(x0 + 36, 32, 8, 0, 7); g.fill(); g.stroke(); }
+  texteCarte(g, $('objectif').textContent, x0 + (cible ? 54 : 28), 40, tactile ? 18 : 22, 'left');
   const [ci, cj] = blocEn(J.x, J.z);   // pour retrouver sa place dans le tableau CARTE
   texteCarte(g, tr('Tu es dans la colonne {col}, ligne {ligne} de la CARTE', { col: ci, ligne: cj }), l - 24, 40, 17, 'right');
-  texteCarte(g, tr('Molette : zoom   ·   Souris ou flèches : se déplacer   ·   M : fermer'), l / 2, h - 19, 19);
+  texteCarte(g, tr(tactile ? 'Deux doigts : zoom   ·   Un doigt : se déplacer   ·   M : fermer' : 'Molette : zoom   ·   Souris ou flèches : se déplacer   ·   M : fermer'), l / 2, h - 19, 19);
 }
 // dans l'armure d'Iron Man, à pied : ses touches. Au chapitre d'Iron Man, celles de l'armure qu'il porte, et de ce qu'il a acheté chez Stark Industries
 function aideIronman() {
@@ -29920,8 +30342,9 @@ function boucle(t) {
   const dt = clamp((t - dernier) / 1000 * R_.vitesseJeu, 0, 0.05);   // (REGLAGES.vitesseJeu ralentit tout le jeu)
   const horloge = R_.vitesseJeu > 0 ? clamp((t - dernier) / 1000, 0, 1) : 0;   // le vrai temps écoulé : la journée dure ce qu'il faut, même si le jeu rame
   dernier = t;
+  majTactile();   // sur un téléphone : les commandes tactiles (voir BOUTONS_TACTILES)
   if (carte.ouverte) { finesse.image = -1; dessinerGrandeCarte(dt); compter(debutImage, performance.now()); requestAnimationFrame(boucle); return; } // pause : la carte cache toute la ville
-  if (enJeu && !ecranChapitre.bloque()) mettreAJour(dt, horloge); else if (!enJeu) dessinerApercu(dt);   // dans le menu : l'aperçu du héros (et le jeu attend que l'écran du chapitre s'en aille)
+  if (enJeu && !ecranChapitre.bloque() && T.mode !== 'tourne') mettreAJour(dt, horloge); else if (!enJeu) dessinerApercu(dt);   // dans le menu : l'aperçu du héros (et le jeu attend que l'écran du chapitre s'en aille, ou qu'on tourne le téléphone)
   majCamera(dt); majRepere(dt); majHUD(dt); majLaser(dt);
   majCiel(dt);   // le soleil (ou la lune), le ciel, la brume, les lumières de la nuit
   majMorceaux();
@@ -30092,6 +30515,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   majDetailsVoitures, voituresEnBloc, ombreEnBloc, enBloc, montrerDeLoin, formeDeLoin, cacheLoin, majPhares,
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
   MENU_JEU, menuJeu, ouvrirMenuJeu, choisirMenuJeu, taper, supermanLibre,
+  BOUTONS_TACTILES, COMMANDES_TACTILES, T, majTactile, appuyerTouche, relacherTouche, regarder, armeSuivante, mettreEnPause, touche, get visee() { return visee; }, get sourisG() { return sourisG; }, get dejaTire() { return dejaTire; },
   // Gotham (chapitre 3)
   costume, changerCostume, costumeCivil, tricheHeros, sansCostume, chauvesSouris, monorail, monorailProche, monterMonorail, descendreMonorail, majMonorail, batSignal, majBatSignal, projecteurBat,
   pluie, nuages, majPluie, COUVERT, BROUILLARD, PLUIE, vueDetails, estGothique, manoir, tourWayne, cathedrale, arkham, aceChemicals, zoo, stade, sphinx, GOTHAM,

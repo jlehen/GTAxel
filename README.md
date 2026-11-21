@@ -17,7 +17,7 @@ Dans GTAxel, tu peux :
 
 ## Sommaire
 
-- [Jouer](#jouer) : lancer le jeu, le menu
+- [Jouer](#jouer) : lancer le jeu, le menu, sur un téléphone
 - [Les touches](#les-touches)
 - [Véhicules](#véhicules) : avion, hélicoptère, heavy robot, armure, ski
 - [Super-héros](#super-héros) : Superman, Batman, Spiderman, Iron Man
@@ -51,8 +51,28 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 - Pour changer la qualité, le jeu recharge la page (pendant une partie, il te demande d'abord : tu gardes ton argent, tes armes et tes missions réussies, mais tu repars du départ, comme avec F5 : la mission en cours recommence, et tes codes de triche s'éteignent). Le navigateur se souvient de ton choix.
 - La qualité change d'un coup plusieurs cases de **⚙ Réglages** (elles deviennent jaunes) : si tu en changes une toi-même, la qualité devient « personnalisée » (c'est ta case qui compte), et **Tout remettre** revient à Haute.
 - Tu peux changer de personnage quand tu veux, même en pause (Échap).
-- Sous le menu, la liste des touches est celle du chapitre où tu es : à Malibu, celles de l'armure d'Iron Man ; à Gotham, celles de Batman, et ainsi de suite.
+- Sous le menu, la liste des touches est celle du chapitre où tu es : à Malibu, celles de l'armure d'Iron Man ; à Gotham, celles de Batman, et ainsi de suite (sur un téléphone, c'est la liste des boutons : voir juste en dessous).
 - En allemand et en anglais, les touches pour se déplacer sont W A S D (et l'armure d'Iron Man s'appelle avec Q W E au lieu de A Z E).
+
+### Sur un téléphone ou une tablette
+
+Ouvre la même adresse dans le navigateur du téléphone. Le jeu se met tout seul en qualité **Basse**. Touche le bouton jaune **Touche ici pour jouer**, et tiens le téléphone **en largeur** (debout, le jeu attend et te dit « Tourne ton téléphone »).
+
+| Où | Ce que tu touches | C'est comme |
+|---|---|---|
+| À gauche | Pose le pouce n'importe où : un **joystick** apparaît. Pousse-le pour marcher (un peu : doucement ; à fond : tu cours) ou pour conduire | Z Q S D |
+| Ailleurs | Fais glisser un doigt pour regarder | La souris |
+| En bas à droite | **Clic gauche** (le gros) : tirer ou frapper ; garde le doigt dessus et fais-le glisser : tu vises en tirant | Clic gauche |
+| | **Clic droit** : viser (touche encore pour arrêter ; en voiture, garde le doigt dessus) | Clic droit |
+| | **Espace**, **Maj**, **C**, **E** | Les mêmes touches |
+| En haut à gauche | **Pause** ; **M**, la carte (un doigt la déplace, deux doigts zooment, **M** la ferme) ; **Tab**, le petit menu (touche une ligne) | Échap, M, Tab |
+| En haut à droite | Le nom de ton arme : l'arme suivante | La molette |
+
+- Chaque bouton porte le nom de la touche qu'il remplace : quand le jeu dit « Appuie sur **E** », touche le bouton **E**. Le joystick, le regard et un bouton marchent en même temps (deux pouces, et un doigt de plus).
+- Les codes de triche : dans le petit menu (**Tab**), « Taper un code de triche » ouvre la liste des codes. Touche un code pour l'allumer (il devient jaune), retouche-le pour l'éteindre. **MISSION** et **CHAPITRE** te demandent leur numéro.
+- La pause : le bouton pause, ou tout seul quand tu quittes le jeu (un appel, une autre appli). Touche le bouton jaune pour continuer. Le menu de pause liste tous les boutons.
+- Le jeu prend tout l'écran (sur Android). Sur un **iPhone**, ce n'est pas possible depuis Safari : touche le bouton de partage, puis **Sur l'écran d'accueil** ; ouvert depuis l'écran d'accueil, le jeu prend tout l'écran.
+- Les touches des super-héros (**H**, **F**, **G**, **R**...) n'ont pas encore de bouton : elles arrivent bientôt. Les réponses aux devinettes du Sphinx non plus.
 
 ## Les touches
 
@@ -98,7 +118,7 @@ En [Superman](#superman) (avec le code `SUPERMAN`, ou à Metropolis en costume) 
 
 ### Le petit menu
 
-Ce qu'on fait rarement est rangé dans un petit menu, au milieu de l'écran : appuie sur **Tab**, puis tape le chiffre de la ligne (1, 2, 3…). Le jeu continue pendant ce temps : tu peux marcher. **Tab** encore le ferme, et il se ferme tout seul au bout de 8 secondes.
+Ce qu'on fait rarement est rangé dans un petit menu, au milieu de l'écran : appuie sur **Tab**, puis tape le chiffre de la ligne (1, 2, 3…). Le jeu continue pendant ce temps : tu peux marcher. **Tab** encore le ferme, et il se ferme tout seul au bout de 8 secondes. Sur un [téléphone](#sur-un-téléphone-ou-une-tablette), touche le bouton **Tab**, en haut à gauche, puis la ligne.
 
 | Chiffre | Où | Ce qu'il fait | Sa touche |
 |---|---|---|---|
@@ -852,7 +872,7 @@ Avec **Supergirl**, les costumes gardent tes longs cheveux blonds. Le jeu se sou
 
 ## Les codes de triche
 
-Appuie sur **Entrée**, tape le code, puis **Entrée**. Retape un code pour l'annuler. Dans le menu, le bouton **🎮 Codes de triche** les montre tous.
+Appuie sur **Entrée**, tape le code, puis **Entrée**. Retape un code pour l'annuler. Dans le menu, le bouton **🎮 Codes de triche** les montre tous. Sur un [téléphone](#sur-un-téléphone-ou-une-tablette), touche le code dans cette liste (le petit menu l'ouvre aussi) : il s'allume en jaune ; retouche-le pour l'éteindre.
 
 **Pour rire** : `SLIP`, `CHAUSSURE`, `SOUTIF`, `JAMBEDEBOIS`, `BARCA`, `BEBE`, `GOKU`, `Z6PO` (ou `C3PO`)… à toi de voir ce qu'ils font !
 
@@ -914,6 +934,7 @@ Les tableaux, dans l'ordre où ils sont dans le fichier, de haut en bas :
 | [`TRADUCTIONS` et `LANGUES`](#traductions-et-langues) | Les phrases du jeu dans les autres langues |
 | [`REGLAGES`](#reglages) | Les nombres de tout le jeu |
 | [`MENU_JEU`](#menu_jeu) | Le petit menu du jeu (touche Tab) |
+| [`BOUTONS_TACTILES`](#boutons_tactiles) | Les boutons d'un téléphone ou d'une tablette |
 | [`ARMES`, `TRESORS` et `ARMES_ROBOT`](#armes-tresors-et-armes_robot) | Les armes et les objets à voler |
 | [`VOITURES`](#voitures-1) | Les voitures, bateaux, avions, skis... |
 | [`ENNEMIS`, `CAMP` et `ARMURE`](#ennemis-camp-et-armure) | Les ennemis, le camp militaire et son armure |
@@ -968,6 +989,7 @@ Les nombres de tout le jeu :
 - **Les super-héros** : ce qu'écrase la chute de Superman (à combien de mètres à la ronde, les dégâts, et de quelle hauteur on passe à travers un toit), vitesse de vol de Superman, vitesse du grappin de Batman, vitesse de sa cape (et de combien elle descend), vitesse de Spiderman sur un mur et au bout de sa toile, vitesse de la voiture qu'il lance, vitesse des batarangs.
 - **Le jour et la nuit** : la durée du jour, du coucher du soleil, de la nuit et du lever du soleil (`dureeJour`, `dureeCrepuscule`, `dureeNuit`, `dureeLever`, en secondes : mets `dureeNuit: 30` pour une nuit toute courte), la lumière de la lune (`clairDeLune`), combien de lampadaires éclairent vraiment la nuit (`lumieresNuit`), combien de piétons et de voitures il reste la nuit, combien de gangs en plus.
 - **Les chapitres de super-héros** : l'amende des héros et la plus grosse dette (`amende`, `amendeVictimes`, `amendeMax`, `pardon`, `detteMax`), combien de secondes un passant assommé reste couché à Gotham (`reveilAssomme`), ce que les batarangs explosifs font à Batman lui-même (`explosifsBatman`, et `explosifsPres` : à moins de combien de mètres de sa main leur explosion ne lui fait rien), les appels de la police (`appelAttente` : le temps entre deux appels, `appelVoyous`, `appelDuree`, et la `prime`), et la durée du voyage en DeLorean (`dureeVoyage`).
+- **Sur un téléphone ou une tablette** : `sensibiliteTactile` (de combien le doigt qui glisse fait tourner la vue : 0.005), `rayonJoystick` (60 points : le joystick est à fond quand le pouce s'est éloigné d'autant), `zoneMorteJoystick` (0.15 : en dessous, il ne fait rien), `joystickLent` (0.35 : à peine poussé, B.J. marche quand même à 35 % de sa vitesse), `seuilCourse` (0.9 : au-delà, il court), `tailleBoutons` (56 points ; voir [`BOUTONS_TACTILES`](#boutons_tactiles)).
 - **Jusqu'où on voit** : `distanceRelief`, les montagnes et la mer (10 km) ; `distanceVue`, les bâtiments et les arbres (900 m).
 - **Les ombres des gens** : `ombresPersonnages` : les passants plus près que ça de la caméra (30 m) ont une vraie ombre, les autres une tache sombre sous les pieds (0 = une tache pour tous).
 - **Les voitures garées** : `sommeilVoitures` : les voitures garées à plus de 60 m de toi, qui ne bougent plus, « dorment » : le jeu ne les recalcule plus à chaque image, et elles se réveillent dès que tu t'approches ou qu'on les touche (0 = aucune ne dort).
@@ -991,6 +1013,21 @@ Juste après `REGLAGES` : les lignes du [petit menu](#le-petit-menu) (touche **T
 ```
 
 Pense à la traduction de son `nom` dans `TRADUCTIONS`. La touche du menu et le temps avant qu'il se ferme tout seul sont dans [`REGLAGES`](#reglages) (`toucheMenu`, `dureeMenu`).
+
+#### `BOUTONS_TACTILES`
+
+Juste après `MENU_JEU` : les boutons d'un [téléphone ou d'une tablette](#sur-un-téléphone-ou-une-tablette) (sur un ordinateur, ils ne s'affichent pas). Une ligne par bouton :
+
+- `nom` : ce qui est écrit dessus, le nom de la touche qu'il remplace (`'Espace'`, `'E'`) ; `touche` : cette touche, écrite comme `touchesDanse` (`'KeyE'` pour E, `'Space'` pour Espace, `'ShiftLeft'` pour Maj), ou `'ClicGauche'`, `'ClicDroit'`, `'Pause'`. Tant que le doigt est dessus, la touche est enfoncée ;
+- `signe` : ce qui est dessiné au-dessus du nom (un caractère, `'»'`, ou un dessin du jeu : `'.tir'`, `'.viseur'`, `'.monte'`, `'.descend'`, `'.pause'`, `'.lignes'`) ;
+- `zone` : `'droite'` (en bas à droite), `'haut'` (en haut à gauche) ou `'milieu'` (en bas au milieu, côte à côte) ; `place` : où il est, en tailles de bouton depuis le coin (`[0, 0]` : dans le coin) ; `gros: 1.5` : une fois et demie plus gros ;
+- `surCarte: true` : il reste sur la grande carte ; `si` : il n'apparaît que quand cette fonction dit oui ; `fait` : ce qu'il fait, pour la liste du menu de pause (juste après, `COMMANDES_TACTILES` : les autres lignes de cette liste).
+
+```js
+{ nom: 'H', touche: 'KeyH', zone: 'milieu', si: () => !J.voiture },
+```
+
+Pense à la traduction de son `nom` et de son `fait` dans `TRADUCTIONS`. Le joystick, la sensibilité du doigt et la taille des boutons sont dans [`REGLAGES`](#reglages).
 
 #### `ARMES`, `TRESORS` et `ARMES_ROBOT`
 
