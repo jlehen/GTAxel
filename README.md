@@ -56,7 +56,7 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 
 ### Sur un téléphone ou une tablette
 
-Ouvre la même adresse dans le navigateur du téléphone. Le jeu se met tout seul en qualité **Basse**. Touche le bouton jaune **Touche ici pour jouer**, et tiens le téléphone **en largeur** (debout, le jeu attend et te dit « Tourne ton téléphone »).
+Ouvre la même adresse dans le navigateur du téléphone. Le jeu se met tout seul en qualité **Basse**. Touche le bouton jaune **Touche ici pour jouer**, et tiens le téléphone **en largeur** (debout, le jeu attend et te dit « Tourne ton téléphone » ; une tablette, elle, se joue aussi en hauteur).
 
 | Où | Ce que tu touches | C'est comme |
 |---|---|---|
@@ -65,11 +65,11 @@ Ouvre la même adresse dans le navigateur du téléphone. Le jeu se met tout seu
 | En bas à droite | **Clic gauche** (le gros) : tirer ou frapper ; garde le doigt dessus et fais-le glisser : tu vises en tirant | Clic gauche |
 | | **Clic droit** : viser (touche encore pour arrêter ; en voiture, garde le doigt dessus) | Clic droit |
 | | **Espace**, **Maj**, **C**, **E** | Les mêmes touches |
-| En haut à gauche | **Pause** ; **M**, la carte (un doigt la déplace, deux doigts zooment, **M** la ferme) ; **Tab**, le petit menu (touche une ligne) | Échap, M, Tab |
+| En haut à gauche | **Pause** ; **M**, la carte (un doigt la déplace, deux doigts zooment, touche « Légende + » pour la légende, **M** la ferme) ; **Tab**, le petit menu (touche une ligne) | Échap, M, Tab |
 | En haut à droite | Le nom de ton arme : l'arme suivante | La molette |
 
 - Chaque bouton porte le nom de la touche qu'il remplace : quand le jeu dit « Appuie sur **E** », touche le bouton **E**. Le joystick, le regard et un bouton marchent en même temps (deux pouces, et un doigt de plus).
-- Les codes de triche : dans le petit menu (**Tab**), « Taper un code de triche » ouvre la liste des codes. Touche un code pour l'allumer (il devient jaune), retouche-le pour l'éteindre. **MISSION** et **CHAPITRE** te demandent leur numéro.
+- Les codes de triche : dans le petit menu (**Tab**), « Codes de triche » ouvre la liste des codes. Touche un code pour l'allumer (il devient jaune), retouche-le pour l'éteindre ; ce qu'il fait s'écrit juste en dessous. **MISSION** et **CHAPITRE** te demandent leur numéro.
 - La pause : le bouton pause, ou tout seul quand tu quittes le jeu (un appel, une autre appli). Touche le bouton jaune pour continuer. Le menu de pause liste tous les boutons.
 - Le jeu prend tout l'écran (sur Android). Sur un **iPhone**, ce n'est pas possible depuis Safari : touche le bouton de partage, puis **Sur l'écran d'accueil** ; ouvert depuis l'écran d'accueil, le jeu prend tout l'écran.
 - Les touches des super-héros (**H**, **F**, **G**, **R**...) n'ont pas encore de bouton : elles arrivent bientôt. Les réponses aux devinettes du Sphinx non plus.
