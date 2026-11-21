@@ -67,16 +67,13 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 | Maj | Courir |
 | Espace | Sauter (en voiture : frein à main) |
 | C ou Ctrl | S'accroupir (on se fait moins toucher) |
-| E ou F | Monter / descendre, et tout le reste : voir [La touche E](#la-touche-e) |
-| V | Vue à la 1re / 3e personne |
+| E ou F | Monter / descendre, et tout le reste : voir [La touche E](#la-touche-e) (en Superman et dans l'armure d'Iron Man, F fait voler) |
 | 1 à 8 ou molette | Changer d'arme |
 | 9 | Les armes des codes de triche : voir [La touche 9](#la-touche-9) |
-| M ou Tab | Carte de tout le pays (molette : zoom ; souris ou flèches : se déplacer) |
-| P | Le compteur de performances, en bas à droite de la mini-carte (P encore : il s'éteint) : les images par seconde, le temps de calcul et de dessin de chaque image, les appels de dessin et les triangles, et la finesse de l'image. Pratique pour voir ce qui fait ramer le jeu |
-| Entrée | Taper un code de triche |
+| M | Carte de tout le pays (molette : zoom ; souris ou flèches : se déplacer) |
+| Tab | Le petit menu : changer de vue, la DeLorean, un code de triche, le compteur de performances… Tape le chiffre de la ligne : voir [Le petit menu](#le-petit-menu) |
 | Échap | Pause |
 | Q S D, 3 fois de suite | Danser comme Michael Jackson : voir [La danse](#la-danse) |
-| Maj, 3 fois de suite (vite) | Voler comme Superman (encore 3 fois : tu arrêtes de voler… et tu tombes !) |
 
 - **Sur une échelle** : avance vers le mur pour grimper, recule pour descendre, Espace pour lâcher.
 - **Astuce** : pour s'accroupir, préfère **C**. Certains navigateurs ferment l'onglet avec Ctrl+W.
@@ -97,14 +94,34 @@ Ouvre **https://jlehen.github.io/GTAxel/**, ou ouvre `index.html` dans un naviga
 
 Dans l'armure d'Iron Man, s'il n'y a rien de tout ça à faire là, **E** tire de la main droite (pas quand quelqu'un à sauver attend tout près : approche-toi de lui).
 
+En [Superman](#superman) (avec le code `SUPERMAN`, ou à Metropolis en costume) et dans l'armure d'Iron Man, **F** fait voler : pour monter en voiture, c'est **E**. À Metropolis, en civil, **F** fait comme **E** (et s'il n'y a rien à faire là : « Mets ton costume (H) pour voler »).
+
+### Le petit menu
+
+Ce qu'on fait rarement est rangé dans un petit menu, au milieu de l'écran : appuie sur **Tab**, puis tape le chiffre de la ligne (1, 2, 3…). Le jeu continue pendant ce temps : tu peux marcher. **Tab** encore le ferme, et il se ferme tout seul au bout de 8 secondes.
+
+| Chiffre | Où | Ce qu'il fait | Sa touche |
+|---|---|---|---|
+| **1** | Partout | Changer de vue : 1re ou 3e personne (en voiture : la vue de dedans ou de dehors) | **V** |
+| **2** | Partout | La [DeLorean](#la-delorean) : dans un chapitre fini, la faire venir ; dedans, choisir le chapitre où aller | **T** |
+| **3** | Partout | Taper un [code de triche](#les-codes-de-triche) (**Entrée** pour valider) | **Entrée** |
+| **4** | Partout | Le compteur de performances, en bas à droite de la mini-carte (encore : il s'éteint) : les images par seconde, le temps de calcul et de dessin de chaque image, les appels de dessin et les triangles, et la finesse de l'image. Pratique pour voir ce qui fait ramer le jeu | **P** |
+| **5** | [Malibu](#le-magasin-de-stark-industries) | Choisir une autre de tes armures (**H** la fait venir) | **J** |
+| **5** | [Gotham](#le-magasin-de-lucius-fox), [Metropolis](#le-magasin-de-star-labs) | Changer de costume (en costume, tout de suite ; en civil, **H** le met) | **J** |
+| **6** | [Malibu](#iron-man) | Lever ou baisser ton masque | **L** |
+| **6** | [Gotham](#le-magasin-de-lucius-fox) | Choisir une autre de tes Batmobiles, le Bat ou le Batpod (**B** le fait venir) | **N** |
+
+Après « changer d'armure », « de costume » ou « de Batmobile », le menu reste ouvert : tape encore le chiffre pour passer au suivant. Chaque ligne a sa touche, qui marche toujours sans ouvrir le menu : c'est un raccourci.
+
 ### Les autres touches
 
-Elles changent selon ce que tu pilotes et le héros que tu es :
+Elles changent selon ce que tu pilotes et le héros que tu es (**J**, **N**, **L** et **T** sont dans [le petit menu](#le-petit-menu)) :
 
 | Touche | Où | Ce qu'elle fait |
 |---|---|---|
 | **F** | [Armure du camp militaire](#larmure-du-camp-militaire) | Les 10 fusées téléguidées |
 | **F** | [Iron Man](#iron-man) | Voler (F encore : arrêter de voler) |
+| **F** | [Superman](#superman) : à Metropolis en costume, ou avec le code `SUPERMAN` | Voler (F encore : arrêter de voler) |
 | **R** | [Skis de rando](#skis-de-rando) | Coller ou enlever les peaux |
 | **R** | [Batmobile](#la-batmobile) | Déployer les ailes et s'envoler, ou se poser |
 | **R** | [Le Bat](#le-bat) | Décoller, ou se poser |
@@ -119,29 +136,25 @@ Elles changent selon ce que tu pilotes et le héros que tu es :
 | **Clic gauche** | [Metropolis](#metropolis-chapitre-4), en costume | Un missile de Lex Luthor dans les mains (4e mission) : tu le lances vers le ciel. La [kryptonite](#la-kryptonite) dans ta main : tu la lances au loin. La lance de kryptonite à la main (11e mission) : tu la plantes dans Doomsday, de tout près |
 | **B** | [Batman](#batman), à pied | Rappeler la Batmobile (à Gotham : celle que tu as choisie, dès la 2e mission, ou le [Bat](#le-bat), dès la 8e, même quand tu nages, ou le [Batpod](#le-batpod), dès la 10e) |
 | **B** | [Metropolis](#le-magasin-de-star-labs), en costume | Le super-cri (si tu l'as acheté) : tout ce qui est devant toi vole |
-| **N** | [Gotham](#le-magasin-de-lucius-fox) | Choisir une autre de tes Batmobiles, le Bat ou le Batpod (B le fait venir) |
 | **1**, **2**, **3** | [Gotham](#gotham-chapitre-3) | Devant une devinette du Sphinx : ta réponse (ça ne change pas ton arme) |
 | **O** | [Gotham](#le-magasin-de-lucius-fox), en costume | La vision de détective : tu vois les ennemis à travers les murs (si tu l'as achetée) |
 | **O** | [Metropolis](#le-magasin-de-star-labs), en costume | La vision à rayons X : tu vois les méchants à travers les murs (si tu l'as achetée) |
 | **K** | [Gotham](#le-magasin-de-lucius-fox), en costume | Un fumigène à tes pieds (si tu en as acheté) |
 | **K** | [Metropolis](#le-magasin-de-star-labs) | Krypto, le super-chien (si tu l'as acheté) : il vient, ou il rentre à la maison |
-| **T** | [DeLorean](#la-delorean) | Choisir le chapitre où aller ; à pied, dans un chapitre fini : faire venir la DeLorean |
 | **A** et **E** | [Iron Man](#iron-man) | Tirer de la main gauche (A) ou de la main droite (E) ; dans la **Mark 50** : A, le bouclier ; E, le canon |
 | **A**, **Z**, **E** (vite) | [Iron Man](#iron-man), avec le code `IRONMAN` | L'armure arrive en volant, pièce par pièce, ou tu en sors |
 | **H** | [Iron Man](#iron-man) | Appeler ton armure, ou en sortir |
 | **H** | [Gotham](#gotham-chapitre-3) | Mettre ton costume (tu deviens Batman, ou Batgirl), même en l'air, ou repasser en civil (les pieds par terre). Ton premier costume, tu le trouves à la 1re mission |
 | **H** | [Metropolis](#metropolis-chapitre-4) | Mettre ton costume (tu deviens Superman, ou Supergirl), même en l'air, ou repasser en civil (les pieds par terre). Ton premier costume, tu le trouves à la 1re mission, dans la Forteresse de Solitude. En civil, tu ne voles pas et tu n'as pas tes yeux laser |
-| **J** | [Iron Man](#iron-man) | Choisir une autre de tes armures |
-| **J** | [Gotham](#le-magasin-de-lucius-fox) | Changer de costume (en costume, tout de suite, dans une nuée de chauves-souris) |
-| **J** | [Metropolis](#le-magasin-de-star-labs) | Changer de costume (en costume, tout de suite, dans un tourbillon) |
 | **X** | [Iron Man](#iron-man) | Le laser des bras (si tu l'as acheté) |
 | **X** | [Gotham](#le-magasin-de-lucius-fox), en costume | Le gel explosif (si tu l'as acheté) : X, tu en projettes là où tu vises ; X encore, boum ! (ça, même en civil ou en voiture) |
 | **X** | [Metropolis](#le-magasin-de-star-labs), en costume | Le souffle glacé (si tu l'as acheté) : tout ce qui est devant toi gèle |
-| **L** | [Iron Man](#iron-man) | Lever ou baisser ton masque |
 
 ### La danse
 
 Tape **Q S D** trois fois de suite (A S D sur un clavier QWERTY) : B.J. met son chapeau et fait le moonwalk, tourne sur lui-même en poussant son petit cri, puis prend la pose de Michael Jackson, la main entre les jambes : « Who's bad ? ». Bouge pour l'arrêter.
+
+**Une astuce cachée** (elle n'est dans aucune liste de touches du jeu) : tape **Maj** 3 fois de suite, très vite. Tu t'envoles comme [Superman](#superman), dans tous les chapitres, sans code de triche ! Encore 3 fois : tu arrêtes de voler… et tu tombes. (À Metropolis, en civil : d'abord **H**, ton costume.)
 
 ## Véhicules
 
@@ -223,7 +236,7 @@ Tu deviens un super-héros avec son [code de triche](#les-codes-de-triche), ou p
 
 ### Superman
 
-Le code `SUPERMAN` t'habille en Superman, avec une cape qui flotte au vent. Sans le code, appuie vite 3 fois sur **Maj** pour voler (sauf à Metropolis, en civil : d'abord **H**, ton costume ; voir [Metropolis](#metropolis-chapitre-4)).
+Le code `SUPERMAN` t'habille en Superman, avec une cape qui flotte au vent. **F** : tu t'envoles ; **F** encore : tu arrêtes de voler. À Metropolis, c'est pareil, en costume (en civil : d'abord **H**, ton costume ; voir [Metropolis](#metropolis-chapitre-4)).
 
 - **Z Q S D** : voler là où tu regardes ; **Espace** : monter ; **C** ou **Ctrl** : descendre.
 - **Maj** : chaque appui te fait aller plus vite, jusqu'à 360 km/h. Espace bien les appuis : 3 fois trop vite et tu arrêtes de voler !
@@ -289,8 +302,8 @@ Elle roule à 223 km/h, et elle est blindée.
 À Gotham, va voir **Lucius Fox** au pied de la **tour Wayne** (⚙ sur la carte) : il t'attend derrière l'accueil du grand hall de Wayne Enterprises, avec ses « nouveaux jouets ». Les costumes sont sur des mannequins, les Batmobiles sur de grands plateaux qui tournent, les gadgets et les améliorations près de la porte, avec leur prix au-dessus. Le magasin ouvre quand tu as ton premier costume.
 
 - **E** devant un stand : tu l'achètes, ou tu le choisis si tu l'as déjà.
-- **J**, n'importe où : tu changes de costume (en costume, tout de suite ; en civil, H le met).
-- **N**, n'importe où : tu choisis une autre de tes Batmobiles, et **B** la fait venir.
+- **J**, n'importe où (ou [le petit menu](#le-petit-menu), **Tab**) : tu changes de costume (en costume, tout de suite ; en civil, H le met).
+- **N**, n'importe où (ou le petit menu) : tu choisis une autre de tes Batmobiles, et **B** la fait venir.
 
 | Costume | Prix | Ce qu'il change |
 |---|---|---|
@@ -345,8 +358,8 @@ Au chapitre 2, à Malibu, tu es Iron Man pour de bon (voir [Malibu](#malibu-chap
 | **R** | Le gros rayon de ton plastron, qui fait tout exploser (il faut ensuite 4 secondes pour le recharger) |
 | **F** | Voler, comme Superman (mêmes touches, mêmes figures), avec des flammes sous les bottes et dans les mains. F encore pour arrêter |
 | **A**, **Z**, **E**, vite, l'une après l'autre | Avec le code `IRONMAN` : tu sors de l'armure les bras en croix, en faisant un pas en avant, et elle reste debout derrière toi, vide. A Z E encore, et elle revient sur toi, pièce par pièce |
-| **L** | Lever ou baisser ton masque |
-| **J** | Choisir une autre de tes armures |
+| **L** | Lever ou baisser ton masque (ou par [le petit menu](#le-petit-menu) : **Tab**) |
+| **J** | Choisir une autre de tes armures (ou par le petit menu) |
 | **G** | Les mini-missiles (si tu les as achetés) |
 | **X** | Le laser des bras (si tu l'as acheté) |
 | **M** | La carte, comme toujours |
@@ -366,7 +379,7 @@ Au chapitre 2, à Malibu, tu es Iron Man pour de bon (voir [Malibu](#malibu-chap
 Au chapitre d'Iron Man, va au magasin de **Stark Industries** (l'usine, ⚙ sur la carte de Malibu) : les armures t'y attendent sur des plateaux qui tournent, avec leur prix.
 
 - **E** devant une armure : tu l'achètes, ou tu la choisis si tu l'as déjà.
-- **J**, n'importe où : tu choisis une autre de tes armures, et **H** la fait venir, chacune à sa façon.
+- **J**, n'importe où (ou [le petit menu](#le-petit-menu), **Tab**) : tu choisis une autre de tes armures, et **H** la fait venir, chacune à sa façon.
 
 | Armure | Prix | Comment elle arrive, ce qu'elle a en plus |
 |---|---|---|
@@ -452,7 +465,7 @@ Monte dans ta chambre, à l'étage, et appuie sur **E** près du lit (ça marche
 
 ### La carte
 
-La touche **M** (ou **Tab**) affiche tout le pays en plein écran et met le jeu en pause.
+La touche **M** affiche tout le pays en plein écran et met le jeu en pause.
 
 - On y voit où on est (flèche blanche), l'objectif (point jaune), le nom des villes et les lieux importants.
 - La légende, à gauche, dit ce que veut dire chaque rond.
@@ -753,7 +766,7 @@ La ville de Superman : une grande ville moderne et lumineuse, au bord de la mer,
 - la **base militaire**, au nord-est, avec ses tanks et ses avions de chasse ;
 - tout au nord, les **glaces** : la neige, les sapins givrés, et la **Forteresse de Solitude**, des cristaux de glace géants (aucune route n'y va). Elle dort sous la glace jusqu'à ta 1re mission !
 
-**En civil, puis en costume** : tu es **Clark Kent**, en costume, cravate rouge et lunettes (ou **Kara Danvers**, gilet bleu, lunettes et cheveux blonds). Ton costume, tu le trouves à ta 1re mission. Ensuite, appuie sur **H** : tu tournes si vite que tu disparais dans un tourbillon bleu et rouge, et tu deviens **Superman** (ou **Supergirl**, sa jupe rouge et ses longs cheveux blonds) ! Tu peux le mettre n'importe où, même en tombant d'un toit (puis **Maj** 3 fois, et tu voles) ; **H** encore : tu repasses en civil, mais seulement les pieds par terre. En civil, pas de pouvoirs : tu ne voles pas, tu n'as pas tes yeux laser, et tomber de haut fait mal.
+**En civil, puis en costume** : tu es **Clark Kent**, en costume, cravate rouge et lunettes (ou **Kara Danvers**, gilet bleu, lunettes et cheveux blonds). Ton costume, tu le trouves à ta 1re mission. Ensuite, appuie sur **H** : tu tournes si vite que tu disparais dans un tourbillon bleu et rouge, et tu deviens **Superman** (ou **Supergirl**, sa jupe rouge et ses longs cheveux blonds) ! En costume, **F** : tu t'envoles ; **F** encore : tu arrêtes de voler. Tu peux le mettre n'importe où, même en tombant d'un toit (puis **F**, et tu voles) ; **H** encore : tu repasses en civil, mais seulement les pieds par terre. En civil, pas de pouvoirs : tu ne voles pas, tu n'as pas tes yeux laser, et tomber de haut fait mal.
 
 #### La super-force
 
@@ -774,7 +787,7 @@ Un caillou vert qui brille, venu de Krypton, la planète de Superman : c'est la 
 À Metropolis, après ta 1re mission, va voir le **professeur Hamilton** à **S.T.A.R. Labs** (★ sur la carte), sur la côte est : il t'attend derrière l'accueil du grand hall, et te fait signe de la main. Les costumes sont sur des mannequins, **Krypto** attend au fond, et les nouveaux pouvoirs et les améliorations sont près de la porte, avec leur prix au-dessus.
 
 - **E** devant un stand : tu l'achètes, ou tu le choisis si tu l'as déjà.
-- **J**, n'importe où : tu changes de costume (en costume, tout de suite ; en civil, H le met).
+- **J**, n'importe où (ou [le petit menu](#le-petit-menu), **Tab**) : tu changes de costume (en costume, tout de suite ; en civil, H le met).
 
 | Costume | Prix | Ce qu'il change |
 |---|---|---|
@@ -805,7 +818,7 @@ Avec **Supergirl**, les costumes gardent tes longs cheveux blonds. Le jeu se sou
 
 **Les missions de Superman** (avec Supergirl, ce sont les mêmes, et c'est Superman qui t'aide) :
 
-1. **La Forteresse de Solitude** : le Daily Planet t'envoie tout au nord, où la glace brille d'une lueur verte. Tu ne voles pas encore : monte dans l'**hélicoptère** du journal, sur la place du départ (**E**). Son pilote t'emmène au-dessus de la ville (rien à piloter : regarde avec la souris !) et te dépose dans la glace. Approche-toi du **cristal vert** : la terre tremble, et la **Forteresse de Solitude** sort de la glace ! L'hologramme de ton père te dit qui tu es... et te donne ton **costume** (le jeu s'en souvient). Puis ton premier vol (**Maj** 3 fois, vite : tu files tout de suite à 300 km/h) : rentre à Metropolis, et pose-toi n'importe où sur le toit du Daily Planet. Le magasin de S.T.A.R. Labs ouvre.
+1. **La Forteresse de Solitude** : le Daily Planet t'envoie tout au nord, où la glace brille d'une lueur verte. Tu ne voles pas encore : monte dans l'**hélicoptère** du journal, sur la place du départ (**E**). Son pilote t'emmène au-dessus de la ville (rien à piloter : regarde avec la souris !) et te dépose dans la glace. Approche-toi du **cristal vert** : la terre tremble, et la **Forteresse de Solitude** sort de la glace ! L'hologramme de ton père te dit qui tu es... et te donne ton **costume** (le jeu s'en souvient). Puis ton premier vol (**F** : tu files tout de suite à 300 km/h) : rentre à Metropolis, et pose-toi n'importe où sur le toit du Daily Planet. Le magasin de S.T.A.R. Labs ouvre.
 2. **Lois tombe du toit** : vole jusqu'au toit du Daily Planet : l'hélicoptère du journal tombe en panne, et s'écrase au bord du toit... **Lois Lane** tombe dans le vide ! Rattrape-la en volant (touche-la), et pose-toi pour la déposer. L'hélicoptère penche au bord du toit, avec son pilote dedans : vole tout près, il glisse... **G** pour le soulever, **G** encore pour le reposer. Si tu rates Lois, les pompiers la rattrapent dans leur grand coussin, et ça recommence ; si tu rates l'hélicoptère, lui seul est de nouveau au bord du toit.
 3. **Le bus sur le pont** : le grand pont de Metropolis s'écroule en son milieu ! Un bus plein de gens et trois voitures pendent au bord du trou, le nez dans le vide. Remonte-les sur la route, un par un (**G**, puis **G**) : chacun tient 15 secondes, et quand il glisse, tu as encore 4 secondes pour le rattraper. Un qui tombe à l'eau ? Les pompiers repêchent tout le monde, et ça recommence.
 4. **Les deux missiles** : Lex Luthor parle sur tous les écrans de la ville, puis tire deux missiles du toit de sa tour, un vers chaque bout de Metropolis ! Rattrape-les en volant (touche-les), puis **clic gauche** : tu les lances vers le ciel, où ils explosent sans faire de mal. Ou détruis-les avec tes yeux laser (**9**)... mais loin des gens ! Un missile qui arrive ? Personne n'est blessé, et Luthor en tire un autre.
@@ -847,7 +860,7 @@ Appuie sur **Entrée**, tape le code, puis **Entrée**. Retape un code pour l'an
 
 | Code | Ce qu'il fait |
 |---|---|
-| `SUPERMAN` | Tu deviens [Superman](#superman) : les yeux laser et la chute qui écrase |
+| `SUPERMAN` | Tu deviens [Superman](#superman) : tu voles (**F**), les yeux laser et la chute qui écrase |
 | `BATMAN` | Tu deviens [Batman](#batman) : la Batmobile, le grappin, la cape, les batarangs et les filets |
 | `SPIDERMAN` | Tu deviens [Spiderman](#spiderman) : grimper aux murs, la toile et les filets |
 | `IRONMAN` | L'armure d'[Iron Man](#iron-man) arrive en volant et se referme sur toi |
@@ -900,6 +913,7 @@ Les tableaux, dans l'ordre où ils sont dans le fichier, de haut en bas :
 | [`FOULES` et `QUALITES`](#foules-et-qualites) | Le nombre de piétons et de voitures, et les qualités du menu |
 | [`TRADUCTIONS` et `LANGUES`](#traductions-et-langues) | Les phrases du jeu dans les autres langues |
 | [`REGLAGES`](#reglages) | Les nombres de tout le jeu |
+| [`MENU_JEU`](#menu_jeu) | Le petit menu du jeu (touche Tab) |
 | [`ARMES`, `TRESORS` et `ARMES_ROBOT`](#armes-tresors-et-armes_robot) | Les armes et les objets à voler |
 | [`VOITURES`](#voitures-1) | Les voitures, bateaux, avions, skis... |
 | [`ENNEMIS`, `CAMP` et `ARMURE`](#ennemis-camp-et-armure) | Les ennemis, le camp militaire et son armure |
@@ -947,7 +961,7 @@ Avant `REGLAGES` : chaque phrase du jeu en allemand, en anglais et en züritüü
 Les nombres de tout le jeu :
 
 - **Le jeu** : la vitesse de tout le jeu (`vitesseJeu` : 0.87, un peu plus lent que la normale pour avoir le temps de viser ; mets 1 pour la vitesse normale, ou 0.5 pour jouer au ralenti), et la vitesse des roquettes.
-- **B.J.** : vitesses à pied et à la nage, vie, hauteur des chutes qui font mal et leurs dégâts (et ceux d'une chute en sautant d'une voiture, à quelle vitesse on roule alors par terre et combien de temps on reste couché, et ceux des piétons renversés), durée et force de la boisson énergisante, touches et durée de la danse.
+- **B.J.** : vitesses à pied et à la nage, vie, hauteur des chutes qui font mal et leurs dégâts (et ceux d'une chute en sautant d'une voiture, à quelle vitesse on roule alors par terre et combien de temps on reste couché, et ceux des piétons renversés), durée et force de la boisson énergisante, touches et durée de la danse, la touche du [petit menu](#menu_jeu) (`toucheMenu: 'Tab'`) et les secondes avant qu'il se ferme tout seul (`dureeMenu: 8`).
 - **La ville** : temps avant qu'un objet volé revienne, nombre de policiers, combien d'immeubles on visite, combien de dos d'âne et leur hauteur, la hauteur des ponts bombés (`hauteurPont`), prix du blindage et du masque à gaz, durée de la perceuse et des mitrailleuses.
 - **Les voitures** : gravité des voitures (mets 1.6 pour sauter comme sur la Lune), dégâts des voitures, impacts de balles (combien il en reste sur les murs et par terre, et sur chaque voiture, et leur taille), accidents (à partir de quelle vitesse, force des tonneaux, temps avant qu'une voiture en feu explose, à partir de quand une voiture abîmée prend feu, hauteur des bornes).
 - **La montagne et le ski** : hauteur des montagnes, pente des routes qui partent d'une ville ou d'un croisement (`penteRoute` : 0.35, pas plus de 35 m de montée pour 100 m), vitesse des remontées (en ligne et dans les gares), ce que la neige freine à ski, jusqu'où descend la neige, hauteur du saut à ski (et ce qu'on gagne en sautant sur une bosse), vitesse des vrilles et des saltos, force du dérapage, vitesse de montée en skis de rando (et de descente avec les peaux), ce que la neige amortit des chutes, la chance que tes skis restent plantés à côté de toi quand tu tombes, nombre d'autres skieurs.
@@ -967,6 +981,16 @@ Les nombres de tout le jeu :
 - **Les effets d'image** : `effetsImage` : en qualité Haute, deux effets sur toute l'image, après le dessin : le halo des lumières (`halo`, 1 : ce qui est très clair déborde doucement autour, surtout la nuit ; 0 = pas de halo, 2 = deux fois plus fort) et l'ombre des coins à l'écran (`ombreEcran`, 1 : là où deux choses se touchent presque, l'image fonce un peu ; 0 = rien, 2 = deux fois plus marquée) ; `halo` et `ombreEcran` comptent tout de suite, `effetsImage` attend F5 (`false` : l'image sans effets, comme en Moyenne et en Basse ; si le jeu rame, mets `false`). Plus de réglages pour eux (le seuil du halo le jour et la nuit, son étalement, le rayon de l'ombre) : `HALO` et `OMBRE_ECRAN`, dans le code, juste avant la boucle principale.
 
 **Si le jeu rame**, choisis d'abord la qualité Moyenne ou Basse dans le menu ; ou mets toi-même `distanceVue: 500`, `ombresPersonnages: 15`, `ombres: false`, `anticrenelage: false`, `distanceRelief: 0` ou `lumieresNuit: 0`, et regarde l'effet avec le compteur de performances (touche P, ou `compteur: true` pour qu'il soit allumé dès le départ). `imagesParSeconde` : le jeu ne dessine pas plus d'images par seconde (60 ; 0 = autant que l'écran ; 30 pour que l'ordinateur chauffe moins ; pas moins de 20 : en dessous, le jeu ralentirait, alors il garde 20). `finesse` : combien de points le jeu dessine pour chaque point de ton écran (1,5 ; jamais plus que ton écran n'en a : 1 sur un écran ordinaire ; 0.75 = un peu flou, mais presque deux fois moins de travail pour la carte graphique) ; avec `finesseAuto: true`, le jeu la baisse tout seul quand la carte graphique n'arrive pas à suivre, mais jamais sous `finesseMin` (0.75), et la remonte quand tout va bien (`finesseAuto: false` : toujours `finesse`).
+
+#### `MENU_JEU`
+
+Juste après `REGLAGES` : les lignes du [petit menu](#le-petit-menu) (touche **Tab**). Chaque ligne a son `nom` (ce qui est écrit), sa `touche` (la place de la touche sur le clavier, comme `touchesDanse` : `'KeyV'` pour V, `'Enter'` pour Entrée) : la choisir, c'est comme appuyer sur cette touche. `chapitres: [3, 4]` : seulement dans ces chapitres (sans : dans tous) ; `reste: true` : le menu reste ouvert après. 9 lignes au plus par chapitre (une par chiffre). Pour y mettre la grande carte, ajoute :
+
+```js
+{ nom: 'La carte du pays', touche: 'KeyM' },
+```
+
+Pense à la traduction de son `nom` dans `TRADUCTIONS`. La touche du menu et le temps avant qu'il se ferme tout seul sont dans [`REGLAGES`](#reglages) (`toucheMenu`, `dureeMenu`).
 
 #### `ARMES`, `TRESORS` et `ARMES_ROBOT`
 

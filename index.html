@@ -45,6 +45,13 @@
   #wasted { position: absolute; top: 38%; left: 0; right: 0; text-align: center; font: 100px 'Anton', Impact, sans-serif; color: #c0392b; letter-spacing: 8px; display: none; }
   #grande-carte { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
   #triche { position: absolute; top: 60%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.75); padding: 8px 18px; font-size: 26px; display: none; }
+  /* le petit menu du jeu (touche Tab) : ce qu'on fait rarement, une ligne par chose, son chiffre devant (voir MENU_JEU) */
+  #menu-jeu { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); min-width: 290px; max-width: 92%; background: rgba(0,0,0,.94); border: 2px solid #f0c850; border-radius: 10px;
+              padding: 10px 20px; font-size: 19px; text-shadow: none; display: none; }
+  #menu-jeu h3 { font: 26px 'Anton', Impact, sans-serif; color: #f0c850; letter-spacing: 2px; margin: 0 0 6px; text-align: center; }
+  #menu-jeu div { padding: 3px 0; }
+  #menu-jeu b { display: inline-block; width: 26px; line-height: 26px; margin-right: 10px; text-align: center; background: #f0c850; color: #000; border-radius: 5px; }
+  #menu-jeu small { display: block; margin-top: 6px; text-align: center; font-size: 14px; opacity: .7; }
   #vitesse { position: absolute; right: 32px; bottom: 28px; font: 44px 'Anton', Impact, sans-serif; display: none; }
   #menu { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: safe center; overflow-y: auto; /* un petit écran fait défiler le menu */
           background: rgba(0,0,0,.72); color: #fff; cursor: pointer; text-align: center; }
@@ -218,6 +225,7 @@
   <div id="compteur"></div>
   <canvas id="grande-carte"></canvas>
   <div id="triche"></div>
+  <div id="menu-jeu"></div>   <!-- le petit menu du jeu (touche Tab, voir MENU_JEU) -->
 </div>
 <div id="menu">
   <h1>GTAxel</h1>
@@ -320,12 +328,11 @@ const CHAPITRES = [
     ['À ski', 'Espace : sauter (plus haut sur une bosse) · Maj + Q ou D : déraper · R : peaux des skis de rando'],
     ["En l'air, à ski", 'Q D : vrilles (180, 360…) · S : backflip · Z : frontflip · S + Q ou D : cork · clics : grabs'],
     ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
-    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
-    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['1 à 8 ou molette', "changer d'arme"], ['M', 'carte du pays (molette : zoom)'],
+    ['Tab', 'le menu : changer de vue, DeLorean, code de triche, compteur de performances · un chiffre : choisir'], ['Échap', 'pause'],
   ], bulles: [
     'Suis le <b>point jaune</b> de la mini-carte : il te mène à ta mission.',
-    '<b>E</b> : monter dans une voiture (ou la voler !). <b>M</b> : la carte du pays.',
+    '<b>E</b> : monter dans une voiture (ou la voler !). <b>M</b> : la carte du pays. <b>Tab</b> : le menu.',
     'Si tu fais des bêtises, la police te poursuit : cache-toi pour la semer.',
     'À la fin du chapitre, la <b>DeLorean</b> t\'emmène au chapitre suivant !',
   ]},
@@ -335,21 +342,19 @@ const CHAPITRES = [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser'],
     ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
     ['H', 'ton armure arrive en volant, et tu deviens {super} · H encore : tu en sors'],
-    ["Dans l'armure", 'A E : répulseurs · R : plastron · F : voler (F encore : te poser) · L : masque'],
+    ["Dans l'armure", 'A E : répulseurs · R : plastron · F : voler (F encore : te poser)'],
     ['En volant', 'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping'],
     ['G, X', "dans l'armure : les mini-missiles, le laser des bras (achète-les chez Stark Industries)"],
-    ['J', "changer d'armure (Stark Industries en vend d'autres : ⚙ sur la carte)"],
     ['E', "monter / descendre (voiture, bateau, avion), ascenseur, magasin de Stark Industries, prendre quelqu'un dans tes bras"],
-    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
-    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['1 à 8 ou molette', "changer d'arme"], ['M', 'carte du pays (molette : zoom)'],
+    ['Tab', "le menu : changer de vue, DeLorean, code de triche, compteur de performances, changer d'armure, masque · un chiffre : choisir"], ['Échap', 'pause'],
   ], bulles: [
     'Tu es <b>{heros}</b>. Ta toute première armure, tu vas la gagner dans ta première mission : suis le <b>point jaune</b> !',
     'Ensuite, <b>H</b> : ton armure arrive en volant, et tu deviens <b>{super}</b> !',
     '<b>A</b> et <b>E</b> : les répulseurs de tes mains. <b>R</b> : le rayon du plastron.',
     '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.',
-    '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>L</b> : le masque.',
-    'Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d\'autres armures et des améliorations. <b>J</b> : changer d\'armure.',
+    '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>Tab</b> : le menu (changer de vue, lever le masque…).',
+    'Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d\'autres armures et des améliorations. <b>Tab</b> : le menu, pour changer d\'armure.',
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     'Suis le <b>point jaune</b> : tes missions t\'attendent. À la fin, le Mandarin a caché la DeLorean : il faudra la retrouver.',
@@ -361,23 +366,21 @@ const CHAPITRES = [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser'],
     ['Maj', "courir · en l'air, en costume, garde-le enfoncé : tu planes avec ta cape"], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
     ['H', 'tu mets ton costume (trouvé à la 1re mission), et tu deviens {super} · H encore : tu repasses en civil (sans tes gadgets)'],
-    ['J', "changer de costume (Lucius Fox en vend d'autres, à Wayne Enterprises : ⚙ sur la carte)"],
     ['G', 'en costume : le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher'],
     ['9', 'en costume : le grappin, les batarangs et les filets'],
-    ['B, N', 'en costume : ta Batmobile arrive à côté de toi (dès la 2e mission) · N : changer de Batmobile (ou le Bat, dès la 8e mission ; le Batpod, dès la 10e)'],
+    ['B', 'en costume : ta Batmobile arrive à côté de toi (dès la 2e mission)'],
     ['R', 'dans la Batmobile ou le Bat : voler, ou se poser (les autres Batmobiles : le turbo, le saut, ou R + Q ou D : le virage au grappin) · sur le Batpod : le câble'],
     ['O, K, X', 'en costume, une fois achetés : la vision de détective, un fumigène, le gel explosif (X encore : boum !)'],
     ['E', 'monter / descendre (voiture, bateau, monorail, le Bat), ascenseur, magasin de Lucius Fox · missions : prendre, brouiller, désamorcer'],
-    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['1, 2, 3', 'devant une devinette du Sphinx : ta réponse'], ['M ou Tab', 'carte du pays (molette : zoom)'],
-    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['1 à 8 ou molette', "changer d'arme"], ['1, 2, 3', 'devant une devinette du Sphinx : ta réponse'], ['M', 'carte du pays (molette : zoom)'],
+    ['Tab', 'le menu : changer de vue, DeLorean, code de triche, compteur de performances, changer de costume, changer de Batmobile · un chiffre : choisir'], ['Échap', 'pause'],
   ], bulles: [
     'Tu es <b>{heros}</b>, en civil. Ton costume, tu le trouveras à ta 1re mission (<b>point jaune</b>). Ensuite, <b>H</b> : tu deviens <b>{super}</b> ! <b>H</b> encore : tu repasses en civil.',
     'En costume, <b>G</b> (ou clic gauche) : le grappin, pour monter sur les toits.',
     'En costume, en l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.',
     'En costume, <b>9</b> : le grappin, les batarangs et les filets.',
     'En costume, <b>B</b> : ta Batmobile arrive à côté de toi (dès la 2e mission). Dedans, <b>R</b> : elle vole !',
-    "Le magasin de <b>Lucius Fox</b>, à Wayne Enterprises (⚙ sur la carte), ouvre quand tu as ton costume : d'autres costumes, des Batmobiles, des gadgets et des améliorations. <b>J</b> : changer de costume, <b>N</b> : de Batmobile.",
+    "Le magasin de <b>Lucius Fox</b>, à Wayne Enterprises (⚙ sur la carte), ouvre quand tu as ton costume : d'autres costumes, des Batmobiles, des gadgets et des améliorations. <b>Tab</b> : le menu, pour changer de costume ou de Batmobile.",
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     '<b>{super}</b> ne tue jamais : ceux que tu bats tombent assommés, et la police vient les embarquer. Un passant assommé se relève... mais il compte quand même !',
     'Quand des voyous braquent un magasin, le <b>Bat-signal</b> s\'allume dans le ciel : suis le <b>point rouge</b> et arrête-les, pour une prime !',
@@ -390,8 +393,7 @@ const CHAPITRES = [
     ['Z Q S D', 'se déplacer / conduire'], ['Souris', 'regarder'], ['Clic gauche', 'tirer / frapper'], ['Clic droit', 'viser'],
     ['Maj', 'courir'], ['Espace', 'sauter (frein à main en voiture)'], ['Ctrl ou C', "s'accroupir"],
     ['H', 'tu mets ton costume (trouvé à la 1re mission), et tu deviens {super} · H encore : tu repasses en civil (sans tes pouvoirs)'],
-    ['J', "changer de costume (S.T.A.R. Labs en vend d'autres : ★ sur la carte)"],
-    ['Maj 3 fois, vite', "en costume : t'envoler · encore 3 fois : arrêter de voler"],
+    ['F', "en costume : t'envoler · F encore : arrêter de voler"],
     ['En volant', 'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping'],
     ['9', 'en costume : les yeux laser (garde le clic gauche enfoncé)'],
     ['G', 'en costume : soulever la voiture la plus proche (même un bus) · clic gauche : la lancer · G encore : la reposer'],
@@ -399,16 +401,15 @@ const CHAPITRES = [
     ['X, O, R, B', 'en costume, une fois achetés à S.T.A.R. Labs : le souffle glacé, la vision à rayons X, la super-vitesse (avec Maj), le super-cri'],
     ['K', 'Krypto, le super-chien (une fois acheté) : il vient, ou il rentre à la maison'],
     ['E', 'monter / descendre (voiture, bateau), ascenseur, magasin de S.T.A.R. Labs'],
-    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
-    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['1 à 8 ou molette', "changer d'arme"], ['M', 'carte du pays (molette : zoom)'],
+    ['Tab', 'le menu : changer de vue, DeLorean, code de triche, compteur de performances, changer de costume · un chiffre : choisir'], ['Échap', 'pause'],
   ], bulles: [
     'Tu es <b>{heros}</b>, en civil. Ton costume, tu le trouveras à ta 1re mission (<b>point jaune</b>). Ensuite, <b>H</b> : tu deviens <b>{super}</b> ! <b>H</b> encore : tu repasses en civil.',
-    'En costume, <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.',
+    'En costume, <b>F</b> : tu t\'envoles. <b>F</b> encore : tu arrêtes de voler.',
     'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.',
     'En costume, <b>9</b> : les yeux laser. Et tomber de très haut ne te fait rien : tout s\'écrase autour de toi !',
     'En costume, <b>G</b> : tu soulèves la voiture la plus proche, même un bus ! Clic gauche : tu la lances. <b>G</b> encore : tu la reposes.',
-    "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte), ouvert après ta 1re mission : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.",
+    "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte), ouvert après ta 1re mission : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>Tab</b> : le menu, pour changer de costume.",
     'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !',
     'La police t\'appelle quand des voyous braquent un magasin : suis le <b>point rouge</b> et arrête-les, pour une prime !',
     "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par la Forteresse de Solitude. À la fin, Mister Mxyzptlk a caché la DeLorean, au vieux théâtre (<b>♣</b> sur la carte) : attrape les lettres de son nom à l'envers, dans l'ordre, puis tiens 88 miles à l'heure pendant 3 secondes.",
@@ -421,9 +422,8 @@ const CHAPITRES = [
     ['Toile sur une voiture', 'garde la touche enfoncée : elle tourne autour de toi · lâche-la : tu la lances'],
     ['9', 'la toile et les filets'],
     ['E', 'monter / descendre (voiture, bateau, avion), acheter, ascenseur, navette des pistes, dormir (près du lit de ta villa)'],
-    ['V', 'vue 1re / 3e personne'], ['1 à 8 ou molette', "changer d'arme"], ['M ou Tab', 'carte du pays (molette : zoom)'],
-    ['T', 'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)'],
-    ['P', 'compteur de performances (images par seconde…)'], ['Entrée', 'code de triche'], ['Échap', 'pause'],
+    ['1 à 8 ou molette', "changer d'arme"], ['M', 'carte du pays (molette : zoom)'],
+    ['Tab', 'le menu : changer de vue, DeLorean, code de triche, compteur de performances · un chiffre : choisir'], ['Échap', 'pause'],
   ], bulles: [
     'Tu es <b>{super}</b> ! <b>G</b> (ou clic gauche) : une toile, pour te balancer d\'immeuble en immeuble.',
     'Avance contre un mur : tu grimpes. <b>Espace</b> : sauter du mur.',
@@ -601,16 +601,40 @@ const TRADUCTIONS = {
   "En l'air, à ski":          { de: 'In der Luft, auf Ski', en: 'In the air, on skis', gsw: 'I de Luft, uf de Ski' },
   'Q D : vrilles (180, 360…) · S : backflip · Z : frontflip · S + Q ou D : cork · clics : grabs': { de: 'A D: Drehungen (180, 360…) · S: Backflip · W: Frontflip · S + A oder D: Cork · Klicks: Grabs',
     en: 'A D: spins (180, 360…) · S: backflip · W: frontflip · S + A or D: cork · clicks: grabs', gsw: 'A D: Dräiige (180, 360…) · S: Backflip · W: Frontflip · S + A oder D: Cork · Klicks: Grabs' },
-  'vue 1re / 3e personne':    { de: 'Ansicht 1. / 3. Person', en: '1st / 3rd person view', gsw: 'Aasicht 1. / 3. Person' },
   '1 à 8 ou molette':         { de: '1 bis 8 oder Mausrad', en: '1 to 8 or wheel', gsw: '1 bis 8 oder Muusrad' },
   "changer d'arme":           { de: 'Waffe wechseln', en: 'switch weapon', gsw: 'Waffe wächsle' },
   'carte du pays (molette : zoom)': { de: 'Landkarte (Mausrad: Zoom)', en: 'map (wheel: zoom)', gsw: 'Charte (Muusrad: Zoom)' },
-  'Entrée':                   { de: 'Enter', en: 'Enter', gsw: 'Enter' },
-  'code de triche':           { de: 'Cheatcode', en: 'cheat code', gsw: 'Cheatcode' },
   'Échap':                    { de: 'Esc', en: 'Esc', gsw: 'Esc' },
   'pause':                    { de: 'Pause', en: 'pause', gsw: 'Pause' },
-  // le compteur de performances (touche P) : sa ligne dans le menu, et ce qu'il écrit
-  'compteur de performances (images par seconde…)': { de: 'Leistungsanzeige (Bilder pro Sekunde…)', en: 'performance meter (frames per second…)', gsw: 'Leischtigsaazeig (Bilder pro Sekunde…)' },
+  // le petit menu du jeu (touche Tab, voir MENU_JEU) : son titre, ses lignes, et ce qu'en dit la liste des touches du menu
+  'Tab':              { de: 'Tab', en: 'Tab', gsw: 'Tab' },
+  'le menu : changer de vue, DeLorean, code de triche, compteur de performances · un chiffre : choisir': {
+    de: 'das Menü: Ansicht wechseln, DeLorean, Cheatcode, Leistungsanzeige · eine Zahl: wählen',
+    en: 'the menu: change view, DeLorean, cheat code, performance meter · a number: choose',
+    gsw: 's Menü: Aasicht wächsle, DeLorean, Cheatcode, Leischtigsaazeig · e Zahl: uuswähle' },
+  "le menu : changer de vue, DeLorean, code de triche, compteur de performances, changer d'armure, masque · un chiffre : choisir": {
+    de: 'das Menü: Ansicht wechseln, DeLorean, Cheatcode, Leistungsanzeige, Rüstung wechseln, Maske · eine Zahl: wählen',
+    en: 'the menu: change view, DeLorean, cheat code, performance meter, change armor, mask · a number: choose',
+    gsw: 's Menü: Aasicht wächsle, DeLorean, Cheatcode, Leischtigsaazeig, Rüschtig wächsle, Maske · e Zahl: uuswähle' },
+  'le menu : changer de vue, DeLorean, code de triche, compteur de performances, changer de costume, changer de Batmobile · un chiffre : choisir': {
+    de: 'das Menü: Ansicht wechseln, DeLorean, Cheatcode, Leistungsanzeige, Kostüm wechseln, Batmobil wechseln · eine Zahl: wählen',
+    en: 'the menu: change view, DeLorean, cheat code, performance meter, change suit, change Batmobile · a number: choose',
+    gsw: 's Menü: Aasicht wächsle, DeLorean, Cheatcode, Leischtigsaazeig, Kostüm wächsle, Batmobil wächsle · e Zahl: uuswähle' },
+  'le menu : changer de vue, DeLorean, code de triche, compteur de performances, changer de costume · un chiffre : choisir': {
+    de: 'das Menü: Ansicht wechseln, DeLorean, Cheatcode, Leistungsanzeige, Kostüm wechseln · eine Zahl: wählen',
+    en: 'the menu: change view, DeLorean, cheat code, performance meter, change suit · a number: choose',
+    gsw: 's Menü: Aasicht wächsle, DeLorean, Cheatcode, Leischtigsaazeig, Kostüm wächsle · e Zahl: uuswähle' },
+  'MENU':             { de: 'MENÜ', en: 'MENU', gsw: 'MENÜ' },
+  'Changer de vue':   { de: 'Ansicht wechseln', en: 'Change view', gsw: 'Aasicht wächsle' },
+  'DeLorean : la faire venir, ou choisir où aller': { de: 'DeLorean: herholen oder Ziel wählen', en: 'DeLorean: call it, or choose where to go', gsw: 'DeLorean: härhole oder Ziil uuswähle' },
+  'Taper un code de triche (Entrée pour valider)': { de: 'Cheatcode eingeben (Enter zum Bestätigen)', en: 'Type a cheat code (Enter to confirm)', gsw: 'Cheatcode iitippe (Enter zum Bestätige)' },
+  'Compteur de performances': { de: 'Leistungsanzeige', en: 'Performance meter', gsw: 'Leischtigsaazeig' },
+  "Changer d'armure": { de: 'Rüstung wechseln', en: 'Change armor', gsw: 'Rüschtig wächsle' },
+  'Changer de costume': { de: 'Kostüm wechseln', en: 'Change suit', gsw: 'Kostüm wächsle' },
+  'Changer de Batmobile': { de: 'Batmobil wechseln', en: 'Change Batmobile', gsw: 'Batmobil wächsle' },
+  'Lever ou baisser le masque': { de: 'Maske heben oder senken', en: 'Raise or lower the mask', gsw: 'Maske ufe oder abe' },
+  'Un chiffre : choisir · {touche} : fermer': { de: 'Eine Zahl: wählen · {touche}: schließen', en: 'A number: choose · {touche}: close', gsw: 'E Zahl: uuswähle · {touche}: zuemache' },
+  // le compteur de performances (touche P) : ce qu'il écrit
   '{ips} i/s · calcul {calcul} ms · dessin {dessin} ms': { de: '{ips} B/s · Rechnen {calcul} ms · Zeichnen {dessin} ms', en: '{ips} fps · update {calcul} ms · render {dessin} ms',
     gsw: '{ips} B/s · Rächne {calcul} ms · Zeichne {dessin} ms' },
   '{appels} appels de dessin · {triangles} triangles': { de: '{appels} Zeichenaufrufe · {triangles} Dreiecke', en: '{appels} draw calls · {triangles} triangles', gsw: '{appels} Zeichenufrüef · {triangles} Dreiegg' },
@@ -791,8 +815,8 @@ const TRADUCTIONS = {
   'Z6PO, le robot doré': { de: 'C-3PO, der goldene Roboter', en: 'C-3PO, the golden robot', gsw: 'C-3PO, de goldig Roboter' },
   'Invincible, comme Zeus ! Sceptre de foudre et yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Unbesiegbar, wie Zeus! Blitzzepter und Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
     en: 'Invincible, like Zeus! Lightning sceptre and laser eyes (key 9), and falling from high up crushes everything', gsw: 'Unbsiegbar, wie de Zeus! Blitzzepter und Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
-  'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Superman! Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
-    en: 'Superman! Laser eyes (key 9), and falling from high up crushes everything', gsw: 'Superman! Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
+  'Superman ! Voler (touche F), yeux laser (touche 9), et tomber de haut écrase tout': { de: 'Superman! Fliegen (Taste F), Laseraugen (Taste 9), und ein Sturz aus großer Höhe zermalmt alles',
+    en: 'Superman! Fly (key F), laser eyes (key 9), and falling from high up crushes everything', gsw: 'Superman! Flüüge (Taschte F), Laserauge (Taschte 9), und wänn er vo wiit obe abegheit, verdruckt er alles' },
   "Batman ! Grappin, batarangs et filets (touche 9), la cape pour planer (Maj en l'air), et la Batmobile qui vole (R ; B la rappelle)": { de: 'Batman! Greifhaken, Batarangs und Netze (Taste 9), der Umhang zum Gleiten (Shift in der Luft) und das Batmobil, das fliegt (R; B ruft es zurück)',
     en: 'Batman! Grapple, batarangs and nets (key 9), the cape to glide (Shift in the air), and the Batmobile that flies (R; B calls it back)', gsw: 'Batman! Griifhaagge, Batarangs und Netz (Taschte 9), de Umhang zum Gleite (Shift i de Luft) und s Batmobil, wo flüügt (R; B rüeft s zrugg)' },
   'Spiderman ! La toile pour se balancer, et les filets (touche 9), grimper aux murs, et tomber de haut ne fait pas mal': { de: 'Spiderman! Das Spinnennetz zum Schwingen und die Netze (Taste 9), an Wänden hochklettern, und ein Sturz aus großer Höhe tut nicht weh',
@@ -828,8 +852,8 @@ const TRADUCTIONS = {
   'Mets ton costume (H) pour voler': { de: 'Zieh dein Kostüm an (H), um zu fliegen', en: 'Put on your suit (H) to fly', gsw: 'Leg dis Kostüm aa (H), zum flüüge' },
   'Mets ton costume (H) pour avoir tes yeux laser': { de: 'Zieh dein Kostüm an (H), um deine Laseraugen zu haben', en: 'Put on your suit (H) to get your laser eyes',
     gsw: 'Leg dis Kostüm aa (H), zum dini Laserauge ha' },
-  'En civil, tu ne voles pas : <b>H</b>, ton costume, puis <b>Maj</b> 3 fois !': { de: 'In Zivil fliegst du nicht: <b>H</b>, dein Kostüm, dann 3-mal <b>Shift</b>!',
-    en: "In plain clothes you can't fly: <b>H</b>, your suit, then <b>Shift</b> 3 times!", gsw: 'In Zivil flüügsch nöd: <b>H</b>, dis Kostüm, dänn 3 Mal <b>Shift</b>!' },
+  'En civil, tu ne voles pas : <b>H</b>, ton costume, puis <b>F</b> !': { de: 'In Zivil fliegst du nicht: <b>H</b>, dein Kostüm, dann <b>F</b>!',
+    en: "In plain clothes you can't fly: <b>H</b>, your suit, then <b>F</b>!", gsw: 'In Zivil flüügsch nöd: <b>H</b>, dis Kostüm, dänn <b>F</b>!' },
   'Mets ton costume (H) pour appeler ta Batmobile': { de: 'Zieh dein Kostüm an (H), um dein Batmobil zu rufen', en: 'Put on your suit (H) to call your Batmobile',
     gsw: 'Leg dis Kostüm aa (H), zum dis Batmobil rüefe' },
   'Gare : {gare}':    { de: 'Station: {gare}', en: 'Station: {gare}', gsw: 'Station: {gare}' },
@@ -926,8 +950,7 @@ const TRADUCTIONS = {
     en: 'You can no longer speed up while flying: it repairs itself once you stop getting hit', gsw: 'Du chasch bim Flüüge nüme schnäller wärde: Es flickt sich sälber, wänn du nüme troffe wirsch' },
   'Dans ton armure, G : ils partent de tes épaules et suivent les ennemis': { de: 'In deiner Rüstung, G: Sie starten von deinen Schultern und verfolgen die Feinde', en: 'In your armor, G: they launch from your shoulders and chase the enemies', gsw: 'I dinere Rüschtig, G: Si started vo dine Schultere und verfolged d Feind' },
   'Dans ton armure, X : un genou à terre, tu tournes sur toi-même, et le laser coupe tout autour de toi': { de: 'In deiner Rüstung, X: Ein Knie am Boden drehst du dich um dich selbst, und der Laser schneidet alles um dich herum', en: 'In your armor, X: one knee down, you spin around, and the laser cuts everything around you', gsw: 'I dinere Rüschtig, X: Es Chnüü am Bode, du drähsch di um di sälber, und de Laser schniidt alles um di ume' },
-  "Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d'autres armures et des améliorations. <b>J</b> : changer d'armure.": { de: 'Der Laden von <b>Stark Industries</b> (⚙ auf der Karte) verkauft andere Rüstungen und Verbesserungen. <b>J</b>: Rüstung wechseln.', en: 'The <b>Stark Industries</b> store (⚙ on the map) sells other armors and upgrades. <b>J</b>: switch armor.', gsw: 'De Lade vo <b>Stark Industries</b> (⚙ uf de Charte) verchauft anderi Rüschtige und Verbesserige. <b>J</b>: Rüschtig wächsle.' },
-  'M ou Tab':         { de: 'M oder Tab', en: 'M or Tab', gsw: 'M oder Tab' },
+  "Le magasin de <b>Stark Industries</b> (⚙ sur la carte) vend d'autres armures et des améliorations. <b>Tab</b> : le menu, pour changer d'armure.": { de: 'Der Laden von <b>Stark Industries</b> (⚙ auf der Karte) verkauft andere Rüstungen und Verbesserungen. <b>Tab</b>: das Menü, um die Rüstung zu wechseln.', en: 'The <b>Stark Industries</b> store (⚙ on the map) sells other armors and upgrades. <b>Tab</b>: the menu, to change armor.', gsw: 'De Lade vo <b>Stark Industries</b> (⚙ uf de Charte) verchauft anderi Rüschtige und Verbesserige. <b>Tab</b>: s Menü, zum d Rüschtig wächsle.' },
   '{voiture} : à côté de toi !': { de: '{voiture}: gleich neben dir!', en: '{voiture}: right next to you!', gsw: '{voiture}: grad näb dir!' },
   '{voiture} : pas de place ici !': { de: '{voiture}: kein Platz hier!', en: '{voiture}: no room here!', gsw: '{voiture}: kei Platz da!' },
   "Descends d'abord !": { de: 'Steig zuerst aus!', en: 'Get out first!', gsw: 'Stiig zerscht uus!' },
@@ -1206,22 +1229,18 @@ const TRADUCTIONS = {
     de: 'Willkommen in {ville}, {nom}! Du bist {super}: Die Polizei ist auf deiner Seite. Finde den DeLorean, um weiterzukommen!',
     en: 'Welcome to {ville}, {nom}! You are {super}: the police are on your side. Find the DeLorean to go further!',
     gsw: 'Willkomme z {ville}, {nom}! Du bisch {super}: d Polizei isch uf dinere Siite. Find de DeLorean, zum wiiterchoo!' },
-  'DeLorean : choisir le chapitre où aller (dedans), ou la faire venir (chapitre fini)': { de: 'DeLorean: das Kapitel wählen, in das du reist (drinnen), oder ihn herholen (fertiges Kapitel)',
-    en: 'DeLorean: choose the chapter to go to (inside), or call it to you (finished chapter)', gsw: 'DeLorean: s Kapitel uuswähle, wo du hii wotsch (dinne), oder en härhole (fertigs Kapitel)' },
   // la liste des touches du menu, dans les chapitres des super-héros (touches, dans CHAPITRES)
   'viser':            { de: 'zielen', en: 'aim', gsw: 'ziele' },
   'ton armure arrive en volant, et tu deviens {super} · H encore : tu en sors': { de: 'deine Rüstung fliegt herbei, und du wirst {super} · H noch einmal: Du steigst aus',
     en: 'your armor flies in, and you become {super} · H again: you step out', gsw: 'dini Rüschtig flüügt här, und du wirsch {super} · H nomal: Du stiigsch uus' },
   "Dans l'armure":    { de: 'In der Rüstung', en: 'In the armor', gsw: 'I de Rüschtig' },
-  'A E : répulseurs · R : plastron · F : voler (F encore : te poser) · L : masque': { de: 'Q E: Repulsoren · R: Brustplatte · F: fliegen (noch einmal F: landen) · L: Maske',
-    en: 'Q E: repulsors · R: chest beam · F: fly (F again: land) · L: mask', gsw: 'Q E: Repulsore · R: Bruschtplatte · F: flüüge (nomal F: lande) · L: Maske' },
+  'A E : répulseurs · R : plastron · F : voler (F encore : te poser)': { de: 'Q E: Repulsoren · R: Brustplatte · F: fliegen (noch einmal F: landen)',
+    en: 'Q E: repulsors · R: chest beam · F: fly (F again: land)', gsw: 'Q E: Repulsore · R: Bruschtplatte · F: flüüge (nomal F: lande)' },
   'En volant':        { de: 'Im Flug', en: 'While flying', gsw: 'Im Flug' },
   'Espace : monter · C : descendre · Maj : plus vite · Maj + Q ou D : tonneau · Maj + Espace : looping': { de: 'Leertaste: steigen · C: sinken · Shift: schneller · Shift + A oder D: Fassrolle · Shift + Leertaste: Looping',
     en: 'Space: up · C: down · Shift: faster · Shift + A or D: barrel roll · Shift + Space: loop', gsw: 'Läärtaschte: ufe · C: abe · Shift: schnäller · Shift + A oder D: Fassrolle · Shift + Läärtaschte: Looping' },
   "dans l'armure : les mini-missiles, le laser des bras (achète-les chez Stark Industries)": { de: 'in der Rüstung: die Mini-Raketen, der Armlaser (kauf sie bei Stark Industries)',
     en: 'in the armor: the mini-missiles, the arm laser (buy them at Stark Industries)', gsw: 'i de Rüschtig: d Mini-Rakete, de Armlaser (chauf si bi Stark Industries)' },
-  "changer d'armure (Stark Industries en vend d'autres : ⚙ sur la carte)": { de: 'Rüstung wechseln (Stark Industries verkauft andere: ⚙ auf der Karte)',
-    en: 'switch armor (Stark Industries sells others: ⚙ on the map)', gsw: 'Rüschtig wächsle (Stark Industries verchauft anderi: ⚙ uf de Charte)' },
   "monter / descendre (voiture, bateau, avion), ascenseur, magasin de Stark Industries, prendre quelqu'un dans tes bras": { de: 'einsteigen / aussteigen (Auto, Boot, Flugzeug), Aufzug, Laden von Stark Industries, jemanden in die Arme nehmen',
     en: 'get in / out (car, boat, plane), elevator, Stark Industries store, pick someone up', gsw: 'iistiige / uusstiige (Auto, Boot, Flüüger), Lift, Lade vo Stark Industries, öpper i d Arme näh' },
   "courir · en l'air, en costume, garde-le enfoncé : tu planes avec ta cape": { de: 'rennen · in der Luft, im Kostüm, gedrückt halten: Du gleitest mit deinem Umhang',
@@ -1229,10 +1248,10 @@ const TRADUCTIONS = {
   'en costume : le grappin, pour monter sur les toits (ou clic gauche, le grappin en main) · Espace : le lâcher': { de: 'im Kostüm: der Greifhaken, um auf die Dächer zu kommen (oder Linksklick, mit dem Greifhaken in der Hand) · Leertaste: loslassen',
     en: 'in your suit: the grapple, to get onto the roofs (or left click, with the grapple in your hand) · Space: let go', gsw: 'im Kostüm: de Griifhaagge, zum uf d Dächer cho (oder Linksklick, mit em Griifhaagge i de Hand) · Läärtaschte: loslaa' },
   'en costume : le grappin, les batarangs et les filets': { de: 'im Kostüm: Greifhaken, Batarangs und Netze', en: 'in your suit: grapple, batarangs and nets', gsw: 'im Kostüm: Griifhaagge, Batarangs und Netz' },
-  'en costume : ta Batmobile arrive à côté de toi (dès la 2e mission) · N : changer de Batmobile (ou le Bat, dès la 8e mission ; le Batpod, dès la 10e)': {
-    de: 'im Kostüm: dein Batmobil kommt neben dich (ab der 2. Mission) · N: Batmobil wechseln (oder der Bat, ab der 8. Mission; der Batpod, ab der 10.)',
-    en: 'in your suit: your Batmobile comes next to you (from the 2nd mission on) · N: switch Batmobile (or the Bat, from the 8th mission on; the Batpod, from the 10th)',
-    gsw: 'im Kostüm: dis Batmobil chunnt näb di (ab de 2. Mission) · N: Batmobil wächsle (oder de Bat, ab de 8. Mission; de Batpod, ab de 10.)' },
+  'en costume : ta Batmobile arrive à côté de toi (dès la 2e mission)': {
+    de: 'im Kostüm: dein Batmobil kommt neben dich (ab der 2. Mission)',
+    en: 'in your suit: your Batmobile comes next to you (from the 2nd mission on)',
+    gsw: 'im Kostüm: dis Batmobil chunnt näb di (ab de 2. Mission)' },
   'tu mets ton costume (trouvé à la 1re mission), et tu deviens {super} · H encore : tu repasses en civil (sans tes gadgets)': {
     de: 'du ziehst dein Kostüm an (gefunden in der 1. Mission) und wirst {super} · H noch einmal: wieder in Zivil (ohne deine Ausrüstung)',
     en: 'you put on your suit (found in the 1st mission), and you become {super} · H again: back in plain clothes (without your gadgets)',
@@ -1245,21 +1264,17 @@ const TRADUCTIONS = {
     de: 'im Batmobil oder im Bat: fliegen oder landen (die anderen Batmobile: der Turbo, der Sprung, oder R + A oder D: die Greifhaken-Kurve) · auf dem Batpod: das Seil',
     en: 'in the Batmobile or the Bat: fly, or land (the other Batmobiles: the turbo, the jump, or R + A or D: the grapple turn) · on the Batpod: the cable',
     gsw: 'im Batmobil oder im Bat: flüüge oder lande (di andere Batmobil: de Turbo, de Gump, oder R + A oder D: d Griifhaagge-Kurve) · uf em Batpod: s Seil' },
-  "changer de costume (Lucius Fox en vend d'autres, à Wayne Enterprises : ⚙ sur la carte)": { de: 'Kostüm wechseln (Lucius Fox verkauft andere, bei Wayne Enterprises: ⚙ auf der Karte)',
-    en: 'switch suit (Lucius Fox sells others, at Wayne Enterprises: ⚙ on the map)', gsw: 'Kostüm wächsle (de Lucius Fox verchauft anderi, bi Wayne Enterprises: ⚙ uf de Charte)' },
   'en costume, une fois achetés : la vision de détective, un fumigène, le gel explosif (X encore : boum !)': {
     de: 'im Kostüm, wenn du sie gekauft hast: der Detektivblick, eine Rauchbombe, das Sprenggel (X noch einmal: bumm!)',
     en: 'in your suit, once bought: detective vision, a smoke pellet, explosive gel (X again: boom!)',
     gsw: 'im Kostüm, wänn du si gchauft häsch: de Detektivblick, e Rauchbombe, s Spränggel (X nomal: bumm!)' },
-  'Maj 3 fois, vite': { de: 'Shift 3-mal, schnell', en: 'Shift 3 times, fast', gsw: 'Shift 3 Mal, schnäll' },
-  "t'envoler · encore 3 fois : arrêter de voler": { de: 'losfliegen · noch 3-mal: aufhören zu fliegen', en: 'take off · 3 more times: stop flying', gsw: 'losflüüge · nomal 3 Mal: ufhöre flüüge' },
   'les yeux laser (garde le clic gauche enfoncé)': { de: 'die Laseraugen (Linksklick gedrückt halten)', en: 'laser eyes (hold left click)', gsw: 'd Laserauge (Linksklick druckt hebe)' },
   'tu mets ton costume, et tu deviens {super} · H encore : tu repasses en civil (sans tes pouvoirs)': {
     de: 'du ziehst dein Kostüm an und wirst {super} · H noch einmal: wieder in Zivil (ohne deine Kräfte)',
     en: 'you put on your suit, and you become {super} · H again: back in plain clothes (without your powers)',
     gsw: 'du leisch dis Kostüm aa und wirsch {super} · H nomal: wieder in Zivil (ohni dini Chräft)' },
-  "en costume : t'envoler · encore 3 fois : arrêter de voler": { de: 'im Kostüm: losfliegen · noch 3-mal: aufhören zu fliegen', en: 'in your suit: take off · 3 more times: stop flying',
-    gsw: 'im Kostüm: losflüüge · nomal 3 Mal: ufhöre flüüge' },
+  "en costume : t'envoler · F encore : arrêter de voler": { de: 'im Kostüm: losfliegen · nochmal F: aufhören zu fliegen', en: 'in your suit: take off · F again: stop flying',
+    gsw: 'im Kostüm: losflüüge · nomal F: ufhöre flüüge' },
   'en costume : les yeux laser (garde le clic gauche enfoncé)': { de: 'im Kostüm: die Laseraugen (Linksklick gedrückt halten)', en: 'in your suit: laser eyes (hold left click)',
     gsw: 'im Kostüm: d Laserauge (Linksklick druckt hebe)' },
   'monter / descendre (voiture, bateau), ascenseur': { de: 'einsteigen / aussteigen (Auto, Boot), Aufzug', en: 'get in / out (car, boat), elevator', gsw: 'iistiige / uusstiige (Auto, Boot), Lift' },
@@ -1276,8 +1291,8 @@ const TRADUCTIONS = {
   'CHAPITRE {n}':     { de: 'KAPITEL {n}', en: 'CHAPTER {n}', gsw: 'KAPITEL {n}' },
   'Suis le <b>point jaune</b> de la mini-carte : il te mène à ta mission.': { de: 'Folge dem <b>gelben Punkt</b> auf der Minikarte: Er führt dich zu deiner Mission.',
     en: 'Follow the <b>yellow dot</b> on the minimap: it leads you to your mission.', gsw: 'Gang em <b>gääle Punkt</b> uf de Minicharte nah: Er füehrt di zu dinere Mission.' },
-  '<b>E</b> : monter dans une voiture (ou la voler !). <b>M</b> : la carte du pays.': { de: '<b>E</b>: in ein Auto steigen (oder es klauen!). <b>M</b>: die Landkarte.',
-    en: '<b>E</b>: get into a car (or steal it!). <b>M</b>: the map of the country.', gsw: '<b>E</b>: in es Auto iistiige (oder s chlaue!). <b>M</b>: d Landcharte.' },
+  '<b>E</b> : monter dans une voiture (ou la voler !). <b>M</b> : la carte du pays. <b>Tab</b> : le menu.': { de: '<b>E</b>: in ein Auto steigen (oder es klauen!). <b>M</b>: die Landkarte. <b>Tab</b>: das Menü.',
+    en: '<b>E</b>: get into a car (or steal it!). <b>M</b>: the map of the country. <b>Tab</b>: the menu.', gsw: '<b>E</b>: in es Auto iistiige (oder s chlaue!). <b>M</b>: d Landcharte. <b>Tab</b>: s Menü.' },
   'Si tu fais des bêtises, la police te poursuit : cache-toi pour la semer.': { de: 'Wenn du Unsinn machst, verfolgt dich die Polizei: Versteck dich, um sie abzuhängen.',
     en: 'If you get up to mischief, the police will chase you: hide to shake them off.', gsw: 'Wänn du Seich machsch, verfolgt di d Polizei: Versteck di, zum si abhänke.' },
   'À la fin du chapitre, la <b>DeLorean</b> t\'emmène au chapitre suivant !': { de: 'Am Ende des Kapitels bringt dich der <b>DeLorean</b> ins nächste Kapitel!',
@@ -1292,8 +1307,8 @@ const TRADUCTIONS = {
     en: '<b>Q</b> and <b>E</b>: the repulsors in your hands. <b>R</b>: the chest beam.', gsw: '<b>Q</b> und <b>E</b>: d Repulsore vo dine Händ. <b>R</b>: de Strahl vo de Bruschtplatte.' },
   '<b>F</b> : voler, et <b>F</b> encore pour te poser. En volant, <b>Maj</b> : plus vite.': { de: '<b>F</b>: fliegen, und noch einmal <b>F</b> zum Landen. Im Flug, <b>Shift</b>: schneller.',
     en: '<b>F</b>: fly, and <b>F</b> again to land. While flying, <b>Shift</b>: faster.', gsw: '<b>F</b>: flüüge, und nomal <b>F</b> zum Lande. Im Flug, <b>Shift</b>: schnäller.' },
-  '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>L</b> : le masque.': { de: '<b>H</b> noch einmal: Du steigst aus der Rüstung (sie bleibt stehen). <b>L</b>: die Maske.',
-    en: '<b>H</b> again: you step out of the armor (it stays standing). <b>L</b>: the mask.', gsw: '<b>H</b> nomal: Du stiigsch us de Rüschtig (si blibt stah). <b>L</b>: d Maske.' },
+  '<b>H</b> encore : tu sors de l\'armure (elle reste debout). <b>Tab</b> : le menu (changer de vue, lever le masque…).': { de: '<b>H</b> noch einmal: Du steigst aus der Rüstung (sie bleibt stehen). <b>Tab</b>: das Menü (Ansicht wechseln, Maske heben…).',
+    en: '<b>H</b> again: you step out of the armor (it stays standing). <b>Tab</b>: the menu (change view, raise the mask…).', gsw: '<b>H</b> nomal: Du stiigsch us de Rüschtig (si blibt stah). <b>Tab</b>: s Menü (Aasicht wächsle, Maske ufe…).' },
   'Tu es un héros : la police est de ton côté. Mais attention aux passants : dès la 3e victime, une amende !': {
     de: 'Du bist ein Held: Die Polizei ist auf deiner Seite. Aber pass auf die Passanten auf: Ab dem 3. Opfer zahlst du eine Strafe!',
     en: 'You are a hero: the police are on your side. But watch out for passers-by: from the 3rd victim on, you pay a fine!',
@@ -1327,8 +1342,6 @@ const TRADUCTIONS = {
   'En costume, en l\'air, garde <b>Maj</b> enfoncé : tu planes avec ta cape.': { de: 'Im Kostüm, in der Luft, halte <b>Shift</b> gedrückt: Du gleitest mit deinem Umhang.',
     en: 'In your suit, in the air, hold <b>Shift</b>: you glide with your cape.', gsw: 'Im Kostüm, i de Luft, heb <b>Shift</b> druckt: Du gleitisch mit dim Umhang.' },
   'En costume, <b>9</b> : le grappin, les batarangs et les filets.': { de: 'Im Kostüm, <b>9</b>: Enterhaken, Batarangs und Netze.', en: 'In your suit, <b>9</b>: grappling hook, batarangs and nets.', gsw: 'Im Kostüm, <b>9</b>: Änterhake, Batarangs und Netz.' },
-  'Tu es <b>{super}</b> ! <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.': { de: 'Du bist <b>{super}</b>! 3-mal schnell <b>Shift</b>: Du fliegst los. Noch 3-mal: Du hörst auf zu fliegen.',
-    en: 'You are <b>{super}</b>! <b>Shift</b> 3 times, fast: you take off. 3 more times: you stop flying.', gsw: 'Du bisch <b>{super}</b>! 3 Mal schnäll <b>Shift</b>: Du flüügsch los. Nomal 3 Mal: Du hörsch uf flüüge.' },
   'En volant, chaque appui sur <b>Maj</b> te fait aller plus vite. <b>Maj</b> + Q ou D : un tonneau.': { de: 'Im Flug macht dich jedes Drücken auf <b>Shift</b> schneller. <b>Shift</b> + A oder D: eine Fassrolle.',
     en: 'While flying, each press of <b>Shift</b> makes you faster. <b>Shift</b> + A or D: a barrel roll.', gsw: 'Im Flug macht di jede Druck uf <b>Shift</b> schnäller. <b>Shift</b> + A oder D: e Fassrolle.' },
   '<b>9</b> : les yeux laser.': { de: '<b>9</b>: die Laseraugen.', en: '<b>9</b>: laser eyes.', gsw: '<b>9</b>: d Laserauge.' },
@@ -1336,8 +1349,8 @@ const TRADUCTIONS = {
     de: 'Du bist <b>{heros}</b>, in Zivil. <b>H</b>: Du ziehst dein Kostüm an und wirst <b>{super}</b>! <b>H</b> noch einmal: wieder in Zivil.',
     en: 'You are <b>{heros}</b>, in plain clothes. <b>H</b>: you put on your suit, and you become <b>{super}</b>! <b>H</b> again: back in plain clothes.',
     gsw: 'Du bisch <b>{heros}</b>, in Zivil. <b>H</b>: Du leisch dis Kostüm aa und wirsch <b>{super}</b>! <b>H</b> nomal: wieder in Zivil.' },
-  'En costume, <b>Maj</b> 3 fois, vite : tu t\'envoles. Encore 3 fois : tu arrêtes de voler.': { de: 'Im Kostüm, 3-mal schnell <b>Shift</b>: Du fliegst los. Noch 3-mal: Du hörst auf zu fliegen.',
-    en: 'In your suit, <b>Shift</b> 3 times, fast: you take off. 3 more times: you stop flying.', gsw: 'Im Kostüm, 3 Mal schnäll <b>Shift</b>: Du flüügsch los. Nomal 3 Mal: Du hörsch uf flüüge.' },
+  'En costume, <b>F</b> : tu t\'envoles. <b>F</b> encore : tu arrêtes de voler.': { de: 'Im Kostüm, <b>F</b>: Du fliegst los. Nochmal <b>F</b>: Du hörst auf zu fliegen.',
+    en: 'In your suit, <b>F</b>: you take off. <b>F</b> again: you stop flying.', gsw: 'Im Kostüm, <b>F</b>: Du flüügsch los. Nomal <b>F</b>: Du hörsch uf flüüge.' },
   'En costume, <b>9</b> : les yeux laser. Et tomber de très haut ne te fait rien : tout s\'écrase autour de toi !': {
     de: 'Im Kostüm, <b>9</b>: die Laseraugen. Und ein Sturz aus großer Höhe tut dir nichts: Alles um dich herum wird zerquetscht!',
     en: 'In your suit, <b>9</b>: laser eyes. And falling from very high does nothing to you: everything around you gets crushed!',
@@ -1710,10 +1723,10 @@ const TRADUCTIONS = {
   '« C\'est Aldrich Killian qui m\'a payé. Le vrai Mandarin, c\'est lui ! »': { de: '„Aldrich Killian hat mich bezahlt. Er ist der echte Mandarin!“',
     en: '"Aldrich Killian paid me. He is the real Mandarin!"', gsw: '«De Aldrich Killian hät mi zahlt. Er isch de ächt Mandarin!»' },
   // le magasin de Lucius Fox, à Wayne Enterprises (chapitre 3) : ce qu'il vend, et ce qu'on lit
-  "Le magasin de <b>Lucius Fox</b>, à Wayne Enterprises (⚙ sur la carte), ouvre quand tu as ton costume : d'autres costumes, des Batmobiles, des gadgets et des améliorations. <b>J</b> : changer de costume, <b>N</b> : de Batmobile.": {
-    de: 'Der Laden von <b>Lucius Fox</b> bei Wayne Enterprises (⚙ auf der Karte) öffnet, sobald du dein Kostüm hast: andere Kostüme, Batmobile, Ausrüstung und Verbesserungen. <b>J</b>: Kostüm wechseln, <b>N</b>: Batmobil wechseln.',
-    en: "<b>Lucius Fox</b>'s store, at Wayne Enterprises (⚙ on the map), opens once you have your suit: other suits, Batmobiles, gadgets and upgrades. <b>J</b>: switch suit, <b>N</b>: switch Batmobile.",
-    gsw: 'De Lade vom <b>Lucius Fox</b> bi Wayne Enterprises (⚙ uf de Charte) gaht uf, sobald du dis Kostüm häsch: anderi Kostüm, Batmobil, Usrüschtig und Verbesserige. <b>J</b>: Kostüm wächsle, <b>N</b>: Batmobil wächsle.' },
+  "Le magasin de <b>Lucius Fox</b>, à Wayne Enterprises (⚙ sur la carte), ouvre quand tu as ton costume : d'autres costumes, des Batmobiles, des gadgets et des améliorations. <b>Tab</b> : le menu, pour changer de costume ou de Batmobile.": {
+    de: 'Der Laden von <b>Lucius Fox</b> bei Wayne Enterprises (⚙ auf der Karte) öffnet, sobald du dein Kostüm hast: andere Kostüme, Batmobile, Ausrüstung und Verbesserungen. <b>Tab</b>: das Menü, um das Kostüm oder das Batmobil zu wechseln.',
+    en: "<b>Lucius Fox</b>'s store, at Wayne Enterprises (⚙ on the map), opens once you have your suit: other suits, Batmobiles, gadgets and upgrades. <b>Tab</b>: the menu, to change suit or Batmobile.",
+    gsw: 'De Lade vom <b>Lucius Fox</b> bi Wayne Enterprises (⚙ uf de Charte) gaht uf, sobald du dis Kostüm häsch: anderi Kostüm, Batmobil, Usrüschtig und Verbesserige. <b>Tab</b>: s Menü, zum s Kostüm oder s Batmobil wächsle.' },
   'Tour Wayne (magasin de Lucius Fox)': { de: 'Wayne Tower (Laden von Lucius Fox)', en: 'Wayne Tower (Lucius Fox\'s store)', gsw: 'Wayne Tower (Lade vom Lucius Fox)' },
   'Costume blindé':   { de: 'Gepanzertes Kostüm', en: 'Armored suit', gsw: 'Panzerets Kostüm' },
   'Costume de 1989':  { de: 'Kostüm von 1989', en: '1989 suit', gsw: 'Kostüm vo 1989' },
@@ -2292,7 +2305,6 @@ const TRADUCTIONS = {
   "Le point d'interrogation": { de: 'Das Fragezeichen', en: 'The question mark', gsw: 'S Fragezeiche' },
   'La virgule': { de: 'Das Komma', en: 'The comma', gsw: 'S Komma' },
   // le magasin de S.T.A.R. Labs, les pouvoirs de Superman, Krypto et la super-force (chapitre 4)
-  "changer de costume (S.T.A.R. Labs en vend d'autres : ★ sur la carte)": { de: 'Kostüm wechseln (S.T.A.R. Labs verkauft andere: ★ auf der Karte)', en: 'change suit (S.T.A.R. Labs sells others: ★ on the map)', gsw: 'Kostüm wächsle (S.T.A.R. Labs verchauft anderi: ★ uf de Charte)' },
   'en costume : soulever la voiture la plus proche (même un bus) · clic gauche : la lancer · G encore : la reposer': { de: 'im Kostüm: das nächste Auto hochheben (sogar einen Bus) · Linksklick: es werfen · G noch einmal: es abstellen', en: 'in your suit: lift the nearest car (even a bus) · left click: throw it · G again: put it down', gsw: 'im Kostüm: s nächschte Auto ufhebe (sogar en Bus) · Linksklick: s wärfe · G nomal: s abstelle' },
   'X, O, R, B': { de: 'X, O, R, B', en: 'X, O, R, B', gsw: 'X, O, R, B' },
   'en costume, une fois achetés à S.T.A.R. Labs : le souffle glacé, la vision à rayons X, la super-vitesse (avec Maj), le super-cri': { de: 'im Kostüm, einmal bei S.T.A.R. Labs gekauft: der Eisatem, der Röntgenblick, die Supergeschwindigkeit (mit Umschalt), der Superschrei', en: 'in your suit, once bought at S.T.A.R. Labs: freeze breath, X-ray vision, super speed (with Shift), super shout', gsw: 'im Kostüm, wänn bi S.T.A.R. Labs kauft: de Iisatem, de Röntgeblick, d Supergschwindigkeit (mit Umschalt), de Superschrei' },
@@ -2362,10 +2374,10 @@ const TRADUCTIONS = {
     en: 'The Daily Planet is sending you on a report far to the north, where the ice glows green: get into the newspaper\'s helicopter, on the square (E). Its pilot will fly you there!',
     gsw: 'De Daily Planet schickt dich für e Reportage ganz in Norde, wo s Iis grüen lüüchtet: Stiig in Heli vo de Ziitig, uf em Platz (E). Sin Pilot flüügt dich hi!' },
   'La lueur verte : un cristal brille dans la glace... Approche-toi (point jaune)': { de: 'Das grüne Leuchten: Ein Kristall leuchtet im Eis... Geh hin (gelber Punkt)', en: 'The green glow: a crystal shines in the ice... Walk up to it (yellow dot)', gsw: 'S grüene Lüüchte: En Kristall lüüchtet im Iis... Gang hi (gääle Punkt)' },
-  'Ton premier vol ! Maj 3 fois, vite : tu t\'envoles. Chaque Maj de plus : encore plus vite ! Rentre à Metropolis, et pose-toi sur le toit du Daily Planet (point jaune)': {
-    de: 'Dein erster Flug! 3-mal schnell Shift: Du fliegst los. Jedes weitere Shift: noch schneller! Flieg zurück nach Metropolis und lande auf dem Dach des Daily Planet (gelber Punkt)',
-    en: 'Your first flight! Shift 3 times, fast: you take off. Each extra Shift: even faster! Fly back to Metropolis, and land on the roof of the Daily Planet (yellow dot)',
-    gsw: 'Din erschte Flug! 3 Mal schnäll Shift: Du flüügsch los. Jedes Shift meh: no schnäller! Flüüg zrugg uf Metropolis und land uf em Dach vom Daily Planet (gääle Punkt)' },
+  'Ton premier vol ! F : tu t\'envoles. Puis chaque appui sur Maj : encore plus vite ! Rentre à Metropolis, et pose-toi sur le toit du Daily Planet (point jaune)': {
+    de: 'Dein erster Flug! F: Du fliegst los. Dann jedes Drücken auf Shift: noch schneller! Flieg zurück nach Metropolis und lande auf dem Dach des Daily Planet (gelber Punkt)',
+    en: 'Your first flight! F: you take off. Then each press of Shift: even faster! Fly back to Metropolis, and land on the roof of the Daily Planet (yellow dot)',
+    gsw: 'Din erschte Flug! F: Du flüügsch los. Denn jede Druck uf Shift: no schnäller! Flüüg zrugg uf Metropolis und land uf em Dach vom Daily Planet (gääle Punkt)' },
   'LE PILOTE': { de: 'DER PILOT', en: 'THE PILOT', gsw: 'DE PILOT' },
   '« Accroche-toi, on décolle ! »': { de: '„Halt dich fest, wir heben ab!“', en: '"Hold on, we\'re taking off!"', gsw: '«Heb di fescht, mir hebed ab!»' },
   '« Je ne peux pas aller plus près... La lueur verte, c\'est là-bas, devant toi ! »': { de: '„Näher kann ich nicht ran... Das grüne Leuchten ist da vorne, vor dir!“', en: '"I can\'t get any closer... The green glow is over there, in front of you!"', gsw: '«Nöcher chan ich nöd... S grüene Lüüchte isch det vorne, vor dir!»' },
@@ -2389,10 +2401,10 @@ const TRADUCTIONS = {
     de: 'im Kostüm, mit einer Rakete von Luthor in den Händen: sie in den Himmel werfen · mit dem Kryptonit-Speer in der Hand: ihn ganz nah in Doomsday stoßen',
     en: 'in your suit, holding one of Luthor\'s missiles: throw it into the sky · holding the kryptonite spear: drive it into Doomsday, up close',
     gsw: 'im Kostüm, mit ere Rakete vom Luthor i de Händ: sie in Himmel ue wärfe · mit em Kryptonit-Speer i de Hand: en ganz nöch in Doomsday ine stosse' },
-  "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte), ouvert après ta 1re mission : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>J</b> : changer de costume.": {
-    de: 'Der Laden von <b>S.T.A.R. Labs</b> (★ auf der Karte), offen nach deiner 1. Mission: andere Kostüme, neue Kräfte, Verbesserungen und Krypto, der Superhund! <b>J</b>: Kostüm wechseln.',
-    en: 'The <b>S.T.A.R. Labs</b> shop (★ on the map), open after your 1st mission: other suits, new powers, upgrades, and Krypto the Superdog! <b>J</b>: change suit.',
-    gsw: 'De Lade vo <b>S.T.A.R. Labs</b> (★ uf de Charte), offe nach dinere 1. Mission: anderi Kostüm, neui Chräft, Verbesserige und Krypto, de Superhund! <b>J</b>: Kostüm wächsle.' },
+  "Le magasin de <b>S.T.A.R. Labs</b> (★ sur la carte), ouvert après ta 1re mission : d'autres costumes, de nouveaux pouvoirs, des améliorations, et Krypto, le super-chien ! <b>Tab</b> : le menu, pour changer de costume.": {
+    de: 'Der Laden von <b>S.T.A.R. Labs</b> (★ auf der Karte), offen nach deiner 1. Mission: andere Kostüme, neue Kräfte, Verbesserungen und Krypto, der Superhund! <b>Tab</b>: das Menü, um das Kostüm zu wechseln.',
+    en: 'The <b>S.T.A.R. Labs</b> shop (★ on the map), open after your 1st mission: other suits, new powers, upgrades, and Krypto the Superdog! <b>Tab</b>: the menu, to change suit.',
+    gsw: 'De Lade vo <b>S.T.A.R. Labs</b> (★ uf de Charte), offe nach dinere 1. Mission: anderi Kostüm, neui Chräft, Verbesserige und Krypto, de Superhund! <b>Tab</b>: s Menü, zum s Kostüm wächsle.' },
   "Suis le <b>point jaune</b> : tes missions t'attendent, en commençant par la Forteresse de Solitude. À la fin, Mister Mxyzptlk a caché la DeLorean, au vieux théâtre (<b>♣</b> sur la carte) : attrape les lettres de son nom à l'envers, dans l'ordre, puis tiens 88 miles à l'heure pendant 3 secondes.": {
     de: 'Folge dem <b>gelben Punkt</b>: Deine Missionen warten auf dich, angefangen mit der Festung der Einsamkeit. Am Ende hat Mister Mxyzptlk den DeLorean beim alten Theater versteckt (<b>♣</b> auf der Karte): Fang die Buchstaben seines Namens rückwärts, der Reihe nach, und halte dann 3 Sekunden lang 88 Meilen pro Stunde.',
     en: 'Follow the <b>yellow dot</b>: your missions are waiting, starting with the Fortress of Solitude. At the end, Mister Mxyzptlk has hidden the DeLorean at the old theater (<b>♣</b> on the map): catch the letters of his name backwards, in order, then hold 88 miles per hour for 3 seconds.',
@@ -2421,7 +2433,7 @@ const TRADUCTIONS = {
   'Il brille de plus en plus fort... La glace tremble !': { de: 'Er leuchtet immer heller... Das Eis bebt!', en: 'It shines brighter and brighter... The ice is shaking!', gsw: 'Er lüüchtet immer heller... S Iis zitteret!' },
   'LA FORTERESSE DE SOLITUDE !': { de: 'DIE FESTUNG DER EINSAMKEIT!', en: 'THE FORTRESS OF SOLITUDE!', gsw: 'D FESCHTIG VO DE EINSAMKEIT!' },
   'Un palais de cristal, venu de Krypton...': { de: 'Ein Palast aus Kristall, von Krypton...', en: 'A crystal palace, from Krypton...', gsw: 'En Palascht us Kristall, vo Krypton...' },
-  'Ton costume ! H : le mettre ou l\'enlever, partout · Maj 3 fois, vite : tu t\'envoles': { de: 'Dein Kostüm! H: es überall an- oder ausziehen · 3-mal schnell Shift: Du fliegst los', en: 'Your suit! H: put it on or take it off, anywhere · Shift 3 times, fast: you take off', gsw: 'Dis Kostüm! H: überall aa- oder uszieh · 3 Mal schnäll Shift: Du flüügsch los' },
+  'Ton costume ! H : le mettre ou l\'enlever, partout · F : tu t\'envoles': { de: 'Dein Kostüm! H: es überall an- oder ausziehen · F: Du fliegst los', en: 'Your suit! H: put it on or take it off, anywhere · F: you take off', gsw: 'Dis Kostüm! H: überall aa- oder uszieh · F: Du flüügsch los' },
   'LE MOTEUR LÂCHE !': { de: 'DER MOTOR FÄLLT AUS!', en: 'THE ENGINE FAILS!', gsw: 'DE MOTOR GIT DE GEIST UF!' },
   'L\'hélicoptère du Daily Planet tombe en tournant...': { de: 'Der Hubschrauber des Daily Planet stürzt trudelnd ab...', en: 'The Daily Planet helicopter is spinning down...', gsw: 'De Heli vom Daily Planet gheit dräiend abe...' },
   'LOIS TOMBE !': { de: 'LOIS FÄLLT!', en: 'LOIS IS FALLING!', gsw: 'D LOIS GHEIT!' },
@@ -2459,21 +2471,21 @@ const TRADUCTIONS = {
   'Tes mains sont prises : lance le missile vers le ciel (clic gauche)': { de: 'Deine Hände sind voll: Wirf die Rakete in den Himmel (Linksklick)', en: 'Your hands are full: throw the missile into the sky (left click)', gsw: 'Dini Händ sind voll: Wirf d Rakete in Himmel ue (Linksklick)' },
   'La Forteresse de Solitude sort de la glace !': { de: 'Die Festung der Einsamkeit wächst aus dem Eis!', en: 'The Fortress of Solitude rises from the ice!', gsw: 'D Feschtig vo de Einsamkeit wachst us em Iis!' },
   'Écoute l\'hologramme de ton père, au cœur de la Forteresse...': { de: 'Hör dem Hologramm deines Vaters zu, im Herzen der Festung...', en: 'Listen to your father\'s hologram, at the heart of the Fortress...', gsw: 'Los em Hologramm vo dim Vater zue, im Härz vo de Feschtig...' },
-  'H : ton costume ! Puis Maj 3 fois, vite : tu t\'envoles. Pose-toi sur le toit du Daily Planet (point jaune)': { de: 'H: dein Kostüm! Dann 3-mal schnell Shift: Du fliegst los. Lande auf dem Dach des Daily Planet (gelber Punkt)', en: 'H: your suit! Then Shift 3 times, fast: you take off. Land on the roof of the Daily Planet (yellow dot)', gsw: 'H: dis Kostüm! Denn 3 Mal schnäll Shift: Du flüügsch los. Land uf em Dach vom Daily Planet (gääle Punkt)' },
-  'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Vole jusqu\'au toit du Daily Planet (point jaune)': { de: 'Zieh dein Kostüm an (H), dann 3-mal schnell Shift: Du fliegst los. Flieg zum Dach des Daily Planet (gelber Punkt)', en: 'Put on your suit (H), then Shift 3 times, fast: you take off. Fly to the roof of the Daily Planet (yellow dot)', gsw: 'Leg dis Kostüm aa (H), denn 3 Mal schnäll Shift: Du flüügsch los. Flüüg ufs Dach vom Daily Planet (gääle Punkt)' },
+  'H : ton costume ! Puis F : tu t\'envoles. Pose-toi sur le toit du Daily Planet (point jaune)': { de: 'H: dein Kostüm! Dann F: Du fliegst los. Lande auf dem Dach des Daily Planet (gelber Punkt)', en: 'H: your suit! Then F: you take off. Land on the roof of the Daily Planet (yellow dot)', gsw: 'H: dis Kostüm! Denn F: Du flüügsch los. Land uf em Dach vom Daily Planet (gääle Punkt)' },
+  'Mets ton costume (H), puis F : tu t\'envoles. Vole jusqu\'au toit du Daily Planet (point jaune)': { de: 'Zieh dein Kostüm an (H), dann F: Du fliegst los. Flieg zum Dach des Daily Planet (gelber Punkt)', en: 'Put on your suit (H), then F: you take off. Fly to the roof of the Daily Planet (yellow dot)', gsw: 'Leg dis Kostüm aa (H), denn F: Du flüügsch los. Flüüg ufs Dach vom Daily Planet (gääle Punkt)' },
   'L\'hélicoptère tombe en tournant... il va s\'écraser sur le toit !': { de: 'Der Hubschrauber stürzt trudelnd ab... er wird auf dem Dach aufschlagen!', en: 'The helicopter is spinning down... it\'s going to crash on the roof!', gsw: 'De Heli gheit dräiend abe... er schlaht uf em Dach uf!' },
   'LOIS TOMBE ! Rattrape-la en volant : touche-la, avant le sol !': { de: 'LOIS FÄLLT! Fang sie im Flug auf: Berühre sie, bevor sie am Boden ist!', en: 'LOIS IS FALLING! Catch her in flight: touch her, before she hits the ground!', gsw: 'D LOIS GHEIT! Fang sie im Flug uf: Berüehr sie, bevor sie am Bode isch!' },
   'Tu la tiens ! Pose-toi (sur le toit, ou en bas) pour la déposer': { de: 'Du hast sie! Lande (auf dem Dach oder unten), um sie abzusetzen', en: 'You\'ve got her! Land (on the roof, or down below) to set her down', gsw: 'Du häsch sie! Land (uf em Dach oder unde), zum sie abstelle' },
   'Tu le tiens ! Repose-le doucement : descends tout près du toit (ou du sol), puis G': { de: 'Du hast ihn! Stell ihn vorsichtig ab: Flieg ganz nah ans Dach (oder an den Boden), dann G', en: 'You\'ve got it! Put it down gently: get very close to the roof (or the ground), then G', gsw: 'Du häsch en! Stell en vorsichtig ab: Flüüg ganz nöch as Dach (oder an Bode), denn G' },
   'Il tombe ! Vole tout près de lui, et G : soulève-le (le pilote est dedans)': { de: 'Er fällt! Flieg ganz nah an ihn heran, und G: Heb ihn hoch (der Pilot ist drin)', en: 'It\'s falling! Fly right up to it, and G: lift it (the pilot is inside)', gsw: 'Er gheit! Flüüg ganz nöch zue em, und G: Heb en uf (de Pilot isch drin)' },
   'Raté... Ça recommence !': { de: 'Daneben... Noch einmal!', en: 'Missed... Try again!', gsw: 'Verpasst... Nomal!' },
-  'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Vole jusqu\'au grand pont (point jaune)': { de: 'Zieh dein Kostüm an (H), dann 3-mal schnell Shift: Du fliegst los. Flieg zur großen Brücke (gelber Punkt)', en: 'Put on your suit (H), then Shift 3 times, fast: you take off. Fly to the great bridge (yellow dot)', gsw: 'Leg dis Kostüm aa (H), denn 3 Mal schnäll Shift: Du flüügsch los. Flüüg zur grosse Brugg (gääle Punkt)' },
+  'Mets ton costume (H), puis F : tu t\'envoles. Vole jusqu\'au grand pont (point jaune)': { de: 'Zieh dein Kostüm an (H), dann F: Du fliegst los. Flieg zur großen Brücke (gelber Punkt)', en: 'Put on your suit (H), then F: you take off. Fly to the great bridge (yellow dot)', gsw: 'Leg dis Kostüm aa (H), denn F: Du flüügsch los. Flüüg zur grosse Brugg (gääle Punkt)' },
   'Repose-le sur la route, loin du trou : descends tout près de la route, puis G · encore {n}': { de: 'Stell es auf der Straße ab, weit weg vom Loch: Flieg ganz nah an die Straße, dann G · noch {n}', en: 'Put it down on the road, away from the hole: get very close to the road, then G · {n} left', gsw: 'Stell s uf de Strass ab, wiit wäg vom Loch: Flüüg ganz nöch a d Strass, denn G · no {n}' },
   'Plouf... Ça recommence !': { de: 'Platsch... Noch einmal!', en: 'Splash... Try again!', gsw: 'Platsch... Nomal!' },
   'Lex Luthor parle sur tous les écrans de Metropolis... Regarde le toit de sa tour !': { de: 'Lex Luthor spricht auf allen Bildschirmen von Metropolis... Schau auf das Dach seines Turms!', en: 'Lex Luthor is speaking on every screen in Metropolis... Look at the roof of his tower!', gsw: 'De Lex Luthor redt uf allne Bildschirm vo Metropolis... Lueg ufs Dach vo sim Turm!' },
   'Il monte vers le ciel... Encore {n}': { de: 'Sie steigt in den Himmel... Noch {n}', en: 'It\'s rising into the sky... {n} left', gsw: 'Sie stiigt in Himmel ue... No {n}' },
   'Tu tiens un missile ! Clic gauche : lance-le vers le ciel · encore {n}': { de: 'Du hältst eine Rakete! Linksklick: Wirf sie in den Himmel · noch {n}', en: 'You\'re holding a missile! Left click: throw it into the sky · {n} left', gsw: 'Du häsch e Rakete! Linksklick: Wirf sie in Himmel ue · no {n}' },
-  'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Rattrape les missiles de Luthor ! Encore {n}': { de: 'Zieh dein Kostüm an (H), dann 3-mal schnell Shift: Du fliegst los. Fang Luthors Raketen! Noch {n}', en: 'Put on your suit (H), then Shift 3 times, fast: you take off. Catch Luthor\'s missiles! {n} left', gsw: 'Leg dis Kostüm aa (H), denn 3 Mal schnäll Shift: Du flüügsch los. Fang em Luthor sini Rakete! No {n}' },
+  'Mets ton costume (H), puis F : tu t\'envoles. Rattrape les missiles de Luthor ! Encore {n}': { de: 'Zieh dein Kostüm an (H), dann F: Du fliegst los. Fang Luthors Raketen! Noch {n}', en: 'Put on your suit (H), then F: you take off. Catch Luthor\'s missiles! {n} left', gsw: 'Leg dis Kostüm aa (H), denn F: Du flüügsch los. Fang em Luthor sini Rakete! No {n}' },
   // les missions de Superman (chapitre 4, missions 5 à 8) : Lex Luthor et sa kryptonite, les robots pirates, la cloche de verre, le vaisseau de Brainiac
   'L\'armure de Luthor': { de: 'Luthors Rüstung', en: 'Luthor\'s armor', gsw: 'Em Luthor sini Rüschtig' },
   'Les robots pirates': { de: 'Die gehackten Roboter', en: 'The hacked robots', gsw: 'D ghackte Roboter' },
@@ -2518,18 +2530,18 @@ const TRADUCTIONS = {
   'Tu tiens sa kryptonite ! Clic gauche : lance-la au loin, très loin de toi (ou G : pose-la)': { de: 'Du hältst sein Kryptonit! Linksklick: Wirf es weit weg, ganz weit weg von dir (oder G: leg es hin)', en: 'You\'re holding his kryptonite! Left click: throw it far away, very far from you (or G: put it down)', gsw: 'Du häsch sis Kryptonit! Linksklick: Wirf es wiit wäg, ganz wiit vo dir wäg (oder G: leg es ane)' },
   'Mets ton costume (H) : Lex Luthor t\'attend sur le toit de LexCorp !': { de: 'Zieh dein Kostüm an (H): Lex Luthor wartet auf dem Dach von LexCorp!', en: 'Put on your suit (H): Lex Luthor is waiting on the roof of LexCorp!', gsw: 'Leg dis Kostüm aa (H): De Lex Luthor wartet uf em Dach vo LexCorp!' },
   'Sa kryptonite est par terre : éloigne-toi d\'elle... ou prends-la (G) et lance-la au loin !': { de: 'Sein Kryptonit liegt am Boden: Geh weg davon... oder heb es auf (G) und wirf es weit weg!', en: 'His kryptonite is on the ground: get away from it... or pick it up (G) and throw it far away!', gsw: 'Sis Kryptonit liit am Bode: Gang wäg devo... oder nimm s (G) und wirf es wiit wäg!' },
-  'Sa kryptonite est loin : vole (Maj 3 fois), et finis Lex Luthor ! Yeux laser (9), poings': { de: 'Sein Kryptonit ist weit weg: Flieg (3-mal Shift) und erledige Lex Luthor! Laseraugen (9), Fäuste', en: 'His kryptonite is far away: fly (Shift 3 times), and finish Lex Luthor! Laser eyes (9), fists', gsw: 'Sis Kryptonit isch wiit wäg: Flüüg (3 Mal Shift) und erledig de Lex Luthor! Laserauge (9), Füscht' },
+  'Sa kryptonite est loin : vole (F), et finis Lex Luthor ! Yeux laser (9), poings': { de: 'Sein Kryptonit ist weit weg: Flieg (F) und erledige Lex Luthor! Laseraugen (9), Fäuste', en: 'His kryptonite is far away: fly (F), and finish Lex Luthor! Laser eyes (9), fists', gsw: 'Sis Kryptonit isch wiit wäg: Flüüg (F) und erledig de Lex Luthor! Laserauge (9), Füscht' },
   'Mets ton costume (H) pour casser les antennes de Brainiac ! Encore {n}': { de: 'Zieh dein Kostüm an (H), um Brainiacs Antennen zu zerstören! Noch {n}', en: 'Put on your suit (H) to smash Brainiac\'s antennas! {n} left', gsw: 'Leg dis Kostüm aa (H), zum em Brainiac sini Antenne kaputt mache! No {n}' },
   'Des machines de Brainiac tiennent une immense cloche de verre, au-dessus de Park Ridge ! Vole jusque-là (point jaune)': { de: 'Brainiacs Maschinen halten eine riesige Glasglocke über Park Ridge! Flieg dorthin (gelber Punkt)', en: 'Brainiac\'s machines are holding a huge glass dome above Park Ridge! Fly there (yellow dot)', gsw: 'Em Brainiac sini Maschine hebed e riesigi Glasglogge über Park Ridge! Flüüg det ane (gääle Punkt)' },
   'La cloche remonte... Prépare-toi : de nouveaux porteurs arrivent !': { de: 'Die Glocke steigt wieder... Mach dich bereit: Neue Träger kommen!', en: 'The dome is rising again... Get ready: new carriers are coming!', gsw: 'D Glogge stiigt wider ue... Mach dich parat: Neui Träger chömed!' },
   'La cloche éclate : Park Ridge est sauvé !': { de: 'Die Glocke zerspringt: Park Ridge ist gerettet!', en: 'The dome shatters: Park Ridge is saved!', gsw: 'D Glogge verspringt: Park Ridge isch grettet!' },
-  'Mets ton costume (H), puis Maj 3 fois : vole sous le vaisseau de Brainiac, dans son rayon vert (point jaune)': { de: 'Zieh dein Kostüm an (H), dann 3-mal Shift: Flieg unter Brainiacs Raumschiff, in seinen grünen Strahl (gelber Punkt)', en: 'Put on your suit (H), then Shift 3 times: fly under Brainiac\'s ship, into its green beam (yellow dot)', gsw: 'Leg dis Kostüm aa (H), denn 3 Mal Shift: Flüüg under s Raumschiff vom Brainiac, in sin grüene Strahl (gääle Punkt)' },
+  'Mets ton costume (H), puis F : vole sous le vaisseau de Brainiac, dans son rayon vert (point jaune)': { de: 'Zieh dein Kostüm an (H), dann F: Flieg unter Brainiacs Raumschiff, in seinen grünen Strahl (gelber Punkt)', en: 'Put on your suit (H), then F: fly under Brainiac\'s ship, into its green beam (yellow dot)', gsw: 'Leg dis Kostüm aa (H), denn F: Flüüg under s Raumschiff vom Brainiac, in sin grüene Strahl (gääle Punkt)' },
   'Retourne dans le vaisseau : vole dans son rayon vert, dessous (point jaune)': { de: 'Geh zurück ins Raumschiff: Flieg in seinen grünen Strahl, darunter (gelber Punkt)', en: 'Go back into the ship: fly into its green beam, underneath (yellow dot)', gsw: 'Gang zrugg is Raumschiff: Flüüg in sin grüene Strahl, drunder (gääle Punkt)' },
   'Ses réparateurs sont cassés : à Brainiac, maintenant ! Yeux laser (9), poings. Et saute de côté quand les câbles tombent !': { de: 'Seine Reparierer sind kaputt: Jetzt ist Brainiac dran! Laseraugen (9), Fäuste. Und spring zur Seite, wenn die Kabel fallen!', en: 'His repairers are broken: now for Brainiac! Laser eyes (9), fists. And jump aside when the cables fall!', gsw: 'Sini Flicker sind kaputt: Jetzt isch de Brainiac dra! Laserauge (9), Füscht. Und gump uf d Siite, wenn d Kabel abegheied!' },
   'Regarde : le vaisseau de Brainiac tombe dans la baie de Metropolis !': { de: 'Schau: Brainiacs Raumschiff stürzt in die Bucht von Metropolis!', en: 'Look: Brainiac\'s ship is falling into Metropolis Bay!', gsw: 'Lueg: S Raumschiff vom Brainiac gheit i d Bucht vo Metropolis!' },
   'La kryptonite se fêle ! Encore un coup !': { de: 'Das Kryptonit bekommt Risse! Noch ein Schlag!', en: 'The kryptonite is cracking! Hit it again!', gsw: 'S Kryptonit bechunnt Riss! No en Schlag!' },
   'LA KRYPTONITE EST CASSÉE !': { de: 'DAS KRYPTONIT IST ZERBROCHEN!', en: 'THE KRYPTONITE IS SMASHED!', gsw: 'S KRYPTONIT ISCH VERCHEIT!' },
-  'Tu retrouves tes forces : Maj 3 fois pour voler, 9 pour tes yeux laser !': { de: 'Du hast deine Kräfte wieder: 3-mal Shift zum Fliegen, 9 für deine Laseraugen!', en: 'You get your strength back: Shift 3 times to fly, 9 for your laser eyes!', gsw: 'Du häsch dini Chräft wider: 3 Mal Shift zum Flüüge, 9 für dini Laserauge!' },
+  'Tu retrouves tes forces : F pour voler, 9 pour tes yeux laser !': { de: 'Du hast deine Kräfte wieder: F zum Fliegen, 9 für deine Laseraugen!', en: 'You get your strength back: F to fly, 9 for your laser eyes!', gsw: 'Du häsch dini Chräft wider: F zum Flüüge, 9 für dini Laserauge!' },
   'TU ARRACHES LA KRYPTONITE !': { de: 'DU REISST DAS KRYPTONIT AB!', en: 'YOU RIP OFF THE KRYPTONITE!', gsw: 'DU RIISSCH S KRYPTONIT AB!' },
   'Clic gauche : lance-la au loin, très loin de toi · G : pose-la': { de: 'Linksklick: Wirf es weit weg, ganz weit weg von dir · G: leg es hin', en: 'Left click: throw it far away, very far from you · G: put it down', gsw: 'Linksklick: Wirf es wiit wäg, ganz wiit vo dir wäg · G: leg es ane' },
   'Tu tiens la kryptonite : clic gauche, lance-la au loin · G : pose-la': { de: 'Du hältst das Kryptonit: Linksklick, wirf es weit weg · G: leg es hin', en: 'You\'re holding the kryptonite: left click, throw it far away · G: put it down', gsw: 'Du häsch s Kryptonit: Linksklick, wirf es wiit wäg · G: leg es ane' },
@@ -2550,7 +2562,7 @@ const TRADUCTIONS = {
     gsw: '«Willkomme bi mir, {super}. Kennsch du Kryptonit? En Stei vo dim Planet... wo dich ganz schwach macht!»' },
   '« Mes drones ! Attaquez-le ! »': { de: '„Meine Drohnen! Greift an!“', en: '"My drones! Attack!"', gsw: '«Mini Drohne! Aagriffe!»' },
   'LUTHOR S\'ENVOLE !': { de: 'LUTHOR FLIEGT DAVON!', en: 'LUTHOR TAKES OFF!', gsw: 'DE LUTHOR FLÜÜGT DÄVO!' },
-  'Sans sa kryptonite, il a peur de toi... Vole (Maj 3 fois), et finis-le !': { de: 'Ohne sein Kryptonit hat er Angst vor dir... Flieg (3-mal Shift) und erledige ihn!', en: 'Without his kryptonite, he\'s scared of you... Fly (Shift 3 times), and finish him!', gsw: 'Ohni sis Kryptonit het er Angscht vor dir... Flüüg (3 Mal Shift) und erledig en!' },
+  'Sans sa kryptonite, il a peur de toi... Vole (F), et finis-le !': { de: 'Ohne sein Kryptonit hat er Angst vor dir... Flieg (F) und erledige ihn!', en: 'Without his kryptonite, he\'s scared of you... Fly (F), and finish him!', gsw: 'Ohni sis Kryptonit het er Angscht vor dir... Flüüg (F) und erledig en!' },
   'Rien ne touche Luthor tant que sa kryptonite brille : casse-la (poings), ou arrache-la (G, tout près) !': { de: 'Nichts kann Luthor etwas anhaben, solange sein Kryptonit leuchtet: Zerschlag es (Fäuste), oder reiß es ab (G, ganz nah)!', en: 'Nothing can hurt Luthor while his kryptonite glows: smash it (fists), or rip it off (G, up close)!', gsw: 'Nüt chann em Luthor öppis aatue, solang sis Kryptonit lüüchtet: Verschla s (Füscht), oder riiss es ab (G, ganz nöch)!' },
   'LEX LUTHOR EST VAINCU !': { de: 'LEX LUTHOR IST BESIEGT!', en: 'LEX LUTHOR IS DEFEATED!', gsw: 'DE LEX LUTHOR ISCH BSIEGT!' },
   'Son armure est en morceaux : la police l\'emmène en prison': { de: 'Seine Rüstung ist in Stücken: Die Polizei bringt ihn ins Gefängnis', en: 'His armor is in pieces: the police take him to prison', gsw: 'Sini Rüschtig isch in Stück: D Polizei bringt en is Gfängnis' },
@@ -2646,10 +2658,10 @@ const TRADUCTIONS = {
     de: 'Die Weltmaschine sinkt auf die Bucht zu, in Hob\'s Bay: Flieg dorthin (gelber Punkt)',
     en: 'The World Engine is coming down toward the bay, at Hob\'s Bay: fly there (yellow dot)',
     gsw: 'D Weltmaschine chunnt uf d Bucht abe, in Hob\'s Bay: Flüüg det ane (gääle Punkt)' },
-  'Mets ton costume (H), puis Maj 3 fois : vole jusqu\'à la machine-monde !': {
-    de: 'Zieh dein Kostüm an (H), dann 3-mal Shift: Flieg zur Weltmaschine!',
-    en: 'Put on your suit (H), then Shift 3 times: fly to the World Engine!',
-    gsw: 'Leg dis Kostüm aa (H), denn 3 Mal Shift: Flüüg zur Weltmaschine!' },
+  'Mets ton costume (H), puis F : vole jusqu\'à la machine-monde !': {
+    de: 'Zieh dein Kostüm an (H), dann F: Flieg zur Weltmaschine!',
+    en: 'Put on your suit (H), then F: fly to the World Engine!',
+    gsw: 'Leg dis Kostüm aa (H), denn F: Flüüg zur Weltmaschine!' },
   'Dans le rayon ! Frappe le cœur de la machine (poings tout près, ou yeux laser), vite !': {
     de: 'Im Strahl! Schlag auf das Herz der Maschine (Fäuste ganz nah, oder Laseraugen), schnell!',
     en: 'In the beam! Hit the core of the machine (fists up close, or laser eyes), quick!',
@@ -2659,10 +2671,10 @@ const TRADUCTIONS = {
     en: 'Its beam lifts everything up! Get into the beam (it pushes you back), and hit its core, under the machine: fists or laser eyes',
     gsw: 'Ihre Strahl lüpft alles ufe! Flüüg in Strahl ine (er drückt dich zrugg), und hau uf ihres Herz, under de Maschine: Füscht oder Laserauge' },
   'La machine-monde s\'effondre dans la baie !': { de: 'Die Weltmaschine stürzt in die Bucht!', en: 'The World Engine is collapsing into the bay!', gsw: 'D Weltmaschine gheit i d Bucht!' },
-  'Mets ton costume (H), puis Maj 3 fois : le général Zod t\'attend dans le ciel, entre les tours !': {
-    de: 'Zieh dein Kostüm an (H), dann 3-mal Shift: General Zod wartet am Himmel zwischen den Türmen auf dich!',
-    en: 'Put on your suit (H), then Shift 3 times: General Zod is waiting for you in the sky, between the towers!',
-    gsw: 'Leg dis Kostüm aa (H), denn 3 Mal Shift: De General Zod wartet am Himmel zwüsched de Türm uf dich!' },
+  'Mets ton costume (H), puis F : le général Zod t\'attend dans le ciel, entre les tours !': {
+    de: 'Zieh dein Kostüm an (H), dann F: General Zod wartet am Himmel zwischen den Türmen auf dich!',
+    en: 'Put on your suit (H), then F: General Zod is waiting for you in the sky, between the towers!',
+    gsw: 'Leg dis Kostüm aa (H), denn F: De General Zod wartet am Himmel zwüsched de Türm uf dich!' },
   'Zod et Faora ! Yeux laser (9), poings tout près : écarte-toi quand ils foncent sur toi': {
     de: 'Zod und Faora! Laseraugen (9), Fäuste ganz nah: Weich aus, wenn sie auf dich losstürmen',
     en: 'Zod and Faora! Laser eyes (9), fists up close: dodge when they charge at you',
@@ -2687,10 +2699,10 @@ const TRADUCTIONS = {
     de: 'Schieb Doomsday ganz nach oben: Schau zum Himmel und flieg (Shift: schneller). Du bist auf {y} m, das Weltall beginnt auf {h} m',
     en: 'Push Doomsday way up: look at the sky, and fly (Shift: faster). You are at {y} m, space starts at {h} m',
     gsw: 'Schieb de Doomsday ganz ufe: Lueg zum Himmel und flüüg (Shift: schnäller). Du bisch uf {y} m, s Weltall faht uf {h} m aa' },
-  'Mets ton costume (H), puis Maj 3 fois : attrape Doomsday en volant !': {
-    de: 'Zieh dein Kostüm an (H), dann 3-mal Shift: Pack Doomsday im Flug!',
-    en: 'Put on your suit (H), then Shift 3 times: grab Doomsday while flying!',
-    gsw: 'Leg dis Kostüm aa (H), denn 3 Mal Shift: Pack de Doomsday im Flug!' },
+  'Mets ton costume (H), puis F : attrape Doomsday en volant !': {
+    de: 'Zieh dein Kostüm an (H), dann F: Pack Doomsday im Flug!',
+    en: 'Put on your suit (H), then F: grab Doomsday while flying!',
+    gsw: 'Leg dis Kostüm aa (H), denn F: Pack de Doomsday im Flug!' },
   'Metropolis t\'acclame !': { de: 'Metropolis jubelt dir zu!', en: 'Metropolis cheers for you!', gsw: 'Metropolis jublet dir zue!' },
   'Mister Mxyzptlk ! Écoute ce qu\'il te dit...': { de: 'Mister Mxyzptlk! Hör zu, was er dir sagt...', en: 'Mister Mxyzptlk! Listen to what he tells you...', gsw: 'Mister Mxyzptlk! Los, was er dir seit...' },
   'Attrape ses lettres dans l\'ordre (touche-les) : la prochaine, en or, c\'est le {l} · déjà : {mot} · encore {n}': {
@@ -3390,12 +3402,14 @@ const REGLAGES = {
   vitesseNage: 2.2,          // dans l'eau
   vitesseNageRapide: 4,      // dans l'eau, avec Maj
   touchesDanse: ['KeyA', 'KeyS', 'KeyD'], // à taper 3 fois de suite pour danser : gauche, arrière, droite (Q S D sur un clavier français)
+  toucheMenu: 'Tab',         // la touche du petit menu du jeu (ce qu'on fait rarement : voir MENU_JEU, juste après REGLAGES), écrite comme dans touchesDanse ('KeyU' : la touche U)
+  dureeMenu: 8,              // secondes : sans chiffre tapé, le petit menu se referme tout seul
   moonwalk: [3, 1, 2],       // la danse, en secondes : le moonwalk, la toupie, puis la pose « Who's bad ? »
   vitesseMoonwalk: 1.5,      // m/s, à reculons
-  vitesseVol: 12,            // Superman (Maj 3 fois de suite) : m/s en volant...
+  vitesseVol: 12,            // Superman (touche F ; ou l'astuce cachée, Maj 3 fois de suite, partout) : m/s en volant...
   vitesseVolMaj: 12,         // ...et chaque appui sur Maj en volant ajoute ça (1 fois : 24 m/s, 2 fois : 36 m/s...)
   vitesseVolMax: 100,        // ...jusqu'à ça (360 km/h, plus vite que l'avion !)
-  tripleMaj: 0.6,            // secondes pour taper Maj 3 fois
+  tripleMaj: 0.6,            // secondes pour taper Maj 3 fois (l'astuce cachée : elle fait voler dans tous les chapitres, sans code de triche)
   traitsTourbillon: 34,      // au chapitre de Superman : les traits bleus, rouges et jaunes du tourbillon, quand il met son costume (touche H) ou l'enlève
   porteeForce: 4,            // au chapitre de Superman, en costume, la super-force : G soulève la voiture la plus proche (même un camion ou un bus), à autant de mètres au plus de sa carrosserie...
   lancerForce: 32,           // ...et le clic gauche la lance là où tu regardes, à cette vitesse (m/s : 32 = 115 km/h). G encore : il la repose doucement par terre
@@ -3473,6 +3487,26 @@ const REGLAGES = {
   dureeVoyage: 3,            // secondes à 88 miles à l'heure (142 km/h) dans la DeLorean pour partir dans un autre chapitre
   retourDeLorean: 4,         // secondes : la DeLorean a explosé ou coulé avant qu'on la retrouve, une neuve revient alors dans sa cachette
 };
+
+// =====================================================================
+//  LE PETIT MENU DU JEU : la touche Tab (REGLAGES.toucheMenu) l'ouvre, pour ce qu'on fait rarement. Une ligne par chose, avec son
+//  chiffre devant (1 pour la première, 2 pour la suivante...) : tape le chiffre, c'est comme si tu appuyais sur la touche de la ligne.
+//  Le jeu continue pendant ce temps (tu peux marcher) ; il se referme tout seul (REGLAGES.dureeMenu), ou avec Tab.
+//  nom : ce qui est écrit (traduit dans TRADUCTIONS) ; touche : la place de la touche sur le clavier, comme touchesDanse dans REGLAGES
+//    ('KeyV' : la touche V, 'Enter' : Entrée, 'Digit5' : le 5). Les anciennes touches marchent toujours, sans passer par le menu
+//  chapitres : seulement dans ces chapitres (sans : dans tous) ; reste: true : le menu reste ouvert après (pour choisir plusieurs fois de suite)
+//  9 lignes au plus par chapitre. Pour ajouter la grande carte : { nom: 'La carte du pays', touche: 'KeyM' },
+// =====================================================================
+const MENU_JEU = [
+  { nom: 'Changer de vue', touche: 'KeyV' },
+  { nom: 'DeLorean : la faire venir, ou choisir où aller', touche: 'KeyT' },
+  { nom: 'Taper un code de triche (Entrée pour valider)', touche: 'Enter' },
+  { nom: 'Compteur de performances', touche: 'KeyP' },
+  { nom: "Changer d'armure", touche: 'KeyJ', chapitres: [2], reste: true },
+  { nom: 'Changer de costume', touche: 'KeyJ', chapitres: [3, 4], reste: true },
+  { nom: 'Changer de Batmobile', touche: 'KeyN', chapitres: [3], reste: true },
+  { nom: 'Lever ou baisser le masque', touche: 'KeyL', chapitres: [2] },
+];
 
 // =====================================================================
 //  LES ARMES : on commence avec les deux premières
@@ -4859,7 +4893,7 @@ const MISSIONS_METROPOLIS = [
     { type: 'passager', voiture: 'Hélicoptère du Daily Planet', pose: 'X', vers: 'glaces', secondes: 22,
       texte: 'Le Daily Planet t\'envoie en reportage tout au nord, où la glace brille d\'une lueur verte : monte dans l\'hélicoptère du journal, sur la place (E). Son pilote t\'emmène !' },
     { type: 'cristal', texte: 'La lueur verte : un cristal brille dans la glace... Approche-toi (point jaune)' },
-    { type: 'aller', point: 'toitPlanet', elan: 6, texte: 'Ton premier vol ! Maj 3 fois, vite : tu t\'envoles. Chaque Maj de plus : encore plus vite ! Rentre à Metropolis, et pose-toi sur le toit du Daily Planet (point jaune)' },
+    { type: 'aller', point: 'toitPlanet', elan: 6, texte: 'Ton premier vol ! F : tu t\'envoles. Puis chaque appui sur Maj : encore plus vite ! Rentre à Metropolis, et pose-toi sur le toit du Daily Planet (point jaune)' },
   ]},
   // Superman (1978) : l'hélicoptère du Daily Planet s'écrase au bord du toit, et Lois Lane tombe dans le vide... « Je vous tiens ! » « Vous me
   // tenez ? Mais qui vous tient, vous ? »
@@ -5557,7 +5591,7 @@ const TRICHES = [
   // le costume de Superman : collant bleu, slip et bottes rouges, ceinture jaune, le « S » sur la poitrine, la cape rouge, les cheveux noirs
   // et l'accroche-cœur (voir habillerSuperman ; au chapitre de Superman, c'est le costume qu'il a choisi, COSTUMES_STAR : avec la fille du
   // menu, celui de Supergirl). Il n'est pas invincible (les balles lui font mal), mais il a les yeux laser, et tomber de haut ne lui fait rien
-  { code: 'SUPERMAN', texte: 'Superman ! Yeux laser (touche 9), et tomber de haut écrase tout', laser: true, ecrase: true, effet: b => habillerSuperman(b, costumeSuperman()) },
+  { code: 'SUPERMAN', texte: 'Superman ! Voler (touche F), yeux laser (touche 9), et tomber de haut écrase tout', laser: true, ecrase: true, effet: b => habillerSuperman(b, costumeSuperman()) },
   // Batman : le costume gris, le slip, les gants, les bottes et la cagoule noirs (avec ses deux oreilles pointues), la ceinture jaune,
   // la chauve-souris sur la poitrine et la grande cape noire. Il a le grappin (qu'il prend en main), les batarangs et les filets (touche 9),
   // la cape pour planer (Maj en l'air), et sa Batmobile, qui vole (touche R), apparaît à côté de lui (la touche B la rappelle). Il n'est pas
@@ -15799,6 +15833,9 @@ const sansGadgets = () => costumeCivil() && !tricheHeros().actif;
 // au chapitre de Superman, Clark Kent (ou Kara Danvers) commence aussi en civil : ni vol, ni yeux laser, et tomber de haut fait mal, comme
 // à tout le monde. H : le costume, dans un tourbillon bleu et rouge (voir tourbillon)
 const chezClark = CHAPITRE.triche === 'SUPERMAN';
+// peut-il voler comme Superman avec la touche F ? Au chapitre de Superman (en civil, F dit de mettre le costume), ou avec le code SUPERMAN,
+// et seulement à pied : pas dans l'armure d'Iron Man (F y vole déjà ; à côté de l'armure vide, si), ni en voiture, ni dans un robot, ni sur une remontée
+const supermanLibre = () => (chezClark || TRICHES.some(t => t.code === 'SUPERMAN' && t.actif)) && !armureIronman() && !J.voiture && !J.robot && !J.telesiege && !J.monorail && !J.mort;
 function changerCostume() {
   const t = tricheHeros();
   if (sansCostume()) { pasEncoreDeCostume(); return; }
@@ -17765,8 +17802,10 @@ addEventListener('keydown', e => {
   if (!e.repeat || !J.danse) touches[e.code] = true;   // pendant la danse, une touche restée enfoncée ne compte pas
   if (e.repeat) return;
   if (e.code === 'KeyP') { allumerCompteur(!compteur.allume); return; }   // P : le compteur de performances (images par seconde...), partout dans le jeu
-  if (e.key.toLowerCase() === 'm' || e.code === 'Tab') { ouvrirCarte(!carte.ouverte); return; } // la lettre M (quel que soit le clavier) ouvre la carte, comme Tab (même dans l'armure d'Iron Man)
+  if (e.key.toLowerCase() === 'm') { ouvrirMenuJeu(false); ouvrirCarte(!carte.ouverte); return; } // la lettre M (quel que soit le clavier) ouvre la carte (même dans l'armure d'Iron Man)
   if (carte.ouverte) return;
+  if (e.code === R_.toucheMenu) { ouvrirMenuJeu(!menuJeu.ouvert); return; }   // Tab : le petit menu du jeu (voir MENU_JEU)
+  if (menuJeu.ouvert && !menuJeu.envoi && /^(Digit|Numpad)\d$/.test(e.code)) { choisirMenuJeu(+e.code.slice(-1)); return; }   // menu ouvert : un chiffre choisit sa ligne (pas d'arme, pas de réponse au Sphinx)
   if (devinette?.affiche && /^(Digit|Numpad)[1-3]$/.test(e.code)) { repondre(+e.code.slice(-1)); return; }   // une devinette du Sphinx : 1, 2 ou 3, la réponse (pas une autre arme)
   if (J.ironman && suiteIronman(e.code)) return;   // A Z E (Q W E sur un clavier anglais) : l'armure d'Iron Man arrive, ou il en sort
   if ((J.ironman?.anim || J.ironman?.tour) && e.code !== 'KeyV') return;   // pendant ce temps (et pendant le tour du laser des bras), il ne fait rien d'autre
@@ -17781,6 +17820,7 @@ addEventListener('keydown', e => {
   const im = ironmanLibre();   // dans l'armure d'Iron Man, à pied
   if (e.code === 'KeyF' && J.robot?.armure) tirerFusees(J.robot);   // dans l'armure du camp, F tire les fusées
   else if (e.code === 'KeyF' && im) decoller();   // Iron Man : F le fait voler, ou arrêter de voler
+  else if (e.code === 'KeyF' && supermanLibre()) { if (!(chezClark && sansGadgets() && action())) decoller(); }   // Superman : F le fait voler, ou arrêter de voler (en civil, F fait d'abord comme E : monter en voiture... ; s'il n'y a rien à faire, « Mets ton costume (H) pour voler »)
   else if (e.code === 'KeyE' && im) { if (action()) J.ironman.mains.D.bloque = true; }   // Iron Man : E fait ce qu'il y a à faire là (monter en voiture, acheter...), sinon la main droite tire
   else if (e.code === 'KeyE' || e.code === 'KeyF') action();
   if (e.code === 'KeyV') J.vue = J.vue === 1 ? 3 : 1;
@@ -17814,6 +17854,36 @@ addEventListener('keyup', e => {
   if (e.key === 'Shift' && J.superman?.appui) { J.superman.appui = false; J.superman.crans++; }   // Superman : Maj relâché sans avoir fait de figure, il va plus vite
   if (J.ironman && (e.code === 'KeyQ' || e.code === 'KeyE')) J.ironman.mains[e.code === 'KeyQ' ? 'G' : 'D'].bloque = false;   // Iron Man : la main peut de nouveau tirer
 });
+// Le petit menu du jeu (Tab, voir MENU_JEU) : ouvert ou pas, ses lignes dans ce chapitre, les secondes avant qu'il se referme tout seul,
+// et envoi : une ligne est en train de « taper » sa touche (si c'est un chiffre, le menu ne doit pas le prendre pour lui)
+const menuJeu = { ouvert: false, lignes: [], reste: 0, envoi: false };
+const nomTouche = code => code.replace(/^(Key|Digit|Numpad)/, '');   // 'KeyV' → 'V', 'Digit5' → '5', 'Tab' → 'Tab'
+function ouvrirMenuJeu(ouvrir) {
+  menuJeu.ouvert = ouvrir;
+  $('menu-jeu').style.display = ouvrir ? 'block' : 'none';
+  if (!ouvrir) return;
+  menuJeu.lignes = MENU_JEU.filter(l => !l.chapitres || l.chapitres.includes(chapitre)).slice(0, 9);   // (9 chiffres : 9 lignes au plus)
+  menuJeu.reste = R_.dureeMenu;
+  $('menu-jeu').innerHTML = `<h3>${tr('MENU')}</h3>` + menuJeu.lignes.map((l, i) => `<div><b>${i + 1}</b>${tr(l.nom)}</div>`).join('')
+    + `<small>${tr('Un chiffre : choisir · {touche} : fermer', { touche: nomTouche(R_.toucheMenu) })}</small>`;
+}
+// la ligne n du menu (1 = la première) : c'est comme si on appuyait sur sa touche
+function choisirMenuJeu(n) {
+  const l = menuJeu.lignes[n - 1];
+  if (!l) return;
+  if (l.reste) menuJeu.reste = R_.dureeMenu; else ouvrirMenuJeu(false);   // (reste : pour changer de costume plusieurs fois de suite)
+  taper(l.touche);
+}
+// fait comme si on appuyait sur une touche du clavier (code : sa place, 'KeyV', 'Enter'...), puis qu'on la relâchait : le jeu fait
+// exactement ce qu'il fait pour la vraie touche. Le petit menu s'en sert ; les boutons d'un téléphone (qui n'a pas de clavier) s'en serviront aussi
+function taper(code) {
+  const key = /^Key[A-Z]$/.test(code) ? code.slice(3).toLowerCase() : '';   // (la lettre : M ouvre la carte d'après sa lettre, pas sa place)
+  menuJeu.envoi = true;
+  try {
+    dispatchEvent(new KeyboardEvent('keydown', { code, key }));
+    dispatchEvent(new KeyboardEvent('keyup', { code, key }));
+  } finally { menuJeu.envoi = false; }
+}
 const touche = (...codes) => codes.some(c => touches[c]) ? 1 : 0;
 const dansLunette = () => visee && !J.voiture && !J.robot && !J.mort && !!ARMES[J.arme].zoom; // on regarde dans la lunette du sniper
 addEventListener('mousedown', e => { if (!enJeu || carte.ouverte) return; if (e.button === 0) sourisG = true; if (e.button === 2) visee = true; });
@@ -17845,7 +17915,7 @@ function lancerJeu() {
 // (le clic sur le menu lance le jeu dès que ses programmes sont compilés : voir preparerProgrammes, tout à la fin)
 function validerTriche() {
   if (saisie === null) { // on ouvre la saisie
-    saisie = ''; for (const k in touches) touches[k] = false;
+    saisie = ''; for (const k in touches) touches[k] = false; ouvrirMenuJeu(false);   // (les chiffres du code ne sont pas pour le petit menu)
     $('triche').textContent = tr('Code : {code}_', { code: '' }); $('triche').style.display = 'block';
     return;
   }
@@ -17962,8 +18032,10 @@ function pasDeDanse(dt) {
   J.angleCorps = J.angleDanse + Math.PI / 2;
   return { pas: 'pose', k: (t - moon - toupie) / pose };
 }
-// Superman : Maj 3 fois de suite (en moins de REGLAGES.tripleMaj secondes) fait décoller B.J. Encore 3 fois : il arrête de voler, et tombe !
-// (Dans l'armure d'Iron Man, la touche F fait pareil, et c'est elle qui encaisse la chute)
+// Superman : la touche F (au chapitre de Superman, en costume, ou avec le code SUPERMAN : voir supermanLibre) fait décoller B.J. F encore :
+// il arrête de voler, et tombe ! (Dans l'armure d'Iron Man, F fait pareil, et c'est elle qui encaisse la chute.)
+// L'astuce cachée, qui n'est dans aucune liste de touches : Maj 3 fois de suite (en moins de REGLAGES.tripleMaj secondes) fait pareil, dans
+// tous les chapitres, sans code de triche
 let tapesMaj = [];   // quand on a tapé Maj les 3 dernières fois
 function decoller() {
   if (J.voiture || J.robot || J.mort || J.ironman?.anim) return;
@@ -17981,7 +18053,7 @@ function decoller() {
 }
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement) return;
-  saisie = null; $('triche').style.display = 'none';
+  saisie = null; $('triche').style.display = 'none'; ouvrirMenuJeu(false);
   enJeu = false; $('menu').style.display = 'flex'; etat('Pause — clique pour continuer');
   ouvrirCarte(false); audio?.suspend();
   for (const k in touches) touches[k] = false;
@@ -21334,8 +21406,8 @@ function texteEtape(et) {
     : et.type === 'passager' && passage?.phase === 'vol' ? 'Le pilote t\'emmène tout au nord : regarde la ville (souris)... et la lueur verte, au loin !'
     : et.type === 'cristal' && cristal?.phase === 'pousse' ? 'La Forteresse de Solitude sort de la glace !'
     : et.type === 'cristal' && cristal?.phase === 'holo' ? 'Écoute l\'hologramme de ton père, au cœur de la Forteresse...'
-    : et.type === 'aller' && et.point === 'toitPlanet' && !enCostumeSuper() ? 'H : ton costume ! Puis Maj 3 fois, vite : tu t\'envoles. Pose-toi sur le toit du Daily Planet (point jaune)'
-    : et.type === 'lois' && chuteLois?.phase === 'tourne' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Vole jusqu\'au toit du Daily Planet (point jaune)'
+    : et.type === 'aller' && et.point === 'toitPlanet' && !enCostumeSuper() ? 'H : ton costume ! Puis F : tu t\'envoles. Pose-toi sur le toit du Daily Planet (point jaune)'
+    : et.type === 'lois' && chuteLois?.phase === 'tourne' && !enCostumeSuper() ? 'Mets ton costume (H), puis F : tu t\'envoles. Vole jusqu\'au toit du Daily Planet (point jaune)'
     : et.type === 'lois' && chuteLois?.phase === 'crash' ? 'L\'hélicoptère tombe en tournant... il va s\'écraser sur le toit !'
     : et.type === 'lois' && chuteLois?.phase === 'tombe' ? 'LOIS TOMBE ! Rattrape-la en volant : touche-la, avant le sol !'
     : et.type === 'lois' && chuteLois?.phase === 'tenue' ? 'Tu la tiens ! Pose-toi (sur le toit, ou en bas) pour la déposer'
@@ -21343,39 +21415,39 @@ function texteEtape(et) {
     : et.type === 'lois' && chuteLois?.phase === 'helico' && !chuteLois.v.anime ? 'Il tombe ! Vole tout près de lui, et G : soulève-le (le pilote est dedans)'
     : et.type === 'lois' && chuteLois?.phase === 'helico' ? 'L\'hélicoptère penche au bord du toit, son pilote dedans ! Vole tout près de lui (point jaune) : il va glisser. G : soulève-le'
     : et.type === 'lois' && chuteLois?.phase === 'rate' ? (chuteLois.seulHelico ? 'Raté... L\'hélicoptère est de nouveau au bord du toit : recommence !' : 'Raté... Ça recommence !')
-    : et.type === 'pont' && ecroulement?.phase === 'attente' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Vole jusqu\'au grand pont (point jaune)'
+    : et.type === 'pont' && ecroulement?.phase === 'attente' && !enCostumeSuper() ? 'Mets ton costume (H), puis F : tu t\'envoles. Vole jusqu\'au grand pont (point jaune)'
     : et.type === 'pont' && ecroulement?.phase === 'casse' && souleve && ecroulement.liste.some(q => q.v === souleve.v) ? 'Repose-le sur la route, loin du trou : descends tout près de la route, puis G · encore {n}'
     : et.type === 'pont' && ecroulement?.phase === 'casse' ? 'Remonte-les sur la route, un par un : vole tout près, G pour le soulever, G encore pour le reposer · encore {n} · le prochain tombe dans {t} s'
     : et.type === 'pont' && ecroulement?.phase === 'rate' ? 'Plouf... Ça recommence !'
     : et.type === 'missiles' && missilesLuthor?.phase === 'discours' ? 'Lex Luthor parle sur tous les écrans de Metropolis... Regarde le toit de sa tour !'
     : et.type === 'missiles' && missileTenu() ? 'Tu tiens un missile ! Clic gauche : lance-le vers le ciel · encore {n}'
     : et.type === 'missiles' && missilesLuthor?.phase === 'vol' && !(tempsMissiles() < Infinity) ? 'Il monte vers le ciel... Encore {n}'
-    : et.type === 'missiles' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois, vite : tu t\'envoles. Rattrape les missiles de Luthor ! Encore {n}'
+    : et.type === 'missiles' && !enCostumeSuper() ? 'Mets ton costume (H), puis F : tu t\'envoles. Rattrape les missiles de Luthor ! Encore {n}'
     : et.cible === 'luthor' && kryptoniteTenue ? 'Tu tiens sa kryptonite ! Clic gauche : lance-la au loin, très loin de toi (ou G : pose-la)'
     : et.cible === 'luthor' && !enCostumeSuper() ? 'Mets ton costume (H) : Lex Luthor t\'attend sur le toit de LexCorp !'
     : et.cible === 'luthor' && personnes.some(p => p.type === 'luthor' && p.vie > 0 && p.krypto === null) && kryptonites.some(k => k.de === 'luthor') ? 'Sa kryptonite est par terre : éloigne-toi d\'elle... ou prends-la (G) et lance-la au loin !'
-    : et.cible === 'luthor' && personnes.some(p => p.type === 'luthor' && p.vie > 0 && p.krypto === null) ? 'Sa kryptonite est loin : vole (Maj 3 fois), et finis Lex Luthor ! Yeux laser (9), poings'
+    : et.cible === 'luthor' && personnes.some(p => p.type === 'luthor' && p.vie > 0 && p.krypto === null) ? 'Sa kryptonite est loin : vole (F), et finis Lex Luthor ! Yeux laser (9), poings'
     : et.type === 'antennes' && !enCostumeSuper() ? 'Mets ton costume (H) pour casser les antennes de Brainiac ! Encore {n}'
     : et.type === 'cloche' && cloche?.phase === 'attente' ? 'Des machines de Brainiac tiennent une immense cloche de verre, au-dessus de Park Ridge ! Vole jusque-là (point jaune)'
     : et.type === 'cloche' && (cloche?.phase === 'fermee' || cloche?.phase === 'remonte') ? 'La cloche remonte... Prépare-toi : de nouveaux porteurs arrivent !'
     : et.type === 'cloche' && cloche?.phase === 'casse' ? 'La cloche éclate : Park Ridge est sauvé !'
-    : et.type === 'vaisseau' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois : vole sous le vaisseau de Brainiac, dans son rayon vert (point jaune)'
+    : et.type === 'vaisseau' && !enCostumeSuper() ? 'Mets ton costume (H), puis F : vole sous le vaisseau de Brainiac, dans son rayon vert (point jaune)'
     : et.cible === 'brainiac' && !dansSalle(J) ? 'Retourne dans le vaisseau : vole dans son rayon vert, dessous (point jaune)'
     : et.cible === 'brainiac' && combatBrainiac && !combatBrainiac.reparateurs.some(q => q.p.vie > 0) ? 'Ses réparateurs sont cassés : à Brainiac, maintenant ! Yeux laser (9), poings. Et saute de côté quand les câbles tombent !'
     : et.type === 'naufrage' && !dansSalle(J) ? 'Regarde : le vaisseau de Brainiac tombe dans la baie de Metropolis !'
     : et.type === 'machine' && machineMonde?.phase === 'descend' ? 'La machine-monde descend vers la baie, à Hob\'s Bay : vole jusque-là (point jaune)'
-    : et.type === 'machine' && machineMonde?.phase === 'gravite' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois : vole jusqu\'à la machine-monde !'
+    : et.type === 'machine' && machineMonde?.phase === 'gravite' && !enCostumeSuper() ? 'Mets ton costume (H), puis F : vole jusqu\'à la machine-monde !'
     : et.type === 'machine' && machineMonde?.phase === 'gravite' && machineMonde.dedans ? 'Dans le rayon ! Frappe le cœur de la machine (poings tout près, ou yeux laser), vite !'
     : et.type === 'machine' && machineMonde?.phase === 'gravite' ? 'Son rayon soulève tout ! Entre dans le rayon (il te repousse), et frappe son cœur, sous la machine : poings ou yeux laser'
     : et.type === 'machine' && (machineMonde?.phase === 'casse' || machineMonde?.phase === 'apres') ? 'La machine-monde s\'effondre dans la baie !'
-    : et.cible === 'zod' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois : le général Zod t\'attend dans le ciel, entre les tours !'
+    : et.cible === 'zod' && !enCostumeSuper() ? 'Mets ton costume (H), puis F : le général Zod t\'attend dans le ciel, entre les tours !'
     : et.cible === 'zod' && personnes.some(p => p.type === 'faora' && p.vie > 0 && !p.fuit) ? 'Zod et Faora ! Yeux laser (9), poings tout près : écarte-toi quand ils foncent sur toi'
     : et.type === 'doomsday' && combatDoomsday?.phase === 'combat' ? 'DOOMSDAY ! Frappe-le (yeux laser, poings)... Attention à ses coups, et aux voitures qu\'il lance !'
     : et.type === 'lance' && kryptoniteTenue && kryptoniteTenue === combatDoomsday?.lance && J.voiture ? 'La lance est avec toi, dans la voiture : fonce jusqu\'à Doomsday, puis descends (E), et plante-la (clic gauche)'
     : et.type === 'lance' && kryptoniteTenue && kryptoniteTenue === combatDoomsday?.lance ? 'Tu tiens la lance : elle t\'affaiblit, tu ne voles plus ! Va jusqu\'à Doomsday (à pied, en sautant, ou en voiture), et plante-la : clic gauche, tout près'
     : et.type === 'lance' && combatDoomsday?.lance && dist(J, combatDoomsday.lance) < 30 ? 'La lance de kryptonite, par terre : approche-toi, et G pour la prendre (elle va t\'affaiblir !)'
     : et.type === 'pousser' && combatDoomsday?.tenu ? 'Pousse Doomsday tout là-haut : regarde vers le ciel, et vole (Maj : plus vite). Tu es à {y} m, l\'espace commence à {h} m'
-    : et.type === 'pousser' && !enCostumeSuper() ? 'Mets ton costume (H), puis Maj 3 fois : attrape Doomsday en volant !'
+    : et.type === 'pousser' && !enCostumeSuper() ? 'Mets ton costume (H), puis F : attrape Doomsday en volant !'
     : et.type === 'acclamer' && acclamation?.phase === 'acclame' ? 'Metropolis t\'acclame !'
     : et.type === 'mxyzptlk' && !enCostumeSuper() && lutin?.phase !== 'nom' ? 'Mets ton costume (H) : Mister Mxyzptlk t\'attend au-dessus du vieux théâtre, et ses lettres flottent jusque sur les toits !'
     : et.type === 'mxyzptlk' && lutin?.phase === 'parle' ? 'Mister Mxyzptlk ! Écoute ce qu\'il te dit...'
@@ -25862,7 +25934,7 @@ function majCristal(dt) {
   if (k >= paroles.length) { // le costume : il le met tout de suite, dans son tourbillon (et la partie s'en souvient : voir sauverPartie)
     C.phase = 'fini'; star.cristal = true; sauverPartie();
     if (!enCostumeSuper()) changerCostume();
-    annonce(tr(nomSuper().toUpperCase() + ' !'), tr('Ton costume ! H : le mettre ou l\'enlever, partout · Maj 3 fois, vite : tu t\'envoles'), 5);
+    annonce(tr(nomSuper().toUpperCase() + ' !'), tr('Ton costume ! H : le mettre ou l\'enlever, partout · F : tu t\'envoles'), 5);
   }
 }
 function finirCristal() {
@@ -26311,7 +26383,7 @@ function casserKryptonite(k) {
   for (let n = 0; n < 10; n++) { const e = new THREE.Mesh(formeCristalVert(), M_KRYPTONITE); e.scale.setScalar(entre(0.08, 0.16)); e.position.copy(P); scene.add(e); lancerDebris(e, V3(entre(-5, 5), entre(2, 6), entre(-5, 5)), entre(1.5, 2.5)); }
   flash(P, 2, scene, M_FLASH); etincelles(P, 18, 6); bruit(0.6, 2500, 0.4); bip(1400, 300, 0.5, 'sine', 0.12);
   enleverKryptonite(k);
-  annonce(tr('LA KRYPTONITE EST CASSÉE !'), tr('Tu retrouves tes forces : Maj 3 fois pour voler, 9 pour tes yeux laser !'), 4);
+  annonce(tr('LA KRYPTONITE EST CASSÉE !'), tr('Tu retrouves tes forces : F pour voler, 9 pour tes yeux laser !'), 4);
 }
 // G, tout près : celle qu'il peut prendre (par terre, à 2,5 m au plus ; sur quelqu'un, à 3,5 m de lui)
 function kryptoniteAPrendre() {
@@ -26469,7 +26541,7 @@ function majLuthor(p, dt, d) {
     if (!p.coup && d > 2.2 && !J.mort) vitesse = E.vitesse;
     if (vitesse) bougerBoss(p, vitesse, dt, vise);
   } else { // sans elle : il s'envole, et tourne autour de lui, à 10 ou 20 m, un peu plus haut que lui (sans s'éloigner de sa tour)
-    if (!p.vole) { p.vole = true; p.ecart = undefined; annonce(tr('LUTHOR S\'ENVOLE !'), tr('Sans sa kryptonite, il a peur de toi... Vole (Maj 3 fois), et finis-le !'), 3.5); bruit(0.6, 900, 1.2); }
+    if (!p.vole) { p.vole = true; p.ecart = undefined; annonce(tr('LUTHOR S\'ENVOLE !'), tr('Sans sa kryptonite, il a peur de toi... Vole (F), et finis-le !'), 3.5); bruit(0.6, 900, 1.2); }
     if (p.ecart === undefined) Object.assign(p, { orbite: angleVers(J, p), ecart: entre(10, 20), haut: entre(1, 6), sens: Math.random() < 0.5 ? 1 : -1, tChange: entre(3, 6), vx: 0, vy: 0, vz: 0 });
     if ((p.tChange -= dt) <= 0) Object.assign(p, { ecart: entre(10, 20), haut: entre(1, 6), sens: Math.random() < 0.3 ? -p.sens : p.sens, tChange: entre(3, 6) });
     p.orbite += p.sens * dt * 0.6 * E.vol / p.ecart;
@@ -28746,7 +28818,7 @@ function majHUD(dt) {
     : J.prise ? tr(J.prise.souris ? 'Lâche le bouton pour lancer la voiture là où tu regardes' : 'Lâche <b>G</b> pour lancer la voiture là où tu regardes') : J.grappin ? tr('<b>Espace</b> : lâcher le grappin')
     : souleve ? tr(souleve.garde ? 'Il y a des gens dedans : repose-la doucement (<b>G</b>)' : 'Clic gauche : la lancer là où tu regardes · <b>G</b> : la reposer')   // (Superman tient une voiture : voir « La super-force »)
     : !J.sol && !J.nage && !J.plane && !J.superman && J.vy < -3 && pouvoir('cape') ? tr('Garde <b>Maj</b> enfoncé pour déployer la cape')
-    : !J.sol && !J.nage && !J.superman && !J.voiture && J.vy < -6 && sansGadgets() && !sansCostume() ? tr(chezClark ? 'En civil, tu ne voles pas : <b>H</b>, ton costume, puis <b>Maj</b> 3 fois !' : 'Pas de cape en civil : <b>H</b>, ton costume, et tu planes !')
+    : !J.sol && !J.nage && !J.superman && !J.voiture && J.vy < -6 && sansGadgets() && !sansCostume() ? tr(chezClark ? 'En civil, tu ne voles pas : <b>H</b>, ton costume, puis <b>F</b> !' : 'Pas de cape en civil : <b>H</b>, ton costume, et tu planes !')
     : J.superman ? tr('<b>Maj</b> + Q ou D : tonneau · <b>Maj</b> + Espace ou C : looping')   // en volant : les figures
     : ironmanLibre() ? aideIronman() : '';   // dans l'armure d'Iron Man
   $('aide').innerHTML = aide; $('aide').style.display = aide ? 'block' : 'none';
@@ -28757,6 +28829,7 @@ function majHUD(dt) {
   $('rouge').style.opacity = Math.max(0, +$('rouge').style.opacity - dt * 2);
   tempsAnnonce -= dt;
   if (tempsAnnonce <= 0) $('annonce').style.opacity = 0;
+  if (menuJeu.ouvert && (menuJeu.reste -= dt) <= 0) ouvrirMenuJeu(false);   // le petit menu (Tab) se referme tout seul (REGLAGES.dureeMenu)
   dessinerMinicarte();
 }
 
@@ -30018,6 +30091,7 @@ window.jeu = { THREE, cachettes, TRESORS, J, joueurH, criMJ, projeter, membresMo
   ETAGES, etages, PLUSIEURS_ETAGES, placerEtages, dansEtage, utileDansEtage, ETAGE_PETITS, get etageOmbre() { return etageOmbre; }, MAT, MATS_COINS, MAT_ARBRE,
   majDetailsVoitures, voituresEnBloc, ombreEnBloc, enBloc, montrerDeLoin, formeDeLoin, cacheLoin, majPhares,
   QUALITES, qualiteActuelle, choisirQualite, remplirQualite, majQualite, AU_LANCEMENT, auLancement, cases, sauverReglages,
+  MENU_JEU, menuJeu, ouvrirMenuJeu, choisirMenuJeu, taper, supermanLibre,
   // Gotham (chapitre 3)
   costume, changerCostume, costumeCivil, tricheHeros, sansCostume, chauvesSouris, monorail, monorailProche, monterMonorail, descendreMonorail, majMonorail, batSignal, majBatSignal, projecteurBat,
   pluie, nuages, majPluie, COUVERT, BROUILLARD, PLUIE, vueDetails, estGothique, manoir, tourWayne, cathedrale, arkham, aceChemicals, zoo, stade, sphinx, GOTHAM,
